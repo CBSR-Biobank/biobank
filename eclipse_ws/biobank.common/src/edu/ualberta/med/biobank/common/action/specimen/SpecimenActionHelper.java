@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.ActionException;
+import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -20,7 +21,8 @@ public class SpecimenActionHelper {
         Integer parentSpecimenId) {
         Specimen parent = null;
         if (parentSpecimenId != null) {
-            parent = (Specimen) session.get(Specimen.class, parentSpecimenId);
+            parent = ActionUtil.sessionGet(session, Specimen.class,
+                parentSpecimenId);
             specimen.setCollectionEvent(parent.getCollectionEvent());
             specimen.setParentSpecimen(parent);
         }
@@ -46,15 +48,15 @@ public class SpecimenActionHelper {
     }
 
     public static void setPosition(Session session, Specimen specimen,
-        RowColPos rcp, Container container) {
+        RowColPos rcp, Integer containerId) {
         // FIXME check if a position exists?
         SpecimenPosition pos = specimen.getSpecimenPosition();
-        if (pos != null && rcp == null && container == null) {
+        if (pos != null && rcp == null && containerId == null) {
             specimen.setSpecimenPosition(null);
             // FIXME not sure this will work. Needs to be tested.
             session.delete(pos);
         }
-        if (rcp != null && container != null) {
+        if (rcp != null && containerId != null) {
             if (pos == null) {
                 pos = new SpecimenPosition();
                 pos.setSpecimen(specimen);
@@ -62,6 +64,9 @@ public class SpecimenActionHelper {
             }
             pos.setRow(rcp.getRow());
             pos.setCol(rcp.getCol());
+
+            Container container = ActionUtil.sessionGet(session,
+                Container.class, containerId);
             pos.setContainer(container);
             ContainerType type = container.getContainerType();
             String positionString = ContainerLabelingSchemeWrapper
@@ -69,10 +74,27 @@ public class SpecimenActionHelper {
                     type.getCapacity().getRowCapacity(), type.getCapacity()
                         .getColCapacity());
             pos.setPositionString(positionString);
-        } else if ((rcp == null && container != null)
-            || (rcp != null && container == null)) {
+        } else if ((rcp == null && containerId != null)
+            || (rcp != null && containerId == null)) {
             throw new ActionException(
                 "Problem: position and parent container should be both null or both set"); //$NON-NLS-1$
         }
+    }
+
+    public static String getPositionString(Specimen specimen,
+        boolean fullString, boolean addTopParentShortName) {
+        if (specimen.getSpecimenPosition() == null)
+            return null;
+
+        String position = specimen.getSpecimenPosition().getPositionString();
+        if (fullString) {
+            position = specimen.getSpecimenPosition().getContainer().getLabel()
+                + position;
+        }
+        if (addTopParentShortName)
+            position += " (" //$NON-NLS-1$ 
+                + specimen.getSpecimenPosition().getContainer()
+                    .getContainerType().getNameShort() + ")"; //$NON-NLS-1$
+        return position;
     }
 }

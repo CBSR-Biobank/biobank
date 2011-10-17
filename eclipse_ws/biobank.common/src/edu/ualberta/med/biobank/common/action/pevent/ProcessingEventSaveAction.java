@@ -7,6 +7,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionException;
+import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.DiffUtils;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
@@ -58,17 +59,18 @@ public class ProcessingEventSaveAction implements Action<Integer> {
         if (peventId == null) {
             peventToSave = new ProcessingEvent();
         } else {
-            peventToSave = (ProcessingEvent) session.get(ProcessingEvent.class,
-                peventId);
+            peventToSave = ActionUtil.sessionGet(session,
+                ProcessingEvent.class, peventId);
         }
 
         // FIXME Version check?
         // FIXME checks?
         // FIXME permission ?
 
-        peventToSave.setActivityStatus((ActivityStatus) session.get(
+        peventToSave.setActivityStatus(ActionUtil.sessionGet(session,
             ActivityStatus.class, statusId));
-        peventToSave.setCenter((Center) session.get(Center.class, centerId));
+        peventToSave.setCenter(ActionUtil.sessionGet(session, Center.class,
+            centerId));
         peventToSave.setComment(comments);
         peventToSave.setCreatedAt(createdAt);
         peventToSave.setWorksheet(worksheet);
@@ -77,7 +79,8 @@ public class ProcessingEventSaveAction implements Action<Integer> {
             CollectionUtils.getCollection(peventToSave,
                 ProcessingEventPeer.SPECIMEN_COLLECTION));
         for (Integer spcId : specimenIds) {
-            Specimen spc = (Specimen) session.load(Specimen.class, spcId);
+            Specimen spc = ActionUtil
+                .sessionGet(session, Specimen.class, spcId);
             spc.setProcessingEvent(peventToSave);
             specUtil.add(spc);
         }

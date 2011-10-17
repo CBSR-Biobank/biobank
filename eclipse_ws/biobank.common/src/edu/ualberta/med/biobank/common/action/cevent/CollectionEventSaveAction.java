@@ -12,6 +12,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionException;
+import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.DiffUtils;
 import edu.ualberta.med.biobank.common.action.activity.ActivityStatusEnum;
@@ -97,18 +98,19 @@ public class CollectionEventSaveAction implements Action<Integer> {
         if (ceventId == null) {
             ceventToSave = new CollectionEvent();
         } else {
-            ceventToSave = (CollectionEvent) session.get(CollectionEvent.class,
-                ceventId);
+            ceventToSave = ActionUtil.sessionGet(session,
+                CollectionEvent.class, ceventId);
         }
 
         // FIXME Version check?
         // FIXME checks?
         // FIXME permission ?
 
-        Patient patient = (Patient) session.get(Patient.class, patientId);
+        Patient patient = ActionUtil.sessionGet(session, Patient.class,
+            patientId);
         ceventToSave.setPatient(patient);
         ceventToSave.setVisitNumber(visitNumber);
-        ceventToSave.setActivityStatus((ActivityStatus) session.get(
+        ceventToSave.setActivityStatus(ActionUtil.sessionGet(session,
             ActivityStatus.class, statusId));
         ceventToSave.setComment(comments);
 
@@ -124,7 +126,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
     private void setSourceSpecimens(Session session,
         CollectionEvent ceventToSave) {
         OriginInfo oi = new OriginInfo();
-        oi.setCenter((Center) session.get(Center.class, centerId));
+        oi.setCenter(ActionUtil.sessionGet(session, Center.class, centerId));
         session.saveOrUpdate(oi);
         DiffUtils<Specimen> originalSpec = new DiffUtils<Specimen>(
             CollectionUtils.getCollection(ceventToSave,
@@ -138,9 +140,10 @@ public class CollectionEventSaveAction implements Action<Integer> {
                 specimen.setCurrentCenter(oi.getCenter());
                 specimen.setOriginInfo(oi);
             } else {
-                specimen = (Specimen) session.get(Specimen.class, specInfo.id);
+                specimen = ActionUtil.sessionGet(session, Specimen.class,
+                    specInfo.id);
             }
-            specimen.setActivityStatus((ActivityStatus) session.get(
+            specimen.setActivityStatus(ActionUtil.sessionGet(session,
                 ActivityStatus.class, specInfo.statusId));
             specimen.setCollectionEvent(ceventToSave);
             // cascade will save-update the specimens from this list:
@@ -151,7 +154,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
             specimen.setCreatedAt(specInfo.timeDrawn);
             specimen.setInventoryId(specInfo.inventoryId);
             specimen.setQuantity(specInfo.quantity);
-            specimen.setSpecimenType((SpecimenType) session.get(
+            specimen.setSpecimenType(ActionUtil.sessionGet(session,
                 SpecimenType.class, specInfo.specimenTypeId));
         }
         // need to remove from collections. the delete-orphan cascade on

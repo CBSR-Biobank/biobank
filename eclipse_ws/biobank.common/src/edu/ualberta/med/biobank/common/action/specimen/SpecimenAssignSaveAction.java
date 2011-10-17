@@ -8,17 +8,17 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionException;
-import edu.ualberta.med.biobank.common.action.container.ContainerSaveHelper;
+import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction.ContainerInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenAssignResInfo;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class SpecimenAssignSaveAction implements Action<List<Integer>> {
+public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,15 +28,28 @@ public class SpecimenAssignSaveAction implements Action<List<Integer>> {
         public RowColPos position;
     }
 
-    public static class ContainerInfo implements Serializable, NotAProxy {
+    public static class SpecimenAssignResInfo implements Serializable,
+        NotAProxy {
         private static final long serialVersionUID = 1L;
-        public String productBarcode;
-        public Integer typeId;
-        public String label;
-        public RowColPos position;
-        public Integer parentId;
-        public Integer statusId;
-        public Integer siteId;
+
+        public Integer parentContainerId;
+        public String parentBarcode;
+        public String parentTypeName;
+        public String parentLabel;
+        public String siteName;
+
+        public List<SpecimenResInfo> specimens;
+    }
+
+    public static class SpecimenResInfo implements Serializable, NotAProxy {
+        private static final long serialVersionUID = 1L;
+        public Integer specimenId;
+        public String position;
+        public String inventoryId;
+        public String typeName;
+        public String patientPNumber;
+        public String visitNumber;
+        public String centerName;
     }
 
     private List<SpecimenInfo> specInfos;
@@ -62,37 +75,45 @@ public class SpecimenAssignSaveAction implements Action<List<Integer>> {
     }
 
     @Override
-    public List<Integer> doAction(Session session) throws ActionException {
-        List<Integer> ids = new ArrayList<Integer>();
+    public SpecimenAssignResInfo doAction(Session session)
+        throws ActionException {
+        SpecimenAssignResInfo res = new SpecimenAssignResInfo();
         if (containerId == null && containerInfo == null)
             throw new ActionException("problem in data sent"); //$NON-NLS-1$
-        Container container;
         if (containerId == null) {
-            // FIXME action to create a container...
-            container = new Container();
-            container.setActivityStatus((ActivityStatus) session.get(
-                ActivityStatus.class, containerInfo.statusId));
-            container.setSite((Site) session.get(Site.class,
-                containerInfo.siteId));
-            container.setProductBarcode(containerInfo.productBarcode);
-            container.setContainerType((ContainerType) session.get(
-                ContainerType.class, containerInfo.typeId));
-            container.setLabel(containerInfo.label);
-            ContainerSaveHelper.setPosition(session, container,
-                containerInfo.position, containerInfo.parentId);
-            session.save(container);
-        } else {
-            container = (Container) session.get(Container.class, containerId);
+            containerId = new ContainerSaveAction(containerInfo)
+                .doAction(session);
         }
+        res.parentContainerId = containerId;
+        Container container = ActionUtil.sessionGet(session, Container.class,
+            containerId);
+        res.parentBarcode = container.getProductBarcode();
+        res.parentTypeName = container.getContainerType().getName();
+        res.parentLabel = container.getLabel();
+        res.siteName = container.getSite().getNameShort();
 
+        res.specimens = new ArrayList<SpecimenAssignSaveAction.SpecimenResInfo>();
         for (SpecimenInfo si : specInfos) {
-            Specimen specimen = (Specimen) session.get(Specimen.class,
+            Specimen specimen = ActionUtil.sessionGet(session, Specimen.class,
                 si.specimenId);
             SpecimenActionHelper.setPosition(session, specimen, si.position,
-                container);
+                containerId);
             session.saveOrUpdate(specimen);
-            ids.add(specimen.getId());
+
+            SpecimenResInfo rInfo = new SpecimenResInfo();
+            rInfo.specimenId = specimen.getId();
+            rInfo.position = SpecimenActionHelper.getPositionString(specimen,
+                true, false);
+            rInfo.inventoryId = specimen.getInventoryId();
+            rInfo.typeName = specimen.getSpecimenType().getName();
+            rInfo.patientPNumber = specimen.getCollectionEvent().getPatient()
+                .getPnumber();
+            rInfo.visitNumber = specimen.getCollectionEvent().getVisitNumber()
+                .toString();
+            rInfo.centerName = specimen.getCurrentCenter().getNameShort();
+            res.specimens.add(rInfo);
         }
-        return ids;
+
+        return res;
     }
 }

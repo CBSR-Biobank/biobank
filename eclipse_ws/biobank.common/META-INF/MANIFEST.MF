@@ -57,6 +57,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.common.action,
  edu.ualberta.med.biobank.common.action.activity,
  edu.ualberta.med.biobank.common.action.cevent,
+ edu.ualberta.med.biobank.common.action.container,
  edu.ualberta.med.biobank.common.action.others,
  edu.ualberta.med.biobank.common.action.patient,
  edu.ualberta.med.biobank.common.action.pevent,

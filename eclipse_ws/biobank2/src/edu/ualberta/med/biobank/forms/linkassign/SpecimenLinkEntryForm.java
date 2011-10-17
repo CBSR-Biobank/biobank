@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.activity.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.scanprocess.SpecimenHierarchy;
 import edu.ualberta.med.biobank.common.scanprocess.data.LinkProcessData;
@@ -484,9 +485,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         @SuppressWarnings("unchecked")
         Map<RowColPos, PalletCell> cells = (Map<RowColPos, PalletCell>) palletWidget
             .getCells();
-        StringBuffer sb = new StringBuffer(
-            Messages.SpecimenLinkEntryForm_activitylog_specimens_start);
-        int nber = 0;
         List<AliquotedSpecimenInfo> asiList = new ArrayList<AliquotedSpecimenInfo>();
         for (PalletCell cell : cells.values()) {
             if (PalletCell.hasValue(cell)
@@ -499,28 +497,36 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 asi.inventoryId = cell.getValue();
                 asi.parentSpecimenId = sourceSpecimen.getId();
                 asiList.add(asi);
-                sb.append(Messages.format(
-                    Messages.SpecimenLinkEntryForm_linked_msg_multiple, cell
-                        .getValue(), cell.getType().getName(), sourceSpecimen
-                        .getSpecimenType().getNameShort(), sourceSpecimen
-                        .getInventoryId(), sourceSpecimen.getCollectionEvent()
-                        .getPatient().getPnumber(), sourceSpecimen
-                        .getCollectionEvent().getVisitNumber(), SessionManager
-                        .getUser().getCurrentWorkingCenter().getNameShort()));
-                nber++;
             }
         }
-        SessionManager.getAppService().doAction(
-            new SpecimenLinkSaveAction(SessionManager.getUser()
-                .getCurrentWorkingCenter().getId(), asiList));
+        List<AliquotedSpecimenResInfo> resList = SessionManager.getAppService()
+            .doAction(
+                new SpecimenLinkSaveAction(SessionManager.getUser()
+                    .getCurrentWorkingCenter().getId(), asiList));
+        printSaveMultipleLogMessage(resList);
+    }
 
+    protected void printSaveMultipleLogMessage(
+        List<AliquotedSpecimenResInfo> resList) {
+        StringBuffer sb = new StringBuffer(
+            Messages.SpecimenLinkEntryForm_activitylog_specimens_start);
+        for (AliquotedSpecimenResInfo resInfo : resList) {
+            sb.append(Messages.format(
+                Messages.SpecimenLinkEntryForm_linked_msg_multiple,
+                resInfo.inventoryId, resInfo.typeName, resInfo.parentTypeName,
+                resInfo.parentInventoryId, resInfo.patientPNumber,
+                resInfo.visitNumber, resInfo.currentCenterName));
+        }
+        // Want only one common 'log entry' so use a stringbuffer to print
+        // everything together
         appendLog(sb.toString());
 
         // LINKING\: {0} specimens linked to patient {1} on center {2}
         appendLog(Messages.format(
-            Messages.SpecimenLinkEntryForm_activitylog_save_summary, nber,
-            linkFormPatientManagement.getCurrentPatient().getPnumber(),
-            SessionManager.getUser().getCurrentWorkingCenter().getNameShort()));
+            Messages.SpecimenLinkEntryForm_activitylog_save_summary, resList
+                .size(), linkFormPatientManagement.getCurrentPatient()
+                .getPnumber(), SessionManager.getUser()
+                .getCurrentWorkingCenter().getNameShort()));
     }
 
     private void saveSingleSpecimen() throws Exception {
@@ -534,26 +540,27 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         asi.inventoryId = singleSpecimen.getInventoryId();
         asi.parentSpecimenId = singleSpecimen.getParentSpecimen().getId();
 
-        List<Integer> specimenIds = SessionManager.getAppService().doAction(
-            new SpecimenLinkSaveAction(SessionManager.getUser()
-                .getCurrentWorkingCenter().getId(), Arrays.asList(asi)));
+        List<AliquotedSpecimenResInfo> resList = SessionManager.getAppService()
+            .doAction(
+                new SpecimenLinkSaveAction(SessionManager.getUser()
+                    .getCurrentWorkingCenter().getId(), Arrays.asList(asi)));
+        printSaveSingleLogMessage(resList);
+    }
 
-        if (specimenIds.size() == 1) {
-            singleSpecimen.getWrappedObject().setId(specimenIds.get(0));
-            singleSpecimen.reload();
-            String posStr = singleSpecimen.getPositionString(true, false);
+    protected void printSaveSingleLogMessage(
+        List<AliquotedSpecimenResInfo> resList) {
+        if (resList.size() == 1) {
+            AliquotedSpecimenResInfo resInfo = resList.get(0);
+            String posStr = resInfo.position;
             if (posStr == null) {
                 posStr = Messages.SpecimenLinkEntryForm_position_label_none;
             }
             appendLog(Messages.format(
                 Messages.SpecimenLinkEntryForm_linked_msg_single,
-                singleSpecimen.getInventoryId(), singleSpecimen
-                    .getSpecimenType().getName(), singleSpecimen
-                    .getParentSpecimen().getInventoryId(), singleSpecimen
-                    .getParentSpecimen().getSpecimenType().getNameShort(),
-                singleSpecimen.getCollectionEvent().getPatient().getPnumber(),
-                singleSpecimen.getCollectionEvent().getVisitNumber(),
-                singleSpecimen.getCurrentCenter().getNameShort(), posStr));
+                resInfo.inventoryId, resInfo.typeName,
+                resInfo.parentInventoryId, resInfo.parentTypeName,
+                resInfo.patientPNumber, resInfo.visitNumber,
+                resInfo.currentCenterName, posStr));
         } else {
             throw new RuntimeException("Result size incorrect"); //$NON-NLS-1$
         }
