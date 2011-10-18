@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.server;
+package edu.ualberta.med.biobank.server.logging;
 
 public class BiobankThreadVariable {
 

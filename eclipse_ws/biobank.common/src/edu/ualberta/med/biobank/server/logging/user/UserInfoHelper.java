@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.server.logging.user;
 
-import edu.ualberta.med.biobank.server.BiobankThreadVariable;
-import edu.ualberta.med.biobank.server.LocalInfo;
+import edu.ualberta.med.biobank.server.logging.BiobankThreadVariable;
+import edu.ualberta.med.biobank.server.logging.LocalInfo;
 
 public class UserInfoHelper {
 

@@ -35,4 +35,9 @@ public class CollectionEventLogProvider implements
 
         return count;
     }
+
+    @Override
+    public Log getObjectLog(Object model) {
+        return getLog((CollectionEvent) model);
+    }
 }

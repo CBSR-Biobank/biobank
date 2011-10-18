@@ -55,9 +55,9 @@
 							<constructor-arg value="false"/>
 						</bean>
 						@ATTRIBUTE_LEVEL_SECURITY_END@
-						<!-- old interceptor to add centers into protection elements
+						<!-- old interceptor to add centers into protection elements-->
 						<bean class="edu.ualberta.med.biobank.server.interceptor.SessionInterceptor"/>
-						-->
+						
 					</list>		
 				</constructor-arg>
 			</bean>
