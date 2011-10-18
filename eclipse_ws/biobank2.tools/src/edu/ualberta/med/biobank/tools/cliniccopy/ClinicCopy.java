@@ -10,11 +10,12 @@ import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
+import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
@@ -95,18 +96,6 @@ public class ClinicCopy {
 
         appService = ServiceConnection.getAppService(hostUrl, appArgs.username,
             appArgs.password);
-
-        cbsrSiteOnProd = null;
-        for (SiteWrapper site : SiteWrapper.getSites(appService)) {
-            LOGGER.info("site name: " + site.getNameShort());
-            if (site.getNameShort().equals("CBSR")) {
-                cbsrSiteOnProd = site;
-            }
-        }
-
-        if (cbsrSiteOnProd == null) {
-            throw new Exception("could not find CBSR site on production server");
-        }
 
         refineStudyOnProd = null;
         for (StudyWrapper study : StudyWrapper.getAllStudies(appService)) {
@@ -210,7 +199,7 @@ public class ClinicCopy {
             throw new Exception("more than one clinic with name short "
                 + nameShort);
         }
-        return ClinicWrapper.wrapModel(appService, rawList.get(0),
+        return WrapperUtil.wrapModel(appService, rawList.get(0),
             ClinicWrapper.class);
     }
 }
