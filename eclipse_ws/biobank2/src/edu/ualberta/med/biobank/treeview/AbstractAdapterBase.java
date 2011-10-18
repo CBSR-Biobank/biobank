@@ -172,10 +172,15 @@ public abstract class AbstractAdapterBase implements
     }
 
     public void removeChild(AbstractAdapterBase item) {
-        removeChild(item, true);
+        removeChild(item, true, true);
     }
 
-    public void removeChild(AbstractAdapterBase item, boolean closeForm) {
+    public void removeChild(AbstractAdapterBase item, boolean nodeOnly) {
+        removeChild(item, true, nodeOnly);
+    }
+
+    public void removeChild(AbstractAdapterBase item, boolean closeForm,
+        boolean nodeOnly) {
         if (children.size() == 0)
             return;
         AbstractAdapterBase itemToRemove = null;
@@ -191,6 +196,14 @@ public abstract class AbstractAdapterBase implements
             }
             children.remove(itemToRemove);
         }
+        if (!nodeOnly)
+            // node might need to remove completely the information from inside
+            // (not only node child)
+            removeChildInternal(itemToRemove.getId());
+    }
+
+    protected void removeChildInternal(@SuppressWarnings("unused") Integer id) {
+        // do mothing by default
     }
 
     public void removeAll() {
@@ -296,8 +309,8 @@ public abstract class AbstractAdapterBase implements
                             .getActiveWorkbenchWindow().getActivePage();
                         IEditorPart part = page.findEditor(new FormInput(
                             AbstractAdapterBase.this));
-                        getParent()
-                            .removeChild(AbstractAdapterBase.this, false);
+                        getParent().removeChild(AbstractAdapterBase.this,
+                            false, false);
                         try {
                             runDelete();
                             page.closeEditor(part, true);

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction;
 import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.model.Study;
@@ -106,5 +107,7 @@ public class PatientSearchedNode extends NewAbstractSearchedNode {
 
     @Override
     protected void runDelete() throws Exception {
+        SessionManager.getAppService().doAction(
+            new PatientDeleteAction(getId()));
     }
 }
