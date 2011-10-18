@@ -11,4 +11,8 @@ public class ActionException extends RuntimeException {
     public ActionException(String message, Exception cause) {
         super(message, cause);
     }
+
+    public ActionException(Exception cause) {
+        super(cause);
+    }
 }

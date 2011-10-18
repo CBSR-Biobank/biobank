@@ -1,12 +1,12 @@
 package edu.ualberta.med.biobank.treeview.patient;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction;
 import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.model.Study;
@@ -70,7 +70,18 @@ public class PatientSearchedNode extends NewAbstractSearchedNode {
             studyPatientsMap.put(pinfo.study.getId(), snodeInfo);
         }
         snodeInfo.patients.put(pinfo.patient.getId(), pinfo);
+    }
 
+    public void removePatient(Integer patientId) {
+        List<Integer> studyToRemove = new ArrayList<Integer>();
+        for (Entry<Integer, StudyNodeInfo> sentry : studyPatientsMap.entrySet()) {
+            SearchedPatientInfo i = sentry.getValue().patients
+                .remove(patientId);
+            if (sentry.getValue().patients.size() == 0)
+                studyToRemove.add(sentry.getKey());
+        }
+        for (Integer sId : studyToRemove)
+            studyPatientsMap.remove(sId);
     }
 
     @Override
@@ -107,7 +118,6 @@ public class PatientSearchedNode extends NewAbstractSearchedNode {
 
     @Override
     protected void runDelete() throws Exception {
-        SessionManager.getAppService().doAction(
-            new PatientDeleteAction(getId()));
     }
+
 }

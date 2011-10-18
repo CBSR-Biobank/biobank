@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.common.action.container;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionException;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.Container;

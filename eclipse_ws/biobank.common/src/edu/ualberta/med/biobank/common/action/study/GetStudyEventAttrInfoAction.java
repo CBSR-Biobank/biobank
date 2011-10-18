@@ -7,7 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.EventAttrTypePeer;
 import edu.ualberta.med.biobank.common.peer.StudyEventAttrPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
