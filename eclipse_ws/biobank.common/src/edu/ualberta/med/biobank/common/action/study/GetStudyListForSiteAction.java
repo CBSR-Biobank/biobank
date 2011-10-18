@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.action.study;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetStudyListForSiteAction implements Action<List<Study>> {
+public class GetStudyListForSiteAction implements Action<ArrayList<Study>> {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,13 +37,13 @@ public class GetStudyListForSiteAction implements Action<List<Study>> {
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public List<Study> doAction(Session session) throws ActionException {
+    public ArrayList<Study> run(User user, Session session)
+        throws ActionException {
         Query query = session.createQuery(STUDIES_QRY);
         query.setParameter(0, siteId);
 
-        @SuppressWarnings("unchecked")
-        List<Study> rows = query.list();
-        return rows;
+        return new ArrayList<Study>(query.list());
     }
 }

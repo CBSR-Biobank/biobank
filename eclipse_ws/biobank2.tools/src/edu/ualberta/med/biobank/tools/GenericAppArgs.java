@@ -7,6 +7,7 @@ import jargs.gnu.CmdLineParser.OptionException;
 import java.net.URISyntaxException;
 
 public class GenericAppArgs {
+    public boolean help = false;
     public boolean verbose = false;
     public String hostname = "localhost";
     public String username = "testuser";
@@ -22,7 +23,8 @@ public class GenericAppArgs {
     public GenericAppArgs(String argv[]) throws URISyntaxException {
 
         CmdLineParser parser = new CmdLineParser();
-        Option hostnameOpt = parser.addStringOption('h', "hostname");
+        Option helpOpt = parser.addBooleanOption('h', "help");
+        Option hostnameOpt = parser.addStringOption('H', "hostname");
         Option portOpt = parser.addIntegerOption('p', "port");
         Option usernameOpt = parser.addStringOption('u', "user");
         Option verboseOpt = parser.addBooleanOption('v', "verbose");
@@ -33,6 +35,11 @@ public class GenericAppArgs {
         } catch (OptionException e) {
             System.out.println(e.getMessage());
             System.exit(-1);
+        }
+
+        Boolean help = (Boolean) parser.getOptionValue(helpOpt);
+        if (help != null) {
+            this.help = help.booleanValue();
         }
 
         Boolean verbose = (Boolean) parser.getOptionValue(verboseOpt);

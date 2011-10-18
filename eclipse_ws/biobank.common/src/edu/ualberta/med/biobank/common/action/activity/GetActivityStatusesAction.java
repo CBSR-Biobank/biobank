@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.action.activity;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -13,7 +12,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.User;
 
 public class GetActivityStatusesAction implements
-    Action<Map<Integer, ActivityStatus>> {
+    Action<HashMap<Integer, ActivityStatus>> {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,9 +28,9 @@ public class GetActivityStatusesAction implements
     }
 
     @Override
-    public Map<Integer, ActivityStatus> doAction(Session session)
+    public HashMap<Integer, ActivityStatus> run(User user, Session session)
         throws ActionException {
-        Map<Integer, ActivityStatus> map = new HashMap<Integer, ActivityStatus>();
+        HashMap<Integer, ActivityStatus> map = new HashMap<Integer, ActivityStatus>();
 
         Query query = session.createQuery(STATUS_QRY);
 

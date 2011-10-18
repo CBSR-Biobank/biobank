@@ -24,7 +24,7 @@ public class CollectionEventDeleteAction implements Action<Integer> {
     }
 
     @Override
-    public Integer doAction(Session session) throws ActionException {
+    public Integer run(User user, Session session) throws ActionException {
         CollectionEvent cevent = (CollectionEvent) session.load(
             CollectionEvent.class, ceventId);
 

@@ -56,7 +56,8 @@ public class SearchPatientAction implements Action<SearchedPatientInfo> {
     }
 
     @Override
-    public SearchedPatientInfo doAction(Session session) throws ActionException {
+    public SearchedPatientInfo run(User user, Session session)
+        throws ActionException {
         String hql = MessageFormat.format(PATIENT_INFO_QRY,
             pnumber == null ? WHERE_FOR_ID : WHERE_FOR_PNUMBER);
 

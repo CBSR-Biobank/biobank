@@ -40,6 +40,9 @@ eclipse_ws/biobank2/src/edu/ualberta/med/biobank/test
 eclipse_ws/biobank2.ws-client/bin
 eclipse_ws/biobank2.ws-client/lib/*.jar
 eclipse_ws/biobank2/dmscanlib.txt
+eclipse_ws/biobank.mvp/lib/*.jar
+eclipse_ws/biobank.mvp/bin
+eclipse_ws/biobank.mvp/output
 log/
 model/*.png
 model/biobank.uml~

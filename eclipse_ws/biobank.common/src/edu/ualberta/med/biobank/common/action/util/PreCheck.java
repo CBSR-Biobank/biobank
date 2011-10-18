@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.action.util;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 
 public class PreCheck<E> {

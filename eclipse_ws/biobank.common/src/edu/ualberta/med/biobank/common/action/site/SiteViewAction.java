@@ -74,7 +74,7 @@ public class SiteViewAction implements Action<SiteInfo> {
     }
 
     @Override
-    public SiteInfo doAction(Session session) throws ActionException {
+    public SiteInfo run(User user, Session session) throws ActionException {
         SiteInfo siteInfo = new SiteInfo();
 
         Query query = session.createQuery(SITE_INFO_HQL);

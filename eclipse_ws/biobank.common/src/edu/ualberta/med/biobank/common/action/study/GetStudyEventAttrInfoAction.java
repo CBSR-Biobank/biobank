@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.action.study;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -18,7 +17,7 @@ import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
 public class GetStudyEventAttrInfoAction implements
-    Action<Map<Integer, StudyEventAttrInfo>> {
+    Action<HashMap<Integer, StudyEventAttrInfo>> {
 
     private static final long serialVersionUID = 1L;
     private Integer studyId;
@@ -48,9 +47,9 @@ public class GetStudyEventAttrInfoAction implements
      * Action that return a map of [label=StudyEventAttrInfo]
      */
     @Override
-    public Map<Integer, StudyEventAttrInfo> doAction(Session session)
+    public HashMap<Integer, StudyEventAttrInfo> run(User user, Session session)
         throws ActionException {
-        Map<Integer, StudyEventAttrInfo> attrInfos = new HashMap<Integer, StudyEventAttrInfo>();
+        HashMap<Integer, StudyEventAttrInfo> attrInfos = new HashMap<Integer, StudyEventAttrInfo>();
 
         Query query = session.createQuery(STUDY_EVENT_ATTR_QRY);
         query.setParameter(0, studyId);
