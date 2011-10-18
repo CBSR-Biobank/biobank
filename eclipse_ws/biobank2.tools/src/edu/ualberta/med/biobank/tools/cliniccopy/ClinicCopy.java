@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.tools.cliniccopy;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
 import edu.ualberta.med.biobank.tools.bbpdbconsent.BbpdbConsent;
+import edu.ualberta.med.biobank.tools.utils.HostUrl;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 /**
@@ -89,12 +91,10 @@ public class ClinicCopy {
             "https://cbsr-training.med.ualberta.ca/biobank", appArgs.username,
             appArgs.password);
 
-        // appService = ServiceConnection.getAppService(
-        // "https://10.8.31.50/biobank", appArgs.username, appArgs.password);
+        String hostUrl = HostUrl.getHostUrl(appArgs.hostname, appArgs.port);
 
-        appService = ServiceConnection
-            .getAppService("http://localhost:8080/biobank", appArgs.username,
-                appArgs.password);
+        appService = ServiceConnection.getAppService(hostUrl, appArgs.username,
+            appArgs.password);
 
         cbsrSiteOnProd = null;
         for (SiteWrapper site : SiteWrapper.getSites(appService)) {
@@ -171,6 +171,8 @@ public class ClinicCopy {
     }
 
     private void addContacts() throws Exception {
+        ArrayList<ContactWrapper> newContacts = new ArrayList<ContactWrapper>();
+
         for (ClinicWrapper clinic : clinicsOnTest.values()) {
             for (ContactWrapper contact : clinic.getContactCollection(false)) {
                 ContactWrapper newContact = new ContactWrapper(appService);
@@ -181,15 +183,19 @@ public class ClinicCopy {
                 newContact.setEmailAddress(contact.getEmailAddress());
                 newContact.setPagerNumber(contact.getPagerNumber());
                 newContact.setOfficeNumber(contact.getOfficeNumber());
-                newContact.addToStudyCollection(Arrays
-                    .asList(refineStudyOnProd));
                 newContact.setClinic(clinicsOnProd.get(clinic.getNameShort()));
                 newContact.persist();
+                newContact.reload();
+
+                newContacts.add(newContact);
 
                 LOGGER.info("added contact " + newContact.getName()
                     + " for clinic " + newContact.getClinic().getNameShort());
             }
         }
+
+        refineStudyOnProd.addToContactCollection(newContacts);
+        refineStudyOnProd.persist();
 
     }
 

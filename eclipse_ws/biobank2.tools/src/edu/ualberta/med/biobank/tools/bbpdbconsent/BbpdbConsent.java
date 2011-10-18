@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
+import edu.ualberta.med.biobank.tools.utils.HostUrl;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 /**
@@ -89,13 +90,7 @@ public class BbpdbConsent {
         bbpdbCon = DriverManager.getConnection("jdbc:mysql://" + args.hostname
             + ":3306/bbpdb", "dummy", "ozzy498");
 
-        String hostUrl;
-        if (args.port == 8080) {
-            hostUrl = "http://" + args.hostname + ":8080";
-        } else {
-            hostUrl = "https://" + args.hostname + ":" + args.port;
-        }
-        hostUrl += "/biobank";
+        String hostUrl = HostUrl.getHostUrl(args.hostname, args.port);
 
         LOGGER.info("host url is " + hostUrl);
 
