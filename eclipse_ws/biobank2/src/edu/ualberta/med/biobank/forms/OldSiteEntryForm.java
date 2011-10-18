@@ -64,7 +64,7 @@ public class OldSiteEntryForm extends AddressEntryFormCommon {
         if (site.isNew()) {
             tabName = Messages.SiteEntryForm_title_new;
             site.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         } else {
             tabName = NLS.bind(Messages.SiteEntryForm_title_edit,
                 site.getNameShort());
@@ -108,8 +108,8 @@ public class OldSiteEntryForm extends AddressEntryFormCommon {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            site.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), site.getActivityStatus(),
             Messages.SiteEntryForm_field_activity_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -171,7 +171,7 @@ public class OldSiteEntryForm extends AddressEntryFormCommon {
 
         if (site.isNew()) {
             site.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         }
 
         GuiUtil.reset(activityStatusComboViewer, site.getActivityStatus());

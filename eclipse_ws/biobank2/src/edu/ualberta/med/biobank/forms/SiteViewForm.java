@@ -10,6 +10,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction;
 import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction.SiteInfo;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -194,7 +195,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         siteAdapter = (SiteAdapter) adapter;
         site = (SiteWrapper) getModelObject();
 
-        siteInfo = appService.doAction(new GetSiteInfoAction(site
-            .getWrappedObject()));
+        siteInfo = SessionManager.getAppService().doAction(
+            new GetSiteInfoAction(site.getWrappedObject()));
     }
 }
