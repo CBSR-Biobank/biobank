@@ -18,6 +18,7 @@ import gov.nih.nci.system.dao.Response;
 import gov.nih.nci.system.dao.orm.WritableORMDAOImpl;
 import gov.nih.nci.system.query.SDKQueryResult;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -58,14 +59,14 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         return super.query(request);
     }
 
-    private <T> Response query(Action<T> action) {
+    private <T extends Serializable> Response query(Action<T> action) {
         Session session = getSession();
 
         // TODO: pass the logged in user
         User user = null;
         action.isAllowed(user, session);
 
-        T actionResult = action.doAction(session);
+        T actionResult = action.run(null, session);
 
         session.flush();
         session.clear();
