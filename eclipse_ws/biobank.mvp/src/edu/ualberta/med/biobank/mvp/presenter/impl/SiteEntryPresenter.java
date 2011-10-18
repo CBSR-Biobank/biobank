@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.mvp.view.FormView;
 
 public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     private final Dispatcher dispatcher;
-    private final AddressEntryPresenter addressEntryPresenter;
+    private final AddressEditPresenter addressEntryPresenter;
     private final ActivityStatusComboPresenter aStatusComboPresenter;
     private SiteInfo siteInfo;
 
@@ -45,7 +45,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
     @Inject
     public SiteEntryPresenter(View view, EventBus eventBus,
-        Dispatcher dispatcher, AddressEntryPresenter addressEntryPresenter,
+        Dispatcher dispatcher, AddressEditPresenter addressEntryPresenter,
         ActivityStatusComboPresenter aStatusComboPresenter) {
         super(view, eventBus);
         this.dispatcher = dispatcher;

@@ -1,22 +1,24 @@
 package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.mvp.event.HasValidationHandlers;
+import edu.ualberta.med.biobank.mvp.event.ValidationEvent;
 import edu.ualberta.med.biobank.mvp.event.ValidationHandler;
-import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter.View;
-import edu.ualberta.med.biobank.mvp.validation.Validation;
-import edu.ualberta.med.biobank.mvp.validation.validator.NotEmptyValidator;
+import edu.ualberta.med.biobank.mvp.event.ui.HasValidationHandlers;
+import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEditPresenter.View;
+import edu.ualberta.med.biobank.mvp.validation.ValidationManager;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
 
-public class AddressEntryPresenter extends BasePresenter<View> implements
+public class AddressEditPresenter extends BasePresenter<View> implements
     HasValidationHandlers {
-    private final Validation validation = new Validation();
+    private final HandlerManager handlerManager = new HandlerManager(this);
+    private final ValidationManager validationManager = new ValidationManager();
     private Address address;
 
     // TODO: make a "HasValue<Aggregate> agg = new AggregateValue<Aggregate>()"
@@ -43,13 +45,21 @@ public class AddressEntryPresenter extends BasePresenter<View> implements
     }
 
     @Inject
-    public AddressEntryPresenter(View view, EventBus eventBus) {
+    public AddressEditPresenter(View view, EventBus eventBus) {
         super(view, eventBus);
     }
 
     @Override
     protected void onBind() {
-        validation.validate(view.getCity(), new NotEmptyValidator("city"));
+        // validationManager.validateValue(view.getCity(), new
+        // NotEmptyValidator(
+        // "city"));
+        //
+        // validationManager.validateValue(view.getCity())
+        // .using(new NotEmptyValidator("city")).when(view.getCheckBox());
+        //
+        // validationManager.validateValue(view.getCity())
+        // .with(new NotEmptyValidator("city")).when(view.getProvince());
     }
 
     @Override
@@ -84,13 +94,11 @@ public class AddressEntryPresenter extends BasePresenter<View> implements
 
     @Override
     public void fireEvent(GwtEvent<?> event) {
-        // TODO Auto-generated method stub
-
+        handlerManager.fireEvent(event);
     }
 
     @Override
     public HandlerRegistration addValidationHandler(ValidationHandler handler) {
-        // TODO Auto-generated method stub
-        return null;
+        return handlerManager.addHandler(ValidationEvent.getType(), handler);
     }
 }
