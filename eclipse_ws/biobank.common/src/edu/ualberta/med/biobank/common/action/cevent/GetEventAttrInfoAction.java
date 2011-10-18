@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.action.cevent;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -19,7 +18,7 @@ import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.User;
 
 public class GetEventAttrInfoAction implements
-    Action<Map<Integer, EventAttrInfo>> {
+    Action<HashMap<Integer, EventAttrInfo>> {
 
     private static final long serialVersionUID = 1L;
     private Integer ceventId;
@@ -48,9 +47,9 @@ public class GetEventAttrInfoAction implements
     }
 
     @Override
-    public Map<Integer, EventAttrInfo> doAction(Session session)
+    public HashMap<Integer, EventAttrInfo> run(User user, Session session)
         throws ActionException {
-        Map<Integer, EventAttrInfo> attrInfos = new HashMap<Integer, EventAttrInfo>();
+        HashMap<Integer, EventAttrInfo> attrInfos = new HashMap<Integer, EventAttrInfo>();
 
         Query query = session.createQuery(EVENT_ATTR_QRY);
         query.setParameter(0, ceventId);

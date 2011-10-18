@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.User;
 
 public class GetPatientCollectionEventInfosAction implements
-    Action<List<PatientCEventInfo>> {
+    Action<ArrayList<PatientCEventInfo>> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -54,9 +54,9 @@ public class GetPatientCollectionEventInfosAction implements
     }
 
     @Override
-    public List<PatientCEventInfo> doAction(Session session)
+    public ArrayList<PatientCEventInfo> run(User user, Session session)
         throws ActionException {
-        List<PatientCEventInfo> ceventInfos = new ArrayList<PatientCEventInfo>();
+        ArrayList<PatientCEventInfo> ceventInfos = new ArrayList<PatientCEventInfo>();
 
         Query query = session.createQuery(CEVENT_INFO_QRY);
         query.setParameter(0, patientId);

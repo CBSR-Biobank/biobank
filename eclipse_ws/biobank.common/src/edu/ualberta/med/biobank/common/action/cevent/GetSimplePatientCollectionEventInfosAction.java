@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -21,7 +20,7 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.User;
 
 public class GetSimplePatientCollectionEventInfosAction implements
-    Action<Map<Integer, SimpleCEventInfo>> {
+    Action<HashMap<Integer, SimpleCEventInfo>> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -52,9 +51,9 @@ public class GetSimplePatientCollectionEventInfosAction implements
     }
 
     @Override
-    public Map<Integer, SimpleCEventInfo> doAction(Session session)
+    public HashMap<Integer, SimpleCEventInfo> run(User user, Session session)
         throws ActionException {
-        Map<Integer, SimpleCEventInfo> ceventInfos = new HashMap<Integer, SimpleCEventInfo>();
+        HashMap<Integer, SimpleCEventInfo> ceventInfos = new HashMap<Integer, SimpleCEventInfo>();
 
         Query query = session.createQuery(CEVENT_INFO_QRY);
         query.setParameter(0, patientId);

@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.User;
 
 public class GetStudySourceSpecimenInfosAction implements
-    Action<List<SourceSpecimen>> {
+    Action<ArrayList<SourceSpecimen>> {
 
     private static final long serialVersionUID = 1L;
     private Integer studyId;
@@ -40,7 +40,7 @@ public class GetStudySourceSpecimenInfosAction implements
     }
 
     @Override
-    public List<SourceSpecimen> doAction(Session session)
+    public ArrayList<SourceSpecimen> run(User user, Session session)
         throws ActionException {
         Query query = session.createQuery(STUDY_SRCE_SPECIMEN_QRY);
         query.setParameter(0, studyId);
