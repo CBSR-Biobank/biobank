@@ -35,7 +35,7 @@ public class PatientSaveAction implements Action<Integer> {
     }
 
     @Override
-    public Integer doAction(Session session) throws ActionException {
+    public Integer run(User user, Session session) throws ActionException {
         Patient patientToSave;
         if (patientId == null) {
             patientToSave = new Patient();

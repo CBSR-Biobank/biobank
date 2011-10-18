@@ -31,7 +31,7 @@ public class NextVisitNumberAction implements Action<Integer> {
     }
 
     @Override
-    public Integer doAction(Session session) throws ActionException {
+    public Integer run(User user, Session session) throws ActionException {
         Query query = session.createQuery(NEXT_NUMBER_QRY);
         query.setParameter(0, patientId);
 

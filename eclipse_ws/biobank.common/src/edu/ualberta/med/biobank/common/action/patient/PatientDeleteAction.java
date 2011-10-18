@@ -24,7 +24,7 @@ public class PatientDeleteAction implements Action<Integer> {
     }
 
     @Override
-    public Integer doAction(Session session) throws ActionException {
+    public Integer run(User user, Session session) throws ActionException {
         Patient patient = (Patient) session.load(Patient.class, patientId);
 
         // FIXME delete checks?

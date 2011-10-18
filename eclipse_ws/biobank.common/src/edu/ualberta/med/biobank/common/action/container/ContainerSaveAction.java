@@ -44,7 +44,7 @@ public class ContainerSaveAction implements Action<Integer> {
     }
 
     @Override
-    public Integer doAction(Session session) throws ActionException {
+    public Integer run(User user, Session session) throws ActionException {
         // FIXME permissions
         // FIXME loggings
         // FIXME checks

@@ -61,7 +61,7 @@ public class GetPatientInfoAction implements Action<PatientInfo> {
     }
 
     @Override
-    public PatientInfo doAction(Session session) throws ActionException {
+    public PatientInfo run(User user, Session session) throws ActionException {
         PatientInfo pInfo = new PatientInfo();
 
         Query query = session.createQuery(PATIENT_INFO_HQL);
@@ -76,7 +76,7 @@ public class GetPatientInfoAction implements Action<PatientInfo> {
             pInfo.sourceSpecimenCount = (Long) row[1];
             pInfo.aliquotedSpecimenCount = (Long) row[2];
             pInfo.cevents = new GetPatientCollectionEventInfosAction(patientId)
-                .doAction(session);
+                .run(user, session);
 
         } else {
             throw new ActionException("No patient found with id:" + patientId); //$NON-NLS-1$

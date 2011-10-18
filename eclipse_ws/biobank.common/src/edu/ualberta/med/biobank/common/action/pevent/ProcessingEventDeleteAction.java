@@ -24,7 +24,7 @@ public class ProcessingEventDeleteAction implements Action<Integer> {
     }
 
     @Override
-    public Integer doAction(Session session) throws ActionException {
+    public Integer run(User user, Session session) throws ActionException {
         ProcessingEvent pevent = (ProcessingEvent) session.load(
             ProcessingEvent.class, peventId);
 

@@ -93,7 +93,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
     }
 
     @Override
-    public Integer doAction(Session session) throws ActionException {
+    public Integer run(User user, Session session) throws ActionException {
         CollectionEvent ceventToSave;
         if (ceventId == null) {
             ceventToSave = new CollectionEvent();
@@ -116,7 +116,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
         setSourceSpecimens(session, ceventToSave);
 
-        setEventAttrs(session, patient.getStudy(), ceventToSave);
+        setEventAttrs(session, user, patient.getStudy(), ceventToSave);
 
         session.saveOrUpdate(ceventToSave);
 
@@ -163,13 +163,13 @@ public class CollectionEventSaveAction implements Action<Integer> {
         allSpec.removeAll(removedSpecimens);
     }
 
-    public void setEventAttrs(Session session, Study study,
+    public void setEventAttrs(Session session, User user, Study study,
         CollectionEvent cevent) throws ActionException {
         Map<Integer, StudyEventAttrInfo> studyEventList = new GetStudyEventAttrInfoAction(
-            study.getId()).doAction(session);
+            study.getId()).run(user, session);
 
         Map<Integer, EventAttrInfo> ceventAttrList = new GetEventAttrInfoAction(
-            ceventId).doAction(session);
+            ceventId).run(user, session);
 
         for (SaveCEventAttrInfo attrInfo : ceAttrList) {
             EventAttrInfo ceventAttrInfo = ceventAttrList

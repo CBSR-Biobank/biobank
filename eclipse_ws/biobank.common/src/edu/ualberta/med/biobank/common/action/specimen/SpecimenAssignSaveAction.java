@@ -75,14 +75,14 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
     }
 
     @Override
-    public SpecimenAssignResInfo doAction(Session session)
+    public SpecimenAssignResInfo run(User user, Session session)
         throws ActionException {
         SpecimenAssignResInfo res = new SpecimenAssignResInfo();
         if (containerId == null && containerInfo == null)
             throw new ActionException("problem in data sent"); //$NON-NLS-1$
         if (containerId == null) {
-            containerId = new ContainerSaveAction(containerInfo)
-                .doAction(session);
+            containerId = new ContainerSaveAction(containerInfo).run(user,
+                session);
         }
         res.parentContainerId = containerId;
         Container container = ActionUtil.sessionGet(session, Container.class,

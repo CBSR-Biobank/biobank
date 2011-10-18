@@ -57,7 +57,7 @@ public class GetCollectionEventInfoAction implements Action<CEventInfo> {
     }
 
     @Override
-    public CEventInfo doAction(Session session) throws ActionException {
+    public CEventInfo run(User user, Session session) throws ActionException {
         CEventInfo ceventInfo = new CEventInfo();
 
         Query query = session.createQuery(CEVENT_INFO_QRY);
@@ -68,11 +68,11 @@ public class GetCollectionEventInfoAction implements Action<CEventInfo> {
         if (rows.size() == 1) {
             ceventInfo.cevent = rows.get(0);
             ceventInfo.sourceSpecimenInfos = new GetCEventSpecimenInfosAction(
-                ceventId, false).doAction(session);
+                ceventId, false).run(user, session);
             ceventInfo.aliquotedSpecimenInfos = new GetCEventSpecimenInfosAction(
-                ceventId, true).doAction(session);
-            ceventInfo.eventAttrs = new GetEventAttrInfoAction(ceventId)
-                .doAction(session);
+                ceventId, true).run(user, session);
+            ceventInfo.eventAttrs = new GetEventAttrInfoAction(ceventId).run(
+                user, session);
         } else {
             throw new ActionException("Cannot find a collection event with id=" //$NON-NLS-1$
                 + ceventId);

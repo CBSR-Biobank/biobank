@@ -54,7 +54,7 @@ public class ProcessingEventSaveAction implements Action<Integer> {
     }
 
     @Override
-    public Integer doAction(Session session) throws ActionException {
+    public Integer run(User user, Session session) throws ActionException {
         ProcessingEvent peventToSave;
         if (peventId == null) {
             peventToSave = new ProcessingEvent();
