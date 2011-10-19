@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.mvp.presenter.impl;
 
-import java.util.Collection;
 import java.util.List;
 
 import com.google.gwt.user.client.ui.HasValue;
@@ -12,24 +11,24 @@ import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction.SiteInfo;
 import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.site.SaveSiteAction;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.util.ObjectCloner;
+import edu.ualberta.med.biobank.mvp.validation.PresenterValidation;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
 import edu.ualberta.med.biobank.mvp.view.FormView;
 
 public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     private final Dispatcher dispatcher;
     private final AddressEditPresenter addressEntryPresenter;
-    private final ActivityStatusComboPresenter aStatusComboPresenter;
+    private final ActivityStatusComboPresenter activityStatusComboPresenter;
+    private final PresenterValidation validation = new PresenterValidation();
     private SiteInfo siteInfo;
 
     public interface View extends FormView {
-        // TODO: have general validation errors
-        void setGeneralErrors(Collection<Object> errors);
-
         void setAddressEntryView(BaseView view);
 
         void setActivityStatusComboView(BaseView view);
@@ -46,37 +45,47 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     @Inject
     public SiteEntryPresenter(View view, EventBus eventBus,
         Dispatcher dispatcher, AddressEditPresenter addressEntryPresenter,
-        ActivityStatusComboPresenter aStatusComboPresenter) {
+        ActivityStatusComboPresenter activityStatusComboPresenter) {
         super(view, eventBus);
         this.dispatcher = dispatcher;
         this.addressEntryPresenter = addressEntryPresenter;
-        this.aStatusComboPresenter = aStatusComboPresenter;
+        this.activityStatusComboPresenter = activityStatusComboPresenter;
 
-        // Doesn't _NEED_ to be done here, can be done later, then the
-        // SiteEntryPresenter.View can create these sub-views when they're set.
+        // so this view can create the other views if create() is called
         view.setAddressEntryView(addressEntryPresenter.getView());
-        view.setActivityStatusComboView(aStatusComboPresenter.getView());
+        view.setActivityStatusComboView(activityStatusComboPresenter.getView());
     }
 
     @Override
     public void onBind() {
-        // TODO: listen to Display properties for validation purposes.
-        // registerHandler(view.getName().addValueChangeHandler(
-        // new ValueChangeHandler<String>() {
-        // @Override
-        // public void onValueChange(ValueChangeEvent<String> event) {
-        // // display.getName().set
-        // }
-        // }));
-
         addressEntryPresenter.bind();
-        aStatusComboPresenter.bind();
+        activityStatusComboPresenter.bind();
+
+        // validation.validate(view.getName())
+        // .using(new NotEmptyValidator("name"))
+        // .when(something?);
+        //
+        // validation.validate(view.getName())
+        // .using(new NotEmptyValidator("name"))
+        // .when(something?);
+        //
+        // validation.validate(view.getNameShort())
+        // .using(new NotEmptyValidator("nameShort"))
+        // .when(something?);
+        //
+        // validation.validate(addressEntryPresenter.getValidation())
+        // .when(something?);
+        //
+        // validation.validate();
+        //
+        // validation.addView(view);
     }
 
     @Override
     protected void onUnbind() {
+        validation.unbind();
+        activityStatusComboPresenter.unbind();
         addressEntryPresenter.unbind();
-        aStatusComboPresenter.unbind();
     }
 
     @Override
@@ -92,8 +101,9 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         saveSite.setNameShort(view.getNameShort().getValue());
         saveSite.setComment(view.getComment().getValue());
 
-        Integer aStatusId = aStatusComboPresenter.getSelectedValue().getId();
-        saveSite.setActivityStatusId(aStatusId);
+        ActivityStatus activityStatus =
+            activityStatusComboPresenter.getSelectedValue();
+        saveSite.setActivityStatusId(activityStatus.getId());
 
         saveSite.setAddress(addressEntryPresenter.getAddress());
 
@@ -164,7 +174,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         view.getStudies().setValue(siteInfo.studies);
 
         addressEntryPresenter.editAddress(siteInfo.site.getAddress());
-        aStatusComboPresenter.setSelectedValue(siteInfo.site
+        activityStatusComboPresenter.setSelectedValue(siteInfo.site
             .getActivityStatus());
     }
 }

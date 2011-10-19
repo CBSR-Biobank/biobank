@@ -89,7 +89,7 @@ public class ValidatedValue<T> implements HasValidation {
     }
 
     @Override
-    public void clear() {
+    public void clearValidation() {
         setValidationResult(new ValidationResultImpl());
     }
 

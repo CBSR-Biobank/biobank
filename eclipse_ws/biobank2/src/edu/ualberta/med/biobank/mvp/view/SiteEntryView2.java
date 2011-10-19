@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.mvp.view;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -90,12 +89,6 @@ public class SiteEntryView2 extends EditorPart implements
     public HasClickHandlers getSave() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public void setGeneralErrors(Collection<Object> errors) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

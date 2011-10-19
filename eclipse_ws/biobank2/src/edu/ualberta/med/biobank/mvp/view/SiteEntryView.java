@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.mvp.view;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -77,12 +76,6 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         // create the inner widgets
         addressEntryView.create(widget);
         activityStatusComboView.create(widget);
-    }
-
-    @Override
-    public void setGeneralErrors(Collection<Object> errors) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

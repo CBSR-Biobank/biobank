@@ -15,6 +15,18 @@ public class ValidationResultImpl implements ValidationResult,
     private final TreeMap<Level, List<ValidationMessage>> levelMap =
         new TreeMap<Level, List<ValidationMessage>>();
 
+    public ValidationResultImpl() {
+    }
+
+    /**
+     * Copy constructor.
+     * 
+     * @param copy
+     */
+    public ValidationResultImpl(ValidationResult copy) {
+        addAll(copy.getMessages());
+    }
+
     @Override
     public void add(ValidationMessage message) {
         messages.add(message);

@@ -1,27 +1,17 @@
 package edu.ualberta.med.biobank.mvp.presenter.impl;
 
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.mvp.event.ValidationEvent;
-import edu.ualberta.med.biobank.mvp.event.ValidationHandler;
-import edu.ualberta.med.biobank.mvp.event.ui.HasValidationHandlers;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEditPresenter.View;
-import edu.ualberta.med.biobank.mvp.validation.ValidationManager;
-import edu.ualberta.med.biobank.mvp.validation.validator.NotEmptyValidator;
+import edu.ualberta.med.biobank.mvp.validation.HasValidation;
+import edu.ualberta.med.biobank.mvp.validation.PresenterValidation;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
 
-public class AddressEditPresenter extends BasePresenter<View> implements
-    HasValidationHandlers {
-    private final HandlerManager handlerManager = new HandlerManager(this);
-    private final ValidationManager validationManager = new ValidationManager();
-    private Address address;
-
+public class AddressEditPresenter extends BasePresenter<View> {
     public interface View extends BaseView {
         HasValue<String> getStreet1();
 
@@ -40,20 +30,14 @@ public class AddressEditPresenter extends BasePresenter<View> implements
         HasValue<String> getCountry();
     }
 
+    private final HandlerManager handlerManager = new HandlerManager(this);
+    private final PresenterValidation validationManager =
+        new PresenterValidation();
+    private Address address;
+
     @Inject
     public AddressEditPresenter(View view, EventBus eventBus) {
         super(view, eventBus);
-    }
-
-    @Override
-    protected void onBind() {
-        validationManager.getValidatedValue(view.getCity()).addValidator(
-            new NotEmptyValidator("city"));
-    }
-
-    @Override
-    protected void onUnbind() {
-        validationManager.unbind();
     }
 
     public void editAddress(Address address) {
@@ -83,12 +67,17 @@ public class AddressEditPresenter extends BasePresenter<View> implements
     }
 
     @Override
-    public void fireEvent(GwtEvent<?> event) {
-        handlerManager.fireEvent(event);
+    protected void onBind() {
+        // validationManager.getValidatedValue(view.getCity()).addValidator(
+        // new NotEmptyValidator("city"));
     }
 
     @Override
-    public HandlerRegistration addValidationHandler(ValidationHandler handler) {
-        return handlerManager.addHandler(ValidationEvent.getType(), handler);
+    protected void onUnbind() {
+        validationManager.unbind();
+    }
+
+    public HasValidation getValidation() {
+        return validationManager;
     }
 }
