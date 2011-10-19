@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.action.specimen;
 
 import java.io.Serializable;
 
+import edu.ualberta.med.biobank.common.action.util.InfoUtil;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Specimen;
 
@@ -27,6 +28,17 @@ public class SpecimenInfo implements Serializable, NotAProxy {
         if (addTopParentShortName)
             position += " (" + topContainerTypeNameShort + ")"; //$NON-NLS-1$ //$NON-NLS-2$
         return position;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof SpecimenInfo) {
+            SpecimenInfo sInfo = (SpecimenInfo) o;
+            if (this == sInfo)
+                return true;
+            return InfoUtil.equals(specimen, sInfo.specimen);
+        }
+        return false;
     }
 
 }

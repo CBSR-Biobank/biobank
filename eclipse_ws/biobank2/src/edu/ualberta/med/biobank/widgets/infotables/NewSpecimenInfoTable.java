@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Specimen;
 
 public class NewSpecimenInfoTable extends InfoTableWidget {
 
@@ -308,13 +307,13 @@ public class NewSpecimenInfoTable extends InfoTableWidget {
     // }
 
     @Override
-    public Specimen getSelection() {
+    public SpecimenInfo getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
         SpecimenInfo row = (SpecimenInfo) item.o;
         Assert.isNotNull(row);
-        return row.specimen;
+        return row;
     }
 
     @Override

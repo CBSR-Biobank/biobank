@@ -161,6 +161,9 @@ public class CollectionEventSaveAction implements Action<Integer> {
         // allspecimencollection will delete orphans
         Collection<Specimen> removedSpecimens = originalSpec.pullRemoved();
         allSpec.removeAll(removedSpecimens);
+        for (Specimen sp : removedSpecimens) {
+            session.delete(sp);
+        }
     }
 
     public void setEventAttrs(Session session, User user, Study study,

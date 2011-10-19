@@ -41,7 +41,7 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
         specimensAdded.setValue(currentSpecimens.size() > 0);
     }
 
-    public void addOrEditSpecimen(boolean add, Specimen specimen,
+    public void addOrEditSpecimen(boolean add, SpecimenInfo si,
         List<SourceSpecimen> studySourceTypes,
         List<SpecimenTypeInfo> allSpecimenTypes, final CollectionEvent cEvent,
         final Date defaultTimeDrawn) {
@@ -62,22 +62,21 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                     SpecimenInfo info = new SpecimenInfo();
                     info.specimen = spec;
                     currentSpecimens.add(info);
-                    addedorModifiedSpecimens.add(spec);
                     specimensAdded.setValue(true);
                     reloadCollection(currentSpecimens);
                     notifyListeners();
                 }
             };
         } else {
-            inventoryIdExcludeList.remove(specimen.getInventoryId());
+            inventoryIdExcludeList.remove(si.specimen.getInventoryId());
         }
         CEventSourceSpecimenDialog dlg = new CEventSourceSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            specimen, studySourceTypes, allSpecimenTypes,
-            inventoryIdExcludeList, newListener, defaultTimeDrawn);
+            si == null ? null : si.specimen, studySourceTypes,
+            allSpecimenTypes, inventoryIdExcludeList, newListener,
+            defaultTimeDrawn);
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
-            addedorModifiedSpecimens.add(specimen);
             reloadCollection(currentSpecimens);
             notifyListeners();
         }
@@ -89,9 +88,9 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
-                    Specimen sw = getSelection();
-                    if (sw != null)
-                        addOrEditSpecimen(false, sw, studySourceTypes,
+                    SpecimenInfo si = getSelection();
+                    if (si != null)
+                        addOrEditSpecimen(false, si, studySourceTypes,
                             allSpecimenTypes, null, null);
                 }
             });
@@ -100,8 +99,8 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
             addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
-                    Specimen sw = getSelection();
-                    if (sw != null) {
+                    SpecimenInfo si = getSelection();
+                    if (si != null) {
                         if (!MessageDialog
                             .openConfirm(
                                 PlatformUI.getWorkbench()
@@ -109,18 +108,14 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                                 Messages.SpecimenEntryInfoTable_delete_title,
                                 NLS.bind(
                                     Messages.SpecimenEntryInfoTable_delete_question,
-                                    sw.getInventoryId()))) {
+                                    si.specimen.getInventoryId()))) {
                             return;
                         }
-                        SpecimenInfo info = new SpecimenInfo();
-                        info.specimen = sw;
-                        currentSpecimens.remove(info);
+                        currentSpecimens.remove(si);
                         setCollection(currentSpecimens);
                         if (currentSpecimens.size() == 0) {
                             specimensAdded.setValue(false);
                         }
-                        addedorModifiedSpecimens.remove(sw);
-                        removedSpecimens.add(sw);
                         notifyListeners();
                     }
                 }
