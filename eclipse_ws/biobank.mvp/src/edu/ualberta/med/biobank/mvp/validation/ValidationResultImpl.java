@@ -9,7 +9,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class ValidationResultImpl implements ValidationResult,
-    ValidationResultAdder {
+    ValidationResultCollector {
     private final List<ValidationMessage> messages =
         new ArrayList<ValidationMessage>();
     private final TreeMap<Level, List<ValidationMessage>> levelMap =
@@ -34,6 +34,11 @@ public class ValidationResultImpl implements ValidationResult,
     }
 
     @Override
+    public boolean contains(Level level) {
+        return getLevels().contains(level);
+    }
+
+    @Override
     public List<ValidationMessage> getMessages() {
         return Collections.unmodifiableList(messages);
     }
@@ -46,11 +51,6 @@ public class ValidationResultImpl implements ValidationResult,
     @Override
     public SortedSet<Level> getLevels() {
         return new TreeSet<Level>(levelMap.keySet());
-    }
-
-    public void clear() {
-        messages.clear();
-        levelMap.clear();
     }
 
     protected List<ValidationMessage> getLevel(Level level) {

@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.mvp.event.ValidationHandler;
 import edu.ualberta.med.biobank.mvp.event.ui.HasValidationHandlers;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEditPresenter.View;
 import edu.ualberta.med.biobank.mvp.validation.ValidationManager;
+import edu.ualberta.med.biobank.mvp.validation.validator.NotEmptyValidator;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
 
 public class AddressEditPresenter extends BasePresenter<View> implements
@@ -20,11 +21,6 @@ public class AddressEditPresenter extends BasePresenter<View> implements
     private final HandlerManager handlerManager = new HandlerManager(this);
     private final ValidationManager validationManager = new ValidationManager();
     private Address address;
-
-    // TODO: make a "HasValue<Aggregate> agg = new AggregateValue<Aggregate>()"
-    // that listens to a list of other HasValues and fires a changed event
-    // whenever any one of them changes, and provides some aggregate object back
-    // to validate?
 
     public interface View extends BaseView {
         HasValue<String> getStreet1();
@@ -51,19 +47,13 @@ public class AddressEditPresenter extends BasePresenter<View> implements
 
     @Override
     protected void onBind() {
-        // validationManager.validateValue(view.getCity(), new
-        // NotEmptyValidator(
-        // "city"));
-        //
-        // validationManager.validateValue(view.getCity())
-        // .using(new NotEmptyValidator("city")).when(view.getCheckBox());
-        //
-        // validationManager.validateValue(view.getCity())
-        // .with(new NotEmptyValidator("city")).when(view.getProvince());
+        validationManager.getValidatedValue(view.getCity()).addValidator(
+            new NotEmptyValidator("city"));
     }
 
     @Override
     protected void onUnbind() {
+        validationManager.unbind();
     }
 
     public void editAddress(Address address) {

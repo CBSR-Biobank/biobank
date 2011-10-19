@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.mvp.validation;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -14,24 +15,54 @@ import com.google.gwt.user.client.ui.HasValue;
 
 import edu.ualberta.med.biobank.mvp.event.ValidationEvent;
 import edu.ualberta.med.biobank.mvp.event.ValidationHandler;
-import edu.ualberta.med.biobank.mvp.event.ui.HasValidationHandlers;
+import edu.ualberta.med.biobank.mvp.user.ui.impl.DelegatingHasValue;
+import edu.ualberta.med.biobank.mvp.view.ValidationView;
 
-public class ValidatedValue<T> implements HasValidationHandlers {
+/**
+ * Manages a {@link List} of {@link Validator}-s for a single {@link HasValue}.
+ * Each {@link Validator} has a condition (a {@link HasValue<Boolean>}) that
+ * determines whether the {@link Validator} will be run.
+ * <p>
+ * Whenever the value or the value of the condition changes, the value will be
+ * automatically revalidated, if the condition is true. A
+ * {@link ValidationEvent} will be sent when validation is done.
+ * <p>
+ * If the validated {@link HasValue} also implements the
+ * {@link HasValidationResult} interface, then the value will also be informed
+ * whenever validation is done.
+ * 
+ * @author jferland
+ * 
+ * @param <T>
+ */
+public class ValidatedValue<T> implements HasValidation {
+    private static final DelegatingHasValue<Boolean> TRUE =
+        new DelegatingHasValue<Boolean>(true);
     private final HandlerManager handlerManager = new HandlerManager(this);
-    private final IdentityHashMap<HasValue<Boolean>, List<Validator<T>>> validatorsMap =
-        new IdentityHashMap<HasValue<Boolean>, List<Validator<T>>>();
+    private final IdentityHashMap<HasValue<Boolean>, List<Validator<? super T>>> validatorsMap =
+        new IdentityHashMap<HasValue<Boolean>, List<Validator<? super T>>>();
+    private final List<HandlerRegistration> handlerRegistrations =
+        new LinkedList<HandlerRegistration>();
+    private ValidationResultImpl validationResult = new ValidationResultImpl();
     private final HasValue<T> value;
     private final ValueChangeHandler<T> valueChangeHandler =
         new ValueChangeHandler<T>() {
             @Override
             public void onValueChange(ValueChangeEvent<T> event) {
-                handleValueChange();
+                validate();
+            }
+        };
+    private final ValueChangeHandler<Boolean> conditionValueChangeHandler =
+        new ValueChangeHandler<Boolean>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<Boolean> event) {
+                validate();
             }
         };
 
     public ValidatedValue(HasValue<T> value) {
         this.value = value;
-        value.addValueChangeHandler(valueChangeHandler);
+        registerHandler(value.addValueChangeHandler(valueChangeHandler));
     }
 
     @Override
@@ -42,6 +73,28 @@ public class ValidatedValue<T> implements HasValidationHandlers {
     @Override
     public HandlerRegistration addValidationHandler(ValidationHandler handler) {
         return handlerManager.addHandler(ValidationEvent.getType(), handler);
+    }
+
+    @Override
+    public ValidationResult getValidationResult() {
+        return validationResult;
+    }
+
+    @Override
+    public ValidationResult validate() {
+        ValidationResultImpl result = new ValidationResultImpl();
+        runValidators(result);
+        setValidationResult(result);
+        return result;
+    }
+
+    @Override
+    public void clear() {
+        setValidationResult(new ValidationResultImpl());
+    }
+
+    public void addValidator(Validator<? super T> validator) {
+        addValidator(validator, TRUE);
     }
 
     /**
@@ -63,68 +116,68 @@ public class ValidatedValue<T> implements HasValidationHandlers {
             throw new NullPointerException("condition is null");
         }
 
-        // getValidators(condition).add(validator);
+        getValidators(condition).add(validator);
     }
 
-    private List<Validator<T>> getValidators(final HasValue<Boolean> condition) {
-        List<Validator<T>> validators = validatorsMap.get(condition);
+    public void unbind() {
+        removeHandlers();
+        validatorsMap.clear();
+    }
+
+    private List<Validator<? super T>> getValidators(
+        final HasValue<Boolean> condition) {
+        List<Validator<? super T>> validators = validatorsMap.get(condition);
 
         if (validators == null) {
-            validators = new ArrayList<Validator<T>>();
+            validators = new ArrayList<Validator<? super T>>();
             validatorsMap.put(condition, validators);
 
-            addConditionChangeHandler(condition);
+            registerHandler(condition
+                .addValueChangeHandler(conditionValueChangeHandler));
         }
 
         return validators;
     }
 
-    private void addConditionChangeHandler(final HasValue<Boolean> condition) {
-        condition.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-            @Override
-            public void onValueChange(ValueChangeEvent<Boolean> event) {
-                handleConditionChange(condition);
-            }
-        });
+    private void runValidators(ValidationResultCollector collector) {
+        runValidators(value.getValue(), collector);
     }
 
-    private void handleConditionChange(HasValue<Boolean> condition) {
-        if (isConditionMet(condition)) {
-            List<Validator<T>> validators = getValidators(condition);
-            for (Validator<T> validator : validators) {
-
-            }
-        }
-    }
-
-    private void handleValueChange() {
-        ValidationResultImpl result = new ValidationResultImpl();
-
-        for (Entry<HasValue<Boolean>, List<Validator<T>>> entry : validatorsMap
+    private void runValidators(T value, ValidationResultCollector collector) {
+        for (Entry<HasValue<Boolean>, List<Validator<? super T>>> entry : validatorsMap
             .entrySet()) {
             HasValue<Boolean> condition = entry.getKey();
-            List<Validator<T>> validators = entry.getValue();
+            List<Validator<? super T>> validators = entry.getValue();
 
-            if (isConditionMet(condition)) {
-
+            if (Boolean.TRUE.equals(condition.getValue())) {
+                for (Validator<? super T> validator : validators) {
+                    validator.validate(value, collector);
+                }
             }
         }
+    }
 
-        ValidationEvent event = new ValidationEvent(result);
+    private void setValidationResult(ValidationResultImpl result) {
+        if (value instanceof ValidationView) {
+            ((ValidationView) value).setValidationResult(result);
+        }
+
+        validationResult = result;
+        fireValidationEvent();
+    }
+
+    private void fireValidationEvent() {
+        ValidationEvent event = new ValidationEvent(validationResult);
         handlerManager.fireEvent(event);
     }
 
-    private void setValidationResult(ValidationResult result) {
-        if (value instanceof HasValidationResult) {
-            ((HasValidationResult) value).setValidationResult(result);
+    private void removeHandlers() {
+        for (HandlerRegistration handlerRegistration : handlerRegistrations) {
+            handlerRegistration.removeHandler();
         }
     }
 
-    private void fireValidationEvent(ValidationEvent event) {
-
-    }
-
-    private boolean isConditionMet(HasValue<Boolean> condition) {
-        return Boolean.TRUE.equals(condition.getValue());
+    private void registerHandler(HandlerRegistration handlerRegistration) {
+        handlerRegistrations.add(handlerRegistration);
     }
 }

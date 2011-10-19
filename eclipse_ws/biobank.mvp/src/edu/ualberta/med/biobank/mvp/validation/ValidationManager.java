@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.mvp.validation;
 
 import java.util.IdentityHashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
@@ -19,11 +20,12 @@ import edu.ualberta.med.biobank.mvp.event.ui.HasValidationHandlers;
  * 
  */
 public class ValidationManager implements HasValidationHandlers {
-    private final Map<HasValidationHandlers, ValidationResult> validationSourceMap =
-        null;
-
+    private final IdentityHashMap<HasValidationHandlers, ValidationResult> validatablesMap =
+        new IdentityHashMap<HasValidationHandlers, ValidationResult>();
     private final IdentityHashMap<HasValue<?>, ValidatedValue<?>> validatedValueMap =
         new IdentityHashMap<HasValue<?>, ValidatedValue<?>>();
+    private final List<HandlerRegistration> handlerRegistrations =
+        new LinkedList<HandlerRegistration>();
     private final HandlerManager handlerManager = new HandlerManager(this);
     private final ValidationHandler validationHandler =
         new ValidationHandler() {
@@ -47,13 +49,13 @@ public class ValidationManager implements HasValidationHandlers {
         return handlerManager.addHandler(ValidationEvent.getType(), handler);
     }
 
-    public void watch(HasValidationHandlers validatable) {
-        // TODO: make a map of validatables to their validations results, roll
-        // them up on an update and fire all to the observers.
-    }
-
-    private void doUpdate() {
-        // TODO: fire event to listeners
+    public void watch(HasValidation validatable) {
+        // TODO: should have a HasValidation interface that we can ask to
+        // validate instead?
+        // TODO: look at pectin's validation manager, but when something is
+        // added, the "HasValidation" SHOULD BE RUN, so that we immediately have
+        // the errors.
+        validatablesMap.put(validatable, new ValidationResultImpl());
     }
 
     public <T> ValidatedValue<T> getValidatedValue(HasValue<T> value) {
@@ -64,11 +66,20 @@ public class ValidationManager implements HasValidationHandlers {
         if (validatedValue == null) {
             validatedValue = new ValidatedValue<T>(value);
             validatedValueMap.put(value, validatedValue);
+            watch(validatedValue);
         }
 
         return validatedValue;
     }
 
-    private class ValidationSource {
+    public void unbind() {
+        unbindValidatedValues();
+    }
+
+    private void unbindValidatedValues() {
+        for (ValidatedValue<?> validatedValue : validatedValueMap.values()) {
+            validatedValue.unbind();
+        }
+        validatedValueMap.clear();
     }
 }

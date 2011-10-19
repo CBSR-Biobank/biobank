@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.mvp.view;
 
-import edu.ualberta.med.biobank.mvp.validation.HasValidationResult;
+import edu.ualberta.med.biobank.mvp.validation.ValidationResult;
 
-public interface ValidationView extends HasValidationResult {
+public interface ValidationView extends BaseView {
+    void setValidationResult(ValidationResult validationResult);
 }
