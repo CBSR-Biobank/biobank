@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.pevent;
+package edu.ualberta.med.biobank.common.action.processingEvent;
 
 import java.util.Date;
 import java.util.List;

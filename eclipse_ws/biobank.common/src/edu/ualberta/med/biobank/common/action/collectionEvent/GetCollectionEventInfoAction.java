@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.cevent;
+package edu.ualberta.med.biobank.common.action.collectionEvent;
 
 import java.io.Serializable;
 import java.util.List;
@@ -8,7 +8,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.GetCollectionEventInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.GetCEventSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.cevent;
+package edu.ualberta.med.biobank.common.action.collectionEvent;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.DiffUtils;
-import edu.ualberta.med.biobank.common.action.activity.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.study.GetStudyEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;

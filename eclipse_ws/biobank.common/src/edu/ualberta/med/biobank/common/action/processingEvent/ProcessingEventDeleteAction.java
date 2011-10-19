@@ -1,20 +1,20 @@
-package edu.ualberta.med.biobank.common.action.cevent;
+package edu.ualberta.med.biobank.common.action.processingEvent;
 
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.User;
 
-public class CollectionEventDeleteAction implements Action<Integer> {
+public class ProcessingEventDeleteAction implements Action<Integer> {
 
     private static final long serialVersionUID = 1L;
 
-    private Integer ceventId;
+    private Integer peventId;
 
-    public CollectionEventDeleteAction(Integer ceventId) {
-        this.ceventId = ceventId;
+    public ProcessingEventDeleteAction(Integer peventId) {
+        this.peventId = peventId;
     }
 
     @Override
@@ -25,14 +25,14 @@ public class CollectionEventDeleteAction implements Action<Integer> {
 
     @Override
     public Integer run(User user, Session session) throws ActionException {
-        CollectionEvent cevent = (CollectionEvent) session.load(
-            CollectionEvent.class, ceventId);
+        ProcessingEvent pevent = (ProcessingEvent) session.load(
+            ProcessingEvent.class, peventId);
 
         // FIXME delete checks?
 
-        session.delete(cevent);
+        session.delete(pevent);
 
-        return ceventId;
+        return peventId;
     }
 
 }

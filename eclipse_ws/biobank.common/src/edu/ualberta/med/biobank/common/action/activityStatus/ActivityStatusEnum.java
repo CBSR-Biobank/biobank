@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.activity;
+package edu.ualberta.med.biobank.common.action.activityStatus;
 
 /**
  * important statuses used very often and referenced in the application

@@ -7,8 +7,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.cevent.GetPatientCollectionEventInfosAction;
-import edu.ualberta.med.biobank.common.action.cevent.GetPatientCollectionEventInfosAction.PatientCEventInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.GetPatientCollectionEventInfosAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.GetPatientCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.GetPatientInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;

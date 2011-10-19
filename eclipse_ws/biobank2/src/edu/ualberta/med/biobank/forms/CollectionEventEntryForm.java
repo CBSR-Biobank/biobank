@@ -22,12 +22,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventSaveAction;
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventSaveAction.SaveCEventAttrInfo;
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
-import edu.ualberta.med.biobank.common.action.cevent.EventAttrInfo;
-import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction;
-import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.GetCollectionEventInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventAttrInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.GetCollectionEventInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.NextVisitNumberAction;
 import edu.ualberta.med.biobank.common.action.specimen.GetSpecimenTypeInfosAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;

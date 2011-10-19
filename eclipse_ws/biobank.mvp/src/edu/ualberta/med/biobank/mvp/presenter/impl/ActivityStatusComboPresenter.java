@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -40,7 +41,7 @@ public class ActivityStatusComboPresenter extends BasePresenter<View> {
     @Override
     protected void onBind() {
         dispatcher.exec(new GetAllActivityStatusesAction(),
-            new ActionCallback<ArrayList<ActivityStatus>>() {
+            new ActionCallback<HashMap<Integer, ActivityStatus>>() {
                 @Override
                 public void onFailure(Throwable caught) {
                     // TODO: need to do something if cannot get information,
@@ -49,8 +50,9 @@ public class ActivityStatusComboPresenter extends BasePresenter<View> {
                 }
 
                 @Override
-                public void onSuccess(ArrayList<ActivityStatus> result) {
-                    view.getActivityStatus().setOptions(result);
+                public void onSuccess(HashMap<Integer, ActivityStatus> result) {
+                    view.getActivityStatus().setOptions(
+                        new ArrayList<ActivityStatus>(result.values()));
                     view.getActivityStatus().setOptionLabeller(labeller);
                 }
             });

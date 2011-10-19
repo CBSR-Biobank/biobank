@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.cevent;
+package edu.ualberta.med.biobank.common.action.collectionEvent;
 
 import java.util.HashMap;
 import java.util.List;
