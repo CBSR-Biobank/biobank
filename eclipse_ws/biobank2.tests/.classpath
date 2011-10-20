@@ -11,5 +11,7 @@
 	<classpathentry kind="lib" path="lib/jta.jar"/>
 	<classpathentry kind="lib" path="lib/biobank-orm.jar"/>
 	<classpathentry kind="lib" path="lib/ehcache-1.2.2.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/biobank.mvp"/>
+	<classpathentry kind="lib" path="lib/mockito-all-1.9.0-rc1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
