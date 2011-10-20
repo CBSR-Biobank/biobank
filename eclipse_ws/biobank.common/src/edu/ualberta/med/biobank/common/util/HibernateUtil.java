@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.util;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 
 public class HibernateUtil {
@@ -21,7 +22,11 @@ public class HibernateUtil {
     }
 
     public static Long getCountFromQuery(Query query) {
-        List<?> results = query.list();
-        return getCountFromResult(results);
+        try {
+            List<?> results = query.list();
+            return getCountFromResult(results);
+        } catch (HibernateException he) {
+            throw he;
+        }
     }
 }

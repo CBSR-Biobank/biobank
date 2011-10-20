@@ -23,6 +23,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -227,6 +228,10 @@ public abstract class BiobankFormBase extends BgcFormBase {
                 ex);
             cancelSave(monitor);
         } else if (ex instanceof BiobankSessionException) {
+            BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
+                ex);
+            cancelSave(monitor);
+        } else if (ex instanceof ActionException) {
             BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
                 ex);
             cancelSave(monitor);

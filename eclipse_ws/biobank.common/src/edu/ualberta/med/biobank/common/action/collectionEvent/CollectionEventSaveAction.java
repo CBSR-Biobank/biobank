@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.action.collectionEvent;
 
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -15,11 +16,14 @@ import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.DiffUtils;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
+import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.study.GetStudyEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -94,6 +98,9 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
     @Override
     public Integer run(User user, Session session) throws ActionException {
+
+        check(user, session);
+
         CollectionEvent ceventToSave;
         if (ceventId == null) {
             ceventToSave = new CollectionEvent();
@@ -103,7 +110,6 @@ public class CollectionEventSaveAction implements Action<Integer> {
         }
 
         // FIXME Version check?
-        // FIXME checks?
         // FIXME permission ?
 
         Patient patient = ActionUtil.sessionGet(session, Patient.class,
@@ -121,6 +127,18 @@ public class CollectionEventSaveAction implements Action<Integer> {
         session.saveOrUpdate(ceventToSave);
 
         return ceventToSave.getId();
+    }
+
+    private void check(User user, Session session) {
+        List<ValueProperty<CollectionEvent>> propUple = new ArrayList<ValueProperty<CollectionEvent>>();
+        propUple.add(new ValueProperty<CollectionEvent>(
+            CollectionEventPeer.PATIENT.to(PatientPeer.ID), patientId));
+        propUple.add(new ValueProperty<CollectionEvent>(
+            CollectionEventPeer.VISIT_NUMBER, visitNumber));
+
+        new UniquePreCheck<CollectionEvent>(new ValueProperty<CollectionEvent>(
+            CollectionEventPeer.ID, ceventId), CollectionEvent.class, propUple)
+            .run(user, session);
     }
 
     private void setSourceSpecimens(Session session,

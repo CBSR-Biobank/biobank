@@ -1,10 +1,10 @@
-package edu.ualberta.med.biobank.common.action.patient;
+package edu.ualberta.med.biobank.common.action.collectionEvent;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class Messages {
-    private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.common.action.patient.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.common.action.collectionEvent.messages"; //$NON-NLS-1$
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
         .getBundle(BUNDLE_NAME);

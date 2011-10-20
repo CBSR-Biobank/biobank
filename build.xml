@@ -391,6 +391,8 @@
   	  <fileset file="${cacore.sdk.dir}/system/lib/c3p0-0.9.0.jar" />
   	  <fileset file="${cacore.sdk.dir}/system/lib/clm-4.1.jar" />
       <fileset file="${cacore.sdk.dir}/system/lib/jta.jar" />
+      <fileset file="${cacore.sdk.dir}/output/biobank/build/jar/biobank-orm.jar"/>
+  	  <fileset file="${cacore.sdk.dir}/system/lib/ehcache-1.2.2.jar"/>	
   	</copy>
   </target>
   <!-- JBoss -->

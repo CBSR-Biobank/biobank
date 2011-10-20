@@ -20,4 +20,12 @@ public class ExceptionUtils {
         }
         return false;
     }
+
+    public static Throwable findFirstCause(Throwable t) {
+        if (t == null)
+            return null;
+        if (t.getCause() == null)
+            return t;
+        return findFirstCause(t.getCause());
+    }
 }

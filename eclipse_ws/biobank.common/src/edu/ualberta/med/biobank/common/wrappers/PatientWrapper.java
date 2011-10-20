@@ -95,11 +95,9 @@ public class PatientWrapper extends PatientBaseWrapper {
                 study.getSiteCollection(false));
             centers.addAll(study.getClinicCollection());
             if (Collections.disjoint(centers, user.getWorkingCenters())) {
-                throw new ApplicationException(
-                    MessageFormat
-                        .format(
-                            Messages.getString("PatientWrapper.patient.access.msg"), //$NON-NLS-1$
-                            patientNumber));
+                throw new ApplicationException(MessageFormat.format(
+                    Messages.getString("PatientWrapper.patient.access.msg"), //$NON-NLS-1$
+                    patientNumber));
             }
         }
         return patient;
@@ -326,8 +324,8 @@ public class PatientWrapper extends PatientBaseWrapper {
     public static Integer getNextVisitNumber(
         WritableApplicationService appService, PatientWrapper patient)
         throws Exception {
-        HQLCriteria c = new HQLCriteria("select max(ce.visitNumber) from "
-            + CollectionEvent.class.getName() + " ce where ce.patient.id=?",
+        HQLCriteria c = new HQLCriteria("select max(ce.visitNumber) from " //$NON-NLS-1$
+            + CollectionEvent.class.getName() + " ce where ce.patient.id=?", //$NON-NLS-1$
             Arrays.asList(patient.getId()));
         List<Object> result = appService.query(c);
         if (result == null || result.size() == 0 || result.get(0) == null)
