@@ -33,7 +33,7 @@ public class ButtonItem implements HasButton {
     private boolean enabled = true;
     private Button button;
 
-    public synchronized void setButtonItem(Button button) {
+    public synchronized void setButton(Button button) {
         unbindOldButton();
         this.button = button;
         button.setEnabled(enabled);

@@ -18,13 +18,12 @@ import edu.ualberta.med.biobank.model.User;
 public class SaveSiteAction implements Action<Integer> {
     private static final long serialVersionUID = 1L;
 
-    private final Integer siteId;
-
     // Specific properties force the programmer only to modify the intended
     // data. A little faster. But disregards version checks. Version checks
     // might apply, but they might not, up to the individual action (e.g.
     // "incrementCountAction" shouldn't care).
 
+    private Integer siteId;
     private String name;
     private String nameShort;
     private String comment;
@@ -32,7 +31,7 @@ public class SaveSiteAction implements Action<Integer> {
     private Integer aStatusId;
     private Set<Integer> studyIds;
 
-    public SaveSiteAction(Integer siteId) {
+    public void setId(Integer siteId) {
         this.siteId = siteId;
     }
 

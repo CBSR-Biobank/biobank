@@ -31,35 +31,27 @@ public class AddressEditPresenter extends BasePresenter<View> {
         HasValue<String> getCountry();
     }
 
-    private Model model = new Model();
+    private Model address = new Model();
 
     @Inject
     public AddressEditPresenter(View view, EventBus eventBus) {
         super(view, eventBus);
     }
 
-    public void editAddress(Address address) {
-        model.setValue(address);
-    }
-
-    public Address getAddress() {
-        return model.getValue();
-    }
-
-    public Model getModel() {
-        return model;
+    public HasValue<Address> getAddress() {
+        return null;
     }
 
     @Override
     protected void onBind() {
-        binder.bind(model.street1).to(view.getStreet1());
-        binder.bind(model.street2).to(view.getStreet2());
-        binder.bind(model.city).to(view.getCity());
-        binder.bind(model.province).to(view.getProvince());
-        binder.bind(model.postalCode).to(view.getPostalCode());
-        binder.bind(model.phoneNumber).to(view.getPhoneNumber());
-        binder.bind(model.faxNumber).to(view.getFaxNumber());
-        binder.bind(model.country).to(view.getCountry());
+        binder.bind(address.street1).to(view.getStreet1());
+        binder.bind(address.street2).to(view.getStreet2());
+        binder.bind(address.city).to(view.getCity());
+        binder.bind(address.province).to(view.getProvince());
+        binder.bind(address.postalCode).to(view.getPostalCode());
+        binder.bind(address.phoneNumber).to(view.getPhoneNumber());
+        binder.bind(address.faxNumber).to(view.getFaxNumber());
+        binder.bind(address.country).to(view.getCountry());
     }
 
     @Override
@@ -76,17 +68,28 @@ public class AddressEditPresenter extends BasePresenter<View> {
         protected final FieldModel<String> faxNumber;
         protected final FieldModel<String> country;
 
+        @SuppressWarnings("unchecked")
         public Model() {
             super(Address.class);
-            street1 = addField(String.class, "street1");
-            street2 = addField(String.class, "street2");
-            city = addField(String.class, "city");
-            province = addField(String.class, "province");
-            postalCode = addField(String.class, "postalCode");
-            phoneNumber = addField(String.class, "phoneNumber");
-            faxNumber = addField(String.class, "faxNumber");
-            country = addField(String.class, "country");
 
+            street1 = fieldOfType(String.class)
+                .boundTo(provider, "street1");
+            street2 = fieldOfType(String.class)
+                .boundTo(provider, "street2");
+            city = fieldOfType(String.class)
+                .boundTo(provider, "city");
+            province = fieldOfType(String.class)
+                .boundTo(provider, "province");
+            postalCode = fieldOfType(String.class)
+                .boundTo(provider, "postalCode");
+            phoneNumber = fieldOfType(String.class)
+                .boundTo(provider, "phoneNumber");
+            faxNumber = fieldOfType(String.class)
+                .boundTo(provider, "faxNumber");
+            country = fieldOfType(String.class)
+                .boundTo(provider, "country");
+
+            // TODO: make Validator-s take a field name arg only?
             ValidationPlugin.validateField(city)
                 .using(new NotEmptyValidator("City is required"));
         }

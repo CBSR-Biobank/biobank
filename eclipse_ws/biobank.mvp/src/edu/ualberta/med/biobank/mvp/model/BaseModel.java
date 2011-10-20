@@ -1,15 +1,16 @@
 package edu.ualberta.med.biobank.mvp.model;
 
-import com.pietschy.gwt.pectin.client.form.FieldModel;
 import com.pietschy.gwt.pectin.client.form.FormModel;
 import com.pietschy.gwt.pectin.client.value.ValueModel;
 import com.pietschy.gwt.pectin.reflect.ReflectionBeanModelProvider;
 
 public class BaseModel<T> extends FormModel {
-    public final ReflectionBeanModelProvider<T> provider;
+    protected final ReflectionBeanModelProvider<T> provider;
 
-    public BaseModel(Class<T> modelClass) {
-        provider = new ReflectionBeanModelProvider<T>(modelClass);
+    public BaseModel(Class<T> beanModelClass) {
+        // TODO: could read the .class from the generic parameter?
+        provider = new ReflectionBeanModelProvider<T>(beanModelClass);
+        provider.setAutoCommit(true);
     }
 
     public T getValue() {
@@ -24,7 +25,11 @@ public class BaseModel<T> extends FormModel {
         return provider.dirty();
     }
 
-    protected <E> FieldModel<E> addField(Class<E> fieldClass, String key) {
-        return fieldOfType(fieldClass).boundTo(provider, key);
+    public void setBeanSource(ValueModel<T> beanSource) {
+        provider.setBeanSource(beanSource);
+    }
+
+    public void revert() {
+        provider.revert();
     }
 }

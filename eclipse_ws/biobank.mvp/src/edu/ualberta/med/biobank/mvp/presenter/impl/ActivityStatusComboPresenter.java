@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import java.util.ArrayList;
 
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -29,12 +30,8 @@ public class ActivityStatusComboPresenter extends BasePresenter<View> {
         this.dispatcher = dispatcher;
     }
 
-    public void setSelectedValue(ActivityStatus activityStatus) {
-        view.getActivityStatus().setValue(activityStatus);
-    }
-
-    public ActivityStatus getSelectedValue() {
-        return view.getActivityStatus().getValue();
+    public HasValue<ActivityStatus> getActivityStatus() {
+        return view.getActivityStatus();
     }
 
     @Override

@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.mvp.presenter.impl;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
@@ -31,8 +33,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     private final AddressEditPresenter addressEditPresenter;
     private final ActivityStatusComboPresenter activityStatusComboPresenter;
     private final ValidationBinder validationBinder = new ValidationBinder();
-    private SiteInfo siteInfo;
-    private final SiteInfoModel model = new SiteInfoModel();
+    private final Model model = new Model();
 
     public interface View extends FormView {
         void setAddressEntryView(BaseView view);
@@ -45,7 +46,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
         HasValue<String> getComment();
 
-        HasValue<List<StudyInfo>> getStudies();
+        HasValue<Collection<StudyInfo>> getStudies();
     }
 
     @Inject
@@ -65,20 +66,29 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
     @Override
     public void onBind() {
+        super.onBind();
+
         addressEditPresenter.bind();
         activityStatusComboPresenter.bind();
 
         binder.bind(model.name).to(view.getName());
-        // binder.bind(model.address).to
+        binder.bind(model.nameShort).to(view.getNameShort());
+        binder.bind(model.comment).to(view.getComment());
+        // binder.bind(model.studies).to(view.getStudies());
 
-        binder.enable(view.getSave()).when(model.dirty());
-        // binder.bind(addressEditPresenter.getModel().get).
+        // TODO: proppa?
+        // binder.bind(model.address)
+        // .to(addressEditPresenter.getAddress());
+        binder.bind(model.activityStatus)
+            .to(activityStatusComboPresenter.getActivityStatus());
 
         // TODO: need to have some sort of:
         // (1) aggregated binding system
         // (2) immediate validation system
         // validationBinder.bindValidationOf(addressEditPresenter.getModel())
         // .to(null);
+
+        binder.enable(view.getSave()).when(model.dirty());
     }
 
     @Override
@@ -91,25 +101,21 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
     @Override
     public void doReload() {
+        // TODO: implement this!
+        model.revert();
     }
 
     @Override
     public void doSave() {
-        SaveSiteAction saveSite = new SaveSiteAction(null);
+        SaveSiteAction saveSite = new SaveSiteAction();
+        saveSite.setId(model.siteId.getValue());
+        saveSite.setName(model.name.getValue());
+        saveSite.setNameShort(model.nameShort.getValue());
         saveSite.setComment(model.comment.getValue());
-
-        saveSite.setName(view.getName().getValue());
-        saveSite.setNameShort(view.getNameShort().getValue());
-        saveSite.setComment(view.getComment().getValue());
-
-        ActivityStatus activityStatus =
-            activityStatusComboPresenter.getSelectedValue();
-        saveSite.setActivityStatusId(activityStatus.getId());
-
-        saveSite.setAddress(addressEditPresenter.getAddress());
-
-        // TODO: get study ids
-        // updateSite.setStudyIds(display.getStudyIds().getValue());
+        // TODO: null check?
+        // saveSite.setActivityStatusId(model.activityStatus.getValue().getId());
+        saveSite.setAddress(model.address.getValue());
+        saveSite.setStudyIds(model.getStudyIds());
 
         dispatcher.exec(saveSite, new ActionCallback<Integer>() {
             @Override
@@ -138,9 +144,10 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     }
 
     public View createSite() {
-        siteInfo = new SiteInfo();
-        siteInfo.site = new Site();
-        siteInfo.site.setAddress(new Address());
+        SiteInfo siteInfo = new SiteInfo();
+        siteInfo.setSite(new Site());
+        siteInfo.getSite().setAddress(new Address());
+        model.setValue(siteInfo);
         return view;
     }
 
@@ -160,34 +167,57 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     }
 
     public View editSite(SiteInfo siteInfo) {
-        this.siteInfo = ObjectCloner.deepCopy(siteInfo);
-        model.setValue(siteInfo);
+        // TODO: not sure if making a clone is necessary with a provider
+        SiteInfo clone = ObjectCloner.deepCopy(siteInfo);
+
+        model.setValue(clone);
         return view;
     }
 
-    private static class SiteInfoModel extends BaseModel<SiteInfo> {
+    private static class Model extends BaseModel<SiteInfo> {
+        protected final FieldModel<Integer> siteId;
         protected final FieldModel<String> name;
         protected final FieldModel<String> nameShort;
         protected final FieldModel<String> comment;
-        protected final FieldModel<ActivityStatus> activityStatus;
         protected final FieldModel<Address> address;
+        protected final FieldModel<ActivityStatus> activityStatus;
         protected final ListFieldModel<StudyInfo> studies;
 
-        public SiteInfoModel() {
+        @SuppressWarnings("unchecked")
+        public Model() {
             super(SiteInfo.class);
-            name = addField(String.class, "site.name");
-            nameShort = addField(String.class, "site.nameShort");
-            comment = addField(String.class, "site.comment");
 
-            address = addField(Address.class, "site.address");
+            // TODO: consider using bindgen to generate a binding class via a
+            // @Binding annotation so that the pays for binding fields to
+            // providers is checked at compile time (don't use strings).
 
+            siteId = fieldOfType(Integer.class)
+                .boundTo(provider, "site.id");
+            name = fieldOfType(String.class)
+                .boundTo(provider, "site.name");
+            nameShort = fieldOfType(String.class)
+                .boundTo(provider, "site.nameShort");
+            comment = fieldOfType(String.class)
+                .boundTo(provider, "site.comment");
+            address = fieldOfType(Address.class)
+                .boundTo(provider, "site.address");
             activityStatus = fieldOfType(ActivityStatus.class)
                 .boundTo(provider, "site.activityStatus");
+            studies = listOfType(StudyInfo.class)
+                .boundTo(provider, "studies");
 
-            studies = listOfType(StudyInfo.class).boundTo(provider, "studies");
+            ValidationPlugin.validateField(name)
+                .using(new NotEmptyValidator("Name is required"));
+            ValidationPlugin.validateField(nameShort)
+                .using(new NotEmptyValidator("Name Short is required"));
+        }
 
-            ValidationPlugin.validateField(name).using(
-                new NotEmptyValidator("Surname is required"));
+        public Set<Integer> getStudyIds() {
+            Set<Integer> studyIds = new HashSet<Integer>();
+            for (StudyInfo studyInfo : studies) {
+                studyIds.add(studyInfo.getStudy().getId());
+            }
+            return studyIds;
         }
     }
 }
