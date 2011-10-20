@@ -18,6 +18,8 @@ import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.util.ObjectCloner;
 import edu.ualberta.med.biobank.mvp.validation.PresenterValidation;
+import edu.ualberta.med.biobank.mvp.validation.validator.NotEmptyValidator;
+import edu.ualberta.med.biobank.mvp.validation.validator.NotNullValidator;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
 import edu.ualberta.med.biobank.mvp.view.FormView;
 
@@ -61,23 +63,27 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         addressEntryPresenter.bind();
         activityStatusComboPresenter.bind();
 
-        // validation.validate(view.getName())
-        // .using(new NotEmptyValidator("name"))
-        // .when(something?);
-        //
-        // validation.validate(view.getName())
-        // .using(new NotEmptyValidator("name"))
-        // .when(something?);
-        //
-        // validation.validate(view.getNameShort())
-        // .using(new NotEmptyValidator("nameShort"))
-        // .when(something?);
-        //
-        // validation.validate(addressEntryPresenter.getValidation())
-        // .when(something?);
-        //
-        // validation.validate();
-        //
+        HasValue<Boolean> condition = null;
+
+        validation.validate(view.getName())
+            .using(new NotEmptyValidator("name"))
+            .when(condition);
+
+        validation.validate(view.getNameShort())
+            .using(new NotEmptyValidator("nameShort"));
+
+        validation.validate(
+            activityStatusComboPresenter.getView().getActivityStatus())
+            .using(new NotNullValidator("activityStatus"));
+
+        // validation.validate(view.getStudies())
+        // .using(NotEmptyCollectionValidator());
+
+        validation.validate(addressEntryPresenter.getValidation())
+            .when(condition);
+
+        validation.validate();
+
         // validation.addView(view);
     }
 
