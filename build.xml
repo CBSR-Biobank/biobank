@@ -33,7 +33,7 @@
             location="eclipse_ws/biobank.common" />
   <property name="eclipse.proj.dir.tools"
             location="eclipse_ws/biobank2.tools" />
-  <property name="eclipse.proj.dir.junit"
+  <property name="eclipse.proj.dir.tests"
             location="eclipse_ws/biobank2.tests" />
   <property name="scripts.proj.dir" location="scripts" />
   <property name="model.proj.dir" location="model" />
@@ -59,6 +59,8 @@
             value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar" />
   <property name="biobank.tools.jar.files"
             value="commons-io-1.4.jar, jargs.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar,mysql-connector-java-5.1.15-bin.jar" />
+  <property name="biobank.test.jar.files"
+            value="mockito-all-1.9.0-rc1.jar" />
   <property name="cacore.system.jar.files"
             value="commons-collections-3.2.jar,commons-logging-1.1.jar,hibernate-validator.jar" />
   <property name="converage.output" location="coverage" />
@@ -320,6 +322,11 @@
                       files="${biobank.tools.jar.files}" />
     </dependset>
     <dependset>
+      <srcfilelist dir="${req.jars.dir}" files="${biobank.test.jar.files}" />
+      <targetfilelist dir="${eclipse.proj.dir.tests}/lib"
+                      files="${biobank.tools.jar.files}" />
+    </dependset>
+    <dependset>
       <srcfilelist dir="${cacore.sdk.dir}/writable-api/dist"
                    files="sdk-writable-client-framework.jar" />
       <targetfilelist dir="${eclipse.proj.dir.common}/lib"
@@ -372,6 +379,9 @@
     <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
       <filelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}" />
     </copy>
+    <copy todir="${eclipse.proj.dir.tests}/lib" overwrite="true">
+      <filelist dir="${req.jars.dir}" files="${biobank.test.jar.files}" />
+    </copy>
     <!--copy todir="${eclipse.workspace.dir}/biobank2.ws-client/lib">
       <filelist dir="${cacore.sdk.dir}/output/biobank/package/ws-client/lib"
                 files="biobank-beans.jar" />
@@ -383,14 +393,14 @@
       <fileset file="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
     </copy>
   	<!-- The following files and jars are needed in the test project to call csm api methods -->
-  	<copy todir="${eclipse.proj.dir.junit}/src" overwrite="true">
+  	<copy todir="${eclipse.proj.dir.tests}/src" overwrite="true">
   		<filelist dir="${cacore.sdk.dir}/output/biobank/src" files="biobank.csm.new.hibernate.cfg.xml" />
   	</copy>
-  	<copy todir="${eclipse.proj.dir.junit}/lib" overwrite="true">
+  	<copy todir="${eclipse.proj.dir.tests}/lib" overwrite="true">
   	  <fileset file="${cacore.sdk.dir}/system/lib/dom4j-1.4.jar" />
   	  <fileset file="${cacore.sdk.dir}/system/lib/c3p0-0.9.0.jar" />
   	  <fileset file="${cacore.sdk.dir}/system/lib/clm-4.1.jar" />
-      <fileset file="${cacore.sdk.dir}/system/lib/jta.jar" />
+          <fileset file="${cacore.sdk.dir}/system/lib/jta.jar" />
   	</copy>
   </target>
   <!-- JBoss -->
@@ -968,7 +978,7 @@
       <fileset dir="${eclipse.proj.dir.mvp}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.gui.common}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.junit}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.tests}/lib" includes="**/*.jar" />
     </delete>
   </target>
 
@@ -1004,7 +1014,7 @@
 
   <property name="test.output" location="testing" />
   <property name="test.output.raw" value="${test.output}/raw" />
-  <property name="test.build.dir" value="${eclipse.proj.dir.junit}/output" />
+  <property name="test.build.dir" value="${eclipse.proj.dir.tests}/output" />
 
   <path id="common.class.path">
     <fileset dir="${eclipse.proj.dir.common}/lib/client">
@@ -1033,7 +1043,7 @@
   <target name="tests-compile" depends="build-common-project,prepare" >
     <copy includeemptydirs="false"
   	      todir="${test.build.dir}" overwrite="true">
-  	  <fileset dir="${eclipse.proj.dir.junit}/src">
+  	  <fileset dir="${eclipse.proj.dir.tests}/src">
   	    <exclude name="**/*.launch" />
   	    <exclude name="**/*.java" />
   	  </fileset>
@@ -1046,7 +1056,7 @@
            debug="true"
            debuglevel="lines,source"
            includeantruntime="false">
-      <src path="${eclipse.proj.dir.junit}/src" />
+      <src path="${eclipse.proj.dir.tests}/src" />
       <src path="${eclipse.proj.dir.tools}/src" />
       <include name="**/tools/utils/*.java" />
       <include name="**/test/reports/**/*.java" />
@@ -1059,7 +1069,7 @@
     </javac>
   </target>
 
-  <fileset id="testcase.files" dir="${eclipse.proj.dir.junit}/src">
+  <fileset id="testcase.files" dir="${eclipse.proj.dir.tests}/src">
     <include name="**/Test*.java" />
     <exclude name="**/speed/**" />
     <exclude name="**/TestReportsProcedurallyGeneratedData.java" />
