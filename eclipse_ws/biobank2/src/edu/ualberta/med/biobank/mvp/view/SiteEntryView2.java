@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.HasValue;
 
 import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
+import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
 
 public class SiteEntryView2 extends EditorPart implements
@@ -86,7 +87,7 @@ public class SiteEntryView2 extends EditorPart implements
     }
 
     @Override
-    public HasClickHandlers getSave() {
+    public HasButton getSave() {
         // TODO Auto-generated method stub
         return null;
     }

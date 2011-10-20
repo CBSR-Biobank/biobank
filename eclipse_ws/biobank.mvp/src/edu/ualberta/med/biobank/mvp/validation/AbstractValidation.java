@@ -10,6 +10,7 @@ import com.google.gwt.user.client.ui.HasValue;
 
 import edu.ualberta.med.biobank.mvp.event.ValidationEvent;
 import edu.ualberta.med.biobank.mvp.event.ValidationHandler;
+import edu.ualberta.med.biobank.mvp.view.ValidationView;
 
 public abstract class AbstractValidation implements HasValidation {
     private final HandlerManager handlerManager = new HandlerManager(this);
@@ -45,8 +46,12 @@ public abstract class AbstractValidation implements HasValidation {
         setValidationResult(new ValidationResultImpl());
     }
 
+    // TODO: more?
     public void unbind() {
         removeRegisteredHandlers();
+    }
+
+    public void updateView(ValidationView view) {
     }
 
     protected abstract void doValidation(ValidationResultCollector collector);

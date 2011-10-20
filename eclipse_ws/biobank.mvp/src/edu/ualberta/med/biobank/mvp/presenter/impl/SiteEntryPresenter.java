@@ -5,6 +5,11 @@ import java.util.List;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.pietschy.gwt.pectin.client.form.FieldModel;
+import com.pietschy.gwt.pectin.client.form.ListFieldModel;
+import com.pietschy.gwt.pectin.client.form.validation.ValidationPlugin;
+import com.pietschy.gwt.pectin.client.form.validation.binding.ValidationBinder;
+import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidator;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
@@ -15,20 +20,19 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
+import edu.ualberta.med.biobank.mvp.model.BaseModel;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.util.ObjectCloner;
-import edu.ualberta.med.biobank.mvp.validation.PresenterValidation;
-import edu.ualberta.med.biobank.mvp.validation.validator.NotEmptyValidator;
-import edu.ualberta.med.biobank.mvp.validation.validator.NotNullValidator;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
 import edu.ualberta.med.biobank.mvp.view.FormView;
 
 public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     private final Dispatcher dispatcher;
-    private final AddressEditPresenter addressEntryPresenter;
+    private final AddressEditPresenter addressEditPresenter;
     private final ActivityStatusComboPresenter activityStatusComboPresenter;
-    private final PresenterValidation validation = new PresenterValidation();
+    private final ValidationBinder validationBinder = new ValidationBinder();
     private SiteInfo siteInfo;
+    private final SiteInfoModel model = new SiteInfoModel();
 
     public interface View extends FormView {
         void setAddressEntryView(BaseView view);
@@ -46,11 +50,12 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
     @Inject
     public SiteEntryPresenter(View view, EventBus eventBus,
-        Dispatcher dispatcher, AddressEditPresenter addressEntryPresenter,
+        Dispatcher dispatcher,
+        AddressEditPresenter addressEntryPresenter,
         ActivityStatusComboPresenter activityStatusComboPresenter) {
         super(view, eventBus);
         this.dispatcher = dispatcher;
-        this.addressEntryPresenter = addressEntryPresenter;
+        this.addressEditPresenter = addressEntryPresenter;
         this.activityStatusComboPresenter = activityStatusComboPresenter;
 
         // so this view can create the other views if create() is called
@@ -60,38 +65,28 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
     @Override
     public void onBind() {
-        addressEntryPresenter.bind();
+        addressEditPresenter.bind();
         activityStatusComboPresenter.bind();
 
-        HasValue<Boolean> condition = null;
+        binder.bind(model.name).to(view.getName());
+        // binder.bind(model.address).to
 
-        validation.validate(view.getName())
-            .using(new NotEmptyValidator("name"))
-            .when(condition);
+        binder.enable(view.getSave()).when(model.dirty());
+        // binder.bind(addressEditPresenter.getModel().get).
 
-        validation.validate(view.getNameShort())
-            .using(new NotEmptyValidator("nameShort"));
-
-        validation.validate(
-            activityStatusComboPresenter.getView().getActivityStatus())
-            .using(new NotNullValidator("activityStatus"));
-
-        // validation.validate(view.getStudies())
-        // .using(NotEmptyCollectionValidator());
-
-        validation.validate(addressEntryPresenter.getValidation())
-            .when(condition);
-
-        validation.validate();
-
-        // validation.addView(view);
+        // TODO: need to have some sort of:
+        // (1) aggregated binding system
+        // (2) immediate validation system
+        // validationBinder.bindValidationOf(addressEditPresenter.getModel())
+        // .to(null);
     }
 
     @Override
     protected void onUnbind() {
-        validation.unbind();
+        validationBinder.dispose();
+
         activityStatusComboPresenter.unbind();
-        addressEntryPresenter.unbind();
+        addressEditPresenter.unbind();
     }
 
     @Override
@@ -100,8 +95,8 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
     @Override
     public void doSave() {
-        SaveSiteAction saveSite = new SaveSiteAction(siteInfo.site.getId());
-        saveSite.setComment(view.getComment().getValue());
+        SaveSiteAction saveSite = new SaveSiteAction(null);
+        saveSite.setComment(model.comment.getValue());
 
         saveSite.setName(view.getName().getValue());
         saveSite.setNameShort(view.getNameShort().getValue());
@@ -111,7 +106,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
             activityStatusComboPresenter.getSelectedValue();
         saveSite.setActivityStatusId(activityStatus.getId());
 
-        saveSite.setAddress(addressEntryPresenter.getAddress());
+        saveSite.setAddress(addressEditPresenter.getAddress());
 
         // TODO: get study ids
         // updateSite.setStudyIds(display.getStudyIds().getValue());
@@ -146,7 +141,6 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         siteInfo = new SiteInfo();
         siteInfo.site = new Site();
         siteInfo.site.setAddress(new Address());
-        populateView();
         return view;
     }
 
@@ -167,20 +161,33 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
     public View editSite(SiteInfo siteInfo) {
         this.siteInfo = ObjectCloner.deepCopy(siteInfo);
-
-        // TODO: another method with id to fetch data from database?
-        populateView();
+        model.setValue(siteInfo);
         return view;
     }
 
-    private void populateView() {
-        view.getName().setValue(siteInfo.site.getName());
-        view.getNameShort().setValue(siteInfo.site.getNameShort());
-        view.getComment().setValue(siteInfo.site.getComment());
-        view.getStudies().setValue(siteInfo.studies);
+    private static class SiteInfoModel extends BaseModel<SiteInfo> {
+        protected final FieldModel<String> name;
+        protected final FieldModel<String> nameShort;
+        protected final FieldModel<String> comment;
+        protected final FieldModel<ActivityStatus> activityStatus;
+        protected final FieldModel<Address> address;
+        protected final ListFieldModel<StudyInfo> studies;
 
-        addressEntryPresenter.editAddress(siteInfo.site.getAddress());
-        activityStatusComboPresenter.setSelectedValue(siteInfo.site
-            .getActivityStatus());
+        public SiteInfoModel() {
+            super(SiteInfo.class);
+            name = addField(String.class, "site.name");
+            nameShort = addField(String.class, "site.nameShort");
+            comment = addField(String.class, "site.comment");
+
+            address = addField(Address.class, "site.address");
+
+            activityStatus = fieldOfType(ActivityStatus.class)
+                .boundTo(provider, "site.activityStatus");
+
+            studies = listOfType(StudyInfo.class).boundTo(provider, "studies");
+
+            ValidationPlugin.validateField(name).using(
+                new NotEmptyValidator("Surname is required"));
+        }
     }
 }

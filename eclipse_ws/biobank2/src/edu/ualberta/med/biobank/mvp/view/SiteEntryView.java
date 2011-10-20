@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.HasValue;
 
 import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
+import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 import edu.ualberta.med.biobank.mvp.view.item.ButtonItem;
 import edu.ualberta.med.biobank.mvp.view.item.TableItem;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
@@ -30,7 +31,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
     private BaseView activityStatusComboView;
 
     @Override
-    public HasClickHandlers getSave() {
+    public HasButton getSave() {
         return save;
     }
 

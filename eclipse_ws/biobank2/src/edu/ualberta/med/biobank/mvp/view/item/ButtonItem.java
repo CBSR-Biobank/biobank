@@ -6,14 +6,14 @@ import org.eclipse.swt.widgets.Button;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
 
 import edu.ualberta.med.biobank.mvp.event.EclipseClickEvent;
+import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 
-public class ButtonItem implements HasClickHandlers {
+public class ButtonItem implements HasButton {
     private final HandlerManager handlerManager = new HandlerManager(this);
     private final MouseListener mouseListener = new MouseListener() {
         @Override
@@ -30,11 +30,13 @@ public class ButtonItem implements HasClickHandlers {
             handlerManager.fireEvent(new EclipseClickEvent());
         }
     };
+    private boolean enabled = true;
     private Button button;
 
     public synchronized void setButtonItem(Button button) {
         unbindOldButton();
         this.button = button;
+        button.setEnabled(enabled);
         button.addMouseListener(mouseListener);
     }
 
@@ -50,6 +52,20 @@ public class ButtonItem implements HasClickHandlers {
     @Override
     public void fireEvent(GwtEvent<?> event) {
         handlerManager.fireEvent(event);
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+
+        if (button != null) {
+            button.setEnabled(enabled);
+        }
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 
     private void unbindOldButton() {
