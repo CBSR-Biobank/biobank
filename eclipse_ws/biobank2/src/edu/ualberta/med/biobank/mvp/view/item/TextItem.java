@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.HasValue;
 import edu.ualberta.med.biobank.mvp.event.SimpleValueChangeEvent;
 
 public class TextItem implements HasValue<String> {
-    private final static String DEFAULT_VALUE = ""; //$NON-NLS-1$
+    private final static String EMPTY_STRING = ""; //$NON-NLS-1$
     private final HandlerManager handlerManager = new HandlerManager(this);
     private final ModifyListener modifyListener = new ModifyListener() {
         @Override
@@ -27,7 +27,7 @@ public class TextItem implements HasValue<String> {
         }
     };
     private Text text;
-    private String value = DEFAULT_VALUE; // track value while Widget not bound
+    private String value; // track value while Text not set
     private boolean fireEvents = true;
 
     public synchronized void setText(Text text) {
@@ -51,23 +51,26 @@ public class TextItem implements HasValue<String> {
 
     @Override
     public String getValue() {
-        return text != null ? text.getText() : value;
+        if (text != null) {
+            return !text.getText().isEmpty() ? text.getText() : null;
+        }
+        return value;
     }
 
     @Override
     public void setValue(String value) {
-        this.value = value != null ? value : DEFAULT_VALUE;
-
-        if (text != null) {
-            text.setText(value);
-        }
+        setValue(value, false);
     }
 
     @Override
     public void setValue(String value, boolean fireEvents) {
-        this.fireEvents = fireEvents;
-        setValue(value);
-        this.fireEvents = true;
+        this.value = value;
+
+        if (text != null) {
+            this.fireEvents = fireEvents;
+            text.setText(value != null ? value : EMPTY_STRING);
+            this.fireEvents = true;
+        }
     }
 
     private void unbindOldText() {
