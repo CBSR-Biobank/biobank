@@ -18,7 +18,7 @@ public class BaseModel<T> extends FormModel {
 
     public void setValue(T value) {
         provider.setValue(value);
-        provider.commit();
+        provider.commit(); // clear dirty
     }
 
     public ValueModel<Boolean> dirty() {
@@ -31,5 +31,6 @@ public class BaseModel<T> extends FormModel {
 
     public void revert() {
         provider.revert();
+        provider.commit(); // clear dirty
     }
 }

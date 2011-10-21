@@ -15,13 +15,16 @@ import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidato
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
+import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction;
 import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction.SiteInfo;
 import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.site.SaveSiteAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.mvp.event.AlertEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
+import edu.ualberta.med.biobank.mvp.event.presenter.site.ShowSiteViewPresenterEvent;
 import edu.ualberta.med.biobank.mvp.model.BaseModel;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.util.ObjectCloner;
@@ -101,8 +104,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
     @Override
     public void doReload() {
-        // TODO: implement this!
-        model.name.setValue("asdfasdfa");
+        model.revert();
     }
 
     @Override
@@ -120,25 +122,15 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         dispatcher.exec(saveSite, new ActionCallback<Integer>() {
             @Override
             public void onFailure(Throwable caught) {
-                // on failure:
-                // log exception
-                // have a listener to a DisplayExceptionEvent:
-                // e.g. eventBus.fireEvent(new ExceptionEvent(???));
+                // TODO: better error message and show or log exception?
+                eventBus.fireEvent(new AlertEvent(caught.getLocalizedMessage()));
             }
 
             @Override
             public void onSuccess(Integer siteId) {
-                // on success:
-
-                // TODO: close this view
-                // TODO: listen for SiteSavedEvent to (1) FormManager open view
-                // form (2) TreeManager(s) update any trees that have this site.
-                // But wait, probably shouldn't open the view form on any site
-                // save event ... :-(
-
                 eventBus.fireEvent(new SiteChangedEvent(siteId));
-
-                // TODO: fire event to open a view form for this site
+                eventBus.fireEvent(new ShowSiteViewPresenterEvent(siteId));
+                close();
             }
         });
     }
@@ -147,21 +139,24 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         SiteInfo siteInfo = new SiteInfo();
         siteInfo.setSite(new Site());
         siteInfo.getSite().setAddress(new Address());
-        model.setValue(siteInfo);
-        return view;
+        return editSite(siteInfo);
     }
 
     public View editSite(Integer siteId) {
-        // final Holder<SiteInfo> siteInfoHolder = new Holder<SiteInfo>(null);
-        // GetSiteInfoAction getSiteInfo = new GetSiteInfoAction(siteId);
-        // dispatcher.exec(getSiteInfo, new ActionCallback<SiteInfo>() {
-        // @Override
-        // public void onFailure(Throwable caught) {
-        // // TODO: better error message and show or log exception?
-        // eventBus.fireEvent(new AlertEvent("FAIL!"));
-        // display.close();
-        // unbind();
-        // }
+        GetSiteInfoAction getSiteInfo = new GetSiteInfoAction(siteId);
+        dispatcher.exec(getSiteInfo, new ActionCallback<SiteInfo>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                // TODO: better error message and show or log exception?
+                eventBus.fireEvent(new AlertEvent(caught.getLocalizedMessage()));
+                close();
+            }
+
+            @Override
+            public void onSuccess(SiteInfo siteInfo) {
+                editSite(siteInfo);
+            }
+        });
 
         return view;
     }
@@ -173,14 +168,15 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         return view;
     }
 
+    // TODO: expose Model for testing purposes?
     private static class Model extends BaseModel<SiteInfo> {
-        protected final FieldModel<Integer> siteId;
-        protected final FieldModel<String> name;
-        protected final FieldModel<String> nameShort;
-        protected final FieldModel<String> comment;
-        protected final FieldModel<Address> address;
-        protected final FieldModel<ActivityStatus> activityStatus;
-        protected final ListFieldModel<StudyInfo> studies;
+        final FieldModel<Integer> siteId;
+        final FieldModel<String> name;
+        final FieldModel<String> nameShort;
+        final FieldModel<String> comment;
+        final FieldModel<Address> address;
+        final FieldModel<ActivityStatus> activityStatus;
+        final ListFieldModel<StudyInfo> studies;
 
         @SuppressWarnings("unchecked")
         public Model() {
@@ -211,7 +207,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
                 .using(new NotEmptyValidator("Name Short is required"));
         }
 
-        public Set<Integer> getStudyIds() {
+        Set<Integer> getStudyIds() {
             Set<Integer> studyIds = new HashSet<Integer>();
             for (StudyInfo studyInfo : studies) {
                 studyIds.add(studyInfo.getStudy().getId());
