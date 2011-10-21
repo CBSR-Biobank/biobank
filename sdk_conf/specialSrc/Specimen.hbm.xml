@@ -8,7 +8,6 @@
 		</id>
 		<!-- Attributes mapping for the Specimen class -->
 		<property name="inventoryId" type="string" length="100" column="INVENTORY_ID" unique="true" not-null="true"/>
-		<property name="comment" type="text" column="COMMENT"/>
 		<property name="quantity" type="double" column="QUANTITY"/>
 		<property name="createdAt" type="java.util.Date" column="CREATED_AT" not-null="true"/>
 		<!-- Associations mapping for the Specimen class -->
@@ -27,6 +26,11 @@
 			<cache usage="read-write" />
 			<key column="PARENT_SPECIMEN_ID" not-null="false" />
 			<one-to-many class="edu.ualberta.med.biobank.model.Specimen"/>
+		</set>
+		<set name="commentCollection" table="SPECIMEN_COMMENT" lazy="true" cascade="none" inverse="false">
+			<cache usage="read-write" />
+			<key column="SPECIMEN_ID" />
+			<many-to-many class="edu.ualberta.med.biobank.model.Comment" column="COMMENT_ID" unique="true"/>
 		</set>
 		<set name="requestSpecimenCollection" lazy="true" cascade="none" inverse="false">
 			<cache usage="read-write" />

@@ -174,7 +174,7 @@ public class ProblemFixer {
                     ceventOnProduction.setVisitNumber(PatientWrapper
                         .getNextVisitNumber(appService, patient));
                     ceventOnProduction
-                        .setComment(ceventOnTraining.getComment());
+                        .setCommentCollection(ceventOnTraining.getCommentCollection(false));
                     ceventOnProduction
                         .setEventAttrValue(heartEventAttrLabel,
                             ceventOnTraining
@@ -230,7 +230,7 @@ public class ProblemFixer {
 
             spcOnProduction = new SpecimenWrapper(appService);
             spcOnProduction.setInventoryId(spcOnTraining.getInventoryId());
-            spcOnProduction.setComment(spcOnTraining.getComment());
+            spcOnProduction.setComment(spcOnTraining.getCommentCollection(false));
             spcOnProduction.setQuantity(spcOnTraining.getQuantity());
             spcOnProduction.setCreatedAt(spcOnTraining.getCreatedAt());
             spcOnProduction.setCollectionEvent(ceventOnProduction);
@@ -275,7 +275,7 @@ public class ProblemFixer {
                     .setWorksheet(peventOnTraining.getWorksheet());
                 peventOnProduction
                     .setCreatedAt(peventOnTraining.getCreatedAt());
-                peventOnProduction.setComment(peventOnTraining.getComment());
+                peventOnProduction.setComment(peventOnTraining.getCommentCollection(false));
                 peventOnProduction.setCenter(calgarySiteOnProduction);
                 peventOnProduction.setActivityStatus(ActivityStatusWrapper
                     .getActivityStatus(appService, peventOnTraining
@@ -354,7 +354,7 @@ public class ProblemFixer {
 
         spcOnProduction = new SpecimenWrapper(appService);
         spcOnProduction.setInventoryId(spcOnTraining.getInventoryId());
-        spcOnProduction.setComment(spcOnTraining.getComment());
+        spcOnProduction.setComment(spcOnTraining.getCommentCollection(false));
         spcOnProduction.setQuantity(spcOnTraining.getQuantity());
         spcOnProduction.setCreatedAt(spcOnTraining.getCreatedAt());
         spcOnProduction.setCollectionEvent(ceventOnProduction);

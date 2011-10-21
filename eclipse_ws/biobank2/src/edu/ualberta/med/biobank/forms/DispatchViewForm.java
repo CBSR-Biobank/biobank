@@ -360,7 +360,7 @@ public class DispatchViewForm extends BiobankViewForm {
                 setTextValue(dateReceivedLabel,
                     shipInfo.getFormattedDateReceived());
         }
-        setTextValue(commentLabel, dispatch.getComment());
+        setTextValue(commentLabel, dispatch.getCommentCollection(false));
     }
 
 }

@@ -152,7 +152,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.label_comments, null, pEvent,
-            ProcessingEventPeer.COMMENT.getName(), null);
+            ProcessingEventPeer.COMMENT_COLLECTION.getName(), null);
     }
 
     private void createSpecimensSection() {

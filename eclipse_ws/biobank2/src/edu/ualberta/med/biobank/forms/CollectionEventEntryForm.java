@@ -137,7 +137,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             ceventCopy.setId(ceventInfo.cevent.getId());
             ceventCopy.setVisitNumber(ceventInfo.cevent.getVisitNumber());
             ceventCopy.setActivityStatus(ceventInfo.cevent.getActivityStatus());
-            ceventCopy.setComment(ceventInfo.cevent.getComment());
+            ceventCopy.setCommentCollection(ceventInfo.cevent
+                .getCommentCollection());
             sourceSpecimens = new ArrayList<SpecimenInfo>(
                 ceventInfo.sourceSpecimenInfos);
         }
@@ -214,7 +215,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.label_comments, null, ceventCopy,
-            CollectionEventPeer.COMMENT.getName(), null);
+            CollectionEventPeer.COMMENT_COLLECTION.getName(), null);
     }
 
     private void createSpecimensSection() {
@@ -331,13 +332,14 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void saveForm() throws Exception {
         List<SaveCEventSpecimenInfo> cevents = new ArrayList<CollectionEventSaveAction.SaveCEventSpecimenInfo>();
         for (Object o : specimensTable.getCollection()) {
             SpecimenInfo specInfo = (SpecimenInfo) o;
             SaveCEventSpecimenInfo ceSpecInfo = new SaveCEventSpecimenInfo();
-            ceSpecInfo.comment = specInfo.specimen.getComment();
+            ceSpecInfo.comment = specInfo.specimen.getCommentCollection();
             ceSpecInfo.id = specInfo.specimen.getId();
             ceSpecInfo.inventoryId = specInfo.specimen.getInventoryId();
             ceSpecInfo.quantity = specInfo.specimen.getQuantity();
@@ -358,12 +360,14 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         }
 
         // save the collection event
-        Integer savedCeventId = SessionManager.getAppService().doAction(
-            new CollectionEventSaveAction(ceventCopy.getId(), ceventCopy
-                .getPatient().getId(), ceventCopy.getVisitNumber(), ceventCopy
-                .getActivityStatus().getId(), ceventCopy.getComment(),
-                SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                cevents, ceventAttrList));
+        Integer savedCeventId = SessionManager.getAppService()
+            .doAction(
+                new CollectionEventSaveAction(ceventCopy.getId(), ceventCopy
+                    .getPatient().getId(), ceventCopy.getVisitNumber(),
+                    ceventCopy.getActivityStatus().getId(), ceventCopy
+                        .getCommentCollection(), SessionManager.getUser()
+                        .getCurrentWorkingCenter().getId(), cevents,
+                    ceventAttrList));
         ((CollectionEventAdapter) adapter).setId(savedCeventId);
         SessionManager.updateAllSimilarNodes(adapter, true);
     }

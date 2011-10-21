@@ -121,7 +121,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         setTextValue(specimenCountLabel, siteInfo.aliquotedSpecimenCount);
         setTextValue(activityStatusLabel, siteInfo.site.getActivityStatus()
             .getName());
-        setTextValue(commentLabel, siteInfo.site.getComment());
+        setTextValue(commentLabel, siteInfo.site.getCommentCollection());
     }
 
     private void createStudySection() {

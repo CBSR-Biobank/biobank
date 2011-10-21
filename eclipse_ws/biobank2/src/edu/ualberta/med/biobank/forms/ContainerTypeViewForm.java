@@ -129,7 +129,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             containerType.getChildLabelingScheme() == null ? "" : containerType //$NON-NLS-1$
                 .getChildLabelingSchemeName());
         setTextValue(activityStatusLabel, containerType.getActivityStatus());
-        setTextValue(commentLabel, containerType.getComment());
+        setTextValue(commentLabel, containerType.getCommentCollection(false));
     }
 
     private void createSpecimenTypesSection() {

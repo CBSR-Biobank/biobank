@@ -67,6 +67,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
     private List<String> inventoryIdExcludeList;
 
+    @SuppressWarnings("unchecked")
     public CEventSourceSpecimenDialog(Shell parent, Specimen spec,
         List<SourceSpecimen> studySourceSpecimen,
         List<SpecimenTypeInfo> allSpecimenTypes,
@@ -94,7 +95,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             internalSpecimen.setInventoryId(spec.getInventoryId());
             internalSpecimen.setQuantity(spec.getQuantity());
             internalSpecimen.setCreatedAt(spec.getCreatedAt());
-            internalSpecimen.setComment(spec.getComment());
+            internalSpecimen.setCommentCollection(spec.getCommentCollection());
             internalSpecimen.setActivityStatus(spec.getActivityStatus());
             editedSpecimen = spec;
         }
@@ -186,7 +187,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         BgcBaseText commentWidget = (BgcBaseText) createBoundWidgetWithLabel(
             contents, BgcBaseText.class, SWT.MULTI,
             Messages.CEventSourceSpecimenDialog_label_comments, null,
-            internalSpecimen, SpecimenPeer.COMMENT.getName(), null);
+            internalSpecimen, SpecimenPeer.COMMENT_COLLECTION.getName(), null);
         gd = (GridData) commentWidget.getLayoutData();
         gd.horizontalSpan = 2;
         gd.widthHint = 400;
@@ -334,6 +335,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         updateWidgetVisibilityAndValues();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void copy(Object newModelObject) {
         Specimen spec = (Specimen) newModelObject;
@@ -341,7 +343,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         spec.setSpecimenType(internalSpecimen.getSpecimenType());
         spec.setQuantity(internalSpecimen.getQuantity());
         spec.setCreatedAt(internalSpecimen.getCreatedAt());
-        spec.setComment(internalSpecimen.getComment());
+        spec.setCommentCollection(internalSpecimen.getCommentCollection());
         spec.setActivityStatus(internalSpecimen.getActivityStatus());
         inventoryIdExcludeList.add(internalSpecimen.getInventoryId());
     }

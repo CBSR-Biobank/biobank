@@ -132,7 +132,7 @@ public class StudyViewForm extends BiobankViewForm {
         setTextValue(nameLabel, study.getName());
         setTextValue(nameShortLabel, study.getNameShort());
         setTextValue(activityStatusLabel, study.getActivityStatus());
-        setTextValue(commentLabel, study.getComment());
+        setTextValue(commentLabel, study.getCommentCollection(false));
         setTextValue(patientTotal, study.getPatientCount(true));
         setTextValue(visitTotal, study.getCollectionEventCount());
     }

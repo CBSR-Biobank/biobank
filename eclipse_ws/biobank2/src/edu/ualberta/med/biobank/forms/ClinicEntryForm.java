@@ -132,7 +132,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.label_comments, null, clinic,
-            ClinicPeer.COMMENT.getName(), null);
+            ClinicPeer.COMMENT_COLLECTION.getName(), null);
     }
 
     private void createContactSection() {

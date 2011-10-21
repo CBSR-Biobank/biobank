@@ -119,7 +119,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
         setTextValue(boxNumberLabel, shipInfo.getBoxNumber());
         setTextValue(dateReceivedLabel, shipInfo.getFormattedDateReceived());
-        setTextValue(commentLabel, shipInfo.getComment());
+        setTextValue(commentLabel, shipInfo.getCommentCollection(false));
     }
 
     @Override
