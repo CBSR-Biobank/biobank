@@ -7,13 +7,11 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.collectionEvent.GetPatientCollectionEventInfosAction;
-import edu.ualberta.med.biobank.common.action.collectionEvent.GetPatientCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.patient.GetPatientCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.GetPatientInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.User;
@@ -28,14 +26,13 @@ public class GetPatientInfoAction implements Action<PatientInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String PATIENT_INFO_HQL = "SELECT patient, COUNT(DISTINCT sourceSpecs), COUNT(DISTINCT aliquotedSpecs)"
+    private static final String PATIENT_INFO_HQL = "SELECT patient, COUNT(DISTINCT sourceSpecs), COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourceSpecs)"
         + " FROM " + Patient.class.getName() + " patient"
         + " INNER JOIN FETCH patient." + PatientPeer.STUDY.getName() + " study"
         + " LEFT JOIN patient." + PatientPeer.COLLECTION_EVENT_COLLECTION.getName() + " AS cevents"
         + " LEFT JOIN cevents." + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName() + " AS sourceSpecs"
-        + " LEFT JOIN cevents." +  CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName() + " AS aliquotedSpecs"
+        + " LEFT JOIN cevents." +  CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName() + " AS allSpecs"
         + " WHERE patient.id = ?"
-        + " AND aliquotedSpecs." + SpecimenPeer.PARENT_SPECIMEN.getName()+ " IS NULL" // count only aliquoted Specimen-s
         + " GROUP BY patient";
     // @formatter:on
 
