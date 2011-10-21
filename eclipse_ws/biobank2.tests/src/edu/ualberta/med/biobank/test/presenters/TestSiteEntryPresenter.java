@@ -110,11 +110,6 @@ public class TestSiteEntryPresenter {
         presenter.bind();
         presenter.createSite();
 
-        // TODO; instead of call doSave() the view's save button should be
-        // pressed
-        presenter.doSave();
-
-        // TODO: test needs to listen to event buffer for site created event
-
+        siteEntryView.getSave();
     }
 }
