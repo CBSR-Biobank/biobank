@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.mvp.view;
 
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -14,6 +15,7 @@ public class ActivityStatusComboView implements
 
     @Override
     public void create(Composite parent) {
+        activityStatus.setComboViewer(new ComboViewer(parent));
     }
 
     @Override

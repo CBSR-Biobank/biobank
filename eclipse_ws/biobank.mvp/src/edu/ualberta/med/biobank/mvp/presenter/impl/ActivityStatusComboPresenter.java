@@ -43,6 +43,8 @@ public class ActivityStatusComboPresenter extends BasePresenter<View> {
                     // TODO: need to do something if cannot get information,
                     // like throwing an ExceptionEvent. Parent Presenter may
                     // need to tear down/ fail if this fails.
+                    System.out.println("FAIL!");
+                    caught.printStackTrace();
                 }
 
                 @Override

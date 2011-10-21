@@ -102,7 +102,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     @Override
     public void doReload() {
         // TODO: implement this!
-        model.revert();
+        model.name.setValue("asdfasdfa");
     }
 
     @Override
@@ -167,9 +167,8 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     }
 
     public View editSite(SiteInfo siteInfo) {
-        // TODO: not sure if making a clone is necessary with a provider
+        // get our own (deep) copy of the data
         SiteInfo clone = ObjectCloner.deepCopy(siteInfo);
-
         model.setValue(clone);
         return view;
     }

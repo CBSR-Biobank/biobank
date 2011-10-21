@@ -9,6 +9,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.ManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -85,12 +86,10 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         widget = new SiteEntryForm(parent, SWT.NONE);
 
         name.setText(widget.name);
+        nameShort.setText(widget.nameShort);
+        comment.setText(widget.comment);
         save.setButton(widget.save);
         reload.setButton(widget.reload);
-
-        // create the inner widgets
-        addressEntryView.create(widget);
-        activityStatusComboView.create(widget);
     }
 
     @Override
@@ -157,8 +156,10 @@ public class SiteEntryView implements SiteEntryPresenter.View {
 
     }
 
-    public static class SiteEntryForm extends BaseForm {
+    private class SiteEntryForm extends BaseForm {
         public final Text name;
+        public final Text nameShort;
+        public final Text comment;
         public final Button save;
         public final Button reload;
 
@@ -176,7 +177,19 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             toolkit.paintBordersFor(client);
 
-            name = new Text(client, SWT.NONE);
+            new Label(client, SWT.NONE).setText("name");
+            name = new Text(client, SWT.BORDER);
+            new Label(client, SWT.NONE).setText("nameShort");
+            nameShort = new Text(client, SWT.BORDER);
+            new Label(client, SWT.NONE).setText("comment");
+            comment = new Text(client, SWT.BORDER);
+
+            // create the inner widgets
+            // addressEntryView.create(client);
+
+            new Label(client, SWT.NONE).setText("activityStatus");
+            activityStatusComboView.create(client);
+
             save = new Button(client, SWT.NONE);
             save.setText("save");
             reload = new Button(client, SWT.NONE);

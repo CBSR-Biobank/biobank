@@ -10,7 +10,6 @@ public class BaseModel<T> extends FormModel {
     public BaseModel(Class<T> beanModelClass) {
         // TODO: could read the .class from the generic parameter?
         provider = new ReflectionBeanModelProvider<T>(beanModelClass);
-        provider.setAutoCommit(true);
     }
 
     public T getValue() {
@@ -19,6 +18,7 @@ public class BaseModel<T> extends FormModel {
 
     public void setValue(T value) {
         provider.setValue(value);
+        provider.commit();
     }
 
     public ValueModel<Boolean> dirty() {

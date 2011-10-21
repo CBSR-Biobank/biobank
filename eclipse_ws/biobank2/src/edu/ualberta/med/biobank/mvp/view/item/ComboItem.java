@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.mvp.view.item;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -9,7 +11,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
@@ -42,6 +44,7 @@ public class ComboItem<T> implements HasSelectedValue<T> {
     };
     private ComboViewer comboViewer;
     private T value = null; // track value while Widget not bound
+    private List<T> options = new ArrayList<T>();
     private Converter<T, String> optionLabeler;
     private boolean fireEvents;
 
@@ -49,8 +52,11 @@ public class ComboItem<T> implements HasSelectedValue<T> {
         unbindOldComboViewer();
 
         this.comboViewer = comboViewer;
-        setValue(value);
+        comboViewer.setContentProvider(new ArrayContentProvider());
         comboViewer.setLabelProvider(new CustomLabelProvider());
+        setValue(value);
+        setOptions(options);
+
         comboViewer.addSelectionChangedListener(selectionChangedListener);
         disableMouseWheel();
     }
@@ -102,7 +108,11 @@ public class ComboItem<T> implements HasSelectedValue<T> {
 
     @Override
     public void setOptions(List<T> options) {
-        comboViewer.setInput(options);
+        this.options = options;
+
+        if (comboViewer != null) {
+            comboViewer.setInput(options);
+        }
     }
 
     @Override
@@ -118,7 +128,7 @@ public class ComboItem<T> implements HasSelectedValue<T> {
     }
 
     private void disableMouseWheel() {
-        CCombo combo = comboViewer.getCCombo();
+        Control combo = comboViewer.getControl();
         combo.addListener(SWT.MouseWheel, KILL_MOUSE_WHEEL_LISTENER);
     }
 
