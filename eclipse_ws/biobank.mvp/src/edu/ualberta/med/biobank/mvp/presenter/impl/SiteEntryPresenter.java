@@ -104,6 +104,9 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
     @Override
     public void doReload() {
+        // TODO: this resets the form. To reload it from the database, something
+        // different must be done (e.g. setting a Command that is re-run on
+        // reload).
         model.revert();
     }
 
@@ -114,9 +117,8 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         saveSite.setName(model.name.getValue());
         saveSite.setNameShort(model.nameShort.getValue());
         saveSite.setComment(model.comment.getValue());
-        // TODO: null check?
-        // saveSite.setActivityStatusId(model.activityStatus.getValue().getId());
         saveSite.setAddress(model.address.getValue());
+        saveSite.setActivityStatusId(model.getActivityStatusId());
         saveSite.setStudyIds(model.getStudyIds());
 
         dispatcher.exec(saveSite, new ActionCallback<Integer>() {
@@ -205,6 +207,11 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
                 .using(new NotEmptyValidator("Name is required"));
             ValidationPlugin.validateField(nameShort)
                 .using(new NotEmptyValidator("Name Short is required"));
+        }
+
+        Integer getActivityStatusId() {
+            ActivityStatus activityStatus = this.activityStatus.getValue();
+            return activityStatus != null ? activityStatus.getId() : null;
         }
 
         Set<Integer> getStudyIds() {
