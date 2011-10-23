@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.mvp.view;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -12,12 +13,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.ManagedForm;
+import org.eclipse.ui.forms.events.ExpansionAdapter;
+import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.ScrolledPageBook;
+import org.eclipse.ui.forms.widgets.Section;
 
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.ui.HasValue;
+import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
+import com.pietschy.gwt.pectin.client.form.validation.message.ValidationMessage;
 
 import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.forms.Messages;
@@ -38,7 +44,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
     private final TextItem comment = new TextItem();
     private final TableItem<List<StudyInfo>> studies = new TableItem<List<StudyInfo>>();
 
-    private BaseView addressEntryView;
+    private BaseView addressEditView;
     private BaseView activityStatusComboView;
 
     @Override
@@ -85,7 +91,12 @@ public class SiteEntryView implements SiteEntryPresenter.View {
     public void create(Composite parent) {
         widget = new SiteEntryForm(parent, SWT.NONE);
 
+        // TODO: make a BaseForm, get an attach point to make the text stuff in
+        // and then we don't need an inner class. that's pointless.
+
+        name.setValidationControl(widget.nameLabel);
         name.setText(widget.name);
+        nameShort.setValidationControl(widget.nameShortLabel);
         nameShort.setText(widget.nameShort);
         comment.setText(widget.comment);
         save.setButton(widget.save);
@@ -94,7 +105,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
 
     @Override
     public void setAddressEntryView(BaseView view) {
-        this.addressEntryView = view;
+        this.addressEditView = view;
     }
 
     @Override
@@ -154,11 +165,50 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             // });
         }
 
+        protected Section createSection(String title, Composite parent,
+            int style) {
+            Section section = toolkit.createSection(parent, style);
+            if (title != null) {
+                section.setText(title);
+            }
+            section.setLayout(new GridLayout(1, false));
+            section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            section.addExpansionListener(new ExpansionAdapter() {
+                @Override
+                public void expansionStateChanged(ExpansionEvent e) {
+                    form.reflow(false);
+                }
+            });
+            return section;
+        }
+
+        protected Section createSection(String title, Composite parent) {
+            return createSection(title, parent, Section.TWISTIE
+                | Section.TITLE_BAR | Section.EXPANDED);
+        }
+
+        protected Section createSection(String title) {
+            return createSection(title, page);
+        }
+
+        protected Composite sectionAddClient(Section section) {
+            Composite client = toolkit.createComposite(section);
+            section.setClient(client);
+            client.setLayout(new GridLayout(2, false));
+            toolkit.paintBordersFor(client);
+            return client;
+        }
+
+        protected Composite createSectionWithClient(String title) {
+            return sectionAddClient(createSection(title, page));
+        }
     }
 
     private class SiteEntryForm extends BaseForm {
         public final Text name;
+        public final Label nameLabel;
         public final Text nameShort;
+        public final Label nameShortLabel;
         public final Text comment;
         public final Button save;
         public final Button reload;
@@ -177,15 +227,17 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             toolkit.paintBordersFor(client);
 
-            new Label(client, SWT.NONE).setText("name");
+            nameLabel = new Label(client, SWT.NONE);
+            nameLabel.setText("name");
             name = new Text(client, SWT.BORDER);
-            new Label(client, SWT.NONE).setText("nameShort");
+            nameShortLabel = new Label(client, SWT.NONE);
+            nameShortLabel.setText("nameShort");
             nameShort = new Text(client, SWT.BORDER);
             new Label(client, SWT.NONE).setText("comment");
             comment = new Text(client, SWT.BORDER);
 
-            // create the inner widgets
-            // addressEntryView.create(client);
+            Composite addressSection = createSectionWithClient("Address");
+            addressEditView.create(addressSection);
 
             new Label(client, SWT.NONE).setText("activityStatus");
             activityStatusComboView.create(client);
@@ -196,6 +248,14 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             reload.setText("reload");
 
             form.reflow(true);
+        }
+    }
+
+    @Override
+    public void setValidationResult(ValidationResult result) {
+        System.out.println(new Date());
+        for (ValidationMessage message : result.getMessages()) {
+            System.out.println(message.getMessage());
         }
     }
 }

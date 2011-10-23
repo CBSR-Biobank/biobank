@@ -6,6 +6,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.pietschy.gwt.pectin.client.form.FieldModel;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationPlugin;
 import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidator;
+import com.pietschy.gwt.pectin.client.value.MutableValueModel;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.mvp.model.BaseModel;
@@ -31,27 +32,27 @@ public class AddressEditPresenter extends BasePresenter<View> {
         HasValue<String> getCountry();
     }
 
-    private Model address = new Model();
+    private Model model = new Model();
 
     @Inject
     public AddressEditPresenter(View view, EventBus eventBus) {
         super(view, eventBus);
     }
 
-    public HasValue<Address> getAddress() {
-        return null;
+    public MutableValueModel<Address> getAddress() {
+        return model.getMutableValueModel();
     }
 
     @Override
     protected void onBind() {
-        binder.bind(address.street1).to(view.getStreet1());
-        binder.bind(address.street2).to(view.getStreet2());
-        binder.bind(address.city).to(view.getCity());
-        binder.bind(address.province).to(view.getProvince());
-        binder.bind(address.postalCode).to(view.getPostalCode());
-        binder.bind(address.phoneNumber).to(view.getPhoneNumber());
-        binder.bind(address.faxNumber).to(view.getFaxNumber());
-        binder.bind(address.country).to(view.getCountry());
+        binder.bind(model.street1).to(view.getStreet1());
+        binder.bind(model.street2).to(view.getStreet2());
+        binder.bind(model.city).to(view.getCity());
+        binder.bind(model.province).to(view.getProvince());
+        binder.bind(model.postalCode).to(view.getPostalCode());
+        binder.bind(model.phoneNumber).to(view.getPhoneNumber());
+        binder.bind(model.faxNumber).to(view.getFaxNumber());
+        binder.bind(model.country).to(view.getCountry());
     }
 
     @Override
@@ -59,14 +60,14 @@ public class AddressEditPresenter extends BasePresenter<View> {
     }
 
     public static class Model extends BaseModel<Address> {
-        protected final FieldModel<String> street1;
-        protected final FieldModel<String> street2;
-        protected final FieldModel<String> city;
-        protected final FieldModel<String> province;
-        protected final FieldModel<String> postalCode;
-        protected final FieldModel<String> phoneNumber;
-        protected final FieldModel<String> faxNumber;
-        protected final FieldModel<String> country;
+        final FieldModel<String> street1;
+        final FieldModel<String> street2;
+        final FieldModel<String> city;
+        final FieldModel<String> province;
+        final FieldModel<String> postalCode;
+        final FieldModel<String> phoneNumber;
+        final FieldModel<String> faxNumber;
+        final FieldModel<String> country;
 
         @SuppressWarnings("unchecked")
         public Model() {
@@ -92,6 +93,11 @@ public class AddressEditPresenter extends BasePresenter<View> {
             // TODO: make Validator-s take a field name arg only?
             ValidationPlugin.validateField(city)
                 .using(new NotEmptyValidator("City is required"));
+
+            // TODO: (1) wrap validation plugin to add listeners to the field
+            // and the condition to re-validate. (2) aggregate validation?
+
+            // TODO: what about unbinding?
         }
     }
 }

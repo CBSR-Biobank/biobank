@@ -11,6 +11,7 @@ import com.pietschy.gwt.pectin.client.form.FieldModel;
 import com.pietschy.gwt.pectin.client.form.ListFieldModel;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationPlugin;
 import com.pietschy.gwt.pectin.client.form.validation.binding.ValidationBinder;
+import com.pietschy.gwt.pectin.client.form.validation.component.ValidationDisplay;
 import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidator;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
@@ -38,7 +39,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     private final ValidationBinder validationBinder = new ValidationBinder();
     private final Model model = new Model();
 
-    public interface View extends FormView {
+    public interface View extends FormView, ValidationDisplay {
         void setAddressEntryView(BaseView view);
 
         void setActivityStatusComboView(BaseView view);
@@ -79,11 +80,14 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         binder.bind(model.comment).to(view.getComment());
         // binder.bind(model.studies).to(view.getStudies());
 
-        // TODO: proppa?
-        // binder.bind(model.address)
-        // .to(addressEditPresenter.getAddress());
+        binder.bind(model.address)
+            .to(addressEditPresenter.getAddress());
         binder.bind(model.activityStatus)
             .to(activityStatusComboPresenter.getActivityStatus());
+
+        validationBinder.bindValidationOf(model).to(view);
+
+        // validationBinder.bindValidationOf(addressEditPresenter.getAddress()).
 
         // TODO: need to have some sort of:
         // (1) aggregated binding system
@@ -112,6 +116,12 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
     @Override
     public void doSave() {
+        boolean valid = ValidationPlugin.getValidationManager(model).validate();
+
+        if (!valid) {
+            return;
+        }
+
         SaveSiteAction saveSite = new SaveSiteAction();
         saveSite.setId(model.siteId.getValue());
         saveSite.setName(model.name.getValue());
@@ -171,7 +181,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     }
 
     // TODO: expose Model for testing purposes?
-    private static class Model extends BaseModel<SiteInfo> {
+    private class Model extends BaseModel<SiteInfo> {
         final FieldModel<Integer> siteId;
         final FieldModel<String> name;
         final FieldModel<String> nameShort;
@@ -207,6 +217,8 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
                 .using(new NotEmptyValidator("Name is required"));
             ValidationPlugin.validateField(nameShort)
                 .using(new NotEmptyValidator("Name Short is required"));
+
+            // TODO: include validation from address?
         }
 
         Integer getActivityStatusId() {

@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.mvp.view;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.google.gwt.user.client.ui.HasValue;
@@ -9,7 +10,7 @@ import com.google.gwt.user.client.ui.HasValue;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEditPresenter;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
 
-public class AddressEntryView implements AddressEditPresenter.View {
+public class AddressEditView implements AddressEditPresenter.View {
     private final TextItem street1 = new TextItem();
     private final TextItem street2 = new TextItem();
     private final TextItem city = new TextItem();
@@ -18,12 +19,26 @@ public class AddressEntryView implements AddressEditPresenter.View {
     private final TextItem phoneNumber = new TextItem();
     private final TextItem faxNumber = new TextItem();
     private final TextItem country = new TextItem();
+    private boolean created = false;
 
     @Override
     public void create(Composite parent) {
-        Widget widget = new Widget(parent, SWT.NONE);
+        if (!created) {
+            Label street1Label = new Label(parent, SWT.NONE);
+            street1Label.setText("street1");
+            street1.setValidationControl(street1Label);
+            street1.setText(new Text(parent, SWT.BORDER));
 
-        street1.setText(widget.street1);
+            Label cityLabel = new Label(parent, SWT.NONE);
+            cityLabel.setText("city");
+            street1.setValidationControl(cityLabel);
+            city.setText(new Text(parent, SWT.BORDER));
+
+            created = true;
+        } else {
+            // TODO: write super class and override onCreate(parent) method?
+            // TODO: complain like crazy?
+        }
     }
 
     @Override
@@ -64,15 +79,5 @@ public class AddressEntryView implements AddressEditPresenter.View {
     @Override
     public HasValue<String> getCountry() {
         return country;
-    }
-
-    public static class Widget extends Composite {
-        public Text street1;
-
-        public Widget(Composite parent, int style) {
-            super(parent, style);
-
-            street1 = new Text(this, SWT.NONE);
-        }
     }
 }

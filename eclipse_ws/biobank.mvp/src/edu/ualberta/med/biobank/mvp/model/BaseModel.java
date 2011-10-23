@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.mvp.model;
 
 import com.pietschy.gwt.pectin.client.form.FormModel;
+import com.pietschy.gwt.pectin.client.value.MutableValueModel;
 import com.pietschy.gwt.pectin.client.value.ValueModel;
 import com.pietschy.gwt.pectin.reflect.ReflectionBeanModelProvider;
 
@@ -9,6 +10,9 @@ public class BaseModel<T> extends FormModel {
 
     public BaseModel(Class<T> beanModelClass) {
         // TODO: could read the .class from the generic parameter?
+        // TODO: should get this from an injected provider in the future if ever
+        // go the GWT-way since it this specific implementation won't work with
+        // GWT
         provider = new ReflectionBeanModelProvider<T>(beanModelClass);
     }
 
@@ -32,5 +36,9 @@ public class BaseModel<T> extends FormModel {
     public void revert() {
         provider.revert();
         provider.commit(); // clear dirty
+    }
+
+    public MutableValueModel<T> getMutableValueModel() {
+        return provider;
     }
 }
