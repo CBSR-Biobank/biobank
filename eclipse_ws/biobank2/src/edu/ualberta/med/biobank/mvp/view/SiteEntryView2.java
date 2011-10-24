@@ -13,7 +13,7 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.ui.HasValue;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 
-import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;

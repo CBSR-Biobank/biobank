@@ -8,16 +8,16 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.site.GetSiteContainerTypeInfoAction.ContainerTypeInfo;
-import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction.SiteInfo;
-import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
-import edu.ualberta.med.biobank.common.permission.SiteReadPermission;
+import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypeInfoAction.ContainerTypeInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction.SiteInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.common.permission.site.SiteReadPermission;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetSiteInfoAction implements Action<SiteInfo> {
+public class SiteGetInfoAction implements Action<SiteInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     private static final String SITE_INFO_HQL = "SELECT site, COUNT(DISTINCT patients), COUNT(DISTINCT collectionEvents), COUNT(DISTINCT aliquotedSpecimens)"
@@ -34,20 +34,20 @@ public class GetSiteInfoAction implements Action<SiteInfo> {
     // @formatter:on
 
     private final Integer siteId;
-    private final GetSiteTopContainersAction getTopContainers;
-    private final GetSiteContainerTypeInfoAction getContainerTypeInfo;
-    private final GetSiteStudyInfoAction getStudyInfo;
+    private final SiteGetTopContainersAction getTopContainers;
+    private final SiteGetContainerTypeInfoAction getContainerTypeInfo;
+    private final SiteGetStudyInfoAction getStudyInfo;
 
-    public GetSiteInfoAction(Site site) {
+    public SiteGetInfoAction(Site site) {
         this(site.getId());
     }
 
-    public GetSiteInfoAction(Integer siteId) {
+    public SiteGetInfoAction(Integer siteId) {
         this.siteId = siteId;
 
-        this.getTopContainers = new GetSiteTopContainersAction(siteId);
-        this.getContainerTypeInfo = new GetSiteContainerTypeInfoAction(siteId);
-        this.getStudyInfo = new GetSiteStudyInfoAction(siteId);
+        this.getTopContainers = new SiteGetTopContainersAction(siteId);
+        this.getContainerTypeInfo = new SiteGetContainerTypeInfoAction(siteId);
+        this.getStudyInfo = new SiteGetStudyInfoAction(siteId);
     }
 
     @Override

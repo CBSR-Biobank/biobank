@@ -16,10 +16,10 @@ import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidato
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
-import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction;
-import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction.SiteInfo;
-import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
-import edu.ualberta.med.biobank.common.action.site.SaveSiteAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction.SiteInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
@@ -120,7 +120,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
             return;
         }
 
-        SaveSiteAction saveSite = new SaveSiteAction();
+        SiteSaveAction saveSite = new SiteSaveAction();
         saveSite.setId(model.siteId.getValue());
         saveSite.setName(model.name.getValue());
         saveSite.setNameShort(model.nameShort.getValue());
@@ -153,7 +153,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     }
 
     public View editSite(Integer siteId) {
-        GetSiteInfoAction getSiteInfo = new GetSiteInfoAction(siteId);
+        SiteGetInfoAction getSiteInfo = new SiteGetInfoAction(siteId);
         dispatcher.exec(getSiteInfo, new ActionCallback<SiteInfo>() {
             @Override
             public void onFailure(Throwable caught) {

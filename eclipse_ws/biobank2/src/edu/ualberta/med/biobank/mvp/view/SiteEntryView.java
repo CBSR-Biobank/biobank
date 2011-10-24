@@ -25,7 +25,7 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 import com.pietschy.gwt.pectin.client.form.validation.message.ValidationMessage;
 
-import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.HasButton;

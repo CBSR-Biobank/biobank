@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class SaveSiteAction implements Action<Integer> {
+public class SiteSaveAction implements Action<Integer> {
     private static final long serialVersionUID = 1L;
 
     // Specific properties force the programmer only to modify the intended

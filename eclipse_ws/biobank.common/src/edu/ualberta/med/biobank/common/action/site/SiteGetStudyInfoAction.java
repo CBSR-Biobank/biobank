@@ -9,13 +9,13 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetSiteStudyInfoAction implements Action<ArrayList<StudyInfo>> {
+public class SiteGetStudyInfoAction implements Action<ArrayList<StudyInfo>> {
     public static class StudyInfo implements Serializable, NotAProxy {
         private static final long serialVersionUID = 1L;
 
@@ -58,11 +58,11 @@ public class GetSiteStudyInfoAction implements Action<ArrayList<StudyInfo>> {
 
     private final Integer siteId;
 
-    public GetSiteStudyInfoAction(Integer siteId) {
+    public SiteGetStudyInfoAction(Integer siteId) {
         this.siteId = siteId;
     }
 
-    public GetSiteStudyInfoAction(Site site) {
+    public SiteGetStudyInfoAction(Site site) {
         this(site.getId());
     }
 
