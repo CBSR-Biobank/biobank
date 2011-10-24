@@ -11,6 +11,7 @@ import java.util.Random;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 
 import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -34,7 +35,7 @@ import edu.ualberta.med.biobank.test.internal.UserHelper;
 public class TestDatabase {
     protected static BiobankApplicationService appService;
 
-    protected Random r;
+    protected static Random r;
 
     private static final List<Class<?>> IGNORE_RETURN_TYPES = new ArrayList<Class<?>>() {
         private static final long serialVersionUID = 1L;
@@ -49,8 +50,8 @@ public class TestDatabase {
         Method setMethod;
     }
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void setUpClass() throws Exception {
         r = new Random();
         appService = AllTests.appService;
         if (appService == null) {
@@ -58,6 +59,11 @@ public class TestDatabase {
             appService = AllTests.appService;
             Assert.assertNotNull("setUp: appService is null", appService);
         }
+    }
+
+    @Before
+    public void setUp() throws Exception {
+
     }
 
     @After

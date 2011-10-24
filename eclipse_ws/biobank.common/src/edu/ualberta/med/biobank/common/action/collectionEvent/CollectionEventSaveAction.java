@@ -71,7 +71,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
     }
 
-    private List<SaveCEventSpecimenInfo> sourceSpecimens;
+    private Collection<SaveCEventSpecimenInfo> sourceSpecimens;
 
     private Integer centerId;
 
@@ -79,7 +79,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
         Integer visitNumber, Integer statusId, Collection<Comment> collection,
-        Integer centerId, List<SaveCEventSpecimenInfo> sourceSpecs,
+        Integer centerId, Collection<SaveCEventSpecimenInfo> sourceSpecs,
         List<SaveCEventAttrInfo> ceAttrList) {
         this.ceventId = ceventId;
         this.patientId = patientId;
@@ -144,37 +144,40 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
     private void setSourceSpecimens(Session session,
         CollectionEvent ceventToSave) {
-        OriginInfo oi = new OriginInfo();
-        oi.setCenter(ActionUtil.sessionGet(session, Center.class, centerId));
-        session.saveOrUpdate(oi);
         DiffUtils<Specimen> originalSpec = new DiffUtils<Specimen>(
             CollectionUtils.getCollection(ceventToSave,
                 CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION));
         Collection<Specimen> allSpec = CollectionUtils.getCollection(
             ceventToSave, CollectionEventPeer.ALL_SPECIMEN_COLLECTION);
-        for (SaveCEventSpecimenInfo specInfo : sourceSpecimens) {
-            Specimen specimen;
-            if (specInfo.id == null) {
-                specimen = new Specimen();
-                specimen.setCurrentCenter(oi.getCenter());
-                specimen.setOriginInfo(oi);
-            } else {
-                specimen = ActionUtil.sessionGet(session, Specimen.class,
-                    specInfo.id);
+
+        if (sourceSpecimens != null) {
+            OriginInfo oi = new OriginInfo();
+            oi.setCenter(ActionUtil.sessionGet(session, Center.class, centerId));
+            session.saveOrUpdate(oi);
+            for (SaveCEventSpecimenInfo specInfo : sourceSpecimens) {
+                Specimen specimen;
+                if (specInfo.id == null) {
+                    specimen = new Specimen();
+                    specimen.setCurrentCenter(oi.getCenter());
+                    specimen.setOriginInfo(oi);
+                } else {
+                    specimen = ActionUtil.sessionGet(session, Specimen.class,
+                        specInfo.id);
+                }
+                specimen.setActivityStatus(ActionUtil.sessionGet(session,
+                    ActivityStatus.class, specInfo.statusId));
+                specimen.setCollectionEvent(ceventToSave);
+                // cascade will save-update the specimens from this list:
+                allSpec.add(specimen);
+                specimen.setOriginalCollectionEvent(ceventToSave);
+                originalSpec.add(specimen);
+                specimen.setCommentCollection(specInfo.comment);
+                specimen.setCreatedAt(specInfo.timeDrawn);
+                specimen.setInventoryId(specInfo.inventoryId);
+                specimen.setQuantity(specInfo.quantity);
+                specimen.setSpecimenType(ActionUtil.sessionGet(session,
+                    SpecimenType.class, specInfo.specimenTypeId));
             }
-            specimen.setActivityStatus(ActionUtil.sessionGet(session,
-                ActivityStatus.class, specInfo.statusId));
-            specimen.setCollectionEvent(ceventToSave);
-            // cascade will save-update the specimens from this list:
-            allSpec.add(specimen);
-            specimen.setOriginalCollectionEvent(ceventToSave);
-            originalSpec.add(specimen);
-            specimen.setCommentCollection(specInfo.comment);
-            specimen.setCreatedAt(specInfo.timeDrawn);
-            specimen.setInventoryId(specInfo.inventoryId);
-            specimen.setQuantity(specInfo.quantity);
-            specimen.setSpecimenType(ActionUtil.sessionGet(session,
-                SpecimenType.class, specInfo.specimenTypeId));
         }
         // need to remove from collections. the delete-orphan cascade on
         // allspecimencollection will delete orphans
@@ -192,97 +195,101 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
         Map<Integer, EventAttrInfo> ceventAttrList = new GetEventAttrInfoAction(
             ceventId).run(user, session);
+        if (ceAttrList != null)
+            for (SaveCEventAttrInfo attrInfo : ceAttrList) {
+                EventAttrInfo ceventAttrInfo = ceventAttrList
+                    .get(attrInfo.studyEventAttrId);
+                StudyEventAttrInfo studyEventAttrInfo = studyEventList
+                    .get(attrInfo.studyEventAttrId);
 
-        for (SaveCEventAttrInfo attrInfo : ceAttrList) {
-            EventAttrInfo ceventAttrInfo = ceventAttrList
-                .get(attrInfo.studyEventAttrId);
-            StudyEventAttrInfo studyEventAttrInfo = studyEventList
-                .get(attrInfo.studyEventAttrId);
+                StudyEventAttr sAttr;
 
-            StudyEventAttr sAttr;
-
-            if (ceventAttrInfo != null) {
-                sAttr = ceventAttrInfo.attr.getStudyEventAttr();
-            } else {
-                sAttr = studyEventAttrInfo == null ? null
-                    : studyEventAttrInfo.attr;
-                if (sAttr == null) {
-                    throw new ActionException(
-                        "no StudyEventAttr found for id \"" //$NON-NLS-1$
-                            + attrInfo.studyEventAttrId + "\""); //$NON-NLS-1$
-                }
-            }
-
-            if (!ActivityStatusEnum.ACTIVE.getId().equals(
-                sAttr.getActivityStatus().getId())) {
-                throw new ActionException("Attribute for \"" + sAttr.getLabel() //$NON-NLS-1$
-                    + "\" is locked, changes not premitted"); //$NON-NLS-1$
-            }
-
-            if (attrInfo.value != null) {
-                // validate the value
-                attrInfo.value = attrInfo.value.trim();
-                if (attrInfo.value.length() > 0) {
-                    EventAttrTypeEnum type = attrInfo.type;
-                    List<String> permissibleSplit = null;
-
-                    if (type == EventAttrTypeEnum.SELECT_SINGLE
-                        || type == EventAttrTypeEnum.SELECT_MULTIPLE) {
-                        String permissible = sAttr.getPermissible();
-                        if (permissible != null) {
-                            permissibleSplit = Arrays.asList(permissible
-                                .split(";")); //$NON-NLS-1$
-                        }
+                if (ceventAttrInfo != null) {
+                    sAttr = ceventAttrInfo.attr.getStudyEventAttr();
+                } else {
+                    sAttr = studyEventAttrInfo == null ? null
+                        : studyEventAttrInfo.attr;
+                    if (sAttr == null) {
+                        throw new ActionException(
+                            "no StudyEventAttr found for id \"" //$NON-NLS-1$
+                                + attrInfo.studyEventAttrId + "\""); //$NON-NLS-1$
                     }
+                }
 
-                    if (type == EventAttrTypeEnum.SELECT_SINGLE) {
-                        if (!permissibleSplit.contains(attrInfo.value)) {
-                            throw new ActionException(
-                                "value " + attrInfo.value //$NON-NLS-1$
-                                    + "is invalid for label \"" + sAttr.getLabel() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
-                        }
-                    } else if (type == EventAttrTypeEnum.SELECT_MULTIPLE) {
-                        for (String singleVal : attrInfo.value.split(";")) { //$NON-NLS-1$
-                            if (!permissibleSplit.contains(singleVal)) {
-                                throw new ActionException(
-                                    "value " + singleVal + " (" //$NON-NLS-1$ //$NON-NLS-2$
-                                        + attrInfo.value
-                                        + ") is invalid for label \"" + sAttr.getLabel() //$NON-NLS-1$
-                                        + "\""); //$NON-NLS-1$
+                if (!ActivityStatusEnum.ACTIVE.getId().equals(
+                    sAttr.getActivityStatus().getId())) {
+                    throw new ActionException(
+                        "Attribute for \"" + sAttr.getLabel() //$NON-NLS-1$
+                            + "\" is locked, changes not premitted"); //$NON-NLS-1$
+                }
+
+                if (attrInfo.value != null) {
+                    // validate the value
+                    attrInfo.value = attrInfo.value.trim();
+                    if (attrInfo.value.length() > 0) {
+                        EventAttrTypeEnum type = attrInfo.type;
+                        List<String> permissibleSplit = null;
+
+                        if (type == EventAttrTypeEnum.SELECT_SINGLE
+                            || type == EventAttrTypeEnum.SELECT_MULTIPLE) {
+                            String permissible = sAttr.getPermissible();
+                            if (permissible != null) {
+                                permissibleSplit = Arrays.asList(permissible
+                                    .split(";")); //$NON-NLS-1$
                             }
                         }
-                    } else if (type == EventAttrTypeEnum.NUMBER) {
-                        Double.parseDouble(attrInfo.value);
-                    } else if (type == EventAttrTypeEnum.DATE_TIME) {
-                        try {
-                            DateFormatter.dateFormatter.parse(attrInfo.value);
-                        } catch (ParseException e) {
-                            throw new ActionException(e);
+
+                        if (type == EventAttrTypeEnum.SELECT_SINGLE) {
+                            if (!permissibleSplit.contains(attrInfo.value)) {
+                                throw new ActionException(
+                                    "value " + attrInfo.value //$NON-NLS-1$
+                                        + "is invalid for label \"" + sAttr.getLabel() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+                            }
+                        } else if (type == EventAttrTypeEnum.SELECT_MULTIPLE) {
+                            for (String singleVal : attrInfo.value.split(";")) { //$NON-NLS-1$
+                                if (!permissibleSplit.contains(singleVal)) {
+                                    throw new ActionException(
+                                        "value " + singleVal + " (" //$NON-NLS-1$ //$NON-NLS-2$
+                                            + attrInfo.value
+                                            + ") is invalid for label \"" + sAttr.getLabel() //$NON-NLS-1$
+                                            + "\""); //$NON-NLS-1$
+                                }
+                            }
+                        } else if (type == EventAttrTypeEnum.NUMBER) {
+                            Double.parseDouble(attrInfo.value);
+                        } else if (type == EventAttrTypeEnum.DATE_TIME) {
+                            try {
+                                DateFormatter.dateFormatter
+                                    .parse(attrInfo.value);
+                            } catch (ParseException e) {
+                                throw new ActionException(e);
+                            }
+                        } else if (type == EventAttrTypeEnum.TEXT) {
+                            // do nothing
+                        } else {
+                            throw new ActionException(
+                                "type \"" + type + "\" not tested"); //$NON-NLS-1$ //$NON-NLS-2$
                         }
-                    } else if (type == EventAttrTypeEnum.TEXT) {
-                        // do nothing
-                    } else {
-                        throw new ActionException(
-                            "type \"" + type + "\" not tested"); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 }
-            }
 
-            EventAttr eventAttr;
-            if (ceventAttrInfo == null) {
-                eventAttr = new EventAttr();
-                CollectionUtils.getCollection(cevent,
-                    CollectionEventPeer.EVENT_ATTR_COLLECTION).add(eventAttr);
-                eventAttr.setCollectionEvent(cevent);
-                eventAttr.setStudyEventAttr(sAttr);
-            } else {
-                eventAttr = ceventAttrInfo.attr;
-            }
-            eventAttr.setValue(attrInfo.value);
+                EventAttr eventAttr;
+                if (ceventAttrInfo == null) {
+                    eventAttr = new EventAttr();
+                    CollectionUtils.getCollection(cevent,
+                        CollectionEventPeer.EVENT_ATTR_COLLECTION).add(
+                        eventAttr);
+                    eventAttr.setCollectionEvent(cevent);
+                    eventAttr.setStudyEventAttr(sAttr);
+                } else {
+                    eventAttr = ceventAttrInfo.attr;
+                }
+                eventAttr.setValue(attrInfo.value);
 
-            // FIXME need to remove attributes ? when they don't exist anymore
-            // in study maybe ? See previous code in wrapper ?
-        }
+                // FIXME need to remove attributes ? when they don't exist
+                // anymore
+                // in study maybe ? See previous code in wrapper ?
+            }
     }
 
 }

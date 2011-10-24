@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -13,43 +14,45 @@ import org.junit.Before;
 import edu.ualberta.med.biobank.test.TestDatabase;
 
 public class TestAction extends TestDatabase {
-    protected SessionFactory sessionFactory;
+    private SessionFactory sessionFactory;
+    protected Session session;
 
+    /**
+     * Done for each test of this class.
+     */
     @Override
     @Before
     public void setUp() throws Exception {
-        // A SessionFactory is set up once for an application
-        sessionFactory = new Configuration().configure() // configures
-                                                         // settings
-            // from
-            // hibernate.cfg.xml
-            .buildSessionFactory();
+        // configure() configures settings from hibernate.cfg.xml found into the
+        // biobank-orm jar
+        sessionFactory = new Configuration().configure().buildSessionFactory();
         super.setUp();
     }
 
+    /**
+     * Done for each test of this class.
+     */
     @Override
     @After
     public void tearDown() throws Exception {
+        closeHibernateSession();
         if (sessionFactory != null) {
             sessionFactory.close();
         }
-        super.tearDown();
     }
 
-    public abstract class HibernateCheck {
+    public void openHibernateSession() {
+        session = sessionFactory.openSession();
+        session.setFlushMode(FlushMode.MANUAL);
+        session.beginTransaction();
+    }
 
-        public void run() throws Exception {
-            Session session = sessionFactory.openSession();
-            session.beginTransaction();
-            try {
-                check(session);
-            } finally {
-                session.getTransaction().commit();
-                session.close();
-            }
+    public void closeHibernateSession() {
+        if ((session != null) && session.isConnected()) {
+            session.getTransaction().commit();
+            session.close();
+            session = null;
         }
-
-        public abstract void check(Session session) throws Exception;
     }
 
     private static Date convertToGmt(Date localDate) {
@@ -75,5 +78,9 @@ public class TestAction extends TestDatabase {
         Date hibernateDate) {
         Date convertdate = convertToGmt(localDate);
         return convertdate.equals(hibernateDate);
+    }
+
+    public static boolean compareDouble(Double d1, Double d2) {
+        return Math.abs((d1 - d2)) < 0.0001;
     }
 }
