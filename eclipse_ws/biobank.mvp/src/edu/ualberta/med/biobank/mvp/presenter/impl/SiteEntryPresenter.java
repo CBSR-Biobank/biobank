@@ -116,9 +116,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
     @Override
     public void doSave() {
-        boolean valid = ValidationPlugin.getValidationManager(model).validate();
-
-        if (!valid) {
+        if (!model.validate()) {
             return;
         }
 

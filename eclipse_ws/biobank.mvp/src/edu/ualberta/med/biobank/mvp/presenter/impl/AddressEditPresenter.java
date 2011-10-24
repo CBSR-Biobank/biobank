@@ -53,10 +53,13 @@ public class AddressEditPresenter extends BasePresenter<View> {
         binder.bind(model.phoneNumber).to(view.getPhoneNumber());
         binder.bind(model.faxNumber).to(view.getFaxNumber());
         binder.bind(model.country).to(view.getCountry());
+
+        model.bind();
     }
 
     @Override
     protected void onUnbind() {
+        model.unbind();
     }
 
     public static class Model extends BaseModel<Address> {
@@ -95,7 +98,8 @@ public class AddressEditPresenter extends BasePresenter<View> {
                 .using(new NotEmptyValidator("City is required"));
 
             // TODO: (1) wrap validation plugin to add listeners to the field
-            // and the condition to re-validate. (2) aggregate validation?
+            // and the condition to re-validate. (2) aggregate validation? Make
+            // a protected model bind() and unbind() method?
 
             // TODO: what about unbinding?
         }

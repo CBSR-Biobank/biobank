@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.mvp.model;
 
 import com.pietschy.gwt.pectin.client.form.FormModel;
+import com.pietschy.gwt.pectin.client.form.validation.ValidationPlugin;
 import com.pietschy.gwt.pectin.client.value.MutableValueModel;
 import com.pietschy.gwt.pectin.client.value.ValueModel;
 import com.pietschy.gwt.pectin.reflect.ReflectionBeanModelProvider;
@@ -40,5 +41,17 @@ public class BaseModel<T> extends FormModel {
 
     public MutableValueModel<T> getMutableValueModel() {
         return provider;
+    }
+
+    public void bind() {
+
+    }
+
+    public void unbind() {
+
+    }
+
+    public boolean validate() {
+        return ValidationPlugin.getValidationManager(this).validate();
     }
 }
