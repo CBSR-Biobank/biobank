@@ -9,14 +9,14 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction.SearchedPatientInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class SearchPatientAction implements Action<SearchedPatientInfo> {
+public class PatientSearchAction implements Action<SearchedPatientInfo> {
     private static final long serialVersionUID = 1L;
 
     // @formatter:off
@@ -27,8 +27,10 @@ public class SearchPatientAction implements Action<SearchedPatientInfo> {
         + " LEFT JOIN p." + PatientPeer.STUDY.getName() + " as study"
         + " LEFT JOIN p." + PatientPeer.COLLECTION_EVENT_COLLECTION.getName() + " as cevents"
         + " where {0} GROUP BY p";
-    private static final String WHERE_FOR_PNUMBER = "p." + PatientPeer.PNUMBER.getName() + "=?"; //$NON-NLS-1$
-    private static final String WHERE_FOR_ID = "p." +  PatientPeer.ID.getName() + "=?"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String WHERE_FOR_PNUMBER = "p." + PatientPeer.PNUMBER.getName() + "=?"; 
+    @SuppressWarnings("nls")
+    private static final String WHERE_FOR_ID = "p." +  PatientPeer.ID.getName() + "=?"; 
     // @formatter:on
 
     private String pnumber;
@@ -41,11 +43,11 @@ public class SearchPatientAction implements Action<SearchedPatientInfo> {
         public Long ceventsCount;
     }
 
-    public SearchPatientAction(String pnumber) {
+    public PatientSearchAction(String pnumber) {
         this.pnumber = pnumber;
     }
 
-    public SearchPatientAction(Integer id) {
+    public PatientSearchAction(Integer id) {
         this.patientId = id;
     }
 
@@ -93,24 +95,5 @@ public class SearchPatientAction implements Action<SearchedPatientInfo> {
         // }
 
     }
-    // private List<CollectionEventInfo> getCollectionEvents(Session session,
-    // Integer patientId) {
-    // List<CollectionEventInfo> ceventInfos = new
-    // ArrayList<CollectionEventInfo>();
-    //
-    // Query query = session.createQuery(CEVENT_INFO_QRY);
-    // query.setParameter(0, patientId);
-    //
-    // @SuppressWarnings("unchecked")
-    // List<Object[]> rows = query.list();
-    // for (Object[] row : rows) {
-    // CollectionEventInfo ceventInfo = new CollectionEventInfo();
-    // ceventInfo.cevent = (CollectionEvent) row[0];
-    // ceventInfo.sourceSpecimenCount = (Long) row[1];
-    // ceventInfo.minSourceSpecimenDate = (Date) row[2];
-    // ceventInfos.add(ceventInfo);
-    // }
-    // return ceventInfos;
-    // }
 
 }

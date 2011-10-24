@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.common.action.patient;
 
-import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.wrappers.Messages;
 
-public class PatientMergeException extends ActionException {
+public class PatientMergeException extends ActionCheckException {
 
     private static final long serialVersionUID = 1L;
 

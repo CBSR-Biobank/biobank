@@ -43,7 +43,7 @@ public class ExceptionInterceptor implements ThrowsAdvice {
             throw new ValidationException((InvalidStateException) cause);
         }
         if (cause != null && cause instanceof ActionException) {
-            throw new ActionException(cause.getMessage(), ae);
+            throw (ActionException) cause;
         }
         // if (cause != null && cause instanceof ConstraintViolationException) {
         // Throwable orig = ExceptionUtils.findFirstCause(cause);

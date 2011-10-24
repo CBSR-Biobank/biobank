@@ -8,8 +8,8 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.patient.GetPatientCollectionEventInfosAction.PatientCEventInfo;
-import edu.ualberta.med.biobank.common.action.patient.GetPatientInfoAction.PatientInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.model.User;
  * @author delphine
  * 
  */
-public class GetPatientInfoAction implements Action<PatientInfo> {
+public class PatientGetInfoAction implements Action<PatientInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -48,7 +48,7 @@ public class GetPatientInfoAction implements Action<PatientInfo> {
 
     }
 
-    public GetPatientInfoAction(Integer patientId) {
+    public PatientGetInfoAction(Integer patientId) {
         this.patientId = patientId;
     }
 
@@ -72,7 +72,7 @@ public class GetPatientInfoAction implements Action<PatientInfo> {
             pInfo.patient = (Patient) row[0];
             pInfo.sourceSpecimenCount = (Long) row[1];
             pInfo.aliquotedSpecimenCount = (Long) row[2];
-            pInfo.cevents = new GetPatientCollectionEventInfosAction(patientId)
+            pInfo.cevents = new PatientGetCollectionEventInfosAction(patientId)
                 .run(user, session);
 
         } else {

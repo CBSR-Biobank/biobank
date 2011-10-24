@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction;
-import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction.SearchedPatientInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.NewAbstractSearchedNode;
@@ -51,7 +51,7 @@ public class PatientSearchedNode extends NewAbstractSearchedNode {
                 try {
                     SearchedPatientInfo patientres = SessionManager
                         .getAppService().doAction(
-                            new SearchPatientAction(pEntry.getKey()));
+                            new PatientSearchAction(pEntry.getKey()));
                     pEntry.setValue(patientres);
                 } catch (ApplicationException e) {
                     throw new RuntimeException(e);

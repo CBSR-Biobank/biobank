@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.treeview.patient;
 
 import java.util.Map;
 
-import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction.SearchedPatientInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.model.Study;
 
 public class StudyNodeInfo {

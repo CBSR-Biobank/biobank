@@ -130,12 +130,12 @@ public class CollectionEventSaveAction implements Action<Integer> {
     }
 
     private void check(User user, Session session) {
+        // Check that the visit number is unique for the patient
         List<ValueProperty<CollectionEvent>> propUple = new ArrayList<ValueProperty<CollectionEvent>>();
         propUple.add(new ValueProperty<CollectionEvent>(
             CollectionEventPeer.PATIENT.to(PatientPeer.ID), patientId));
         propUple.add(new ValueProperty<CollectionEvent>(
             CollectionEventPeer.VISIT_NUMBER, visitNumber));
-
         new UniquePreCheck<CollectionEvent>(new ValueProperty<CollectionEvent>(
             CollectionEventPeer.ID, ceventId), CollectionEvent.class, propUple)
             .run(user, session);
@@ -192,7 +192,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
         Map<Integer, StudyEventAttrInfo> studyEventList = new GetStudyEventAttrInfoAction(
             study.getId()).run(user, session);
 
-        Map<Integer, EventAttrInfo> ceventAttrList = new GetEventAttrInfoAction(
+        Map<Integer, EventAttrInfo> ceventAttrList = new CollectionEventGetEventAttrInfoAction(
             ceventId).run(user, session);
         if (ceAttrList != null)
             for (SaveCEventAttrInfo attrInfo : ceAttrList) {

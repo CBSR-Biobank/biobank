@@ -14,8 +14,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.patient.GetPatientInfoAction;
-import edu.ualberta.med.biobank.common.action.patient.GetPatientInfoAction.PatientInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.study.GetStudyListForSiteAction;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
@@ -62,7 +62,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         patientCopy = new Patient();
         if (adapter.getId() != null) {
             pInfo = SessionManager.getAppService().doAction(
-                new GetPatientInfoAction(adapter.getId()));
+                new PatientGetInfoAction(adapter.getId()));
             copyPatient();
         }
 

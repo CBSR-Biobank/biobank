@@ -24,11 +24,11 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
-import edu.ualberta.med.biobank.common.action.collectionEvent.GetCollectionEventInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
-import edu.ualberta.med.biobank.common.action.collectionEvent.GetCollectionEventInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.patient.NextVisitNumberAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientNextVisitNumberAction;
 import edu.ualberta.med.biobank.common.action.specimen.GetSpecimenTypeInfosAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenTypeInfo;
@@ -106,7 +106,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 .getPatient());
         } else {
             ceventInfo = SessionManager.getAppService().doAction(
-                new GetCollectionEventInfoAction(adapter.getId()));
+                new CollectionEventGetInfoAction(adapter.getId()));
         }
         copyCEvent();
         // FIXME log edit action?
@@ -127,7 +127,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         ceventCopy.setPatient(ceventInfo.cevent.getPatient());
         if (adapter.getId() == null) {
             ceventCopy.setVisitNumber(SessionManager.getAppService().doAction(
-                new NextVisitNumberAction(ceventInfo.cevent.getPatient()
+                new PatientNextVisitNumberAction(ceventInfo.cevent.getPatient()
                     .getId())));
             ceventCopy.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(SessionManager.getAppService())

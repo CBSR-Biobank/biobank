@@ -10,7 +10,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.patient.GetSimplePatientCollectionEventInfosAction.SimpleCEventInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetSimplePatientCollectionEventInfosAction implements
+public class PatientGetSimpleCollectionEventInfosAction implements
     Action<HashMap<Integer, SimpleCEventInfo>> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
@@ -41,7 +41,7 @@ public class GetSimplePatientCollectionEventInfosAction implements
         public Date minSourceSpecimenDate;
     }
 
-    public GetSimplePatientCollectionEventInfosAction(Integer patientId) {
+    public PatientGetSimpleCollectionEventInfosAction(Integer patientId) {
         this.patientId = patientId;
     }
 

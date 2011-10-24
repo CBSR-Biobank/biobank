@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.specimen;
+package edu.ualberta.med.biobank.common.action.collectionEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
@@ -19,7 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetCEventSpecimenInfosAction implements
+public class CollectionEventGetSpecimenInfosAction implements
     Action<ArrayList<SpecimenInfo>> {
     private static final long serialVersionUID = 1L;
 
@@ -59,7 +60,7 @@ public class GetCEventSpecimenInfosAction implements
     private Integer ceventId;
     private boolean aliquotedSpecimens = false;
 
-    public GetCEventSpecimenInfosAction(Integer cevenId,
+    public CollectionEventGetSpecimenInfosAction(Integer cevenId,
         boolean aliquotedSpecimens) {
         this.ceventId = cevenId;
         this.aliquotedSpecimens = aliquotedSpecimens;

@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.User;
 
-public class NextVisitNumberAction implements Action<Integer> {
+public class PatientNextVisitNumberAction implements Action<Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -20,7 +20,7 @@ public class NextVisitNumberAction implements Action<Integer> {
 
     private Integer patientId;
 
-    public NextVisitNumberAction(Integer patientId) {
+    public PatientNextVisitNumberAction(Integer patientId) {
         this.patientId = patientId;
     }
 

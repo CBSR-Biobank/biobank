@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetEventAttrInfoAction implements
+public class CollectionEventGetEventAttrInfoAction implements
     Action<HashMap<Integer, EventAttrInfo>> {
 
     private static final long serialVersionUID = 1L;
@@ -36,7 +36,7 @@ public class GetEventAttrInfoAction implements
         + " group by attr";
     // @formatter:on
 
-    public GetEventAttrInfoAction(Integer ceventId) {
+    public CollectionEventGetEventAttrInfoAction(Integer ceventId) {
         this.ceventId = ceventId;
     }
 
