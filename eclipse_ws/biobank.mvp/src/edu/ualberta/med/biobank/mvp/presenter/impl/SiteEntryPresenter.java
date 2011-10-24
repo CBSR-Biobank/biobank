@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction.SiteInfo;
 import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
-import edu.ualberta.med.biobank.common.action.site.SaveSiteAction;
+import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Site;
@@ -86,7 +86,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
     @Override
     public void doSave() {
-        SaveSiteAction saveSite = new SaveSiteAction(siteInfo.site.getId());
+        SiteSaveAction saveSite = new SiteSaveAction(siteInfo.site.getId());
         saveSite.setCommentCollection(view.getCommentCollection().getValue());
 
         saveSite.setName(view.getName().getValue());
