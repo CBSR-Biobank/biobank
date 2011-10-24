@@ -22,7 +22,7 @@ public class SpecimenCreatePermission implements Permission {
         Study study = specimen.getCollectionEvent().getPatient().getStudy();
         Center center = specimen.getOriginInfo().getCenter();
 
-        boolean isAllowed = PermissionUtil.isAllowed(user, this, center, study);
+        boolean isAllowed = false;
 
         return isAllowed;
     }

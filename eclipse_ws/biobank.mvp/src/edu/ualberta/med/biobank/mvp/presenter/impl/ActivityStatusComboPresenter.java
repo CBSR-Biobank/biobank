@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.mvp.presenter.impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -30,12 +31,8 @@ public class ActivityStatusComboPresenter extends BasePresenter<View> {
         this.dispatcher = dispatcher;
     }
 
-    public void setSelectedValue(ActivityStatus activityStatus) {
-        view.getActivityStatus().setValue(activityStatus);
-    }
-
-    public ActivityStatus getSelectedValue() {
-        return view.getActivityStatus().getValue();
+    public HasValue<ActivityStatus> getActivityStatus() {
+        return view.getActivityStatus();
     }
 
     @Override
@@ -47,6 +44,8 @@ public class ActivityStatusComboPresenter extends BasePresenter<View> {
                     // TODO: need to do something if cannot get information,
                     // like throwing an ExceptionEvent. Parent Presenter may
                     // need to tear down/ fail if this fails.
+                    System.out.println("FAIL!");
+                    caught.printStackTrace();
                 }
 
                 @Override

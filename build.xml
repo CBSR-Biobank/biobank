@@ -52,7 +52,7 @@
   <property name="biobank.gui.common.jar.files"
             value="commons-beanutils-1.8.0.jar,commons-io-1.4.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.1.jar,jdt-compiler-3.1.1.jar,DynamicJasper-3.0.14.jar" />
   <property name="biobank.mvp.jar.files"
-            value="gwt-user.jar,guice-3.0.jar,peaberry-1.2.jar,javax.inject.jar,aopalliance.jar" />
+            value="gwt-user.jar,gwt-pectin-0.8.1.jar,guice-3.0.jar,peaberry-1.2.jar,javax.inject.jar,aopalliance.jar" />
   <property name="biobank.jar.files"
             value="gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
   <property name="biobank.common.jar.files"

@@ -9,7 +9,7 @@ public class ClinicEditPermission implements Permission {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        return PermissionUtil.isAllowed(user, this);
+        return false;
     }
 
 }

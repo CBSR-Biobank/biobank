@@ -6,6 +6,8 @@ import java.util.SortedSet;
 public interface ValidationResult {
     boolean isEmpty();
 
+    public boolean contains(Level level);
+
     public List<ValidationMessage> getMessages();
 
     public List<ValidationMessage> getMessages(Level level);

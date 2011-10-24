@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.mvp.validation;
 
 import java.util.Collection;
 
-public interface ValidationResultAdder {
+public interface ValidationResultCollector {
     /**
      * Adds a new message to the adder.
      * 

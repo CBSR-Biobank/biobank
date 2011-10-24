@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetSiteTopContainersAction implements Action<ArrayList<Container>> {
+public class SiteGetTopContainersAction implements Action<ArrayList<Container>> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     private static final String SELECT_TOP_CONTAINERS_HQL = "SELECT container"
@@ -25,11 +25,11 @@ public class GetSiteTopContainersAction implements Action<ArrayList<Container>> 
 
     private final Integer siteId;
 
-    public GetSiteTopContainersAction(Integer siteId) {
+    public SiteGetTopContainersAction(Integer siteId) {
         this.siteId = siteId;
     }
 
-    public GetSiteTopContainersAction(Site site) {
+    public SiteGetTopContainersAction(Site site) {
         this(site.getId());
     }
 

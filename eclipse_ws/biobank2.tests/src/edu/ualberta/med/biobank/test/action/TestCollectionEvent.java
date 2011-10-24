@@ -74,7 +74,8 @@ public class TestCollectionEvent extends TestAction {
     public void testSaveWithSpecs() throws Exception {
         String s = "testSaveWithSpecs" + r.nextInt();
         final Integer visitNumber = r.nextInt(20);
-        final String comments = Utils.getRandomString(8, 50);
+        final Collection<String> comments = Arrays.asList() 
+            Utils.getRandomString(8, 50);
         final Integer statusId = 1;
 
         // add specimen type
