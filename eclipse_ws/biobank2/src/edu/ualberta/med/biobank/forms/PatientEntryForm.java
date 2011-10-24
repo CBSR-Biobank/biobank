@@ -145,7 +145,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
             Messages.PatientEntryForm_field_pNumber_label, null, patientCopy,
-            PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
+            PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator, false);
 
         createdAtLabel = widgetCreator.createLabel(client,
             Messages.PatientEntryForm_created_label);
@@ -157,7 +157,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         createDateTimeWidget(client, createdAtLabel,
             patientCopy.getCreatedAt(), patientCopy,
             PatientPeer.CREATED_AT.getName(), createdAtValidator, SWT.DATE
-                | SWT.TIME, CREATED_AT_BINDING);
+                | SWT.TIME, CREATED_AT_BINDING, false);
     }
 
     @Override
@@ -170,22 +170,31 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        final Patient patient = SessionManager.getAppService()
+        Integer patientId = SessionManager.getAppService()
             .doAction(
                 new PatientSaveAction(patientCopy.getId(), patientCopy
                     .getStudy().getId(), patientCopy.getPnumber(), patientCopy
                     .getCreatedAt()));
-        adapter.setId(patient.getId());
+        adapter.setId(patientId);
 
-        SessionManager.updateAllSimilarNodes(adapter, true);
+        // FIXME the tree needs to get the new value from the patien in case it
+        // has been modified (like de pnumber for instance), but the studynode
+        // contains and old version of the patient... Rebuild should rebuild
+        // this but this is not that nice...
+        // SessionManager.getCurrentAdapterViewWithTree().reload();
+    }
+
+    @Override
+    protected void doAfterSave() throws Exception {
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                PatientInfo pinfo = new PatientInfo();
-                pinfo.patient = patient;
-                // FIXME how to display new patient?
-                CollectionView.getCurrent().showSearchedObjectsInTree(patient,
-                    true);
+                // FIXME how to display new patient without explicitly calling
+                // the collection tree view?
+                CollectionView.getCurrent().showSearchedObjectsInTree(
+                    adapter.getId(), patientCopy.getPnumber(), true, true);
+                // the node is not highlighted because the entryform is opening
+                // a viewform with a different adapter
             }
         });
     }
@@ -199,5 +208,11 @@ public class PatientEntryForm extends BiobankEntryForm {
     protected void onReset() throws Exception {
         copyPatient();
         GuiUtil.reset(studiesViewer, patientCopy.getStudy());
+    }
+
+    @Override
+    protected boolean openViewAfterSaving() {
+        // already done by showSearchedObjectsInTree called in doAfterSave
+        return false;
     }
 }

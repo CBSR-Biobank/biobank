@@ -8,7 +8,9 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.common.action.cevent.GetSimplePatientCollectionEventInfosAction.SimpleCEventInfo;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventDeleteAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.GetSimplePatientCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
@@ -146,4 +148,15 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
         return 0;
     }
 
+    @Override
+    public void setValue(Object value) {
+        if (value instanceof SimpleCEventInfo)
+            ceventInfo = (SimpleCEventInfo) value;
+    }
+
+    @Override
+    protected void runDelete() throws Exception {
+        SessionManager.getAppService().doAction(
+            new CollectionEventDeleteAction(getId()));
+    }
 }

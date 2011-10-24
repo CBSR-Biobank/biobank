@@ -7,7 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
@@ -19,7 +19,8 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetCEventSpecimenInfosAction implements Action<List<SpecimenInfo>> {
+public class GetCEventSpecimenInfosAction implements
+    Action<ArrayList<SpecimenInfo>> {
     private static final long serialVersionUID = 1L;
 
     // @formatter:off
@@ -70,8 +71,9 @@ public class GetCEventSpecimenInfosAction implements Action<List<SpecimenInfo>> 
     }
 
     @Override
-    public List<SpecimenInfo> doAction(Session session) throws ActionException {
-        List<SpecimenInfo> specs = new ArrayList<SpecimenInfo>();
+    public ArrayList<SpecimenInfo> run(User user, Session session)
+        throws ActionException {
+        ArrayList<SpecimenInfo> specs = new ArrayList<SpecimenInfo>();
 
         Query query = session
             .createQuery(aliquotedSpecimens ? ALIQUOTED_SPEC_QRY

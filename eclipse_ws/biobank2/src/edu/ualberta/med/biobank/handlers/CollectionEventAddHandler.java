@@ -4,7 +4,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-import edu.ualberta.med.biobank.common.action.cevent.GetSimplePatientCollectionEventInfosAction.SimpleCEventInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.GetSimplePatientCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
@@ -23,8 +23,8 @@ public class CollectionEventAddHandler extends AbstractHandler {
             SimpleCEventInfo cevent = new SimpleCEventInfo();
             cevent.cevent = new CollectionEvent();
             cevent.cevent.setPatient(patientAdapter.getPatient());
-            CollectionEventAdapter adapter = new CollectionEventAdapter(
-                patientAdapter, cevent);
+            CollectionEventAdapter adapter = new CollectionEventAdapter(null,
+                cevent);
             adapter.openEntryForm();
         } catch (Exception exp) {
             logger.error("Error while opening the collection event entry form", //$NON-NLS-1$

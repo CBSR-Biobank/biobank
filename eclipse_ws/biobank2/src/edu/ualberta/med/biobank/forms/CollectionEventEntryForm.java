@@ -22,12 +22,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventSaveAction;
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventSaveAction.SaveCEventAttrInfo;
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
-import edu.ualberta.med.biobank.common.action.cevent.EventAttrInfo;
-import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction;
-import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventAttrInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.GetCollectionEventInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.GetCollectionEventInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.NextVisitNumberAction;
 import edu.ualberta.med.biobank.common.action.specimen.GetSpecimenTypeInfosAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
@@ -183,7 +183,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             CollectionEventPeer.VISIT_NUMBER.getName(),
             new IntegerNumberValidator(
                 Messages.CollectionEventEntryForm_field_visitNumber_validation_msg,
-                false));
+                false), false);
 
         visitNumberText.addSelectionChangedListener(listener);
         setFirstControl(visitNumberText);
@@ -215,7 +215,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.label_comments, null, ceventCopy,
-            CollectionEventPeer.COMMENT_COLLECTION.getName(), null);
+            CollectionEventPeer.COMMENT_COLLECTION.getName(), null, false);
     }
 
     private void createSpecimensSection() {
@@ -369,7 +369,11 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                         .getCurrentWorkingCenter().getId(), cevents,
                     ceventAttrList));
         ((CollectionEventAdapter) adapter).setId(savedCeventId);
-        SessionManager.updateAllSimilarNodes(adapter, true);
+    }
+
+    @Override
+    protected boolean openViewAfterSaving() {
+        return true;
     }
 
     private void savePvInfoValueFromControlType(FormPvCustomInfo pvCustomInfo) {

@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.permission;
 
+import org.hibernate.Session;
+
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 
@@ -16,7 +18,7 @@ public class SiteEditPermission implements Permission {
     }
 
     @Override
-    public boolean isAllowed(User user) {
+    public boolean isAllowed(User user, Session session) {
         return PermissionUtil.isAllowed(user, this, site);
     }
 }

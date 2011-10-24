@@ -23,6 +23,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -57,17 +58,17 @@ public abstract class BiobankFormBase extends BgcFormBase {
 
     @Override
     public void setFocus() {
-        if ((adapter != null) && (adapter.getId() != null)) {
-            SessionManager.setSelectedNode(adapter);
-            // if selection fails, then the adapter needs to be matched at the
-            // id level
-            if (SessionManager.getSelectedNode() == null
-                && adapter.getClass() != null) {
-                AbstractAdapterBase node = SessionManager.searchFirstNode(
-                    adapter.getClass(), adapter.getId());
-                SessionManager.setSelectedNode(node);
-            }
-        }
+        // if ((adapter != null) && (adapter.getId() != null)) {
+        // SessionManager.setSelectedNode(adapter);
+        // // if selection fails, then the adapter needs to be matched at the
+        // // id level
+        // if (SessionManager.getSelectedNode() == null
+        // && adapter.getClass() != null) {
+        // AbstractAdapterBase node = SessionManager.searchFirstNode(
+        // adapter.getClass(), adapter.getId());
+        // SessionManager.setSelectedNode(node);
+        // }
+        // }
     }
 
     @Override
@@ -103,7 +104,6 @@ public abstract class BiobankFormBase extends BgcFormBase {
             linkedForms.add(this);
         }
         super.init(editorSite, formInput);
-        getSite().setSelectionProvider(this);
     }
 
     protected Object getModelObject() throws Exception {
@@ -228,6 +228,10 @@ public abstract class BiobankFormBase extends BgcFormBase {
                 ex);
             cancelSave(monitor);
         } else if (ex instanceof BiobankSessionException) {
+            BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
+                ex);
+            cancelSave(monitor);
+        } else if (ex instanceof ActionException) {
             BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
                 ex);
             cancelSave(monitor);

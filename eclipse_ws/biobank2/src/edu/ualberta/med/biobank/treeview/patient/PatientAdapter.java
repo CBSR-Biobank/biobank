@@ -13,8 +13,9 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.cevent.GetSimplePatientCollectionEventInfosAction;
-import edu.ualberta.med.biobank.common.action.cevent.GetSimplePatientCollectionEventInfosAction.SimpleCEventInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.GetSimplePatientCollectionEventInfosAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.GetSimplePatientCollectionEventInfosAction.SimpleCEventInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
@@ -80,7 +81,7 @@ public class PatientAdapter extends AbstractNewAdapterBase {
                     cevent.cevent = new CollectionEvent();
                     cevent.cevent.setPatient(patient);
                     CollectionEventAdapter ceventAdapter = new CollectionEventAdapter(
-                        PatientAdapter.this, cevent);
+                        null, cevent);
                     ceventAdapter.openEntryForm();
                 }
             });
@@ -146,5 +147,23 @@ public class PatientAdapter extends AbstractNewAdapterBase {
             return patient.getPnumber().compareTo(
                 ((PatientAdapter) o).patient.getPnumber());
         return 0;
+    }
+
+    @Override
+    public void setValue(Object value) {
+        if (value instanceof SearchedPatientInfo) {
+            SearchedPatientInfo pinfo = (SearchedPatientInfo) value;
+            if (pinfo != null) {
+                this.patient = pinfo.patient;
+                this.study = pinfo.study;
+                this.ceventsCount = pinfo.ceventsCount;
+            }
+        }
+    }
+
+    @Override
+    protected void runDelete() throws Exception {
+        SessionManager.getAppService().doAction(
+            new PatientDeleteAction(getId()));
     }
 }

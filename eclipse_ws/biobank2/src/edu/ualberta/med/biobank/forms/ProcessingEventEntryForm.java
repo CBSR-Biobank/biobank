@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -15,9 +16,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -31,7 +32,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModificationConcurrencyException;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
@@ -278,30 +278,42 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        try {
-            pEvent.persist();
-        } catch (ModificationConcurrencyException mc) {
-            if (isTryingAgain) {
-                // already tried once
-                throw mc;
-            }
-            Display.getDefault().syncExec(new Runnable() {
-                @Override
-                public void run() {
-                    tryAgain = BgcPlugin
-                        .openConfirm(
-                            Messages.ProcessingEventEntryForm_save_error_title,
-                            Messages.ProcessingEventEntryForm_concurrency_error_msg);
-                    setDirty(true);
-                    try {
-                        doTrySettingAgain();
-                        tryAgain = true;
-                    } catch (Exception e) {
-                        saveErrorCatch(e, null, true);
-                    }
-                }
-            });
+        List<Integer> specimens = new ArrayList<Integer>();
+        for (SpecimenWrapper spc : pEvent.getSpecimenCollection(false)) {
+            specimens.add(spc.getId());
         }
+
+        Integer peventId = SessionManager.getAppService().doAction(
+            new ProcessingEventSaveAction(pEvent.getId(), pEvent.getCenter()
+                .getId(), pEvent.getCreatedAt(), pEvent.getWorksheet(), pEvent
+                .getActivityStatus().getId(), null, specimens));
+        adapter.setId(peventId);
+        // FIXME figure out if still need this. But should probably be on the
+        // action side now
+        // try {
+        // pEvent.persist();
+        // } catch (ModificationConcurrencyException mc) {
+        // if (isTryingAgain) {
+        // // already tried once
+        // throw mc;
+        // }
+        // Display.getDefault().syncExec(new Runnable() {
+        // @Override
+        // public void run() {
+        // tryAgain = BgcPlugin
+        // .openConfirm(
+        // Messages.ProcessingEventEntryForm_save_error_title,
+        // Messages.ProcessingEventEntryForm_concurrency_error_msg);
+        // setDirty(true);
+        // try {
+        // doTrySettingAgain();
+        // tryAgain = true;
+        // } catch (Exception e) {
+        // saveErrorCatch(e, null, true);
+        // }
+        // }
+        // });
+        // }
     }
 
     @Override

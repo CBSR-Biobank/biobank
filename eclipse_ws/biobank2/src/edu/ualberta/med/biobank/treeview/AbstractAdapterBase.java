@@ -7,8 +7,10 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -20,6 +22,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 import edu.ualberta.med.biobank.treeview.util.DeltaEvent;
@@ -169,10 +172,15 @@ public abstract class AbstractAdapterBase implements
     }
 
     public void removeChild(AbstractAdapterBase item) {
-        removeChild(item, true);
+        removeChild(item, true, true);
     }
 
-    public void removeChild(AbstractAdapterBase item, boolean closeForm) {
+    public void removeChild(AbstractAdapterBase item, boolean nodeOnly) {
+        removeChild(item, true, nodeOnly);
+    }
+
+    public void removeChild(AbstractAdapterBase item, boolean closeForm,
+        boolean nodeOnly) {
         if (children.size() == 0)
             return;
         AbstractAdapterBase itemToRemove = null;
@@ -188,6 +196,14 @@ public abstract class AbstractAdapterBase implements
             }
             children.remove(itemToRemove);
         }
+        if (!nodeOnly)
+            // node might need to remove completely the information from inside
+            // (not only node child)
+            removeChildInternal(itemToRemove.getId());
+    }
+
+    protected void removeChildInternal(@SuppressWarnings("unused") Integer id) {
+        // do mothing by default
     }
 
     public void removeAll() {
@@ -273,7 +289,48 @@ public abstract class AbstractAdapterBase implements
         }
     }
 
-    protected abstract void deleteWithConfirm();
+    public void deleteWithConfirm() {
+        String msg = getConfirmDeleteMessage();
+        if (msg == null) {
+            throw new RuntimeException("adapter has no confirm delete msg: " //$NON-NLS-1$
+                + getClass().getName());
+        }
+        boolean doDelete = true;
+        if (msg != null)
+            doDelete = BgcPlugin.openConfirm(
+                Messages.AdapterBase_confirm_delete_title, msg);
+        if (doDelete) {
+            BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                @Override
+                public void run() {
+                    // the order is very important
+                    if (getId() != null) {
+                        IWorkbenchPage page = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage();
+                        IEditorPart part = page.findEditor(new FormInput(
+                            AbstractAdapterBase.this));
+                        getParent().removeChild(AbstractAdapterBase.this,
+                            false, false);
+                        try {
+                            runDelete();
+                            page.closeEditor(part, true);
+                        } catch (Exception e) {
+                            BgcPlugin.openAsyncError(
+                                Messages.AdapterBase_delete_error_title, e);
+                            getParent().addChild(AbstractAdapterBase.this);
+                            return;
+                        }
+                        getParent().rebuild();
+                        getParent().notifyListeners();
+                        notifyListeners();
+                        additionalRefreshAfterDelete();
+                    }
+                }
+            });
+        }
+    }
+
+    protected abstract void runDelete() throws Exception;
 
     /**
      * Create a adequate child node for this node
@@ -469,5 +526,35 @@ public abstract class AbstractAdapterBase implements
     public void notifyListeners() {
         notifyListeners(new AdapterChangedEvent(this));
     }
+
+    /**
+     * Used when searching inside the tree
+     */
+    @Override
+    public boolean equals(Object o) {
+        boolean same = this == o;
+        if (!same && o instanceof AbstractAdapterBase) {
+            Class<?> class1 = getClass();
+            Class<?> class2 = o.getClass();
+            if (class1.equals(class2)) {
+                Integer id1 = getId();
+                Integer id2 = ((AbstractAdapterBase) o).getId();
+                return id1 != null && id2 != null && id1.equals(id2);
+            }
+        }
+        return same;
+    }
+
+    /**
+     * Used when searching inside the tree
+     */
+    @Override
+    public int hashCode() {
+        if (id != null)
+            return id.hashCode();
+        return super.hashCode();
+    }
+
+    public abstract void setValue(Object value);
 
 }

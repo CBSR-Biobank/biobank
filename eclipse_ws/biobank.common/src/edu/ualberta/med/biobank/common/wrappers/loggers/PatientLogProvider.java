@@ -14,4 +14,10 @@ public class PatientLogProvider implements WrapperLogProvider<Patient> {
 
         return log;
     }
+
+    @Override
+    public Log getObjectLog(Object model) {
+        return getLog((Patient) model);
+    }
+
 }

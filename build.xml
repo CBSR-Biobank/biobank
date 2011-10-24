@@ -26,13 +26,14 @@
   <property name="cacore.sdk.filename" value="caCORE_SDK_411.tar.gz" />
   <property name="eclipse.workspace.dir" location="eclipse_ws" />
   <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
+  <property name="eclipse.proj.dir.mvp" location="eclipse_ws/biobank.mvp" />
   <property name="eclipse.proj.dir.gui.common"
             location="eclipse_ws/biobank.gui.common" />
   <property name="eclipse.proj.dir.common"
             location="eclipse_ws/biobank.common" />
   <property name="eclipse.proj.dir.tools"
             location="eclipse_ws/biobank2.tools" />
-  <property name="eclipse.proj.dir.junit"
+  <property name="eclipse.proj.dir.tests"
             location="eclipse_ws/biobank2.tests" />
   <property name="scripts.proj.dir" location="scripts" />
   <property name="model.proj.dir" location="model" />
@@ -50,12 +51,16 @@
   <property name="lib-sources.dir" value="lib-sources" />
   <property name="biobank.gui.common.jar.files"
             value="commons-beanutils-1.8.0.jar,commons-io-1.4.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.1.jar,jdt-compiler-3.1.1.jar,DynamicJasper-3.0.14.jar" />
+  <property name="biobank.mvp.jar.files"
+            value="gwt-user.jar,guice-3.0.jar,peaberry-1.2.jar,javax.inject.jar,aopalliance.jar" />
   <property name="biobank.jar.files"
             value="gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
   <property name="biobank.common.jar.files"
             value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar" />
   <property name="biobank.tools.jar.files"
             value="commons-io-1.4.jar, jargs.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar,mysql-connector-java-5.1.15-bin.jar" />
+  <property name="biobank.test.jar.files"
+            value="mockito-all-1.9.0-rc1.jar" />
   <property name="cacore.system.jar.files"
             value="commons-collections-3.2.jar,commons-logging-1.1.jar,hibernate-validator.jar" />
   <property name="converage.output" location="coverage" />
@@ -302,6 +307,11 @@
                       files="${biobank.gui.commmon.jar.files}" />
     </dependset>
     <dependset>
+      <srcfilelist dir="${req.jars.dir}" files="${biobank.mvp.jar.files}" />
+      <targetfilelist dir="${eclipse.proj.dir.mvp}/lib"
+                      files="${biobank.mvp.jar.files}" />
+    </dependset>
+    <dependset>
       <srcfilelist dir="${req.jars.dir}" files="${biobank.jar.files}" />
       <targetfilelist dir="${eclipse.proj.dir}/lib"
                       files="${biobank.jar.files}" />
@@ -309,6 +319,11 @@
     <dependset>
       <srcfilelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}" />
       <targetfilelist dir="${eclipse.proj.dir.tools}/lib"
+                      files="${biobank.tools.jar.files}" />
+    </dependset>
+    <dependset>
+      <srcfilelist dir="${req.jars.dir}" files="${biobank.test.jar.files}" />
+      <targetfilelist dir="${eclipse.proj.dir.tests}/lib"
                       files="${biobank.tools.jar.files}" />
     </dependset>
     <dependset>
@@ -355,11 +370,17 @@
     <copy todir="${eclipse.proj.dir.gui.common}/lib" overwrite="true">
       <filelist dir="${cacore.sdk.dir}/system/lib" files="commons-collections-3.2.jar,commons-logging-1.1.jar" />
     </copy>
+    <copy todir="${eclipse.proj.dir.mvp}/lib" overwrite="true">
+      <filelist dir="${req.jars.dir}" files="${biobank.mvp.jar.files}" />
+    </copy>
     <copy todir="${eclipse.proj.dir}/lib" overwrite="true">
       <filelist dir="${req.jars.dir}" files="${biobank.jar.files}" />
     </copy>
     <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
       <filelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}" />
+    </copy>
+    <copy todir="${eclipse.proj.dir.tests}/lib" overwrite="true">
+      <filelist dir="${req.jars.dir}" files="${biobank.test.jar.files}" />
     </copy>
     <!--copy todir="${eclipse.workspace.dir}/biobank2.ws-client/lib">
       <filelist dir="${cacore.sdk.dir}/output/biobank/package/ws-client/lib"
@@ -372,14 +393,16 @@
       <fileset file="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
     </copy>
   	<!-- The following files and jars are needed in the test project to call csm api methods -->
-  	<copy todir="${eclipse.proj.dir.junit}/src" overwrite="true">
+  	<copy todir="${eclipse.proj.dir.tests}/src" overwrite="true">
   		<filelist dir="${cacore.sdk.dir}/output/biobank/src" files="biobank.csm.new.hibernate.cfg.xml" />
   	</copy>
-  	<copy todir="${eclipse.proj.dir.junit}/lib" overwrite="true">
+  	<copy todir="${eclipse.proj.dir.tests}/lib" overwrite="true">
   	  <fileset file="${cacore.sdk.dir}/system/lib/dom4j-1.4.jar" />
   	  <fileset file="${cacore.sdk.dir}/system/lib/c3p0-0.9.0.jar" />
   	  <fileset file="${cacore.sdk.dir}/system/lib/clm-4.1.jar" />
       <fileset file="${cacore.sdk.dir}/system/lib/jta.jar" />
+      <fileset file="${cacore.sdk.dir}/output/biobank/build/jar/biobank-orm.jar"/>
+  	  <fileset file="${cacore.sdk.dir}/system/lib/ehcache-1.2.2.jar"/>	
   	</copy>
   </target>
   <!-- JBoss -->
@@ -775,7 +798,7 @@
       <fileset dir="${cacore.sdk.dir}/${build.classes.dir}"/>
     </delete>
   	<!-- copy the interface that all model object should implements now (thanks to the hbmpostprocess) -->
-  	<copy todir="${cacore.sdk.dir}/${output.src.dir}/edu/ualberta/med/biobank/model" 
+  	<copy todir="${cacore.sdk.dir}/${output.src.dir}/edu/ualberta/med/biobank/model"
   		file="${eclipse.proj.dir.tools}/src/edu/ualberta/med/biobank/model/IBiobankModel.java"
   	    overwrite="true"/>
 
@@ -954,9 +977,10 @@
   <target name="clean-jars" description="deletes jars from eclipse projects">
     <delete>
       <fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.mvp}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.gui.common}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.junit}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.tests}/lib" includes="**/*.jar" />
     </delete>
   </target>
 
@@ -992,7 +1016,7 @@
 
   <property name="test.output" location="testing" />
   <property name="test.output.raw" value="${test.output}/raw" />
-  <property name="test.build.dir" value="${eclipse.proj.dir.junit}/output" />
+  <property name="test.build.dir" value="${eclipse.proj.dir.tests}/output" />
 
   <path id="common.class.path">
     <fileset dir="${eclipse.proj.dir.common}/lib/client">
@@ -1021,7 +1045,7 @@
   <target name="tests-compile" depends="build-common-project,prepare" >
     <copy includeemptydirs="false"
   	      todir="${test.build.dir}" overwrite="true">
-  	  <fileset dir="${eclipse.proj.dir.junit}/src">
+  	  <fileset dir="${eclipse.proj.dir.tests}/src">
   	    <exclude name="**/*.launch" />
   	    <exclude name="**/*.java" />
   	  </fileset>
@@ -1034,7 +1058,7 @@
            debug="true"
            debuglevel="lines,source"
            includeantruntime="false">
-      <src path="${eclipse.proj.dir.junit}/src" />
+      <src path="${eclipse.proj.dir.tests}/src" />
       <src path="${eclipse.proj.dir.tools}/src" />
       <include name="**/tools/utils/*.java" />
       <include name="**/test/reports/**/*.java" />
@@ -1047,7 +1071,7 @@
     </javac>
   </target>
 
-  <fileset id="testcase.files" dir="${eclipse.proj.dir.junit}/src">
+  <fileset id="testcase.files" dir="${eclipse.proj.dir.tests}/src">
     <include name="**/Test*.java" />
     <exclude name="**/speed/**" />
     <exclude name="**/TestReportsProcedurallyGeneratedData.java" />

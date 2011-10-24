@@ -6,14 +6,10 @@ import java.util.List;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
 
 public class NewSpecimenEntryInfoTable extends NewSpecimenInfoTable {
-
-    protected List<Specimen> addedorModifiedSpecimens = new ArrayList<Specimen>();
-    protected List<Specimen> removedSpecimens = new ArrayList<Specimen>();
 
     // list of what is displayed into the table
     protected List<SpecimenInfo> currentSpecimens;
@@ -50,16 +46,6 @@ public class NewSpecimenEntryInfoTable extends NewSpecimenInfoTable {
     public void reload(List<SpecimenInfo> specimens) {
         setCurrentSpecimens(specimens);
         reloadCollection(currentSpecimens);
-        addedorModifiedSpecimens = new ArrayList<Specimen>();
-        removedSpecimens = new ArrayList<Specimen>();
-    }
-
-    public List<Specimen> getAddedOrModifiedSpecimens() {
-        return addedorModifiedSpecimens;
-    }
-
-    public List<Specimen> getRemovedSpecimens() {
-        return removedSpecimens;
     }
 
     private void setCurrentSpecimens(List<SpecimenInfo> specInfos) {

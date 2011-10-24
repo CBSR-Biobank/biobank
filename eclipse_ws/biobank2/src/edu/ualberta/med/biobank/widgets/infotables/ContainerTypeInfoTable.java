@@ -11,8 +11,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.site.SiteViewAction.ContainerTypeInfo;
+import edu.ualberta.med.biobank.common.action.site.GetSiteContainerTypeInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -97,7 +96,7 @@ public class ContainerTypeInfoTable extends InfoTableWidget {
         ContainerTypeInfo containerTypeInfo = (ContainerTypeInfo) type;
 
         info.containerType = new ContainerTypeWrapper(
-            SessionManager.getAppService(), containerTypeInfo.containerType);
+            siteAdapter.getAppService(), containerTypeInfo.getContainerType());
         Integer rowCapacity = info.containerType.getRowCapacity();
         Integer colCapacity = info.containerType.getColCapacity();
 
@@ -107,7 +106,7 @@ public class ContainerTypeInfoTable extends InfoTableWidget {
         if ((rowCapacity != null) && (colCapacity != null)) {
             info.capacity = rowCapacity * colCapacity;
         }
-        info.inUseCount = containerTypeInfo.containerCount;
+        info.inUseCount = containerTypeInfo.getContainerCount();
         info.temperature = info.containerType.getDefaultTemperature();
         return info;
     }

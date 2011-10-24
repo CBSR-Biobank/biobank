@@ -81,12 +81,10 @@ public class ClinicAdapter extends AdapterBase {
         return ClinicViewForm.ID;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public int compareTo(AbstractAdapterBase o) {
         if (o instanceof ClinicAdapter)
-            return getModelObject().compareTo(
-                (ModelWrapper) ((AdapterBase) o).getModelObject());
+            return internalCompareTo(o);
         return 0;
     }
 

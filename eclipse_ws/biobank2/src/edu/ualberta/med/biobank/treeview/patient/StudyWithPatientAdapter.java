@@ -43,4 +43,9 @@ public class StudyWithPatientAdapter extends NewStudyAdapter {
     protected PatientAdapter createChildNode(Object child) {
         return new PatientAdapter(this, (SearchedPatientInfo) child);
     }
+
+    @Override
+    protected void removeChildInternal(Integer id) {
+        spInfo.patients.remove(id);
+    }
 }

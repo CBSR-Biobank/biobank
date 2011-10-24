@@ -7,12 +7,12 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.User;
 
 public class GetSpecimenTypeInfosAction implements
-    Action<List<SpecimenTypeInfo>> {
+    Action<ArrayList<SpecimenTypeInfo>> {
     private static final long serialVersionUID = 1L;
 
     // @formatter:off
@@ -29,9 +29,9 @@ public class GetSpecimenTypeInfosAction implements
     }
 
     @Override
-    public List<SpecimenTypeInfo> doAction(Session session)
+    public ArrayList<SpecimenTypeInfo> run(User user, Session session)
         throws ActionException {
-        List<SpecimenTypeInfo> specs = new ArrayList<SpecimenTypeInfo>();
+        ArrayList<SpecimenTypeInfo> specs = new ArrayList<SpecimenTypeInfo>();
 
         Query query = session.createQuery(SPEC_TYPE_QRY);
 

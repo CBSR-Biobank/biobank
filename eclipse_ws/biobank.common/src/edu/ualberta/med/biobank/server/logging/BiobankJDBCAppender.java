@@ -10,8 +10,6 @@ import org.apache.log4j.spi.LoggingEvent;
 
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.model.Log;
-import edu.ualberta.med.biobank.server.BiobankThreadVariable;
-import edu.ualberta.med.biobank.server.LocalInfo;
 
 /**
  * A custom Apache Log4J Appender will be responsible for formatting and

@@ -79,12 +79,10 @@ public class StudyAdapter extends AdapterBase {
         return StudyViewForm.ID;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public int compareTo(AbstractAdapterBase o) {
         if (o instanceof StudyAdapter)
-            return getModelObject().compareTo(
-                (ModelWrapper) ((AdapterBase) o).getModelObject());
+            return internalCompareTo(o);
         return 0;
     }
 }

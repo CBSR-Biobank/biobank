@@ -125,13 +125,6 @@ public abstract class NewAbstractSearchedNode extends AbstractNewAdapterBase {
         return null;
     }
 
-    // public void addSearchObject(Object searchedObject, Integer id) {
-    // searchedObjects.add(searchedObject);
-    // searchedObjectIds.add(id);
-    // }
-
-    // protected abstract boolean isParentTo(Object parent, Object child);
-
     @Override
     public List<AbstractAdapterBase> search(Class<?> searchedClass,
         Integer objectId) {
@@ -139,13 +132,6 @@ public abstract class NewAbstractSearchedNode extends AbstractNewAdapterBase {
     }
 
     public void clear() {
-        // searchedObjects.clear();
-        // searchedObjectIds.clear();
-        // removeAll();
+        removeAll();
     }
-    //
-    // public void removeObject(Object child, Integer childId) {
-    // searchedObjects.remove(child);
-    // searchedObjectIds.remove(childId);
-    // }
 }

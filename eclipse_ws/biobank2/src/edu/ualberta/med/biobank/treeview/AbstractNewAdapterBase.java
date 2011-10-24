@@ -72,6 +72,7 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
                         addChild(node);
                     }
                     if (updateNode) {
+                        node.setValue(entry.getValue());
                         SessionManager.updateAdapterTreeNode(node);
                     }
                 }
@@ -87,14 +88,9 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
     }
 
     @Override
-    public void deleteWithConfirm() {
-        // FIXME action ?
-    }
-
-    @Override
     public List<AbstractAdapterBase> search(Class<?> searchedClass,
         Integer objectId) {
-        if (getClass().equals(searchedClass))
+        if (getClass().equals(searchedClass) && getId().equals(objectId))
             return Arrays.asList(new AbstractAdapterBase[] { this });
         return new ArrayList<AbstractAdapterBase>();
     }

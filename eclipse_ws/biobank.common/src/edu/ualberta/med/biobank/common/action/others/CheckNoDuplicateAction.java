@@ -8,7 +8,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.User;
 
 public class CheckNoDuplicateAction implements Action<Boolean> {
@@ -37,7 +37,7 @@ public class CheckNoDuplicateAction implements Action<Boolean> {
     }
 
     @Override
-    public Boolean doAction(Session session) throws ActionException {
+    public Boolean run(User user, Session session) throws ActionException {
         final List<Object> params = new ArrayList<Object>();
         params.add(value);
         String equalsTest = ""; //$NON-NLS-1$

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
@@ -41,5 +42,10 @@ public class OriginInfoLogProvider implements WrapperLogProvider<OriginInfo> {
     private int getSpecimenCollectionSize(OriginInfo originInfo) {
         Collection<Specimen> specimens = originInfo.getSpecimenCollection();
         return specimens == null ? 0 : specimens.size();
+    }
+
+    @Override
+    public Log getObjectLog(Object model) {
+        return getLog((OriginInfo) model);
     }
 }

@@ -13,9 +13,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.cevent.EventAttrInfo;
-import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction;
-import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.GetCollectionEventInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.GetCollectionEventInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.study.GetStudyEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;

@@ -6,7 +6,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.User;
 
@@ -31,7 +31,7 @@ public class NextVisitNumberAction implements Action<Integer> {
     }
 
     @Override
-    public Integer doAction(Session session) throws ActionException {
+    public Integer run(User user, Session session) throws ActionException {
         Query query = session.createQuery(NEXT_NUMBER_QRY);
         query.setParameter(0, patientId);
 

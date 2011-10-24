@@ -42,4 +42,13 @@ public class SpecimenLogProvider implements WrapperLogProvider<Specimen> {
 
         return log;
     }
+
+    @Override
+    public Log getObjectLog(Object model) {
+        if (model instanceof Specimen)
+            return getLog((Specimen) model);
+        if (model instanceof SpecimenPosition)
+            return getLog(((SpecimenPosition) model).getSpecimen());
+        return null;
+    }
 }

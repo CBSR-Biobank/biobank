@@ -40,31 +40,30 @@ public class SearchView extends ViewPart {
 
     protected boolean loggedIn;
 
+    private ISourceProviderListener sourceProviderListener;
+
     @Override
     public void createPartControl(Composite parent) {
         parent.setLayout(new GridLayout(2, false));
         // listen to login state
-        BgcSessionState sessionSourceProvider = BgcPlugin
-            .getSessionStateSourceProvider();
-        sessionSourceProvider
-            .addSourceProviderListener(new ISourceProviderListener() {
+        sourceProviderListener = new ISourceProviderListener() {
+            @Override
+            public void sourceChanged(int sourcePriority,
+                @SuppressWarnings("rawtypes") Map sourceValuesByName) {
+            }
 
-                @Override
-                public void sourceChanged(int sourcePriority,
-                    @SuppressWarnings("rawtypes") Map sourceValuesByName) {
+            @Override
+            public void sourceChanged(int sourcePriority, String sourceName,
+                Object sourceValue) {
+                if (sourceName
+                    .equals(BgcSessionState.SESSION_STATE_SOURCE_NAME)) {
+                    loggedIn = sourceValue.equals(BgcSessionState.LOGGED_IN);
+                    setEnabled();
                 }
-
-                @Override
-                public void sourceChanged(int sourcePriority,
-                    String sourceName, Object sourceValue) {
-                    if (sourceName
-                        .equals(BgcSessionState.SESSION_STATE_SOURCE_NAME)) {
-                        loggedIn = sourceValue
-                            .equals(BgcSessionState.LOGGED_IN);
-                        setEnabled();
-                    }
-                }
-            });
+            }
+        };
+        BgcPlugin.getSessionStateSourceProvider().addSourceProviderListener(
+            sourceProviderListener);
 
         searchTypeCombo = new ComboViewer(parent);
         searchTypeCombo.setContentProvider(new ArrayContentProvider());
@@ -113,7 +112,7 @@ public class SearchView extends ViewPart {
             }
         });
 
-        loggedIn = sessionSourceProvider.getCurrentState()
+        loggedIn = BgcPlugin.getSessionStateSourceProvider().getCurrentState()
             .get(BgcSessionState.SESSION_STATE_SOURCE_NAME)
             .equals(BgcSessionState.LOGGED_IN);
         setEnabled();
@@ -127,6 +126,9 @@ public class SearchView extends ViewPart {
 
     @Override
     public void dispose() {
+        if (sourceProviderListener != null)
+            BgcPlugin.getSessionStateSourceProvider()
+                .removeSourceProviderListener(sourceProviderListener);
         super.dispose();
     }
 
@@ -145,11 +147,13 @@ public class SearchView extends ViewPart {
                     if (res != null && res.size() > 0) {
                         type.processResults(res);
                     } else {
-                        BgcPlugin.openInformation(Messages.SearchView_noresult_dialog_title,
+                        BgcPlugin.openInformation(
+                            Messages.SearchView_noresult_dialog_title,
                             Messages.SearchView_noresult__dialog_msg);
                     }
                 } catch (Exception ex) {
-                    BgcPlugin.openAsyncError(Messages.SearchView_search_error_title, ex);
+                    BgcPlugin.openAsyncError(
+                        Messages.SearchView_search_error_title, ex);
                 }
             }
         });

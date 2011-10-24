@@ -21,7 +21,7 @@ eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/base/*.ja
 eclipse_ws/biobank.gui.common/bin
 eclipse_ws/biobank.gui.common/lib/*.jar
 eclipse_ws/biobank2.tools/bin
-eclipse_ws/biobank2.tools/lib
+eclipse_ws/biobank2.tools/lib/*.jar
 eclipse_ws/biobank2.tools/output
 eclipse_ws/biobank2.tests/bin
 eclipse_ws/biobank2.tests/build
@@ -40,6 +40,9 @@ eclipse_ws/biobank2/src/edu/ualberta/med/biobank/test
 eclipse_ws/biobank2.ws-client/bin
 eclipse_ws/biobank2.ws-client/lib/*.jar
 eclipse_ws/biobank2/dmscanlib.txt
+eclipse_ws/biobank.mvp/lib/*.jar
+eclipse_ws/biobank.mvp/bin
+eclipse_ws/biobank.mvp/output
 log/
 model/*.png
 model/biobank.uml~

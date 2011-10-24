@@ -9,7 +9,6 @@ import org.eclipse.core.runtime.Assert;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class DeleteSelectionHandler extends AbstractHandler implements IHandler {
 
@@ -23,17 +22,8 @@ public class DeleteSelectionHandler extends AbstractHandler implements IHandler 
                 Messages.DeleteSelectionHandler_delete_error_msg);
             return null;
         }
-        ((AdapterBase) adapter).deleteWithConfirm();
+        adapter.deleteWithConfirm();
         return null;
     }
 
-    @Override
-    public boolean isEnabled() {
-        AbstractAdapterBase adapter = SessionManager.getSelectedNode();
-        boolean isEnabled = adapter != null
-            && adapter.isDeletable()
-            && SessionManager.canDelete(((AdapterBase) adapter)
-                .getModelObject());
-        return isEnabled;
-    }
 }

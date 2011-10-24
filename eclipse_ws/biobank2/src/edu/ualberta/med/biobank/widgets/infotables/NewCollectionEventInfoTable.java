@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.action.cevent.GetPatientCollectionEventInfosAction.PatientCEventInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.GetPatientCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;

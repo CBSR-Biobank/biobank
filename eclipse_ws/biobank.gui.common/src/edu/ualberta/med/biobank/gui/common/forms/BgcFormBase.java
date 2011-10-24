@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
@@ -108,6 +109,7 @@ public abstract class BgcFormBase extends EditorPart implements
         } catch (Exception e) {
             logger.error("BgcFormBase.createPartControl Error", e); //$NON-NLS-1$
         }
+        getSite().setSelectionProvider(this);
     }
 
     /**
@@ -313,11 +315,14 @@ public abstract class BgcFormBase extends EditorPart implements
         if (bean == null)
             return null;
         Assert.isNotNull(propertyName);
-        // FIXME temporary use pojo to be able to make some tests in new forms
-        // behaviour. Should not need this anymore when will use presenter.
-        // Might eventually need to set back to Beansobservable if still needed
-        // in some specific situations
-        // return BeansObservables.observeValue(bean, propertyName);
+        return BeansObservables.observeValue(bean, propertyName);
+    }
+
+    private IObservableValue createPojoObservable(Object bean,
+        String propertyName) {
+        if (bean == null)
+            return null;
+        Assert.isNotNull(propertyName);
         return PojoObservables.observeValue(bean, propertyName);
     }
 
@@ -325,45 +330,96 @@ public abstract class BgcFormBase extends EditorPart implements
         Class<? extends Widget> widgetClass, int widgetOptions, Label label,
         String[] widgetValues, Object bean, String propertyName,
         AbstractValidator validator) {
+        return createBoundWidget(composite, widgetClass, widgetOptions, label,
+            widgetValues, bean, propertyName, validator, true);
+    }
+
+    public Control createBoundWidget(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions, Label label,
+        String[] widgetValues, Object bean, String propertyName,
+        AbstractValidator validator, boolean createBeansObservable) {
         return widgetCreator.createBoundWidget(composite, widgetClass,
             widgetOptions, label, widgetValues,
-            createBeansObservable(bean, propertyName), validator);
+            createBeansObservable ? createBeansObservable(bean, propertyName)
+                : createPojoObservable(bean, propertyName), validator);
     }
 
     public Control createBoundWidget(Composite composite,
         Class<? extends Widget> widgetClass, int widgetOptions, Label label,
         String[] widgetValues, Object bean, String propertyName,
         AbstractValidator validator, String bindingKey) {
+        return createBoundWidget(composite, widgetClass, widgetOptions, label,
+            widgetValues, bean, propertyName, validator, bindingKey, true);
+    }
+
+    public Control createBoundWidget(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions, Label label,
+        String[] widgetValues, Object bean, String propertyName,
+        AbstractValidator validator, String bindingKey,
+        boolean createBeansObservable) {
         return widgetCreator.createBoundWidget(composite, widgetClass,
             widgetOptions, label, widgetValues,
-            createBeansObservable(bean, propertyName), validator, bindingKey);
-
+            createBeansObservable ? createBeansObservable(bean, propertyName)
+                : createPojoObservable(bean, propertyName), validator,
+            bindingKey);
     }
 
     protected Control createBoundWidgetWithLabel(Composite composite,
         Class<? extends Widget> widgetClass, int widgetOptions,
         String fieldLabel, String[] widgetValues, Object bean,
         String propertyName, AbstractValidator validator) {
+        return createBoundWidgetWithLabel(composite, widgetClass,
+            widgetOptions, fieldLabel, widgetValues, bean, propertyName,
+            validator, true);
+    }
+
+    protected Control createBoundWidgetWithLabel(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions,
+        String fieldLabel, String[] widgetValues, Object bean,
+        String propertyName, AbstractValidator validator,
+        boolean createBeansObservable) {
         return widgetCreator.createBoundWidgetWithLabel(composite, widgetClass,
             widgetOptions, fieldLabel, widgetValues,
-            createBeansObservable(bean, propertyName), validator);
+            createBeansObservable ? createBeansObservable(bean, propertyName)
+                : createPojoObservable(bean, propertyName), validator);
     }
 
     protected Control createBoundWidgetWithLabel(Composite composite,
         Class<? extends Widget> widgetClass, int widgetOptions,
         String fieldLabel, String[] widgetValues, Object bean,
         String propertyName, AbstractValidator validator, String bindingKey) {
+        return createBoundWidgetWithLabel(composite, widgetClass,
+            widgetOptions, fieldLabel, widgetValues, bean, propertyName,
+            validator, bindingKey, true);
+    }
+
+    protected Control createBoundWidgetWithLabel(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions,
+        String fieldLabel, String[] widgetValues, Object bean,
+        String propertyName, AbstractValidator validator, String bindingKey,
+        boolean createBeansObservable) {
         return widgetCreator.createBoundWidgetWithLabel(composite, widgetClass,
             widgetOptions, fieldLabel, widgetValues,
-            createBeansObservable(bean, propertyName), validator, bindingKey);
+            createBeansObservable ? createBeansObservable(bean, propertyName)
+                : createPojoObservable(bean, propertyName), validator,
+            bindingKey);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client, Label label,
         Date date, Object bean, String propertyName,
         AbstractValidator validator, int typeShown, String bindingKey) {
+        return createDateTimeWidget(client, label, date, bean, propertyName,
+            validator, typeShown, bindingKey, true);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client, Label label,
+        Date date, Object bean, String propertyName,
+        AbstractValidator validator, int typeShown, String bindingKey,
+        boolean createBeansObservable) {
         return widgetCreator.createDateTimeWidget(client, label, date,
-            createBeansObservable(bean, propertyName), validator, typeShown,
-            bindingKey);
+            createBeansObservable ? createBeansObservable(bean, propertyName)
+                : createPojoObservable(bean, propertyName), validator,
+            typeShown, bindingKey);
     }
 
     protected DateTimeWidget createDateTimeWidget(Composite client,
@@ -376,9 +432,18 @@ public abstract class BgcFormBase extends EditorPart implements
     public DateTimeWidget createDateTimeWidget(Composite client,
         String nameLabel, Date date, Object bean, String propertyName,
         AbstractValidator validator, int typeShown) {
+        return createDateTimeWidget(client, nameLabel, date, bean,
+            propertyName, validator, typeShown, true);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date, Object bean, String propertyName,
+        AbstractValidator validator, int typeShown,
+        boolean createBeansObservable) {
         return widgetCreator.createDateTimeWidget(client, nameLabel, date,
-            createBeansObservable(bean, propertyName), validator, typeShown,
-            null);
+            createBeansObservable ? createBeansObservable(bean, propertyName)
+                : createPojoObservable(bean, propertyName), validator,
+            typeShown, null);
     }
 
     // implementation of ISelectionProvider

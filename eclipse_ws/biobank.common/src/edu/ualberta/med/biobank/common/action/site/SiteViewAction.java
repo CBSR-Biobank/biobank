@@ -8,7 +8,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.site.SiteViewAction.SiteInfo;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Container;
@@ -74,7 +74,7 @@ public class SiteViewAction implements Action<SiteInfo> {
     }
 
     @Override
-    public SiteInfo doAction(Session session) throws ActionException {
+    public SiteInfo run(User user, Session session) throws ActionException {
         SiteInfo siteInfo = new SiteInfo();
 
         Query query = session.createQuery(SITE_INFO_HQL);

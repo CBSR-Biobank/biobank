@@ -120,12 +120,10 @@ public class ReportAdapter extends AdapterBase {
         return ReportEntryForm.ID;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public int compareTo(AbstractAdapterBase o) {
         if (o instanceof ReportAdapter)
-            return getModelObject().compareTo(
-                (ModelWrapper) ((AdapterBase) o).getModelObject());
+            return internalCompareTo(o);
         return 0;
     }
 

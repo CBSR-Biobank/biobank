@@ -1,16 +1,21 @@
 package edu.ualberta.med.biobank.common.action.patient;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionException;
+import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
+import edu.ualberta.med.biobank.common.action.check.ValueProperty;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class PatientSaveAction implements Action<Patient> {
+public class PatientSaveAction implements Action<Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,13 +38,21 @@ public class PatientSaveAction implements Action<Patient> {
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Patient doAction(Session session) throws ActionException {
+    public Integer run(User user, Session session) throws ActionException {
+        // checks pnumber unique to send a proper message
+        new UniquePreCheck<Patient>(new ValueProperty<Patient>(
+            PatientPeer.ID, patientId), Patient.class,
+            Arrays.asList(new ValueProperty<Patient>(PatientPeer.PNUMBER,
+                pnumber))).run(user, session);
+
         Patient patientToSave;
         if (patientId == null) {
             patientToSave = new Patient();
         } else {
-            patientToSave = (Patient) session.get(Patient.class, patientId);
+            patientToSave = ActionUtil.sessionGet(session, Patient.class,
+                patientId);
         }
         patientToSave.setPnumber(pnumber);
         patientToSave.setCreatedAt(createdAt);
@@ -47,6 +60,7 @@ public class PatientSaveAction implements Action<Patient> {
 
         session.saveOrUpdate(patientToSave);
 
-        return patientToSave;
+        return patientToSave.getId();
     }
+
 }

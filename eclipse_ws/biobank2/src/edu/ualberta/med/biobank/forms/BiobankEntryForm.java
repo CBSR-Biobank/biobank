@@ -124,7 +124,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                 && (((AdapterBase) adapter).getModelObject() != null)) {
                 ((AdapterBase) adapter).getModelObject().reload();
             }
-        SessionManager.updateAdapterTreeNode(adapter);
+
+        // not everything is well initialized on the adapter before it is really
+        // saved. Should not do that now..
+        // SessionManager.updateAdapterTreeNode(adapter);
     }
 
     @Override
@@ -156,6 +159,11 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                         monitor.beginTask(Messages.BiobankEntryForm_saving,
                             IProgressMonitor.UNKNOWN);
                         saveForm();
+                        // this needs to be done there if we want the new node
+                        // to be in the tree and to be selected and to see the
+                        // right label (needs to be done when save is finished,
+                        // not when the form close)
+                        SessionManager.updateAllSimilarNodes(adapter, true);
                         monitor.done();
                     } catch (Exception ex) {
                         saveErrorCatch(ex, monitor, true);
@@ -433,11 +441,15 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().saveEditor(this, false);
             if (!isDirty()) {
-                closeEntryOpenView(true, true);
+                closeEntryOpenView(true, openViewAfterSaving());
             }
         } catch (Exception e) {
             logger.error("Can't save the form", e); //$NON-NLS-1$
         }
+    }
+
+    protected boolean openViewAfterSaving() {
+        return true;
     }
 
     protected void closeEntryOpenView(boolean saveOnClose, boolean openView) {

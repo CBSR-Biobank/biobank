@@ -81,12 +81,10 @@ public class ResearchGroupAdapter extends AdapterBase {
         return ResearchGroupViewForm.ID;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public int compareTo(AbstractAdapterBase o) {
         if (o instanceof ResearchGroupAdapter)
-            return getModelObject().compareTo(
-                (ModelWrapper) ((AdapterBase) o).getModelObject());
+            return internalCompareTo(o);
         return 0;
     }
 }
