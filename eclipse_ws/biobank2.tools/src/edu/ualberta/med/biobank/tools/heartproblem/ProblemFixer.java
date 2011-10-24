@@ -173,8 +173,9 @@ public class ProblemFixer {
                     ceventOnProduction.setPatient(patient);
                     ceventOnProduction.setVisitNumber(PatientWrapper
                         .getNextVisitNumber(appService, patient));
-                    ceventOnProduction
-                        .setCommentCollection(ceventOnTraining.getCommentCollection(false));
+                    // ceventOnProduction
+                    // .setCommentCollection(ceventOnTraining
+                    // .getCommentCollection(false));
                     ceventOnProduction
                         .setEventAttrValue(heartEventAttrLabel,
                             ceventOnTraining
@@ -230,7 +231,8 @@ public class ProblemFixer {
 
             spcOnProduction = new SpecimenWrapper(appService);
             spcOnProduction.setInventoryId(spcOnTraining.getInventoryId());
-            spcOnProduction.setComment(spcOnTraining.getCommentCollection(false));
+            // spcOnProduction.setComment(spcOnTraining
+            // .getCommentCollection(false));
             spcOnProduction.setQuantity(spcOnTraining.getQuantity());
             spcOnProduction.setCreatedAt(spcOnTraining.getCreatedAt());
             spcOnProduction.setCollectionEvent(ceventOnProduction);
@@ -275,7 +277,9 @@ public class ProblemFixer {
                     .setWorksheet(peventOnTraining.getWorksheet());
                 peventOnProduction
                     .setCreatedAt(peventOnTraining.getCreatedAt());
-                peventOnProduction.setComment(peventOnTraining.getCommentCollection(false));
+
+                // peventOnProduction.setComment(peventOnTraining.getCommentCollection(false));
+
                 peventOnProduction.setCenter(calgarySiteOnProduction);
                 peventOnProduction.setActivityStatus(ActivityStatusWrapper
                     .getActivityStatus(appService, peventOnTraining
@@ -354,7 +358,7 @@ public class ProblemFixer {
 
         spcOnProduction = new SpecimenWrapper(appService);
         spcOnProduction.setInventoryId(spcOnTraining.getInventoryId());
-        spcOnProduction.setComment(spcOnTraining.getCommentCollection(false));
+        // spcOnProduction.setComment(spcOnTraining.getCommentCollection(false));
         spcOnProduction.setQuantity(spcOnTraining.getQuantity());
         spcOnProduction.setCreatedAt(spcOnTraining.getCreatedAt());
         spcOnProduction.setCollectionEvent(ceventOnProduction);
