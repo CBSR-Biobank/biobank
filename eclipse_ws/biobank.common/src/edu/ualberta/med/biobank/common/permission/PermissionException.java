@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.permission;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Study;
 
+// TODO: find a better home?
 public class PermissionException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
