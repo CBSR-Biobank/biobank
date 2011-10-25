@@ -5,8 +5,10 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.check.CollectionIsEmptyCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventDeletePermission;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.User;
 
@@ -14,7 +16,8 @@ public class CollectionEventDeleteAction implements Action<Integer> {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String HAS_SPECIMENS_MSG = Messages.getString("CollectionEventDeleteAction.has_specimen_delete_msg"); //$NON-NLS-1$
+    private static final String HAS_SPECIMENS_MSG = Messages
+        .getString("CollectionEventDeleteAction.has_specimen_delete_msg"); //$NON-NLS-1$
 
     private Integer ceventId;
 
@@ -24,8 +27,8 @@ public class CollectionEventDeleteAction implements Action<Integer> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
-        return false;
+        return new CollectionEventDeletePermission(ceventId).isAllowed(user,
+            session);
     }
 
     @Override

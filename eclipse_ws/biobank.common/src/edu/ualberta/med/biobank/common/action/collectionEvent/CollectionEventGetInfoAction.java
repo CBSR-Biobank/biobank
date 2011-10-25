@@ -9,10 +9,12 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.User;
@@ -57,7 +59,8 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        return true; // TODO: restrict access
+        return new CollectionEventReadPermission(ceventId).isAllowed(user,
+            session);
     }
 
     @Override

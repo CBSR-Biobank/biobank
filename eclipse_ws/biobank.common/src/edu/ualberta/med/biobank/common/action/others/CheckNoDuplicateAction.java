@@ -33,7 +33,7 @@ public class CheckNoDuplicateAction implements Action<Boolean> {
     @Override
     public boolean isAllowed(User user, Session session) {
         // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     @Override

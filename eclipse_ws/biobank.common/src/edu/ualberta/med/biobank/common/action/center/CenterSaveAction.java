@@ -1,9 +1,6 @@
 package edu.ualberta.med.biobank.common.action.center;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.Session;
 
@@ -12,10 +9,8 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.User;
 
 public abstract class CenterSaveAction implements Action<Integer> {
@@ -56,12 +51,6 @@ public abstract class CenterSaveAction implements Action<Integer> {
 
     public void setActivityStatusId(Integer activityStatusId) {
         this.aStatusId = activityStatusId;
-    }
-
-    @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     protected Integer runInternal(User user, Session session,

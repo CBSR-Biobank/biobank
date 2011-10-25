@@ -7,11 +7,13 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.User;
@@ -27,11 +29,21 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
     // @formatter:off
     @SuppressWarnings("nls")
     private static final String PATIENT_INFO_HQL = "SELECT patient, COUNT(DISTINCT sourceSpecs), COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourceSpecs)"
-        + " FROM " + Patient.class.getName() + " patient"
-        + " INNER JOIN FETCH patient." + PatientPeer.STUDY.getName() + " study"
-        + " LEFT JOIN patient." + PatientPeer.COLLECTION_EVENT_COLLECTION.getName() + " AS cevents"
-        + " LEFT JOIN cevents." + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName() + " AS sourceSpecs"
-        + " LEFT JOIN cevents." +  CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName() + " AS allSpecs"
+        + " FROM "
+        + Patient.class.getName()
+        + " patient"
+        + " INNER JOIN FETCH patient."
+        + PatientPeer.STUDY.getName()
+        + " study"
+        + " LEFT JOIN patient."
+        + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
+        + " AS cevents"
+        + " LEFT JOIN cevents."
+        + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
+        + " AS sourceSpecs"
+        + " LEFT JOIN cevents."
+        + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
+        + " AS allSpecs"
         + " WHERE patient.id = ?"
         + " GROUP BY patient";
     // @formatter:on
@@ -54,7 +66,7 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        return true; // TODO: restrict access
+        return new PatientReadPermission(patientId).isAllowed(user, session); 
     }
 
     @Override

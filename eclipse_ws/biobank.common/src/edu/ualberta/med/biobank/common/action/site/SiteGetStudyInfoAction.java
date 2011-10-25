@@ -68,8 +68,7 @@ public class SiteGetStudyInfoAction implements Action<ArrayList<StudyInfo>> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     @Override

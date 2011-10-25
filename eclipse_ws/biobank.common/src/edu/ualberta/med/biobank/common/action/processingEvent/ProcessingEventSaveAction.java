@@ -14,8 +14,12 @@ import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.DiffUtils;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
+import edu.ualberta.med.biobank.common.permission.Permission;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventCreatePermission;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventUpdatePermission;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
@@ -55,8 +59,13 @@ public class ProcessingEventSaveAction implements Action<Integer> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
-        return false;
+        Permission permission;
+        if (peventId == null) {
+            permission = new ProcessingEventCreatePermission();
+        } else {
+            permission = new ProcessingEventUpdatePermission(peventId);
+        }
+        return permission.isAllowed(user, session);
     }
 
     @SuppressWarnings("unchecked")
@@ -71,10 +80,9 @@ public class ProcessingEventSaveAction implements Action<Integer> {
         }
 
         // FIXME Version check?
-        // FIXME permission ?
 
         // check worksheet number unique. Can't set it as a database constraint
-        // since imported pevent can have a null worksheet
+        // since imported pevent can have a null worksheet:
         new UniquePreCheck<ProcessingEvent>(new ValueProperty<ProcessingEvent>(
             ProcessingEventPeer.ID, peventId), ProcessingEvent.class,
             Arrays.asList(new ValueProperty<ProcessingEvent>(

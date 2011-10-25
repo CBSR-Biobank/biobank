@@ -44,8 +44,7 @@ public class UniquePreCheck<T extends IBiobankModel> extends ActionCheck<T> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     @Override

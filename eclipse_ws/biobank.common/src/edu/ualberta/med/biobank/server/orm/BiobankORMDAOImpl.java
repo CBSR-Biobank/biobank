@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.server.orm;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
@@ -24,9 +27,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.acegisecurity.context.SecurityContextHolder;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 
@@ -62,9 +68,9 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
     private <T extends Serializable> Response query(Action<T> action) {
         Session session = getSession();
 
-        // TODO: pass the logged in user
-        User user = null;
-        action.isAllowed(user, session);
+        User user = getCurrentUser(session);
+        if (!action.isAllowed(user, session))
+            throw new AccessDeniedException();
 
         T actionResult = action.run(null, session);
 
@@ -75,6 +81,18 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         response.setResponse(actionResult);
 
         return response;
+    }
+
+    protected User getCurrentUser(Session session) {
+        String currentLogin = SecurityContextHolder.getContext()
+            .getAuthentication().getName();
+        Criteria criteria = session.createCriteria(User.class).add(
+            Restrictions.eq(UserPeer.LOGIN.getName(), currentLogin));
+        @SuppressWarnings("unchecked")
+        List<User> res = criteria.list();
+        if (res.size() != 1)
+            throw new ActionException("Problem getting current user"); //$NON-NLS-1$
+        return res.get(0);
     }
 
     protected Response query(@SuppressWarnings("unused") Request request,

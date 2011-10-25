@@ -35,6 +35,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionN
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
+import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -261,7 +262,8 @@ public class TestPatient extends TestAction {
 
     @Test
     public void testPatientGetSimpleCEventInfoAction() throws Exception {
-        final Integer patientId = createPatient("testPatientGetSimpleCEventInfoAction");
+        final Integer patientId = PatientHelper.createPatient(appService,
+            "testPatientGetSimpleCEventInfoAction", study.getId());
 
         // add specimen type
         final Integer typeId = edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
@@ -293,17 +295,11 @@ public class TestPatient extends TestAction {
         Assert.assertEquals(minDate, info.minSourceSpecimenDate);
     }
 
-    protected Integer createPatient(String s) throws ApplicationException {
-        String pnumber = s + r.nextInt();
-        Date date = Utils.getRandomDate();
-        Integer patientId = appService.doAction(new PatientSaveAction(null,
-            study.getId(), pnumber, date));
-        return patientId;
-    }
-
     @Test
     public void testPatientGetCEventInfoAction() throws Exception {
-        Integer patientId = createPatient("testPatientGetCEventInfoAction");
+        Integer patientId = PatientHelper
+            .createPatient(appService, "testPatientGetCEventInfoAction",
+                study.getId());
 
         // add specimen type
         final Integer typeId = edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
@@ -377,7 +373,8 @@ public class TestPatient extends TestAction {
 
     @Test
     public void testNextVisitNumber() throws Exception {
-        Integer patientId = createPatient("testNextVisitNumber");
+        Integer patientId = PatientHelper.createPatient(appService,
+            "testNextVisitNumber", study.getId());
 
         Integer visitNumber = r.nextInt(20);
         appService.doAction(new CollectionEventSaveAction(null, patientId,

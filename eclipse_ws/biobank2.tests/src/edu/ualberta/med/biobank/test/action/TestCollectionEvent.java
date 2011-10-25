@@ -402,6 +402,7 @@ public class TestCollectionEvent extends TestAction {
         Assert.assertEquals(visitNber, info.cevent.getVisitNumber());
         Assert.assertEquals(statusId, info.cevent.getActivityStatus().getId());
         Assert.assertNotNull(info.cevent.getCommentCollection());
+        // FIXME sometimes size not correct !!??!!
         Assert.assertEquals(comments.size(), info.cevent.getCommentCollection()
             .size());
         Assert.assertEquals(attrs.size(), info.eventAttrs.size());

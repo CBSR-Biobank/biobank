@@ -24,13 +24,17 @@ public class GetStudyEventAttrInfoAction implements
 
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String STUDY_EVENT_ATTR_QRY = 
+    private static final String STUDY_EVENT_ATTR_QRY =
         "select attr,"
-        + " type." + EventAttrTypePeer.NAME.getName()
-        + " from " + StudyEventAttr.class.getName() + " as attr"
-        + " left join fetch attr." + StudyEventAttrPeer.EVENT_ATTR_TYPE.getName() + " as type"
-        + " where attr." + Property.concatNames(StudyEventAttrPeer.STUDY, StudyPeer.ID) + " =?"
-        + " group by attr";
+            + " type." + EventAttrTypePeer.NAME.getName()
+            + " from " + StudyEventAttr.class.getName() + " as attr"
+            + " left join fetch attr."
+            + StudyEventAttrPeer.EVENT_ATTR_TYPE.getName() + " as type"
+            + " where attr."
+            + Property.concatNames(StudyEventAttrPeer.STUDY, StudyPeer.ID)
+            + " =?"
+            + " group by attr";
+
     // @formatter:on
 
     public GetStudyEventAttrInfoAction(Integer studyId) {
@@ -39,7 +43,6 @@ public class GetStudyEventAttrInfoAction implements
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
         return true;
     }
 

@@ -23,6 +23,12 @@ public class ClinicSaveAction extends CenterSaveAction {
     }
 
     @Override
+    public boolean isAllowed(User user, Session session) throws ActionException {
+        // TODO Auto-generated method stub
+        return true;
+    }
+
+    @Override
     public Integer run(User user, Session session) throws ActionException {
         SessionUtil sessionUtil = new SessionUtil(session);
         Clinic clinic = sessionUtil.get(Clinic.class, centerId, new Clinic());
@@ -30,4 +36,5 @@ public class ClinicSaveAction extends CenterSaveAction {
 
         return runInternal(user, session, sessionUtil, clinic);
     }
+
 }

@@ -22,8 +22,7 @@ public class UserGetAction implements Action<User> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     @Override

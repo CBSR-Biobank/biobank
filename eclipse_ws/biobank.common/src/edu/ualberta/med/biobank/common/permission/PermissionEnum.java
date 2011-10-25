@@ -117,7 +117,8 @@ public enum PermissionEnum {
 
     private boolean isPermissionAllowed(Collection<Permission> permissions) {
         for (Permission permission : permissions) {
-            if (permission.getId().equals(getId())) {
+            if (permission.getId().equals(getId())
+                || permission.getId().equals(ADMINISTRATION.getId())) {
                 return true;
             }
         }

@@ -54,8 +54,7 @@ public class CountUsesAction<E extends IBiobankModel> implements Action<Long> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     public Class<?> getPropertyClass() {

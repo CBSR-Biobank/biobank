@@ -22,7 +22,9 @@ public class SiteViewAction implements Action<SiteInfo> {
     // @formatter:off
     @SuppressWarnings("nls")
     private static final String SITE_INFO_HQL = "SELECT site, COUNT(DISTINCT patients), COUNT(DISTINCT collectionEvents), COUNT(DISTINCT aliquotedSpecimens)"
-        + " FROM " + Site.class.getName() + " site"
+        + " FROM "
+        + Site.class.getName()
+        + " site"
         + " INNER JOIN FETCH site.address address"
         + " INNER JOIN FETCH site.activityStatus activityStatus"
         + " LEFT JOIN site.studyCollection AS studies"
@@ -30,7 +32,9 @@ public class SiteViewAction implements Action<SiteInfo> {
         + " LEFT JOIN patients.collectionEventCollection AS collectionEvents"
         + " LEFT JOIN collectionEvents.allSpecimenCollection AS aliquotedSpecimens"
         + " WHERE site.id = ?"
-        + " AND aliquotedSpecimens.parentSpecimen IS NULL" // count only aliquoted Specimen-s
+        + " AND aliquotedSpecimens.parentSpecimen IS NULL" // count only
+                                                           // aliquoted
+                                                           // Specimen-s
         + " GROUP BY site";
     @SuppressWarnings("nls")
     private static final String TOP_CONTAINER_HQL = "SELECT container"
@@ -38,9 +42,12 @@ public class SiteViewAction implements Action<SiteInfo> {
         + " INNER JOIN FETCH container.containerType containerType"
         + " INNER JOIN FETCH container.activityStatus activityStatus"
         + " WHERE container.site.id = ?"
-        + " AND containerType.topLevel IS TRUE"; // only select top-level Container-s
+        + " AND containerType.topLevel IS TRUE"; // only select top-level
+                                                 // Container-s
     @SuppressWarnings("nls")
-    private static final String CONTAINER_TYPE_INFO_HQL = "SELECT containerType, (SELECT COUNT(*) FROM " + Container.class.getName() + " c WHERE c.containerType = containerType)"
+    private static final String CONTAINER_TYPE_INFO_HQL = "SELECT containerType, (SELECT COUNT(*) FROM "
+        + Container.class.getName()
+        + " c WHERE c.containerType = containerType)"
         + " FROM " + ContainerType.class.getName() + " containerType"
         + " INNER JOIN FETCH containerType.activityStatus AS activityStatus"
         + " INNER JOIN FETCH containerType.capacity capacity"
@@ -70,7 +77,7 @@ public class SiteViewAction implements Action<SiteInfo> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        return true; // TODO: restrict access
+        return true; 
     }
 
     @Override

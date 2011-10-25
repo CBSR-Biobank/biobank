@@ -8,9 +8,11 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.permission.patient.PatientMergePermission;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
@@ -35,15 +37,14 @@ public class PatientMergeAction implements Action<Boolean> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        // TODO Auto-generated method stub
-        return false;
+        return new PatientMergePermission(patient1Id, patient2Id).isAllowed(user,
+            session);
     }
 
     @Override
     public Boolean run(User user, Session session) throws ActionException {
         // FIXME add checks
         // FIXME logging?
-        // FIXME permission?
 
         Patient patient1 = ActionUtil.sessionGet(session, Patient.class,
             patient1Id);

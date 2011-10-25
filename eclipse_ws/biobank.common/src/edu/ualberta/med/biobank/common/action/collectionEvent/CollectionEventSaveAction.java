@@ -26,6 +26,9 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.permission.Permission;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventCreatePermission;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -96,8 +99,13 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
-        return true;
+        Permission permission;
+        if (ceventId == null) {
+            permission = new CollectionEventCreatePermission(patientId);
+        } else {
+            permission = new CollectionEventUpdatePermission(ceventId);
+        }
+        return permission.isAllowed(user, session);
     }
 
     @Override
@@ -114,7 +122,6 @@ public class CollectionEventSaveAction implements Action<Integer> {
         }
 
         // FIXME Version check?
-        // FIXME permission ?
 
         Patient patient = ActionUtil.sessionGet(session, Patient.class,
             patientId);
