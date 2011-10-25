@@ -92,7 +92,8 @@ public class TestCollectionEvent extends TestAction {
             .addSpecimenType(s).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
-            .createSaveCEventSpecimenInfoRandomList(5, typeId);
+            .createSaveCEventSpecimenInfoRandomList(5, typeId,
+                currentUser.getId());
 
         // Save a new cevent
         final Integer ceventId = appService
@@ -120,7 +121,8 @@ public class TestCollectionEvent extends TestAction {
             SaveCEventSpecimenInfo info = specs.get(sp.getInventoryId());
             Assert.assertNotNull(info);
             if (info != null) {
-                Assert.assertEquals(info.comments, sp.getCommentCollection()
+                Assert.assertEquals(info.comments.size(), sp
+                    .getCommentCollection()
                     .size());
                 Assert.assertEquals(info.inventoryId, sp.getInventoryId());
                 Assert
@@ -145,7 +147,7 @@ public class TestCollectionEvent extends TestAction {
         modifiedSpec.quantity += 1;
         newSpecList.add(modifiedSpec);
         SaveCEventSpecimenInfo newSpec = CollectionEventHelper
-            .createSaveCEventSpecimenInfoRandom(typeId);
+            .createSaveCEventSpecimenInfoRandom(typeId, currentUser.getId());
         newSpecList.add(newSpec);
         // modify cevent
         appService.doAction(new CollectionEventSaveAction(ceventId, patientId,
@@ -167,8 +169,10 @@ public class TestCollectionEvent extends TestAction {
             Assert.assertTrue(sp.getInventoryId().equals(newSpec.inventoryId)
                 || sp.getInventoryId().equals(modifiedSpec.inventoryId));
             if (sp.getInventoryId().equals(newSpec.inventoryId)) {
+                Assert.assertNotNull(sp.getCommentCollection());
                 Assert
-                    .assertEquals(newSpec.comments, sp.getCommentCollection());
+                    .assertEquals(newSpec.comments.size(),
+                        sp.getCommentCollection().size());
                 Assert.assertEquals(newSpec.inventoryId, sp.getInventoryId());
                 Assert.assertTrue(compareDouble(newSpec.quantity,
                     sp.getQuantity()));
@@ -309,7 +313,8 @@ public class TestCollectionEvent extends TestAction {
             .addSpecimenType("testSaveWithSpecs" + r.nextInt()).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
-            .createSaveCEventSpecimenInfoRandomList(5, typeId);
+            .createSaveCEventSpecimenInfoRandomList(5, typeId,
+                currentUser.getId());
 
         // Save a new cevent
         final Integer ceventId = appService
@@ -358,7 +363,8 @@ public class TestCollectionEvent extends TestAction {
             .addSpecimenType("testGetInfos" + r.nextInt()).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
-            .createSaveCEventSpecimenInfoRandomList(5, typeId);
+            .createSaveCEventSpecimenInfoRandomList(5, typeId,
+                currentUser.getId());
 
         addEventAttrs(study);
         List<String> labels = Arrays.asList(study.getStudyEventAttrLabels());

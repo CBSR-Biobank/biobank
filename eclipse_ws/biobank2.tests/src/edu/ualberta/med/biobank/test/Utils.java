@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Random;
 
 import edu.ualberta.med.biobank.common.action.CommentInfo;
-import edu.ualberta.med.biobank.model.Comment;
 
 public class Utils {
 
@@ -44,26 +43,13 @@ public class Utils {
         return cal.getTime();
     }
 
-    @Deprecated
-    public static List<Comment> getRandomComments() {
-        final List<Comment> comments = new ArrayList<Comment>();
-
-        for (int i = 0, n = r.nextInt(5); i < n; ++i) {
-            Comment c = new Comment();
-            c.setDateAdded(getRandomDate());
-            c.setText("comment " + r.nextInt());
-            comments.add(c);
-        }
-        return comments;
-    }
-
     public static List<CommentInfo> getRandomCommentInfos(Integer userId) {
         final List<CommentInfo> comments = new ArrayList<CommentInfo>();
 
         for (int i = 0, n = r.nextInt(5); i < n; ++i) {
             CommentInfo c = new CommentInfo();
             c.createAt = getRandomDate();
-            c.value = "comment " + r.nextInt();
+            c.message = "comment " + r.nextInt();
             c.userId = userId;
             comments.add(c);
         }

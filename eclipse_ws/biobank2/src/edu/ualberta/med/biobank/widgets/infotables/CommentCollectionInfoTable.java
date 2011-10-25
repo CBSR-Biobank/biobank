@@ -57,9 +57,9 @@ public class CommentCollectionInfoTable extends InfoTableWidget {
     public Object getCollectionModelObject(Object o) throws Exception {
         TableRowData info = new TableRowData();
         CommentWrapper comment = (CommentWrapper) o;
-        info.comment = comment.getText();
+        info.comment = comment.getMessage();
         info.user = comment.getUser();
-        info.date = comment.getDateAdded();
+        info.date = comment.getCreatedAt();
         return info;
     }
 
@@ -79,8 +79,8 @@ public class CommentCollectionInfoTable extends InfoTableWidget {
             public int compare(Object o, Object o2) {
                 CommentWrapper comment1 = (CommentWrapper) o;
                 CommentWrapper comment2 = (CommentWrapper) o2;
-                return comment1.getDateAdded().compareTo(
-                    comment2.getDateAdded());
+                return comment1.getCreatedAt().compareTo(
+                    comment2.getCreatedAt());
             }
         };
     }

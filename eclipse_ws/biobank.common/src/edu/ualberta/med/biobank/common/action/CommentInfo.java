@@ -15,7 +15,7 @@ public class CommentInfo implements NotAProxy, Serializable {
     private static final long serialVersionUID = -7537167935539051938L;
 
     public Integer id;
-    public String value;
+    public String message;
     public Integer userId;
     public Date createAt;
 
@@ -26,7 +26,7 @@ public class CommentInfo implements NotAProxy, Serializable {
         else
             dbComment = ActionUtil.sessionGet(session, Comment.class,
                 id);
-        dbComment.setText(value);
+        dbComment.setMessage(message);
         User user = ActionUtil.sessionGet(session, User.class, userId);
         dbComment.setUser(user);
         return dbComment;
@@ -47,7 +47,7 @@ public class CommentInfo implements NotAProxy, Serializable {
         CommentInfo ci = new CommentInfo();
         ci.id = c.getId();
         ci.userId = c.getUser().getId();
-        ci.value = c.getText();
+        ci.message = c.getMessage();
         return ci;
     }
 

@@ -28,7 +28,6 @@ public class TestProcessingEvent extends TestAction {
     private SiteWrapper site;
     private StudyWrapper study;
     private ClinicWrapper clinic;
-    private Integer patientId;
 
     @Override
     @Before
@@ -93,7 +92,7 @@ public class TestProcessingEvent extends TestAction {
     public void testSaveSameWorksheet() throws Exception {
         String worksheet = Utils.getRandomString(50);
         Date date = Utils.getRandomDate();
-        Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
+        appService.doAction(new ProcessingEventSaveAction(
             null, site.getId(), date, worksheet, 1, null, null));
 
         // try to save another pevent with the same worksheet

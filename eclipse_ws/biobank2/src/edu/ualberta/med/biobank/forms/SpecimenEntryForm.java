@@ -301,9 +301,9 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         specimen2.setCollectionEvent(collectionEvent);
         CommentWrapper newComment = new CommentWrapper(
             SessionManager.getAppService());
-        newComment.setDateAdded(new Date());
+        newComment.setCreatedAt(new Date());
         newComment.setUser(SessionManager.getUser());
-        newComment.setText(Messages.SpecimenEntryForm_cevent_modification
+        newComment.setMessage(Messages.SpecimenEntryForm_cevent_modification
             + wcomment);
         specimen2.addToCommentCollection(Arrays.asList(newComment));
         for (SpecimenWrapper spec : specimen2.getChildSpecimenCollection(false)) {
