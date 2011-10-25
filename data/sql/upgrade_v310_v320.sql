@@ -22,7 +22,8 @@ insert into csm_protection_element (protection_element_name, object_id, applicat
 ('edu.ualberta.med.biobank.model.Principal','edu.ualberta.med.biobank.model.Principal',2,sysdate()),
 ('edu.ualberta.med.biobank.model.Membership','edu.ualberta.med.biobank.model.Membership',2,sysdate()),
 ('edu.ualberta.med.biobank.model.Permission','edu.ualberta.med.biobank.model.Permission',2,sysdate()),
-('edu.ualberta.med.biobank.model.Role','edu.ualberta.med.biobank.model.Role',2,sysdate());
+('edu.ualberta.med.biobank.model.Role','edu.ualberta.med.biobank.model.Role',2,sysdate()),
+('edu.ualberta.med.biobank.model.Comment','edu.ualberta.med.biobank.model.Comment',2,sysdate());
 
 -- add the new object into the protection group with id 1 (the one containing all objects protection elements)
 insert into csm_pg_pe (protection_group_id, protection_element_id, update_date)
@@ -32,7 +33,8 @@ or protection_element_name = 'edu.ualberta.med.biobank.model.BbGroup'
 or protection_element_name = 'edu.ualberta.med.biobank.model.Principal'
 or protection_element_name = 'edu.ualberta.med.biobank.model.Membership'
 or protection_element_name = 'edu.ualberta.med.biobank.model.Permission'
-or protection_element_name = 'edu.ualberta.med.biobank.model.Role';
+or protection_element_name = 'edu.ualberta.med.biobank.model.Role'
+or protection_element_name = 'edu.ualberta.med.biobank.model.Comment';
 
 
 -- add new security tables
@@ -223,8 +225,17 @@ CREATE TABLE dispatch_specimen_comment (
     COMMENT_ID INT(11) NOT NULL,
     CONSTRAINT COMMENT_ID UNIQUE KEY(COMMENT_ID),
     INDEX FKC3C4FD2DCDA9FD4F (COMMENT_ID),
-    INDEX FKC3C4FD2D65A03C4D (DISPATCH_SPECIMEN_ID),
+    INDEX FKC3C4FD2DBCCB06BA (DISPATCH_SPECIMEN_ID),
     PRIMARY KEY (DISPATCH_SPECIMEN_ID, COMMENT_ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+CREATE TABLE patient_comment (
+    PATIENT_ID INT(11) NOT NULL,
+    COMMENT_ID INT(11) NOT NULL,
+    CONSTRAINT COMMENT_ID UNIQUE KEY(COMMENT_ID),
+    INDEX FK901E2E5B563F38F (PATIENT_ID),
+    INDEX FK901E2E5CDA9FD4F (COMMENT_ID),
+    PRIMARY KEY (PATIENT_ID, COMMENT_ID)
 ) ENGINE=InnoDB COLLATE=latin1_general_cs;
 
 CREATE TABLE processing_event_comment (
@@ -276,7 +287,9 @@ ALTER TABLE container_type_comment ADD CONSTRAINT FK6657C158CDA9FD4F FOREIGN KEY
 
 ALTER TABLE dispatch_comment ADD CONSTRAINT FKAFC93B7ADE99CA25 FOREIGN KEY (DISPATCH_ID) REFERENCES dispatch (ID) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT FKAFC93B7ACDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
-ALTER TABLE dispatch_specimen_comment ADD CONSTRAINT FKC3C4FD2D65A03C4D FOREIGN KEY (DISPATCH_SPECIMEN_ID) REFERENCES dispatch_specimen (ID) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT FKC3C4FD2DCDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE dispatch_specimen_comment ADD CONSTRAINT FKC3C4FD2DBCCB06BA FOREIGN KEY (DISPATCH_SPECIMEN_ID) REFERENCES dispatch_specimen (ID) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT FKC3C4FD2DCDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE patient_comment ADD CONSTRAINT FK901E2E5CDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT FK901E2E5B563F38F FOREIGN KEY (PATIENT_ID) REFERENCES patient (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 ALTER TABLE processing_event_comment ADD CONSTRAINT FKA958114ECDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT FKA958114E33126C8 FOREIGN KEY (PROCESSING_EVENT_ID) REFERENCES processing_event (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
@@ -356,6 +369,8 @@ insert dispatch_specimen_comment (dispatch_specimen_id, comment_id)
 select src_id,id from comment where src_id is not null;
 
 update comment set src_id=null;
+
+-- patient comments -> this column was not in version 3.1.1
 
 -- processing_event comments
 
