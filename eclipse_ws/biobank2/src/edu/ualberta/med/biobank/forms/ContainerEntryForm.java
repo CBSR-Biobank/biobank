@@ -7,11 +7,14 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
@@ -23,11 +26,14 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
+import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class ContainerEntryForm extends BiobankEntryForm {
@@ -60,6 +66,15 @@ public class ContainerEntryForm extends BiobankEntryForm {
     protected List<ContainerTypeWrapper> containerTypes;
 
     private boolean renamingChildren;
+
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
+
+    private CommentCollectionEntryInfoTable commentEntryTable;
 
     @Override
     public void init() throws Exception {
@@ -162,8 +177,28 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 }
             });
 
+        createCommentSection();
+
         createContainerTypesSection(client);
 
+    }
+
+    private void createCommentSection() {
+        Section section = createSection(Messages.Comments_title);
+        commentEntryTable = new CommentCollectionEntryInfoTable(section,
+            container.getCommentCollection(false)
+            );
+        commentEntryTable.adaptToToolkit(toolkit, true);
+        commentEntryTable.addSelectionChangedListener(listener);
+
+        addSectionToolbar(section, Messages.Comments_button_add,
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    commentEntryTable.addComment();
+                }
+            });
+        section.setClient(commentEntryTable);
     }
 
     private void createContainerTypesSection(Composite client) throws Exception {

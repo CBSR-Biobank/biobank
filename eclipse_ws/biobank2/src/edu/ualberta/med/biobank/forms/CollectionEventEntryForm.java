@@ -38,7 +38,9 @@ import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
@@ -46,6 +48,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
@@ -55,6 +58,7 @@ import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 import edu.ualberta.med.biobank.widgets.infotables.entry.CEventSpecimenEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -91,6 +95,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     private List<SpecimenInfo> sourceSpecimens;
 
     private CEventInfo ceventInfo;
+
+    private CommentCollectionEntryInfoTable commentEntryTable;
 
     @Override
     public void init() throws Exception {
@@ -151,10 +157,33 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         createMainSection();
+        createCommentSection();
         createSpecimensSection();
         if (adapter.getId() == null) {
             setDirty(true);
         }
+    }
+
+    private void createCommentSection() {
+        Section section = createSection(Messages.Comments_title);
+        commentEntryTable = new CommentCollectionEntryInfoTable(
+            section,
+            ModelWrapper.wrapModelCollection(
+                SessionManager.getAppService(),
+                new ArrayList<Comment>(ceventInfo.cevent.getCommentCollection()),
+                CommentWrapper.class)
+            );
+        commentEntryTable.adaptToToolkit(toolkit, true);
+        commentEntryTable.addSelectionChangedListener(listener);
+
+        addSectionToolbar(section, Messages.Comments_button_add,
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    commentEntryTable.addComment();
+                }
+            });
+        section.setClient(commentEntryTable);
     }
 
     private void createMainSection() throws Exception {

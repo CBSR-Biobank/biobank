@@ -16,11 +16,14 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -47,6 +50,7 @@ import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget.ItemAction;
+import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.Event;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
@@ -103,6 +107,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private boolean isTryingAgain;
 
     protected boolean tryAgain;
+
+    private CommentCollectionEntryInfoTable commentEntryTable;
+
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
 
     @Override
     protected void init() throws Exception {
@@ -228,9 +241,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             ShipmentInfoPeer.RECEIVED_AT.getName(), new NotNullValidator(
                 Messages.ShipmentEntryForm_received_validation_msg));
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.WRAP
-            | SWT.MULTI, Messages.ShipmentEntryForm_comments_label, null,
-            shipmentInfo, ShipmentInfoPeer.COMMENT_COLLECTION.getName(), null);
+        createCommentSection();
 
     }
 
@@ -373,6 +384,23 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             vetoListener);
 
         specimenEntryWidget.setSpecimens(specimens);
+    }
+
+    private void createCommentSection() {
+        Section section = createSection(Messages.Comments_title);
+        commentEntryTable = new CommentCollectionEntryInfoTable(section,
+            originInfo.getShipmentInfo().getCommentCollection(false));
+        commentEntryTable.adaptToToolkit(toolkit, true);
+        commentEntryTable.addSelectionChangedListener(listener);
+
+        addSectionToolbar(section, Messages.Comments_button_add,
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    commentEntryTable.addComment();
+                }
+            });
+        section.setClient(commentEntryTable);
     }
 
     @Override

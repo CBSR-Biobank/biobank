@@ -16,6 +16,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
@@ -36,6 +37,7 @@ import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
+import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -78,6 +80,15 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private Button hasSpecimensRadio;
 
+    private CommentCollectionEntryInfoTable commentEntryTable;
+
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
+
     public ContainerTypeEntryForm() {
         super();
         multiSelectListener = new BgcEntryFormWidgetListener() {
@@ -116,7 +127,26 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         page.setLayout(new GridLayout(1, false));
 
         createContainerTypeSection();
+        createCommentSection();
         createContainsSection();
+    }
+
+    private void createCommentSection() {
+        Section section = createSection(Messages.Comments_title);
+        commentEntryTable = new CommentCollectionEntryInfoTable(section,
+            containerType.getCommentCollection(false)
+            );
+        commentEntryTable.adaptToToolkit(toolkit, true);
+        commentEntryTable.addSelectionChangedListener(listener);
+
+        addSectionToolbar(section, Messages.Comments_button_add,
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    commentEntryTable.addComment();
+                }
+            });
+        section.setClient(commentEntryTable);
     }
 
     protected void createContainerTypeSection() throws ApplicationException {

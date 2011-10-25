@@ -241,9 +241,9 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                     .next()).getSpecimen();
                 CommentWrapper commentOb = new CommentWrapper(
                     SessionManager.getAppService());
-                commentOb.setDateAdded(new Date());
+                commentOb.setCreatedAt(new Date());
                 commentOb.setUser(SessionManager.getUser());
-                commentOb.setText(comment);
+                commentOb.setMessage(comment);
                 dsa.addToCommentCollection(Arrays.asList(commentOb));
                 if (newState != null) {
                     dsa.setDispatchSpecimenState(newState);

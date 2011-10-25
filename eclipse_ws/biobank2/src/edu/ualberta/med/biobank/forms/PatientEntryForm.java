@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -7,11 +8,14 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
@@ -19,15 +23,21 @@ import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.Patie
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.study.GetStudyListForSiteAction;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.CollectionView;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class PatientEntryForm extends BiobankEntryForm {
@@ -52,6 +62,15 @@ public class PatientEntryForm extends BiobankEntryForm {
     private PatientInfo pInfo;
 
     private Patient patientCopy;
+
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
+
+    private CommentCollectionEntryInfoTable commentEntryTable;
 
     @Override
     public void init() throws Exception {
@@ -158,6 +177,27 @@ public class PatientEntryForm extends BiobankEntryForm {
             patientCopy.getCreatedAt(), patientCopy,
             PatientPeer.CREATED_AT.getName(), createdAtValidator, SWT.DATE
                 | SWT.TIME, CREATED_AT_BINDING, false);
+
+        createCommentSection();
+    }
+
+    private void createCommentSection() {
+        Section section = createSection(Messages.Comments_title);
+        commentEntryTable = new CommentCollectionEntryInfoTable(section,
+            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+                new ArrayList<Comment>(pInfo.patient.getCommentCollection()),
+                CommentWrapper.class));
+        commentEntryTable.adaptToToolkit(toolkit, true);
+        commentEntryTable.addSelectionChangedListener(listener);
+
+        addSectionToolbar(section, Messages.Comments_button_add,
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    commentEntryTable.addComment();
+                }
+            });
+        section.setClient(commentEntryTable);
     }
 
     @Override

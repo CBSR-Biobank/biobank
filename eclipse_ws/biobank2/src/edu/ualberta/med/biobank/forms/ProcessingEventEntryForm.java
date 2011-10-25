@@ -13,9 +13,12 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
@@ -36,6 +39,7 @@ import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget.ItemAction;
+import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.Event;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
@@ -65,6 +69,15 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     protected boolean tryAgain = false;
 
     private boolean isTryingAgain;
+
+    private CommentCollectionEntryInfoTable commentEntryTable;
+
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
 
     @Override
     protected void init() throws Exception {
@@ -150,6 +163,25 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             setDirty(false);
         }
 
+        createCommentSection();
+
+    }
+
+    private void createCommentSection() {
+        Section section = createSection(Messages.Comments_title);
+        commentEntryTable = new CommentCollectionEntryInfoTable(section,
+            pEvent.getCommentCollection(false));
+        commentEntryTable.adaptToToolkit(toolkit, true);
+        commentEntryTable.addSelectionChangedListener(listener);
+
+        addSectionToolbar(section, Messages.Comments_button_add,
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    commentEntryTable.addComment();
+                }
+            });
+        section.setClient(commentEntryTable);
     }
 
     private void createSpecimensSection() {

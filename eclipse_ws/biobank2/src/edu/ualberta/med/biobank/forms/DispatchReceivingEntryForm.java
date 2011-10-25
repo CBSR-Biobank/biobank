@@ -10,10 +10,13 @@ import java.util.Map.Entry;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.SessionSecurityHelper;
@@ -26,7 +29,10 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
 public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
@@ -34,6 +40,14 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm"; //$NON-NLS-1$
     private DispatchSpecimensTreeTable specimensTree;
     private List<SpecimenWrapper> receivedOrExtraSpecimens = new ArrayList<SpecimenWrapper>();
+    private CommentCollectionEntryInfoTable commentEntryTable;
+
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
 
     @Override
     protected void createFormContent() throws Exception {
@@ -87,6 +101,25 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
             .getFormattedDateReceived());
 
+        createCommentSection();
+
+    }
+
+    private void createCommentSection() {
+        Section section = createSection(Messages.Comments_title);
+        commentEntryTable = new CommentCollectionEntryInfoTable(section,
+            dispatch.getCommentCollection(false));
+        commentEntryTable.adaptToToolkit(toolkit, true);
+        commentEntryTable.addSelectionChangedListener(listener);
+
+        addSectionToolbar(section, Messages.Comments_button_add,
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    commentEntryTable.addComment();
+                }
+            });
+        section.setClient(commentEntryTable);
     }
 
     @Override
