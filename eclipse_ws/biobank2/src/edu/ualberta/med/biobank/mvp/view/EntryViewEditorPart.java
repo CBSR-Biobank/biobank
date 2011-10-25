@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.mvp.event.EclipseClickEvent;
 
 public class EntryViewEditorPart extends EditorPart {
     public static String ID = "edu.ualberta.med.biobank.mvp.view.EntryViewEditorPart"; //$NON-NLS-1$
-    private FormView entryView;
+    private IFormView entryView;
 
     @Override
     public void doSave(IProgressMonitor monitor) {
@@ -62,13 +62,13 @@ public class EntryViewEditorPart extends EditorPart {
     }
 
     public static class EntryViewEditorInput implements IEditorInput {
-        private final FormView entryView;
+        private final IFormView entryView;
 
-        public EntryViewEditorInput(FormView entryView) {
+        public EntryViewEditorInput(IFormView entryView) {
             this.entryView = entryView;
         }
 
-        public FormView getEntryView() {
+        public IFormView getEntryView() {
             return entryView;
         }
 

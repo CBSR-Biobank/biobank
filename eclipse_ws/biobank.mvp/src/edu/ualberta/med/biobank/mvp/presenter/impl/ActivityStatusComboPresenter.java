@@ -13,13 +13,13 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter.View;
 import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValue;
 import edu.ualberta.med.biobank.mvp.util.Converter;
-import edu.ualberta.med.biobank.mvp.view.BaseView;
+import edu.ualberta.med.biobank.mvp.view.IView;
 
 public class ActivityStatusComboPresenter extends BasePresenter<View> {
     private final static OptionLabeller labeller = new OptionLabeller();
     private final Dispatcher dispatcher;
 
-    public interface View extends BaseView {
+    public interface View extends IView {
         HasSelectedValue<ActivityStatus> getActivityStatus();
     }
 

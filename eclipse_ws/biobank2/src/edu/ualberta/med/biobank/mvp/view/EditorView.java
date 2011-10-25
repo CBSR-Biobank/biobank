@@ -15,8 +15,8 @@ import com.google.gwt.user.client.ui.HasValue;
 public class EditorView {
     HasValue<String> name;
 
-    private BaseView addressEntryView;
-    private BaseView activityStatusComboView;
+    private IView addressEntryView;
+    private IView activityStatusComboView;
 
     public HasValue<String> getName() {
         return name;

@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.mvp.event.model.site.CreateSiteEvent;
+import edu.ualberta.med.biobank.mvp.event.model.site.SiteCreateEvent;
 
 public class SiteAddHandler extends AbstractHandler {
     private static BgcLogger LOGGER = BgcLogger.getLogger(SiteAddHandler.class
@@ -32,7 +32,7 @@ public class SiteAddHandler extends AbstractHandler {
         Injector injector = BiobankPlugin.getInjector();
         injector.injectMembers(this);
 
-        eventBus.fireEvent(new CreateSiteEvent());
+        eventBus.fireEvent(new SiteCreateEvent());
 
         // old code to create a new site
         // SessionAdapter sessionAdapter = SessionManager.getInstance()
