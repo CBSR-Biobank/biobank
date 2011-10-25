@@ -45,11 +45,11 @@ public class Utils {
 
     public static List<Comment> getRandomComments() {
         final List<Comment> comments = new ArrayList<Comment>();
-    
+
         for (int i = 0, n = r.nextInt(5); i < n; ++i) {
             Comment c = new Comment();
-            c.setDateAdded(getRandomDate());
-            c.setText("comment " + r.nextInt());
+            c.setCreatedAt(getRandomDate());
+            c.setMessage("comment " + r.nextInt());
             comments.add(c);
         }
         return comments;

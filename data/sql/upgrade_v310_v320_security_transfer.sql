@@ -3,10 +3,6 @@
 -- convert users from csm to users from biobank:
 -- add + 10 because groups (that are also principals) should be added. So far only one is added, but just in case we add more, add 10
 
--- add 'Unknown user' which is used in upgrade scripts
-insert into principal (id, version) values 1,0;
-
-
 insert into principal (id, version)
 select user_id + 10, 0 from csm_user where login_name != 'administrator' and login_name != 'bbadmin';
 
