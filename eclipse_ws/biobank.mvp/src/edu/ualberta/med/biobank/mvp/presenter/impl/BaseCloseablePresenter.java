@@ -22,6 +22,7 @@ public abstract class BaseCloseablePresenter<V extends CloseableView> extends
 
     @Override
     public void close() {
+        unbind();
         view.close();
     }
 

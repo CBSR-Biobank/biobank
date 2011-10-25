@@ -29,7 +29,7 @@ public class SiteEntryForm extends EditorPart {
         // presenter.bind();
     }
 
-                @Override
+    @Override
     public void doSave(IProgressMonitor monitor) {
         // TODO Auto-generated method stub
 

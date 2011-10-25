@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.widgets.trees;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,6 +29,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -142,7 +145,8 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                 } else if (element instanceof TreeItemAdapter) {
                     if (columnIndex == 4)
                         return ((DispatchSpecimenWrapper) ((TreeItemAdapter) element)
-                            .getSpecimen()).getComment();
+                            .getSpecimen()).getCommentCollection(false)
+                            .toString();
                     return ((TreeItemAdapter) element)
                         .getColumnText(columnIndex);
                 }
@@ -222,7 +226,8 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         String previousComment = null;
         if (iStructuredSelection.size() == 1) {
             previousComment = ((DispatchSpecimenWrapper) ((TreeItemAdapter) iStructuredSelection
-                .getFirstElement()).getSpecimen()).getComment();
+                .getFirstElement()).getSpecimen()).getCommentCollection(false)
+                .toString();
         }
         ModifyStateDispatchDialog dialog = new ModifyStateDispatchDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
@@ -234,7 +239,12 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                 .hasNext();) {
                 DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) ((TreeItemAdapter) iter
                     .next()).getSpecimen();
-                dsa.setComment(comment);
+                CommentWrapper commentOb = new CommentWrapper(
+                    SessionManager.getAppService());
+                commentOb.setDateAdded(new Date());
+                commentOb.setUser(SessionManager.getUser());
+                commentOb.setText(comment);
+                dsa.addToCommentCollection(Arrays.asList(commentOb));
                 if (newState != null) {
                     dsa.setDispatchSpecimenState(newState);
                 }

@@ -152,7 +152,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.label_comments, null, pEvent,
-            ProcessingEventPeer.COMMENT.getName(), null);
+            ProcessingEventPeer.COMMENT_COLLECTION.getName(), null);
     }
 
     private void createSpecimensSection() {
@@ -282,10 +282,11 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         for (SpecimenWrapper spc : pEvent.getSpecimenCollection(false)) {
             specimens.add(spc.getId());
         }
+
         Integer peventId = SessionManager.getAppService().doAction(
             new ProcessingEventSaveAction(pEvent.getId(), pEvent.getCenter()
                 .getId(), pEvent.getCreatedAt(), pEvent.getWorksheet(), pEvent
-                .getActivityStatus().getId(), pEvent.getComment(), specimens));
+                .getActivityStatus().getId(), null, specimens));
         adapter.setId(peventId);
         // FIXME figure out if still need this. But should probably be on the
         // action side now

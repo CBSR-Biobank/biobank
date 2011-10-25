@@ -158,8 +158,8 @@ public class NewSpecimenInfoTable extends InfoTableWidget {
                 case 8:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 9:
-                    return (row.specimen.getComment() == null || row.specimen
-                        .getComment().equals("")) ? Messages.SpecimenInfoTable_no_first_letter //$NON-NLS-1$
+                    return (row.specimen.getCommentCollection() == null || row.specimen
+                        .getCommentCollection().equals("")) ? Messages.SpecimenInfoTable_no_first_letter //$NON-NLS-1$
                         : Messages.SpecimenInfoTable_yes_first_letter;
                 default:
                     return ""; //$NON-NLS-1$
@@ -214,8 +214,8 @@ public class NewSpecimenInfoTable extends InfoTableWidget {
                 case 8:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 9:
-                    return (row.specimen.getComment() == null || row.specimen
-                        .getComment().equals("")) ? Messages.SpecimenInfoTable_no_first_letter //$NON-NLS-1$
+                    return (row.specimen.getCommentCollection() == null || row.specimen
+                        .getCommentCollection().equals("")) ? Messages.SpecimenInfoTable_no_first_letter //$NON-NLS-1$
                         : Messages.SpecimenInfoTable_yes_first_letter;
                 default:
                     return ""; //$NON-NLS-1$

@@ -121,14 +121,10 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
         }
 
-        createBoundWidgetWithLabel(
-            client,
-            BgcBaseText.class,
-            SWT.MULTI,
-            Messages.DispatchSendingEntryForm_comments_label,
-            null,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
+            Messages.DispatchSendingEntryForm_comments_label, null,
             BeansObservables.observeValue(dispatch,
-                DispatchPeer.COMMENT.getName()), null);
+                DispatchPeer.COMMENT_COLLECTION.getName()), null);
 
         createSpecimensSelectionSection();
     }

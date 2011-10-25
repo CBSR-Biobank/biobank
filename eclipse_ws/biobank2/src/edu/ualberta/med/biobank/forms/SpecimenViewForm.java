@@ -239,7 +239,7 @@ public class SpecimenViewForm extends BiobankViewForm {
         setTextValue(childrenLabel, specimen.getChildSpecimenCollection(false)
             .size());
         setTextValue(activityStatusLabel, specimen.getActivityStatus());
-        setTextValue(commentLabel, specimen.getComment());
+        setTextValue(commentLabel, specimen.getCommentCollection(false));
 
     }
 

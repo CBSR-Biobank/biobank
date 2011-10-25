@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.action;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -13,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.test.Utils;
@@ -44,7 +46,7 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void testSaveWithoutSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(50);
-        String comments = Utils.getRandomString(100);
+        List<Comment> comments = Utils.getRandomComments();
         Date date = Utils.getRandomDate();
         Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
             null, site.getId(), date, worksheet, 1, comments, null));
@@ -54,7 +56,8 @@ public class TestProcessingEvent extends TestAction {
         ProcessingEvent pevent = (ProcessingEvent) session.get(
             ProcessingEvent.class, pEventId);
         Assert.assertEquals(worksheet, pevent.getWorksheet());
-        Assert.assertEquals(comments, pevent.getComment());
+        Assert.assertEquals(comments.size(), pevent.getCommentCollection()
+            .size());
         Assert.assertTrue(compareDateInHibernate(date, pevent.getCreatedAt()));
         Assert.assertEquals(0, pevent.getSpecimenCollection().size());
         closeHibernateSession();
@@ -63,7 +66,7 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void testSaveWithSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(50);
-        String comments = Utils.getRandomString(100);
+        List<Comment> comments = Utils.getRandomComments();
         Date date = Utils.getRandomDate();
 
         // FIXME create a list of specimens to add.
@@ -77,7 +80,8 @@ public class TestProcessingEvent extends TestAction {
         ProcessingEvent pevent = (ProcessingEvent) session.get(
             ProcessingEvent.class, pEventId);
         Assert.assertEquals(worksheet, pevent.getWorksheet());
-        Assert.assertEquals(comments, pevent.getComment());
+        Assert.assertEquals(comments.size(), pevent.getCommentCollection()
+            .size());
         Assert.assertTrue(compareDateInHibernate(date, pevent.getCreatedAt()));
         Assert.assertEquals(0, pevent.getSpecimenCollection().size());
         closeHibernateSession();
@@ -86,10 +90,9 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void testSaveSameWorksheet() throws Exception {
         String worksheet = Utils.getRandomString(50);
-        String comments = Utils.getRandomString(100);
         Date date = Utils.getRandomDate();
         Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
-            null, site.getId(), date, worksheet, 1, comments, null));
+            null, site.getId(), date, worksheet, 1, null, null));
 
         // try to save another pevent with the same worksheet
         try {

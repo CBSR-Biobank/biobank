@@ -151,7 +151,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
         setTextValue(visitNumberLabel, ceventInfo.cevent.getVisitNumber());
         setTextValue(activityStatusLabel, ceventInfo.cevent.getActivityStatus()
             .getName());
-        setTextValue(commentLabel, ceventInfo.cevent.getComment());
+        setTextValue(commentLabel, ceventInfo.cevent.getCommentCollection());
         // assign PvInfo
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
             setTextValue(combinedPvInfo.widget, combinedPvInfo.getValue());

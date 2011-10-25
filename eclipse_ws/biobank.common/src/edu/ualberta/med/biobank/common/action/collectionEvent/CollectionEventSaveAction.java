@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
@@ -46,7 +47,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
     private Integer patientId;
     private Integer visitNumber;
     private Integer statusId;
-    private String comments;
+    private Collection<Comment> comments;
 
     public static class SaveCEventSpecimenInfo implements Serializable,
         NotAProxy {
@@ -57,7 +58,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
         public Date timeDrawn;
         public Integer statusId;
         public Integer specimenTypeId;
-        public String comment;
+        public Collection<Comment> comments;
         public Double quantity;
     }
 
@@ -77,14 +78,14 @@ public class CollectionEventSaveAction implements Action<Integer> {
     private List<SaveCEventAttrInfo> ceAttrList;
 
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
-        Integer visitNumber, Integer statusId, String comments,
+        Integer visitNumber, Integer statusId, Collection<Comment> collection,
         Integer centerId, Collection<SaveCEventSpecimenInfo> sourceSpecs,
         List<SaveCEventAttrInfo> ceAttrList) {
         this.ceventId = ceventId;
         this.patientId = patientId;
         this.visitNumber = visitNumber;
         this.statusId = statusId;
-        this.comments = comments;
+        this.comments = collection;
         this.centerId = centerId;
         this.sourceSpecimens = sourceSpecs;
         this.ceAttrList = ceAttrList;
@@ -118,7 +119,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
         ceventToSave.setVisitNumber(visitNumber);
         ceventToSave.setActivityStatus(ActionUtil.sessionGet(session,
             ActivityStatus.class, statusId));
-        ceventToSave.setComment(comments);
+        ceventToSave.setCommentCollection(comments);
 
         setSourceSpecimens(session, ceventToSave);
 
@@ -170,7 +171,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
                 allSpec.add(specimen);
                 specimen.setOriginalCollectionEvent(ceventToSave);
                 originalSpec.add(specimen);
-                specimen.setComment(specInfo.comment);
+                specimen.setCommentCollection(specInfo.comments);
                 specimen.setCreatedAt(specInfo.timeDrawn);
                 specimen.setInventoryId(specInfo.inventoryId);
                 specimen.setQuantity(specInfo.quantity);

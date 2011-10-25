@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.action.processingEvent;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
@@ -34,13 +36,13 @@ public class ProcessingEventSaveAction implements Action<Integer> {
 
     private Integer statusId;
 
-    private String comments;
+    private Collection<Comment> comments;
 
     private List<Integer> specimenIds;
 
     public ProcessingEventSaveAction(Integer peventId, Integer centerId,
-        Date createdAt, String worksheet, Integer statusId, String comments,
-        List<Integer> specimenIds) {
+        Date createdAt, String worksheet, Integer statusId,
+        Collection<Comment> comments, List<Integer> specimenIds) {
         this.peventId = peventId;
         this.centerId = centerId;
         this.createdAt = createdAt;
@@ -81,7 +83,7 @@ public class ProcessingEventSaveAction implements Action<Integer> {
             ActivityStatus.class, statusId));
         peventToSave.setCenter(ActionUtil.sessionGet(session, Center.class,
             centerId));
-        peventToSave.setComment(comments);
+        peventToSave.setCommentCollection(comments);
         peventToSave.setCreatedAt(createdAt);
         peventToSave.setWorksheet(worksheet);
 

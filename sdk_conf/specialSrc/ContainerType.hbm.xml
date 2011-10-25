@@ -11,7 +11,6 @@
 		<property name="nameShort" type="string" column="NAME_SHORT"/>
 		<property name="topLevel" type="boolean" column="TOP_LEVEL"/>
 		<property name="defaultTemperature" type="double" column="DEFAULT_TEMPERATURE"/>
-		<property name="comment" type="string" column="COMMENT"/>
 		<!-- Associations mapping for the ContainerType class -->
 		<set name="specimenTypeCollection" table="CONTAINER_TYPE_SPECIMEN_TYPE" lazy="true" inverse="false">
 			<cache usage="read-write" />
@@ -24,6 +23,11 @@
 			<many-to-many class="edu.ualberta.med.biobank.model.ContainerType" column="CHILD_CONTAINER_TYPE_ID" />
 		</set>
 			<many-to-one name="activityStatus" class="edu.ualberta.med.biobank.model.ActivityStatus" column="ACTIVITY_STATUS_ID" lazy="proxy" not-null="true" cascade="none"/>
+		<set name="commentCollection" table="CONTAINER_TYPE_COMMENT" lazy="true" cascade="none" inverse="false">
+			<cache usage="read-write" />
+			<key column="CONTAINER_TYPE_ID" />
+			<many-to-many class="edu.ualberta.med.biobank.model.Comment" column="COMMENT_ID" unique="true"/>
+		</set>
 		<many-to-one name="capacity" class="edu.ualberta.med.biobank.model.Capacity" column="CAPACITY_ID" unique="true" lazy="proxy" not-null="true" cascade="all"/>
 			<many-to-one name="site" class="edu.ualberta.med.biobank.model.Site" column="SITE_ID" lazy="proxy" not-null="true" cascade="none"/>
 			<many-to-one name="childLabelingScheme" class="edu.ualberta.med.biobank.model.ContainerLabelingScheme" column="CHILD_LABELING_SCHEME_ID" lazy="proxy" not-null="true" cascade="none"/>

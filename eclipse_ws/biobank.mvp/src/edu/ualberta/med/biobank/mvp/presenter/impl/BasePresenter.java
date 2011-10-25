@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.pietschy.gwt.pectin.client.form.binding.FormBinder;
 
 import edu.ualberta.med.biobank.mvp.presenter.Presenter;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
@@ -12,6 +13,7 @@ import edu.ualberta.med.biobank.mvp.view.BaseView;
 public abstract class BasePresenter<V extends BaseView> implements Presenter<V> {
     private final List<HandlerRegistration> handlerRegistrations =
         new ArrayList<HandlerRegistration>();
+    protected final FormBinder binder = new FormBinder();
     protected final V view;
     protected final EventBus eventBus;
     private boolean bound = false;
@@ -38,10 +40,8 @@ public abstract class BasePresenter<V extends BaseView> implements Presenter<V> 
         if (bound) {
             bound = false;
 
-            for (HandlerRegistration reg : handlerRegistrations) {
-                reg.removeHandler();
-            }
-            handlerRegistrations.clear();
+            removeHandlers();
+            binder.dispose();
 
             onUnbind();
         }
@@ -92,4 +92,11 @@ public abstract class BasePresenter<V extends BaseView> implements Presenter<V> 
      * will have already been removed at this point.
      */
     protected abstract void onUnbind();
+
+    private void removeHandlers() {
+        for (HandlerRegistration reg : handlerRegistrations) {
+            reg.removeHandler();
+        }
+        handlerRegistrations.clear();
+    }
 }

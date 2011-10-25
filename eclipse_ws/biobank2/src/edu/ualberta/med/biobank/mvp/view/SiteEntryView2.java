@@ -12,9 +12,12 @@ import org.eclipse.ui.part.EditorPart;
 
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.ui.HasValue;
+import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 
-import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
+import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
 
 public class SiteEntryView2 extends EditorPart implements
@@ -87,15 +90,9 @@ public class SiteEntryView2 extends EditorPart implements
     }
 
     @Override
-    public HasClickHandlers getSave() {
+    public HasButton getSave() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public void setGeneralErrors(Collection<Object> errors) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -122,15 +119,21 @@ public class SiteEntryView2 extends EditorPart implements
     }
 
     @Override
-    public HasValue<String> getComment() {
+    public HasValue<List<Comment>> getCommentCollection() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public HasValue<List<StudyInfo>> getStudies() {
+    public HasValue<Collection<StudyInfo>> getStudies() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public void setValidationResult(ValidationResult result) {
+        // TODO Auto-generated method stub
+
     }
 
 }

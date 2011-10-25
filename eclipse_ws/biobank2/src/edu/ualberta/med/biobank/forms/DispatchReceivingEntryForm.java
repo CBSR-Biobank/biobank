@@ -90,7 +90,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.DispatchReceivingEntryForm_comments_label, null, dispatch,
-            DispatchPeer.COMMENT.getName(), null);
+            DispatchPeer.COMMENT_COLLECTION.getName(), null);
 
     }
 

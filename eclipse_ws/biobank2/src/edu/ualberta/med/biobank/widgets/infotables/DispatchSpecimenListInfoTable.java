@@ -139,7 +139,7 @@ public abstract class DispatchSpecimenListInfoTable extends InfoTableWidget {
         Assert.isNotNull(type, Messages.DispatchSpecimenListInfoTable_16);
         info.type = type.getName();
         info.status = info.dsa.getSpecimen().getActivityStatus().toString();
-        info.comment = info.dsa.getComment();
+        info.comment = info.dsa.getCommentCollection(false).toString();
         return info;
     }
 

@@ -230,7 +230,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.WRAP
             | SWT.MULTI, Messages.ShipmentEntryForm_comments_label, null,
-            shipmentInfo, ShipmentInfoPeer.COMMENT.getName(), null);
+            shipmentInfo, ShipmentInfoPeer.COMMENT_COLLECTION.getName(), null);
 
     }
 

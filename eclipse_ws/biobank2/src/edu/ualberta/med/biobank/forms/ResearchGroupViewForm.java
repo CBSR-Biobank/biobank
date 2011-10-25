@@ -201,7 +201,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         setTextValue(nameShortLabel, researchGroup.getNameShort());
         setTextValue(studyLabel, researchGroup.getStudy());
         setTextValue(activityStatusLabel, researchGroup.getActivityStatus());
-        setTextValue(commentLabel, researchGroup.getComment());
+        setTextValue(commentLabel, researchGroup.getCommentCollection(false));
     }
 
     @Override

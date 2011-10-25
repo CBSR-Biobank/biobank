@@ -141,7 +141,7 @@ public class TestPatient extends TestAction {
             null, study.getId(), pnumber, date));
         // add a cevent to the patient:
         appService.doAction(new CollectionEventSaveAction(null, patientId, r
-            .nextInt(20), 1, Utils.getRandomString(8, 50), site.getId(), null,
+            .nextInt(20), 1, null, site.getId(), null,
             null));
 
         // delete the patient
@@ -273,7 +273,7 @@ public class TestPatient extends TestAction {
         // Save a new cevent with specimens
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId, r
-                .nextInt(20), 1, Utils.getRandomString(8, 50), site.getId(),
+                .nextInt(20), 1, Utils.getRandomComments(), site.getId(),
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
         HashMap<Integer, SimpleCEventInfo> ceventInfos = appService
@@ -312,7 +312,7 @@ public class TestPatient extends TestAction {
 
         // Save a new cevent with specimens
         appService.doAction(new CollectionEventSaveAction(null, patientId, r
-            .nextInt(20), 1, Utils.getRandomString(8, 50), site.getId(),
+            .nextInt(20), 1, null, site.getId(),
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
         ArrayList<PatientCEventInfo> infos = appService
@@ -350,11 +350,11 @@ public class TestPatient extends TestAction {
         // Save a new cevent with specimens
         Integer visitNumber = r.nextInt(20);
         appService.doAction(new CollectionEventSaveAction(null, patientId,
-            visitNumber, 1, Utils.getRandomString(8, 50), site.getId(),
+            visitNumber, 1, null, site.getId(),
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
         // Save a second new cevent without specimens
         appService.doAction(new CollectionEventSaveAction(null, patientId,
-            visitNumber + 1, 1, Utils.getRandomString(8, 50), site.getId(),
+            visitNumber + 1, 1, null, site.getId(),
             null, null));
 
         // method to test:
@@ -377,7 +377,7 @@ public class TestPatient extends TestAction {
 
         Integer visitNumber = r.nextInt(20);
         appService.doAction(new CollectionEventSaveAction(null, patientId,
-            visitNumber, 1, Utils.getRandomString(8, 50), site.getId(), null,
+            visitNumber, 1, null, site.getId(), null,
             null));
 
         Integer next = appService.doAction(new PatientNextVisitNumberAction(
@@ -395,9 +395,9 @@ public class TestPatient extends TestAction {
         // add 2 cevents to this patient:
         int vnber = r.nextInt(20);
         appService.doAction(new CollectionEventSaveAction(null, patientId,
-            vnber, 1, Utils.getRandomString(8, 50), site.getId(), null, null));
+            vnber, 1, null, site.getId(), null, null));
         appService.doAction(new CollectionEventSaveAction(null, patientId,
-            vnber + 1, 1, Utils.getRandomString(8, 50), site.getId(), null,
+            vnber + 1, 1, null, site.getId(), null,
             null));
 
         openHibernateSession();

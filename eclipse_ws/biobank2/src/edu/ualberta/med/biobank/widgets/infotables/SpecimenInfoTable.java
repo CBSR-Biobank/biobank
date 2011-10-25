@@ -241,7 +241,7 @@ public class SpecimenInfoTable extends InfoTableWidget {
         info.position = info.specimen.getPositionString();
         ActivityStatusWrapper status = info.specimen.getActivityStatus();
         info.activityStatus = (status == null) ? "" : status.getName(); //$NON-NLS-1$
-        info.comment = info.specimen.getComment();
+        info.comment = info.specimen.getCommentCollection(false).toString();
         info.center = info.specimen.getCurrentCenter().getNameShort();
 
         info.originCenter = ""; //$NON-NLS-1$

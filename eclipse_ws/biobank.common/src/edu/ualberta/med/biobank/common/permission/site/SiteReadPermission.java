@@ -1,7 +1,8 @@
-package edu.ualberta.med.biobank.common.permission;
+package edu.ualberta.med.biobank.common.permission.site;
 
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 

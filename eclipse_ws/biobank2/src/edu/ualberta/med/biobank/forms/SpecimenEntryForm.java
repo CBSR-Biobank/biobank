@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -24,6 +26,7 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
@@ -282,7 +285,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         commentText = (BgcBaseText) createBoundWidgetWithLabel(client,
             BgcBaseText.class, SWT.WRAP | SWT.MULTI,
             Messages.SpecimenEntryForm_comments_label, null, specimen,
-            SpecimenPeer.COMMENT.getName(), null);
+            SpecimenPeer.COMMENT_COLLECTION.getName(), null);
 
         setFirstControl(specimenTypeComboViewer.getControl());
     }
@@ -296,13 +299,13 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         }
         allchildren.add(specimen2);
         specimen2.setCollectionEvent(collectionEvent);
-        String comment = specimen2.getComment();
-        if (comment == null)
-            comment = ""; //$NON-NLS-1$
-        else
-            comment += "\n"; //$NON-NLS-1$
-        comment += Messages.SpecimenEntryForm_cevent_modification + wcomment;
-        specimen2.setComment(comment);
+        CommentWrapper newComment = new CommentWrapper(
+            SessionManager.getAppService());
+        newComment.setDateAdded(new Date());
+        newComment.setUser(SessionManager.getUser());
+        newComment.setText(Messages.SpecimenEntryForm_cevent_modification
+            + wcomment);
+        specimen2.addToCommentCollection(Arrays.asList(newComment));
         for (SpecimenWrapper spec : specimen2.getChildSpecimenCollection(false)) {
             transferSpecimen(spec, collectionEvent, wcomment);
         }

@@ -1,5 +1,6 @@
-package edu.ualberta.med.biobank.common.action.site;
+package edu.ualberta.med.biobank.common.action.center;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -11,14 +12,16 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.User;
 
-public class SaveSiteAction implements Action<Integer> {
+public abstract class CenterSaveAction implements Action<Integer> {
     private static final long serialVersionUID = 1L;
 
-    private final Integer siteId;
+    protected final Integer centerId;
 
     // Specific properties force the programmer only to modify the intended
     // data. A little faster. But disregards version checks. Version checks
@@ -27,13 +30,12 @@ public class SaveSiteAction implements Action<Integer> {
 
     private String name;
     private String nameShort;
-    private String comment;
+    private Collection<Comment> comment;
     private Address address;
     private Integer aStatusId;
-    private Set<Integer> studyIds;
 
-    public SaveSiteAction(Integer siteId) {
-        this.siteId = siteId;
+    public CenterSaveAction(Integer centerId) {
+        this.centerId = centerId;
     }
 
     public void setName(String name) {
@@ -44,7 +46,7 @@ public class SaveSiteAction implements Action<Integer> {
         this.nameShort = nameShort;
     }
 
-    public void setComment(String comment) {
+    public void setCommentCollection(Collection<Comment> comment) {
         this.comment = comment;
     }
 
@@ -56,20 +58,16 @@ public class SaveSiteAction implements Action<Integer> {
         this.aStatusId = activityStatusId;
     }
 
-    public void setStudyIds(Set<Integer> studyIds) {
-        this.studyIds = studyIds;
-    }
-
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
         // TODO Auto-generated method stub
         return false;
     }
 
-    @Override
-    public Integer run(User user, Session session) throws ActionException {
-        SessionUtil sessionUtil = new SessionUtil(session);
-        Site site = sessionUtil.get(Site.class, siteId, new Site());
+    protected Integer runInternal(User user, Session session,
+        SessionUtil sessionUtil, Center center) throws ActionException {
+        // SessionUtil sessionUtil = new SessionUtil(session);
+        // Site site = sessionUtil.get(Site.class, siteId, new Site());
 
         // TODO: check permission? (can edit site?)
 
@@ -78,35 +76,24 @@ public class SaveSiteAction implements Action<Integer> {
 
         // TODO: LocalizedMessage in Exception?
 
-        site.setName(name);
-        site.setNameShort(nameShort);
-        site.setComment(comment);
+        center.setName(name);
+        center.setNameShort(nameShort);
+        center.setCommentCollection(comment);
 
         ActivityStatus aStatus = sessionUtil.get(ActivityStatus.class,
             aStatusId);
-        site.setActivityStatus(aStatus);
+        center.setActivityStatus(aStatus);
 
         // TODO: remember to check the address
-        site.setAddress(address);
+        center.setAddress(address);
 
-        // TODO: check that the user has access to at least the studies they are
-        // removing or adding?
-        Map<Integer, Study> studies = sessionUtil.get(Study.class, studyIds);
-
-        // TODO: write a Diff class?
-        // Diff<Collection<Study>> diff = Diff.from(site.getStudyCollection(),
-        // studies.values());
-        // diff.getRemoved()
-        // diff.getAdded()
-        site.setStudyCollection(new HashSet<Study>(studies.values()));
-
-        session.saveOrUpdate(site);
+        session.saveOrUpdate(center);
         session.flush();
 
         // TODO: SHOULD NOT require a flush so that we can get the inserted id
         // if this was an insert, try using a callback that sets the response
         // value instead?
 
-        return site.getId();
+        return center.getId();
     }
 }

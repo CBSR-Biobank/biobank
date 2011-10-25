@@ -1,5 +1,5 @@
 INSERT INTO csm_user (USER_ID, LOGIN_NAME, MIGRATED_FLAG, FIRST_NAME, LAST_NAME, PASSWORD, UPDATE_DATE)
-select coalesce(MAX(id), 0)+Max(user_id)+1, 'testuser', 0 , 'testuser', 'testuser', 'orDBlaojDQE=', sysdate() from principal, csm_user;
+select (select coalesce(MAX(id), 0)+Max(user_id)+1 from principal, csm_user), 'testuser', 0 , 'testuser', 'testuser', 'orDBlaojDQE=', sysdate();
 
 insert into principal (id, version)  
 select user_id, 0 from csm_user where login_name = 'testuser';
@@ -14,4 +14,7 @@ select user_id, 8, 1, sysdate() from csm_user where login_name = 'testuser';
 insert into group_user(user_id, group_id) 
 select u.principal_id, g.principal_id from user u, bb_group g where u.login='testuser' and g.name='Super Administrators';
 
-
+-- add a membership for site CBSR (id = 34)
+-- comment the following insert out on an empty database since site id '34' won't exist
+insert into membership (id, version, center_id, principal_id) 
+select coalesce(MAX(ms.id), 0)+1, 0, 34, u.user_id from csm_user as u, membership as ms where login_name = 'testuser';

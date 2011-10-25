@@ -80,7 +80,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         setTextValue(worksheetLabel, pEvent.getWorksheet());
         setTextValue(dateCreationLabel, pEvent.getFormattedCreatedAt());
         setTextValue(activityLabel, pEvent.getActivityStatus().getName());
-        setTextValue(commentLabel, pEvent.getComment());
+        setTextValue(commentLabel, pEvent.getCommentCollection(false));
     }
 
     private void createSourceSpecimensSection() {
