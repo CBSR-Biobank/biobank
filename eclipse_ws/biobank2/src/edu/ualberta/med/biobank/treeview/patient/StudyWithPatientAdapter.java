@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.treeview.patient;
 import java.util.List;
 import java.util.Map;
 
-import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction.SearchedPatientInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.NewStudyAdapter;

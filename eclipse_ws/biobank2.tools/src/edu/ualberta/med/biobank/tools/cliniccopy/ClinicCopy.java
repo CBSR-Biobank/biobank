@@ -32,17 +32,17 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ClinicCopy {
 
     // @formatter:off
-    private static String USAGE = 
-          "Usage: bbpdbconsent [options]\n\n"
-        + "Used to copy clinic information from the training server to the\n"
-        + "CBSR server for the REFINE clinics.\n\n"
-        + "Options\n"
-        + "  -H, --host       hostname for BioBank server and MySQL server\n"
-        + "  -p, --port       port number for BioBank server\n"
-        + "  -u, --user       user name to log into BioBank server\n"
-        + "  -w, --password   password to log into BioBank server\n"
-        + "  -v, --verbose    shows verbose output\n"
-        + "  -h, --help       shows this text\n"; //$NON-NLS-1$
+    private static String USAGE =
+        "Usage: bbpdbconsent [options]\n\n"
+            + "Used to copy clinic information from the training server to the\n"
+            + "CBSR server for the REFINE clinics.\n\n"
+            + "Options\n"
+            + "  -H, --host       hostname for BioBank server and MySQL server\n"
+            + "  -p, --port       port number for BioBank server\n"
+            + "  -u, --user       user name to log into BioBank server\n"
+            + "  -w, --password   password to log into BioBank server\n"
+            + "  -v, --verbose    shows verbose output\n"
+            + "  -h, --help       shows this text\n"; //$NON-NLS-1$
     // @formatter:on
 
     private static final Logger LOGGER = Logger.getLogger(BbpdbConsent.class
@@ -144,7 +144,7 @@ public class ClinicCopy {
                 ClinicWrapper newClinic = new ClinicWrapper(appService);
                 newClinic.setName(clinic.getName());
                 newClinic.setNameShort(clinic.getNameShort());
-                newClinic.setComment(clinic.getComment());
+                // newClinic.setComment(clinic.getComment());
                 newClinic.setAddress(newAddress);
                 newClinic.setActivityStatus(ActivityStatusWrapper
                     .getActivityStatus(appService, clinic.getActivityStatus()

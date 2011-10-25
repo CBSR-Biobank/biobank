@@ -24,11 +24,12 @@ public class TestCaCore extends TestDatabase {
 
         Specimen s1 = new Specimen();
         s1.setId(1);
-        s1.setComment("hi");
+        s1.setQuantity(0.1);
 
         Specimen s2 = new Specimen();
         s2.setId(1);
-        s2.setComment("bye");
+        s1.setQuantity(0.2);
+        ;
 
         ce.setAllSpecimenCollection(Arrays.asList(s1));
         ce.setOriginalSpecimenCollection(Arrays.asList(s2));
@@ -39,6 +40,6 @@ public class TestCaCore extends TestDatabase {
         Specimen after2 = ce.getOriginalSpecimenCollection().iterator().next();
 
         Assert.assertTrue(after1 != after2);
-        Assert.assertTrue(!after1.getComment().equals(after2.getComment()));
+        Assert.assertTrue(!after1.getQuantity().equals(after2.getQuantity()));
     }
 }

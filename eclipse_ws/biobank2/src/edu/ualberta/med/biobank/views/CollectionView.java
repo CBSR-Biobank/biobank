@@ -8,8 +8,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction;
-import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction.SearchedPatientInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -129,7 +129,7 @@ public class CollectionView extends AbstractAdministrationView {
     protected void internalSearch(String text) {
         try {
             SearchedPatientInfo pinfo = SessionManager.getAppService()
-                .doAction(new SearchPatientAction(text.trim()));
+                .doAction(new PatientSearchAction(text.trim()));
             if (pinfo == null) {
                 notFound(text);
             } else {

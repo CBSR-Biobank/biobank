@@ -100,7 +100,7 @@ public class UniquePreCheck<T extends IBiobankModel> extends ActionCheck<T> {
 
     private void setParameters(Query query) {
         int i = 0;
-        for (ValueProperty vp : valueProperties) {
+        for (ValueProperty<T> vp : valueProperties) {
             query.setParameter(i, vp.value);
             i++;
         }
@@ -121,7 +121,7 @@ public class UniquePreCheck<T extends IBiobankModel> extends ActionCheck<T> {
     private List<String> getPropertyNames() {
         List<String> propertyNames = new ArrayList<String>();
 
-        for (ValueProperty vp : valueProperties) {
+        for (ValueProperty<T> vp : valueProperties) {
             propertyNames.add(vp.property.getName());
         }
 

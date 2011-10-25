@@ -58,7 +58,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
         public Date timeDrawn;
         public Integer statusId;
         public Integer specimenTypeId;
-        public Collection<Comment> comment;
+        public Collection<Comment> comments;
         public Double quantity;
     }
 
@@ -131,12 +131,12 @@ public class CollectionEventSaveAction implements Action<Integer> {
     }
 
     private void check(User user, Session session) {
+        // Check that the visit number is unique for the patient
         List<ValueProperty<CollectionEvent>> propUple = new ArrayList<ValueProperty<CollectionEvent>>();
         propUple.add(new ValueProperty<CollectionEvent>(
             CollectionEventPeer.PATIENT.to(PatientPeer.ID), patientId));
         propUple.add(new ValueProperty<CollectionEvent>(
             CollectionEventPeer.VISIT_NUMBER, visitNumber));
-
         new UniquePreCheck<CollectionEvent>(new ValueProperty<CollectionEvent>(
             CollectionEventPeer.ID, ceventId), CollectionEvent.class, propUple)
             .run(user, session);
@@ -171,7 +171,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
                 allSpec.add(specimen);
                 specimen.setOriginalCollectionEvent(ceventToSave);
                 originalSpec.add(specimen);
-                specimen.setCommentCollection(specInfo.comment);
+                specimen.setCommentCollection(specInfo.comments);
                 specimen.setCreatedAt(specInfo.timeDrawn);
                 specimen.setInventoryId(specInfo.inventoryId);
                 specimen.setQuantity(specInfo.quantity);
@@ -193,7 +193,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
         Map<Integer, StudyEventAttrInfo> studyEventList = new GetStudyEventAttrInfoAction(
             study.getId()).run(user, session);
 
-        Map<Integer, EventAttrInfo> ceventAttrList = new GetEventAttrInfoAction(
+        Map<Integer, EventAttrInfo> ceventAttrList = new CollectionEventGetEventAttrInfoAction(
             ceventId).run(user, session);
         if (ceAttrList != null)
             for (SaveCEventAttrInfo attrInfo : ceAttrList) {

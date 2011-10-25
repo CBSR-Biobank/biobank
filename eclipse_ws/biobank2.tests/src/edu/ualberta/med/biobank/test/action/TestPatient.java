@@ -1,29 +1,38 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.hibernate.SQLQuery;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
-import edu.ualberta.med.biobank.common.action.patient.GetPatientCollectionEventInfosAction;
-import edu.ualberta.med.biobank.common.action.patient.GetPatientCollectionEventInfosAction.PatientCEventInfo;
-import edu.ualberta.med.biobank.common.action.patient.GetSimplePatientCollectionEventInfosAction;
-import edu.ualberta.med.biobank.common.action.patient.GetSimplePatientCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientMergeAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientMergeException;
+import edu.ualberta.med.biobank.common.action.patient.PatientNextVisitNumberAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -62,8 +71,8 @@ public class TestPatient extends TestAction {
     }
 
     @Test
-    public void testSaveExisting() throws Exception {
-        final String pnumber = "testSaveExisting" + r.nextInt();
+    public void testUpdate() throws Exception {
+        final String pnumber = "testUpdate" + r.nextInt();
         final Date date = Utils.getRandomDate();
         // create a new patient
         final Integer id = appService.doAction(new PatientSaveAction(null,
@@ -83,7 +92,29 @@ public class TestPatient extends TestAction {
         closeHibernateSession();
     }
 
-    @SuppressWarnings("unchecked")
+    @Test
+    public void testSaveSamePnumber() throws Exception {
+        final String pnumber = "testSaveSamePnumber" + r.nextInt();
+        final Date date = Utils.getRandomDate();
+        final Integer id = appService.doAction(new PatientSaveAction(null,
+            study.getId(), pnumber, date));
+
+        openHibernateSession();
+        // Check patient is in database with correct values
+        Patient p = (Patient) session.get(Patient.class, id);
+        Assert.assertNotNull(p);
+        closeHibernateSession();
+
+        // try to save with same pnumber
+        try {
+            appService.doAction(new PatientSaveAction(null, study.getId(),
+                pnumber, new Date()));
+            Assert.fail("should not be able to use the same pnumber twice");
+        } catch (DuplicatePropertySetException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
     @Test
     public void testDelete() throws Exception {
         final String pnumber = "testDelete" + r.nextInt();
@@ -92,70 +123,145 @@ public class TestPatient extends TestAction {
         final Integer id = appService.doAction(new PatientSaveAction(null,
             study.getId(), pnumber, date));
 
-        openHibernateSession();
-        SQLQuery qry = session.createSQLQuery("select * from patient where id="
-            + id);
-        List<Object[]> res = qry.list();
-        Assert.assertEquals(1, res.size());
-        closeHibernateSession();
-
         // delete the patient
         appService.doAction(new PatientDeleteAction(id));
 
         openHibernateSession();
-        qry = session.createSQLQuery("select * from patient where id=" + id);
-        res = qry.list();
-        Assert.assertEquals(0, res.size());
+        Patient patient = (Patient) session.get(Patient.class, id);
+        Assert.assertNull(patient);
         closeHibernateSession();
     }
 
-    @SuppressWarnings("unchecked")
+    @Test
+    public void testDeleteWithCevents() throws Exception {
+        final String pnumber = "testDeleteWithCevents" + r.nextInt();
+        final Date date = Utils.getRandomDate();
+        // create a new patient
+        final Integer patientId = appService.doAction(new PatientSaveAction(
+            null, study.getId(), pnumber, date));
+        // add a cevent to the patient:
+        appService.doAction(new CollectionEventSaveAction(null, patientId, r
+            .nextInt(20), 1, null, site.getId(), null,
+            null));
+
+        // delete the patient
+        try {
+            appService.doAction(new PatientDeleteAction(patientId));
+            Assert
+                .fail("should throw an exception since the patient still has on cevent");
+        } catch (CollectionNotEmptyException ae) {
+            Assert.assertTrue(true);
+        }
+
+        openHibernateSession();
+        Patient patient = (Patient) session.get(Patient.class, patientId);
+        Assert.assertNotNull(patient);
+        closeHibernateSession();
+    }
+
     @Test
     public void testMerge() throws Exception {
         final String string = "testMerge" + r.nextInt();
 
-        // create a new patient 1
-        final Integer id1 = appService.doAction(new PatientSaveAction(null,
-            study.getId(), string + "1", Utils.getRandomDate()));
+        // add specimen type
+        final Integer typeId = edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
+            .addSpecimenType(string).getId();
 
+        // create a new patient 1
+        final Integer patientId1 = appService.doAction(new PatientSaveAction(
+            null, study.getId(), string + "1", Utils.getRandomDate()));
         // create cevents in patient1
+        createCEventWithSpecimens(patientId1, 1, typeId, 4);
+        createCEventWithSpecimens(patientId1, 2, typeId, 2);
 
         // create a new patient 2
-        final Integer id2 = appService.doAction(new PatientSaveAction(null,
-            study.getId(), string + "2", Utils.getRandomDate()));
-
+        final Integer patientId2 = appService.doAction(new PatientSaveAction(
+            null, study.getId(), string + "2", Utils.getRandomDate()));
         // create cevents in patient2
-
-        openHibernateSession();
-        SQLQuery qry = session.createSQLQuery("select * from patient where id="
-            + id1);
-        List<Object[]> res = qry.list();
-        Assert.assertEquals(1, res.size());
-
-        // FIXME check cevents and specimens inside
-
-        qry = session.createSQLQuery("select * from patient where id=" + id2);
-        res = qry.list();
-        Assert.assertEquals(1, res.size());
-
-        // FIXME check cevents and specimens inside
-        closeHibernateSession();
+        createCEventWithSpecimens(patientId2, 1, typeId, 5);
+        createCEventWithSpecimens(patientId2, 3, typeId, 7);
 
         // merge patient1 into patient2
-        appService.doAction(new PatientMergeAction(id1, id2));
+        appService.doAction(new PatientMergeAction(patientId1, patientId2));
 
         openHibernateSession();
-        qry = session.createSQLQuery("select * from patient where id=" + id2);
-        res = qry.list();
-        Assert.assertEquals(0, res.size());
+        Patient p1 = ActionUtil.sessionGet(session, Patient.class, patientId1);
+        Assert.assertNotNull(p1);
+        Patient p2 = ActionUtil.sessionGet(session, Patient.class, patientId2);
+        Assert.assertNull(p2);
+        Collection<CollectionEvent> cevents = p1.getCollectionEventCollection();
+        Assert.assertEquals(3, cevents.size());
+        for (CollectionEvent cevent : cevents) {
+            switch (cevent.getVisitNumber()) {
+            case 1:
+                Assert
+                    .assertEquals(9, cevent.getAllSpecimenCollection().size());
+                break;
+            case 2:
+                Assert
+                    .assertEquals(2, cevent.getAllSpecimenCollection().size());
+                break;
+            case 3:
+                Assert
+                    .assertEquals(7, cevent.getAllSpecimenCollection().size());
+                break;
+            default:
+                Assert.fail("wrong visit number");
+            }
+        }
 
-        // check cevents of patient1
         closeHibernateSession();
     }
 
     @Test
-    public void testGetSimplePatientCEventInfoAction() throws Exception {
-        final Integer patientId = createPatient("testGetSimplePatientCEventInfoAction");
+    public void testMergeDifferentStudies() throws Exception {
+        final String string = "testMergeDifferentStudies" + r.nextInt();
+
+        // add specimen type
+        final Integer typeId = edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
+            .addSpecimenType(string).getId();
+
+        // create a new patient 1
+        final Integer patientId1 = appService.doAction(new PatientSaveAction(
+            null, study.getId(), string + "1", Utils.getRandomDate()));
+        // create cevents in patient1
+        createCEventWithSpecimens(patientId1, 1, typeId, 4);
+        createCEventWithSpecimens(patientId1, 2, typeId, 2);
+
+        // create a new patient 2
+        StudyWrapper study2 = StudyHelper.addStudy(string
+            + Utils.getRandomString(10));
+        final Integer patientId2 = appService.doAction(new PatientSaveAction(
+            null, study2.getId(), string + "2", Utils.getRandomDate()));
+        // create cevents in patient2
+        createCEventWithSpecimens(patientId2, 1, typeId, 5);
+        createCEventWithSpecimens(patientId2, 3, typeId, 7);
+
+        // merge patient1 into patient2
+        try {
+            appService.doAction(new PatientMergeAction(patientId1, patientId2));
+            Assert
+                .fail("Should not be able to merge when patients are from different studies");
+        } catch (PatientMergeException pme) {
+            Assert.assertTrue(true);
+        }
+
+    }
+
+    private void createCEventWithSpecimens(Integer patientId,
+        Integer visitNber, Integer specType, int specNber)
+        throws ApplicationException {
+        final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
+            .createSaveCEventSpecimenInfoRandomList(specNber, specType);
+        // Save a new cevent
+        appService.doAction(new CollectionEventSaveAction(null, patientId,
+            visitNber, 1, null, site.getId(),
+            new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
+    }
+
+    @Test
+    public void testPatientGetSimpleCEventInfoAction() throws Exception {
+        final Integer patientId = createPatient("testPatientGetSimpleCEventInfoAction");
 
         // add specimen type
         final Integer typeId = edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
@@ -167,11 +273,11 @@ public class TestPatient extends TestAction {
         // Save a new cevent with specimens
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId, r
-                .nextInt(20), 1, Utils.getRandomString(8, 50), site.getId(),
+                .nextInt(20), 1, Utils.getRandomComments(), site.getId(),
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
         HashMap<Integer, SimpleCEventInfo> ceventInfos = appService
-            .doAction(new GetSimplePatientCollectionEventInfosAction(patientId));
+            .doAction(new PatientGetSimpleCollectionEventInfosAction(patientId));
         Assert.assertEquals(1, ceventInfos.size());
         SimpleCEventInfo info = ceventInfos.get(ceventId);
         Assert.assertNotNull(info);
@@ -186,16 +292,16 @@ public class TestPatient extends TestAction {
     }
 
     protected Integer createPatient(String s) throws ApplicationException {
-        final String pnumber = s + r.nextInt();
-        final Date date = Utils.getRandomDate();
-        final Integer patientId = appService.doAction(new PatientSaveAction(
-            null, study.getId(), pnumber, date));
+        String pnumber = s + r.nextInt();
+        Date date = Utils.getRandomDate();
+        Integer patientId = appService.doAction(new PatientSaveAction(null,
+            study.getId(), pnumber, date));
         return patientId;
     }
 
     @Test
-    public void testGetPatientCEventInfoAction() throws Exception {
-        Integer patientId = createPatient("testGetPatientCEventInfoAction");
+    public void testPatientGetCEventInfoAction() throws Exception {
+        Integer patientId = createPatient("testPatientGetCEventInfoAction");
 
         // add specimen type
         final Integer typeId = edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
@@ -205,16 +311,15 @@ public class TestPatient extends TestAction {
             .createSaveCEventSpecimenInfoRandomList(5, typeId);
 
         // Save a new cevent with specimens
-        final Integer ceventId = appService
-            .doAction(new CollectionEventSaveAction(null, patientId, r
-                .nextInt(20), 1, Utils.getRandomString(8, 50), site.getId(),
-                new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
+        appService.doAction(new CollectionEventSaveAction(null, patientId, r
+            .nextInt(20), 1, null, site.getId(),
+            new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
         ArrayList<PatientCEventInfo> infos = appService
-            .doAction(new GetPatientCollectionEventInfosAction(patientId));
+            .doAction(new PatientGetCollectionEventInfosAction(patientId));
         Assert.assertEquals(1, infos.size());
         PatientCEventInfo info = infos.get(0);
-        // FIXME test with aliquoted specimens
+        // no aliquoted specimens added:
         Assert.assertEquals(0, info.aliquotedSpecimenCount.intValue());
         Date minDate = new Date();
         for (SaveCEventSpecimenInfo sp : specs.values()) {
@@ -224,6 +329,91 @@ public class TestPatient extends TestAction {
         }
         Assert.assertEquals(minDate, info.minSourceSpecimenDate);
         Assert.assertEquals(specs.size(), info.sourceSpecimenCount.intValue());
+
+        // FIXME test also with aliquoted specimens
     }
 
+    @Test
+    public void testGetInfoAction() throws Exception {
+        String name = "testGetInfoAction" + r.nextInt();
+        Date date = Utils.getRandomDate();
+        Integer patientId = appService.doAction(new PatientSaveAction(null,
+            study.getId(), name, date));
+
+        // add specimen type
+        final Integer typeId = edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
+            .addSpecimenType(name).getId();
+
+        final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
+            .createSaveCEventSpecimenInfoRandomList(5, typeId);
+
+        // Save a new cevent with specimens
+        Integer visitNumber = r.nextInt(20);
+        appService.doAction(new CollectionEventSaveAction(null, patientId,
+            visitNumber, 1, null, site.getId(),
+            new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
+        // Save a second new cevent without specimens
+        appService.doAction(new CollectionEventSaveAction(null, patientId,
+            visitNumber + 1, 1, null, site.getId(),
+            null, null));
+
+        // method to test:
+        PatientInfo pinfo = appService.doAction(new PatientGetInfoAction(
+            patientId));
+        Assert.assertNotNull(pinfo.patient);
+        Assert.assertEquals(name, pinfo.patient.getPnumber());
+        Assert.assertEquals(date, pinfo.patient.getCreatedAt());
+        // no aliquoted specimens added:
+        Assert.assertEquals(0, pinfo.aliquotedSpecimenCount.intValue());
+        Assert.assertEquals(2, pinfo.cevents.size());
+        Assert.assertEquals(specs.size(), pinfo.sourceSpecimenCount.intValue());
+
+        // FIXME test also with aliquoted specimens
+    }
+
+    @Test
+    public void testNextVisitNumber() throws Exception {
+        Integer patientId = createPatient("testNextVisitNumber");
+
+        Integer visitNumber = r.nextInt(20);
+        appService.doAction(new CollectionEventSaveAction(null, patientId,
+            visitNumber, 1, null, site.getId(), null,
+            null));
+
+        Integer next = appService.doAction(new PatientNextVisitNumberAction(
+            patientId));
+        Assert.assertEquals(visitNumber + 1, next.intValue());
+    }
+
+    @Test
+    public void testSearch() throws Exception {
+        final String pnumber = "testSearch" + r.nextInt();
+        final Date date = Utils.getRandomDate();
+        final Integer patientId = appService.doAction(new PatientSaveAction(
+            null, study.getId(), pnumber, date));
+
+        // add 2 cevents to this patient:
+        int vnber = r.nextInt(20);
+        appService.doAction(new CollectionEventSaveAction(null, patientId,
+            vnber, 1, null, site.getId(), null, null));
+        appService.doAction(new CollectionEventSaveAction(null, patientId,
+            vnber + 1, 1, null, site.getId(), null,
+            null));
+
+        openHibernateSession();
+        // Check patient is in database
+        Patient p = (Patient) session.get(Patient.class, patientId);
+        Assert.assertNotNull(p);
+        closeHibernateSession();
+
+        // search for it using the pnumber:
+        SearchedPatientInfo info = appService.doAction(new PatientSearchAction(
+            pnumber));
+        Assert.assertNotNull(info.patient);
+        Assert.assertEquals(patientId, info.patient.getId());
+        Assert.assertEquals(2, info.ceventsCount.intValue());
+        Assert.assertNotNull(info.study);
+        Assert.assertEquals(study.getId(), info.study.getId());
+
+    }
 }

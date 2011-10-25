@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction;
-import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction.SiteInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction.SiteInfo;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -207,6 +207,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         site = (SiteWrapper) getModelObject();
 
         siteInfo = SessionManager.getAppService().doAction(
-            new GetSiteInfoAction(site.getWrappedObject()));
+            new SiteGetInfoAction(site
+                .getWrappedObject()));
     }
 }

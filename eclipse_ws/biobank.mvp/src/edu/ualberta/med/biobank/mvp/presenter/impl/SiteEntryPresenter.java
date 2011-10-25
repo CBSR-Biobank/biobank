@@ -1,21 +1,34 @@
 package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.pietschy.gwt.pectin.client.form.FieldModel;
+import com.pietschy.gwt.pectin.client.form.ListFieldModel;
+import com.pietschy.gwt.pectin.client.form.validation.ValidationPlugin;
+import com.pietschy.gwt.pectin.client.form.validation.binding.ValidationBinder;
+import com.pietschy.gwt.pectin.client.form.validation.component.ValidationDisplay;
+import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidator;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
-import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction.SiteInfo;
-import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
-import edu.ualberta.med.biobank.common.action.site.SaveSiteAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction.SiteInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.mvp.event.AlertEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
+import edu.ualberta.med.biobank.mvp.event.presenter.site.ShowSiteViewPresenterEvent;
+import edu.ualberta.med.biobank.mvp.model.BaseModel;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.util.ObjectCloner;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
@@ -23,14 +36,12 @@ import edu.ualberta.med.biobank.mvp.view.FormView;
 
 public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     private final Dispatcher dispatcher;
-    private final AddressEntryPresenter addressEntryPresenter;
-    private final ActivityStatusComboPresenter aStatusComboPresenter;
-    private SiteInfo siteInfo;
+    private final AddressEditPresenter addressEditPresenter;
+    private final ActivityStatusComboPresenter activityStatusComboPresenter;
+    private final ValidationBinder validationBinder = new ValidationBinder();
+    private final Model model = new Model();
 
-    public interface View extends FormView {
-        // TODO: have general validation errors
-        void setGeneralErrors(Collection<Object> errors);
-
+    public interface View extends FormView, ValidationDisplay {
         void setAddressEntryView(BaseView view);
 
         void setActivityStatusComboView(BaseView view);
@@ -41,132 +52,188 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
         HasValue<List<Comment>> getCommentCollection();
 
-        HasValue<List<StudyInfo>> getStudies();
+        HasValue<Collection<StudyInfo>> getStudies();
     }
 
     @Inject
     public SiteEntryPresenter(View view, EventBus eventBus,
-        Dispatcher dispatcher, AddressEntryPresenter addressEntryPresenter,
-        ActivityStatusComboPresenter aStatusComboPresenter) {
+        Dispatcher dispatcher,
+        AddressEditPresenter addressEntryPresenter,
+        ActivityStatusComboPresenter activityStatusComboPresenter) {
         super(view, eventBus);
         this.dispatcher = dispatcher;
-        this.addressEntryPresenter = addressEntryPresenter;
-        this.aStatusComboPresenter = aStatusComboPresenter;
+        this.addressEditPresenter = addressEntryPresenter;
+        this.activityStatusComboPresenter = activityStatusComboPresenter;
 
-        // Doesn't _NEED_ to be done here, can be done later, then the
-        // SiteEntryPresenter.View can create these sub-views when they're set.
+        // so this view can create the other views if create() is called
         view.setAddressEntryView(addressEntryPresenter.getView());
-        view.setActivityStatusComboView(aStatusComboPresenter.getView());
+        view.setActivityStatusComboView(activityStatusComboPresenter.getView());
     }
 
     @Override
     public void onBind() {
-        // TODO: listen to Display properties for validation purposes.
-        // registerHandler(view.getName().addValueChangeHandler(
-        // new ValueChangeHandler<String>() {
-        // @Override
-        // public void onValueChange(ValueChangeEvent<String> event) {
-        // // display.getName().set
-        // }
-        // }));
+        super.onBind();
 
-        addressEntryPresenter.bind();
-        aStatusComboPresenter.bind();
+        addressEditPresenter.bind();
+        activityStatusComboPresenter.bind();
+
+        binder.bind(model.name).to(view.getName());
+        binder.bind(model.nameShort).to(view.getNameShort());
+
+        // TODO: fix comment colletion section
+        // binder.bind(model.comment).to(view.getCommentCollection());
+
+        // binder.bind(model.studies).to(view.getStudies());
+
+        binder.bind(model.address)
+            .to(addressEditPresenter.getAddress());
+        binder.bind(model.activityStatus)
+            .to(activityStatusComboPresenter.getActivityStatus());
+
+        validationBinder.bindValidationOf(model).to(view);
+
+        // validationBinder.bindValidationOf(addressEditPresenter.getAddress()).
+
+        // TODO: need to have some sort of:
+        // (1) aggregated binding system
+        // (2) immediate validation system
+        // validationBinder.bindValidationOf(addressEditPresenter.getModel())
+        // .to(null);
+
+        binder.enable(view.getSave()).when(model.dirty());
     }
 
     @Override
     protected void onUnbind() {
-        addressEntryPresenter.unbind();
-        aStatusComboPresenter.unbind();
+        validationBinder.dispose();
+
+        activityStatusComboPresenter.unbind();
+        addressEditPresenter.unbind();
     }
 
     @Override
     public void doReload() {
+        // TODO: this resets the form. To reload it from the database, something
+        // different must be done (e.g. setting a Command that is re-run on
+        // reload).
+        model.revert();
     }
 
     @Override
     public void doSave() {
-        SaveSiteAction saveSite = new SaveSiteAction(siteInfo.site.getId());
-        saveSite.setCommentCollection(view.getCommentCollection().getValue());
+        if (!model.validate()) {
+            return;
+        }
 
-        saveSite.setName(view.getName().getValue());
-        saveSite.setNameShort(view.getNameShort().getValue());
-        saveSite.setCommentCollection(view.getCommentCollection().getValue());
-
-        Integer aStatusId = aStatusComboPresenter.getSelectedValue().getId();
-        saveSite.setActivityStatusId(aStatusId);
-
-        saveSite.setAddress(addressEntryPresenter.getAddress());
-
-        // TODO: get study ids
-        // updateSite.setStudyIds(display.getStudyIds().getValue());
+        SiteSaveAction saveSite = new SiteSaveAction(model.siteId.getValue());
+        saveSite.setName(model.name.getValue());
+        saveSite.setNameShort(model.nameShort.getValue());
+        // saveSite.setComment(model.comment.getValue());
+        saveSite.setAddress(model.address.getValue());
+        saveSite.setActivityStatusId(model.getActivityStatusId());
+        saveSite.setStudyIds(model.getStudyIds());
 
         dispatcher.exec(saveSite, new ActionCallback<Integer>() {
             @Override
             public void onFailure(Throwable caught) {
-                // on failure:
-                // log exception
-                // have a listener to a DisplayExceptionEvent:
-                // e.g. eventBus.fireEvent(new ExceptionEvent(???));
+                // TODO: better error message and show or log exception?
+                eventBus.fireEvent(new AlertEvent(caught.getLocalizedMessage()));
             }
 
             @Override
             public void onSuccess(Integer siteId) {
-                // on success:
-
-                // TODO: close this view
-                // TODO: listen for SiteSavedEvent to (1) FormManager open view
-                // form (2) TreeManager(s) update any trees that have this site.
-                // But wait, probably shouldn't open the view form on any site
-                // save event ... :-(
-
                 eventBus.fireEvent(new SiteChangedEvent(siteId));
-
-                // TODO: fire event to open a view form for this site
+                eventBus.fireEvent(new ShowSiteViewPresenterEvent(siteId));
+                close();
             }
         });
     }
 
     public View createSite() {
-        siteInfo = new SiteInfo();
-        siteInfo.site = new Site();
-        siteInfo.site.setAddress(new Address());
-        populateView();
-        return view;
+        SiteInfo siteInfo = new SiteInfo();
+        siteInfo.setSite(new Site());
+        siteInfo.getSite().setAddress(new Address());
+        return editSite(siteInfo);
     }
 
     public View editSite(Integer siteId) {
-        // final Holder<SiteInfo> siteInfoHolder = new Holder<SiteInfo>(null);
-        // GetSiteInfoAction getSiteInfo = new GetSiteInfoAction(siteId);
-        // dispatcher.exec(getSiteInfo, new ActionCallback<SiteInfo>() {
-        // @Override
-        // public void onFailure(Throwable caught) {
-        // // TODO: better error message and show or log exception?
-        // eventBus.fireEvent(new AlertEvent("FAIL!"));
-        // display.close();
-        // unbind();
-        // }
+        SiteGetInfoAction getSiteInfo = new SiteGetInfoAction(siteId);
+        dispatcher.exec(getSiteInfo, new ActionCallback<SiteInfo>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                // TODO: better error message and show or log exception?
+                eventBus.fireEvent(new AlertEvent(caught.getLocalizedMessage()));
+                close();
+            }
+
+            @Override
+            public void onSuccess(SiteInfo siteInfo) {
+                editSite(siteInfo);
+            }
+        });
 
         return view;
     }
 
     public View editSite(SiteInfo siteInfo) {
-        this.siteInfo = ObjectCloner.deepCopy(siteInfo);
-
-        // TODO: another method with id to fetch data from database?
-        populateView();
+        // get our own (deep) copy of the data
+        SiteInfo clone = ObjectCloner.deepCopy(siteInfo);
+        model.setValue(clone);
         return view;
     }
 
-    private void populateView() {
-        view.getName().setValue(siteInfo.site.getName());
-        view.getNameShort().setValue(siteInfo.site.getNameShort());
-        view.getCommentCollection().setValue(
-            (List<Comment>) siteInfo.site.getCommentCollection());
-        view.getStudies().setValue(siteInfo.studies);
+    // TODO: expose Model for testing purposes?
+    private class Model extends BaseModel<SiteInfo> {
+        final FieldModel<Integer> siteId;
+        final FieldModel<String> name;
+        final FieldModel<String> nameShort;
+        final FieldModel<String> comment;
+        final FieldModel<Address> address;
+        final FieldModel<ActivityStatus> activityStatus;
+        final ListFieldModel<StudyInfo> studies;
 
-        addressEntryPresenter.editAddress(siteInfo.site.getAddress());
-        aStatusComboPresenter.setSelectedValue(siteInfo.site
-            .getActivityStatus());
+        @SuppressWarnings("unchecked")
+        public Model() {
+            super(SiteInfo.class);
+
+            // TODO: consider using bindgen to generate a binding class via a
+            // @Binding annotation so that the pays for binding fields to
+            // providers is checked at compile time (don't use strings).
+
+            siteId = fieldOfType(Integer.class)
+                .boundTo(provider, "site.id");
+            name = fieldOfType(String.class)
+                .boundTo(provider, "site.name");
+            nameShort = fieldOfType(String.class)
+                .boundTo(provider, "site.nameShort");
+            comment = fieldOfType(String.class)
+                .boundTo(provider, "site.comment");
+            address = fieldOfType(Address.class)
+                .boundTo(provider, "site.address");
+            activityStatus = fieldOfType(ActivityStatus.class)
+                .boundTo(provider, "site.activityStatus");
+            studies = listOfType(StudyInfo.class)
+                .boundTo(provider, "studies");
+
+            ValidationPlugin.validateField(name)
+                .using(new NotEmptyValidator("Name is required"));
+            ValidationPlugin.validateField(nameShort)
+                .using(new NotEmptyValidator("Name Short is required"));
+
+            // TODO: include validation from address?
+        }
+
+        Integer getActivityStatusId() {
+            ActivityStatus activityStatus = this.activityStatus.getValue();
+            return activityStatus != null ? activityStatus.getId() : null;
+        }
+
+        Set<Integer> getStudyIds() {
+            Set<Integer> studyIds = new HashSet<Integer>();
+            for (StudyInfo studyInfo : studies) {
+                studyIds.add(studyInfo.getStudy().getId());
+            }
+            return studyIds;
+        }
     }
 }
