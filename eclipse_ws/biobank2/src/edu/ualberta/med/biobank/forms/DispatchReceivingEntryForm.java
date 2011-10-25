@@ -18,7 +18,6 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.SessionSecurityHelper;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
@@ -87,10 +86,6 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             SWT.NONE, Messages.DispatchReceivingEntryForm_received_label);
         setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
             .getFormattedDateReceived());
-
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.DispatchReceivingEntryForm_comments_label, null, dispatch,
-            DispatchPeer.COMMENT_COLLECTION.getName(), null);
 
     }
 

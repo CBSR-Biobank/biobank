@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeViewForm"; //$NON-NLS-1$
@@ -43,11 +44,11 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private BgcBaseText activityStatusLabel;
 
-    private BgcBaseText commentLabel;
-
     private ListViewer sampleTypesViewer;
 
     private ListViewer childContainerTypesViewer;
+
+    private CommentCollectionInfoTable commentTable;
 
     public ContainerTypeViewForm() {
         super();
@@ -111,10 +112,18 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             Messages.containerType_field_label_scheme);
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.label_activity);
-        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.label_comments);
+
+        createCommentsSection();
 
         setContainerTypeValues();
+    }
+
+    private void createCommentsSection() {
+        Composite client = createSectionWithClient(Messages.label_comments);
+        commentTable = new CommentCollectionInfoTable(client,
+            containerType.getCommentCollection(false));
+        commentTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(commentTable);
     }
 
     private void setContainerTypeValues() {
@@ -129,7 +138,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             containerType.getChildLabelingScheme() == null ? "" : containerType //$NON-NLS-1$
                 .getChildLabelingSchemeName());
         setTextValue(activityStatusLabel, containerType.getActivityStatus());
-        setTextValue(commentLabel, containerType.getCommentCollection(false));
     }
 
     private void createSpecimenTypesSection() {
@@ -233,6 +241,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setContainerTypeValues();
         setSpecimenTypesValues();
         setChildContainerTypesValues();
+        commentTable.setCollection(containerType.getCommentCollection(false));
     }
 
 }

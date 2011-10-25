@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -18,6 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewStudyInfoTable;
@@ -49,11 +52,11 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private BgcBaseText activityStatusLabel;
 
-    private BgcBaseText commentLabel;
-
     private SiteInfo siteInfo;
 
     private SiteWrapper site;
+
+    private CommentCollectionInfoTable commentTable;
 
     @Override
     public void init() throws Exception {
@@ -75,6 +78,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createSiteSection();
+        createCommentsSection();
         createAddressSection(site);
         createStudySection();
         createContainerTypesSection();
@@ -105,8 +109,6 @@ public class SiteViewForm extends AddressViewFormCommon {
             Messages.SiteViewForm_field_totalSpecimen);
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.label_activity);
-        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.label_comments);
         setSiteSectionValues();
     }
 
@@ -121,7 +123,6 @@ public class SiteViewForm extends AddressViewFormCommon {
         setTextValue(specimenCountLabel, siteInfo.aliquotedSpecimenCount);
         setTextValue(activityStatusLabel, siteInfo.site.getActivityStatus()
             .getName());
-        setTextValue(commentLabel, siteInfo.site.getCommentCollection());
     }
 
     private void createStudySection() {
@@ -134,6 +135,14 @@ public class SiteViewForm extends AddressViewFormCommon {
         // studiesTable.createDefaultEditItem();
 
         section.setClient(studiesTable);
+    }
+
+    private void createCommentsSection() {
+        Composite client = createSectionWithClient(Messages.label_comments);
+        commentTable = new CommentCollectionInfoTable(client,
+            site.getCommentCollection(false));
+        commentTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(commentTable);
     }
 
     private void createContainerTypesSection() {
@@ -189,6 +198,8 @@ public class SiteViewForm extends AddressViewFormCommon {
         studiesTable.setCollection(siteInfo.studies);
         containerTypesTable.setCollection(siteInfo.containerTypes);
         topContainersTable.setCollection(siteInfo.topContainers);
+        commentTable.setCollection((List<?>) siteInfo.site
+            .getCommentCollection());
     }
 
     private void updateSiteInfo() throws Exception {

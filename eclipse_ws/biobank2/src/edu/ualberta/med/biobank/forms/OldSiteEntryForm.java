@@ -118,9 +118,6 @@ public class OldSiteEntryForm extends AddressEntryFormCommon {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.label_comments, null, site,
-            SitePeer.COMMENT_COLLECTION.getName(), null);
     }
 
     private void createStudySection() {

@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SourceSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
 
@@ -32,7 +33,6 @@ public class StudyViewForm extends BiobankViewForm {
     private BgcBaseText nameLabel;
     private BgcBaseText nameShortLabel;
     private BgcBaseText activityStatusLabel;
-    private BgcBaseText commentLabel;
     private BgcBaseText patientTotal;
     private BgcBaseText visitTotal;
 
@@ -45,6 +45,8 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private List<StudyPvCustomInfo> pvCustomInfoList;
+
+    private CommentCollectionInfoTable commentTable;
 
     @Override
     public void init() throws Exception {
@@ -79,19 +81,26 @@ public class StudyViewForm extends BiobankViewForm {
             Messages.label_nameShort);
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.label_activity);
-        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.label_comments);
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.StudyViewForm_field_label_total_patients);
         visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.StudyViewForm_field_label_total_cEvents);
 
+        createCommentsSection();
         createClinicSection();
         createSourceSpecimenSection();
         createAliquotedSpecimenSection();
         createPvCustomInfoSection();
         setStudySectionValues();
         setPvDataSectionValues();
+    }
+
+    private void createCommentsSection() {
+        Composite client = createSectionWithClient(Messages.label_comments);
+        commentTable = new CommentCollectionInfoTable(client,
+            study.getCommentCollection(false));
+        commentTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(commentTable);
     }
 
     private void createClinicSection() {
@@ -132,7 +141,6 @@ public class StudyViewForm extends BiobankViewForm {
         setTextValue(nameLabel, study.getName());
         setTextValue(nameShortLabel, study.getNameShort());
         setTextValue(activityStatusLabel, study.getActivityStatus());
-        setTextValue(commentLabel, study.getCommentCollection(false));
         setTextValue(patientTotal, study.getPatientCount(true));
         setTextValue(visitTotal, study.getCollectionEventCount());
     }
@@ -224,5 +232,6 @@ public class StudyViewForm extends BiobankViewForm {
         sourceSpecimenTable.setCollection(study
             .getSourceSpecimenCollection(true));
         contactsTable.setCollectionByStudy(study);
+        commentTable.setCollection(study.getCommentCollection(false));
     }
 }

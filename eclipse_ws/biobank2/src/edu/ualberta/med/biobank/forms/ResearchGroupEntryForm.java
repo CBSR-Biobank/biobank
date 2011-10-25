@@ -142,9 +142,6 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.label_comments, null, researchGroup,
-            ResearchGroupPeer.COMMENT_COLLECTION.getName(), null);
     }
 
     private void createButtonsSection() {

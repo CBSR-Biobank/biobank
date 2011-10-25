@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcFileBrowser;
 import edu.ualberta.med.biobank.gui.common.widgets.IBgcFileBrowserListener;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 
 public class ResearchGroupViewForm extends AddressViewFormCommon implements
     IBgcFileBrowserListener {
@@ -46,13 +47,13 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
     private BgcBaseText activityStatusLabel;
 
-    private BgcBaseText commentLabel;
-
     private BgcBaseText studyLabel;
 
     private BgcFileBrowser csvSelector;
 
     private Button uploadButton;
+
+    private CommentCollectionInfoTable commentTable;
 
     @Override
     protected void init() throws Exception {
@@ -190,10 +191,17 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study"); //$NON-NLS-1$
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.label_activity);
-        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.label_comments);
 
+        createCommentsSection();
         setResearchGroupValues();
+    }
+
+    private void createCommentsSection() {
+        Composite client = createSectionWithClient(Messages.label_comments);
+        commentTable = new CommentCollectionInfoTable(client,
+            researchGroup.getCommentCollection(false));
+        commentTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(commentTable);
     }
 
     private void setResearchGroupValues() {
@@ -201,7 +209,6 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         setTextValue(nameShortLabel, researchGroup.getNameShort());
         setTextValue(studyLabel, researchGroup.getStudy());
         setTextValue(activityStatusLabel, researchGroup.getActivityStatus());
-        setTextValue(commentLabel, researchGroup.getCommentCollection(false));
     }
 
     @Override
@@ -213,6 +220,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             researchGroup.getName()));
         setResearchGroupValues();
         setAddressValues(researchGroup);
+        commentTable.setCollection(researchGroup.getCommentCollection(false));
     }
 
 }

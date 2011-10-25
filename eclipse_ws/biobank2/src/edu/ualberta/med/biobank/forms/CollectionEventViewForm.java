@@ -18,10 +18,14 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGet
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.study.GetStudyEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 
@@ -37,8 +41,6 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private BgcBaseText visitNumberLabel;
 
-    private BgcBaseText commentLabel;
-
     private NewSpecimenInfoTable sourceSpecimenTable;
 
     private BgcBaseText activityStatusLabel;
@@ -46,6 +48,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
     private NewSpecimenInfoTable aliquotedSpcTable;
 
     private CEventInfo ceventInfo;
+
+    private CommentCollectionInfoTable commentTable;
 
     private static class FormPvCustomInfo extends PvAttrCustom {
         BgcBaseText widget;
@@ -100,11 +104,19 @@ public class CollectionEventViewForm extends BiobankViewForm {
             Messages.label_activity);
 
         createPvDataSection(client);
-
-        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.label_comments);
+        createCommentsSection();
 
         setCollectionEventValues();
+    }
+
+    private void createCommentsSection() {
+        Composite client = createSectionWithClient(Messages.label_comments);
+        commentTable = new CommentCollectionInfoTable(client,
+            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+                (List<Comment>) ceventInfo.cevent.getCommentCollection(),
+                CommentWrapper.class));
+        commentTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(commentTable);
     }
 
     private void createPvDataSection(Composite client) throws Exception {
@@ -151,7 +163,6 @@ public class CollectionEventViewForm extends BiobankViewForm {
         setTextValue(visitNumberLabel, ceventInfo.cevent.getVisitNumber());
         setTextValue(activityStatusLabel, ceventInfo.cevent.getActivityStatus()
             .getName());
-        setTextValue(commentLabel, ceventInfo.cevent.getCommentCollection());
         // assign PvInfo
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
             setTextValue(combinedPvInfo.widget, combinedPvInfo.getValue());
@@ -189,6 +200,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
         setCollectionEventValues();
         sourceSpecimenTable.setCollection(ceventInfo.sourceSpecimenInfos);
         aliquotedSpcTable.setCollection(ceventInfo.aliquotedSpecimenInfos);
+        commentTable.setCollection((List<?>) ceventInfo.cevent
+            .getCommentCollection());
     }
 
 }

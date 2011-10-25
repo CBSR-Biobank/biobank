@@ -36,6 +36,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
@@ -62,13 +63,13 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private BgcBaseText dateReceivedLabel;
 
-    private BgcBaseText commentLabel;
-
     private DispatchSpecimensTreeTable specimensTree;
 
     private DispatchSpecimenListInfoTable specimensNonProcessedTable;
 
     private boolean canSeeEverything;
+
+    private CommentCollectionInfoTable commentTable;
 
     @Override
     protected void init() throws Exception {
@@ -90,6 +91,7 @@ public class DispatchViewForm extends BiobankViewForm {
             logger.error(Messages.DispatchViewForm_retrieve_ship_error_msg
                 + dispatch.getShipmentInfo().getWaybill(), ex);
         }
+        commentTable.setCollection(dispatch.getCommentCollection(false));
     }
 
     @Override
@@ -331,8 +333,15 @@ public class DispatchViewForm extends BiobankViewForm {
             dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
                 Messages.DispatchViewForm_received_label);
         }
-        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.DispatchViewForm_comments_label);
+        createCommentsSection();
+    }
+
+    private void createCommentsSection() {
+        Composite client = createSectionWithClient(Messages.label_comments);
+        commentTable = new CommentCollectionInfoTable(client,
+            dispatch.getCommentCollection(false));
+        commentTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(commentTable);
     }
 
     private void setDispatchValues() {
@@ -360,7 +369,6 @@ public class DispatchViewForm extends BiobankViewForm {
                 setTextValue(dateReceivedLabel,
                     shipInfo.getFormattedDateReceived());
         }
-        setTextValue(commentLabel, dispatch.getCommentCollection(false));
     }
 
 }

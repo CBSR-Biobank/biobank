@@ -215,9 +215,6 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
         createEventAttrSection(client);
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.label_comments, null, ceventCopy,
-            CollectionEventPeer.COMMENT_COLLECTION.getName(), null, false);
     }
 
     private void createSpecimensSection() {
