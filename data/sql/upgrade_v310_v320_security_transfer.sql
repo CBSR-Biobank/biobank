@@ -2,14 +2,19 @@
 
 -- convert users from csm to users from biobank:
 -- add + 10 because groups (that are also principals) should be added. So far only one is added, but just in case we add more, add 10
-insert into principal (id, version)  
+
+-- add 'Unknown user' which is used in upgrade scripts
+insert into principal (id, version) values 1,0;
+
+
+insert into principal (id, version)
 select user_id + 10, 0 from csm_user where login_name != 'administrator' and login_name != 'bbadmin';
 
-insert into user (principal_id, login, csm_user_id, bulk_emails, full_name, email, need_change_pwd) 
+insert into user (principal_id, login, csm_user_id, bulk_emails, full_name, email, need_change_pwd)
 select user_id + 10, login_name, user_id, 1, concat(first_name, ' ', last_name), email_id, 0 from csm_user where login_name != 'administrator' and login_name != 'bbadmin';
 
 -- Old super admin group_id was 5 in csm database. Add previous super admin users in new super admin group:
-insert into group_user(user_id, group_id) 
+insert into group_user(user_id, group_id)
 select u.principal_id, g.principal_id from user u, bb_group g, csm_user_group ug
 where ug.group_id = 5 and ug.user_id = u.csm_user_id and g.name='Super Administrators';
 

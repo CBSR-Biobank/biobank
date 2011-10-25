@@ -16,7 +16,7 @@ INSERT INTO entity_filter VALUES (31, 1, 'Processing Event Worksheet', 32, 0);
 -- -----------------------------------------------------------------------
 
 -- add new objects into the csm database:
-insert into csm_protection_element (protection_element_name, object_id, application_id, update_date) values 
+insert into csm_protection_element (protection_element_name, object_id, application_id, update_date) values
 ('edu.ualberta.med.biobank.model.User','edu.ualberta.med.biobank.model.User',2,sysdate()),
 ('edu.ualberta.med.biobank.model.BbGroup','edu.ualberta.med.biobank.model.BbGroup',2,sysdate()),
 ('edu.ualberta.med.biobank.model.Principal','edu.ualberta.med.biobank.model.Principal',2,sysdate()),
@@ -25,8 +25,8 @@ insert into csm_protection_element (protection_element_name, object_id, applicat
 ('edu.ualberta.med.biobank.model.Role','edu.ualberta.med.biobank.model.Role',2,sysdate());
 
 -- add the new object into the protection group with id 1 (the one containing all objects protection elements)
-insert into csm_pg_pe (protection_group_id, protection_element_id, update_date)  
-select 1, protection_element_id, sysdate() from csm_protection_element 
+insert into csm_pg_pe (protection_group_id, protection_element_id, update_date)
+select 1, protection_element_id, sysdate() from csm_protection_element
 where protection_element_name = 'edu.ualberta.med.biobank.model.User'
 or protection_element_name = 'edu.ualberta.med.biobank.model.BbGroup'
 or protection_element_name = 'edu.ualberta.med.biobank.model.Principal'
@@ -146,6 +146,310 @@ CREATE TABLE `user` (
   KEY `FK27E3CBFF154DAF` (`PRINCIPAL_ID`),
   CONSTRAINT `FK27E3CBFF154DAF` FOREIGN KEY (`PRINCIPAL_ID`) REFERENCES `principal` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+
+
+-- add 'Unknown user' which is used in upgrade scripts
+insert into principal (id, version) values (1,0);
+
+insert into user (principal_id, login, csm_user_id, bulk_emails, full_name, email, need_change_pwd)
+values (1, 'Unknown user', -1, 0, '', '', 0);
+
+-- -----------------------------------------------------------------------
+--
+-- Comment field changes
+--
+-- Needs to run after User and Principal tables are created since
+-- it uses the 'Unknown User' for comments.
+--
+-- -----------------------------------------------------------------------
+
+CREATE TABLE comment (
+    ID INT(11) NOT NULL auto_increment,
+    VERSION INT(11) NOT NULL,
+    MESSAGE TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    CREATED_AT    DATETIME NULL DEFAULT NULL,
+    USER_ID INT(11) NOT NULL,
+    INDEX FK63717A3FB9634A05 (USER_ID),
+    PRIMARY KEY (ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+CREATE TABLE center_comment (
+    CENTER_ID INT(11) NOT NULL,
+    COMMENT_ID INT(11) NOT NULL,
+    CONSTRAINT COMMENT_ID UNIQUE KEY(COMMENT_ID),
+    INDEX FKDF3FBC55CDA9FD4F (COMMENT_ID),
+    INDEX FKDF3FBC5592FAA705 (CENTER_ID),
+    PRIMARY KEY (CENTER_ID, COMMENT_ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+CREATE TABLE collection_event_comment (
+    COLLECTION_EVENT_ID INT(11) NOT NULL,
+    COMMENT_ID INT(11) NOT NULL,
+    CONSTRAINT COMMENT_ID UNIQUE KEY(COMMENT_ID),
+    INDEX FK1CFC0199280272F2 (COLLECTION_EVENT_ID),
+    INDEX FK1CFC0199CDA9FD4F (COMMENT_ID),
+    PRIMARY KEY (COLLECTION_EVENT_ID, COMMENT_ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+CREATE TABLE container_comment (
+    CONTAINER_ID INT(11) NOT NULL,
+    COMMENT_ID INT(11) NOT NULL,
+    CONSTRAINT COMMENT_ID UNIQUE KEY(COMMENT_ID),
+    INDEX FK9A6C8C619BFD88CF (CONTAINER_ID),
+    INDEX FK9A6C8C61CDA9FD4F (COMMENT_ID),
+    PRIMARY KEY (CONTAINER_ID, COMMENT_ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+CREATE TABLE container_type_comment (
+    CONTAINER_TYPE_ID INT(11) NOT NULL,
+    COMMENT_ID INT(11) NOT NULL,
+    CONSTRAINT COMMENT_ID UNIQUE KEY(COMMENT_ID),
+    INDEX FK6657C158B3E77A12 (CONTAINER_TYPE_ID),
+    INDEX FK6657C158CDA9FD4F (COMMENT_ID),
+    PRIMARY KEY (CONTAINER_TYPE_ID, COMMENT_ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+CREATE TABLE dispatch_comment (
+    DISPATCH_ID INT(11) NOT NULL,
+    COMMENT_ID INT(11) NOT NULL,
+    CONSTRAINT COMMENT_ID UNIQUE KEY(COMMENT_ID),
+    INDEX FKAFC93B7ACDA9FD4F (COMMENT_ID),
+    INDEX FKAFC93B7ADE99CA25 (DISPATCH_ID),
+    PRIMARY KEY (DISPATCH_ID, COMMENT_ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+CREATE TABLE dispatch_specimen_comment (
+    DISPATCH_SPECIMEN_ID INT(11) NOT NULL,
+    COMMENT_ID INT(11) NOT NULL,
+    CONSTRAINT COMMENT_ID UNIQUE KEY(COMMENT_ID),
+    INDEX FKC3C4FD2DCDA9FD4F (COMMENT_ID),
+    INDEX FKC3C4FD2D65A03C4D (DISPATCH_SPECIMEN_ID),
+    PRIMARY KEY (DISPATCH_SPECIMEN_ID, COMMENT_ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+CREATE TABLE processing_event_comment (
+    PROCESSING_EVENT_ID INT(11) NOT NULL,
+    COMMENT_ID INT(11) NOT NULL,
+    CONSTRAINT COMMENT_ID UNIQUE KEY(COMMENT_ID),
+    INDEX FKA958114E33126C8 (PROCESSING_EVENT_ID),
+    INDEX FKA958114ECDA9FD4F (COMMENT_ID),
+    PRIMARY KEY (PROCESSING_EVENT_ID, COMMENT_ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+CREATE TABLE shipment_info_comment (
+    SHIPMENT_INFO_ID INT(11) NOT NULL,
+    COMMENT_ID INT(11) NOT NULL,
+    CONSTRAINT COMMENT_ID UNIQUE KEY(COMMENT_ID),
+    INDEX FK6A7BE233CDA9FD4F (COMMENT_ID),
+    INDEX FK6A7BE233F59D873A (SHIPMENT_INFO_ID),
+    PRIMARY KEY (SHIPMENT_INFO_ID, COMMENT_ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+CREATE TABLE specimen_comment (
+    SPECIMEN_ID INT(11) NOT NULL,
+    COMMENT_ID INT(11) NOT NULL,
+    CONSTRAINT COMMENT_ID UNIQUE KEY(COMMENT_ID),
+    INDEX FK73068C08EF199765 (SPECIMEN_ID),
+    INDEX FK73068C08CDA9FD4F (COMMENT_ID),
+    PRIMARY KEY (SPECIMEN_ID, COMMENT_ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+CREATE TABLE study_comment (
+    STUDY_ID INT(11) NOT NULL,
+    COMMENT_ID INT(11) NOT NULL,
+    CONSTRAINT COMMENT_ID UNIQUE KEY(COMMENT_ID),
+    INDEX FKAA027DA9F2A2464F (STUDY_ID),
+    INDEX FKAA027DA9CDA9FD4F (COMMENT_ID),
+    PRIMARY KEY (STUDY_ID, COMMENT_ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+ALTER TABLE center_comment
+      ADD CONSTRAINT FKDF3FBC5592FAA705 FOREIGN KEY (CENTER_ID) REFERENCES center (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FKDF3FBC55CDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE collection_event_comment ADD CONSTRAINT FK1CFC0199CDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT FK1CFC0199280272F2 FOREIGN KEY (COLLECTION_EVENT_ID) REFERENCES collection_event (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE comment ADD CONSTRAINT FK63717A3FB9634A05 FOREIGN KEY (USER_ID) REFERENCES user (PRINCIPAL_ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE container_comment ADD CONSTRAINT FK9A6C8C61CDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT FK9A6C8C619BFD88CF FOREIGN KEY (CONTAINER_ID) REFERENCES container (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE container_type_comment ADD CONSTRAINT FK6657C158CDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT FK6657C158B3E77A12 FOREIGN KEY (CONTAINER_TYPE_ID) REFERENCES container_type (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE dispatch_comment ADD CONSTRAINT FKAFC93B7ADE99CA25 FOREIGN KEY (DISPATCH_ID) REFERENCES dispatch (ID) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT FKAFC93B7ACDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE dispatch_specimen_comment ADD CONSTRAINT FKC3C4FD2D65A03C4D FOREIGN KEY (DISPATCH_SPECIMEN_ID) REFERENCES dispatch_specimen (ID) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT FKC3C4FD2DCDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE processing_event_comment ADD CONSTRAINT FKA958114ECDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT FKA958114E33126C8 FOREIGN KEY (PROCESSING_EVENT_ID) REFERENCES processing_event (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE shipment_info_comment ADD CONSTRAINT FK6A7BE233F59D873A FOREIGN KEY (SHIPMENT_INFO_ID) REFERENCES shipment_info (ID) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT FK6A7BE233CDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE specimen_comment ADD CONSTRAINT FK73068C08CDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT FK73068C08EF199765 FOREIGN KEY (SPECIMEN_ID) REFERENCES specimen (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE study_comment ADD CONSTRAINT FKAA027DA9CDA9FD4F FOREIGN KEY (COMMENT_ID) REFERENCES comment (ID) ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT FKAA027DA9F2A2464F FOREIGN KEY (STUDY_ID) REFERENCES study (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+-- add temp column into comment table to store source id, this id will then be inserted
+-- to the corresponding correlation table
+
+ALTER TABLE comment ADD COLUMN SRC_ID INT(11);
+
+-- center comments
+
+insert into comment (version, message, created_at, user_id, src_id)
+select 0, comment, '1970-01-01 00:00', 1, id
+from center where comment is not null and length(comment)>0;
+
+insert into center_comment (center_id, comment_id)
+select src_id,id from comment where src_id is not null;
+
+update comment set src_id=null;
+
+-- collection_event comments
+
+insert into comment (version, message, created_at, user_id, src_id)
+select 0, comment, '1970-01-01 00:00', 1, id
+from collection_event where comment is not null and length(comment)>0;
+
+insert collection_event_comment (collection_event_id, comment_id)
+select src_id,id from comment where src_id is not null;
+
+update comment set src_id=null;
+
+-- container comments
+
+insert into comment (version, message, created_at, user_id, src_id)
+select 0, comment, '1970-01-01 00:00', 1, id
+from container where comment is not null and length(comment)>0;
+
+insert container_comment (container_id, comment_id)
+select src_id,id from comment where src_id is not null;
+
+update comment set src_id=null;
+
+-- container_type comments
+
+insert into comment (version, message, created_at, user_id, src_id)
+select 0, comment, '1970-01-01 00:00', 1, id
+from container_type where comment is not null and length(comment)>0;
+
+insert container_type_comment (container_type_id, comment_id)
+select src_id,id from comment where src_id is not null;
+
+update comment set src_id=null;
+
+-- dispatch comments
+
+insert into comment (version, message, created_at, user_id, src_id)
+select 0, comment, '1970-01-01 00:00', 1, id
+from dispatch where comment is not null and length(comment)>0;
+
+insert dispatch_comment (dispatch_id, comment_id)
+select src_id,id from comment where src_id is not null;
+
+update comment set src_id=null;
+
+-- dispatch_specimen comments
+
+insert into comment (version, message, created_at, user_id, src_id)
+select 0, comment, '1970-01-01 00:00', 1, id
+from dispatch_specimen where comment is not null and length(comment)>0;
+
+insert dispatch_specimen_comment (dispatch_specimen_id, comment_id)
+select src_id,id from comment where src_id is not null;
+
+update comment set src_id=null;
+
+-- processing_event comments
+
+insert into comment (version, message, created_at, user_id, src_id)
+select 0, comment, '1970-01-01 00:00', 1, id
+from processing_event where comment is not null and length(comment)>0;
+
+insert processing_event_comment (processing_event_id, comment_id)
+select src_id,id from comment where src_id is not null;
+
+update comment set src_id=null;
+
+-- shipment_info comments
+
+insert into comment (version, message, created_at, user_id, src_id)
+select 0, comment, '1970-01-01 00:00', 1, id
+from shipment_info where comment is not null and length(comment)>0;
+
+insert shipment_info_comment (shipment_info_id, comment_id)
+select src_id,id from comment where src_id is not null;
+
+update comment set src_id=null;
+
+-- specimen comments
+
+insert into comment (version, message, created_at, user_id, src_id)
+select 0, comment, '1970-01-01 00:00', 1, id
+from specimen where comment is not null and length(comment)>0;
+
+insert specimen_comment (specimen_id, comment_id)
+select src_id,id from comment where src_id is not null;
+
+update comment set src_id=null;
+
+-- study comments
+
+insert into comment (version, message, created_at, user_id, src_id)
+select 0, comment, '1970-01-01 00:00', 1, id
+from study where comment is not null and length(comment)>0;
+
+insert study_comment (study_id, comment_id)
+select src_id,id from comment where src_id is not null;
+
+update comment set src_id=null;
+
+-- clean up
+
+ALTER TABLE center DROP COLUMN COMMENT;
+ALTER TABLE collection_event DROP COLUMN COMMENT;
+ALTER TABLE container DROP COLUMN COMMENT;
+ALTER TABLE container_type DROP COLUMN COMMENT;
+ALTER TABLE dispatch DROP COLUMN COMMENT;
+ALTER TABLE dispatch_specimen DROP COLUMN COMMENT;
+ALTER TABLE processing_event DROP COLUMN COMMENT;
+ALTER TABLE shipment_info DROP COLUMN COMMENT;
+ALTER TABLE specimen DROP COLUMN COMMENT;
+ALTER TABLE study DROP COLUMN COMMENT;
+
+ALTER TABLE comment
+      MODIFY COLUMN ID INT(11) NOT NULL,
+      DROP COLUMN SRC_ID;
+
+-- -----------------------------------------------------------------------
+--
+-- Other changes
+--
+-- -----------------------------------------------------------------------
+
+ALTER TABLE collection_event DROP KEY uc_visit_number;
+
+ALTER TABLE container DROP KEY uc_label, DROP KEY uc_productbarcode;
+
+ALTER TABLE container_type DROP KEY uc_name, DROP KEY uc_nameshort;
+
+ALTER TABLE study_event_attr DROP KEY uc_label;
+
+ALTER TABLE address
+      ADD COLUMN NAME VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '';
+
+ALTER TABLE collection_event
+      ADD CONSTRAINT uc_ce_visit_number UNIQUE KEY(VISIT_NUMBER, PATIENT_ID);
+
+ALTER TABLE container
+      ADD CONSTRAINT uc_c_label UNIQUE KEY(LABEL, CONTAINER_TYPE_ID),
+      ADD CONSTRAINT uc_c_productbarcode UNIQUE KEY(PRODUCT_BARCODE, SITE_ID);
+
+ALTER TABLE container_type
+      ADD CONSTRAINT uc_ct_nameshort UNIQUE KEY(NAME_SHORT, SITE_ID),
+      ADD CONSTRAINT uc_ct_name UNIQUE KEY(NAME, SITE_ID);
+
+ALTER TABLE study_event_attr
+      ADD CONSTRAINT uc_se_label UNIQUE KEY(LABEL, STUDY_ID);
+
+
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
