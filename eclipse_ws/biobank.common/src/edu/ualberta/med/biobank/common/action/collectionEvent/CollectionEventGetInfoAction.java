@@ -21,14 +21,19 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String CEVENT_INFO_QRY = 
+    private static final String CEVENT_INFO_QRY =
         "select cevent"
-        + " from " + CollectionEvent.class.getName() + " as cevent"
-        + " inner join fetch cevent." + CollectionEventPeer.PATIENT.getName() + " patient"
-        + " inner join fetch cevent." + CollectionEventPeer.ACTIVITY_STATUS.getName() + " status"
-        + " inner join fetch patient." + PatientPeer.STUDY.getName() + " study"
-        + " where cevent." + CollectionEventPeer.ID.getName() + "=?"
-        + " GROUP BY cevent";
+            + " from " + CollectionEvent.class.getName() + " as cevent"
+            + " inner join fetch cevent."
+            + CollectionEventPeer.PATIENT.getName() + " patient"
+            + " inner join fetch cevent."
+            + CollectionEventPeer.ACTIVITY_STATUS.getName() + " status"
+            + " left join fetch cevent."
+            + CollectionEventPeer.COMMENT_COLLECTION.getName() + " comments"
+            + " inner join fetch patient." + PatientPeer.STUDY.getName()
+            + " study"
+            + " where cevent." + CollectionEventPeer.ID.getName() + "=?"
+            + " GROUP BY cevent";
     // @formatter:on
 
     private final Integer ceventId;
@@ -70,7 +75,8 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
                 ceventId, false).run(user, session);
             ceventInfo.aliquotedSpecimenInfos = new CollectionEventGetSpecimenInfosAction(
                 ceventId, true).run(user, session);
-            ceventInfo.eventAttrs = new CollectionEventGetEventAttrInfoAction(ceventId).run(
+            ceventInfo.eventAttrs = new CollectionEventGetEventAttrInfoAction(
+                ceventId).run(
                 user, session);
         } else {
             throw new ActionException("Cannot find a collection event with id=" //$NON-NLS-1$

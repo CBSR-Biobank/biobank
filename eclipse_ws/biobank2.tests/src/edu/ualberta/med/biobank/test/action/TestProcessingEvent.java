@@ -9,12 +9,12 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.test.Utils;
@@ -46,7 +46,8 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void testSaveWithoutSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(50);
-        List<Comment> comments = Utils.getRandomComments();
+        List<CommentInfo> comments = Utils.getRandomCommentInfos(currentUser
+            .getId());
         Date date = Utils.getRandomDate();
         Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
             null, site.getId(), date, worksheet, 1, comments, null));
@@ -66,7 +67,8 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void testSaveWithSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(50);
-        List<Comment> comments = Utils.getRandomComments();
+        List<CommentInfo> comments = Utils.getRandomCommentInfos(currentUser
+            .getId());
         Date date = Utils.getRandomDate();
 
         // FIXME create a list of specimens to add.

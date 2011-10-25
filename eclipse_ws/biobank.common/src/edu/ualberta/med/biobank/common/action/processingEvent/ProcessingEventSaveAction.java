@@ -10,6 +10,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
+import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.DiffUtils;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
@@ -36,13 +37,13 @@ public class ProcessingEventSaveAction implements Action<Integer> {
 
     private Integer statusId;
 
-    private Collection<Comment> comments;
+    private Collection<CommentInfo> comments;
 
     private List<Integer> specimenIds;
 
     public ProcessingEventSaveAction(Integer peventId, Integer centerId,
         Date createdAt, String worksheet, Integer statusId,
-        Collection<Comment> comments, List<Integer> specimenIds) {
+        Collection<CommentInfo> comments, List<Integer> specimenIds) {
         this.peventId = peventId;
         this.centerId = centerId;
         this.createdAt = createdAt;
@@ -83,7 +84,7 @@ public class ProcessingEventSaveAction implements Action<Integer> {
             ActivityStatus.class, statusId));
         peventToSave.setCenter(ActionUtil.sessionGet(session, Center.class,
             centerId));
-        peventToSave.setCommentCollection(comments);
+        setComments(session, peventToSave);
         peventToSave.setCreatedAt(createdAt);
         peventToSave.setWorksheet(worksheet);
 
@@ -104,5 +105,17 @@ public class ProcessingEventSaveAction implements Action<Integer> {
         session.saveOrUpdate(peventToSave);
 
         return peventToSave.getId();
+    }
+
+    protected void setComments(Session session, ProcessingEvent peventToSave) {
+        if (comments != null) {
+            Collection<Comment> dbComments = CollectionUtils.getCollection(
+                peventToSave, ProcessingEventPeer.COMMENT_COLLECTION);
+            for (CommentInfo info : comments) {
+                Comment commentModel = info.getCommentModel(session);
+                dbComments.add(commentModel);
+                session.saveOrUpdate(commentModel);
+            }
+        }
     }
 }

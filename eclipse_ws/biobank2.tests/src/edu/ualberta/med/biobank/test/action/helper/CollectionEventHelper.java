@@ -14,7 +14,6 @@ public class CollectionEventHelper extends Helper {
     public static SaveCEventSpecimenInfo createSaveCEventSpecimenInfoRandom(
         Integer specimenTypeId) {
         SaveCEventSpecimenInfo info = new SaveCEventSpecimenInfo();
-        info.comments = Utils.getRandomComments();
         info.inventoryId = Utils.getRandomString(8, 12);
         info.quantity = r.nextDouble();
         info.specimenTypeId = specimenTypeId;

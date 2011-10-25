@@ -14,6 +14,7 @@ import org.hibernate.Query;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
@@ -28,7 +29,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -60,7 +60,8 @@ public class TestCollectionEvent extends TestAction {
     @Test
     public void testSaveNoSpecsNoAttrs() throws Exception {
         final Integer visitNumber = r.nextInt(20);
-        final List<Comment> comments = Utils.getRandomComments();
+        final List<CommentInfo> comments = Utils
+            .getRandomCommentInfos(currentUser.getId());
         final Integer statusId = 1;
         // test add
         final Integer ceventId = appService
@@ -82,7 +83,8 @@ public class TestCollectionEvent extends TestAction {
     public void testSaveWithSpecs() throws Exception {
         String s = "testSaveWithSpecs" + r.nextInt();
         final Integer visitNumber = r.nextInt(20);
-        final List<Comment> comments = Utils.getRandomComments();
+        final List<CommentInfo> comments = Utils
+            .getRandomCommentInfos(currentUser.getId());
         final Integer statusId = 1;
 
         // add specimen type
@@ -104,6 +106,7 @@ public class TestCollectionEvent extends TestAction {
             CollectionEvent.class, ceventId);
         Assert.assertEquals(visitNumber, cevent.getVisitNumber());
         Assert.assertEquals(statusId, cevent.getActivityStatus().getId());
+        Assert.assertNotNull(cevent.getCommentCollection());
         Assert.assertEquals(comments.size(), cevent.getCommentCollection()
             .size());
         Assert.assertEquals(specs.size(), cevent.getAllSpecimenCollection()
@@ -201,7 +204,8 @@ public class TestCollectionEvent extends TestAction {
         Assert.assertNotNull(studyAttr);
 
         final Integer visitNumber = r.nextInt(20);
-        final List<Comment> comments = Utils.getRandomComments();
+        final List<CommentInfo> comments = Utils
+            .getRandomCommentInfos(currentUser.getId());
         final Integer statusId = 1;
 
         List<SaveCEventAttrInfo> attrs = new ArrayList<CollectionEventSaveAction.SaveCEventAttrInfo>();
@@ -285,7 +289,8 @@ public class TestCollectionEvent extends TestAction {
     public void testDeleteWithoutSpecimens() throws Exception {
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId, r
-                .nextInt(20), 1, Utils.getRandomComments(), site.getId(),
+                .nextInt(20), 1, Utils.getRandomCommentInfos(currentUser
+                .getId()), site.getId(),
                 null, null));
 
         // test delete
@@ -309,7 +314,7 @@ public class TestCollectionEvent extends TestAction {
         // Save a new cevent
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId, r
-                .nextInt(20), 1, Utils.getRandomComments(), site.getId(),
+                .nextInt(20), 1, null, site.getId(),
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
         // try delete this cevent:
@@ -374,7 +379,8 @@ public class TestCollectionEvent extends TestAction {
 
         Integer visitNber = r.nextInt(20);
         Integer statusId = 1;
-        List<Comment> comments = Utils.getRandomComments();
+        List<CommentInfo> comments = Utils.getRandomCommentInfos(currentUser
+            .getId());
         // Save a new cevent
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId, visitNber,
@@ -389,6 +395,7 @@ public class TestCollectionEvent extends TestAction {
         Assert.assertNotNull(info.cevent);
         Assert.assertEquals(visitNber, info.cevent.getVisitNumber());
         Assert.assertEquals(statusId, info.cevent.getActivityStatus().getId());
+        Assert.assertNotNull(info.cevent.getCommentCollection());
         Assert.assertEquals(comments.size(), info.cevent.getCommentCollection()
             .size());
         Assert.assertEquals(attrs.size(), info.eventAttrs.size());

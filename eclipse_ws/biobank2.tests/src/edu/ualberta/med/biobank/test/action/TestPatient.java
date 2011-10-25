@@ -273,7 +273,7 @@ public class TestPatient extends TestAction {
         // Save a new cevent with specimens
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId, r
-                .nextInt(20), 1, Utils.getRandomComments(), site.getId(),
+                .nextInt(20), 1, null, site.getId(),
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
         HashMap<Integer, SimpleCEventInfo> ceventInfos = appService
@@ -282,9 +282,11 @@ public class TestPatient extends TestAction {
         SimpleCEventInfo info = ceventInfos.get(ceventId);
         Assert.assertNotNull(info);
         Assert.assertEquals(specs.size(), info.sourceSpecimenCount.intValue());
-        Date minDate = new Date();
+        Date minDate = null;
         for (SaveCEventSpecimenInfo sp : specs.values()) {
-            if (sp.timeDrawn.compareTo(minDate) < 0) {
+            if (minDate == null)
+                minDate = sp.timeDrawn;
+            else if (sp.timeDrawn.compareTo(minDate) < 0) {
                 minDate = sp.timeDrawn;
             }
         }
@@ -321,9 +323,11 @@ public class TestPatient extends TestAction {
         PatientCEventInfo info = infos.get(0);
         // no aliquoted specimens added:
         Assert.assertEquals(0, info.aliquotedSpecimenCount.intValue());
-        Date minDate = new Date();
+        Date minDate = null;
         for (SaveCEventSpecimenInfo sp : specs.values()) {
-            if (sp.timeDrawn.compareTo(minDate) < 0) {
+            if (minDate == null)
+                minDate = sp.timeDrawn;
+            else if (sp.timeDrawn.compareTo(minDate) < 0) {
                 minDate = sp.timeDrawn;
             }
         }
