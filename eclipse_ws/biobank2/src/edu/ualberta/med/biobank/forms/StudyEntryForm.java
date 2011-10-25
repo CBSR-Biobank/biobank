@@ -135,10 +135,6 @@ public class StudyEntryForm extends BiobankEntryForm {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.label_comments, null, study,
-            StudyPeer.COMMENT_COLLECTION.getName(), null);
-
         createClinicSection();
         createSourceSpecimensSection();
         createAliquotedSpecimensSection();

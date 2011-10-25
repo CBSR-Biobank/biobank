@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ContactEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -53,6 +54,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     };
 
     private ComboViewer activityStatusComboViewer;
+
+    private CommentCollectionInfoTable commentTable;
 
     @Override
     protected void init() throws Exception {
@@ -130,9 +133,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.label_comments, null, clinic,
-            ClinicPeer.COMMENT_COLLECTION.getName(), null);
     }
 
     private void createContactSection() {

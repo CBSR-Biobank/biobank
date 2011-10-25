@@ -162,10 +162,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.ContainerEntryForm_comments_label, null, container,
-            ContainerPeer.COMMENT_COLLECTION.getName(), null);
-
         createContainerTypesSection(client);
 
     }

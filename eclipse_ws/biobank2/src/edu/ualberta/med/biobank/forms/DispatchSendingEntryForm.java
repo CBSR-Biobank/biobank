@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -21,7 +20,6 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.SessionSecurityHelper;
-import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
@@ -120,11 +118,6 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 Messages.DispatchSendingEntryForm_waybill_label, null,
                 shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
         }
-
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.DispatchSendingEntryForm_comments_label, null,
-            BeansObservables.observeValue(dispatch,
-                DispatchPeer.COMMENT_COLLECTION.getName()), null);
 
         createSpecimensSelectionSection();
     }
