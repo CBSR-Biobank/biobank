@@ -167,7 +167,7 @@ public class TestPatient extends TestAction {
         // Save a new cevent with specimens
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId, r
-                .nextInt(20), 1, Utils.getRandomString(8, 50), site.getId(),
+                .nextInt(20), 1, Utils.getRandomComments(), site.getId(),
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
         HashMap<Integer, SimpleCEventInfo> ceventInfos = appService
@@ -207,7 +207,7 @@ public class TestPatient extends TestAction {
         // Save a new cevent with specimens
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId, r
-                .nextInt(20), 1, Utils.getRandomString(8, 50), site.getId(),
+                .nextInt(20), 1, Utils.getRandomComments(), site.getId(),
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
         ArrayList<PatientCEventInfo> infos = appService

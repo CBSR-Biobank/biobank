@@ -339,7 +339,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         for (Object o : specimensTable.getCollection()) {
             SpecimenInfo specInfo = (SpecimenInfo) o;
             SaveCEventSpecimenInfo ceSpecInfo = new SaveCEventSpecimenInfo();
-            ceSpecInfo.comment = specInfo.specimen.getCommentCollection();
+            ceSpecInfo.comments = specInfo.specimen.getCommentCollection();
             ceSpecInfo.id = specInfo.specimen.getId();
             ceSpecInfo.inventoryId = specInfo.specimen.getInventoryId();
             ceSpecInfo.quantity = specInfo.specimen.getQuantity();

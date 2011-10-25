@@ -16,7 +16,6 @@ public class TestChecks extends TestDatabase {
         StudyWrapper study = new StudyWrapper(appService);
         study.setName("a");
         study.setNameShort("a");
-        study.setComment("a");
         study.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
 
@@ -34,14 +33,12 @@ public class TestChecks extends TestDatabase {
         StudyWrapper study2 = new StudyWrapper(appService);
         study2.setName("b");
         study2.setNameShort("b");
-        study2.setComment("a");
         study2.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
 
         StudyWrapper study3 = new StudyWrapper(appService);
         study3.setName("c");
         study3.setNameShort("c");
-        study3.setComment("a");
         study3.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
 

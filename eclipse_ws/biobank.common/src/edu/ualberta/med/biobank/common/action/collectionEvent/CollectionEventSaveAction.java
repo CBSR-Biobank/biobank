@@ -58,7 +58,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
         public Date timeDrawn;
         public Integer statusId;
         public Integer specimenTypeId;
-        public Collection<Comment> comment;
+        public Collection<Comment> comments;
         public Double quantity;
     }
 
@@ -171,7 +171,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
                 allSpec.add(specimen);
                 specimen.setOriginalCollectionEvent(ceventToSave);
                 originalSpec.add(specimen);
-                specimen.setCommentCollection(specInfo.comment);
+                specimen.setCommentCollection(specInfo.comments);
                 specimen.setCreatedAt(specInfo.timeDrawn);
                 specimen.setInventoryId(specInfo.inventoryId);
                 specimen.setQuantity(specInfo.quantity);
