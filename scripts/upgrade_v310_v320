@@ -55,6 +55,7 @@ DUMPFILE="/tmp/$SCRIPT.$RANDOM.sql"
 
 echo "extracting old database..."
 mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank create biobank
+echo "importing old database..."
 pv $DBDUMP | gzip -dc | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
 echo "upgrading database..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v310_v320.sql

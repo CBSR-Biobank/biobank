@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.model.User;
 public abstract class CenterSaveAction implements Action<Integer> {
     private static final long serialVersionUID = 1L;
 
-    protected final Integer centerId;
+    protected Integer centerId = null;
 
     // Specific properties force the programmer only to modify the intended
     // data. A little faster. But disregards version checks. Version checks
@@ -29,8 +29,8 @@ public abstract class CenterSaveAction implements Action<Integer> {
     private Address address;
     private Integer aStatusId;
 
-    public CenterSaveAction(Integer centerId) {
-        this.centerId = centerId;
+    public void setId(Integer id) {
+        this.centerId = id;
     }
 
     public void setName(String name) {
@@ -53,10 +53,15 @@ public abstract class CenterSaveAction implements Action<Integer> {
         this.aStatusId = activityStatusId;
     }
 
-    protected Integer runInternal(User user, Session session,
+    @Override
+    public boolean isAllowed(User user, Session session) throws ActionException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    protected Integer run(@SuppressWarnings("unused") User user,
+        Session session,
         SessionUtil sessionUtil, Center center) throws ActionException {
-        // SessionUtil sessionUtil = new SessionUtil(session);
-        // Site site = sessionUtil.get(Site.class, siteId, new Site());
 
         // TODO: check permission? (can edit site?)
 

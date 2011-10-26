@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.test.action;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -12,13 +13,13 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.CommentInfo;
+import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -27,14 +28,14 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsed
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
+import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
-import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestProcessingEvent extends TestAction {
 
-    private SiteWrapper site;
+    private Integer siteId;
     private StudyWrapper study;
     private ClinicWrapper clinic;
     private Integer patientId;
@@ -44,7 +45,6 @@ public class TestProcessingEvent extends TestAction {
     public void setUp() throws Exception {
         super.setUp();
         String name = "Processing Event Test" + r.nextInt();
-        site = SiteHelper.addSite(name + "site");
         study = StudyHelper.addStudy(name);
         clinic = ClinicHelper.addClinic(name + "clinic");
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
@@ -52,6 +52,10 @@ public class TestProcessingEvent extends TestAction {
         study.persist();
         patientId = PatientHelper.createPatient(appService,
             name, study.getId());
+
+        siteId = SiteHelper.createSite(appService, name, "Edmonton",
+            ActivityStatusEnum.ACTIVE,
+            new HashSet<Integer>(study.getId()));
     }
 
     @Test
@@ -61,7 +65,7 @@ public class TestProcessingEvent extends TestAction {
             .getId());
         Date date = Utils.getRandomDate();
         Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
-            null, site.getId(), date, worksheet, 1, comments, null));
+            null, siteId, date, worksheet, 1, comments, null));
 
         openHibernateSession();
         // Check ProcessingEvent is in database with correct values
@@ -84,7 +88,7 @@ public class TestProcessingEvent extends TestAction {
 
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(appService,
-                patientId, site.getId());
+                patientId, siteId);
         ArrayList<SpecimenInfo> sourceSpecs = appService
             .doAction(new CollectionEventGetSpecimenInfosAction(ceventId,
                 false));
@@ -92,7 +96,7 @@ public class TestProcessingEvent extends TestAction {
         // create a processing event with one of the collection event source
         // specimen
         Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
-            null, site.getId(), date, worksheet, 1, comments, Arrays
+            null, siteId, date, worksheet, 1, comments, Arrays
                 .asList(sourceSpecs.get(0).specimen.getId())));
 
         // FIXME should test to add specimens that can't add ???
@@ -114,12 +118,12 @@ public class TestProcessingEvent extends TestAction {
         String worksheet = Utils.getRandomString(50);
         Date date = Utils.getRandomDate();
         appService.doAction(new ProcessingEventSaveAction(
-            null, site.getId(), date, worksheet, 1, null, null));
+            null, siteId, date, worksheet, 1, null, null));
 
         // try to save another pevent with the same worksheet
         try {
-            appService.doAction(new ProcessingEventSaveAction(null, site
-                .getId(), new Date(), worksheet, 1, null, null));
+            appService.doAction(new ProcessingEventSaveAction(null, siteId,
+                new Date(), worksheet, 1, null, null));
             Assert
                 .fail("should not be able to use the same worksheet to 2 different pevents");
         } catch (DuplicatePropertySetException e) {
@@ -130,7 +134,7 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void testDelete() throws Exception {
         Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
-            null, site.getId(), Utils.getRandomDate(), Utils
+            null, siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), 1, null, null));
 
         appService.doAction(new ProcessingEventDeleteAction(pEventId));
@@ -147,7 +151,7 @@ public class TestProcessingEvent extends TestAction {
         // add cevent and source specimens
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(appService,
-                patientId, site.getId());
+                patientId, siteId);
         ArrayList<SpecimenInfo> sourceSpecs = appService
             .doAction(new CollectionEventGetSpecimenInfosAction(ceventId,
                 false));
@@ -156,7 +160,7 @@ public class TestProcessingEvent extends TestAction {
         // create a processing event with one of the collection event source
         // specimen.
         Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
-            null, site.getId(), Utils.getRandomDate(), Utils
+            null, siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), 1, null,
             Arrays
                 .asList(spcId)));
@@ -188,7 +192,7 @@ public class TestProcessingEvent extends TestAction {
         // add cevent and source specimens
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(appService,
-                patientId, site.getId());
+                patientId, siteId);
         ArrayList<SpecimenInfo> sourceSpecs = appService
             .doAction(new CollectionEventGetSpecimenInfosAction(ceventId,
                 false));
@@ -199,7 +203,7 @@ public class TestProcessingEvent extends TestAction {
         // create a processing event with one of the collection event source
         // specimen.
         Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
-            null, site.getId(), Utils.getRandomDate(), Utils
+            null, siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), 1, null,
             Arrays
                 .asList(spcId)));
