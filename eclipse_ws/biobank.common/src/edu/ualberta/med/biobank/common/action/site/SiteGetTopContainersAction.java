@@ -20,7 +20,8 @@ public class SiteGetTopContainersAction implements Action<ArrayList<Container>> 
         + " INNER JOIN FETCH container.containerType containerType"
         + " INNER JOIN FETCH container.activityStatus activityStatus"
         + " WHERE container.site.id = ?"
-        + " AND containerType.topLevel IS TRUE"; // only select top-level Container-s
+        + " AND containerType.topLevel IS TRUE"; // only select top-level
+                                                 // Container-s
     // @formatter:on
 
     private final Integer siteId;
@@ -35,8 +36,7 @@ public class SiteGetTopContainersAction implements Action<ArrayList<Container>> 
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     @Override

@@ -125,7 +125,8 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
             return;
         }
 
-        SiteSaveAction saveSite = new SiteSaveAction(model.siteId.getValue());
+        SiteSaveAction saveSite = new SiteSaveAction();
+        saveSite.setId(model.siteId.getValue());
         saveSite.setName(model.name.getValue());
         saveSite.setNameShort(model.nameShort.getValue());
         // saveSite.setComment(model.comment.getValue());

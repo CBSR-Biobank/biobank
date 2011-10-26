@@ -49,8 +49,7 @@ public class CollectionIsEmptyCheck<T extends Serializable> extends
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     @Override

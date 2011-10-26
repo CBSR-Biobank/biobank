@@ -25,15 +25,26 @@ public class CollectionEventGetEventAttrInfoAction implements
 
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String EVENT_ATTR_QRY = 
+    private static final String EVENT_ATTR_QRY =
         "select attr,"
-        +" sAttr." + StudyEventAttrPeer.ID.getName() 
-        + ", attrType." + EventAttrTypePeer.NAME.getName()
-        + " from " + EventAttr.class.getName() + " as attr"
-        + " left join fetch attr." + EventAttrPeer.STUDY_EVENT_ATTR.getName() + " as sAttr"
-        + " left join sAttr." + StudyEventAttrPeer.EVENT_ATTR_TYPE.getName() + " as attrType"
-        + " where attr." + Property.concatNames(EventAttrPeer.COLLECTION_EVENT, CollectionEventPeer.ID) + " =?"
-        + " group by attr";
+            + " sAttr."
+            + StudyEventAttrPeer.ID.getName()
+            + ", attrType."
+            + EventAttrTypePeer.NAME.getName()
+            + " from "
+            + EventAttr.class.getName()
+            + " as attr"
+            + " left join fetch attr."
+            + EventAttrPeer.STUDY_EVENT_ATTR.getName()
+            + " as sAttr"
+            + " left join sAttr."
+            + StudyEventAttrPeer.EVENT_ATTR_TYPE.getName()
+            + " as attrType"
+            + " where attr."
+            + Property.concatNames(EventAttrPeer.COLLECTION_EVENT,
+                CollectionEventPeer.ID) + " =?"
+            + " group by attr";
+
     // @formatter:on
 
     public CollectionEventGetEventAttrInfoAction(Integer ceventId) {
@@ -42,7 +53,6 @@ public class CollectionEventGetEventAttrInfoAction implements
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
         return true;
     }
 

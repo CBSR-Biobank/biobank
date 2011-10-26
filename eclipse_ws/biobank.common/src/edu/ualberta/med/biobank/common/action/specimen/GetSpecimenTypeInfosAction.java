@@ -17,7 +17,9 @@ public class GetSpecimenTypeInfosAction implements
 
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String SPEC_TYPE_QRY = "from " + SpecimenType.class.getName();
+    private static final String SPEC_TYPE_QRY = "from "
+        + SpecimenType.class.getName();
+
     // @formatter:on
 
     public GetSpecimenTypeInfosAction() {

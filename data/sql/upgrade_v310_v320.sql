@@ -307,7 +307,7 @@ ALTER TABLE comment ADD COLUMN SRC_ID INT(11);
 -- center comments
 
 insert into comment (version, message, created_at, user_id, src_id)
-select 0, comment, '1970-01-01 00:00', 1, id
+select 0, comment, convert_tz('1970-01-01 00:00', 'Canada/Mountain', 'GMT'), 1, id
 from center where comment is not null and length(comment)>0;
 
 insert into center_comment (center_id, comment_id)

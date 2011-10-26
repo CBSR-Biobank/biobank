@@ -63,7 +63,7 @@ public class SpecimenLinkSaveAction implements
     @Override
     public boolean isAllowed(User user, Session session) {
         // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     /**

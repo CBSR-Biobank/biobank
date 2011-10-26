@@ -11,11 +11,16 @@ import org.hibernate.cfg.Configuration;
 import org.junit.After;
 import org.junit.Before;
 
+import edu.ualberta.med.biobank.common.action.security.UserGetAction;
+import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.test.AllTests;
 import edu.ualberta.med.biobank.test.TestDatabase;
 
 public class TestAction extends TestDatabase {
     private SessionFactory sessionFactory;
     protected Session session;
+
+    protected User currentUser;
 
     /**
      * Done for each test of this class.
@@ -27,6 +32,8 @@ public class TestAction extends TestDatabase {
         // biobank-orm jar
         sessionFactory = new Configuration().configure().buildSessionFactory();
         super.setUp();
+        currentUser = appService
+            .doAction(new UserGetAction(AllTests.userLogin));
     }
 
     /**

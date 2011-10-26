@@ -24,13 +24,23 @@ public class PatientGetCollectionEventInfosAction implements
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String CEVENT_INFO_QRY = 
-    "select cevent, COUNT(DISTINCT sourcesSpecs), COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourcesSpecs), min(sourcesSpecs." + SpecimenPeer.CREATED_AT.getName() + ")"
-    + " from " + CollectionEvent.class.getName() + " as cevent"
-    + " left join cevent." + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName() + " as sourcesSpecs"
-    + " left join cevent." + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName() + " as allSpecs"
-    + " where cevent." + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID) + "=?"
-    + " GROUP BY cevent";
+    private static final String CEVENT_INFO_QRY =
+        "select cevent, COUNT(DISTINCT sourcesSpecs), COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourcesSpecs), min(sourcesSpecs."
+            + SpecimenPeer.CREATED_AT.getName()
+            + ")"
+            + " from "
+            + CollectionEvent.class.getName()
+            + " as cevent"
+            + " left join cevent."
+            + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
+            + " as sourcesSpecs"
+            + " left join cevent."
+            + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
+            + " as allSpecs"
+            + " where cevent."
+            + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+            + "=?"
+            + " GROUP BY cevent";
     // @formatter:on
 
     private final Integer patientId;
@@ -49,7 +59,7 @@ public class PatientGetCollectionEventInfosAction implements
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        return true; // TODO: restrict access
+        return true;
     }
 
     @Override

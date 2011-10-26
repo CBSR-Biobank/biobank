@@ -20,11 +20,13 @@ public class GetStudyListForSiteAction implements Action<ArrayList<Study>> {
 
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String STUDIES_QRY = 
+    private static final String STUDIES_QRY =
         "select study"
-        + " from " + Study.class.getName() + " as study"
-        + " left join study." + StudyPeer.SITE_COLLECTION.getName() + " as site"
-        + " where site." + SitePeer.ID.getName() + " =?";
+            + " from " + Study.class.getName() + " as study"
+            + " left join study." + StudyPeer.SITE_COLLECTION.getName()
+            + " as site"
+            + " where site." + SitePeer.ID.getName() + " =?";
+
     // @formatter:on
 
     public GetStudyListForSiteAction(Integer siteId) {
@@ -33,8 +35,7 @@ public class GetStudyListForSiteAction implements Action<ArrayList<Study>> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     @SuppressWarnings("unchecked")

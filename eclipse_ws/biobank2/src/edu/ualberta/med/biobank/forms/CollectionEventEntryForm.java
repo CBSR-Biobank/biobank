@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
@@ -385,13 +386,19 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             ceventAttrList.add(ceventAttr);
         }
 
+        List<CommentInfo> commentList = new ArrayList<CommentInfo>();
+        if (ceventCopy.getCommentCollection() != null)
+            for (Comment c : ceventCopy.getCommentCollection()) {
+                commentList.add(CommentInfo.createFromModel(c));
+            }
+
         // save the collection event
         Integer savedCeventId = SessionManager.getAppService()
             .doAction(
                 new CollectionEventSaveAction(ceventCopy.getId(), ceventCopy
                     .getPatient().getId(), ceventCopy.getVisitNumber(),
-                    ceventCopy.getActivityStatus().getId(), ceventCopy
-                        .getCommentCollection(), SessionManager.getUser()
+                    ceventCopy.getActivityStatus().getId(), commentList,
+                    SessionManager.getUser()
                         .getCurrentWorkingCenter().getId(), cevents,
                     ceventAttrList));
         ((CollectionEventAdapter) adapter).setId(savedCeventId);

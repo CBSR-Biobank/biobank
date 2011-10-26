@@ -44,10 +44,12 @@ import edu.ualberta.med.biobank.test.wrappers.TestStudy;
     TestStudy.class })
 public class AllTests {
     public static BiobankApplicationService appService = null;
+    public static final String userLogin = "testuser";
+    public static final String userPwd = "test";
 
     @BeforeClass
     public static void setUp() throws Exception {
-        appService = connect("testuser", "test");
+        appService = connect(userLogin, userPwd);
         DbHelper.setAppService(appService);
     }
 

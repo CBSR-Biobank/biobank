@@ -3,13 +3,11 @@ package edu.ualberta.med.biobank.common.action.activityStatus;
 import java.util.HashMap;
 import java.util.List;
 
-import org.hibernate.Query;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.User;
 
@@ -18,15 +16,9 @@ public class GetAllActivityStatusesAction implements
 
     private static final long serialVersionUID = 1L;
 
-    // @formatter:off
-    @SuppressWarnings("nls")
-    private static final String STATUS_QRY = "from " + ActivityStatus.class.getName();
-    // @formatter:on
-
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     @Override
@@ -34,10 +26,10 @@ public class GetAllActivityStatusesAction implements
         throws ActionException {
         HashMap<Integer, ActivityStatus> map = new HashMap<Integer, ActivityStatus>();
 
-        Query query = session.createQuery(STATUS_QRY);
+        Criteria criteria = session.createCriteria(ActivityStatus.class);
 
         @SuppressWarnings("unchecked")
-        List<ActivityStatus> rows = query.list();
+        List<ActivityStatus> rows = criteria.list();
         for (ActivityStatus st : rows) {
             map.put(st.getId(), st);
         }

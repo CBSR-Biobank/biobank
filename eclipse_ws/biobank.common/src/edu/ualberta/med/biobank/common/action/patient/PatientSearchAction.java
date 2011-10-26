@@ -21,16 +21,19 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
 
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String PATIENT_INFO_QRY = 
+    private static final String PATIENT_INFO_QRY =
         " select p, study, count(cevents)"
-        + " from " + Patient.class.getName() + " as p" 
-        + " LEFT JOIN p." + PatientPeer.STUDY.getName() + " as study"
-        + " LEFT JOIN p." + PatientPeer.COLLECTION_EVENT_COLLECTION.getName() + " as cevents"
-        + " where {0} GROUP BY p";
+            + " from " + Patient.class.getName() + " as p"
+            + " LEFT JOIN p." + PatientPeer.STUDY.getName() + " as study"
+            + " LEFT JOIN p."
+            + PatientPeer.COLLECTION_EVENT_COLLECTION.getName() + " as cevents"
+            + " where {0} GROUP BY p";
     @SuppressWarnings("nls")
-    private static final String WHERE_FOR_PNUMBER = "p." + PatientPeer.PNUMBER.getName() + "=?"; 
+    private static final String WHERE_FOR_PNUMBER = "p."
+        + PatientPeer.PNUMBER.getName() + "=?";
     @SuppressWarnings("nls")
-    private static final String WHERE_FOR_ID = "p." +  PatientPeer.ID.getName() + "=?"; 
+    private static final String WHERE_FOR_ID = "p." + PatientPeer.ID.getName()
+        + "=?";
     // @formatter:on
 
     private String pnumber;
@@ -53,7 +56,6 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO restrict access
         return true;
     }
 

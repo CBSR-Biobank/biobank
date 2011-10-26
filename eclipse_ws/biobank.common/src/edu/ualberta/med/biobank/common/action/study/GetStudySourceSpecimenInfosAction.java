@@ -22,11 +22,15 @@ public class GetStudySourceSpecimenInfosAction implements
 
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String STUDY_SRCE_SPECIMEN_QRY = 
+    private static final String STUDY_SRCE_SPECIMEN_QRY =
         "select srce"
-        + " from " + SourceSpecimen.class.getName() + " as srce"
-        + " inner join fetch srce." + SourceSpecimenPeer.SPECIMEN_TYPE.getName()
-        + " where srce." + Property.concatNames(SourceSpecimenPeer.STUDY, StudyPeer.ID) + " =?";
+            + " from " + SourceSpecimen.class.getName() + " as srce"
+            + " inner join fetch srce."
+            + SourceSpecimenPeer.SPECIMEN_TYPE.getName()
+            + " where srce."
+            + Property.concatNames(SourceSpecimenPeer.STUDY, StudyPeer.ID)
+            + " =?";
+
     // @formatter:on
 
     public GetStudySourceSpecimenInfosAction(Integer studyId) {
@@ -35,7 +39,6 @@ public class GetStudySourceSpecimenInfosAction implements
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
         return true;
     }
 

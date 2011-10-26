@@ -14,6 +14,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
+import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.DiffUtils;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
@@ -24,6 +25,10 @@ import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.permission.Permission;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventCreatePermission;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -47,7 +52,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
     private Integer patientId;
     private Integer visitNumber;
     private Integer statusId;
-    private Collection<Comment> comments;
+    private Collection<CommentInfo> comments;
 
     public static class SaveCEventSpecimenInfo implements Serializable,
         NotAProxy {
@@ -58,7 +63,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
         public Date timeDrawn;
         public Integer statusId;
         public Integer specimenTypeId;
-        public Collection<Comment> comments;
+        public Collection<CommentInfo> comments;
         public Double quantity;
     }
 
@@ -78,14 +83,15 @@ public class CollectionEventSaveAction implements Action<Integer> {
     private List<SaveCEventAttrInfo> ceAttrList;
 
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
-        Integer visitNumber, Integer statusId, Collection<Comment> collection,
+        Integer visitNumber, Integer statusId,
+        Collection<CommentInfo> comments,
         Integer centerId, Collection<SaveCEventSpecimenInfo> sourceSpecs,
         List<SaveCEventAttrInfo> ceAttrList) {
         this.ceventId = ceventId;
         this.patientId = patientId;
         this.visitNumber = visitNumber;
         this.statusId = statusId;
-        this.comments = collection;
+        this.comments = comments;
         this.centerId = centerId;
         this.sourceSpecimens = sourceSpecs;
         this.ceAttrList = ceAttrList;
@@ -93,8 +99,13 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
-        return true;
+        Permission permission;
+        if (ceventId == null) {
+            permission = new CollectionEventCreatePermission(patientId);
+        } else {
+            permission = new CollectionEventUpdatePermission(ceventId);
+        }
+        return permission.isAllowed(user, session);
     }
 
     @Override
@@ -111,7 +122,6 @@ public class CollectionEventSaveAction implements Action<Integer> {
         }
 
         // FIXME Version check?
-        // FIXME permission ?
 
         Patient patient = ActionUtil.sessionGet(session, Patient.class,
             patientId);
@@ -119,7 +129,12 @@ public class CollectionEventSaveAction implements Action<Integer> {
         ceventToSave.setVisitNumber(visitNumber);
         ceventToSave.setActivityStatus(ActionUtil.sessionGet(session,
             ActivityStatus.class, statusId));
-        ceventToSave.setCommentCollection(comments);
+
+        Collection<Comment> commentsToSave = CollectionUtils.getCollection(
+            ceventToSave,
+            CollectionEventPeer.COMMENT_COLLECTION);
+        CommentInfo
+            .setCommentModelCollection(session, commentsToSave, comments);
 
         setSourceSpecimens(session, ceventToSave);
 
@@ -171,7 +186,12 @@ public class CollectionEventSaveAction implements Action<Integer> {
                 allSpec.add(specimen);
                 specimen.setOriginalCollectionEvent(ceventToSave);
                 originalSpec.add(specimen);
-                specimen.setCommentCollection(specInfo.comments);
+                Collection<Comment> commentsToSave = CollectionUtils
+                    .getCollection(
+                        specimen,
+                        SpecimenPeer.COMMENT_COLLECTION);
+                CommentInfo.setCommentModelCollection(session, commentsToSave,
+                    specInfo.comments);
                 specimen.setCreatedAt(specInfo.timeDrawn);
                 specimen.setInventoryId(specInfo.inventoryId);
                 specimen.setQuantity(specInfo.quantity);

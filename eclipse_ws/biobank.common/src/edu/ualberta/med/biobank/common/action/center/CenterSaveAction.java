@@ -1,9 +1,6 @@
 package edu.ualberta.med.biobank.common.action.center;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.Session;
 
@@ -12,16 +9,14 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.User;
 
 public abstract class CenterSaveAction implements Action<Integer> {
     private static final long serialVersionUID = 1L;
 
-    protected final Integer centerId;
+    protected Integer centerId = null;
 
     // Specific properties force the programmer only to modify the intended
     // data. A little faster. But disregards version checks. Version checks
@@ -34,8 +29,8 @@ public abstract class CenterSaveAction implements Action<Integer> {
     private Address address;
     private Integer aStatusId;
 
-    public CenterSaveAction(Integer centerId) {
-        this.centerId = centerId;
+    public void setId(Integer id) {
+        this.centerId = id;
     }
 
     public void setName(String name) {
@@ -64,10 +59,9 @@ public abstract class CenterSaveAction implements Action<Integer> {
         return false;
     }
 
-    protected Integer runInternal(User user, Session session,
+    protected Integer run(@SuppressWarnings("unused") User user,
+        Session session,
         SessionUtil sessionUtil, Center center) throws ActionException {
-        // SessionUtil sessionUtil = new SessionUtil(session);
-        // Site site = sessionUtil.get(Site.class, siteId, new Site());
 
         // TODO: check permission? (can edit site?)
 

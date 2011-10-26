@@ -5,8 +5,10 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.check.CollectionIsEmptyCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.permission.patient.PatientDeletePermission;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.User;
 
@@ -14,7 +16,8 @@ public class PatientDeleteAction implements Action<Integer> {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String HAS_COLLECTION_EVENTS_MSG = Messages.getString("PatientDeleteAction.has.collectionevents.msg"); //$NON-NLS-1$
+    private static final String HAS_COLLECTION_EVENTS_MSG = Messages
+        .getString("PatientDeleteAction.has.collectionevents.msg"); //$NON-NLS-1$
 
     private Integer patientId;
 
@@ -24,8 +27,7 @@ public class PatientDeleteAction implements Action<Integer> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
-        return false;
+       return new PatientDeletePermission(patientId).isAllowed(user, session);
     }
 
     @Override

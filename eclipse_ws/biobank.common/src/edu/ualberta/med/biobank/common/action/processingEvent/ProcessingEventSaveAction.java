@@ -10,11 +10,16 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
+import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.DiffUtils;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
+import edu.ualberta.med.biobank.common.permission.Permission;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventCreatePermission;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventUpdatePermission;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
@@ -36,13 +41,13 @@ public class ProcessingEventSaveAction implements Action<Integer> {
 
     private Integer statusId;
 
-    private Collection<Comment> comments;
+    private Collection<CommentInfo> comments;
 
     private List<Integer> specimenIds;
 
     public ProcessingEventSaveAction(Integer peventId, Integer centerId,
         Date createdAt, String worksheet, Integer statusId,
-        Collection<Comment> comments, List<Integer> specimenIds) {
+        Collection<CommentInfo> comments, List<Integer> specimenIds) {
         this.peventId = peventId;
         this.centerId = centerId;
         this.createdAt = createdAt;
@@ -54,8 +59,13 @@ public class ProcessingEventSaveAction implements Action<Integer> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
-        return false;
+        Permission permission;
+        if (peventId == null) {
+            permission = new ProcessingEventCreatePermission();
+        } else {
+            permission = new ProcessingEventUpdatePermission(peventId);
+        }
+        return permission.isAllowed(user, session);
     }
 
     @SuppressWarnings("unchecked")
@@ -70,10 +80,9 @@ public class ProcessingEventSaveAction implements Action<Integer> {
         }
 
         // FIXME Version check?
-        // FIXME permission ?
 
         // check worksheet number unique. Can't set it as a database constraint
-        // since imported pevent can have a null worksheet
+        // since imported pevent can have a null worksheet:
         new UniquePreCheck<ProcessingEvent>(new ValueProperty<ProcessingEvent>(
             ProcessingEventPeer.ID, peventId), ProcessingEvent.class,
             Arrays.asList(new ValueProperty<ProcessingEvent>(
@@ -83,7 +92,7 @@ public class ProcessingEventSaveAction implements Action<Integer> {
             ActivityStatus.class, statusId));
         peventToSave.setCenter(ActionUtil.sessionGet(session, Center.class,
             centerId));
-        peventToSave.setCommentCollection(comments);
+        setComments(session, peventToSave);
         peventToSave.setCreatedAt(createdAt);
         peventToSave.setWorksheet(worksheet);
 
@@ -104,5 +113,17 @@ public class ProcessingEventSaveAction implements Action<Integer> {
         session.saveOrUpdate(peventToSave);
 
         return peventToSave.getId();
+    }
+
+    protected void setComments(Session session, ProcessingEvent peventToSave) {
+        if (comments != null) {
+            Collection<Comment> dbComments = CollectionUtils.getCollection(
+                peventToSave, ProcessingEventPeer.COMMENT_COLLECTION);
+            for (CommentInfo info : comments) {
+                Comment commentModel = info.getCommentModel(session);
+                dbComments.add(commentModel);
+                session.saveOrUpdate(commentModel);
+            }
+        }
     }
 }

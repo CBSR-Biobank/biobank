@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,8 @@ import org.hibernate.Query;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.action.CommentInfo;
+import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
@@ -24,11 +27,9 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -36,14 +37,14 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionN
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestCollectionEvent extends TestAction {
 
     private StudyWrapper study;
     private Integer patientId;
-    private SiteWrapper site;
+    private Integer siteId;
 
     @Override
     @Before
@@ -51,21 +52,25 @@ public class TestCollectionEvent extends TestAction {
         super.setUp();
         String name = "CEventTest" + r.nextInt();
         // FIXME should not use wrappers for set up
-        site = SiteHelper.addSite(name);
         study = StudyHelper.addStudy(name);
         patientId = appService.doAction(new PatientSaveAction(null, study
             .getId(), name, Utils.getRandomDate()));
+
+        siteId = SiteHelper.createSite(appService, name, "Edmonton",
+            ActivityStatusEnum.ACTIVE,
+            new HashSet<Integer>(study.getId()));
     }
 
     @Test
     public void testSaveNoSpecsNoAttrs() throws Exception {
         final Integer visitNumber = r.nextInt(20);
-        final List<Comment> comments = Utils.getRandomComments();
+        final List<CommentInfo> comments = Utils
+            .getRandomCommentInfos(currentUser.getId());
         final Integer statusId = 1;
         // test add
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId,
-                visitNumber, statusId, comments, site.getId(), null, null));
+                visitNumber, statusId, comments, siteId, null, null));
 
         openHibernateSession();
         // Check CollectionEvent is in database with correct values
@@ -82,7 +87,8 @@ public class TestCollectionEvent extends TestAction {
     public void testSaveWithSpecs() throws Exception {
         String s = "testSaveWithSpecs" + r.nextInt();
         final Integer visitNumber = r.nextInt(20);
-        final List<Comment> comments = Utils.getRandomComments();
+        final List<CommentInfo> comments = Utils
+            .getRandomCommentInfos(currentUser.getId());
         final Integer statusId = 1;
 
         // add specimen type
@@ -90,12 +96,13 @@ public class TestCollectionEvent extends TestAction {
             .addSpecimenType(s).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
-            .createSaveCEventSpecimenInfoRandomList(5, typeId);
+            .createSaveCEventSpecimenInfoRandomList(5, typeId,
+                currentUser.getId());
 
         // Save a new cevent
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId,
-                visitNumber, statusId, comments, site.getId(),
+                visitNumber, statusId, comments, siteId,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
         openHibernateSession();
@@ -104,6 +111,7 @@ public class TestCollectionEvent extends TestAction {
             CollectionEvent.class, ceventId);
         Assert.assertEquals(visitNumber, cevent.getVisitNumber());
         Assert.assertEquals(statusId, cevent.getActivityStatus().getId());
+        Assert.assertNotNull(cevent.getCommentCollection());
         Assert.assertEquals(comments.size(), cevent.getCommentCollection()
             .size());
         Assert.assertEquals(specs.size(), cevent.getAllSpecimenCollection()
@@ -117,7 +125,8 @@ public class TestCollectionEvent extends TestAction {
             SaveCEventSpecimenInfo info = specs.get(sp.getInventoryId());
             Assert.assertNotNull(info);
             if (info != null) {
-                Assert.assertEquals(info.comments, sp.getCommentCollection()
+                Assert.assertEquals(info.comments.size(), sp
+                    .getCommentCollection()
                     .size());
                 Assert.assertEquals(info.inventoryId, sp.getInventoryId());
                 Assert
@@ -142,11 +151,11 @@ public class TestCollectionEvent extends TestAction {
         modifiedSpec.quantity += 1;
         newSpecList.add(modifiedSpec);
         SaveCEventSpecimenInfo newSpec = CollectionEventHelper
-            .createSaveCEventSpecimenInfoRandom(typeId);
+            .createSaveCEventSpecimenInfoRandom(typeId, currentUser.getId());
         newSpecList.add(newSpec);
         // modify cevent
         appService.doAction(new CollectionEventSaveAction(ceventId, patientId,
-            visitNumber + 1, statusId, comments, site.getId(), newSpecList,
+            visitNumber + 1, statusId, comments, siteId, newSpecList,
             null));
 
         openHibernateSession();
@@ -164,8 +173,10 @@ public class TestCollectionEvent extends TestAction {
             Assert.assertTrue(sp.getInventoryId().equals(newSpec.inventoryId)
                 || sp.getInventoryId().equals(modifiedSpec.inventoryId));
             if (sp.getInventoryId().equals(newSpec.inventoryId)) {
+                Assert.assertNotNull(sp.getCommentCollection());
                 Assert
-                    .assertEquals(newSpec.comments, sp.getCommentCollection());
+                    .assertEquals(newSpec.comments.size(),
+                        sp.getCommentCollection().size());
                 Assert.assertEquals(newSpec.inventoryId, sp.getInventoryId());
                 Assert.assertTrue(compareDouble(newSpec.quantity,
                     sp.getQuantity()));
@@ -201,7 +212,8 @@ public class TestCollectionEvent extends TestAction {
         Assert.assertNotNull(studyAttr);
 
         final Integer visitNumber = r.nextInt(20);
-        final List<Comment> comments = Utils.getRandomComments();
+        final List<CommentInfo> comments = Utils
+            .getRandomCommentInfos(currentUser.getId());
         final Integer statusId = 1;
 
         List<SaveCEventAttrInfo> attrs = new ArrayList<CollectionEventSaveAction.SaveCEventAttrInfo>();
@@ -216,7 +228,7 @@ public class TestCollectionEvent extends TestAction {
         // Save a new cevent
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId,
-                visitNumber, statusId, comments, site.getId(), null, attrs));
+                visitNumber, statusId, comments, siteId, null, attrs));
 
         openHibernateSession();
         // Check CollectionEvent is in database with correct values
@@ -238,7 +250,7 @@ public class TestCollectionEvent extends TestAction {
         attrInfo.value = value2;
         // Save with a different value for attrinfo
         appService.doAction(new CollectionEventSaveAction(ceventId, patientId,
-            visitNumber, statusId, comments, site.getId(), null, attrs));
+            visitNumber, statusId, comments, siteId, null, attrs));
 
         openHibernateSession();
         cevent = (CollectionEvent) session.get(CollectionEvent.class, ceventId);
@@ -285,7 +297,8 @@ public class TestCollectionEvent extends TestAction {
     public void testDeleteWithoutSpecimens() throws Exception {
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId, r
-                .nextInt(20), 1, Utils.getRandomComments(), site.getId(),
+                .nextInt(20), 1, Utils.getRandomCommentInfos(currentUser
+                .getId()), siteId,
                 null, null));
 
         // test delete
@@ -304,12 +317,13 @@ public class TestCollectionEvent extends TestAction {
             .addSpecimenType("testSaveWithSpecs" + r.nextInt()).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
-            .createSaveCEventSpecimenInfoRandomList(5, typeId);
+            .createSaveCEventSpecimenInfoRandomList(5, typeId,
+                currentUser.getId());
 
         // Save a new cevent
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId, r
-                .nextInt(20), 1, Utils.getRandomComments(), site.getId(),
+                .nextInt(20), 1, null, siteId,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
         // try delete this cevent:
@@ -333,12 +347,12 @@ public class TestCollectionEvent extends TestAction {
         final Integer statusId = 1;
         // add
         appService.doAction(new CollectionEventSaveAction(null, patientId,
-            visitNumber, statusId, null, site.getId(), null, null));
+            visitNumber, statusId, null, siteId, null, null));
 
         // try to add a second collection event with the same visit number
         try {
             appService.doAction(new CollectionEventSaveAction(null, patientId,
-                visitNumber, statusId, null, site.getId(), null, null));
+                visitNumber, statusId, null, siteId, null, null));
             Assert
                 .fail("should throw an exception because the visit number is already used");
         } catch (DuplicatePropertySetException e) {
@@ -353,7 +367,8 @@ public class TestCollectionEvent extends TestAction {
             .addSpecimenType("testGetInfos" + r.nextInt()).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
-            .createSaveCEventSpecimenInfoRandomList(5, typeId);
+            .createSaveCEventSpecimenInfoRandomList(5, typeId,
+                currentUser.getId());
 
         addEventAttrs(study);
         List<String> labels = Arrays.asList(study.getStudyEventAttrLabels());
@@ -374,11 +389,12 @@ public class TestCollectionEvent extends TestAction {
 
         Integer visitNber = r.nextInt(20);
         Integer statusId = 1;
-        List<Comment> comments = Utils.getRandomComments();
+        List<CommentInfo> comments = Utils.getRandomCommentInfos(currentUser
+            .getId());
         // Save a new cevent
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId, visitNber,
-                statusId, comments, site.getId(),
+                statusId, comments, siteId,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), attrs));
 
         // Call get infos action
@@ -389,6 +405,8 @@ public class TestCollectionEvent extends TestAction {
         Assert.assertNotNull(info.cevent);
         Assert.assertEquals(visitNber, info.cevent.getVisitNumber());
         Assert.assertEquals(statusId, info.cevent.getActivityStatus().getId());
+        Assert.assertNotNull(info.cevent.getCommentCollection());
+        // FIXME sometimes size not correct !!??!!
         Assert.assertEquals(comments.size(), info.cevent.getCommentCollection()
             .size());
         Assert.assertEquals(attrs.size(), info.eventAttrs.size());
@@ -423,7 +441,7 @@ public class TestCollectionEvent extends TestAction {
         // Save a new cevent
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId, visitNber,
-                statusId, null, site.getId(), null, attrs));
+                statusId, null, siteId, null, attrs));
 
         // Call get eventAttr infos action
         HashMap<Integer, EventAttrInfo> infos = appService
