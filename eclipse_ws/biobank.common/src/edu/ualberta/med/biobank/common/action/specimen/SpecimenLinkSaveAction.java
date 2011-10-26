@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermission;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -28,6 +29,8 @@ public class SpecimenLinkSaveAction implements
     private Integer centerId;
 
     private List<AliquotedSpecimenInfo> aliquotedSpecInfoList;
+
+    private Integer studyId;
 
     public static class AliquotedSpecimenInfo implements Serializable,
         NotAProxy {
@@ -54,16 +57,17 @@ public class SpecimenLinkSaveAction implements
         public String position;
     }
 
-    public SpecimenLinkSaveAction(Integer centerId,
+    public SpecimenLinkSaveAction(Integer centerId, Integer studyId,
         List<AliquotedSpecimenInfo> asiList) {
         this.centerId = centerId;
+        this.studyId = studyId;
         this.aliquotedSpecInfoList = asiList;
     }
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
-        return true;
+        return new SpecimenLinkPermission(centerId, studyId).isAllowed(user,
+            session);
     }
 
     /**

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.specimen;
+package edu.ualberta.med.biobank.common.action.specimenType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetSpecimenTypeInfosAction implements
+public class SpecimenTypeGetInfosAction implements
     Action<ArrayList<SpecimenTypeInfo>> {
     private static final long serialVersionUID = 1L;
 
@@ -22,7 +22,7 @@ public class GetSpecimenTypeInfosAction implements
 
     // @formatter:on
 
-    public GetSpecimenTypeInfosAction() {
+    public SpecimenTypeGetInfosAction() {
     }
 
     @Override

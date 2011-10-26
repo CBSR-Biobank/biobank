@@ -9,23 +9,25 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class SpecimenCreatePermission implements Permission {
+public class SpecimenLinkPermission implements Permission {
     private static final long serialVersionUID = 1L;
 
     private final Integer centerId;
     private final Integer studyId;
 
-    public SpecimenCreatePermission(Integer centerId, Integer studyId) {
+    public SpecimenLinkPermission(Integer centerId, Integer studyId) {
         this.centerId = centerId;
         this.studyId = studyId;
     }
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        Study study = ActionUtil.sessionGet(session,
-            Study.class, studyId);
         Center center = ActionUtil.sessionGet(session,
             Center.class, centerId);
-        return PermissionEnum.SPECIMEN_CREATE.isAllowed(user, center, study);
+        Study study = ActionUtil.sessionGet(session,
+            Study.class, studyId);
+        return PermissionEnum.SPECIMEN_LINK.isAllowed(user, center, study)
+            && new SpecimenCreatePermission(centerId, studyId).isAllowed(user,
+                session);
     }
 }

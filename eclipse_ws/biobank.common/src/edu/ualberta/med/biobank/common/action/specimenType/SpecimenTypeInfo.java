@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.specimen;
+package edu.ualberta.med.biobank.common.action.specimenType;
 
 import java.io.Serializable;
 

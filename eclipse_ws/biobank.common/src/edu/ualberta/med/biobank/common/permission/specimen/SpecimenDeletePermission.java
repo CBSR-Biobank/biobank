@@ -10,12 +10,12 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class ReadSpecimenPermission implements Permission {
+public class SpecimenDeletePermission implements Permission {
     private static final long serialVersionUID = 1L;
 
     private final Integer specimenId;
 
-    public ReadSpecimenPermission(Integer specimenId) {
+    public SpecimenDeletePermission(Integer specimenId) {
         this.specimenId = specimenId;
     }
 
@@ -27,6 +27,6 @@ public class ReadSpecimenPermission implements Permission {
         Center center = specimen.getCurrentCenter();
         Study study = specimen.getCollectionEvent().getPatient().getStudy();
 
-        return PermissionEnum.SPECIMEN_READ.isAllowed(user, center, study);
+        return PermissionEnum.SPECIMEN_DELETE.isAllowed(user, center, study);
     }
 }

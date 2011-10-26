@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenAssignResInfo;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenAssignPermission;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Container;
@@ -70,8 +71,17 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
-        return true;
+        Integer centerId;
+        if (containerId != null) {
+            Container container = ActionUtil.sessionGet(session,
+                Container.class, containerId);
+            centerId = container.getSite().getId();
+        } else if (containerInfo != null) {
+            centerId = containerInfo.siteId;
+        } else
+            return true;
+        return new SpecimenAssignPermission(centerId).isAllowed(user,
+            session);
     }
 
     @Override

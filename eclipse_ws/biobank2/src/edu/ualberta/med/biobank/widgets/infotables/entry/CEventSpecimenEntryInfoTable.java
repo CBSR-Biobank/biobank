@@ -14,7 +14,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenTypeInfo;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeInfo;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.CEventSourceSpecimenDialog;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;

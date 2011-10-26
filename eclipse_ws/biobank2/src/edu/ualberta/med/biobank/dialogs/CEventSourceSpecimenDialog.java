@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.activityStatus.GetAllActivityStatusesAction;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenTypeInfo;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeInfo;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;

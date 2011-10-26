@@ -30,9 +30,9 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientNextVisitNumberAction;
-import edu.ualberta.med.biobank.common.action.specimen.GetSpecimenTypeInfosAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenTypeInfo;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetInfosAction;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeInfo;
 import edu.ualberta.med.biobank.common.action.study.GetStudyEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.GetStudySourceSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
@@ -253,7 +253,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         specimensTable.addSelectionChangedListener(listener);
         try {
             final List<SpecimenTypeInfo> allSpecimenTypes = SessionManager
-                .getAppService().doAction(new GetSpecimenTypeInfosAction());
+                .getAppService().doAction(new SpecimenTypeGetInfosAction());
             final List<SourceSpecimen> studySourceSpecimens = SessionManager
                 .getAppService().doAction(
                     new GetStudySourceSpecimenInfosAction(ceventInfo.cevent

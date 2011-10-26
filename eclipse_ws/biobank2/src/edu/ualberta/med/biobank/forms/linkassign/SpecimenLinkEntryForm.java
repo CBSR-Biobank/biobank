@@ -502,7 +502,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         List<AliquotedSpecimenResInfo> resList = SessionManager.getAppService()
             .doAction(
                 new SpecimenLinkSaveAction(SessionManager.getUser()
-                    .getCurrentWorkingCenter().getId(), asiList));
+                    .getCurrentWorkingCenter().getId(),
+                    linkFormPatientManagement.getCurrentPatient().getStudy()
+                        .getId(), asiList));
         printSaveMultipleLogMessage(resList);
     }
 
@@ -543,7 +545,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         List<AliquotedSpecimenResInfo> resList = SessionManager.getAppService()
             .doAction(
                 new SpecimenLinkSaveAction(SessionManager.getUser()
-                    .getCurrentWorkingCenter().getId(), Arrays.asList(asi)));
+                    .getCurrentWorkingCenter().getId(),
+                    linkFormPatientManagement.getCurrentPatient().getStudy()
+                        .getId(), Arrays.asList(asi)));
         printSaveSingleLogMessage(resList);
     }
 
