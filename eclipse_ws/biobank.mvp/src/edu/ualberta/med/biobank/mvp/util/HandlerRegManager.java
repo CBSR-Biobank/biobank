@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
-public class HandlerRegistrationManager {
+public class HandlerRegManager {
     private final List<HandlerRegistration> handlerRegistrations =
         new ArrayList<HandlerRegistration>();
 

@@ -7,6 +7,8 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.pietschy.gwt.pectin.client.condition.Condition;
+import com.pietschy.gwt.pectin.client.condition.Conditions;
 import com.pietschy.gwt.pectin.client.condition.DelegatingCondition;
 import com.pietschy.gwt.pectin.client.condition.OrFunction;
 import com.pietschy.gwt.pectin.client.condition.ReducingCondition;
@@ -19,6 +21,9 @@ import com.pietschy.gwt.pectin.client.form.ListFieldModel;
 import com.pietschy.gwt.pectin.client.form.binding.FormBinder;
 import com.pietschy.gwt.pectin.client.form.validation.FormValidator;
 import com.pietschy.gwt.pectin.client.form.validation.HasValidation;
+import com.pietschy.gwt.pectin.client.form.validation.Severity;
+import com.pietschy.gwt.pectin.client.form.validation.ValidationEvent;
+import com.pietschy.gwt.pectin.client.form.validation.ValidationHandler;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationPlugin;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 import com.pietschy.gwt.pectin.client.form.validation.binding.ValidationBinder;
@@ -27,7 +32,8 @@ import com.pietschy.gwt.pectin.client.value.MutableValueModel;
 import com.pietschy.gwt.pectin.client.value.ValueModel;
 import com.pietschy.gwt.pectin.reflect.ReflectionBeanModelProvider;
 
-import edu.ualberta.med.biobank.mvp.util.HandlerRegistrationManager;
+import edu.ualberta.med.biobank.mvp.model.validation.ValidationTree;
+import edu.ualberta.med.biobank.mvp.util.HandlerRegManager;
 
 /**
  * For use by {@link edu.ualberta.med.biobank.mvp.presenter.IPresenter}-s.
@@ -46,16 +52,20 @@ import edu.ualberta.med.biobank.mvp.util.HandlerRegistrationManager;
  * 
  * @param <T>
  */
-public abstract class BaseModel<T> extends FormModel { // TODO: implement
-                                                       // HasValidation
-    protected final FormBinder binder = new FormBinder();
-    protected final ValidationBinder validationBinder = new ValidationBinder();
+public abstract class BaseModel<T> extends FormModel {
     protected final ReflectionBeanModelProvider<T> provider;
-    protected final DelegatingCondition dirty = new DelegatingCondition(false);
+    private final FormBinder binder = new FormBinder();
+    private final ValidationBinder validationBinder = new ValidationBinder();
+    private final ValidationTree validationTree = new ValidationTree();
+    private final DelegatingCondition dirty = new DelegatingCondition(false);
+    private final DelegatingCondition valid = new DelegatingCondition(false);
     private final List<BaseModel<?>> models = new ArrayList<BaseModel<?>>();
-    private final HandlerRegistrationManager handlerRegistrationManager =
-        new HandlerRegistrationManager();
+    private final HandlerRegManager hrManager = new HandlerRegManager();
+    private final ValidationMonitor validationMonitor = new ValidationMonitor();
     private boolean bound = false;
+
+    @SuppressWarnings("unchecked")
+    private final Condition validAndDirty = Conditions.and(valid, dirty);
 
     public BaseModel(Class<T> beanModelClass) {
         // TODO: could read the .class from the generic parameter?
@@ -69,8 +79,12 @@ public abstract class BaseModel<T> extends FormModel { // TODO: implement
         // dirty states
         provider = new ReflectionBeanModelProvider<T>(beanModelClass);
 
-        // auto-commit so that the
+        // auto-commit so models can be bound to other models and are
+        // automatically updated instantly
         provider.setAutoCommit(true);
+
+        validationTree.add(getFormValidator());
+        validationTree.addValidationHandler(validationMonitor);
     }
 
     public T getValue() {
@@ -99,15 +113,15 @@ public abstract class BaseModel<T> extends FormModel { // TODO: implement
     }
 
     public ValueModel<Boolean> valid() {
-        return null; // TODO: make a valid-watcher
+        return valid;
     }
 
     public ValueModel<Boolean> validAndDirty() {
-        return null; // TODO: implement this!
+        return validAndDirty;
     }
 
     public void bindValidationTo(ValidationDisplay validationDisplay) {
-        // TODO: this!
+        validationBinder.bindValidationOf(validationTree).to(validationDisplay);
     }
 
     /**
@@ -130,11 +144,7 @@ public abstract class BaseModel<T> extends FormModel { // TODO: implement
     }
 
     public boolean validate() {
-        for (BaseModel<?> model : models) {
-            model.validate();
-        }
-
-        return ValidationPlugin.getValidationManager(this).validate();
+        return validationTree.validate();
     }
 
     /**
@@ -159,6 +169,8 @@ public abstract class BaseModel<T> extends FormModel { // TODO: implement
 
         models.add(model);
         binder.bind(field).to(model.getMutableValueModel());
+
+        validationTree.add(model.validationTree);
     }
 
     public MutableValueModel<T> getMutableValueModel() {
@@ -167,13 +179,11 @@ public abstract class BaseModel<T> extends FormModel { // TODO: implement
 
     public void bind() {
         if (!bound) {
+            // bind inner models before binding ourself
+            bindModels();
+
             onBind();
 
-            // TODO: add self as a handler for each of model children, aggregate
-            // all and do something like FormValidator, and BaseModel should
-            // implement HasValidators
-
-            bindModels();
             addValidationHandlers();
             updateDirtyDelegate();
 
@@ -188,18 +198,23 @@ public abstract class BaseModel<T> extends FormModel { // TODO: implement
             bound = false;
 
             unbindModels();
-            dirty.setDelegate(provider.dirty());
-            handlerRegistrationManager.clear();
-            binder.dispose();
-            validationBinder.dispose();
 
             onUnbind();
+
+            dirty.setDelegate(provider.dirty());
+            hrManager.clear();
+            binder.dispose();
+            validationBinder.dispose();
         }
     }
 
     public abstract void onBind();
 
     public abstract void onUnbind();
+
+    protected FormValidator getFormValidator() {
+        return ValidationPlugin.getValidationManager(this).getFormValidator();
+    }
 
     private void addValidationHandlers() {
         for (Field<?> field : allFields()) {
@@ -220,7 +235,7 @@ public abstract class BaseModel<T> extends FormModel { // TODO: implement
                         }
                     });
 
-            handlerRegistrationManager.add(handlerRegistration);
+            hrManager.add(handlerRegistration);
 
             // TODO: listen to conditions of validation, then re-validate().
             // But how?
@@ -228,28 +243,27 @@ public abstract class BaseModel<T> extends FormModel { // TODO: implement
     }
 
     private HasValidation getValidator(Field<?> field) {
-        FormValidator form = ValidationPlugin.getValidationManager(this)
-            .getFormValidator();
+        FormValidator formValidator = getFormValidator();
 
         // unfortunately, FormValidator.getValidator() will create the validator
         // if it doesn't exist, but we only want to get one if it exists
         if (field instanceof FieldModel) {
-            return form.getFieldValidator(
+            return formValidator.getFieldValidator(
                 (FieldModel<?>) field,
                 false);
         }
         else if (field instanceof FormattedFieldModel) {
-            return form.getFieldValidator(
+            return formValidator.getFieldValidator(
                 (FormattedFieldModel<?>) field,
                 false);
         }
         else if (field instanceof ListFieldModel) {
-            return form.getFieldValidator(
+            return formValidator.getFieldValidator(
                 (ListFieldModel<?>) field,
                 false);
         }
         else if (field instanceof FormattedListFieldModel) {
-            return form.getFieldValidator(
+            return formValidator.getFieldValidator(
                 (FormattedListFieldModel<?>) field,
                 false);
         }
@@ -281,6 +295,18 @@ public abstract class BaseModel<T> extends FormModel { // TODO: implement
     private void unbindModels() {
         for (BaseModel<?> model : models) {
             model.unbind();
+        }
+    }
+
+    private void updateValidity(ValidationResult result) {
+        boolean isValid = !result.contains(Severity.ERROR);
+        // valid.setValue(isValid);
+    }
+
+    private class ValidationMonitor implements ValidationHandler {
+        @Override
+        public void onValidate(ValidationEvent event) {
+            updateValidity(event.getValidationResult());
         }
     }
 }

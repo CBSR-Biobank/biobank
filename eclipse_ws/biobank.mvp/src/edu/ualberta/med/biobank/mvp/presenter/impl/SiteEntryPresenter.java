@@ -84,9 +84,9 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
         model.bind();
 
-        // model.bindValidationTo(view); // TODO: uncomment?
+        model.bindValidationTo(view);
 
-        binder.enable(view.getSave()).when(model.dirty());
+        binder.enable(view.getSave()).when(model.validAndDirty());
     }
 
     @Override

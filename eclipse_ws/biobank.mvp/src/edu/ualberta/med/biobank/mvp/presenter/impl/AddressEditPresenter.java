@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEditPresenter.View;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
 public class AddressEditPresenter extends BasePresenter<View> {
-    private Model model = new Model();
+    private final Model model;
 
     public interface View extends IView {
         HasValue<String> getStreet1();
@@ -36,6 +36,8 @@ public class AddressEditPresenter extends BasePresenter<View> {
     @Inject
     public AddressEditPresenter(View view, EventBus eventBus) {
         super(view, eventBus);
+
+        this.model = new Model();
     }
 
     public Model getModel() {
@@ -61,7 +63,7 @@ public class AddressEditPresenter extends BasePresenter<View> {
         model.unbind();
     }
 
-    public class Model extends BaseModel<Address> {
+    public static class Model extends BaseModel<Address> {
         final FieldModel<String> street1;
         final FieldModel<String> street2;
         final FieldModel<String> city;
