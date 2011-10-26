@@ -51,6 +51,7 @@ import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionSpecificBehaviour;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 
@@ -75,8 +76,6 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private BgcBaseText activityStatusLabel;
 
-    private BgcBaseText commentsLabel;
-
     private BgcBaseText containerTypeLabel;
 
     private BgcBaseText temperatureLabel;
@@ -100,6 +99,8 @@ public class ContainerViewForm extends BiobankViewForm {
     private ComboViewer initSelectionCv;
 
     private ComboViewer deleteCv;
+
+    private CommentCollectionInfoTable commentTable;
 
     @Override
     public void init() throws Exception {
@@ -149,12 +150,12 @@ public class ContainerViewForm extends BiobankViewForm {
             Messages.container_field_label_barcode);
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.label_activity);
-        commentsLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.label_comments);
         containerTypeLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.container_field_label_type);
         temperatureLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.container_field_label_temperature);
+
+        createCommentsSection();
 
         setContainerValues();
 
@@ -162,6 +163,14 @@ public class ContainerViewForm extends BiobankViewForm {
             .size() > 0) {
             createVisualizeContainer();
         }
+    }
+
+    private void createCommentsSection() {
+        Composite client = createSectionWithClient(Messages.label_comments);
+        commentTable = new CommentCollectionInfoTable(client,
+            container.getCommentCollection(false));
+        commentTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(commentTable);
     }
 
     private void initCells() {
@@ -500,7 +509,6 @@ public class ContainerViewForm extends BiobankViewForm {
         setTextValue(containerLabelLabel, container.getLabel());
         setTextValue(productBarcodeLabel, container.getProductBarcode());
         setTextValue(activityStatusLabel, container.getActivityStatus());
-        setTextValue(commentsLabel, container.getCommentCollection(false));
         setTextValue(containerTypeLabel, container.getContainerType().getName());
         setTextValue(temperatureLabel, container.getTopContainer()
             .getTemperature());

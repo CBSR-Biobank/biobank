@@ -40,6 +40,12 @@ public class Messages extends NLS {
     public static String CollectionEventInfoTable_header_numAliquotedSpecimens;
     public static String CollectionEventInfoTable_header_comment;
 
+    public static String CommentCollectionInfoTable_0;
+
+    public static String CommentCollectionInfoTable_1;
+
+    public static String CommentCollectionInfoTable_2;
+
     public static String ContactInfoTable_email_label;
 
     public static String ContactInfoTable_fax_label;

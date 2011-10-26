@@ -35,6 +35,7 @@ import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import edu.ualberta.med.biobank.widgets.infotables.entry.AliquotedSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ClinicAddInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SourceSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
@@ -67,6 +68,8 @@ public class StudyEntryForm extends BiobankEntryForm {
     private ComboViewer activityStatusComboViewer;
 
     private SourceSpecimenEntryInfoTable sourceSpecimenEntryTable;
+
+    private CommentCollectionEntryInfoTable commentEntryTable;
 
     private static class StudyPvAttrCustom extends PvAttrCustom {
         public PvInfoWidget widget;
@@ -135,6 +138,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 }
             });
 
+        createCommentSection();
         createClinicSection();
         createSourceSpecimensSection();
         createAliquotedSpecimensSection();
@@ -156,6 +160,23 @@ public class StudyEntryForm extends BiobankEntryForm {
                 }
             });
         section.setClient(contactEntryTable);
+    }
+
+    private void createCommentSection() {
+        Section section = createSection(Messages.Comments_title);
+        commentEntryTable = new CommentCollectionEntryInfoTable(section,
+            study.getCommentCollection(false));
+        commentEntryTable.adaptToToolkit(toolkit, true);
+        commentEntryTable.addSelectionChangedListener(listener);
+
+        addSectionToolbar(section, Messages.Comments_button_add,
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    commentEntryTable.addComment();
+                }
+            });
+        section.setClient(commentEntryTable);
     }
 
     private void createAliquotedSpecimensSection() {

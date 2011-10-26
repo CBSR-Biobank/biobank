@@ -11,6 +11,8 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -18,6 +20,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -35,8 +38,11 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import edu.ualberta.med.biobank.wizards.SelectCollectionEventWizard;
 
@@ -68,6 +74,15 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     private List<SpecimenWrapper> allchildren;
 
     protected CollectionEventWrapper newCollectionEvent;
+
+    private CommentCollectionEntryInfoTable commentEntryTable;
+
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
 
     @Override
     protected void init() throws Exception {
@@ -282,12 +297,26 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 }
             });
 
-        commentText = (BgcBaseText) createBoundWidgetWithLabel(client,
-            BgcBaseText.class, SWT.WRAP | SWT.MULTI,
-            Messages.SpecimenEntryForm_comments_label, null, specimen,
-            SpecimenPeer.COMMENT_COLLECTION.getName(), null);
+        createCommentSection();
 
         setFirstControl(specimenTypeComboViewer.getControl());
+    }
+
+    private void createCommentSection() {
+        Section section = createSection(Messages.Comments_title);
+        commentEntryTable = new CommentCollectionEntryInfoTable(section,
+            specimen.getCommentCollection(false));
+        commentEntryTable.adaptToToolkit(toolkit, true);
+        commentEntryTable.addSelectionChangedListener(listener);
+
+        addSectionToolbar(section, Messages.Comments_button_add,
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    commentEntryTable.addComment();
+                }
+            });
+        section.setClient(commentEntryTable);
     }
 
     protected void transferSpecimen(SpecimenWrapper specimen2,

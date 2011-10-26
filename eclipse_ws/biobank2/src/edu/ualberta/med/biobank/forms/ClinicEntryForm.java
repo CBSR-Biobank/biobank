@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ContactEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -56,6 +57,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private ComboViewer activityStatusComboViewer;
 
     private CommentCollectionInfoTable commentTable;
+
+    private CommentCollectionEntryInfoTable commentEntryTable;
 
     @Override
     protected void init() throws Exception {
@@ -133,6 +136,26 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 }
             });
 
+        createCommentSection();
+
+    }
+
+    private void createCommentSection() {
+        Section section = createSection(Messages.Comments_title);
+        commentEntryTable = new CommentCollectionEntryInfoTable(section,
+            clinic.getCommentCollection(false)
+            );
+        commentEntryTable.adaptToToolkit(toolkit, true);
+        commentEntryTable.addSelectionChangedListener(listener);
+
+        addSectionToolbar(section, Messages.Comments_button_add,
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    commentEntryTable.addComment();
+                }
+            });
+        section.setClient(commentEntryTable);
     }
 
     private void createContactSection() {

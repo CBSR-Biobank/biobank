@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 public class CommentCollectionInfoTable extends InfoTableWidget {
 
-    private static class TableRowData {
+    protected static class TableRowData {
         public String comment;
         public UserWrapper user;
         public Date date;
@@ -25,8 +25,10 @@ public class CommentCollectionInfoTable extends InfoTableWidget {
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Comment", "User",
-        "Date" };
+    private static final String[] HEADINGS = new String[] {
+        Messages.CommentCollectionInfoTable_0,
+        Messages.CommentCollectionInfoTable_1,
+        Messages.CommentCollectionInfoTable_2 };
 
     public CommentCollectionInfoTable(Composite parent,
         List<CommentWrapper> collection) {
