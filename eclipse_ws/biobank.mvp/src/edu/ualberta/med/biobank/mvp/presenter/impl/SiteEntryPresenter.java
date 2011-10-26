@@ -211,6 +211,12 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         @SuppressWarnings("unchecked")
         @Override
         public void onBind() {
+            // validation (must be done before binding to view)
+            ValidationPlugin.validateField(name)
+                .using(new NotEmptyValidator("Name is required"));
+            ValidationPlugin.validateField(nameShort)
+                .using(new NotEmptyValidator("Name Short is required"));
+
             binder.bind(name).to(view.getName());
             binder.bind(nameShort).to(view.getNameShort());
             binder.bind(comment).to(view.getComment());
@@ -222,12 +228,6 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
             // also updated in the Address presenter
             binder.bind(address)
                 .to(addressEditPresenter.getModel().getMutableValueModel());
-
-            // validation
-            ValidationPlugin.validateField(name)
-                .using(new NotEmptyValidator("Name is required"));
-            ValidationPlugin.validateField(nameShort)
-                .using(new NotEmptyValidator("Name Short is required"));
 
             // TODO: listen on changes to condition and to field, then
             // validate(), put in superclass?

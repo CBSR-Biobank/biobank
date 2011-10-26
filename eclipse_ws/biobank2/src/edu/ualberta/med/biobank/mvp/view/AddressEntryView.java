@@ -31,7 +31,7 @@ public class AddressEntryView implements AddressEditPresenter.View {
 
             Label cityLabel = new Label(parent, SWT.NONE);
             cityLabel.setText("city");
-            street1.setValidationControl(cityLabel);
+            city.setValidationControl(cityLabel);
             city.setText(new Text(parent, SWT.BORDER));
 
             created = true;

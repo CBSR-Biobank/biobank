@@ -86,6 +86,10 @@ public class AddressEditPresenter extends BasePresenter<View> {
         @SuppressWarnings("unchecked")
         @Override
         public void onBind() {
+            // TODO: make Validator-s take a field name arg only?
+            ValidationPlugin.validateField(city)
+                .using(new NotEmptyValidator("City is required"));
+
             binder.bind(street1).to(view.getStreet1());
             binder.bind(street2).to(view.getStreet2());
             binder.bind(city).to(view.getCity());
@@ -94,10 +98,6 @@ public class AddressEditPresenter extends BasePresenter<View> {
             binder.bind(phoneNumber).to(view.getPhoneNumber());
             binder.bind(faxNumber).to(view.getFaxNumber());
             binder.bind(country).to(view.getCountry());
-
-            // TODO: make Validator-s take a field name arg only?
-            ValidationPlugin.validateField(city)
-                .using(new NotEmptyValidator("City is required"));
 
             // TODO: (1) wrap validation plugin to add listeners to the field
             // and the condition to re-validate. (2) aggregate validation? Make

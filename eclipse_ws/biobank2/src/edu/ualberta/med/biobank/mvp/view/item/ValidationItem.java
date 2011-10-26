@@ -27,6 +27,7 @@ public abstract class ValidationItem<T> extends BaseItem<T> implements
     public void setValidationControl(Control control) {
         disposeOldControlDecoration();
         controlDecoration = createControlDecoration(control);
+        updateControlDecoration();
     }
 
     private void disposeOldControlDecoration() {
@@ -36,8 +37,9 @@ public abstract class ValidationItem<T> extends BaseItem<T> implements
     }
 
     private void updateControlDecoration() {
-        if (controlDecoration != null && validationResult != null) {
-            if (validationResult.contains(Severity.ERROR)) {
+        if (controlDecoration != null) {
+            if (validationResult != null
+                && validationResult.contains(Severity.ERROR)) {
                 controlDecoration.setDescriptionText(getDescriptionText());
                 controlDecoration.show();
             } else {
@@ -56,7 +58,6 @@ public abstract class ValidationItem<T> extends BaseItem<T> implements
         ControlDecoration controlDecoration = new ControlDecoration(control,
             SWT.RIGHT | SWT.TOP);
         controlDecoration.setImage(ERROR_FIELD_DECORATION.getImage());
-        updateControlDecoration();
         return controlDecoration;
     }
 }
