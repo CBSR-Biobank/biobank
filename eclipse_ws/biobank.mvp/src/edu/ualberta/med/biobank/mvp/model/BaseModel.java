@@ -205,6 +205,7 @@ public abstract class BaseModel<T> extends FormModel {
             hrManager.clear();
             binder.dispose();
             validationBinder.dispose();
+            validationTree.dispose();
         }
     }
 
