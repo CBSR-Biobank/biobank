@@ -869,6 +869,30 @@ public class Messages extends NLS {
     public static String DecodeImage_tabTitle;
     public static String DecodeImage_browse_label;
 
+    public static String CommentEntryForm_0;
+
+    public static String CommentEntryForm_1;
+
+    public static String CommentEntryForm_2;
+
+    public static String CommentEntryForm_3;
+
+    public static String CommentEntryForm_4;
+
+    public static String CommentEntryForm_main_title;
+
+    public static String CommentEntryForm_new_title;
+
+    public static String CommentEntryForm_edit_title;
+
+    public static String CommentViewForm_0;
+
+    public static String CommentViewForm_1;
+
+    public static String CommentViewForm_2;
+
+    public static String CommentViewForm_title;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

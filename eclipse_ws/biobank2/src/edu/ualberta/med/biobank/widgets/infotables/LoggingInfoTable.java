@@ -57,7 +57,7 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
                 TableRowData item = getCollectionModelObject((LogWrapper) element);
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.LoggingInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }

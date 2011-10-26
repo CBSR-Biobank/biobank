@@ -55,7 +55,7 @@ public class ContactInfoTable extends InfoTableWidget {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.ContactInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }

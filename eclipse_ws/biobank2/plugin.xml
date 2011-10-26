@@ -1988,6 +1988,18 @@
       id="edu.ualberta.med.biobank.forms.ResearchGroupViewForm"
       name="%ResearchGroupView.editor">
 </editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.CommentEntryForm"
+      default="false"
+      id="edu.ualberta.med.biobank.forms.CommentEntryForm"
+      name="%CommentEntry.editor">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.CommentViewForm"
+      default="false"
+      id="edu.ualberta.med.biobank.forms.CommentViewForm"
+      name="%CommentView.editor">
+</editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">

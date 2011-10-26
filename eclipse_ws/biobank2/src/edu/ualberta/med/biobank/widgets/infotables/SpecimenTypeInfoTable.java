@@ -29,7 +29,7 @@ public class SpecimenTypeInfoTable extends InfoTableWidget {
                 SpecimenTypeWrapper item = (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.SpecimenTypeInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }
