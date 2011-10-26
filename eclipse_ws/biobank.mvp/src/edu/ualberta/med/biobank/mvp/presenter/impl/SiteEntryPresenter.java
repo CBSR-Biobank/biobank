@@ -61,7 +61,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         this.addressEditPresenter = addressEditPresenter;
         this.activityStatusComboPresenter = activityStatusComboPresenter;
 
-        this.model = new Model();
+        this.model = new Model(addressEditPresenter.getModel());
 
         // so this view can create the other views if create() is called
         view.setAddressEditView(addressEditPresenter.getView());
@@ -72,12 +72,21 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     public void onBind() {
         super.onBind();
 
-        addressEditPresenter.bind();
+        addressEditPresenter.bind(); // still necessary to bind view to model
         activityStatusComboPresenter.bind();
 
-        binder.enable(view.getSave()).when(model.dirty());
+        binder.bind(model.name).to(view.getName());
+        binder.bind(model.nameShort).to(view.getNameShort());
+        binder.bind(model.comment).to(view.getComment());
+        // binder.bind(model.studies).to(view.getStudies());
+        binder.bind(model.activityStatus)
+            .to(activityStatusComboPresenter.getActivityStatus());
 
         model.bind();
+
+        // model.bindValidationTo(view); // TODO: uncomment?
+
+        binder.enable(view.getSave()).when(model.dirty());
     }
 
     @Override
@@ -106,7 +115,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         saveSite.setName(model.name.getValue());
         saveSite.setNameShort(model.nameShort.getValue());
         saveSite.setComment(model.comment.getValue());
-        saveSite.setAddress(model.getAddress());
+        saveSite.setAddress(model.address.getValue());
         saveSite.setActivityStatusId(model.getActivityStatusId());
         saveSite.setStudyIds(model.getStudyIds());
 
@@ -161,7 +170,9 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         return view;
     }
 
-    public class Model extends BaseModel<SiteInfo> {
+    public static class Model extends BaseModel<SiteInfo> {
+        private final BaseModel<Address> addressModel;
+
         final FieldModel<Integer> siteId;
         final FieldModel<String> name;
         final FieldModel<String> nameShort;
@@ -170,8 +181,11 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         final FieldModel<Address> address;
         final ListFieldModel<StudyInfo> studies;
 
-        private Model() {
+        @SuppressWarnings("unchecked")
+        private Model(BaseModel<Address> addressModel) {
             super(SiteInfo.class);
+
+            this.addressModel = addressModel;
 
             siteId = fieldOfType(Integer.class)
                 .boundTo(provider, "site.id");
@@ -188,7 +202,10 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
             studies = listOfType(StudyInfo.class)
                 .boundTo(provider, "studies");
 
-            addChild(addressEditPresenter.getModel());
+            ValidationPlugin.validateField(name)
+                .using(new NotEmptyValidator("Name is required"));
+            ValidationPlugin.validateField(nameShort)
+                .using(new NotEmptyValidator("Name Short is required"));
         }
 
         Integer getActivityStatusId() {
@@ -204,35 +221,9 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
             return studyIds;
         }
 
-        Address getAddress() {
-            return model.address.getValue();
-        }
-
-        @SuppressWarnings("unchecked")
         @Override
         public void onBind() {
-            // validation (must be done before binding to view)
-            ValidationPlugin.validateField(name)
-                .using(new NotEmptyValidator("Name is required"));
-            ValidationPlugin.validateField(nameShort)
-                .using(new NotEmptyValidator("Name Short is required"));
-
-            binder.bind(name).to(view.getName());
-            binder.bind(nameShort).to(view.getNameShort());
-            binder.bind(comment).to(view.getComment());
-            // binder.bind(studies).to(view.getStudies());
-            binder.bind(activityStatus)
-                .to(activityStatusComboPresenter.getActivityStatus());
-
-            // necessary so when this model's value is set that the Address is
-            // also updated in the Address presenter
-            binder.bind(address)
-                .to(addressEditPresenter.getModel().getMutableValueModel());
-
-            // TODO: listen on changes to condition and to field, then
-            // validate(), put in superclass?
-
-            // validationBinder.bindValidationOf(this).to(view);
+            bind(address, addressModel);
         }
 
         @Override

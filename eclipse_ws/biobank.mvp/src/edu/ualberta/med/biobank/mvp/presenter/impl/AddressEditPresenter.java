@@ -44,6 +44,15 @@ public class AddressEditPresenter extends BasePresenter<View> {
 
     @Override
     protected void onBind() {
+        binder.bind(model.street1).to(view.getStreet1());
+        binder.bind(model.street2).to(view.getStreet2());
+        binder.bind(model.city).to(view.getCity());
+        binder.bind(model.province).to(view.getProvince());
+        binder.bind(model.postalCode).to(view.getPostalCode());
+        binder.bind(model.phoneNumber).to(view.getPhoneNumber());
+        binder.bind(model.faxNumber).to(view.getFaxNumber());
+        binder.bind(model.country).to(view.getCountry());
+
         model.bind();
     }
 
@@ -62,6 +71,7 @@ public class AddressEditPresenter extends BasePresenter<View> {
         final FieldModel<String> faxNumber;
         final FieldModel<String> country;
 
+        @SuppressWarnings("unchecked")
         private Model() {
             super(Address.class);
 
@@ -81,37 +91,17 @@ public class AddressEditPresenter extends BasePresenter<View> {
                 .boundTo(provider, "faxNumber");
             country = fieldOfType(String.class)
                 .boundTo(provider, "country");
-        }
 
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onBind() {
-            // TODO: make Validator-s take a field name arg only?
             ValidationPlugin.validateField(city)
                 .using(new NotEmptyValidator("City is required"));
+        }
 
-            binder.bind(street1).to(view.getStreet1());
-            binder.bind(street2).to(view.getStreet2());
-            binder.bind(city).to(view.getCity());
-            binder.bind(province).to(view.getProvince());
-            binder.bind(postalCode).to(view.getPostalCode());
-            binder.bind(phoneNumber).to(view.getPhoneNumber());
-            binder.bind(faxNumber).to(view.getFaxNumber());
-            binder.bind(country).to(view.getCountry());
-
-            // TODO: (1) wrap validation plugin to add listeners to the field
-            // and the condition to re-validate. (2) aggregate validation? Make
-            // a protected model bind() and unbind() method?
-
-            // TODO: make models implement HasValidation? Also allow them to
-            // listen to the validation of other models?
-
-            // TODO: what about unbinding?
+        @Override
+        public void onBind() {
         }
 
         @Override
         public void onUnbind() {
-            // TODO Auto-generated method stub
         }
     }
 }
