@@ -94,6 +94,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         model.unbind();
 
         activityStatusComboPresenter.unbind();
+        addressEntryPresenter.unbind();
     }
 
     @Override
