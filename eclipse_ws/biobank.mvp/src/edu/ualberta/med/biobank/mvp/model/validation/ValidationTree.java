@@ -83,7 +83,7 @@ public class ValidationTree extends AbstractValidation {
             HasValidation validator = entry.getKey();
             Condition condition = entry.getValue();
 
-            if (Boolean.TRUE.equals(condition)) {
+            if (Boolean.TRUE.equals(condition.getValue())) {
                 valid = valid && validator.validate();
             }
             else {
