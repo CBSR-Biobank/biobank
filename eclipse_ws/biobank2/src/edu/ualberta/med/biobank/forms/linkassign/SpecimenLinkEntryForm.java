@@ -652,14 +652,17 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected Action<ProcessResult> getCellProcessAction(Integer centerId,
         Cell cell, Locale locale) {
-        return new LinkProcess(centerId, cell, locale);
+        return new LinkProcess(centerId, linkFormPatientManagement
+            .getCurrentPatient().getStudy().getId(), cell, locale);
     }
 
     @Override
     protected Action<ProcessResult> getPalletProcessAction(
         Integer centerId, Map<RowColPos, Cell> cells, boolean isRescanMode,
         Locale locale) {
-        return new LinkProcess(centerId, cells, isRescanMode, locale);
+        return new LinkProcess(centerId, linkFormPatientManagement
+            .getCurrentPatient().getStudy().getId(), cells, isRescanMode,
+            locale);
     }
 
     @Override

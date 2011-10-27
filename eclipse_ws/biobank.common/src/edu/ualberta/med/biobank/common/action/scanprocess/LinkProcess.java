@@ -20,19 +20,18 @@ import edu.ualberta.med.biobank.model.User;
 public class LinkProcess extends ServerProcess {
 
     private static final long serialVersionUID = 1L;
+    private Integer studyId;
 
-    public LinkProcess(
-        Integer currentWorkingCenterId,
-        Map<RowColPos, Cell> cells,
-        boolean isRescanMode, Locale locale) {
+    public LinkProcess(Integer currentWorkingCenterId, Integer studyId,
+        Map<RowColPos, Cell> cells, boolean isRescanMode, Locale locale) {
         super(currentWorkingCenterId, cells, isRescanMode, locale);
+        this.studyId = studyId;
     }
 
-    public LinkProcess(
-        Integer currentWorkingCenterId,
-        Cell cell,
-        Locale locale) {
+    public LinkProcess(Integer currentWorkingCenterId, Integer studyId,
+        Cell cell, Locale locale) {
         super(currentWorkingCenterId, cell, locale);
+        this.studyId = studyId;
     }
 
     @Override
@@ -46,8 +45,8 @@ public class LinkProcess extends ServerProcess {
     }
 
     protected CellStatus internalProcessScanResult(Session session,
-        Map<RowColPos, Cell> cells,
-        boolean isRescanMode) throws ActionException {
+        Map<RowColPos, Cell> cells, boolean isRescanMode)
+        throws ActionException {
         CellStatus currentScanState = CellStatus.EMPTY;
         if (cells != null) {
             Map<String, Cell> allValues = new HashMap<String, Cell>();
@@ -113,8 +112,7 @@ public class LinkProcess extends ServerProcess {
         else {
             String value = cell.getValue();
             if (value != null) {
-                Specimen foundSpecimen = searchSpecimen(session, value
-                    );
+                Specimen foundSpecimen = searchSpecimen(session, value);
                 if (foundSpecimen != null) {
                     cell.setStatus(CellStatus.ERROR);
                     cell.setInformation(Messages.getString(
@@ -160,10 +158,8 @@ public class LinkProcess extends ServerProcess {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        // FIXME get a studyId ?
-        return new SpecimenLinkPermission(currentWorkingCenterId, null)
-            .isAllowed(user,
-                session);
+        return new SpecimenLinkPermission(currentWorkingCenterId, studyId)
+            .isAllowed(user, session);
     }
 
 }
