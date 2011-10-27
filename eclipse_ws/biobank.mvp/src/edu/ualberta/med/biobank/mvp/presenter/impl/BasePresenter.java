@@ -7,10 +7,10 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.pietschy.gwt.pectin.client.form.binding.FormBinder;
 
-import edu.ualberta.med.biobank.mvp.presenter.Presenter;
-import edu.ualberta.med.biobank.mvp.view.BaseView;
+import edu.ualberta.med.biobank.mvp.presenter.IPresenter;
+import edu.ualberta.med.biobank.mvp.view.IView;
 
-public abstract class BasePresenter<V extends BaseView> implements Presenter<V> {
+public abstract class BasePresenter<V extends IView> implements IPresenter<V> {
     private final List<HandlerRegistration> handlerRegistrations =
         new ArrayList<HandlerRegistration>();
     protected final FormBinder binder = new FormBinder();

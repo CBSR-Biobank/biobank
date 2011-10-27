@@ -96,13 +96,7 @@ public class SiteEntryView2 extends EditorPart implements
     }
 
     @Override
-    public void setAddressEntryView(BaseView view) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setActivityStatusComboView(BaseView view) {
+    public void setActivityStatusComboView(IView view) {
         // TODO Auto-generated method stub
 
     }
@@ -135,5 +129,17 @@ public class SiteEntryView2 extends EditorPart implements
         // TODO Auto-generated method stub
 
     }
+
+    @Override
+    public void setAddressEditView(IView view) {
+        // TODO Auto-generated method stub
+
+    }
+
+    // @Override
+    // public IAddressEntryView getAddressEntryView() {
+    // // TODO Auto-generated method stub
+    // return null;
+    // }
 
 }

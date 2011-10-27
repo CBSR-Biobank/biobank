@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.mvp.PresenterModule;
 import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter;
-import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEditPresenter;
+import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValue;
@@ -36,7 +36,7 @@ public class TestSiteEntryPresenter {
 
     private SiteEntryPresenter.View siteEntryView;
 
-    private AddressEditPresenter.View addressView;
+    private AddressEntryPresenter.View addressView;
 
     private ActivityStatusComboPresenter.View activityStatusView;
 
@@ -50,7 +50,7 @@ public class TestSiteEntryPresenter {
     public void testValidInput() {
         activityStatusView = Mockito
             .mock(ActivityStatusComboPresenter.View.class);
-        addressView = Mockito.mock(AddressEditPresenter.View.class);
+        addressView = Mockito.mock(AddressEntryPresenter.View.class);
         siteEntryView = Mockito.mock(SiteEntryPresenter.View.class);
 
         AbstractModule module = new AbstractModule() {
@@ -65,7 +65,7 @@ public class TestSiteEntryPresenter {
 
                 bind(ActivityStatusComboPresenter.View.class).toInstance(
                     activityStatusView);
-                bind(AddressEditPresenter.View.class).toInstance(addressView);
+                bind(AddressEntryPresenter.View.class).toInstance(addressView);
                 bind(FormManagerPresenter.View.class).toInstance(
                     Mockito.mock(FormManagerPresenter.View.class));
                 bind(SiteEntryPresenter.View.class).toInstance(siteEntryView);

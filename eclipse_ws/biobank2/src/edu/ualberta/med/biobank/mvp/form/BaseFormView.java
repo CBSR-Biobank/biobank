@@ -6,9 +6,9 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.mvp.view.BaseView;
+import edu.ualberta.med.biobank.mvp.view.IView;
 
-public class BaseFormView implements BaseView {
+public class BaseFormView implements IView {
 
     @Override
     public void create(Composite parent) {

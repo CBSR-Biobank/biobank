@@ -45,8 +45,8 @@ public class SiteEntryView implements SiteEntryPresenter.View {
     private final HasValue<List<Comment>> comment = new TableItem<List<Comment>>();
     private final TableItem<List<StudyInfo>> studies = new TableItem<List<StudyInfo>>();
 
-    private BaseView addressEditView;
-    private BaseView activityStatusComboView;
+    private IView addressEntryView;
+    private IView activityStatusComboView;
 
     @Override
     public HasButton getSave() {
@@ -108,12 +108,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
     }
 
     @Override
-    public void setAddressEntryView(BaseView view) {
-        this.addressEditView = view;
-    }
-
-    @Override
-    public void setActivityStatusComboView(BaseView view) {
+    public void setActivityStatusComboView(IView view) {
         this.activityStatusComboView = view;
     }
 
@@ -241,7 +236,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             comment = new Text(client, SWT.BORDER);
 
             Composite addressSection = createSectionWithClient("Address");
-            addressEditView.create(addressSection);
+            addressEntryView.create(addressSection);
 
             new Label(client, SWT.NONE).setText("activityStatus");
             activityStatusComboView.create(client);
@@ -261,5 +256,10 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         for (ValidationMessage message : result.getMessages()) {
             System.out.println(message.getMessage());
         }
+    }
+
+    @Override
+    public void setAddressEditView(IView view) {
+        this.addressEntryView = view;
     }
 }

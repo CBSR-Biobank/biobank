@@ -4,11 +4,11 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.web.bindery.event.shared.EventBus;
 
-import edu.ualberta.med.biobank.mvp.presenter.CloseablePresenter;
-import edu.ualberta.med.biobank.mvp.view.CloseableView;
+import edu.ualberta.med.biobank.mvp.presenter.ICloseablePresenter;
+import edu.ualberta.med.biobank.mvp.view.ICloseableView;
 
-public abstract class BaseCloseablePresenter<V extends CloseableView> extends
-    BasePresenter<V> implements CloseablePresenter<V> {
+public abstract class BaseCloseablePresenter<V extends ICloseableView> extends
+    BasePresenter<V> implements ICloseablePresenter<V> {
 
     public BaseCloseablePresenter(V view, EventBus eventBus) {
         super(view, eventBus);
