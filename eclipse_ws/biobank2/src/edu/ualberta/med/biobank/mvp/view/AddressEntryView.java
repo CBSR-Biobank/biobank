@@ -10,7 +10,8 @@ import com.google.gwt.user.client.ui.HasValue;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
 
-public class AddressEntryView implements AddressEntryPresenter.View {
+public class AddressEntryView extends AbstractView implements
+    AddressEntryPresenter.View {
     private final TextItem street1 = new TextItem();
     private final TextItem street2 = new TextItem();
     private final TextItem city = new TextItem();
@@ -19,27 +20,6 @@ public class AddressEntryView implements AddressEntryPresenter.View {
     private final TextItem phoneNumber = new TextItem();
     private final TextItem faxNumber = new TextItem();
     private final TextItem country = new TextItem();
-    private boolean created = false;
-
-    @Override
-    public void create(Composite parent) {
-        if (!created) {
-            Label street1Label = new Label(parent, SWT.NONE);
-            street1Label.setText("street1");
-            street1.setValidationControl(street1Label);
-            street1.setText(new Text(parent, SWT.BORDER));
-
-            Label cityLabel = new Label(parent, SWT.NONE);
-            cityLabel.setText("city");
-            city.setValidationControl(cityLabel);
-            city.setText(new Text(parent, SWT.BORDER));
-
-            created = true;
-        } else {
-            // TODO: write super class and override onCreate(parent) method?
-            // TODO: complain like crazy?
-        }
-    }
 
     @Override
     public HasValue<String> getStreet1() {
@@ -79,5 +59,18 @@ public class AddressEntryView implements AddressEntryPresenter.View {
     @Override
     public HasValue<String> getCountry() {
         return country;
+    }
+
+    @Override
+    protected void onCreate(Composite parent) {
+        Label street1Label = new Label(parent, SWT.NONE);
+        street1Label.setText("street1");
+        street1.setValidationControl(street1Label);
+        street1.setText(new Text(parent, SWT.BORDER));
+
+        Label cityLabel = new Label(parent, SWT.NONE);
+        cityLabel.setText("city");
+        city.setValidationControl(cityLabel);
+        city.setText(new Text(parent, SWT.BORDER));
     }
 }
