@@ -5,8 +5,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.widgets.infotables.messages"; //$NON-NLS-1$
 
-    public static String ClinicInfoTable_loading;
-
     public static String ClinicInfoTable_name_label;
 
     public static String ClinicInfoTable_nameshort_label;
@@ -21,15 +19,11 @@ public class Messages extends NLS {
 
     public static String ClinicStudyInfoTable_cvent_count_label;
 
-    public static String ClinicStudyInfoTable_loading;
-
     public static String ClinicStudyInfoTable_patient_count_label;
 
     public static String ClinicStudyInfoTable_study_label;
 
     public static String ClinicVisitInfoTable_aliquoted_spec_label;
-
-    public static String ClinicVisitInfoTable_loading;
 
     public static String ClinicVisitInfoTable_nber_label;
 
@@ -50,8 +44,6 @@ public class Messages extends NLS {
 
     public static String ContactInfoTable_fax_label;
 
-    public static String ContactInfoTable_loading;
-
     public static String ContactInfoTable_mobile_label;
 
     public static String ContactInfoTable_name_label;
@@ -68,8 +60,6 @@ public class Messages extends NLS {
 
     public static String ContainerInfoTable_edit_label;
 
-    public static String ContainerInfoTable_loading;
-
     public static String ContainerInfoTable_name_label;
 
     public static String ContainerInfoTable_status_label;
@@ -81,8 +71,6 @@ public class Messages extends NLS {
     public static String ContainerTypeInfoTable_capacity_label;
 
     public static String ContainerTypeInfoTable_edit_label;
-
-    public static String ContainerTypeInfoTable_loading;
 
     public static String ContainerTypeInfoTable_name_label;
 
@@ -97,16 +85,10 @@ public class Messages extends NLS {
     public static String infotable_loading_msg;
     public static String label_activity;
 
-    public static String SearchResultsInfoTable_loading;
-
-    public static String ShippingMethodInfoTable_loading;
-
     public static String ShippingMethodInfoTable_ship_label;
 
     public static String SourceSpecimen_field_type_label;
     public static String SourceSpecimen_field_originalVolume_label;
-
-    public static String SourceSpecimenInfoTable_loading;
 
     public static String SourceSpecimenInfoTable_no_label;
 
@@ -118,8 +100,6 @@ public class Messages extends NLS {
     public static String SpecimenInfoTable_current_center_label;
 
     public static String SpecimenInfoTable_inventoryid_label;
-
-    public static String SpecimenInfoTable_loading;
 
     public static String SpecimenInfoTable_no_first_letter;
 
@@ -147,8 +127,6 @@ public class Messages extends NLS {
 
     public static String SpecimenInfoTable_yes_first_letter;
 
-    public static String SpecimenTypeInfoTable_loading;
-
     public static String SpecimenTypeInfoTable_shortname_label;
 
     public static String SpecimenTypeInfoTable_type_label;
@@ -156,8 +134,6 @@ public class Messages extends NLS {
     public static String StudyContactEntryInfoTable_clinic_label;
 
     public static String StudyContactEntryInfoTable_email_label;
-
-    public static String StudyContactEntryInfoTable_loading;
 
     public static String StudyContactEntryInfoTable_mobile_label;
 
@@ -175,11 +151,7 @@ public class Messages extends NLS {
 
     public static String StudyContactInfoTable_contact_name_label;
 
-    public static String StudyContactInfoTable_loading;
-
     public static String StudyContactInfoTable_patient_count_label;
-
-    public static String StudyInfoTable_loading;
 
     public static String StudyInfoTable_name_label;
 
@@ -191,17 +163,11 @@ public class Messages extends NLS {
 
     public static String StudyInfoTable_visits_label;
 
-    public static String ActivityStatusInfoTable_loading;
-
     public static String ActivityStatusInfoTable_status_label;
 
     public static String AliquotedSpecimen_field_type_label;
     public static String AliquotedSpecimen_field_volume_label;
     public static String AliquotedSpecimen_field_quantity_label;
-
-    public static String AliquotedSpecimenInfoTable_loading;
-
-    public static String DispatchInfoTable_loading;
 
     public static String DispatchInfoTable_received_label;
 
@@ -231,8 +197,6 @@ public class Messages extends NLS {
 
     public static String DispatchSpecimenListInfoTable_inventoryid_label;
 
-    public static String DispatchSpecimenListInfoTable_loading;
-
     public static String DispatchSpecimenListInfoTable_pnumber_label;
 
     public static String DispatchSpecimenListInfoTable_remove_confirm_title;
@@ -253,8 +217,6 @@ public class Messages extends NLS {
 
     public static String GroupInfoTable_duplicate;
 
-    public static String GroupInfoTable_loading;
-
     public static String GroupInfoTable_name_label;
 
     public static String InfoTableWidget_add_label;
@@ -273,8 +235,6 @@ public class Messages extends NLS {
 
     public static String LoggingInfoTable_inventoryid_label;
 
-    public static String LoggingInfoTable_loading;
-
     public static String LoggingInfoTable_location_label;
 
     public static String LoggingInfoTable_pnumber_label;
@@ -289,8 +249,6 @@ public class Messages extends NLS {
 
     public static String MembershipInfoTable_center_label;
 
-    public static String MembershipInfoTable_loading;
-
     public static String MembershipInfoTable_permissions_label;
 
     public static String MembershipInfoTable_role_label;
@@ -303,8 +261,6 @@ public class Messages extends NLS {
 
     public static String PeListInfoTable_aliquoteds_label;
 
-    public static String PeListInfoTable_loading;
-
     public static String PeListInfoTable_sources_label;
 
     public static String PeListInfoTable_start_label;
@@ -315,11 +271,7 @@ public class Messages extends NLS {
 
     public static String PermissionInfoTable_right_label;
 
-    public static String PermissionInfoTable_loading;
-
     public static String ReportTableWidget_pages_label;
-
-    public static String RequestDispatchInfoTable_loading;
 
     public static String RequestDispatchInfoTable_packed_label;
 
@@ -354,8 +306,6 @@ public class Messages extends NLS {
     public static String UserInfoTable_fullname_label;
 
     public static String UserInfoTable_lastname_label;
-
-    public static String UserInfoTable_loading;
 
     public static String UserInfoTable_login_label;
 

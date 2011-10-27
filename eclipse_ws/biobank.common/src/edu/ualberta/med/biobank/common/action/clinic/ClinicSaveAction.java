@@ -14,10 +14,6 @@ public class ClinicSaveAction extends CenterSaveAction {
 
     private Boolean sendsShipments;
 
-    public ClinicSaveAction(Integer clinicId) {
-        super(clinicId);
-    }
-
     public void setSendsShipments(Boolean sendsShipments) {
         this.sendsShipments = sendsShipments;
     }
@@ -34,7 +30,7 @@ public class ClinicSaveAction extends CenterSaveAction {
         Clinic clinic = sessionUtil.get(Clinic.class, centerId, new Clinic());
         clinic.setSendsShipments(sendsShipments);
 
-        return runInternal(user, session, sessionUtil, clinic);
+        return run(user, session, sessionUtil, clinic);
     }
 
 }

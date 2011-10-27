@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import junit.framework.Assert;
@@ -12,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
@@ -27,7 +29,6 @@ import edu.ualberta.med.biobank.common.action.patient.PatientNextVisitNumberActi
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
@@ -36,23 +37,26 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
-import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestPatient extends TestAction {
 
     private StudyWrapper study;
-    private SiteWrapper site;
+    private Integer siteId;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
         String name = "PatientTest" + r.nextInt();
+
         // FIXME should not use wrappers for set up
-        site = SiteHelper.addSite(name);
         study = StudyHelper.addStudy(name + Utils.getRandomString(10));
+        siteId = SiteHelper.createSite(appService, name, "Edmonton",
+            ActivityStatusEnum.ACTIVE,
+            new HashSet<Integer>(study.getId()));
     }
 
     @Test
@@ -142,7 +146,7 @@ public class TestPatient extends TestAction {
             null, study.getId(), pnumber, date));
         // add a cevent to the patient:
         appService.doAction(new CollectionEventSaveAction(null, patientId, r
-            .nextInt(20), 1, null, site.getId(), null,
+            .nextInt(20), 1, null, siteId, null,
             null));
 
         // delete the patient
@@ -256,7 +260,7 @@ public class TestPatient extends TestAction {
             .createSaveCEventSpecimenInfoRandomList(specNber, specType);
         // Save a new cevent
         appService.doAction(new CollectionEventSaveAction(null, patientId,
-            visitNber, 1, null, site.getId(),
+            visitNber, 1, null, siteId,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
     }
 
@@ -275,7 +279,7 @@ public class TestPatient extends TestAction {
         // Save a new cevent with specimens
         final Integer ceventId = appService
             .doAction(new CollectionEventSaveAction(null, patientId, r
-                .nextInt(20), 1, null, site.getId(),
+                .nextInt(20), 1, null, siteId,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
         HashMap<Integer, SimpleCEventInfo> ceventInfos = appService
@@ -310,7 +314,7 @@ public class TestPatient extends TestAction {
 
         // Save a new cevent with specimens
         appService.doAction(new CollectionEventSaveAction(null, patientId, r
-            .nextInt(20), 1, null, site.getId(),
+            .nextInt(20), 1, null, siteId,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
         ArrayList<PatientCEventInfo> infos = appService
@@ -350,11 +354,11 @@ public class TestPatient extends TestAction {
         // Save a new cevent with specimens
         Integer visitNumber = r.nextInt(20);
         appService.doAction(new CollectionEventSaveAction(null, patientId,
-            visitNumber, 1, null, site.getId(),
+            visitNumber, 1, null, siteId,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
         // Save a second new cevent without specimens
         appService.doAction(new CollectionEventSaveAction(null, patientId,
-            visitNumber + 1, 1, null, site.getId(),
+            visitNumber + 1, 1, null, siteId,
             null, null));
 
         // method to test:
@@ -378,7 +382,7 @@ public class TestPatient extends TestAction {
 
         Integer visitNumber = r.nextInt(20);
         appService.doAction(new CollectionEventSaveAction(null, patientId,
-            visitNumber, 1, null, site.getId(), null,
+            visitNumber, 1, null, siteId, null,
             null));
 
         Integer next = appService.doAction(new PatientNextVisitNumberAction(
@@ -396,9 +400,9 @@ public class TestPatient extends TestAction {
         // add 2 cevents to this patient:
         int vnber = r.nextInt(20);
         appService.doAction(new CollectionEventSaveAction(null, patientId,
-            vnber, 1, null, site.getId(), null, null));
+            vnber, 1, null, siteId, null, null));
         appService.doAction(new CollectionEventSaveAction(null, patientId,
-            vnber + 1, 1, null, site.getId(), null,
+            vnber + 1, 1, null, siteId, null,
             null));
 
         openHibernateSession();

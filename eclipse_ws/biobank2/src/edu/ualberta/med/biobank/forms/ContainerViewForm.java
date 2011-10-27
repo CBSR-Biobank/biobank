@@ -565,6 +565,8 @@ public class ContainerViewForm extends BiobankViewForm {
                     .reloadCollection(new ArrayList<SpecimenWrapper>(container
                         .getSpecimens().values()));
             }
+            commentTable.setCollection(container
+                .getCommentCollection(false));
         }
     }
 }

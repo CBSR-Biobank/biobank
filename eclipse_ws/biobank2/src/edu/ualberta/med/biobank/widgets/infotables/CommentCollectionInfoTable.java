@@ -41,13 +41,19 @@ public class CommentCollectionInfoTable extends InfoTableWidget {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                if (item == null) {
+                    if (columnIndex == 0) {
+                        return Messages.infotable_loading_msg;
+                    }
+                    return ""; //$NON-NLS-1$
+                }
                 switch (columnIndex) {
                 case 0:
                     return item.comment;
                 case 1:
                     return item.user.getLogin();
                 case 2:
-                    return DateFormatter.formatAsDate(item.date);
+                    return DateFormatter.formatAsDateTime(item.date);
                 default:
                     return ""; //$NON-NLS-1$
                 }

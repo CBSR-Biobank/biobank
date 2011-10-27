@@ -37,8 +37,10 @@ public class DispatchInfoTable extends InfoTableWidget {
         }
     }
 
-    private static final String[] HEADINGS = new String[] { Messages.DispatchInfoTable_sender_label,
-        Messages.DispatchInfoTable_time_label, Messages.DispatchInfoTable_receiver_label,
+    private static final String[] HEADINGS = new String[] {
+        Messages.DispatchInfoTable_sender_label,
+        Messages.DispatchInfoTable_time_label,
+        Messages.DispatchInfoTable_receiver_label,
         Messages.DispatchInfoTable_received_label,
         Messages.DispatchInfoTable_waybill_label,
         Messages.DispatchInfoTable_state_label,
@@ -65,7 +67,7 @@ public class DispatchInfoTable extends InfoTableWidget {
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.DispatchInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }

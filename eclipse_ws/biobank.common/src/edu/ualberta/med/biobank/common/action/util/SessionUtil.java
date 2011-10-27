@@ -15,6 +15,9 @@ public class SessionUtil {
     }
 
     public <E> E get(Class<E> klazz, Serializable id) {
+        if (id == null)
+            return null;
+
         @SuppressWarnings("unchecked")
         E result = (E) session.get(klazz, id);
         return result;

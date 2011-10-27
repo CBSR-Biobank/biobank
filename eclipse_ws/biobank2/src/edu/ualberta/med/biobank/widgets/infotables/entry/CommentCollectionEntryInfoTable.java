@@ -5,7 +5,12 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
+import edu.ualberta.med.biobank.forms.CommentAdapter;
+import edu.ualberta.med.biobank.forms.CommentEntryForm;
+import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 
@@ -67,8 +72,9 @@ public class CommentCollectionEntryInfoTable extends CommentCollectionInfoTable 
     }
 
     public void addComment() {
-        // AdapterBase.openForm(new FormInput(new
-        // CommentWrapper(SessionManager.getAppService())));
-        // PlatformUtil.openForm(new A)
+        AdapterBase
+            .openForm(new FormInput(new
+                CommentAdapter(null, new CommentWrapper(SessionManager
+                    .getAppService()))), CommentEntryForm.ID, true);
     }
 }

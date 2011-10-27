@@ -106,7 +106,7 @@ public abstract class DispatchSpecimenListInfoTable extends InfoTableWidget {
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.DispatchSpecimenListInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return Messages.DispatchSpecimenListInfoTable_14;
                 }

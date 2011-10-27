@@ -26,7 +26,7 @@ public class ActivityStatusInfoTable extends InfoTableWidget {
                 ActivityStatusWrapper item = (ActivityStatusWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.ActivityStatusInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }

@@ -22,10 +22,6 @@ public class SiteSaveAction extends CenterSaveAction {
 
     private Set<Integer> studyIds;
 
-    public SiteSaveAction(Integer siteId) {
-        super(siteId);
-    }
-
     public void setStudyIds(Set<Integer> studyIds) {
         this.studyIds = studyIds;
     }
@@ -57,7 +53,7 @@ public class SiteSaveAction extends CenterSaveAction {
         // diff.getAdded()
         site.setStudyCollection(new HashSet<Study>(studies.values()));
 
-        return runInternal(user, session, sessionUtil, site);
+        return run(user, session, sessionUtil, site);
     }
 
 }
