@@ -9,10 +9,10 @@ import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidato
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.mvp.model.BaseModel;
-import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEditPresenter.View;
+import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
-public class AddressEditPresenter extends BasePresenter<View> {
+public class AddressEntryPresenter extends BasePresenter<View> {
     private final Model model;
 
     public interface View extends IView {
@@ -34,7 +34,7 @@ public class AddressEditPresenter extends BasePresenter<View> {
     }
 
     @Inject
-    public AddressEditPresenter(View view, EventBus eventBus) {
+    public AddressEntryPresenter(View view, EventBus eventBus) {
         super(view, eventBus);
 
         this.model = new Model();

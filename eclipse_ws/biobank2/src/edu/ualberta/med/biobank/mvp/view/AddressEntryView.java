@@ -7,10 +7,10 @@ import org.eclipse.swt.widgets.Text;
 
 import com.google.gwt.user.client.ui.HasValue;
 
-import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEditPresenter;
+import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
 
-public class AddressEntryView implements AddressEditPresenter.View {
+public class AddressEntryView implements AddressEntryPresenter.View {
     private final TextItem street1 = new TextItem();
     private final TextItem street2 = new TextItem();
     private final TextItem city = new TextItem();

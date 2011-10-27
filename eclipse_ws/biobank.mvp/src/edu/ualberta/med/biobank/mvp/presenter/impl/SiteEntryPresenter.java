@@ -33,7 +33,7 @@ import edu.ualberta.med.biobank.mvp.view.IView;
 
 public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     private final Dispatcher dispatcher;
-    private final AddressEditPresenter addressEditPresenter;
+    private final AddressEntryPresenter addressEntryPresenter;
     private final ActivityStatusComboPresenter activityStatusComboPresenter;
     private final Model model;
 
@@ -54,17 +54,17 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     @Inject
     public SiteEntryPresenter(View view, EventBus eventBus,
         Dispatcher dispatcher,
-        AddressEditPresenter addressEditPresenter,
+        AddressEntryPresenter addressEntryPresenter,
         ActivityStatusComboPresenter activityStatusComboPresenter) {
         super(view, eventBus);
         this.dispatcher = dispatcher;
-        this.addressEditPresenter = addressEditPresenter;
+        this.addressEntryPresenter = addressEntryPresenter;
         this.activityStatusComboPresenter = activityStatusComboPresenter;
 
-        this.model = new Model(addressEditPresenter.getModel());
+        this.model = new Model(addressEntryPresenter.getModel());
 
         // so this view can create the other views if create() is called
-        view.setAddressEditView(addressEditPresenter.getView());
+        view.setAddressEditView(addressEntryPresenter.getView());
         view.setActivityStatusComboView(activityStatusComboPresenter.getView());
     }
 
@@ -72,7 +72,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     public void onBind() {
         super.onBind();
 
-        addressEditPresenter.bind(); // still necessary to bind view to model
+        addressEntryPresenter.bind(); // still necessary to bind view to model
         activityStatusComboPresenter.bind();
 
         binder.bind(model.name).to(view.getName());
