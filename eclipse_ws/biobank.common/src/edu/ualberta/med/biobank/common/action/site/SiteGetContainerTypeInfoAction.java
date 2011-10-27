@@ -42,6 +42,7 @@ public class SiteGetContainerTypeInfoAction implements
 
     private static final long serialVersionUID = 1L;
     // @formatter:off
+    @SuppressWarnings("nls")
     private static final String SELECT_CONTAINER_TYPE_INFO_HQL = "SELECT containerType,"
         + " (SELECT COUNT(*) FROM "
         + Container.class.getName()

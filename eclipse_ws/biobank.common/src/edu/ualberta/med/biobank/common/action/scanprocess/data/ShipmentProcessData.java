@@ -1,20 +1,15 @@
-package edu.ualberta.med.biobank.common.scanprocess.data;
+package edu.ualberta.med.biobank.common.action.scanprocess.data;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.util.ItemState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
-import edu.ualberta.med.biobank.server.scanprocess.DispatchCreateProcess;
-import edu.ualberta.med.biobank.server.scanprocess.ServerProcess;
-import edu.ualberta.med.biobank.server.scanprocess.ShipmentReceiveProcess;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import edu.ualberta.med.biobank.model.Container;
 
 public class ShipmentProcessData extends ProcessWithPallet {
 
@@ -24,24 +19,23 @@ public class ShipmentProcessData extends ProcessWithPallet {
     private Integer senderId;
 
     private Map<Integer, ItemState> currentDispatchSpecimenIds;
-    private boolean creation;
     private boolean errorIfAlreadyAdded;
 
-    public ShipmentProcessData(ContainerWrapper pallet, RequestWrapper request,
-        boolean creation, boolean errorIfAlreadyAdded) {
-        super(pallet);
-        init(request.getRequestSpecimenCollection(false), creation,
+    public ShipmentProcessData(Container pallet, RequestWrapper request,
+        boolean errorIfAlreadyAdded) {
+        super(pallet.getId());
+        init(request.getRequestSpecimenCollection(false),
             errorIfAlreadyAdded, null);
     }
 
-    public ShipmentProcessData(ContainerWrapper pallet,
-        DispatchWrapper dispatch, boolean creation, boolean errorIfAlreadyAdded) {
-        super(pallet);
-        init(dispatch.getDispatchSpecimenCollection(false), creation,
+    public ShipmentProcessData(Container pallet,
+        DispatchWrapper dispatch, boolean errorIfAlreadyAdded) {
+        super(pallet.getId());
+        init(dispatch.getDispatchSpecimenCollection(false),
             errorIfAlreadyAdded, dispatch.getSenderCenter());
     }
 
-    private void init(List<? extends ItemWrapper> items, boolean creation,
+    private void init(List<? extends ItemWrapper> items,
         boolean errorIfAlreadyAdded, CenterWrapper<?> sender) {
         if (items != null) {
             currentDispatchSpecimenIds = new HashMap<Integer, ItemState>();
@@ -51,19 +45,7 @@ public class ShipmentProcessData extends ProcessWithPallet {
             }
             senderId = sender == null ? null : sender.getId();
         }
-        this.creation = creation;
         this.errorIfAlreadyAdded = errorIfAlreadyAdded;
-    }
-
-    @Override
-    public ServerProcess getProcessInstance(
-        WritableApplicationService appService, Integer currentWorkingCenterId,
-        Locale locale) {
-        if (isCreation())
-            return new DispatchCreateProcess(appService, this,
-                currentWorkingCenterId, locale);
-        return new ShipmentReceiveProcess(appService, this,
-            currentWorkingCenterId, locale);
     }
 
     public Map<Integer, ItemState> getCurrentDispatchSpecimenIds() {
@@ -72,10 +54,6 @@ public class ShipmentProcessData extends ProcessWithPallet {
 
     public Integer getSenderId() {
         return senderId;
-    }
-
-    public boolean isCreation() {
-        return creation;
     }
 
     public boolean isErrorIfAlreadyAdded() {

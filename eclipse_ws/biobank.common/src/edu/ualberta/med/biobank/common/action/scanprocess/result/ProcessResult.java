@@ -1,10 +1,10 @@
-package edu.ualberta.med.biobank.common.scanprocess.result;
+package edu.ualberta.med.biobank.common.action.scanprocess.result;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 
 public abstract class ProcessResult implements Serializable, NotAProxy {

@@ -20,10 +20,11 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.SessionSecurityHelper;
+import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcess;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
@@ -150,11 +151,14 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     protected void doSpecimenTextAction(String inventoryId, boolean showMessages)
         throws Exception {
         try {
-            CellProcessResult res = SessionManager.getAppService()
-                .processCellStatus(new Cell(-1, -1, inventoryId, null),
-                    new ShipmentProcessData(null, dispatch, false, false),
-                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                    Locale.getDefault());
+            CellProcessResult res = (CellProcessResult) SessionManager
+                .getAppService().doAction(
+                    new ShipmentReceiveProcess(
+                        new ShipmentProcessData(null, dispatch, false),
+                        SessionManager.getUser().getCurrentWorkingCenter()
+                            .getId(),
+                        new Cell(-1, -1, inventoryId, null),
+                        Locale.getDefault()));
             SpecimenWrapper specimen = null;
             if (res.getCell().getSpecimenId() != null) {
                 specimen = new SpecimenWrapper(SessionManager.getAppService());

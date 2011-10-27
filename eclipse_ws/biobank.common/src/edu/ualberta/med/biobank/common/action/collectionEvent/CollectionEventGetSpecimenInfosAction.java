@@ -26,32 +26,24 @@ public class CollectionEventGetSpecimenInfosAction implements
 
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String COMMON_SPEC_QRY =
-        "select spec, parent." + ContainerPeer.LABEL.getName()
-            + ", pos." + SpecimenPositionPeer.POSITION_STRING.getName()
-            + ", toptype." + ContainerTypePeer.NAME_SHORT.getName()
-            + " from " + Specimen.class.getName() + " as spec"
-            + " inner join fetch spec." + SpecimenPeer.SPECIMEN_TYPE.getName()
-            + " left join spec." + SpecimenPeer.SPECIMEN_POSITION.getName()
-            + " pos"
-            + " left join pos." + SpecimenPositionPeer.CONTAINER.getName()
-            + " parent"
-            + " left join parent." + ContainerPeer.TOP_CONTAINER.getName()
-            + " topparent"
-            + " left join topparent." + ContainerPeer.CONTAINER_TYPE.getName()
-            + " toptype"
-            + " inner join fetch spec."
-            + SpecimenPeer.ACTIVITY_STATUS.getName()
-            + " inner join fetch spec."
-            + SpecimenPeer.COLLECTION_EVENT.getName() + " cevent"
-            + " inner join fetch spec." + SpecimenPeer.ORIGIN_INFO.getName()
-            + " originInfo"
-            + " inner join fetch originInfo." + OriginInfoPeer.CENTER.getName()
-            + " inner join fetch spec." + SpecimenPeer.CURRENT_CENTER.getName()
-            + " inner join fetch cevent."
-            + CollectionEventPeer.PATIENT.getName() + " as patient"
-            + " inner join fetch patient." + PatientPeer.STUDY.getName()
-            + " study";
+    private static final String COMMON_SPEC_QRY = 
+        "select spec, parent." + ContainerPeer.LABEL.getName() 
+        + ", pos." + SpecimenPositionPeer.POSITION_STRING.getName() 
+        + ", toptype." + ContainerTypePeer.NAME_SHORT.getName()
+        + " from " + Specimen.class.getName() + " as spec"
+        + " inner join fetch spec." + SpecimenPeer.SPECIMEN_TYPE.getName() 
+        + " left join spec." + SpecimenPeer.SPECIMEN_POSITION.getName() + " pos"
+        + " left join pos." + SpecimenPositionPeer.CONTAINER.getName() + " parent"
+        + " left join parent." + ContainerPeer.TOP_CONTAINER.getName() + " topparent"
+        + " left join topparent." + ContainerPeer.CONTAINER_TYPE.getName() + " toptype"
+        + " inner join fetch spec." + SpecimenPeer.ACTIVITY_STATUS.getName() 
+        + " inner join fetch spec." + SpecimenPeer.COLLECTION_EVENT.getName() + " cevent"
+        + " inner join fetch spec." + SpecimenPeer.ORIGIN_INFO.getName() + " originInfo"
+        + " inner join fetch originInfo." + OriginInfoPeer.CENTER.getName() 
+        + " inner join fetch spec." + SpecimenPeer.CURRENT_CENTER.getName() 
+        + " left join fetch spec." + SpecimenPeer.COMMENT_COLLECTION.getName()
+        + " inner join fetch cevent." + CollectionEventPeer.PATIENT.getName() + " as patient"
+        + " inner join fetch patient." + PatientPeer.STUDY.getName() + " study";
     @SuppressWarnings("nls")
     private static final String SOURCE_SPEC_QRY =
         COMMON_SPEC_QRY

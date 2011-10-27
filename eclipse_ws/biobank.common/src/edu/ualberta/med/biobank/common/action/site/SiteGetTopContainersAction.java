@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.model.User;
 public class SiteGetTopContainersAction implements Action<ArrayList<Container>> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
+    @SuppressWarnings("nls")
     private static final String SELECT_TOP_CONTAINERS_HQL = "SELECT container"
         + " FROM " + Container.class.getName() + " container"
         + " INNER JOIN FETCH container.containerType containerType"

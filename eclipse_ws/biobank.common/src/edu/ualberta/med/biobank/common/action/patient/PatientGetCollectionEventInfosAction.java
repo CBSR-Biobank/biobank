@@ -25,21 +25,13 @@ public class PatientGetCollectionEventInfosAction implements
     // @formatter:off
     @SuppressWarnings("nls")
     private static final String CEVENT_INFO_QRY =
-        "select cevent, COUNT(DISTINCT sourcesSpecs), COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourcesSpecs), min(sourcesSpecs."
-            + SpecimenPeer.CREATED_AT.getName()
-            + ")"
-            + " from "
-            + CollectionEvent.class.getName()
-            + " as cevent"
-            + " left join cevent."
-            + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
-            + " as sourcesSpecs"
-            + " left join cevent."
-            + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
-            + " as allSpecs"
-            + " where cevent."
-            + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
-            + "=?"
+        "select cevent, COUNT(DISTINCT sourcesSpecs), COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourcesSpecs)," 
+            + " min(sourcesSpecs." + SpecimenPeer.CREATED_AT.getName() + ")" 
+            + " from " + CollectionEvent.class.getName() + " as cevent" 
+            + " left join cevent." + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName() + " as sourcesSpecs"
+            + " left join cevent." + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName() + " as allSpecs"
+            + " left join fetch cevent." + CollectionEventPeer.COMMENT_COLLECTION.getName()
+            + " where cevent." + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID) + "=?"
             + " GROUP BY cevent";
     // @formatter:on
 

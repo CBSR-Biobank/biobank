@@ -1,14 +1,4 @@
-package edu.ualberta.med.biobank.server.scanprocess;
-
-import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
-import edu.ualberta.med.biobank.common.scanprocess.data.LinkProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
+package edu.ualberta.med.biobank.common.action.scanprocess;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -16,23 +6,48 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.hibernate.Session;
+
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermission;
+import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.User;
+
 public class LinkProcess extends ServerProcess {
 
-    public LinkProcess(WritableApplicationService appService,
-        LinkProcessData data, Integer currentWorkingCenterId, Locale locale) {
-        super(appService, data, currentWorkingCenterId, locale);
+    private static final long serialVersionUID = 1L;
+
+    public LinkProcess(
+        Integer currentWorkingCenterId,
+        Map<RowColPos, Cell> cells,
+        boolean isRescanMode, Locale locale) {
+        super(currentWorkingCenterId, cells, isRescanMode, locale);
+    }
+
+    public LinkProcess(
+        Integer currentWorkingCenterId,
+        Cell cell,
+        Locale locale) {
+        super(currentWorkingCenterId, cell, locale);
     }
 
     @Override
-    protected ScanProcessResult getScanProcessResult(
-        Map<RowColPos, Cell> cells, boolean isRescanMode) throws Exception {
+    protected ScanProcessResult getScanProcessResult(Session session,
+        Map<RowColPos, Cell> cells, boolean isRescanMode)
+        throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
-        res.setResult(cells, internalProcessScanResult(cells, isRescanMode));
+        res.setResult(cells,
+            internalProcessScanResult(session, cells, isRescanMode));
         return res;
     }
 
-    protected CellStatus internalProcessScanResult(Map<RowColPos, Cell> cells,
-        boolean isRescanMode) throws Exception {
+    protected CellStatus internalProcessScanResult(Session session,
+        Map<RowColPos, Cell> cells,
+        boolean isRescanMode) throws ActionException {
         CellStatus currentScanState = CellStatus.EMPTY;
         if (cells != null) {
             Map<String, Cell> allValues = new HashMap<String, Cell>();
@@ -63,7 +78,7 @@ public class LinkProcess extends ServerProcess {
                 if (!isRescanMode
                     || (cell != null && cell.getStatus() != CellStatus.TYPE && cell
                         .getStatus() != CellStatus.NO_TYPE)) {
-                    processCellLinkStatus(cell);
+                    processCellLinkStatus(session, cell);
                 }
                 CellStatus newStatus = CellStatus.EMPTY;
                 if (cell != null) {
@@ -76,10 +91,10 @@ public class LinkProcess extends ServerProcess {
     }
 
     @Override
-    protected CellProcessResult getCellProcessResult(Cell cell)
-        throws Exception {
+    protected CellProcessResult getCellProcessResult(Session session, Cell cell)
+        throws ActionException {
         CellProcessResult res = new CellProcessResult();
-        processCellLinkStatus(cell);
+        processCellLinkStatus(session, cell);
         res.setResult(cell);
         return res;
     }
@@ -89,7 +104,8 @@ public class LinkProcess extends ServerProcess {
      * 
      * @throws Exception
      */
-    private CellStatus processCellLinkStatus(Cell cell) throws Exception {
+    private CellStatus processCellLinkStatus(Session session, Cell cell)
+        throws ActionException {
         if (cell == null)
             return CellStatus.EMPTY;
         if (cell.getStatus() == CellStatus.ERROR)
@@ -97,8 +113,8 @@ public class LinkProcess extends ServerProcess {
         else {
             String value = cell.getValue();
             if (value != null) {
-                SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(
-                    appService, value);
+                Specimen foundSpecimen = searchSpecimen(session, value
+                    );
                 if (foundSpecimen != null) {
                     cell.setStatus(CellStatus.ERROR);
                     cell.setInformation(Messages.getString(
@@ -140,6 +156,14 @@ public class LinkProcess extends ServerProcess {
             }
             return cell.getStatus();
         }
+    }
+
+    @Override
+    public boolean isAllowed(User user, Session session) throws ActionException {
+        // FIXME get a studyId ?
+        return new SpecimenLinkPermission(currentWorkingCenterId, null)
+            .isAllowed(user,
+                session);
     }
 
 }

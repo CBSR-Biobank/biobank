@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.scanprocess;
+package edu.ualberta.med.biobank.common.action.scanprocess;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 

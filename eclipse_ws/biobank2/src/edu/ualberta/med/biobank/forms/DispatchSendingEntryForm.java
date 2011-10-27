@@ -20,10 +20,11 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.SessionSecurityHelper;
+import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcess;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
-import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
@@ -258,11 +259,13 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     @Override
     protected void doSpecimenTextAction(String inventoryId) {
         try {
-            CellProcessResult res = SessionManager.getAppService()
-                .processCellStatus(new Cell(-1, -1, inventoryId, null),
-                    new ShipmentProcessData(null, dispatch, true, true),
-                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                    Locale.getDefault());
+            CellProcessResult res = (CellProcessResult) SessionManager
+                .getAppService().doAction(
+                    new DispatchCreateProcess(new ShipmentProcessData(null,
+                        dispatch, true), SessionManager.getUser()
+                        .getCurrentWorkingCenter().getId(),
+                        new Cell(-1, -1, inventoryId, null),
+                        Locale.getDefault()));
             switch (res.getProcessStatus()) {
             case FILLED:
                 // ok

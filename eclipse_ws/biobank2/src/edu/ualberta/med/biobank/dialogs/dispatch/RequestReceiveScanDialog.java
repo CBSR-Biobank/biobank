@@ -2,14 +2,18 @@ package edu.ualberta.med.biobank.dialogs.dispatch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcess;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -29,11 +33,6 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
         final RequestWrapper currentShipment, CenterWrapper<?> centerWrapper) {
         super(parentShell, currentShipment, centerWrapper);
         dispatchSpecimens = new ArrayList<SpecimenWrapper>();
-    }
-
-    @Override
-    protected ProcessData getProcessData() {
-        return new ShipmentProcessData(null, currentShipment, false, false);
     }
 
     @Override
@@ -89,6 +88,25 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
 
     public List<SpecimenWrapper> getSpecimens() {
         return dispatchSpecimens;
+    }
+
+    @Override
+    protected Action<ProcessResult> getCellProcessAction(Integer centerId,
+        Cell cell, Locale locale) {
+        return new ShipmentReceiveProcess(getProcessData(), centerId, cell,
+            locale);
+    }
+
+    @Override
+    protected Action<ProcessResult> getPalletProcessAction(
+        Integer centerId, Map<RowColPos, Cell> cells, boolean isRescanMode,
+        Locale locale) {
+        return new ShipmentReceiveProcess(getProcessData(), centerId, cells,
+            isRescanMode, locale);
+    }
+
+    private ShipmentProcessData getProcessData() {
+        return new ShipmentProcessData(null, currentShipment, false);
     }
 
 }

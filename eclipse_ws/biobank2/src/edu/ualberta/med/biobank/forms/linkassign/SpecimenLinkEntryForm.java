@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -26,14 +27,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.action.scanprocess.LinkProcess;
+import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenHierarchy;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.scanprocess.SpecimenHierarchy;
-import edu.ualberta.med.biobank.common.scanprocess.data.LinkProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -647,8 +650,16 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    protected ProcessData getProcessData() {
-        return new LinkProcessData();
+    protected Action<ProcessResult> getCellProcessAction(Integer centerId,
+        Cell cell, Locale locale) {
+        return new LinkProcess(centerId, cell, locale);
+    }
+
+    @Override
+    protected Action<ProcessResult> getPalletProcessAction(
+        Integer centerId, Map<RowColPos, Cell> cells, boolean isRescanMode,
+        Locale locale) {
+        return new LinkProcess(centerId, cells, isRescanMode, locale);
     }
 
     @Override

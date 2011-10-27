@@ -1,35 +1,54 @@
-package edu.ualberta.med.biobank.server.scanprocess;
-
-import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
-import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.util.ItemState;
-import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
+package edu.ualberta.med.biobank.common.action.scanprocess;
 
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
 
-public class DispatchCreateProcess extends ServerProcess {
+import org.hibernate.Session;
 
-    public DispatchCreateProcess(WritableApplicationService appService,
-        ShipmentProcessData data, Integer currentWorkingCenterId, Locale locale) {
-        super(appService, data, currentWorkingCenterId, locale);
+import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenIsUsedInDispatchAction;
+import edu.ualberta.med.biobank.common.util.ItemState;
+import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.User;
+
+public class DispatchCreateProcess extends ServerProcess {
+    private static final long serialVersionUID = 1L;
+
+    private ShipmentProcessData data;
+
+    public DispatchCreateProcess(ShipmentProcessData data,
+        Integer currentWorkingCenterId,
+        Map<RowColPos, Cell> cells,
+        boolean isRescanMode, Locale locale) {
+        super(currentWorkingCenterId, cells, isRescanMode, locale);
+        this.data = data;
+    }
+
+    public DispatchCreateProcess(ShipmentProcessData data,
+        Integer currentWorkingCenterId,
+        Cell cell,
+        Locale locale) {
+        super(currentWorkingCenterId, cell, locale);
+        this.data = data;
     }
 
     /**
      * Process of a map of cells
      */
     @Override
-    protected ScanProcessResult getScanProcessResult(
-        Map<RowColPos, Cell> cells, boolean isRescanMode) throws Exception {
+    protected ScanProcessResult getScanProcessResult(Session session,
+        Map<RowColPos, Cell> cells, boolean isRescanMode)
+        throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
-        res.setResult(cells, createProcess(cells));
+        res.setResult(cells, createProcess(session, cells));
         return res;
     }
 
@@ -37,16 +56,16 @@ public class DispatchCreateProcess extends ServerProcess {
      * Process of only one cell
      */
     @Override
-    protected CellProcessResult getCellProcessResult(Cell cell)
-        throws Exception {
+    protected CellProcessResult getCellProcessResult(Session session, Cell cell)
+        throws ActionException {
         CellProcessResult res = new CellProcessResult();
-        ShipmentProcessData dispatchData = (ShipmentProcessData) data;
-        CenterWrapper<?> sender = null;
+        ShipmentProcessData dispatchData = data;
+        Center sender = null;
         if (dispatchData.getSenderId() != null) {
-            sender = CenterWrapper.getCenterFromId(appService,
+            sender = ActionUtil.sessionGet(session, Center.class,
                 dispatchData.getSenderId());
         }
-        processCellDipatchCreateStatus(cell, sender,
+        processCellDipatchCreateStatus(session, cell, sender,
             dispatchData.isErrorIfAlreadyAdded());
         res.setResult(cell);
         return res;
@@ -59,29 +78,28 @@ public class DispatchCreateProcess extends ServerProcess {
      * @return
      * @throws Exception
      */
-    private CellStatus createProcess(Map<RowColPos, Cell> cells)
-        throws Exception {
+    private CellStatus createProcess(Session session, Map<RowColPos, Cell> cells) {
         CellStatus currentScanState = CellStatus.EMPTY;
-        ShipmentProcessData dispatchData = (ShipmentProcessData) data;
-        CenterWrapper<?> sender = null;
+        ShipmentProcessData dispatchData = data;
+        Center sender = null;
         if (dispatchData.getSenderId() != null) {
-            sender = CenterWrapper.getCenterFromId(appService,
+            sender = ActionUtil.sessionGet(session, Center.class,
                 dispatchData.getSenderId());
         }
-        if (dispatchData.getPallet(appService) == null) {
+        if (dispatchData.getPallet(session) == null) {
             for (Cell cell : cells.values()) {
-                processCellDipatchCreateStatus(cell, sender, false);
+                processCellDipatchCreateStatus(session, cell, sender, false);
                 currentScanState = currentScanState.mergeWith(cell.getStatus());
             }
+
         } else {
-            for (int row = 0; row < dispatchData.getPallet(appService)
-                .getRowCapacity(); row++) {
-                for (int col = 0; col < dispatchData.getPallet(appService)
-                    .getColCapacity(); col++) {
+            for (int row = 0; row < dispatchData.getPalletRowCapacity(session); row++) {
+                for (int col = 0; col < dispatchData
+                    .getPalletColCapacity(session); col++) {
                     RowColPos rcp = new RowColPos(row, col);
                     Cell cell = cells.get(rcp);
-                    SpecimenWrapper expectedSpecimen = dispatchData
-                        .getPallet(appService).getSpecimens().get(rcp);
+                    Specimen expectedSpecimen = dispatchData
+                        .getSpecimen(session, row, col);
                     if (expectedSpecimen != null) {
                         if (cell == null) {
                             cell = new Cell(row, col, null, null);
@@ -90,7 +108,8 @@ public class DispatchCreateProcess extends ServerProcess {
                         cell.setExpectedSpecimenId(expectedSpecimen.getId());
                     }
                     if (cell != null) {
-                        processCellDipatchCreateStatus(cell, sender, false);
+                        processCellDipatchCreateStatus(session, cell, sender,
+                            false);
                         currentScanState = currentScanState.mergeWith(cell
                             .getStatus());
                     }
@@ -106,14 +125,13 @@ public class DispatchCreateProcess extends ServerProcess {
      * only be 'already added' (this status is used while scanning: the color
      * will be different)
      */
-    private CellStatus processCellDipatchCreateStatus(Cell scanCell,
-        CenterWrapper<?> sender, boolean checkAlreadyAdded) throws Exception {
-        SpecimenWrapper expectedSpecimen = null;
+    private CellStatus processCellDipatchCreateStatus(Session session,
+        Cell scanCell,
+        Center sender, boolean checkAlreadyAdded) {
+        Specimen expectedSpecimen = null;
         if (scanCell.getExpectedSpecimenId() != null) {
-            expectedSpecimen = new SpecimenWrapper(appService);
-            expectedSpecimen.getWrappedObject().setId(
+            expectedSpecimen = ActionUtil.sessionGet(session, Specimen.class,
                 scanCell.getExpectedSpecimenId());
-            expectedSpecimen.reload();
         }
         String value = scanCell.getValue();
         if (value == null) { // no specimen scanned
@@ -123,8 +141,7 @@ public class DispatchCreateProcess extends ServerProcess {
                 expectedSpecimen.getInventoryId()));
             scanCell.setTitle("?"); //$NON-NLS-1$
         } else {
-            SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(
-                appService, value);
+            Specimen foundSpecimen = searchSpecimen(session, value);
             if (foundSpecimen == null) {
                 // not in database
                 scanCell.setStatus(CellStatus.ERROR);
@@ -143,9 +160,9 @@ public class DispatchCreateProcess extends ServerProcess {
                 } else {
                     scanCell.setSpecimenId(foundSpecimen.getId());
                     if (expectedSpecimen != null
-                        || ((ShipmentProcessData) data).getPallet(appService) == null) {
-                        checkCanAddSpecimen(scanCell, foundSpecimen, sender,
-                            checkAlreadyAdded);
+                        || data.getPallet(session) == null) {
+                        checkCanAddSpecimen(session, scanCell, foundSpecimen,
+                            sender, checkAlreadyAdded);
                     } else {
                         // should not be there
                         scanCell.setStatus(CellStatus.ERROR);
@@ -171,13 +188,14 @@ public class DispatchCreateProcess extends ServerProcess {
      * @param checkAlreadyAdded
      * @throws Exception
      */
-    private void checkCanAddSpecimen(Cell cell, SpecimenWrapper specimen,
-        CenterWrapper<?> sender, boolean checkAlreadyAdded) throws Exception {
-        specimen.reload();
-        if (specimen.isNew()) {
+    private void checkCanAddSpecimen(Session session, Cell cell,
+        Specimen specimen,
+        Center sender, boolean checkAlreadyAdded) {
+        if (specimen.getId() == null) {
             cell.setStatus(CellStatus.ERROR);
             cell.setInformation(""); //$NON-NLS-1$
-        } else if (!specimen.isActive()) {
+        } else if (!specimen.getActivityStatus().getId()
+            .equals(ActivityStatusEnum.ACTIVE.getId())) {
             cell.setStatus(CellStatus.ERROR);
             cell.setInformation(MessageFormat.format(Messages.getString(
                 "DispatchProcess.create.specimen.status", locale), //$NON-NLS-1$
@@ -189,7 +207,7 @@ public class DispatchCreateProcess extends ServerProcess {
                 specimen.getInventoryId(), specimen.getCurrentCenter()
                     .getNameShort(), sender.getNameShort()));
         } else {
-            Map<Integer, ItemState> currentSpecimenIds = ((ShipmentProcessData) data)
+            Map<Integer, ItemState> currentSpecimenIds = data
                 .getCurrentDispatchSpecimenIds();
             boolean alreadyInShipment = currentSpecimenIds != null
                 && currentSpecimenIds.get(specimen.getId()) != null;
@@ -198,7 +216,8 @@ public class DispatchCreateProcess extends ServerProcess {
                 cell.setInformation(MessageFormat.format(Messages.getString(
                     "DispatchProcess.create.specimen.alreadyAdded", locale), //$NON-NLS-1$
                     specimen.getInventoryId()));
-            } else if (specimen.isUsedInDispatch()) {
+            } else if (new SpecimenIsUsedInDispatchAction(specimen.getId())
+                .run(null, session)) {
                 cell.setStatus(CellStatus.ERROR);
                 cell.setInformation(MessageFormat.format(
                     Messages
@@ -216,4 +235,11 @@ public class DispatchCreateProcess extends ServerProcess {
             }
         }
     }
+
+    @Override
+    public boolean isAllowed(User user, Session session) throws ActionException {
+        // FIXME add dispatch create permission
+        return true;
+    }
+
 }

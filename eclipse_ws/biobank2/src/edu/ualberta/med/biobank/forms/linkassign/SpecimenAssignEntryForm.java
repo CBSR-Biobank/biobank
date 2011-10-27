@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -34,14 +35,17 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction.ContainerInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.AssignProcess;
+import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.AssignProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenAssignResInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenResInfo;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
-import edu.ualberta.med.biobank.common.scanprocess.data.AssignProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -1050,11 +1054,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    protected ProcessData getProcessData() {
-        return new AssignProcessData(currentMultipleContainer);
-    }
-
-    @Override
     public void onReset() throws Exception {
         super.onReset();
         parentContainers = null;
@@ -1331,4 +1330,21 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         return useScanner;
     }
 
+    @Override
+    protected Action<ProcessResult> getCellProcessAction(Integer centerId,
+        Cell cell, Locale locale) {
+        return new AssignProcess(getProcessData(), centerId, cell, locale);
+    }
+
+    @Override
+    protected Action<ProcessResult> getPalletProcessAction(Integer centerId,
+        Map<RowColPos, Cell> cells, boolean isRescanMode, Locale locale) {
+        return new AssignProcess(getProcessData(), centerId, cells,
+            isRescanMode, locale);
+    }
+
+    protected AssignProcessData getProcessData() {
+        return new AssignProcessData(
+            currentMultipleContainer.getWrappedObject());
+    }
 }

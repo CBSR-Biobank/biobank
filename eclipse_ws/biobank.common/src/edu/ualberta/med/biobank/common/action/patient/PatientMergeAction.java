@@ -8,7 +8,6 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
-import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
@@ -37,7 +36,8 @@ public class PatientMergeAction implements Action<Boolean> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        return new PatientMergePermission(patient1Id, patient2Id).isAllowed(user,
+        return new PatientMergePermission(patient1Id, patient2Id).isAllowed(
+            user,
             session);
     }
 

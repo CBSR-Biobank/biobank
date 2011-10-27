@@ -1,38 +1,55 @@
-package edu.ualberta.med.biobank.server.scanprocess;
-
-import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
-import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.util.ItemState;
-import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
+package edu.ualberta.med.biobank.common.action.scanprocess;
 
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
+
+import org.hibernate.Session;
+
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
+import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
+import edu.ualberta.med.biobank.common.util.ItemState;
+import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.User;
 
 /**
  * Used by dispatch and request
  */
 public class ShipmentReceiveProcess extends ServerProcess {
 
-    public ShipmentReceiveProcess(WritableApplicationService appService,
-        ShipmentProcessData data, Integer currentWorkingCenterId, Locale locale) {
-        super(appService, data, currentWorkingCenterId, locale);
+    private static final long serialVersionUID = 1L;
+
+    private ShipmentProcessData data;
+
+    public ShipmentReceiveProcess(ShipmentProcessData data,
+        Integer currentWorkingCenterId,
+        Map<RowColPos, Cell> cells,
+        boolean isRescanMode, Locale locale) {
+        super(currentWorkingCenterId, cells, isRescanMode, locale);
+        this.data = data;
+    }
+
+    public ShipmentReceiveProcess(ShipmentProcessData data,
+        Integer currentWorkingCenterId,
+        Cell cell,
+        Locale locale) {
+        super(currentWorkingCenterId, cell, locale);
+        this.data = data;
     }
 
     /**
      * Process of a map of cells
      */
     @Override
-    protected ScanProcessResult getScanProcessResult(
-        Map<RowColPos, Cell> cells, boolean isRescanMode) throws Exception {
+    protected ScanProcessResult getScanProcessResult(Session session,
+        Map<RowColPos, Cell> cells, boolean isRescanMode)
+        throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
-        res.setResult(cells, receiveProcess(cells));
+        res.setResult(cells, receiveProcess(session, cells));
         return res;
     }
 
@@ -40,10 +57,10 @@ public class ShipmentReceiveProcess extends ServerProcess {
      * Process of only one cell
      */
     @Override
-    protected CellProcessResult getCellProcessResult(Cell cell)
-        throws Exception {
+    protected CellProcessResult getCellProcessResult(Session session, Cell cell)
+        throws ActionException {
         CellProcessResult res = new CellProcessResult();
-        processCellDipatchReceiveStatus(cell);
+        processCellDipatchReceiveStatus(session, cell);
         res.setResult(cell);
         return res;
     }
@@ -55,12 +72,12 @@ public class ShipmentReceiveProcess extends ServerProcess {
      * @return
      * @throws Exception
      */
-    private CellStatus receiveProcess(Map<RowColPos, Cell> cells)
-        throws Exception {
+    private CellStatus receiveProcess(Session session,
+        Map<RowColPos, Cell> cells) {
         CellStatus currentScanState = CellStatus.EMPTY;
         if (cells != null) {
             for (Cell cell : cells.values()) {
-                processCellDipatchReceiveStatus(cell);
+                processCellDipatchReceiveStatus(session, cell);
                 currentScanState = currentScanState.mergeWith(cell.getStatus());
             }
         }
@@ -73,7 +90,7 @@ public class ShipmentReceiveProcess extends ServerProcess {
      * @param cell
      * @param specimen
      */
-    private void updateCellWithSpecimen(Cell cell, SpecimenWrapper specimen) {
+    private void updateCellWithSpecimen(Cell cell, Specimen specimen) {
         cell.setSpecimenId(specimen.getId());
         cell.setTitle(specimen.getCollectionEvent().getPatient().getPnumber());
     }
@@ -84,9 +101,8 @@ public class ShipmentReceiveProcess extends ServerProcess {
      * @param cell
      * @throws Exception
      */
-    private void processCellDipatchReceiveStatus(Cell cell) throws Exception {
-        SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(appService,
-            cell.getValue());
+    private void processCellDipatchReceiveStatus(Session session, Cell cell) {
+        Specimen foundSpecimen = searchSpecimen(session, cell.getValue());
         if (foundSpecimen == null) {
             // not in db
             cell.setStatus(CellStatus.ERROR);
@@ -95,7 +111,7 @@ public class ShipmentReceiveProcess extends ServerProcess {
                 .getValue()));
             cell.setTitle("!"); //$NON-NLS-1$
         } else {
-            ItemState state = ((ShipmentProcessData) data)
+            ItemState state = data
                 .getCurrentDispatchSpecimenIds().get(foundSpecimen.getId());
             if (state == null) {
                 // not in the shipment
@@ -116,6 +132,12 @@ public class ShipmentReceiveProcess extends ServerProcess {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean isAllowed(User user, Session session) throws ActionException {
+        // FIXME create Permission for shipment receive
+        return true;
     }
 
 }

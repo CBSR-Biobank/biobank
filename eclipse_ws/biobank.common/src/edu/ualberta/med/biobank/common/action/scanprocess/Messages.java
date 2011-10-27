@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.server.scanprocess;
+package edu.ualberta.med.biobank.common.action.scanprocess;
 
 import java.util.Locale;
 import java.util.MissingResourceException;

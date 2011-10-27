@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
-import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShipmentInfo;

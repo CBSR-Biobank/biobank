@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.dialogs.dispatch;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Status;
@@ -17,8 +18,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcess;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -145,9 +149,23 @@ public class DispatchCreateScanDialog extends
     }
 
     @Override
-    protected ProcessData getProcessData() {
-        return new ShipmentProcessData(currentPallet, currentShipment, true,
-            false);
+    protected Action<ProcessResult> getCellProcessAction(Integer centerId,
+        Cell cell, Locale locale) {
+        return new DispatchCreateProcess(getProcessData(), centerId, cell,
+            locale);
+    }
+
+    @Override
+    protected Action<ProcessResult> getPalletProcessAction(
+        Integer centerId, Map<RowColPos, Cell> cells, boolean isRescanMode,
+        Locale locale) {
+        return new DispatchCreateProcess(getProcessData(), centerId, cells,
+            isRescanMode, locale);
+    }
+
+    protected ShipmentProcessData getProcessData() {
+        return new ShipmentProcessData(currentPallet.getWrappedObject(),
+            currentShipment, false);
     }
 
     @Override
@@ -216,7 +234,8 @@ public class DispatchCreateScanDialog extends
             for (SpecimenWrapper specimen : currentPallet.getSpecimens()
                 .values()) {
                 PalletCell cell = new PalletCell(new ScanCell(
-                    specimen.getPosition().getRow(), specimen.getPosition().getCol(),
+                    specimen.getPosition().getRow(), specimen.getPosition()
+                        .getCol(),
                     specimen.getInventoryId()));
                 map.put(specimen.getPosition(), cell);
             }

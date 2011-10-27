@@ -1,60 +1,83 @@
-package edu.ualberta.med.biobank.server.scanprocess;
-
-import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
-import edu.ualberta.med.biobank.common.scanprocess.data.AssignProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
+package edu.ualberta.med.biobank.common.action.scanprocess;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.hibernate.Session;
+
+import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.AssignProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenIsUsedInDispatchAction;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenAssignPermission;
+import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.User;
+
 public class AssignProcess extends ServerProcess {
 
-    public AssignProcess(WritableApplicationService appService,
-        AssignProcessData data, Integer currentWorkingCenterId, Locale locale) {
-        super(appService, data, currentWorkingCenterId, locale);
+    private static final long serialVersionUID = 1L;
+    private AssignProcessData data;
+
+    public AssignProcess(AssignProcessData data,
+        Integer currentWorkingCenterId,
+        Map<RowColPos, Cell> cells,
+        boolean isRescanMode, Locale locale) {
+        super(currentWorkingCenterId, cells, isRescanMode, locale);
+        this.data = data;
+    }
+
+    public AssignProcess(AssignProcessData data,
+        Integer currentWorkingCenterId,
+        Cell cell,
+        Locale locale) {
+        super(currentWorkingCenterId, cell, locale);
+        this.data = data;
     }
 
     @Override
-    protected ScanProcessResult getScanProcessResult(
-        Map<RowColPos, Cell> cells, boolean isRescanMode) throws Exception {
+    protected ScanProcessResult getScanProcessResult(Session session,
+        Map<RowColPos, Cell> cells, boolean isRescanMode)
+        throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
-        res.setResult(cells, internalProcessScanResult(cells, isRescanMode));
+        res.setResult(cells,
+            internalProcessScanResult(session, cells, isRescanMode));
         return res;
     }
 
-    protected CellStatus internalProcessScanResult(Map<RowColPos, Cell> cells,
-        boolean rescanMode) throws Exception {
-        AssignProcessData assignData = (AssignProcessData) data;
+    protected CellStatus internalProcessScanResult(Session session,
+        Map<RowColPos, Cell> cells,
+        boolean rescanMode) throws ActionException {
+        AssignProcessData assignData = data;
         CellStatus currentScanState = CellStatus.EMPTY;
         Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet = new HashMap<RowColPos, Boolean>();
-        for (int row = 0; row < assignData.getPalletRowCapacity(appService); row++) {
-            for (int col = 0; col < assignData.getPalletColCapacity(appService); col++) {
+        for (int row = 0; row < assignData.getPalletRowCapacity(session); row++) {
+            for (int col = 0; col < assignData.getPalletColCapacity(session); col++) {
                 RowColPos rcp = new RowColPos(row, col);
                 Cell cell = cells.get(rcp);
                 if (!rescanMode || cell == null || cell.getStatus() == null
                     || cell.getStatus() == CellStatus.EMPTY
                     || cell.getStatus() == CellStatus.ERROR
                     || cell.getStatus() == CellStatus.MISSING) {
-                    SpecimenWrapper expectedSpecimen = assignData
-                        .getExpectedSpecimen(appService, row, col);
+                    Specimen expectedSpecimen = assignData
+                        .getExpectedSpecimen(session, row, col);
                     if (expectedSpecimen != null) {
                         if (cell == null) {
-                            cell = new Cell(rcp.getRow(), rcp.getCol(), null, null);
+                            cell = new Cell(rcp.getRow(), rcp.getCol(), null,
+                                null);
                             cells.put(rcp, cell);
                         }
                         cell.setExpectedSpecimenId(expectedSpecimen.getId());
                     }
                     if (cell != null) {
-                        internalProcessCellAssignStatus(cell,
+                        internalProcessCellAssignStatus(session, cell,
                             movedAndMissingSpecimensFromPallet);
                     }
                 }
@@ -69,10 +92,10 @@ public class AssignProcess extends ServerProcess {
     }
 
     @Override
-    protected CellProcessResult getCellProcessResult(Cell cell)
-        throws Exception {
+    protected CellProcessResult getCellProcessResult(Session session, Cell cell)
+        throws ActionException {
         CellProcessResult res = new CellProcessResult();
-        internalProcessCellAssignStatus(cell, null);
+        internalProcessCellAssignStatus(session, cell, null);
         res.setResult(cell);
         return res;
     }
@@ -80,28 +103,25 @@ public class AssignProcess extends ServerProcess {
     /**
      * set the status of the cell
      */
-    protected CellStatus internalProcessCellAssignStatus(Cell scanCell,
+    protected CellStatus internalProcessCellAssignStatus(Session session,
+        Cell scanCell,
         Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet)
-        throws Exception {
-        SpecimenWrapper expectedSpecimen = null;
+        throws ActionException {
+        Specimen expectedSpecimen = null;
         if (scanCell.getExpectedSpecimenId() != null) {
-            expectedSpecimen = new SpecimenWrapper(appService);
-            expectedSpecimen.getWrappedObject().setId(
+            expectedSpecimen = ActionUtil.sessionGet(session, Specimen.class,
                 scanCell.getExpectedSpecimenId());
-            expectedSpecimen.reload();
         }
-
         String value = scanCell.getValue();
-        String positionString = ((AssignProcessData) data)
-            .getPalletLabel(appService)
+        String positionString = data
+            .getPalletLabel(session)
             + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(scanCell
                 .getRow(), scanCell.getCol()));
         if (value == null) { // no specimen scanned
             updateCellAsMissing(positionString, scanCell, expectedSpecimen,
                 movedAndMissingSpecimensFromPallet);
         } else {
-            SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(
-                appService, value);
+            Specimen foundSpecimen = searchSpecimen(session, value);
             if (foundSpecimen == null) {
                 updateCellAsNotFound(positionString, scanCell);
             } else if (!foundSpecimen.getCurrentCenter().getId()
@@ -121,17 +141,21 @@ public class AssignProcess extends ServerProcess {
                         .getPatient().getPnumber());
                     scanCell.setSpecimenId(expectedSpecimen.getId());
                 } else {
-                    ContainerTypeWrapper cType = ((AssignProcessData) data)
-                        .getContainerType(appService);
+                    ContainerType cType = data
+                        .getContainerType(session);
                     if (cType.getSpecimenTypeCollection().contains(
                         foundSpecimen.getSpecimenType())) {
-                        if (foundSpecimen.hasParent()) { // moved ?
-                            processCellWithPreviousPosition(scanCell,
+                        if (foundSpecimen.getSpecimenPosition() != null
+                            && foundSpecimen.getSpecimenPosition()
+                                .getContainer() != null) { // moved ?
+                            processCellWithPreviousPosition(session, scanCell,
                                 positionString, foundSpecimen,
                                 movedAndMissingSpecimensFromPallet);
                         } else { // new in pallet
-                            if (foundSpecimen.isUsedInDispatch()) {
-                                updateCellAsDispatchedError(positionString,
+                            if (new SpecimenIsUsedInDispatchAction(
+                                foundSpecimen.getId()).run(null, session)) {
+                                updateCellAsDispatchedError(
+                                    positionString,
                                     scanCell, foundSpecimen);
                             } else {
                                 scanCell.setStatus(CellStatus.NEW);
@@ -155,7 +179,7 @@ public class AssignProcess extends ServerProcess {
      * specimen missing
      */
     private void updateCellAsMissing(String position, Cell scanCell,
-        SpecimenWrapper missingSpecimen,
+        Specimen missingSpecimen,
         Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet) {
         RowColPos rcp = new RowColPos(scanCell.getRow(), scanCell.getCol());
         Boolean posHasMovedSpecimen = movedAndMissingSpecimensFromPallet
@@ -196,8 +220,8 @@ public class AssignProcess extends ServerProcess {
      * specimen found but another specimen already at this position
      */
     private void updateCellAsPositionAlreadyTaken(String position,
-        Cell scanCell, SpecimenWrapper expectedSpecimen,
-        SpecimenWrapper foundSpecimen) {
+        Cell scanCell, Specimen expectedSpecimen,
+        Specimen foundSpecimen) {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages.getString(
             "ScanAssign.scanStatus.specimen.positionTakenError", locale)); //$NON-NLS-1$
@@ -215,18 +239,23 @@ public class AssignProcess extends ServerProcess {
      * 
      * @throws Exception
      */
-    private void processCellWithPreviousPosition(Cell scanCell,
-        String positionString, SpecimenWrapper foundSpecimen,
-        Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet)
-        throws Exception {
-        if (foundSpecimen.getParentContainer().equals(
-            ((AssignProcessData) data).getPallet(appService))) {
+    private void processCellWithPreviousPosition(Session session,
+        Cell scanCell,
+        String positionString, Specimen foundSpecimen,
+        Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet) {
+        if (foundSpecimen.getSpecimenPosition() != null && foundSpecimen
+            .getSpecimenPosition().getContainer().equals(
+                data.getPallet(session))) {
             // same pallet
             RowColPos rcp = new RowColPos(scanCell.getRow(), scanCell.getCol());
-            if (!foundSpecimen.getPosition().equals(rcp)) {
+            RowColPos foundSpecPosition = new RowColPos(foundSpecimen
+                .getSpecimenPosition().getRow(),
+                foundSpecimen.getSpecimenPosition().getCol());
+            if (!foundSpecPosition.equals(rcp)) {
                 // moved inside the same pallet
-                updateCellAsMoved(positionString, scanCell, foundSpecimen);
-                RowColPos movedFromPosition = foundSpecimen.getPosition();
+                updateCellAsMoved(positionString, scanCell,
+                    foundSpecimen);
+                RowColPos movedFromPosition = foundSpecPosition;
                 Boolean posHasMissing = movedAndMissingSpecimensFromPallet
                     .get(movedFromPosition);
                 if (Boolean.TRUE.equals(posHasMissing)) {
@@ -249,8 +278,9 @@ public class AssignProcess extends ServerProcess {
     }
 
     private void updateCellAsMoved(String position, Cell scanCell,
-        SpecimenWrapper foundSpecimen) {
-        String expectedPosition = foundSpecimen.getPositionString(true, false);
+        Specimen foundSpecimen) {
+        String expectedPosition = SpecimenActionHelper.getPositionString(
+            foundSpecimen, true, false);
         if (expectedPosition == null) {
             expectedPosition = "none"; //$NON-NLS-1$
         }
@@ -269,12 +299,13 @@ public class AssignProcess extends ServerProcess {
     }
 
     private void updateCellAsInOtherSite(String position, Cell scanCell,
-        SpecimenWrapper foundSpecimen) {
-        String currentPosition = foundSpecimen.getPositionString(true, false);
+        Specimen foundSpecimen) {
+        String currentPosition = SpecimenActionHelper.getPositionString(
+            foundSpecimen, true, false);
         if (currentPosition == null) {
             currentPosition = "none"; //$NON-NLS-1$
         }
-        String siteName = foundSpecimen.getCenterString();
+        String siteName = foundSpecimen.getCurrentCenter().getNameShort();
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient()
             .getPnumber());
@@ -288,7 +319,7 @@ public class AssignProcess extends ServerProcess {
     }
 
     private void updateCellAsTypeError(String position, Cell scanCell,
-        SpecimenWrapper foundSpecimen, ContainerTypeWrapper containerType) {
+        Specimen foundSpecimen, ContainerType containerType) {
         String palletType = containerType.getName();
         String sampleType = foundSpecimen.getSpecimenType().getName();
 
@@ -304,7 +335,7 @@ public class AssignProcess extends ServerProcess {
     }
 
     private void updateCellAsDispatchedError(String positionString,
-        Cell scanCell, SpecimenWrapper foundSpecimen) {
+        Cell scanCell, Specimen foundSpecimen) {
         scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient()
             .getPnumber());
         scanCell.setStatus(CellStatus.ERROR);
@@ -314,6 +345,12 @@ public class AssignProcess extends ServerProcess {
             "ScanAssign.activitylog.specimen.dispatchedError", locale), //$NON-NLS-1$
             positionString));
 
+    }
+
+    @Override
+    public boolean isAllowed(User user, Session session) throws ActionException {
+        return new SpecimenAssignPermission(currentWorkingCenterId).isAllowed(
+            user, session);
     }
 
 }

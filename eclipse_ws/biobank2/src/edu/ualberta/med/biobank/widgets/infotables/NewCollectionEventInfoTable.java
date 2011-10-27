@@ -43,7 +43,8 @@ public class NewCollectionEventInfoTable extends InfoTableWidget {
                 case 2:
                     return NumberFormatter.format(info.aliquotedSpecimenCount);
                 case 3:
-                    return info.cevent.getCommentCollection().toString();
+                    return info.cevent.getCommentCollection().size() == 0 ? "N"
+                        : "Y";
 
                 default:
                     return ""; //$NON-NLS-1$

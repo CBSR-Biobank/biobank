@@ -7,11 +7,6 @@ import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
-import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PrintedSsInvItem;
@@ -21,7 +16,6 @@ import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
-import edu.ualberta.med.biobank.server.scanprocess.ServerProcess;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.dao.Request;
@@ -37,8 +31,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Level;
@@ -188,36 +180,38 @@ public class BiobankApplicationServiceImpl extends
         return BiobankVersionUtil.getServerVersion();
     }
 
-    @Override
-    public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
-        ProcessData processData, boolean isRescanMode,
-        Integer currentWorkingCenterId, Locale locale)
-        throws ApplicationException {
-        try {
-            ServerProcess process = processData.getProcessInstance(this,
-                currentWorkingCenterId, locale);
-            return process.processScanResult(cells, isRescanMode);
-        } catch (ApplicationException ae) {
-            throw ae;
-        } catch (Exception e) {
-            throw new ApplicationException(e);
-        }
-    }
-
-    @Override
-    public CellProcessResult processCellStatus(Cell cell,
-        ProcessData processData, Integer currentWorkingCenterId, Locale locale)
-        throws ApplicationException {
-        try {
-            ServerProcess process = processData.getProcessInstance(this,
-                currentWorkingCenterId, locale);
-            return process.processCellStatus(cell);
-        } catch (ApplicationException ae) {
-            throw ae;
-        } catch (Exception e) {
-            throw new ApplicationException(e);
-        }
-    }
+    // @Override
+    // @Deprecated
+    // public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
+    // ProcessData processData, boolean isRescanMode,
+    // Integer currentWorkingCenterId, Locale locale)
+    // throws ApplicationException {
+    // try {
+    // ServerProcess process = processData.getProcessInstance(this,
+    // currentWorkingCenterId, locale);
+    // return process.processScanResult(cells, isRescanMode);
+    // } catch (ApplicationException ae) {
+    // throw ae;
+    // } catch (Exception e) {
+    // throw new ApplicationException(e);
+    // }
+    // }
+    //
+    // @Override
+    // @Deprecated
+    // public CellProcessResult processCellStatus(Cell cell,
+    // ProcessData processData, Integer currentWorkingCenterId, Locale locale)
+    // throws ApplicationException {
+    // try {
+    // ServerProcess process = processData.getProcessInstance(this,
+    // currentWorkingCenterId, locale);
+    // return process.processCellStatus(cell);
+    // } catch (ApplicationException ae) {
+    // throw ae;
+    // } catch (Exception e) {
+    // throw new ApplicationException(e);
+    // }
+    // }
 
     private static final int SS_INV_ID_LENGTH = 12;
 

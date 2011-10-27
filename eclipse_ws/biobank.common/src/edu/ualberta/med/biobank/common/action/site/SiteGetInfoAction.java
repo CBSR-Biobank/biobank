@@ -7,7 +7,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypeInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction.SiteInfo;
@@ -21,6 +20,7 @@ import edu.ualberta.med.biobank.model.User;
 public class SiteGetInfoAction implements Action<SiteInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
+    @SuppressWarnings("nls")
     private static final String SITE_INFO_HQL = "SELECT site, COUNT(DISTINCT patients), COUNT(DISTINCT collectionEvents), COUNT(DISTINCT aliquotedSpecimens)"
         + " FROM "
         + Site.class.getName()
