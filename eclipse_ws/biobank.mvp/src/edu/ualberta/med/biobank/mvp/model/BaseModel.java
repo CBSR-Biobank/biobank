@@ -29,6 +29,7 @@ import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 import com.pietschy.gwt.pectin.client.form.validation.binding.ValidationBinder;
 import com.pietschy.gwt.pectin.client.form.validation.component.ValidationDisplay;
 import com.pietschy.gwt.pectin.client.value.MutableValueModel;
+import com.pietschy.gwt.pectin.client.value.ValueHolder;
 import com.pietschy.gwt.pectin.client.value.ValueModel;
 import com.pietschy.gwt.pectin.reflect.ReflectionBeanModelProvider;
 
@@ -58,7 +59,7 @@ public abstract class BaseModel<T> extends FormModel {
     private final ValidationBinder validationBinder = new ValidationBinder();
     private final ValidationTree validationTree = new ValidationTree();
     private final DelegatingCondition dirty = new DelegatingCondition(false);
-    private final DelegatingCondition valid = new DelegatingCondition(false);
+    private final ValueHolder<Boolean> valid = new ValueHolder<Boolean>(false);
     private final List<BaseModel<?>> models = new ArrayList<BaseModel<?>>();
     private final HandlerRegManager hrManager = new HandlerRegManager();
     private final ValidationMonitor validationMonitor = new ValidationMonitor();
@@ -301,7 +302,7 @@ public abstract class BaseModel<T> extends FormModel {
 
     private void updateValidity(ValidationResult result) {
         boolean isValid = !result.contains(Severity.ERROR);
-        // valid.setValue(isValid);
+        valid.setValue(isValid);
     }
 
     private class ValidationMonitor implements ValidationHandler {
