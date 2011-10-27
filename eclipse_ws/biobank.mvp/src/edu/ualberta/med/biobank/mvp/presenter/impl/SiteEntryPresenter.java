@@ -106,10 +106,6 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
     @Override
     public void doSave() {
-        if (!model.validate()) {
-            return;
-        }
-
         SiteSaveAction saveSite = new SiteSaveAction();
         saveSite.setId(model.siteId.getValue());
         saveSite.setName(model.name.getValue());
@@ -138,9 +134,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     public View createSite() {
         SiteInfo siteInfo = new SiteInfo();
         siteInfo.setSite(new Site());
-        siteInfo.getSite().setName("name");
         siteInfo.getSite().setAddress(new Address());
-        siteInfo.getSite().getAddress().setStreet1("asdfasdfa");
         return editSite(siteInfo);
     }
 
@@ -164,7 +158,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     }
 
     public View editSite(SiteInfo siteInfo) {
-        // get our own (deep) copy of the data
+        // as long as this method is public, get our own (deep) copy of the data
         SiteInfo clone = ObjectCloner.deepCopy(siteInfo);
         model.setValue(clone);
         return view;
