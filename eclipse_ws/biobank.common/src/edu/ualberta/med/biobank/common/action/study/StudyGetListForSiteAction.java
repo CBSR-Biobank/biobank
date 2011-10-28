@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetStudyListForSiteAction implements Action<ArrayList<Study>> {
+public class StudyGetListForSiteAction implements Action<ArrayList<Study>> {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,7 +29,7 @@ public class GetStudyListForSiteAction implements Action<ArrayList<Study>> {
 
     // @formatter:on
 
-    public GetStudyListForSiteAction(Integer siteId) {
+    public StudyGetListForSiteAction(Integer siteId) {
         this.siteId = siteId;
     }
 

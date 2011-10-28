@@ -50,7 +50,6 @@ public class TestCollectionEvent extends TestAction {
     public void setUp() throws Exception {
         super.setUp();
         String name = "CEventTest" + r.nextInt();
-        // FIXME should not use wrappers for set up
         studyId = StudyHelper.createStudy(appService, name,
             ActivityStatusEnum.ACTIVE);
         patientId = appService.doAction(new PatientSaveAction(null, studyId,

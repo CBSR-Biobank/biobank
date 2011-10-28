@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.study.GetStudyEventAttrInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -210,7 +210,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
     public void setEventAttrs(Session session, User user, Study study,
         CollectionEvent cevent) throws ActionException {
-        Map<Integer, StudyEventAttrInfo> studyEventList = new GetStudyEventAttrInfoAction(
+        Map<Integer, StudyEventAttrInfo> studyEventList = new StudyGetEventAttrInfoAction(
             study.getId()).run(user, session);
 
         Map<Integer, EventAttrInfo> ceventAttrList = new CollectionEventGetEventAttrInfoAction(

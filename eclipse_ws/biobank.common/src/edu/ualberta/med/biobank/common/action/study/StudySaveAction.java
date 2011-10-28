@@ -10,7 +10,6 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
 public class StudySaveAction implements Action<Integer> {
@@ -20,7 +19,7 @@ public class StudySaveAction implements Action<Integer> {
     private String name;
     private String nameShort;
     private Integer aStatusId;
-    private List<StudyEventAttr> studyEventAttr;
+    private List<StudyEventAttrInfo> studyEventAttr;
     private Set<Integer> contactIds;
     private Set<Integer> sourceSpecimenIds;
     private Set<Integer> aliquotedSpcTypesIds;
@@ -39,6 +38,10 @@ public class StudySaveAction implements Action<Integer> {
 
     public void setActivityStatusId(Integer activityStatusId) {
         this.aStatusId = activityStatusId;
+    }
+
+    public void setContactIds(Set<Integer> contactIds) {
+        this.contactIds = contactIds;
     }
 
     @Override
