@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.mvp.model.BaseModel;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
-public class AddressEntryPresenter extends BasePresenter<View> {
+public class AddressEntryPresenter extends AbstractPresenter<View> {
     private final Model model;
 
     public interface View extends IView {

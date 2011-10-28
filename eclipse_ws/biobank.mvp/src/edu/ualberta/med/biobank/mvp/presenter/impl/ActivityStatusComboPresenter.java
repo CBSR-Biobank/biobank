@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValue;
 import edu.ualberta.med.biobank.mvp.util.Converter;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
-public class ActivityStatusComboPresenter extends BasePresenter<View> {
+public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
     private final static OptionLabeller labeller = new OptionLabeller();
     private final Dispatcher dispatcher;
 

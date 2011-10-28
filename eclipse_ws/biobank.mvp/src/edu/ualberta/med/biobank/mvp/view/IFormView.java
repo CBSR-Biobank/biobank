@@ -1,4 +1,4 @@
 package edu.ualberta.med.biobank.mvp.view;
 
-public interface IFormView extends IDisplayView, ISaveableView {
+public interface IFormView extends ICloseableView, IReloadableView {
 }

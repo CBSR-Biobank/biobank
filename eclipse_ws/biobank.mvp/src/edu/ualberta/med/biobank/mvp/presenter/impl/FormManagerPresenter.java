@@ -13,9 +13,9 @@ import edu.ualberta.med.biobank.mvp.event.model.site.SiteEditEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteEditHandler;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter.View;
 import edu.ualberta.med.biobank.mvp.view.IView;
-import edu.ualberta.med.biobank.mvp.view.IFormView;
+import edu.ualberta.med.biobank.mvp.view.IEntryView;
 
-public class FormManagerPresenter extends BasePresenter<View> {
+public class FormManagerPresenter extends AbstractPresenter<View> {
     private Provider<SiteEntryPresenter> siteEntryPresenterProvider;
 
     public interface View extends IView {
@@ -25,7 +25,7 @@ public class FormManagerPresenter extends BasePresenter<View> {
          *            determines uniqueness
          * @param view
          */
-        void openForm(Object object, IFormView view);
+        void openForm(Object object, IEntryView view);
     }
 
     @Inject
@@ -61,7 +61,7 @@ public class FormManagerPresenter extends BasePresenter<View> {
     private void doSiteEdit(Integer siteId) {
         SiteEntryPresenter siteEntryPres = siteEntryPresenterProvider.get();
         siteEntryPres.bind();
-        IFormView formView = siteEntryPres.editSite(siteId);
+        IEntryView formView = siteEntryPres.editSite(siteId);
 
         // TODO: think about unique object
         // TODO: the view could implement a method that explains how it's
@@ -72,7 +72,7 @@ public class FormManagerPresenter extends BasePresenter<View> {
     private void doSiteCreate() {
         SiteEntryPresenter siteEntryPres = siteEntryPresenterProvider.get();
         siteEntryPres.bind();
-        IFormView formView = siteEntryPres.createSite();
+        IEntryView formView = siteEntryPres.createSite();
 
         // TODO: think about unique object
         view.openForm(new Object(), formView);

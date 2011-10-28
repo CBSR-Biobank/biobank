@@ -28,16 +28,16 @@ import edu.ualberta.med.biobank.mvp.event.presenter.site.SiteViewPresenterShowEv
 import edu.ualberta.med.biobank.mvp.model.BaseModel;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.util.ObjectCloner;
-import edu.ualberta.med.biobank.mvp.view.IFormView;
+import edu.ualberta.med.biobank.mvp.view.IEntryView;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
-public class SiteEntryPresenter extends BaseEntryPresenter<View> {
+public class SiteEntryPresenter extends AbstractEntryPresenter<View> {
     private final Dispatcher dispatcher;
     private final AddressEntryPresenter addressEntryPresenter;
     private final ActivityStatusComboPresenter activityStatusComboPresenter;
     private final Model model;
 
-    public interface View extends IFormView, ValidationDisplay {
+    public interface View extends IEntryView, ValidationDisplay {
         void setActivityStatusComboView(IView view);
 
         void setAddressEditView(IView view);
