@@ -55,7 +55,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         int itemNumber;
     }
 
-    protected List<T> list;
+    private List<T> list;
 
     protected TableViewer tableViewer;
 
@@ -453,9 +453,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     }
 
     public void setList(final List<T> list) {
-    }
-
-    public void setList(final List<T> list, final T selection) {
+        this.list = list;
     }
 
     public List<T> getList() {

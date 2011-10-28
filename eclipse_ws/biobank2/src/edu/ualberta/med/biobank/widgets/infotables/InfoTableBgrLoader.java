@@ -35,22 +35,17 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
     @Override
     public void setList(List<T> collection) {
         setList(collection, null);
-        if (collection != null) {
-            size = collection.size();
-        }
     }
 
-    @Override
-    public void setList(final List<T> collection, final T selection) {
+    public void setList(final List<T> list, final T selection) {
         try {
-            if ((collection == null)
+            if ((list == null)
                 || ((backgroundThread != null) && backgroundThread.isAlive())) {
                 return;
-            } else if ((this.list != collection)
-                || (size != collection.size())) {
-                this.list = collection;
-                init(collection);
-                setPaginationParams(collection);
+            } else if (getList() != list) {
+                setList(list);
+                init(list);
+                setPaginationParams(list);
             }
             if (paginationRequired) {
                 showPaginationWidget();
@@ -65,7 +60,7 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
             backgroundThread = new Thread() {
                 @Override
                 public void run() {
-                    tableLoader(collection, selection);
+                    tableLoader(list, selection);
                     if (autoSizeColumns) {
                         display.syncExec(new Runnable() {
                             @Override
@@ -96,27 +91,27 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
 
     @Override
     public void firstPage() {
-        setList(list);
+        setList(getList());
     }
 
     @Override
     public void lastPage() {
-        setList(list);
+        setList(getList());
     }
 
     @Override
     public void prevPage() {
-        setList(list);
+        setList(getList());
     }
 
     @Override
     public void nextPage() {
-        setList(list);
+        setList(getList());
     }
 
     @Override
     public void reload() {
-        setList(list);
+        setList(getList());
     }
 
 }
