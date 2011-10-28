@@ -9,16 +9,12 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
-import edu.ualberta.med.biobank.mvp.event.EclipseClickEvent;
-
-public class EntryViewEditorPart extends EditorPart {
-    public static String ID = "edu.ualberta.med.biobank.mvp.view.EntryViewEditorPart"; //$NON-NLS-1$
-    private IEntryView entryView;
+public class FormViewEditorPart extends EditorPart {
+    public static String ID = "edu.ualberta.med.biobank.mvp.view.FormViewEditorPart"; //$NON-NLS-1$
+    private IFormView formView;
 
     @Override
     public void doSave(IProgressMonitor monitor) {
-        // TODO: pay attention to the monitor?
-        entryView.getSave().fireEvent(new EclipseClickEvent());
     }
 
     @Override
@@ -35,12 +31,12 @@ public class EntryViewEditorPart extends EditorPart {
         throws PartInitException {
         setSite(site);
         setInput(input);
-        entryView = ((EntryViewEditorInput) input).getEntryView();
+
+        formView = getEditorInput().getFormView();
     }
 
     @Override
     public boolean isDirty() {
-        // TODO: dirty handling
         return false;
     }
 
@@ -53,7 +49,7 @@ public class EntryViewEditorPart extends EditorPart {
         // TODO: add command exceution listener so the save command triggers
         // entryView.getSave() ?
 
-        entryView.create(parent);
+        formView.create(parent);
     }
 
     @Override
@@ -61,15 +57,20 @@ public class EntryViewEditorPart extends EditorPart {
         // TODO: set focus on some child element
     }
 
-    public static class EntryViewEditorInput implements IEditorInput {
-        private final IEntryView entryView;
+    @Override
+    public FormViewEditorInput getEditorInput() {
+        return (FormViewEditorInput) super.getEditorInput();
+    }
 
-        public EntryViewEditorInput(IEntryView entryView) {
-            this.entryView = entryView;
+    public static class FormViewEditorInput implements IEditorInput {
+        private final IFormView formView;
+
+        public FormViewEditorInput(IFormView formView) {
+            this.formView = formView;
         }
 
-        public IEntryView getEntryView() {
-            return entryView;
+        public IFormView getFormView() {
+            return formView;
         }
 
         @Override
