@@ -64,7 +64,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         if (selectedSourceSpecimen == null) {
             selectedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
         }
-        setCollection(selectedSourceSpecimen);
+        setList(selectedSourceSpecimen);
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -153,7 +153,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
                         }
 
                         selectedSourceSpecimen.remove(sourceSpecimen);
-                        setCollection(selectedSourceSpecimen);
+                        setList(selectedSourceSpecimen);
                         study.removeFromSourceSpecimenCollection(Arrays
                             .asList(sourceSpecimen));
                         availableSpecimenTypes.add(sourceSpecimen

@@ -109,7 +109,7 @@ public abstract class GroupInfoTable extends InfoTableWidget {
             .getActiveWorkbenchWindow().getShell(), group);
         int res = dlg.open();
         if (res == Dialog.OK) {
-            reloadCollection(getCollection(), group);
+            reloadCollection(getList(), group);
             notifyListeners();
         }
     }
@@ -125,8 +125,8 @@ public abstract class GroupInfoTable extends InfoTableWidget {
                 Messages.GroupInfoTable_delete_confirm_title, message)) {
                 group.delete();
                 // remove the group from the collection
-                getCollection().remove(group);
-                reloadCollection(getCollection(), null);
+                getList().remove(group);
+                reloadCollection(getList(), null);
                 notifyListeners();
                 return true;
             }

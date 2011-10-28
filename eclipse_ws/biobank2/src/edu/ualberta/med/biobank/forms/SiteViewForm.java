@@ -186,8 +186,8 @@ public class SiteViewForm extends AddressViewFormCommon {
         setAddressValues(site);
 
         studiesTable.setCollection(siteInfo.studies);
-        containerTypesTable.setCollection(siteInfo.containerTypes);
-        topContainersTable.setCollection(siteInfo.topContainers);
+        containerTypesTable.setList(siteInfo.containerTypes);
+        topContainersTable.setList(siteInfo.topContainers);
     }
 
     private void updateSiteInfo() throws Exception {

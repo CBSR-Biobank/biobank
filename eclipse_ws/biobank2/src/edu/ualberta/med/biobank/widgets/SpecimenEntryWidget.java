@@ -176,7 +176,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
 
         specimens.add(specimen);
         Collections.sort(specimens);
-        specTable.setCollection(specimens);
+        specTable.setList(specimens);
         addedSpecimens.add(specimen);
         removedSpecimens.remove(specimen);
 
@@ -228,7 +228,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         if (preDelete.doit) {
             specimens.remove(specimen);
             Collections.sort(specimens);
-            specTable.setCollection(specimens);
+            specTable.setList(specimens);
             removedSpecimens.add(specimen);
             addedSpecimens.remove(specimen);
 
@@ -245,9 +245,9 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         this.specimens = new ArrayList<SpecimenWrapper>(specimens);
 
         if (specimens != null)
-            specTable.setCollection(specimens);
+            specTable.setList(specimens);
         else
-            specTable.setCollection(new ArrayList<SpecimenWrapper>());
+            specTable.setList(new ArrayList<SpecimenWrapper>());
 
         addedSpecimens.clear();
         removedSpecimens.clear();

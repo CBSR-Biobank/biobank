@@ -55,7 +55,7 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
  * @param <T> The model object wrapper the table is based on.
  * 
  */
-public abstract class InfoTableWidget extends InfoTableBgrLoader {
+public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
 
     /*
      * see http://lekkimworld.com/2008/03/27/setting_table_row_height_in_swt
@@ -71,7 +71,7 @@ public abstract class InfoTableWidget extends InfoTableBgrLoader {
 
     private Class<?> wrapperClass;
 
-    public InfoTableWidget(Composite parent, List<?> collection,
+    public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int rowsPerPage, Class<?> wrapperClass) {
         super(parent, collection, headings, null, rowsPerPage);
 
@@ -80,9 +80,9 @@ public abstract class InfoTableWidget extends InfoTableBgrLoader {
         useDefaultEditItem = false;
     }
 
-    public InfoTableWidget(Composite parent, List<?> collection,
+    public InfoTableWidget(Composite parent, List<T> list,
         String[] headings, Class<?> wrapperClass) {
-        this(parent, collection, headings, 5, wrapperClass);
+        this(parent, list, headings, 5, wrapperClass);
     }
 
     public void createDefaultEditItem() {
@@ -108,15 +108,15 @@ public abstract class InfoTableWidget extends InfoTableBgrLoader {
     }
 
     @Override
-    protected void init(List<?> collection) {
+    protected void init(List<T> list) {
         reloadData = true;
 
         model = new ArrayList<BiobankCollectionModel>();
-        initModel(collection);
+        initModel(list);
     }
 
     @Override
-    protected void setPaginationParams(List<?> collection) {
+    protected void setPaginationParams(List<T> collection) {
         paginationRequired = paginationWidget
             .setTableMaxRows(collection.size());
         if (paginationRequired) {
@@ -173,19 +173,19 @@ public abstract class InfoTableWidget extends InfoTableBgrLoader {
      * Should be used by info tables that allow editing of data. Use this method
      * instead of setCollection().
      * 
-     * @param collection
+     * @param list
      */
-    public void reloadCollection(final List<?> collection, Object selection) {
+    public void reloadCollection(final List<T> list, T selection) {
         reloadData = true;
-        setCollection(collection, selection);
+        setList(list, selection);
     }
 
-    public void reloadCollection(final List<?> collection) {
-        reloadCollection(collection, null);
+    public void reloadCollection(final List<T> list) {
+        reloadCollection(list, null);
     }
 
     @Override
-    protected void tableLoader(final List<?> collection, final Object selection) {
+    protected void tableLoader(final List<T> collection, final T selection) {
         final TableViewer viewer = getTableViewer();
         final Table table = viewer.getTable();
         Display display = viewer.getTable().getDisplay();

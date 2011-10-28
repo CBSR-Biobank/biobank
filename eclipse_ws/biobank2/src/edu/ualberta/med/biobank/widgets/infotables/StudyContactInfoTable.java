@@ -63,7 +63,7 @@ public class StudyContactInfoTable extends InfoTableWidget {
     }
 
     public void setCollectionByStudy(StudyWrapper study) {
-        super.setCollection(new ArrayList<ClinicContacts>(processClinics(study
+        super.setList(new ArrayList<ClinicContacts>(processClinics(study
             .getContactCollection(true))));
     }
 

@@ -109,7 +109,7 @@ public class PatientViewForm extends BiobankViewForm {
             patient.getPnumber()));
         form.setText(NLS.bind(Messages.PatientViewForm_title,
             patient.getPnumber()));
-        collectionEventTable.setCollection(patient
+        collectionEventTable.setList(patient
             .getCollectionEventCollection(true));
     }
 

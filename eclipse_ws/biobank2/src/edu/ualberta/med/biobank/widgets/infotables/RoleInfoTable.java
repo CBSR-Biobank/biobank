@@ -107,7 +107,7 @@ public abstract class RoleInfoTable extends InfoTableWidget {
             .getActiveWorkbenchWindow().getShell(), role);
         int res = dlg.open();
         if (res == Dialog.OK) {
-            reloadCollection(getCollection(), role);
+            reloadCollection(getList(), role);
             notifyListeners();
         }
     }
@@ -123,8 +123,8 @@ public abstract class RoleInfoTable extends InfoTableWidget {
                 Messages.RoleInfoTable_delete_confirm_title, message)) {
                 role.delete();
                 // remove the role from the collection
-                getCollection().remove(role);
-                reloadCollection(getCollection(), null);
+                getList().remove(role);
+                reloadCollection(getList(), null);
                 notifyListeners();
                 return true;
             }

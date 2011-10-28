@@ -110,7 +110,7 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
                         }
 
                         currentSpecimens.remove(sw);
-                        setCollection(currentSpecimens);
+                        setList(currentSpecimens);
                         if (currentSpecimens.size() == 0) {
                             specimensAdded.setValue(false);
                         }

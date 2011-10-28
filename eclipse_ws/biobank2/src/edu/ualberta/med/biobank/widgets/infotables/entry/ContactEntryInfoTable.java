@@ -85,7 +85,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
 
                         deletedContacts.add(contact);
                         selectedContacts.remove(contact);
-                        setCollection(selectedContacts);
+                        setList(selectedContacts);
                         notifyListeners();
                     }
                 }

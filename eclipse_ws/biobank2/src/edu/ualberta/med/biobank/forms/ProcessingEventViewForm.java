@@ -101,7 +101,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         form.setText(NLS.bind(Messages.ProcessingEventViewForm_title,
             pEvent.getFormattedCreatedAt()));
         setValues();
-        sourceSpecimenTable.setCollection(pEvent.getSpecimenCollection(true));
+        sourceSpecimenTable.setList(pEvent.getSpecimenCollection(true));
     }
 
 }

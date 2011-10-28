@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.gui.common.widgets;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.SafeRunnable;
@@ -46,16 +48,16 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * <li>pagination widget</li>
  * </ul>
  */
-public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
-    IInfoTalePagination, IDoubleClickListener {
+public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
+    implements IInfoTablePagination, IDoubleClickListener {
 
     public static class RowItem {
         int itemNumber;
     }
 
-    protected TableViewer tableViewer;
+    protected List<T> list;
 
-    protected Thread backgroundThread;
+    protected TableViewer tableViewer;
 
     protected Menu menu;
 
@@ -75,13 +77,12 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
 
     protected PaginationWidget paginationWidget;
 
+    // TODO: all listeners can be managed by an external class
     protected ListenerList addItemListeners = new ListenerList();
-
     protected ListenerList editItemListeners = new ListenerList();
-
     protected ListenerList deleteItemListeners = new ListenerList();
-
     protected ListenerList doubleClickListeners = new ListenerList();
+    protected ListenerList listChangeListeners = new ListenerList();
 
     public AbstractInfoTableWidget(Composite parent, String[] headings,
         int[] columnWidths, int rowsPerPage) {
@@ -304,6 +305,10 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
         doubleClickListeners.add(listener);
     }
 
+    public void addModifyListener(IInfoTableListChangeListener listener) {
+        listChangeListeners.add(listener);
+    }
+
     public void addAddItemListener(IInfoTableAddItemListener listener) {
         addItemListeners.add(listener);
 
@@ -434,4 +439,26 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
         }
     }
 
+    protected void fireListChangeEvent() {
+        Object[] listeners = listChangeListeners.getListeners();
+        for (int i = 0; i < listeners.length; ++i) {
+            final IInfoTableListChangeListener l = (IInfoTableListChangeListener) listeners[i];
+            SafeRunnable.run(new SafeRunnable() {
+                @Override
+                public void run() {
+                    l.onListChange();
+                }
+            });
+        }
+    }
+
+    public void setList(final List<T> list) {
+    }
+
+    public void setList(final List<T> list, final T selection) {
+    }
+
+    public List<T> getList() {
+        return list;
+    }
 }

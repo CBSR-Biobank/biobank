@@ -10,16 +10,15 @@ import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 import edu.ualberta.med.biobank.gui.common.widgets.Messages;
 
-public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
+public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
+    protected Thread backgroundThread;
 
     private int size;
 
-    private List<?> collection;
-
-    public InfoTableBgrLoader(Composite parent, List<?> collection,
+    public InfoTableBgrLoader(Composite parent, List<T> list,
         String[] headings, int[] columnWidths, int rowsPerPage) {
         super(parent, headings, columnWidths, rowsPerPage);
-        setCollection(collection);
+        setList(list);
     }
 
     /**
@@ -31,24 +30,25 @@ public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
      * 
      * @throws Exception
      */
-    protected abstract void tableLoader(final List<?> collection,
-        final Object Selection);
+    protected abstract void tableLoader(final List<T> list, final T Selection);
 
-    public void setCollection(List<?> collection) {
-        setCollection(collection, null);
+    @Override
+    public void setList(List<T> collection) {
+        setList(collection, null);
         if (collection != null) {
             size = collection.size();
         }
     }
 
-    public void setCollection(final List<?> collection, final Object selection) {
+    @Override
+    public void setList(final List<T> collection, final T selection) {
         try {
             if ((collection == null)
                 || ((backgroundThread != null) && backgroundThread.isAlive())) {
                 return;
-            } else if ((this.collection != collection)
+            } else if ((this.list != collection)
                 || (size != collection.size())) {
-                this.collection = collection;
+                this.list = collection;
                 init(collection);
                 setPaginationParams(collection);
             }
@@ -83,13 +83,9 @@ public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
         }
     }
 
-    protected abstract void init(List<?> collection);
+    protected abstract void init(List<T> list);
 
-    protected abstract void setPaginationParams(List<?> collection);
-
-    public List<?> getCollection() {
-        return collection;
-    }
+    protected abstract void setPaginationParams(List<T> list);
 
     @Override
     protected BgcTableSorter getTableSorter() {
@@ -100,27 +96,27 @@ public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
 
     @Override
     public void firstPage() {
-        setCollection(collection);
+        setList(list);
     }
 
     @Override
     public void lastPage() {
-        setCollection(collection);
+        setList(list);
     }
 
     @Override
     public void prevPage() {
-        setCollection(collection);
+        setList(list);
     }
 
     @Override
     public void nextPage() {
-        setCollection(collection);
+        setList(list);
     }
 
     @Override
     public void reload() {
-        setCollection(collection);
+        setList(list);
     }
 
 }

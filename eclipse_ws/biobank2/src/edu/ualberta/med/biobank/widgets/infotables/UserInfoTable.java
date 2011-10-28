@@ -79,7 +79,7 @@ public abstract class UserInfoTable extends InfoTableWidget {
                 try {
                     SessionManager.getAppService().unlockUser(userName);
                     user.setLockedOut(false);
-                    reloadCollection(getCollection(), user);
+                    reloadCollection(getList(), user);
                 } catch (ApplicationException e) {
                     BgcPlugin.openAsyncError(MessageFormat.format(
                         Messages.UserInfoTable_unlock_error_msg,
@@ -155,7 +155,7 @@ public abstract class UserInfoTable extends InfoTableWidget {
             .getActiveWorkbenchWindow().getShell(), user);
         int res = dlg.open();
         if (res == Dialog.OK) {
-            reloadCollection(getCollection(), user);
+            reloadCollection(getList(), user);
             notifyListeners();
         }
         return res;
@@ -182,9 +182,9 @@ public abstract class UserInfoTable extends InfoTableWidget {
                 user.delete();
 
                 // remove the user from the collection
-                getCollection().remove(user);
+                getList().remove(user);
 
-                reloadCollection(getCollection(), null);
+                reloadCollection(getList(), null);
                 notifyListeners();
                 return true;
             }

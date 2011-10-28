@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class DispatchInfoTable extends InfoTableWidget {
+public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
     SpecimenWrapper a;
 
@@ -37,8 +37,10 @@ public class DispatchInfoTable extends InfoTableWidget {
         }
     }
 
-    private static final String[] HEADINGS = new String[] { Messages.DispatchInfoTable_sender_label,
-        Messages.DispatchInfoTable_time_label, Messages.DispatchInfoTable_receiver_label,
+    private static final String[] HEADINGS = new String[] {
+        Messages.DispatchInfoTable_sender_label,
+        Messages.DispatchInfoTable_time_label,
+        Messages.DispatchInfoTable_receiver_label,
         Messages.DispatchInfoTable_received_label,
         Messages.DispatchInfoTable_waybill_label,
         Messages.DispatchInfoTable_state_label,
@@ -49,7 +51,7 @@ public class DispatchInfoTable extends InfoTableWidget {
     public DispatchInfoTable(Composite parent, SpecimenWrapper a) {
         super(parent, null, HEADINGS, 15, DispatchWrapper.class);
         this.a = a;
-        setCollection(a.getDispatches());
+        setList(a.getDispatches());
     }
 
     @Override

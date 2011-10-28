@@ -118,7 +118,7 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
         List<ContactWrapper> clinicContacts = clinic.getContactCollection(true);
         for (ContactWrapper contact : contacts)
             clinicContacts.remove(contact);
-        contactInfoTable.setCollection(clinicContacts);
+        contactInfoTable.setList(clinicContacts);
     }
 
     @Override

@@ -50,7 +50,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
         if (selectedAliquotedSpecimen == null) {
             selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         }
-        setCollection(selectedAliquotedSpecimen);
+        setList(selectedAliquotedSpecimen);
         addedOrModifiedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         deletedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
 
@@ -155,7 +155,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                         }
 
                         selectedAliquotedSpecimen.remove(aliquotedSpecimen);
-                        setCollection(selectedAliquotedSpecimen);
+                        setList(selectedAliquotedSpecimen);
                         deletedAliquotedSpecimen.add(aliquotedSpecimen);
                         notifyListeners();
                     }

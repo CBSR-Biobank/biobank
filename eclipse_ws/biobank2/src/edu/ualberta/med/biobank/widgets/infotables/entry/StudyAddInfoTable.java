@@ -60,7 +60,7 @@ public class StudyAddInfoTable extends StudyInfoTable {
                     List<StudyWrapper> dummyList = new ArrayList<StudyWrapper>();
                     dummyList.add(study);
                     site.addToStudyCollection(dummyList);
-                    setCollection(site.getStudyCollection(true));
+                    setList(site.getStudyCollection(true));
                 }
             }
         } catch (Exception e) {
@@ -94,7 +94,7 @@ public class StudyAddInfoTable extends StudyInfoTable {
                 try {
                     site.removeFromStudyCollectionWithCheck(Arrays
                         .asList(study));
-                    setCollection(site.getStudyCollection(true));
+                    setList(site.getStudyCollection(true));
                     notifyListeners();
                 } catch (BiobankCheckException e) {
                     BgcPlugin.openAsyncError(
@@ -105,12 +105,12 @@ public class StudyAddInfoTable extends StudyInfoTable {
     }
 
     public void setStudies(List<StudyWrapper> studies) {
-        setCollection(studies);
+        setList(studies);
     }
 
     @Override
     public void reload() {
-        setCollection(site.getStudyCollection(true));
+        setList(site.getStudyCollection(true));
     }
 
 }

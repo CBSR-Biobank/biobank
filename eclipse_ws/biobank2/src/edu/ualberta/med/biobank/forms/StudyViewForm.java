@@ -219,9 +219,9 @@ public class StudyViewForm extends BiobankViewForm {
         form.setText(NLS.bind(Messages.StudyViewForm_title, study.getName()));
         setStudySectionValues();
         setPvDataSectionValues();
-        aliquotedSpecimenTable.setCollection(study
+        aliquotedSpecimenTable.setList(study
             .getAliquotedSpecimenCollection(true));
-        sourceSpecimenTable.setCollection(study
+        sourceSpecimenTable.setList(study
             .getSourceSpecimenCollection(true));
         contactsTable.setCollectionByStudy(study);
     }

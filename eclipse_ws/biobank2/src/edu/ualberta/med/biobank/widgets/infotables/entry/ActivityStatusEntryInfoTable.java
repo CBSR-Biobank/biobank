@@ -154,7 +154,7 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
                         // ids are null.
                         selectedActivityStatus.remove(type);
                         type.delete();
-                        setCollection(selectedActivityStatus);
+                        setList(selectedActivityStatus);
                     } catch (final RemoteConnectFailureException exp) {
                         BgcPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {

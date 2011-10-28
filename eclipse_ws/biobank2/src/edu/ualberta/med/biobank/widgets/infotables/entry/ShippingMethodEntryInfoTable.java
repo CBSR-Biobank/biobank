@@ -154,7 +154,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                         // ids are null.
                         selectedShippingMethod.remove(type);
                         type.delete();
-                        setCollection(selectedShippingMethod);
+                        setList(selectedShippingMethod);
                     } catch (final RemoteConnectFailureException exp) {
                         BgcPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {

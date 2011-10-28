@@ -49,7 +49,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
                     List<ContactWrapper> dummyList = new ArrayList<ContactWrapper>();
                     dummyList.add(contact);
                     study.addToContactCollection(dummyList);
-                    setCollection(study.getContactCollection(true));
+                    setList(study.getContactCollection(true));
                 }
             }
         } catch (Exception e) {
@@ -80,7 +80,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
                     }
 
                     study.removeFromContactCollection(Arrays.asList(contact));
-                    setCollection(study.getContactCollection(true));
+                    setList(study.getContactCollection(true));
                     notifyListeners();
                 }
             }
@@ -88,12 +88,12 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
     }
 
     public void setContacts(List<ContactWrapper> contacts) {
-        setCollection(contacts);
+        setList(contacts);
     }
 
     @Override
     public void reload() {
-        setCollection(study.getContactCollection(true));
+        setList(study.getContactCollection(true));
     }
 
 }

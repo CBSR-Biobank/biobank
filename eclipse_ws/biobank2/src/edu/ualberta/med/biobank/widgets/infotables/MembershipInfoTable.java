@@ -57,7 +57,7 @@ public class MembershipInfoTable extends InfoTableWidget {
             public void deleteItem(InfoTableEvent event) {
                 MembershipWrapper ms = ((TableRowData) getSelection()).ms;
                 principal.removeFromMembershipCollection(Arrays.asList(ms));
-                getCollection().remove(ms);
+                getList().remove(ms);
                 reloadCollection(principal.getMembershipCollection(true));
             }
         });
@@ -68,7 +68,7 @@ public class MembershipInfoTable extends InfoTableWidget {
             .getWorkbench().getActiveWorkbenchWindow().getShell(), ms);
         int res = dlg.open();
         if (res == Dialog.OK) {
-            reloadCollection(getCollection(), ms);
+            reloadCollection(getList(), ms);
             notifyListeners();
         }
     }

@@ -122,8 +122,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
         form.setText(NLS.bind(Messages.ClinicViewForm_title, clinic.getName()));
         setClinicValues();
         setAddressValues(clinic);
-        contactsTable.setCollection(clinic.getContactCollection(true));
-        studiesTable.setCollection(clinic.getStudyCollection());
+        contactsTable.setList(clinic.getContactCollection(true));
+        studiesTable.setList(clinic.getStudyCollection());
     }
 
 }

@@ -171,9 +171,9 @@ public class CollectionEventViewForm extends BiobankViewForm {
         form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
             +cevent.getVisitNumber()));
         setCollectionEventValues();
-        sourceSpecimenTable.setCollection(cevent
+        sourceSpecimenTable.setList(cevent
             .getOriginalSpecimenCollection(true));
-        aliquotedSpcTable.setCollection(cevent
+        aliquotedSpcTable.setList(cevent
             .getAliquotedSpecimenCollection(true));
     }
 

@@ -35,7 +35,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget {
     public ClinicStudyInfoTable(Composite parent, ClinicWrapper clinic) {
         super(parent, null, HEADINGS, 10, StudyWrapper.class);
         this.clinic = clinic;
-        setCollection(clinic.getStudyCollection());
+        setList(clinic.getStudyCollection());
     }
 
     @Override
