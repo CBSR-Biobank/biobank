@@ -14,13 +14,14 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 public class CommentCollectionInfoTable extends InfoTableWidget {
 
     protected static class TableRowData {
-        public String comment;
+        public CommentWrapper comment;
+        public String message;
         public UserWrapper user;
         public Date date;
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { comment.toString(),
+            return StringUtils.join(new String[] { message.toString(),
                 user.toString(), date.toString() });
         }
     }
@@ -49,7 +50,7 @@ public class CommentCollectionInfoTable extends InfoTableWidget {
                 }
                 switch (columnIndex) {
                 case 0:
-                    return item.comment;
+                    return item.message;
                 case 1:
                     return item.user.getLogin();
                 case 2:
@@ -64,10 +65,11 @@ public class CommentCollectionInfoTable extends InfoTableWidget {
     @Override
     public Object getCollectionModelObject(Object o) throws Exception {
         TableRowData info = new TableRowData();
-        CommentWrapper comment = (CommentWrapper) o;
-        info.comment = comment.getMessage();
-        info.user = comment.getUser();
-        info.date = comment.getCreatedAt();
+        CommentWrapper comm = (CommentWrapper) o;
+        info.comment = comm;
+        info.message = comm.getMessage();
+        info.user = comm.getUser();
+        info.date = comm.getCreatedAt();
         return info;
     }
 
