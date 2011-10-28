@@ -78,7 +78,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         binder.bind(model.name).to(view.getName());
         binder.bind(model.nameShort).to(view.getNameShort());
         binder.bind(model.comment).to(view.getComment());
-        // binder.bind(model.studies).to(view.getStudies());
+        binder.bind(model.studies).to(view.getStudies());
         binder.bind(model.activityStatus)
             .to(activityStatusComboPresenter.getActivityStatus());
 

@@ -56,7 +56,6 @@ public class SiteEntryView2 extends EditorPart implements
     @Override
     public void createPartControl(Composite parent) {
         // TODO Auto-generated method stub
-
     }
 
     @Override

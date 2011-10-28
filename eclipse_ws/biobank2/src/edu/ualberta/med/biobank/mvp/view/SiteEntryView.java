@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.mvp.view;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
@@ -10,6 +9,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.ManagedForm;
@@ -42,10 +42,20 @@ public class SiteEntryView implements SiteEntryPresenter.View {
     private final TextItem name = new TextItem();
     private final TextItem nameShort = new TextItem();
     private final TextItem comment = new TextItem();
-    private final TableItem<List<StudyInfo>> studies = new TableItem<List<StudyInfo>>();
+    private final TableItem<StudyInfo> studies = new TableItem<StudyInfo>();
 
     private IView addressEntryView;
     private IView activityStatusComboView;
+
+    @Override
+    public void setActivityStatusComboView(IView view) {
+        this.activityStatusComboView = view;
+    }
+
+    @Override
+    public void setAddressEditView(IView view) {
+        this.addressEntryView = view;
+    }
 
     @Override
     public HasButton getSave() {
@@ -69,7 +79,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
 
     @Override
     public HasValue<Collection<StudyInfo>> getStudies() {
-        return null;
+        return studies;
     }
 
     @Override
@@ -103,11 +113,6 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         reload.setButton(widget.reload);
     }
 
-    @Override
-    public void setActivityStatusComboView(IView view) {
-        this.activityStatusComboView = view;
-    }
-
     // TODO: move out
     public static class BaseForm extends Composite {
         private static final String PAGE_KEY = "page"; //$NON-NLS-1$
@@ -116,6 +121,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         protected final FormToolkit toolkit;
         protected final ScrolledPageBook book;
         protected final Composite page;
+        private final SectionExpansionAdapter sectionExpansionAdapter = new SectionExpansionAdapter();
 
         public BaseForm(Composite parent, int style) {
             super(parent, style);
@@ -160,42 +166,56 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             // });
         }
 
-        protected Section createSection(String title, Composite parent,
+        private Composite createSection(String title, Composite parent,
             int style) {
             Section section = toolkit.createSection(parent, style);
-            if (title != null) {
-                section.setText(title);
-            }
+
+            if (title != null) section.setText(title);
+
             section.setLayout(new GridLayout(1, false));
             section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            section.addExpansionListener(new ExpansionAdapter() {
-                @Override
-                public void expansionStateChanged(ExpansionEvent e) {
-                    form.reflow(false);
-                }
-            });
-            return section;
-        }
+            section.addExpansionListener(sectionExpansionAdapter);
 
-        protected Section createSection(String title, Composite parent) {
-            return createSection(title, parent, Section.TWISTIE
-                | Section.TITLE_BAR | Section.EXPANDED);
-        }
-
-        protected Section createSection(String title) {
-            return createSection(title, page);
-        }
-
-        protected Composite sectionAddClient(Section section) {
             Composite client = toolkit.createComposite(section);
+            client.setLayout(new GridLayout(1, false));
             section.setClient(client);
-            client.setLayout(new GridLayout(2, false));
             toolkit.paintBordersFor(client);
+
             return client;
         }
 
-        protected Composite createSectionWithClient(String title) {
-            return sectionAddClient(createSection(title, page));
+        protected Composite createSection(String title, Composite parent) {
+            return createSection(title, parent,
+                Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
+        }
+
+        protected Composite createSection(String title) {
+            return createSection(title, page);
+        }
+
+        public void adaptToToolkit(FormToolkit toolkit, boolean paintBorder) {
+            toolkit.adapt(this, true, true);
+            adaptAllChildren(this, toolkit);
+            if (paintBorder) {
+                toolkit.paintBordersFor(this);
+            }
+        }
+
+        private void adaptAllChildren(Composite container, FormToolkit toolkit) {
+            Control[] children = container.getChildren();
+            for (Control child : children) {
+                toolkit.adapt(child, true, true);
+                if (child instanceof Composite) {
+                    adaptAllChildren((Composite) child, toolkit);
+                }
+            }
+        }
+
+        private class SectionExpansionAdapter extends ExpansionAdapter {
+            @Override
+            public void expansionStateChanged(ExpansionEvent e) {
+                form.reflow(false);
+            }
         }
     }
 
@@ -231,7 +251,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             new Label(client, SWT.NONE).setText("comment");
             comment = new Text(client, SWT.BORDER);
 
-            Composite addressSection = createSectionWithClient("Address");
+            Composite addressSection = createSection("Address");
             addressEntryView.create(addressSection);
 
             new Label(client, SWT.NONE).setText("activityStatus");
@@ -243,6 +263,8 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             reload.setText("reload");
 
             form.reflow(true);
+
+            adaptToToolkit(toolkit, true);
         }
     }
 
@@ -252,10 +274,5 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         for (ValidationMessage message : result.getMessages()) {
             System.out.println(message.getMessage());
         }
-    }
-
-    @Override
-    public void setAddressEditView(IView view) {
-        this.addressEntryView = view;
     }
 }

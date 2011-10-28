@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.mvp.view.item;
 
-import java.util.List;
+import java.util.Collection;
 
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -12,7 +12,7 @@ import com.google.gwt.user.client.ui.HasValue;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableBgrLoader;
 
 // TODO: ideally, tables would use MVP too, but for now, do this
-public class TableItem<T extends List<?>> implements HasValue<T> {
+public class TableItem<T> implements HasValue<Collection<T>> {
     private final HandlerManager handlerManager = new HandlerManager(this);
     private InfoTableBgrLoader table;
 
@@ -25,7 +25,8 @@ public class TableItem<T extends List<?>> implements HasValue<T> {
 
     @Override
     public HandlerRegistration addValueChangeHandler(
-        ValueChangeHandler<T> handler) {
+        ValueChangeHandler<Collection<T>> handler) {
+        // TODO Auto-generated method stub
         return handlerManager.addHandler(ValueChangeEvent.getType(), handler);
     }
 
@@ -35,16 +36,20 @@ public class TableItem<T extends List<?>> implements HasValue<T> {
     }
 
     @Override
-    public T getValue() {
+    public Collection<T> getValue() {
+        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void setValue(T value) {
+    public void setValue(Collection<T> value) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override
-    public void setValue(T value, boolean fireEvents) {
+    public void setValue(Collection<T> value, boolean fireEvents) {
+        // TODO Auto-generated method stub
 
     }
 }
