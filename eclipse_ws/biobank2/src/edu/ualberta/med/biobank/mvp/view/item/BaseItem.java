@@ -21,8 +21,12 @@ public abstract class BaseItem<T> implements HasValue<T> {
         handlerManager.fireEvent(event);
     }
 
+    /**
+     * Finalized to agree to the {@link HasValue#setValue(Object)} contract of
+     * being the same as {@link HasValue#setValue(Object, boolean)} with false.
+     */
     @Override
-    public void setValue(T value) {
+    public final void setValue(T value) {
         setValue(value, false);
     }
 }
