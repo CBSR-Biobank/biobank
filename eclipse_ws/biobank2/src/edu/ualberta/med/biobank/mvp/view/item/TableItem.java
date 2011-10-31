@@ -11,6 +11,12 @@ import edu.ualberta.med.biobank.common.util.ListChangeHandler;
 import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.mvp.event.SimpleValueChangeEvent;
 
+/**
+ * 
+ * @author jferland
+ * 
+ * @param <T>
+ */
 // TODO: ideally, tables would use MVP too, but for now, do this
 public class TableItem<T> extends ValidationItem<Collection<T>> implements
     HasValue<Collection<T>> {

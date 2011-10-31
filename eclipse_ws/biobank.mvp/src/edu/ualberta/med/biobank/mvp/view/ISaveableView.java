@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.mvp.view;
 
-import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
+import edu.ualberta.med.biobank.mvp.user.ui.IButton;
 
 public interface ISaveableView extends IView {
-    HasButton getSave();
+    IButton getSave();
 }

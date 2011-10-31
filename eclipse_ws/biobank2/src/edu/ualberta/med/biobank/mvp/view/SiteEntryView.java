@@ -39,7 +39,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
-import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
+import edu.ualberta.med.biobank.mvp.user.ui.IButton;
 import edu.ualberta.med.biobank.mvp.view.item.ButtonItem;
 import edu.ualberta.med.biobank.mvp.view.item.TableItem;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
@@ -48,6 +48,11 @@ import edu.ualberta.med.biobank.mvp.view.item.TranslatedItem.Translator;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+/**
+ * 
+ * @author jferland
+ * 
+ */
 public class SiteEntryView implements SiteEntryPresenter.View {
     private SiteEntryForm widget;
 
@@ -105,7 +110,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
     }
 
     @Override
-    public HasButton getSave() {
+    public IButton getSave() {
         return save;
     }
 

@@ -11,9 +11,9 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
 
 import edu.ualberta.med.biobank.mvp.event.EclipseClickEvent;
-import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
+import edu.ualberta.med.biobank.mvp.user.ui.IButton;
 
-public class ButtonItem implements HasButton {
+public class ButtonItem implements IButton {
     private final HandlerManager handlerManager = new HandlerManager(this);
     private final MouseListener mouseListener = new MouseListener() {
         @Override

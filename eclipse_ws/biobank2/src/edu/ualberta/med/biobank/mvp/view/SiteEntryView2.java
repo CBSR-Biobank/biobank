@@ -15,7 +15,7 @@ import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 
 import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
-import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
+import edu.ualberta.med.biobank.mvp.user.ui.IButton;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
 
 public class SiteEntryView2 extends EditorPart implements
@@ -87,7 +87,7 @@ public class SiteEntryView2 extends EditorPart implements
     }
 
     @Override
-    public HasButton getSave() {
+    public IButton getSave() {
         // TODO Auto-generated method stub
         return null;
     }

@@ -31,6 +31,11 @@ import edu.ualberta.med.biobank.mvp.util.ObjectCloner;
 import edu.ualberta.med.biobank.mvp.view.IEntryView;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
+/**
+ * 
+ * @author jferland
+ * 
+ */
 public class SiteEntryPresenter extends AbstractEntryPresenter<View> {
     private final Dispatcher dispatcher;
     private final AddressEntryPresenter addressEntryPresenter;
