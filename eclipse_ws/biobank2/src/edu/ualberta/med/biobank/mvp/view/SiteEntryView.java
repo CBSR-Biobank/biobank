@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.mvp.view;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -34,6 +35,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
@@ -41,6 +43,8 @@ import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 import edu.ualberta.med.biobank.mvp.view.item.ButtonItem;
 import edu.ualberta.med.biobank.mvp.view.item.TableItem;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
+import edu.ualberta.med.biobank.mvp.view.item.TranslatedItem;
+import edu.ualberta.med.biobank.mvp.view.item.TranslatedItem.Translator;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -53,10 +57,42 @@ public class SiteEntryView implements SiteEntryPresenter.View {
     private final TextItem name = new TextItem();
     private final TextItem nameShort = new TextItem();
     private final TextItem comment = new TextItem();
-    private final TableItem<StudyInfo> studies = new TableItem<StudyInfo>();
+    private final TableItem<StudyWrapper> studyWrappers = new TableItem<StudyWrapper>();
+    private final TranslatedItem<Collection<StudyInfo>, Collection<StudyWrapper>> studies = TranslatedItem
+        .from(studyWrappers, STUDY_TRANSLATOR);
 
     private IView addressEntryView;
     private IView activityStatusComboView;
+
+    private static final StudyTranslator STUDY_TRANSLATOR = new StudyTranslator();
+
+    private static class StudyTranslator implements
+        Translator<Collection<StudyInfo>, Collection<StudyWrapper>> {
+        @Override
+        public Collection<StudyInfo> fromDelegate(
+            Collection<StudyWrapper> delegate) {
+            Collection<StudyInfo> studies = new ArrayList<StudyInfo>();
+            for (StudyWrapper study : delegate) {
+                StudyInfo studyInfo = new StudyInfo(study.getWrappedObject(),
+                    -1l, -1l);
+                studies.add(studyInfo);
+            }
+            return studies;
+        }
+
+        @Override
+        public Collection<StudyWrapper> toDelegate(Collection<StudyInfo> foreign) {
+            Collection<StudyWrapper> studies = new ArrayList<StudyWrapper>();
+            for (StudyInfo study : foreign) {
+                WritableApplicationService appService = SessionManager
+                    .getAppService();
+                StudyWrapper wrapper = new StudyWrapper(appService,
+                    study.getStudy());
+                studies.add(wrapper);
+            }
+            return studies;
+        }
+    }
 
     @Override
     public void setActivityStatusComboView(IView view) {
@@ -122,7 +158,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         comment.setText(widget.comment);
         save.setButton(widget.save);
         reload.setButton(widget.reload);
-        // studies.setTable(widget.studiesTable);
+        studyWrappers.setTable(widget.studiesTable);
     }
 
     // TODO: move out
@@ -316,6 +352,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             SiteWrapper siteWrapper = new SiteWrapper(appService);
             studiesTable = new StudyAddInfoTable(studySection, siteWrapper,
                 superAdmin);
+            studySection.setClient(studiesTable);
 
             save = new Button(client, SWT.NONE);
             save.setText("save");
