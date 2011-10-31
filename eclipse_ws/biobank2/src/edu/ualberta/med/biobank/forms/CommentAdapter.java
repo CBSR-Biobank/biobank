@@ -14,7 +14,6 @@ public class CommentAdapter extends AdapterBase {
 
     public CommentAdapter(AdapterBase parent, ModelWrapper<?> object) {
         super(parent, object);
-        // TODO Auto-generated constructor stub
     }
 
     @Override

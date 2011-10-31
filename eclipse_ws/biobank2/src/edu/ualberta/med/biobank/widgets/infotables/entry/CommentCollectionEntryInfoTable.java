@@ -36,6 +36,11 @@ public class CommentCollectionEntryInfoTable extends CommentCollectionInfoTable 
         return true;
     }
 
+    @Override
+    public CommentWrapper getSelection() {
+        return ((TableRowData) super.getSelection()).comment;
+    }
+
     @SuppressWarnings("serial")
     @Override
     protected BiobankTableSorter getComparator() {
@@ -72,9 +77,10 @@ public class CommentCollectionEntryInfoTable extends CommentCollectionInfoTable 
     }
 
     public void addComment() {
-        AdapterBase
-            .openForm(new FormInput(new
-                CommentAdapter(null, new CommentWrapper(SessionManager
-                    .getAppService()))), CommentEntryForm.ID, true);
+        CommentWrapper wrapper = new CommentWrapper(
+            SessionManager.getAppService());
+        CommentAdapter adapter = new CommentAdapter(null, wrapper);
+        AdapterBase.openForm(new FormInput(adapter), CommentEntryForm.ID);
+
     }
 }

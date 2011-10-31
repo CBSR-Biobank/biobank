@@ -19,17 +19,22 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -190,7 +195,18 @@ public class ContainerEntryForm extends BiobankEntryForm {
             );
         commentEntryTable.adaptToToolkit(toolkit, true);
         commentEntryTable.addSelectionChangedListener(listener);
+        commentEntryTable.addEditItemListener(new IInfoTableEditItemListener() {
 
+            @Override
+            public void editItem(InfoTableEvent event) {
+                CommentWrapper wrapper = commentEntryTable.getSelection();
+                if (wrapper != null) {
+                    CommentAdapter adapter = new CommentAdapter(null, wrapper);
+                    AdapterBase.openForm(new FormInput(adapter),
+                        CommentEntryForm.ID);
+                }
+            }
+        });
         addSectionToolbar(section, Messages.Comments_button_add,
             new SelectionAdapter() {
                 @Override

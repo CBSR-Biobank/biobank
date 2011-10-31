@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.others.CommentSaveAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -106,6 +107,14 @@ public class CommentEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+        CommentSaveAction action = new CommentSaveAction();
+        action.setCommentId(comment.getId());
+        action.setMessage(comment.getMessage());
+
+        Integer savedCommentId = SessionManager.getAppService()
+            .doAction(action
+            );
+        ((CommentAdapter) adapter).setId(savedCommentId);
     }
 
     @Override
