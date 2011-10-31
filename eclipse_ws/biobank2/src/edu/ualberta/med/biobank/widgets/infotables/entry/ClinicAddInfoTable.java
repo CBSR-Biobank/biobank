@@ -59,16 +59,16 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
     }
 
     private void addDeleteSupport() {
-        addAddItemListener(new IInfoTableAddItemListener() {
+        addAddItemListener(new IInfoTableAddItemListener<ContactWrapper>() {
             @Override
-            public void addItem(InfoTableEvent event) {
+            public void addItem(InfoTableEvent<ContactWrapper> event) {
                 createClinicContact();
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<ContactWrapper>() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
+            public void deleteItem(InfoTableEvent<ContactWrapper> event) {
                 ContactWrapper contact = getSelection();
                 if (contact != null) {
                     if (!BgcPlugin.openConfirm(

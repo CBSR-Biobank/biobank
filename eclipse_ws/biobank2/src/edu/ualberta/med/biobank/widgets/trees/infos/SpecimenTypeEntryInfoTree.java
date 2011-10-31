@@ -99,25 +99,25 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
     }
 
     private void addEditSupport() {
-        addAddItemListener(new IInfoTreeAddItemListener() {
+        addAddItemListener(new IInfoTreeAddItemListener<SpecimenTypeWrapper>() {
             @Override
-            public void addItem(InfoTreeEvent event) {
+            public void addItem(InfoTreeEvent<SpecimenTypeWrapper> event) {
                 addSpecimenType();
             }
         });
 
-        addEditItemListener(new IInfoTreeEditItemListener() {
+        addEditItemListener(new IInfoTreeEditItemListener<SpecimenTypeWrapper>() {
             @Override
-            public void editItem(InfoTreeEvent event) {
+            public void editItem(InfoTreeEvent<SpecimenTypeWrapper> event) {
                 SpecimenTypeWrapper type = getSelection();
                 if (type != null)
                     addOrEditSpecimenType(false, type, editMessage);
             }
         });
 
-        addDeleteItemListener(new IInfoTreeDeleteItemListener() {
+        addDeleteItemListener(new IInfoTreeDeleteItemListener<SpecimenTypeWrapper>() {
             @Override
-            public void deleteItem(InfoTreeEvent event) {
+            public void deleteItem(InfoTreeEvent<SpecimenTypeWrapper> event) {
                 SpecimenTypeWrapper specType = getSelection();
                 if (specType != null) {
                     try {

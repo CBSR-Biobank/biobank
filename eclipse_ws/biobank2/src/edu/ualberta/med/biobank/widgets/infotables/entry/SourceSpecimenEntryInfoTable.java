@@ -120,17 +120,17 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
 
     private void addEditSupport() {
         if (SessionManager.canCreate(SourceSpecimenWrapper.class)) {
-            addAddItemListener(new IInfoTableAddItemListener() {
+            addAddItemListener(new IInfoTableAddItemListener<SourceSpecimenWrapper>() {
                 @Override
-                public void addItem(InfoTableEvent event) {
+                public void addItem(InfoTableEvent<SourceSpecimenWrapper> event) {
                     addSourceSpecimen();
                 }
             });
         }
         if (SessionManager.canUpdate(SourceSpecimenWrapper.class)) {
-            addEditItemListener(new IInfoTableEditItemListener() {
+            addEditItemListener(new IInfoTableEditItemListener<SourceSpecimenWrapper>() {
                 @Override
-                public void editItem(InfoTableEvent event) {
+                public void editItem(InfoTableEvent<SourceSpecimenWrapper> event) {
                     SourceSpecimenWrapper sourceSpecimen = getSelection();
                     if (sourceSpecimen != null)
                         addOrEditStudySourceSpecimen(false, sourceSpecimen);
@@ -138,9 +138,10 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
             });
         }
         if (SessionManager.canDelete(SourceSpecimenWrapper.class)) {
-            addDeleteItemListener(new IInfoTableDeleteItemListener() {
+            addDeleteItemListener(new IInfoTableDeleteItemListener<SourceSpecimenWrapper>() {
                 @Override
-                public void deleteItem(InfoTableEvent event) {
+                public void deleteItem(
+                    InfoTableEvent<SourceSpecimenWrapper> event) {
                     SourceSpecimenWrapper sourceSpecimen = getSelection();
                     if (sourceSpecimen != null) {
                         if (!MessageDialog

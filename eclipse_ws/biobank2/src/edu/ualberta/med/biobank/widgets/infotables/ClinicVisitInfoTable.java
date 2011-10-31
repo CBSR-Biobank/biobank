@@ -9,7 +9,8 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class ClinicVisitInfoTable extends InfoTableWidget {
+public class ClinicVisitInfoTable extends
+    InfoTableWidget<CollectionEventWrapper> {
 
     private static class TableRowData {
         public CollectionEventWrapper cevent;

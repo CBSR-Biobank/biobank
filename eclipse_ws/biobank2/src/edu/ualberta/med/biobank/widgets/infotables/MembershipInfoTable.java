@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 
-public class MembershipInfoTable extends InfoTableWidget {
+public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
     public static final int ROWS_PER_PAGE = 7;
     private static final String[] HEADINGS = new String[] {
         Messages.MembershipInfoTable_center_label,
@@ -44,17 +44,17 @@ public class MembershipInfoTable extends InfoTableWidget {
         super(parent, principal.getMembershipCollection(true), HEADINGS,
             ROWS_PER_PAGE, MembershipWrapper.class);
 
-        addEditItemListener(new IInfoTableEditItemListener() {
+        addEditItemListener(new IInfoTableEditItemListener<MembershipWrapper>() {
             @Override
-            public void editItem(InfoTableEvent event) {
+            public void editItem(InfoTableEvent<MembershipWrapper> event) {
                 MembershipWrapper user = ((TableRowData) getSelection()).ms;
                 editMembership(user);
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<MembershipWrapper>() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
+            public void deleteItem(InfoTableEvent<MembershipWrapper> event) {
                 MembershipWrapper ms = ((TableRowData) getSelection()).ms;
                 principal.removeFromMembershipCollection(Arrays.asList(ms));
                 getList().remove(ms);

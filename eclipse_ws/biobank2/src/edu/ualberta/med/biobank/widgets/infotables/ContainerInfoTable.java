@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
-public class ContainerInfoTable extends InfoTableWidget {
+public class ContainerInfoTable extends InfoTableWidget<Container> {
 
     private static class TableRowData {
         ContainerWrapper container;

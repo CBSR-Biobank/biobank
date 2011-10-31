@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class StudyInfoTable extends InfoTableWidget {
+public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     protected static class TableRowData {
         StudyWrapper study;

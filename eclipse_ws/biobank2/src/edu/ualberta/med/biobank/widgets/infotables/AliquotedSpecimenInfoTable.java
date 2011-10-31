@@ -12,7 +12,8 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class AliquotedSpecimenInfoTable extends InfoTableWidget {
+public class AliquotedSpecimenInfoTable extends
+    InfoTableWidget<AliquotedSpecimenWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 5;
 

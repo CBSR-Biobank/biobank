@@ -41,17 +41,17 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         deletedContacts = new ArrayList<ContactWrapper>();
 
         if (SessionManager.canCreate(ContactWrapper.class)) {
-            addAddItemListener(new IInfoTableAddItemListener() {
+            addAddItemListener(new IInfoTableAddItemListener<ContactWrapper>() {
                 @Override
-                public void addItem(InfoTableEvent event) {
+                public void addItem(InfoTableEvent<ContactWrapper> event) {
                     addContact();
                 }
             });
         }
         if (SessionManager.canUpdate(ContactWrapper.class)) {
-            addEditItemListener(new IInfoTableEditItemListener() {
+            addEditItemListener(new IInfoTableEditItemListener<ContactWrapper>() {
                 @Override
-                public void editItem(InfoTableEvent event) {
+                public void editItem(InfoTableEvent<ContactWrapper> event) {
                     ContactWrapper contact = getSelection();
                     if (contact != null)
                         addOrEditContact(false, contact);
@@ -59,9 +59,9 @@ public class ContactEntryInfoTable extends ContactInfoTable {
             });
         }
         if (SessionManager.canDelete(ContactWrapper.class)) {
-            addDeleteItemListener(new IInfoTableDeleteItemListener() {
+            addDeleteItemListener(new IInfoTableDeleteItemListener<ContactWrapper>() {
                 @Override
-                public void deleteItem(InfoTableEvent event) {
+                public void deleteItem(InfoTableEvent<ContactWrapper> event) {
                     ContactWrapper contact = getSelection();
                     if (contact != null) {
                         if (!contact.deleteAllowed()) {

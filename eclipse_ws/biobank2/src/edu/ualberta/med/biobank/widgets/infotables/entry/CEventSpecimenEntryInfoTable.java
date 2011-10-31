@@ -82,9 +82,9 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
         final List<SourceSpecimenWrapper> studySourceTypes,
         final List<SpecimenTypeWrapper> allSpecimenTypes) {
         if (SessionManager.canUpdate(SpecimenWrapper.class)) {
-            addEditItemListener(new IInfoTableEditItemListener() {
+            addEditItemListener(new IInfoTableEditItemListener<SpecimenWrapper>() {
                 @Override
-                public void editItem(InfoTableEvent event) {
+                public void editItem(InfoTableEvent<SpecimenWrapper> event) {
                     SpecimenWrapper sw = getSelection();
                     if (sw != null)
                         addOrEditSpecimen(false, sw, studySourceTypes,
@@ -93,9 +93,9 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
             });
         }
         if (SessionManager.canDelete(SpecimenWrapper.class)) {
-            addDeleteItemListener(new IInfoTableDeleteItemListener() {
+            addDeleteItemListener(new IInfoTableDeleteItemListener<SpecimenWrapper>() {
                 @Override
-                public void deleteItem(InfoTableEvent event) {
+                public void deleteItem(InfoTableEvent<SpecimenWrapper> event) {
                     SpecimenWrapper sw = getSelection();
                     if (sw != null) {
                         if (!MessageDialog

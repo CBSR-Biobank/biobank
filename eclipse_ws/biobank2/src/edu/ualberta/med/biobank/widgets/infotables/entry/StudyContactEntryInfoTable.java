@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 import edu.ualberta.med.biobank.widgets.infotables.Messages;
 
-public class StudyContactEntryInfoTable extends InfoTableWidget {
+public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 10;
 

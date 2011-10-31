@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class UserInfoTable extends InfoTableWidget {
+public abstract class UserInfoTable extends InfoTableWidget<UserWrapper> {
 
     public static final int ROWS_PER_PAGE = 12;
 
@@ -53,17 +53,17 @@ public abstract class UserInfoTable extends InfoTableWidget {
 
     public UserInfoTable(Composite parent, List<UserWrapper> collection) {
         super(parent, collection, HEADINGS, ROWS_PER_PAGE, UserWrapper.class);
-        addEditItemListener(new IInfoTableEditItemListener() {
+        addEditItemListener(new IInfoTableEditItemListener<UserWrapper>() {
             @Override
-            public void editItem(InfoTableEvent event) {
+            public void editItem(InfoTableEvent<UserWrapper> event) {
                 UserWrapper user = ((TableRowData) getSelection()).user;
                 editUser(user);
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<UserWrapper>() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
+            public void deleteItem(InfoTableEvent<UserWrapper> event) {
                 UserWrapper user = ((TableRowData) getSelection()).user;
                 deleteUser(user);
             }

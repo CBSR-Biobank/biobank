@@ -340,7 +340,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         }
     }
 
-    public void addAddItemListener(IInfoTreeAddItemListener listener) {
+    public void addAddItemListener(IInfoTreeAddItemListener<T> listener) {
         addItemListeners.add(listener);
 
         Assert.isNotNull(menu);
@@ -354,7 +354,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         });
     }
 
-    public void addEditItemListener(IInfoTreeEditItemListener listener) {
+    public void addEditItemListener(IInfoTreeEditItemListener<T> listener) {
         editItemListeners.add(listener);
 
         Assert.isNotNull(menu);
@@ -368,7 +368,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         });
     }
 
-    public void addDeleteItemListener(IInfoTreeDeleteItemListener listener) {
+    public void addDeleteItemListener(IInfoTreeDeleteItemListener<T> listener) {
         deleteItemListeners.add(listener);
 
         Assert.isNotNull(menu);
@@ -384,10 +384,11 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
 
     protected void addItem() {
         InfoTreeSelection selection = new InfoTreeSelection(getSelection());
-        final InfoTreeEvent event = new InfoTreeEvent(this, selection);
+        final InfoTreeEvent<T> event = new InfoTreeEvent<T>(this, selection);
         Object[] listeners = addItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTreeAddItemListener l = (IInfoTreeAddItemListener) listeners[i];
+            @SuppressWarnings("unchecked")
+            final IInfoTreeAddItemListener<T> l = (IInfoTreeAddItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -399,10 +400,11 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
 
     protected void editItem() {
         InfoTreeSelection selection = new InfoTreeSelection(getSelection());
-        final InfoTreeEvent event = new InfoTreeEvent(this, selection);
+        final InfoTreeEvent<T> event = new InfoTreeEvent<T>(this, selection);
         Object[] listeners = editItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTreeEditItemListener l = (IInfoTreeEditItemListener) listeners[i];
+            @SuppressWarnings("unchecked")
+            final IInfoTreeEditItemListener<T> l = (IInfoTreeEditItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -414,10 +416,11 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
 
     protected void deleteItem() {
         InfoTreeSelection selection = new InfoTreeSelection(getSelection());
-        final InfoTreeEvent event = new InfoTreeEvent(this, selection);
+        final InfoTreeEvent<T> event = new InfoTreeEvent<T>(this, selection);
         Object[] listeners = deleteItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTreeDeleteItemListener l = (IInfoTreeDeleteItemListener) listeners[i];
+            @SuppressWarnings("unchecked")
+            final IInfoTreeDeleteItemListener<T> l = (IInfoTreeDeleteItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {

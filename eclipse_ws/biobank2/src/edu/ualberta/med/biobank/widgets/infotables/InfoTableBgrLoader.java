@@ -13,8 +13,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.Messages;
 public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
     protected Thread backgroundThread;
 
-    private int size;
-
     public InfoTableBgrLoader(Composite parent, List<T> list,
         String[] headings, int[] columnWidths, int rowsPerPage) {
         super(parent, headings, columnWidths, rowsPerPage);
@@ -43,7 +41,7 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
                 || ((backgroundThread != null) && backgroundThread.isAlive())) {
                 return;
             } else if (getList() != list) {
-                setList(list);
+                super.setList(list);
                 init(list);
                 setPaginationParams(list);
             }

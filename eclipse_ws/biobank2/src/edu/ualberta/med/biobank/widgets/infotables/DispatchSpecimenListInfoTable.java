@@ -53,9 +53,10 @@ public abstract class DispatchSpecimenListInfoTable extends
         this.editMode = editMode;
         if (editMode) {
             if (shipment.isInCreationState()) {
-                addDeleteItemListener(new IInfoTableDeleteItemListener() {
+                addDeleteItemListener(new IInfoTableDeleteItemListener<DispatchSpecimenWrapper>() {
                     @Override
-                    public void deleteItem(InfoTableEvent event) {
+                    public void deleteItem(
+                        InfoTableEvent<DispatchSpecimenWrapper> event) {
                         List<DispatchSpecimenWrapper> dsaList = getSelectedItems();
                         if (dsaList.size() > 0) {
                             if (dsaList.size() == 1

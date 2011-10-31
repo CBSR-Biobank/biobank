@@ -21,23 +21,23 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 
-public abstract class GroupInfoTable extends InfoTableWidget {
+public abstract class GroupInfoTable extends InfoTableWidget<BbGroupWrapper> {
     public static final int ROWS_PER_PAGE = 12;
     private static final String[] HEADINGS = new String[] { Messages.GroupInfoTable_name_label };
 
     public GroupInfoTable(Composite parent, List<BbGroupWrapper> collection) {
         super(parent, collection, HEADINGS, ROWS_PER_PAGE, BbGroupWrapper.class);
 
-        addEditItemListener(new IInfoTableEditItemListener() {
+        addEditItemListener(new IInfoTableEditItemListener<BbGroupWrapper>() {
             @Override
-            public void editItem(InfoTableEvent event) {
+            public void editItem(InfoTableEvent<BbGroupWrapper> event) {
                 editGroup((BbGroupWrapper) getSelection());
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<BbGroupWrapper>() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
+            public void deleteItem(InfoTableEvent<BbGroupWrapper> event) {
                 deleteGroup((BbGroupWrapper) getSelection());
             }
         });

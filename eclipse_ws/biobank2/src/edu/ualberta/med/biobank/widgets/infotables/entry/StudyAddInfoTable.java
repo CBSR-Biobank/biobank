@@ -70,16 +70,16 @@ public class StudyAddInfoTable extends StudyInfoTable {
     }
 
     private void addDeleteCreateSupport() {
-        addAddItemListener(new IInfoTableAddItemListener() {
+        addAddItemListener(new IInfoTableAddItemListener<StudyWrapper>() {
             @Override
-            public void addItem(InfoTableEvent event) {
+            public void addItem(InfoTableEvent<StudyWrapper> event) {
                 createStudyDlg();
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<StudyWrapper>() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
+            public void deleteItem(InfoTableEvent<StudyWrapper> event) {
                 StudyWrapper study = getSelection();
                 if (study == null)
                     return;

@@ -5,7 +5,7 @@ import java.util.EventObject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ISelection;
 
-public class InfoTableEvent extends EventObject {
+public class InfoTableEvent<T> extends EventObject {
 
     /**
      * Generated serial version UID for this class.
@@ -14,7 +14,8 @@ public class InfoTableEvent extends EventObject {
 
     protected transient ISelection selection;
 
-    public InfoTableEvent(AbstractInfoTableWidget source, ISelection selection) {
+    public InfoTableEvent(AbstractInfoTableWidget<T> source,
+        ISelection selection) {
         super(source);
         Assert.isNotNull(selection);
         this.selection = selection;
@@ -34,8 +35,9 @@ public class InfoTableEvent extends EventObject {
      * 
      * @return the originating viewer
      */
-    public AbstractInfoTableWidget getInfoTable() {
-        return (AbstractInfoTableWidget) getSource();
+    @SuppressWarnings("unchecked")
+    public AbstractInfoTableWidget<T> getInfoTable() {
+        return (AbstractInfoTableWidget<T>) getSource();
     }
 
 }

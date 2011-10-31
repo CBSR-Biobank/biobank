@@ -107,25 +107,25 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
     }
 
     private void addEditSupport() {
-        addAddItemListener(new IInfoTableAddItemListener() {
+        addAddItemListener(new IInfoTableAddItemListener<ActivityStatusWrapper>() {
             @Override
-            public void addItem(InfoTableEvent event) {
+            public void addItem(InfoTableEvent<ActivityStatusWrapper> event) {
                 addActivityStatus();
             }
         });
 
-        addEditItemListener(new IInfoTableEditItemListener() {
+        addEditItemListener(new IInfoTableEditItemListener<ActivityStatusWrapper>() {
             @Override
-            public void editItem(InfoTableEvent event) {
+            public void editItem(InfoTableEvent<ActivityStatusWrapper> event) {
                 ActivityStatusWrapper type = getSelection();
                 if (type != null)
                     addOrEditActivityStatus(false, type, editMessage);
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<ActivityStatusWrapper>() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
+            public void deleteItem(InfoTableEvent<ActivityStatusWrapper> event) {
                 ActivityStatusWrapper type = getSelection();
                 if (type != null) {
                     try {

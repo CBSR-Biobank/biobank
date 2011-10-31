@@ -91,9 +91,9 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
             // IMPORTANT! call our super classes addEditItemListener() here
             //
             // if not, then the default edit item behaviour will not work
-            super.addEditItemListener(new IInfoTableEditItemListener() {
+            super.addEditItemListener(new IInfoTableEditItemListener<T>() {
                 @Override
-                public void editItem(InfoTableEvent event) {
+                public void editItem(InfoTableEvent<T> event) {
                     // do nothing
                 }
             });
@@ -101,7 +101,7 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
     }
 
     @Override
-    public void addEditItemListener(IInfoTableEditItemListener listener) {
+    public void addEditItemListener(IInfoTableEditItemListener<T> listener) {
         // turn off the default edit item behaviour
         useDefaultEditItem = false;
         super.addEditItemListener(listener);

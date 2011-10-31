@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class ContactInfoTable extends InfoTableWidget {
+public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 5;
 
