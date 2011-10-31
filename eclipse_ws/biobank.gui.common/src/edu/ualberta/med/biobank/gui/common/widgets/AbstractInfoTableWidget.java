@@ -26,6 +26,9 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.common.util.DelegatingList;
+import edu.ualberta.med.biobank.common.util.ListChangeHandler;
+import edu.ualberta.med.biobank.common.util.ListChangeSource;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -49,13 +52,13 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * </ul>
  */
 public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
-    implements IInfoTablePagination, IDoubleClickListener {
+    implements IInfoTablePagination, IDoubleClickListener, ListChangeSource<T> {
 
     public static class RowItem {
         int itemNumber;
     }
 
-    private List<T> list;
+    protected final DelegatingList<T> list = new DelegatingList<T>();
 
     protected TableViewer tableViewer;
 
@@ -82,7 +85,6 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     protected ListenerList editItemListeners = new ListenerList();
     protected ListenerList deleteItemListeners = new ListenerList();
     protected ListenerList doubleClickListeners = new ListenerList();
-    protected ListenerList listChangeListeners = new ListenerList();
 
     public AbstractInfoTableWidget(Composite parent, String[] headings,
         int[] columnWidths, int rowsPerPage) {
@@ -305,10 +307,6 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         doubleClickListeners.add(listener);
     }
 
-    public void addModifyListener(IInfoTableListChangeListener listener) {
-        listChangeListeners.add(listener);
-    }
-
     public void addAddItemListener(IInfoTableAddItemListener<T> listener) {
         addItemListeners.add(listener);
 
@@ -442,24 +440,21 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         }
     }
 
-    protected void fireListChangeEvent() {
-        Object[] listeners = listChangeListeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTableListChangeListener l = (IInfoTableListChangeListener) listeners[i];
-            SafeRunnable.run(new SafeRunnable() {
-                @Override
-                public void run() {
-                    l.onListChange();
-                }
-            });
-        }
-    }
-
     public void setList(final List<T> list) {
-        this.list = list;
+        this.list.setDelegate(list);
     }
 
     public List<T> getList() {
         return list;
+    }
+
+    @Override
+    public void addListChangeHandler(ListChangeHandler<T> handler) {
+        list.addListChangeHandler(handler);
+    }
+
+    @Override
+    public void removeListChangeHandler(ListChangeHandler<T> handler) {
+        list.removeListChangeHandler(handler);
     }
 }

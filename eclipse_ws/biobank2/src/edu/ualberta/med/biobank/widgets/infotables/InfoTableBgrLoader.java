@@ -5,6 +5,8 @@ import java.util.List;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
+import edu.ualberta.med.biobank.common.util.ListChangeEvent;
+import edu.ualberta.med.biobank.common.util.ListChangeHandler;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
@@ -12,10 +14,12 @@ import edu.ualberta.med.biobank.gui.common.widgets.Messages;
 
 public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
     protected Thread backgroundThread;
+    private final InfoTableListChangeHandler infoTableListChangeHandler = new InfoTableListChangeHandler();
 
     public InfoTableBgrLoader(Composite parent, List<T> list,
         String[] headings, int[] columnWidths, int rowsPerPage) {
         super(parent, headings, columnWidths, rowsPerPage);
+        addListChangeHandler(infoTableListChangeHandler);
         setList(list);
     }
 
@@ -40,11 +44,10 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
             if ((list == null)
                 || ((backgroundThread != null) && backgroundThread.isAlive())) {
                 return;
-            } else if (getList() != list) {
-                super.setList(list);
-                init(list);
-                setPaginationParams(list);
             }
+
+            super.setList(list);
+
             if (paginationRequired) {
                 showPaginationWidget();
                 paginationWidget.setPageLabelText();
@@ -112,4 +115,23 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
         setList(getList());
     }
 
+    private class InfoTableListChangeHandler implements ListChangeHandler<T> {
+        private boolean ignoreEvents = false;
+
+        @Override
+        public void onListChange(ListChangeEvent<T> event) {
+            // init() may cause ListChangeEvent-s to be fired, so don't listen
+            // for them when init() is called.
+            if (!ignoreEvents) {
+                try {
+                    ignoreEvents = true;
+                    List<T> list = getList();
+                    init(list);
+                    setPaginationParams(list);
+                } finally {
+                    ignoreEvents = false;
+                }
+            }
+        }
+    }
 }

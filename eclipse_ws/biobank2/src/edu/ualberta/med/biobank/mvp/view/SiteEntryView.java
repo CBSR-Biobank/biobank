@@ -5,6 +5,9 @@ import java.util.Date;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -12,6 +15,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.ManagedForm;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
@@ -25,13 +30,19 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 import com.pietschy.gwt.pectin.client.form.validation.message.ValidationMessage;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.Messages;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 import edu.ualberta.med.biobank.mvp.view.item.ButtonItem;
 import edu.ualberta.med.biobank.mvp.view.item.TableItem;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
+import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SiteEntryView implements SiteEntryPresenter.View {
     private SiteEntryForm widget;
@@ -111,6 +122,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         comment.setText(widget.comment);
         save.setButton(widget.save);
         reload.setButton(widget.reload);
+        // studies.setTable(widget.studiesTable);
     }
 
     // TODO: move out
@@ -166,7 +178,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             // });
         }
 
-        private Composite createSection(String title, Composite parent,
+        private Section createSection(String title, Composite parent,
             int style) {
             Section section = toolkit.createSection(parent, style);
 
@@ -176,6 +188,12 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             section.addExpansionListener(sectionExpansionAdapter);
 
+            return section;
+        }
+
+        protected Composite createSectionWithClient(String title) {
+            Section section = createSection(title);
+
             Composite client = toolkit.createComposite(section);
             client.setLayout(new GridLayout(1, false));
             section.setClient(client);
@@ -184,12 +202,12 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             return client;
         }
 
-        protected Composite createSection(String title, Composite parent) {
+        protected Section createSection(String title, Composite parent) {
             return createSection(title, parent,
                 Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
         }
 
-        protected Composite createSection(String title) {
+        protected Section createSection(String title) {
             return createSection(title, page);
         }
 
@@ -211,6 +229,29 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             }
         }
 
+        protected static void addSectionToolbar(Section section,
+            String tooltip,
+            SelectionListener listener, Class<?> wrapperTypeToAdd,
+            String imageKey) {
+            if (wrapperTypeToAdd == null
+                || SessionManager.canCreate(wrapperTypeToAdd)) {
+                ToolBar tbar = (ToolBar) section.getTextClient();
+                if (tbar == null) {
+                    tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
+                    section.setTextClient(tbar);
+                }
+
+                ToolItem titem = new ToolItem(tbar, SWT.NULL);
+                if (imageKey == null) {
+                    imageKey = BgcPlugin.IMG_ADD;
+                }
+                titem.setImage(BgcPlugin.getDefault().getImageRegistry()
+                    .get(imageKey));
+                titem.setToolTipText(tooltip);
+                titem.addSelectionListener(listener);
+            }
+        }
+
         private class SectionExpansionAdapter extends ExpansionAdapter {
             @Override
             public void expansionStateChanged(ExpansionEvent e) {
@@ -227,6 +268,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         public final Text comment;
         public final Button save;
         public final Button reload;
+        public final StudyAddInfoTable studiesTable;
 
         public SiteEntryForm(Composite parent, int style) {
             super(parent, style);
@@ -251,11 +293,29 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             new Label(client, SWT.NONE).setText("comment");
             comment = new Text(client, SWT.BORDER);
 
-            Composite addressSection = createSection("Address");
+            Composite addressSection = createSectionWithClient("Address");
             addressEntryView.create(addressSection);
 
             new Label(client, SWT.NONE).setText("activityStatus");
             activityStatusComboView.create(client);
+
+            Section studySection = createSection("Studies");
+            boolean superAdmin = SessionManager.getUser().isSuperAdmin();
+            if (superAdmin) {
+                BaseForm.addSectionToolbar(studySection,
+                    Messages.SiteEntryForm_studies_add,
+                    new SelectionAdapter() {
+                        @Override
+                        public void widgetSelected(SelectionEvent e) {
+                            studiesTable.createStudyDlg();
+                        }
+                    }, ContactWrapper.class, null);
+            }
+            WritableApplicationService appService = SessionManager
+                .getAppService();
+            SiteWrapper siteWrapper = new SiteWrapper(appService);
+            studiesTable = new StudyAddInfoTable(studySection, siteWrapper,
+                superAdmin);
 
             save = new Button(client, SWT.NONE);
             save.setText("save");
