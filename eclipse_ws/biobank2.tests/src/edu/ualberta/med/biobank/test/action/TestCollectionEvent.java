@@ -22,12 +22,11 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGet
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventAttrInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttr;
@@ -38,11 +37,11 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
-import edu.ualberta.med.biobank.test.internal.StudyHelper;
+import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
 public class TestCollectionEvent extends TestAction {
 
-    private StudyWrapper study;
+    private Integer studyId;
     private Integer patientId;
     private Integer siteId;
 
@@ -51,14 +50,14 @@ public class TestCollectionEvent extends TestAction {
     public void setUp() throws Exception {
         super.setUp();
         String name = "CEventTest" + r.nextInt();
-        // FIXME should not use wrappers for set up
-        study = StudyHelper.addStudy(name);
-        patientId = appService.doAction(new PatientSaveAction(null, study
-            .getId(), name, Utils.getRandomDate()));
+        studyId = StudyHelper.createStudy(appService, name,
+            ActivityStatusEnum.ACTIVE);
+        patientId = appService.doAction(new PatientSaveAction(null, studyId,
+            name, Utils.getRandomDate()));
 
         siteId = SiteHelper.createSite(appService, name, "Edmonton",
             ActivityStatusEnum.ACTIVE,
-            new HashSet<Integer>(study.getId()));
+            new HashSet<Integer>(studyId));
     }
 
     @Test
@@ -200,11 +199,11 @@ public class TestCollectionEvent extends TestAction {
     @Test
     public void testSaveWithAttrs() throws Exception {
         // FIXME should not use wrappers for set up
-        addEventAttrs(study);
-        List<String> labels = Arrays.asList(study.getStudyEventAttrLabels());
+        addEventAttrs(studyId);
+        List<String> labels = Arrays.asList(studyId.getStudyEventAttrLabels());
         Assert.assertEquals(5, labels.size());
         StudyEventAttr studyAttr = null;
-        for (StudyEventAttr o : study.getWrappedObject()
+        for (StudyEventAttr o : studyId.getWrappedObject()
             .getStudyEventAttrCollection()) {
             if ("Worksheet".equals(o.getLabel()))
                 studyAttr = o;
@@ -216,9 +215,9 @@ public class TestCollectionEvent extends TestAction {
             .getRandomCommentInfos(currentUser.getId());
         final Integer statusId = 1;
 
-        List<SaveCEventAttrInfo> attrs = new ArrayList<CollectionEventSaveAction.SaveCEventAttrInfo>();
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
         String value1 = "abcdefghi";
-        SaveCEventAttrInfo attrInfo = CollectionEventHelper
+        CEventAttrSaveInfo attrInfo = CollectionEventHelper
             .createSaveCEventAttrInfo(studyAttr.getId(), EventAttrTypeEnum
                 .getEventAttrType(studyAttr.getEventAttrType().getName()),
                 value1);
@@ -277,7 +276,7 @@ public class TestCollectionEvent extends TestAction {
         closeHibernateSession();
     }
 
-    private void addEventAttrs(StudyWrapper study) throws Exception {
+    private void addEventAttrs(Integer studyId) throws Exception {
         // add Event Attr to study
         Collection<String> types = EventAttrTypeWrapper
             .getAllEventAttrTypesMap(appService).keySet();
@@ -370,18 +369,18 @@ public class TestCollectionEvent extends TestAction {
             .createSaveCEventSpecimenInfoRandomList(5, typeId,
                 currentUser.getId());
 
-        addEventAttrs(study);
-        List<String> labels = Arrays.asList(study.getStudyEventAttrLabels());
+        addEventAttrs(studyId);
+        List<String> labels = Arrays.asList(studyId.getStudyEventAttrLabels());
         Assert.assertEquals(5, labels.size());
         StudyEventAttr studyAttr = null;
-        for (StudyEventAttr o : study.getWrappedObject()
+        for (StudyEventAttr o : studyId.getWrappedObject()
             .getStudyEventAttrCollection()) {
             if ("Worksheet".equals(o.getLabel()))
                 studyAttr = o;
         }
         Assert.assertNotNull(studyAttr);
-        List<SaveCEventAttrInfo> attrs = new ArrayList<CollectionEventSaveAction.SaveCEventAttrInfo>();
-        SaveCEventAttrInfo attrInfo = CollectionEventHelper
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
+        CEventAttrSaveInfo attrInfo = CollectionEventHelper
             .createSaveCEventAttrInfo(studyAttr.getId(), EventAttrTypeEnum
                 .getEventAttrType(studyAttr.getEventAttrType().getName()),
                 "abcdefghi");
@@ -418,11 +417,11 @@ public class TestCollectionEvent extends TestAction {
     @Test
     public void testGetEventAttrInfos() throws Exception {
         // add specimen type
-        addEventAttrs(study);
-        List<String> labels = Arrays.asList(study.getStudyEventAttrLabels());
+        addEventAttrs(studyId);
+        List<String> labels = Arrays.asList(studyId.getStudyEventAttrLabels());
         Assert.assertEquals(5, labels.size());
         StudyEventAttr studyAttr = null;
-        for (StudyEventAttr o : study.getWrappedObject()
+        for (StudyEventAttr o : studyId.getWrappedObject()
             .getStudyEventAttrCollection()) {
             if ("Worksheet".equals(o.getLabel()))
                 studyAttr = o;
@@ -430,9 +429,9 @@ public class TestCollectionEvent extends TestAction {
         Assert.assertNotNull(studyAttr);
         EventAttrTypeEnum eventAttrType = EventAttrTypeEnum
             .getEventAttrType(studyAttr.getEventAttrType().getName());
-        List<SaveCEventAttrInfo> attrs = new ArrayList<CollectionEventSaveAction.SaveCEventAttrInfo>();
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
         String value = "abcdefghi";
-        SaveCEventAttrInfo attrInfo = CollectionEventHelper
+        CEventAttrSaveInfo attrInfo = CollectionEventHelper
             .createSaveCEventAttrInfo(studyAttr.getId(), eventAttrType, value);
         attrs.add(attrInfo);
 

@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
-import edu.ualberta.med.biobank.common.action.activityStatus.GetAllActivityStatusesAction;
+import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusGetAllAction;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeInfo;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -78,7 +78,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         this.inventoryIdExcludeList = inventoryIdExcludeList;
         try {
             allActivityStatuses = SessionManager.getAppService().doAction(
-                new GetAllActivityStatusesAction());
+                new ActivityStatusGetAllAction());
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
                 Messages.CEventSourceSpecimenDialog_activity_error_msg, e);

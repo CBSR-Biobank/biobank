@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetAllActivityStatusesAction implements
+public class ActivityStatusGetAllAction implements
     Action<HashMap<Integer, ActivityStatus>> {
 
     private static final long serialVersionUID = 1L;

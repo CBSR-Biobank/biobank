@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
-import edu.ualberta.med.biobank.common.action.study.GetStudyEventAttrInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
@@ -121,7 +121,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     private void createPvDataSection(Composite client) throws Exception {
         Map<Integer, StudyEventAttrInfo> studyAttrInfos = SessionManager
             .getAppService().doAction(
-                new GetStudyEventAttrInfoAction(ceventInfo.cevent.getPatient()
+                new StudyGetEventAttrInfoAction(ceventInfo.cevent.getPatient()
                     .getStudy().getId()));
 
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();

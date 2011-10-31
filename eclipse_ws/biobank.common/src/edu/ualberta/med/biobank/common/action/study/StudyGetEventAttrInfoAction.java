@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetStudyEventAttrInfoAction implements
+public class StudyGetEventAttrInfoAction implements
     Action<HashMap<Integer, StudyEventAttrInfo>> {
 
     private static final long serialVersionUID = 1L;
@@ -37,7 +37,7 @@ public class GetStudyEventAttrInfoAction implements
 
     // @formatter:on
 
-    public GetStudyEventAttrInfoAction(Integer studyId) {
+    public StudyGetEventAttrInfoAction(Integer studyId) {
         this.studyId = studyId;
     }
 

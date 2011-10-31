@@ -9,7 +9,7 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
-import edu.ualberta.med.biobank.common.action.activityStatus.GetAllActivityStatusesAction;
+import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusGetAllAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter.View;
 import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValue;
@@ -37,7 +37,7 @@ public class ActivityStatusComboPresenter extends BasePresenter<View> {
 
     @Override
     protected void onBind() {
-        dispatcher.exec(new GetAllActivityStatusesAction(),
+        dispatcher.exec(new ActivityStatusGetAllAction(),
             new ActionCallback<HashMap<Integer, ActivityStatus>>() {
                 @Override
                 public void onFailure(Throwable caught) {

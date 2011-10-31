@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.study.GetStudyEventAttrInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -67,7 +67,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
         public Double quantity;
     }
 
-    public static class SaveCEventAttrInfo implements Serializable, NotAProxy {
+    public static class CEventAttrSaveInfo implements Serializable, NotAProxy {
 
         private static final long serialVersionUID = 1L;
         public Integer studyEventAttrId;
@@ -80,13 +80,13 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
     private Integer centerId;
 
-    private List<SaveCEventAttrInfo> ceAttrList;
+    private List<CEventAttrSaveInfo> ceAttrList;
 
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
         Integer visitNumber, Integer statusId,
         Collection<CommentInfo> comments,
         Integer centerId, Collection<SaveCEventSpecimenInfo> sourceSpecs,
-        List<SaveCEventAttrInfo> ceAttrList) {
+        List<CEventAttrSaveInfo> ceAttrList) {
         this.ceventId = ceventId;
         this.patientId = patientId;
         this.visitNumber = visitNumber;
@@ -210,13 +210,13 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
     public void setEventAttrs(Session session, User user, Study study,
         CollectionEvent cevent) throws ActionException {
-        Map<Integer, StudyEventAttrInfo> studyEventList = new GetStudyEventAttrInfoAction(
+        Map<Integer, StudyEventAttrInfo> studyEventList = new StudyGetEventAttrInfoAction(
             study.getId()).run(user, session);
 
         Map<Integer, EventAttrInfo> ceventAttrList = new CollectionEventGetEventAttrInfoAction(
             ceventId).run(user, session);
         if (ceAttrList != null)
-            for (SaveCEventAttrInfo attrInfo : ceAttrList) {
+            for (CEventAttrSaveInfo attrInfo : ceAttrList) {
                 EventAttrInfo ceventAttrInfo = ceventAttrList
                     .get(attrInfo.studyEventAttrId);
                 StudyEventAttrInfo studyEventAttrInfo = studyEventList

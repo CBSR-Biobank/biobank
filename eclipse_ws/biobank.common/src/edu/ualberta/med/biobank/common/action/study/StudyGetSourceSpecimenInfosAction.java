@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetStudySourceSpecimenInfosAction implements
+public class StudyGetSourceSpecimenInfosAction implements
     Action<ArrayList<SourceSpecimen>> {
 
     private static final long serialVersionUID = 1L;
@@ -33,7 +33,7 @@ public class GetStudySourceSpecimenInfosAction implements
 
     // @formatter:on
 
-    public GetStudySourceSpecimenInfosAction(Integer studyId) {
+    public StudyGetSourceSpecimenInfosAction(Integer studyId) {
         this.studyId = studyId;
     }
 

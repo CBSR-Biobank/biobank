@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventAttrInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -49,9 +49,9 @@ public class CollectionEventHelper extends Helper {
         return specs;
     }
 
-    public static SaveCEventAttrInfo createSaveCEventAttrInfo(
+    public static CEventAttrSaveInfo createSaveCEventAttrInfo(
         Integer studyEventAttrId, EventAttrTypeEnum type, String value) {
-        SaveCEventAttrInfo info = new SaveCEventAttrInfo();
+        CEventAttrSaveInfo info = new CEventAttrSaveInfo();
         info.studyEventAttrId = studyEventAttrId;
         info.type = type;
         info.value = value;

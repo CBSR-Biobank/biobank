@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.center;
 
-import java.util.Collection;
-
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -10,7 +8,6 @@ import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.User;
 
 public abstract class CenterSaveAction implements Action<Integer> {
@@ -25,7 +22,6 @@ public abstract class CenterSaveAction implements Action<Integer> {
 
     private String name;
     private String nameShort;
-    private Collection<Comment> comment;
     private Address address;
     private Integer aStatusId;
 
@@ -39,10 +35,6 @@ public abstract class CenterSaveAction implements Action<Integer> {
 
     public void setNameShort(String nameShort) {
         this.nameShort = nameShort;
-    }
-
-    public void setCommentCollection(Collection<Comment> comment) {
-        this.comment = comment;
     }
 
     public void setAddress(Address address) {
@@ -72,7 +64,6 @@ public abstract class CenterSaveAction implements Action<Integer> {
 
         center.setName(name);
         center.setNameShort(nameShort);
-        center.setCommentCollection(comment);
 
         ActivityStatus aStatus = sessionUtil.get(ActivityStatus.class,
             aStatusId);
