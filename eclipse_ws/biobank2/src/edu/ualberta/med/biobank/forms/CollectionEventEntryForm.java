@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventAttrInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientNextVisitNumberAction;
@@ -377,9 +377,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             cevents.add(ceSpecInfo);
         }
 
-        List<SaveCEventAttrInfo> ceventAttrList = new ArrayList<CollectionEventSaveAction.SaveCEventAttrInfo>();
+        List<CEventAttrSaveInfo> ceventAttrList = new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
-            SaveCEventAttrInfo ceventAttr = new SaveCEventAttrInfo();
+            CEventAttrSaveInfo ceventAttr = new CEventAttrSaveInfo();
             ceventAttr.studyEventAttrId = combinedPvInfo.getStudyEventAttrId();
             ceventAttr.value = combinedPvInfo.getValue();
             ceventAttr.type = combinedPvInfo.getType();

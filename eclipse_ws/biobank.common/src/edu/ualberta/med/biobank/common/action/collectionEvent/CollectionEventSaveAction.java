@@ -67,7 +67,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
         public Double quantity;
     }
 
-    public static class SaveCEventAttrInfo implements Serializable, NotAProxy {
+    public static class CEventAttrSaveInfo implements Serializable, NotAProxy {
 
         private static final long serialVersionUID = 1L;
         public Integer studyEventAttrId;
@@ -80,13 +80,13 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
     private Integer centerId;
 
-    private List<SaveCEventAttrInfo> ceAttrList;
+    private List<CEventAttrSaveInfo> ceAttrList;
 
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
         Integer visitNumber, Integer statusId,
         Collection<CommentInfo> comments,
         Integer centerId, Collection<SaveCEventSpecimenInfo> sourceSpecs,
-        List<SaveCEventAttrInfo> ceAttrList) {
+        List<CEventAttrSaveInfo> ceAttrList) {
         this.ceventId = ceventId;
         this.patientId = patientId;
         this.visitNumber = visitNumber;
@@ -216,7 +216,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
         Map<Integer, EventAttrInfo> ceventAttrList = new CollectionEventGetEventAttrInfoAction(
             ceventId).run(user, session);
         if (ceAttrList != null)
-            for (SaveCEventAttrInfo attrInfo : ceAttrList) {
+            for (CEventAttrSaveInfo attrInfo : ceAttrList) {
                 EventAttrInfo ceventAttrInfo = ceventAttrList
                     .get(attrInfo.studyEventAttrId);
                 StudyEventAttrInfo studyEventAttrInfo = studyEventList

@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGet
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventAttrInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
@@ -215,9 +215,9 @@ public class TestCollectionEvent extends TestAction {
             .getRandomCommentInfos(currentUser.getId());
         final Integer statusId = 1;
 
-        List<SaveCEventAttrInfo> attrs = new ArrayList<CollectionEventSaveAction.SaveCEventAttrInfo>();
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
         String value1 = "abcdefghi";
-        SaveCEventAttrInfo attrInfo = CollectionEventHelper
+        CEventAttrSaveInfo attrInfo = CollectionEventHelper
             .createSaveCEventAttrInfo(studyAttr.getId(), EventAttrTypeEnum
                 .getEventAttrType(studyAttr.getEventAttrType().getName()),
                 value1);
@@ -379,8 +379,8 @@ public class TestCollectionEvent extends TestAction {
                 studyAttr = o;
         }
         Assert.assertNotNull(studyAttr);
-        List<SaveCEventAttrInfo> attrs = new ArrayList<CollectionEventSaveAction.SaveCEventAttrInfo>();
-        SaveCEventAttrInfo attrInfo = CollectionEventHelper
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
+        CEventAttrSaveInfo attrInfo = CollectionEventHelper
             .createSaveCEventAttrInfo(studyAttr.getId(), EventAttrTypeEnum
                 .getEventAttrType(studyAttr.getEventAttrType().getName()),
                 "abcdefghi");
@@ -429,9 +429,9 @@ public class TestCollectionEvent extends TestAction {
         Assert.assertNotNull(studyAttr);
         EventAttrTypeEnum eventAttrType = EventAttrTypeEnum
             .getEventAttrType(studyAttr.getEventAttrType().getName());
-        List<SaveCEventAttrInfo> attrs = new ArrayList<CollectionEventSaveAction.SaveCEventAttrInfo>();
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
         String value = "abcdefghi";
-        SaveCEventAttrInfo attrInfo = CollectionEventHelper
+        CEventAttrSaveInfo attrInfo = CollectionEventHelper
             .createSaveCEventAttrInfo(studyAttr.getId(), eventAttrType, value);
         attrs.add(attrInfo);
 
