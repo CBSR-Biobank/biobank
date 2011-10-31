@@ -1,8 +1,11 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 public enum EventAttrTypeEnum {
-    SELECT_SINGLE("select_single"), SELECT_MULTIPLE("select_multiple"), NUMBER( //$NON-NLS-1$ //$NON-NLS-2$
-        "number"), DATE_TIME("date_time"), TEXT("text"); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+    SELECT_SINGLE("select_single"), //$NON-NLS-1$
+    SELECT_MULTIPLE("select_multiple"), //$NON-NLS-1$
+    NUMBER("number"), //$NON-NLS-1$
+    DATE_TIME("date_time"), //$NON-NLS-1$
+    TEXT("text"); //$NON-NLS-1$
 
     private String name;
 

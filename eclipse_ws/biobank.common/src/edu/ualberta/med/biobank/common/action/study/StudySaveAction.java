@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
 public class StudySaveAction implements Action<Integer> {
@@ -35,12 +36,13 @@ public class StudySaveAction implements Action<Integer> {
     public static class StudyEventAttrSaveInfo implements Serializable,
         NotAProxy {
         private static final long serialVersionUID = 1L;
-        public Integer studyEventAttrId;
+        public Integer globalEventAttrId;
         public EventAttrTypeEnum type;
+        public Boolean required;
         public String permissible;
     }
 
-    private List<StudyEventAttrSaveInfo> studyEventAttrInfo;
+    private List<StudyEventAttrSaveInfo> studyEventAttrInfos;
 
     public void setId(Integer id) {
         this.id = id;
@@ -91,26 +93,24 @@ public class StudySaveAction implements Action<Integer> {
         study.setName(name);
         study.setNameShort(nameShort);
 
-        ActivityStatus aStatus = sessionUtil.get(ActivityStatus.class,
-            aStatusId);
+        ActivityStatus aStatus =
+            sessionUtil.get(ActivityStatus.class, aStatusId);
         study.setActivityStatus(aStatus);
 
         // TODO: set collections based on diffs
-        Map<Integer, Contact> contacts = sessionUtil.get(Contact.class,
-            contactIds);
+        Map<Integer, Contact> contacts =
+            sessionUtil.get(Contact.class, contactIds);
         study.setContactCollection(new HashSet<Contact>(contacts.values()));
 
         // TODO: set collections based on diffs
-        Map<Integer, AliquotedSpecimen> aliquotedSpcs = sessionUtil.get(
-            AliquotedSpecimen.class,
-            aliquotedSpcTypeIds);
+        Map<Integer, AliquotedSpecimen> aliquotedSpcs =
+            sessionUtil.get(AliquotedSpecimen.class, aliquotedSpcTypeIds);
         study.setAliquotedSpecimenCollection(new HashSet<AliquotedSpecimen>(
             aliquotedSpcs.values()));
 
         // TODO: set collections based on diffs
-        Map<Integer, SourceSpecimen> sourceSpcs = sessionUtil.get(
-            SourceSpecimen.class,
-            sourceSpcIds);
+        Map<Integer, SourceSpecimen> sourceSpcs =
+            sessionUtil.get(SourceSpecimen.class, sourceSpcIds);
         study.setSourceSpecimenCollection(new HashSet<SourceSpecimen>(
             sourceSpcs.values()));
 
@@ -123,11 +123,22 @@ public class StudySaveAction implements Action<Integer> {
     }
 
     private void setStudyEventAttrs(User user, Session session, Study study) {        
-        Map<Integer, GlobalEventAttrInfo> studyEventList = new GlobalEventAttrInfoGetAction(
-            ).run(user, session);
+        Map<Integer, GlobalEventAttrInfo> globalEventAttrInfoList = 
+            new GlobalEventAttrInfoGetAction().run(user, session);
         
-        if (studyEventAttrInfo == null) {
+        if (studyEventAttrInfos == null) {
             // remove existing study event attrs?
+        }
+        
+        for (StudyEventAttrSaveInfo info : studyEventAttrInfos) {
+            GlobalEventAttrInfo globalAttrInfo = 
+                globalEventAttrInfoList.get(info.globalEventAttrId);
+            
+            StudyEventAttr seAttr;
+            seAttr.setLabel(globalAttrInfo.attr.getLabel());
+            seAttr.setPermissible(info.permissible);
+            seAttr.setRequired(info.required);
+            seAttr.setEventAttrType(globalAttrInfo.attr.getEventAttrType());
         }
         
         study.setStudyEventAttrCollection(new Collection<>(studyEventAttrInfo));  
