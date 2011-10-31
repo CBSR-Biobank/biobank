@@ -7,11 +7,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Session;
-import org.hibernate.mapping.Collection;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -72,6 +73,10 @@ public class StudySaveAction implements Action<Integer> {
         this.aliquotedSpcTypeIds = aliquotedSpcTypeIds;
     }
 
+    public void setStudyEventAttrSaveInfo(List<StudyEventAttrSaveInfo> infos) {
+        this.studyEventAttrInfos = infos;
+    }
+
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
         // FIXME: needs implementation
@@ -114,7 +119,7 @@ public class StudySaveAction implements Action<Integer> {
         study.setSourceSpecimenCollection(new HashSet<SourceSpecimen>(
             sourceSpcs.values()));
 
-        setStudyEventAttrs(user, session, study);
+        setStudyEventAttrs(user, session, sessionUtil, study);
 
         session.saveOrUpdate(study);
         session.flush();
@@ -122,26 +127,32 @@ public class StudySaveAction implements Action<Integer> {
         return study.getId();
     }
 
-    private void setStudyEventAttrs(User user, Session session, Study study) {        
-        Map<Integer, GlobalEventAttrInfo> globalEventAttrInfoList = 
+    private void setStudyEventAttrs(User user, Session session,
+        SessionUtil sessionUtil, Study study) {
+        Map<Integer, GlobalEventAttrInfo> globalEventAttrInfoList =
             new GlobalEventAttrInfoGetAction().run(user, session);
-        
+
         if (studyEventAttrInfos == null) {
             // remove existing study event attrs?
         }
-        
+
         for (StudyEventAttrSaveInfo info : studyEventAttrInfos) {
-            GlobalEventAttrInfo globalAttrInfo = 
+            GlobalEventAttrInfo globalAttrInfo =
                 globalEventAttrInfoList.get(info.globalEventAttrId);
-            
-            StudyEventAttr seAttr;
+
+            StudyEventAttr seAttr =
+                sessionUtil.get(StudyEventAttr.class, null,
+                    new StudyEventAttr());
+
             seAttr.setLabel(globalAttrInfo.attr.getLabel());
             seAttr.setPermissible(info.permissible);
             seAttr.setRequired(info.required);
             seAttr.setEventAttrType(globalAttrInfo.attr.getEventAttrType());
+            seAttr.setStudy(study);
+
+            CollectionUtils.getCollection(study,
+                StudyPeer.STUDY_EVENT_ATTR_COLLECTION).add(seAttr);
         }
-        
-        study.setStudyEventAttrCollection(new Collection<>(studyEventAttrInfo));  
-        
+
     }
 }
