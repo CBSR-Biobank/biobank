@@ -25,7 +25,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ContactEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -58,7 +57,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     private CommentCollectionInfoTable commentTable;
 
-    private CommentCollectionEntryInfoTable commentEntryTable;
+    private CommentCollectionInfoTable commentEntryTable;
 
     @Override
     protected void init() throws Exception {
@@ -141,21 +140,20 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     private void createCommentSection() {
-        Section section = createSection(Messages.Comments_title);
-        commentEntryTable = new CommentCollectionEntryInfoTable(section,
-            clinic.getCommentCollection(false)
-            );
-        commentEntryTable.adaptToToolkit(toolkit, true);
-        commentEntryTable.addSelectionChangedListener(listener);
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
 
-        addSectionToolbar(section, Messages.Comments_button_add,
-            new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    commentEntryTable.addComment();
-                }
-            });
-        section.setClient(commentEntryTable);
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(client,
+            clinic.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_button_add);
+
     }
 
     private void createContactSection() {

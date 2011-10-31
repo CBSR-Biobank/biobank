@@ -7,38 +7,30 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
-import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
-import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
-import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class ContainerEntryForm extends BiobankEntryForm {
@@ -79,7 +71,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         }
     };
 
-    private CommentCollectionEntryInfoTable commentEntryTable;
+    private CommentCollectionInfoTable commentEntryTable;
 
     @Override
     public void init() throws Exception {
@@ -189,32 +181,20 @@ public class ContainerEntryForm extends BiobankEntryForm {
     }
 
     private void createCommentSection() {
-        Section section = createSection(Messages.Comments_title);
-        commentEntryTable = new CommentCollectionEntryInfoTable(section,
-            container.getCommentCollection(false)
-            );
-        commentEntryTable.adaptToToolkit(toolkit, true);
-        commentEntryTable.addSelectionChangedListener(listener);
-        commentEntryTable.addEditItemListener(new IInfoTableEditItemListener() {
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
 
-            @Override
-            public void editItem(InfoTableEvent event) {
-                CommentWrapper wrapper = commentEntryTable.getSelection();
-                if (wrapper != null) {
-                    CommentAdapter adapter = new CommentAdapter(null, wrapper);
-                    AdapterBase.openForm(new FormInput(adapter),
-                        CommentEntryForm.ID);
-                }
-            }
-        });
-        addSectionToolbar(section, Messages.Comments_button_add,
-            new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    commentEntryTable.addComment();
-                }
-            });
-        section.setClient(commentEntryTable);
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(client,
+            container.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_button_add);
+
     }
 
     private void createContainerTypesSection(Composite client) throws Exception {

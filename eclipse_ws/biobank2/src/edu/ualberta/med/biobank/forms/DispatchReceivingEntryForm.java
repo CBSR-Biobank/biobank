@@ -10,13 +10,10 @@ import java.util.Map.Entry;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.SessionSecurityHelper;
@@ -33,7 +30,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
 public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
@@ -41,7 +38,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm"; //$NON-NLS-1$
     private DispatchSpecimensTreeTable specimensTree;
     private List<SpecimenWrapper> receivedOrExtraSpecimens = new ArrayList<SpecimenWrapper>();
-    private CommentCollectionEntryInfoTable commentEntryTable;
+    private CommentCollectionInfoTable commentEntryTable;
 
     private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
         @Override
@@ -107,20 +104,20 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     }
 
     private void createCommentSection() {
-        Section section = createSection(Messages.Comments_title);
-        commentEntryTable = new CommentCollectionEntryInfoTable(section,
-            dispatch.getCommentCollection(false));
-        commentEntryTable.adaptToToolkit(toolkit, true);
-        commentEntryTable.addSelectionChangedListener(listener);
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
 
-        addSectionToolbar(section, Messages.Comments_button_add,
-            new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    commentEntryTable.addComment();
-                }
-            });
-        section.setClient(commentEntryTable);
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(client,
+            dispatch.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_button_add);
+
     }
 
     @Override

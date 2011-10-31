@@ -57,9 +57,9 @@ import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 import edu.ualberta.med.biobank.widgets.infotables.entry.CEventSpecimenEntryInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -97,7 +97,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private CEventInfo ceventInfo;
 
-    private CommentCollectionEntryInfoTable commentEntryTable;
+    private CommentCollectionInfoTable commentEntryTable;
 
     @Override
     public void init() throws Exception {
@@ -166,25 +166,24 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     }
 
     private void createCommentSection() {
-        Section section = createSection(Messages.Comments_title);
-        commentEntryTable = new CommentCollectionEntryInfoTable(
-            section,
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(
+            client,
             ModelWrapper.wrapModelCollection(
                 SessionManager.getAppService(),
                 new ArrayList<Comment>(ceventInfo.cevent.getCommentCollection()),
-                CommentWrapper.class)
-            );
-        commentEntryTable.adaptToToolkit(toolkit, true);
-        commentEntryTable.addSelectionChangedListener(listener);
+                CommentWrapper.class));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_button_add);
 
-        addSectionToolbar(section, Messages.Comments_button_add,
-            new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    commentEntryTable.addComment();
-                }
-            });
-        section.setClient(commentEntryTable);
     }
 
     private void createMainSection() throws Exception {

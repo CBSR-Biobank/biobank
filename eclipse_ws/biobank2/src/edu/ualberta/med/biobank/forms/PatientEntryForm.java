@@ -8,14 +8,11 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
@@ -37,7 +34,7 @@ import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.CollectionView;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.infotables.entry.CommentCollectionEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class PatientEntryForm extends BiobankEntryForm {
@@ -70,7 +67,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         }
     };
 
-    private CommentCollectionEntryInfoTable commentEntryTable;
+    private CommentCollectionInfoTable commentEntryTable;
 
     @Override
     public void init() throws Exception {
@@ -182,22 +179,22 @@ public class PatientEntryForm extends BiobankEntryForm {
     }
 
     private void createCommentSection() {
-        Section section = createSection(Messages.Comments_title);
-        commentEntryTable = new CommentCollectionEntryInfoTable(section,
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(client,
             ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
                 new ArrayList<Comment>(pInfo.patient.getCommentCollection()),
                 CommentWrapper.class));
-        commentEntryTable.adaptToToolkit(toolkit, true);
-        commentEntryTable.addSelectionChangedListener(listener);
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_button_add);
 
-        addSectionToolbar(section, Messages.Comments_button_add,
-            new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    commentEntryTable.addComment();
-                }
-            });
-        section.setClient(commentEntryTable);
     }
 
     @Override
