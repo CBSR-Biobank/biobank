@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -15,9 +16,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -31,11 +32,11 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModificationConcurrencyException;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget.ItemAction;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.Event;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
@@ -66,6 +67,15 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     private boolean isTryingAgain;
 
+    private CommentCollectionInfoTable commentEntryTable;
+
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ProcessingEventAdapter,
@@ -79,7 +89,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         if (pEvent.isNew()) {
             tabName = Messages.ProcessingEventEntryForm_title_new;
             pEvent.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         } else {
             if (pEvent.getWorksheet() == null)
                 tabName = NLS.bind(
@@ -91,7 +101,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     pEvent.getFormattedCreatedAt());
         }
         closedActivityStatus = ActivityStatusWrapper.getActivityStatus(
-            appService, ActivityStatusWrapper.CLOSED_STATUS_STRING);
+            SessionManager.getAppService(),
+            ActivityStatusWrapper.CLOSED_STATUS_STRING);
         setPartName(tabName);
     }
 
@@ -132,8 +143,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            pEvent.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), pEvent.getActivityStatus(),
             Messages.ProcessingEventEntryForm_field_activity_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -149,9 +160,25 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             setDirty(false);
         }
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.label_comments, null, pEvent,
-            ProcessingEventPeer.COMMENT.getName(), null);
+        createCommentSection();
+
+    }
+
+    private void createCommentSection() {
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(client,
+            pEvent.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_button_add);
+
     }
 
     private void createSpecimensSection() {
@@ -164,7 +191,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         List<SpecimenWrapper> specimens = pEvent.getSpecimenCollection(true);
 
         specimenEntryWidget = new SpecimenEntryWidget(client, SWT.NONE,
-            toolkit, appService, true);
+            toolkit, SessionManager.getAppService(), true);
         specimenEntryWidget
             .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
                 @Override
@@ -277,30 +304,42 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        try {
-            pEvent.persist();
-        } catch (ModificationConcurrencyException mc) {
-            if (isTryingAgain) {
-                // already tried once
-                throw mc;
-            }
-            Display.getDefault().syncExec(new Runnable() {
-                @Override
-                public void run() {
-                    tryAgain = BgcPlugin
-                        .openConfirm(
-                            Messages.ProcessingEventEntryForm_save_error_title,
-                            Messages.ProcessingEventEntryForm_concurrency_error_msg);
-                    setDirty(true);
-                    try {
-                        doTrySettingAgain();
-                        tryAgain = true;
-                    } catch (Exception e) {
-                        saveErrorCatch(e, null, true);
-                    }
-                }
-            });
+        List<Integer> specimens = new ArrayList<Integer>();
+        for (SpecimenWrapper spc : pEvent.getSpecimenCollection(false)) {
+            specimens.add(spc.getId());
         }
+
+        Integer peventId = SessionManager.getAppService().doAction(
+            new ProcessingEventSaveAction(pEvent.getId(), pEvent.getCenter()
+                .getId(), pEvent.getCreatedAt(), pEvent.getWorksheet(), pEvent
+                .getActivityStatus().getId(), null, specimens));
+        adapter.setId(peventId);
+        // FIXME figure out if still need this. But should probably be on the
+        // action side now
+        // try {
+        // pEvent.persist();
+        // } catch (ModificationConcurrencyException mc) {
+        // if (isTryingAgain) {
+        // // already tried once
+        // throw mc;
+        // }
+        // Display.getDefault().syncExec(new Runnable() {
+        // @Override
+        // public void run() {
+        // tryAgain = BgcPlugin
+        // .openConfirm(
+        // Messages.ProcessingEventEntryForm_save_error_title,
+        // Messages.ProcessingEventEntryForm_concurrency_error_msg);
+        // setDirty(true);
+        // try {
+        // doTrySettingAgain();
+        // tryAgain = true;
+        // } catch (Exception e) {
+        // saveErrorCatch(e, null, true);
+        // }
+        // }
+        // });
+        // }
     }
 
     @Override
@@ -388,7 +427,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         pEvent.setCenter(center);
         if (pEvent.isNew()) {
             pEvent.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         }
         GuiUtil.reset(activityStatusComboViewer, pEvent.getActivityStatus());
         specimenEntryWidget.setSpecimens(pEvent.getSpecimenCollection(true));

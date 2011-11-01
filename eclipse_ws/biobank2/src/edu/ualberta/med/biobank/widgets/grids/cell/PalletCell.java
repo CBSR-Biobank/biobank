@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
-import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -240,7 +240,7 @@ public class PalletCell extends AbstractUICell {
     }
 
     public void merge(WritableApplicationService appService,
-        edu.ualberta.med.biobank.common.scanprocess.Cell cell) throws Exception {
+        edu.ualberta.med.biobank.common.action.scanprocess.Cell cell) throws Exception {
         setStatus(cell.getStatus());
         setInformation(cell.getInformation());
         setValue(cell.getValue());

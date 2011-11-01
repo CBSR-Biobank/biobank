@@ -5,7 +5,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 
 public abstract class PagedDialog extends BgcBaseDialog {
@@ -73,15 +72,15 @@ public abstract class PagedDialog extends BgcBaseDialog {
     }
 
     protected void addNew() {
-        ModelWrapper<?> newModelObject = getNew();
-        copy(newModelObject);
+        Object newObject = getNew();
+        copy(newObject);
         if (newListener != null)
-            newListener.newAdded(newModelObject);
+            newListener.newAdded(newObject);
     }
 
-    protected abstract void copy(ModelWrapper<?> newModelObject);
+    protected abstract void copy(Object newModelObject);
 
-    protected abstract ModelWrapper<?> getNew();
+    protected abstract Object getNew();
 
     protected abstract void resetFields();
 
@@ -90,7 +89,7 @@ public abstract class PagedDialog extends BgcBaseDialog {
     }
 
     public static abstract class NewListener {
-        public abstract void newAdded(ModelWrapper<?> ob);
+        public abstract void newAdded(Object ob);
     }
 
 }

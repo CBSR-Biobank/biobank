@@ -11,6 +11,7 @@ public class PvAttrCustom {
     public static final String VALUE_MULTIPLE_SEPARATOR = ";"; //$NON-NLS-1$
 
     private Boolean isDefault;
+    private Integer studyEventAttrId;
     private String label;
     private EventAttrTypeEnum type;
     private String[] allowedValues;
@@ -75,6 +76,14 @@ public class PvAttrCustom {
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    public Integer getStudyEventAttrId() {
+        return studyEventAttrId;
+    }
+
+    public void setStudyEventAttrId(Integer studyEventAttrId) {
+        this.studyEventAttrId = studyEventAttrId;
     }
 
 };

@@ -49,7 +49,7 @@ public class SourceSpecimenInfoTable extends
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.SourceSpecimenInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }

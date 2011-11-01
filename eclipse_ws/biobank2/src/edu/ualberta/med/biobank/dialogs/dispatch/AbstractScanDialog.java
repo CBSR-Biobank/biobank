@@ -28,11 +28,12 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
-import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellStatus;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -164,24 +165,25 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         if (checkBeforeProcessing(currentCenter)) {
             Map<RowColPos, PalletCell> cells = getCells();
             // conversion for server side call
-            Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells = null;
+            Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.Cell> serverCells = null;
             if (cells != null) {
-                serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell>();
+                serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.Cell>();
                 for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
                     serverCells.put(entry.getKey(), entry.getValue()
                         .transformIntoServerCell());
                 }
             }
             // server side call
-            ScanProcessResult res = SessionManager.getAppService()
-                .processScanResult(serverCells, getProcessData(),
-                    isRescanMode(),
-                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                    Locale.getDefault());
+            ScanProcessResult res = (ScanProcessResult) SessionManager
+                .getAppService().doAction(
+                    getPalletProcessAction(SessionManager.getUser()
+                        .getCurrentWorkingCenter().getId(),
+                        serverCells, isRescanMode(),
+                        Locale.getDefault()));
 
             if (cells != null) {
                 // for each cell, convert into a client side cell
-                for (Entry<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> entry : res
+                for (Entry<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.Cell> entry : res
                     .getCells().entrySet()) {
                     RowColPos rcp = entry.getKey();
                     monitor.subTask(NLS.bind(
@@ -462,11 +464,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-        CellProcessResult res = SessionManager.getAppService()
-            .processCellStatus(cell.transformIntoServerCell(),
-                getProcessData(),
-                SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                Locale.getDefault());
+        CellProcessResult res = (CellProcessResult) SessionManager
+            .getAppService().doAction(
+                getCellProcessAction(SessionManager.getUser()
+                    .getCurrentWorkingCenter().getId(),
+                    cell.transformIntoServerCell(),
+                    Locale.getDefault()));
         cell.merge(SessionManager.getAppService(), res.getCell());
         if (res.getProcessStatus() == CellStatus.ERROR) {
             Button okButton = getButton(IDialogConstants.PROCEED_ID);
@@ -476,7 +479,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         spw.redraw();
     }
 
-    protected abstract ProcessData getProcessData();
+    protected abstract Action<ProcessResult> getCellProcessAction(
+        Integer centerId, Cell cell, Locale locale);
+
+    protected abstract Action<ProcessResult> getPalletProcessAction(
+        Integer centerId, Map<RowColPos, Cell> cells, boolean isRescanMode,
+        Locale locale);
 
     protected void resetScan() {
         if (spw != null)

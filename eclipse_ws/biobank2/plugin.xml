@@ -737,14 +737,9 @@
                <reference
                      definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
-               <or>
-                  <reference
-                        definitionId="biobank.isSuperAdminMode">
-                  </reference>
-                   <reference
-                        definitionId="biobank.hasUserManagementRights">
-                  </reference>
-               </or>
+               <reference
+                     definitionId="biobank.mainPerspectiveSelected">
+               </reference>
             </and>
          </activeWhen>
          <enabledWhen>
@@ -1010,14 +1005,14 @@
                       style="push">
                    <visibleWhen
                          checkEnabled="false">
-                         <or>
+                      <or>
                          <reference
                                definitionId="biobank.isSuperAdminMode">
                          </reference>
-                           <reference
-                        definitionId="biobank.hasUserManagementRights">
-                  </reference>
-               </or>
+                         <reference
+                               definitionId="biobank.hasUserManagementRights">
+                         </reference>
+                      </or>
                    </visibleWhen>
                 </command>
                 <command
@@ -2530,7 +2525,7 @@
             id="biobank.adapterBasePropertyTester"
             namespace="biobank"
             properties="canDelete,canUpdate"
-            type="edu.ualberta.med.biobank.treeview.AdapterBase">
+            type="edu.ualberta.med.biobank.treeview.AbstractAdapterBase">
       </propertyTester>
    </extension>
    <extension

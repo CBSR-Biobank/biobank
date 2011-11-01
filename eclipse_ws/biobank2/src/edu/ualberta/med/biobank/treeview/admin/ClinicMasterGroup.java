@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 
 public class ClinicMasterGroup extends AbstractClinicGroup {
@@ -36,13 +37,13 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return ClinicWrapper.getAllClinics(SessionManager.getAppService());
     }
 
     public void addClinic() {
-        ClinicWrapper clinic = new ClinicWrapper(getAppService());
+        ClinicWrapper clinic = new ClinicWrapper(SessionManager.getAppService());
         ClinicAdapter adapter = new ClinicAdapter(this, clinic);
         adapter.openEntryForm();
     }
@@ -52,4 +53,8 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
         return (int) ClinicWrapper.getCount(SessionManager.getAppService());
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

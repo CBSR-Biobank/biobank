@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
@@ -65,7 +65,7 @@ public class ContainerTypeInfoTable extends InfoTableWidget<ContainerTypeInfo> {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.ContainerTypeInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -144,7 +144,8 @@ public class ContainerTypeInfoTable extends InfoTableWidget<ContainerTypeInfo> {
                 ModelWrapper<?> selection = ContainerTypeInfoTable.this
                     .getSelection();
                 if (selection != null) {
-                    AdapterBase adapter = AdapterFactory.getAdapter(selection);
+                    AbstractAdapterBase adapter = AdapterFactory
+                        .getAdapter(selection);
                     adapter.setParent(siteAdapter.getContainerTypesGroupNode());
                     adapter.openEntryForm();
                 }

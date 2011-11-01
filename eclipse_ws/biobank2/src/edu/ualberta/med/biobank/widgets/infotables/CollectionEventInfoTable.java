@@ -78,7 +78,8 @@ public class CollectionEventInfoTable extends
             .getSourceSpecimensCount(true);
         info.aliquotedSpecimenCount = info.collectionEvent
             .getAliquotedSpecimensCount(true);
-        info.comment = info.collectionEvent.getComment();
+        info.comment = info.collectionEvent.getCommentCollection(false)
+            .toString();
         return info;
     }
 

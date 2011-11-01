@@ -89,7 +89,7 @@ public abstract class GroupInfoTable extends InfoTableWidget<BbGroupWrapper> {
                 BbGroupWrapper group = (BbGroupWrapper) ((BiobankCollectionModel) element).o;
                 if (group == null) {
                     if (columnIndex == 0) {
-                        return Messages.GroupInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }

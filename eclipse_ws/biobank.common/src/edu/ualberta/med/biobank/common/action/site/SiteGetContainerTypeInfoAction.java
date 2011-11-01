@@ -42,8 +42,11 @@ public class SiteGetContainerTypeInfoAction implements
 
     private static final long serialVersionUID = 1L;
     // @formatter:off
+    @SuppressWarnings("nls")
     private static final String SELECT_CONTAINER_TYPE_INFO_HQL = "SELECT containerType,"
-    	+ " (SELECT COUNT(*) FROM " + Container.class.getName() + " c WHERE c.containerType = containerType)"
+        + " (SELECT COUNT(*) FROM "
+        + Container.class.getName()
+        + " c WHERE c.containerType = containerType)"
         + " FROM " + ContainerType.class.getName() + " containerType"
         + " INNER JOIN FETCH containerType.activityStatus AS activityStatus"
         + " INNER JOIN FETCH containerType.capacity capacity"
@@ -69,6 +72,7 @@ public class SiteGetContainerTypeInfoAction implements
     @Override
     public ArrayList<ContainerTypeInfo> run(User user, Session session)
         throws ActionException {
+
         ArrayList<ContainerTypeInfo> containerTypes = new ArrayList<ContainerTypeInfo>();
 
         Query query = session.createQuery(SELECT_CONTAINER_TYPE_INFO_HQL);

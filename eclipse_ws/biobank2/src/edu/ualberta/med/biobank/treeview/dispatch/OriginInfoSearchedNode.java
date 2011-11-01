@@ -5,8 +5,8 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
@@ -19,7 +19,7 @@ public class OriginInfoSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof DispatchWrapper
             || child instanceof OriginInfoWrapper);
         if (child instanceof OriginInfoWrapper)
@@ -34,7 +34,7 @@ public class OriginInfoSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
+    protected boolean isParentTo(Object parent, Object child) {
         if (child instanceof DispatchWrapper) {
             return parent.equals(((DispatchWrapper) child).getSenderCenter());
         }
@@ -42,21 +42,27 @@ public class OriginInfoSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        if (searchedObject instanceof Integer)
-            return findChildFromClass(searchedObject, Integer.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        if (Integer.class.isAssignableFrom(searchedClass))
+            return findChildFromClass(searchedClass, objectId, Integer.class);
         else
-            return searchChildren(searchedObject);
+            return searchChildren(searchedClass, objectId);
     }
 
     @Override
-    protected void addNode(ModelWrapper<?> wrapper) {
-        SpecimenTransitView.addToNode(this, wrapper);
+    protected void addNode(Object obj) {
+        SpecimenTransitView.addToNode(this, obj);
     }
 
     @Override
     public void rebuild() {
         performExpand();
+    }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
     }
 
 }

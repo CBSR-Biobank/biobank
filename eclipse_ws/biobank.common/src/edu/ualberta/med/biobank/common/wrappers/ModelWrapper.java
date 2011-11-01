@@ -617,7 +617,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     public static <W extends ModelWrapper<? extends R>, R, M> List<W> wrapModelCollection(
         WritableApplicationService appService,
-        List<? extends R> modelCollection, Class<W> wrapperKlazz) {
+        Collection<? extends R> modelCollection, Class<W> wrapperKlazz) {
         List<W> wrappers = new ArrayList<W>();
 
         if (modelCollection != null) {

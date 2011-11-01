@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -15,17 +15,19 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class InCreationDispatchGroup extends AbstractDispatchGroup {
 
     public InCreationDispatchGroup(AdapterBase parent, int id,
         CenterWrapper<?> center) {
-        super(parent, id, Messages.InCreationDispatchGroup_creation_node_label, center);
+        super(parent, id, Messages.InCreationDispatchGroup_creation_node_label,
+            center);
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return SiteWrapper.getInCreationDispatchCollection(center);
     }
@@ -49,6 +51,11 @@ public class InCreationDispatchGroup extends AbstractDispatchGroup {
             SessionManager.getAppService());
         DispatchAdapter shipNode = new DispatchAdapter(this, shipment);
         shipNode.openEntryForm();
+    }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
     }
 
 }

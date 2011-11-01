@@ -54,11 +54,15 @@ fi
 DUMPFILE="/tmp/$SCRIPT.$RANDOM.sql"
 
 echo "extracting old database..."
-mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank
-mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD create biobank
-gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
+mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank create biobank
+echo "importing old database..."
+pv $DBDUMP | gzip -dc | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
 echo "upgrading database..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v310_v320.sql
+echo "setting permissions..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/permissions.sql
+echo "assigning groups..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/groups.sql
+echo "migrating security..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v310_v320_security_transfer.sql
+echo "done"

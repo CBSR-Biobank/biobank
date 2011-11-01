@@ -108,7 +108,7 @@ public abstract class DispatchSpecimenListInfoTable extends
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.DispatchSpecimenListInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return Messages.DispatchSpecimenListInfoTable_14;
                 }
@@ -141,7 +141,7 @@ public abstract class DispatchSpecimenListInfoTable extends
         Assert.isNotNull(type, Messages.DispatchSpecimenListInfoTable_16);
         info.type = type.getName();
         info.status = info.dsa.getSpecimen().getActivityStatus().toString();
-        info.comment = info.dsa.getComment();
+        info.comment = info.dsa.getCommentCollection(false).toString();
         return info;
     }
 

@@ -36,6 +36,7 @@ import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -78,6 +79,15 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private Button hasSpecimensRadio;
 
+    private CommentCollectionInfoTable commentEntryTable;
+
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
+
     public ContainerTypeEntryForm() {
         super();
         multiSelectListener = new BgcEntryFormWidgetListener() {
@@ -101,7 +111,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         if (containerType.isNew()) {
             tabName = Messages.ContainerTypeEntryForm_new_title;
             containerType.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         } else {
             tabName = NLS.bind(Messages.ContainerTypeEntryForm_edit_title,
                 containerType.getName());
@@ -116,7 +126,25 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         page.setLayout(new GridLayout(1, false));
 
         createContainerTypeSection();
+        createCommentSection();
         createContainsSection();
+    }
+
+    private void createCommentSection() {
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(client,
+            containerType.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_button_add);
+
     }
 
     protected void createContainerTypeSection() throws ApplicationException {
@@ -127,8 +155,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        adapter.setParent(((SiteAdapter) SessionManager
-            .searchFirstNode(containerType.getSite()))
+        adapter.setParent(((SiteAdapter) SessionManager.searchFirstNode(
+            SiteWrapper.class, containerType.getSite().getId()))
             .getContainerTypesGroupNode());
 
         availSubContainerTypes = new ArrayList<ContainerTypeWrapper>();
@@ -181,7 +209,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         String currentScheme = containerType.getChildLabelingSchemeName();
         labelingSchemeMap = new HashMap<Integer, String>();
         for (ContainerLabelingSchemeWrapper scheme : ContainerLabelingSchemeWrapper
-            .getAllLabelingSchemesMap(appService).values()) {
+            .getAllLabelingSchemesMap(SessionManager.getAppService()).values()) {
             labelingSchemeMap.put(scheme.getId(), scheme.getName());
         }
         labelingSchemeComboViewer = createComboViewer(client,
@@ -205,8 +233,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            containerType.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), containerType.getActivityStatus(),
             Messages.ContainerTypeEntryForm_activity_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -215,10 +243,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                         .setActivityStatus((ActivityStatusWrapper) selectedObject);
                 }
             });
-
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.label_comments, null, containerType,
-            ContainerTypePeer.COMMENT.getName(), null);
 
     }
 
@@ -266,8 +290,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void createSpecimenTypesSection(Composite parent) throws Exception {
-        allSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(appService,
-            true);
+        allSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(
+            SessionManager.getAppService(), true);
 
         specimensMultiSelect = new MultiSelectWidget<SpecimenTypeWrapper>(
             parent, SWT.NONE,
@@ -378,7 +402,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         if (containerType.isNew()) {
             containerType.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         }
 
         setChildContainerTypeSelection();

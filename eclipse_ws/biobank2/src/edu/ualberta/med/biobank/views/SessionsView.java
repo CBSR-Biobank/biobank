@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.views;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
 
@@ -19,12 +20,12 @@ public class SessionsView extends AbstractViewWithAdapterTree {
     }
 
     @Override
-    public void createPartControl(Composite parent) {
+    public void createPartControlInternal(Composite parent) {
         adaptersTree = new AdapterTreeWidget(parent, false);
-        getSite().setSelectionProvider(getTreeViewer());
+
         rootNode = SessionManager.getInstance().getRootNode();
         getTreeViewer().setInput(rootNode);
-        rootNode.setTreeViewer(getTreeViewer());
+        ((RootNode) rootNode).setTreeViewer(getTreeViewer());
         if (rootNode.hasChildren()) {
             getTreeViewer().expandToLevel(3);
         }
@@ -51,4 +52,5 @@ public class SessionsView extends AbstractViewWithAdapterTree {
     public String getId() {
         return ID;
     }
+
 };

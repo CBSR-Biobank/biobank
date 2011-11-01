@@ -10,6 +10,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction.SiteInfo;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -17,12 +18,14 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewStudyInfoTable;
 
 public class SiteViewForm extends AddressViewFormCommon {
-    public static final String ID = "edu.ualberta.med.biobank.forms.SiteViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.SiteViewForm"; //$NON-NLS-1$
 
     private SiteAdapter siteAdapter;
 
@@ -48,11 +51,11 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private BgcBaseText activityStatusLabel;
 
-    private BgcBaseText commentLabel;
-
     private SiteInfo siteInfo;
 
     private SiteWrapper site;
+
+    private CommentCollectionInfoTable commentTable;
 
     @Override
     public void init() throws Exception {
@@ -74,6 +77,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createSiteSection();
+        createCommentsSection();
         createAddressSection(site);
         createStudySection();
         createContainerTypesSection();
@@ -86,26 +90,32 @@ public class SiteViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_name);
-        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_nameShort);
-        studyCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SiteViewForm_field_studyCount_label);
-        containerTypeCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.site_field_type_label);
-        topContainerCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SiteViewForm_field_topLevelCount_label);
-        patientCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SiteViewForm_field_patientCount_label);
-        patientVisitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SiteViewForm_field_pvCount_label);
-        specimenCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SiteViewForm_field_totalSpecimen);
-        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_activity);
-        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.label_comments);
+        nameLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, Messages.label_name);
+        nameShortLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.label_nameShort);
+        studyCountLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.SiteViewForm_field_studyCount_label);
+        containerTypeCountLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.site_field_type_label);
+        topContainerCountLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.SiteViewForm_field_topLevelCount_label);
+        patientCountLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.SiteViewForm_field_patientCount_label);
+        patientVisitCountLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.SiteViewForm_field_pvCount_label);
+        specimenCountLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.SiteViewForm_field_totalSpecimen);
+        activityStatusLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.label_activity);
         setSiteSectionValues();
     }
 
@@ -120,7 +130,6 @@ public class SiteViewForm extends AddressViewFormCommon {
         setTextValue(specimenCountLabel, siteInfo.aliquotedSpecimenCount);
         setTextValue(activityStatusLabel, siteInfo.site.getActivityStatus()
             .getName());
-        setTextValue(commentLabel, siteInfo.site.getComment());
     }
 
     private void createStudySection() {
@@ -135,6 +144,15 @@ public class SiteViewForm extends AddressViewFormCommon {
         section.setClient(studiesTable);
     }
 
+    private void createCommentsSection() {
+        Composite client = createSectionWithClient(Messages.label_comments);
+        commentTable =
+            new CommentCollectionInfoTable(client,
+                site.getCommentCollection(false));
+        commentTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(commentTable);
+    }
+
     private void createContainerTypesSection() {
         Section section = createSection(Messages.SiteViewForm_types_title);
         addSectionToolbar(section, Messages.SiteViewForm_type_add,
@@ -146,8 +164,9 @@ public class SiteViewForm extends AddressViewFormCommon {
                 }
             }, ContainerTypeWrapper.class);
 
-        containerTypesTable = new ContainerTypeInfoTable(section, siteAdapter,
-            siteInfo.containerTypes);
+        containerTypesTable =
+            new ContainerTypeInfoTable(section, siteAdapter,
+                siteInfo.containerTypes);
         containerTypesTable.adaptToToolkit(toolkit, true);
 
         containerTypesTable.addClickListener(collectionDoubleClickListener);
@@ -155,7 +174,8 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createContainerSection() {
-        Section section = createSection(Messages.SiteViewForm_topContainers_title);
+        Section section =
+            createSection(Messages.SiteViewForm_topContainers_title);
         addSectionToolbar(section, Messages.SiteViewForm_topContainers_add,
             new SelectionAdapter() {
                 @Override
@@ -165,8 +185,8 @@ public class SiteViewForm extends AddressViewFormCommon {
                 }
             }, ContainerWrapper.class);
 
-        topContainersTable = new ContainerInfoTable(section, siteAdapter,
-            siteInfo.topContainers);
+        topContainersTable =
+            new ContainerInfoTable(section, siteAdapter, siteInfo.topContainers);
         topContainersTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(topContainersTable);
 
@@ -188,13 +208,17 @@ public class SiteViewForm extends AddressViewFormCommon {
         studiesTable.setCollection(siteInfo.studies);
         containerTypesTable.setList(siteInfo.containerTypes);
         topContainersTable.setList(siteInfo.topContainers);
+        // TODO: load comments?
+        // commentTable.setList((List<?>) siteInfo.site
+        // .getCommentCollection());
     }
 
     private void updateSiteInfo() throws Exception {
         siteAdapter = (SiteAdapter) adapter;
         site = (SiteWrapper) getModelObject();
 
-        siteInfo = appService.doAction(new SiteGetInfoAction(site
-            .getWrappedObject()));
+        siteInfo =
+            SessionManager.getAppService().doAction(
+                new SiteGetInfoAction(site.getWrappedObject()));
     }
 }

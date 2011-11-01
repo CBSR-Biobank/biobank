@@ -10,12 +10,14 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 
 public class ProcessingEventViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ProcessingEventViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ProcessingEventViewForm"; //$NON-NLS-1$
 
     private ProcessingEventWrapper pEvent;
 
@@ -25,11 +27,11 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     private BgcBaseText dateCreationLabel;
 
-    private BgcBaseText commentLabel;
-
     private SpecimenInfoTable sourceSpecimenTable;
 
     private BgcBaseText activityLabel;
+
+    private CommentCollectionInfoTable commentTable;
 
     @Override
     public void init() throws Exception {
@@ -60,19 +62,31 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        centerLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ProcessingEvent_field_center_label);
-        worksheetLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ProcessingEvent_field_worksheet_label);
-        dateCreationLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ProcessingEvent_field_date_label);
-        activityLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_activity);
+        centerLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ProcessingEvent_field_center_label);
+        worksheetLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ProcessingEvent_field_worksheet_label);
+        dateCreationLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ProcessingEvent_field_date_label);
+        activityLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.label_activity);
 
-        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.label_comments);
+        createCommentsSection();
 
         setValues();
+    }
+
+    private void createCommentsSection() {
+        Composite client = createSectionWithClient(Messages.label_comments);
+        commentTable =
+            new CommentCollectionInfoTable(client,
+                pEvent.getCommentCollection(false));
+        commentTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(commentTable);
     }
 
     private void setValues() {
@@ -80,14 +94,14 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         setTextValue(worksheetLabel, pEvent.getWorksheet());
         setTextValue(dateCreationLabel, pEvent.getFormattedCreatedAt());
         setTextValue(activityLabel, pEvent.getActivityStatus().getName());
-        setTextValue(commentLabel, pEvent.getComment());
     }
 
     private void createSourceSpecimensSection() {
-        Composite client = createSectionWithClient(Messages.ProcessingEventViewForm_specimens_title);
-        sourceSpecimenTable = new SpecimenInfoTable(client,
-            pEvent.getSpecimenCollection(true), ColumnsShown.SOURCE_SPECIMENS,
-            10);
+        Composite client =
+            createSectionWithClient(Messages.ProcessingEventViewForm_specimens_title);
+        sourceSpecimenTable =
+            new SpecimenInfoTable(client, pEvent.getSpecimenCollection(true),
+                ColumnsShown.SOURCE_SPECIMENS, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
         sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
         sourceSpecimenTable.createDefaultEditItem();
@@ -102,6 +116,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
             pEvent.getFormattedCreatedAt()));
         setValues();
         sourceSpecimenTable.setList(pEvent.getSpecimenCollection(true));
+        commentTable.setList(pEvent.getCommentCollection(false));
     }
 
 }

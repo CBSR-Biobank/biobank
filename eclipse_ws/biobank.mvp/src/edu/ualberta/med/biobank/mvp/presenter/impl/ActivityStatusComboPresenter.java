@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
@@ -8,7 +9,7 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
-import edu.ualberta.med.biobank.common.action.activityStatus.GetAllActivityStatusesAction;
+import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusGetAllAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter.View;
 import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValue;
@@ -36,8 +37,8 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
 
     @Override
     protected void onBind() {
-        dispatcher.exec(new GetAllActivityStatusesAction(),
-            new ActionCallback<ArrayList<ActivityStatus>>() {
+        dispatcher.exec(new ActivityStatusGetAllAction(),
+            new ActionCallback<HashMap<Integer, ActivityStatus>>() {
                 @Override
                 public void onFailure(Throwable caught) {
                     // TODO: need to do something if cannot get information,
@@ -48,8 +49,9 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
                 }
 
                 @Override
-                public void onSuccess(ArrayList<ActivityStatus> result) {
-                    view.getActivityStatus().setOptions(result);
+                public void onSuccess(HashMap<Integer, ActivityStatus> result) {
+                    view.getActivityStatus().setOptions(
+                        new ArrayList<ActivityStatus>(result.values()));
                     view.getActivityStatus().setOptionLabeller(labeller);
                 }
             });

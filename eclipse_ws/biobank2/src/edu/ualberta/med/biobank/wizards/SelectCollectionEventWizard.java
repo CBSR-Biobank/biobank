@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.wizards;
 
+import org.eclipse.jface.wizard.IWizardPage;
+
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizard;
@@ -8,8 +10,6 @@ import edu.ualberta.med.biobank.wizards.pages.EnterPnumberPage;
 import edu.ualberta.med.biobank.wizards.pages.SelectCollectionEventPage;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-
-import org.eclipse.jface.wizard.IWizardPage;
 
 public class SelectCollectionEventWizard extends BgcWizard {
     private final WritableApplicationService appService;
@@ -68,7 +68,8 @@ public class SelectCollectionEventWizard extends BgcWizard {
                 cePage.setCollectionEventList(patient
                     .getCollectionEventCollection(true));
             } else {
-                pnumberPage.setErrorMessage(Messages.SelectCollectionEventWizard_notexists_error_msg);
+                pnumberPage
+                    .setErrorMessage(Messages.SelectCollectionEventWizard_notexists_error_msg);
                 return false;
             }
         }

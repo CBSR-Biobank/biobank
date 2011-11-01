@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -19,7 +19,7 @@ public class SpecimenAdapter extends AdapterBase {
     }
 
     @Override
-    public void addChild(AdapterBase child) {
+    public void addChild(AbstractAdapterBase child) {
         Assert.isTrue(false, "Cannot add children to this adapter"); //$NON-NLS-1$
     }
 
@@ -30,7 +30,7 @@ public class SpecimenAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return getTooltipText(Messages.SpecimenAdapter_specimen_label);
     }
 
@@ -45,12 +45,12 @@ public class SpecimenAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }
@@ -70,4 +70,10 @@ public class SpecimenAdapter extends AdapterBase {
         return SpecimenViewForm.ID;
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof SpecimenAdapter)
+            return internalCompareTo(o);
+        return 0;
+    }
 }

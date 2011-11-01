@@ -34,6 +34,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-writable-core.jar"/>
 	<classpathentry kind="lib" path="lib/client/mysql-connector-java-5.1.15-bin.jar"/>
-	<classpathentry kind="lib" path="lib/server/jta.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/server/jta.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

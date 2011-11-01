@@ -23,10 +23,14 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class ContainerEntryForm extends BiobankEntryForm {
@@ -60,6 +64,15 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private boolean renamingChildren;
 
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
+
+    private CommentCollectionInfoTable commentEntryTable;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ContainerAdapter),
@@ -72,7 +85,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (container.isNew()) {
             tabName = Messages.ContainerEntryForm_new_title;
             container.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
             if (container.hasParentContainer()) {
                 // need to set the label at least for display. But will be set
                 // during persit dependencies of the container
@@ -86,10 +99,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
         }
 
         if (adapter.getParent() == null)
-            adapter
-                .setParent(((SiteAdapter) SessionManager
-                    .searchFirstNode(container.getSite()))
-                    .getContainersGroupNode());
+            adapter.setParent(((SiteAdapter) SessionManager.searchFirstNode(
+                Site.class, container.getSite().getId()))
+                .getContainersGroupNode());
 
         setPartName(tabName);
     }
@@ -118,7 +130,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         if (!container.hasParentContainer()) {
             containerTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
-                appService, container.getSite());
+                SessionManager.getAppService(), container.getSite());
         } else {
             containerTypes = container.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();
@@ -151,8 +163,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.ContainerEntryForm_status_label,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            container.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), container.getActivityStatus(),
             Messages.ContainerEntryForm_status_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -162,11 +174,26 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.ContainerEntryForm_comments_label, null, container,
-            ContainerPeer.COMMENT.getName(), null);
+        createCommentSection();
 
         createContainerTypesSection(client);
+
+    }
+
+    private void createCommentSection() {
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(client,
+            container.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_button_add);
 
     }
 
@@ -179,7 +206,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 containerTypes = new ArrayList<ContainerTypeWrapper>();
             else
                 containerTypes = ContainerTypeWrapper
-                    .getTopContainerTypesInSite(appService, currentSite);
+                    .getTopContainerTypesInSite(SessionManager.getAppService(),
+                        currentSite);
         } else {
             containerTypes = container.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();
@@ -285,7 +313,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         if (container.isNew()) {
             container.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         }
 
         GuiUtil.reset(activityStatusComboViewer, container.getActivityStatus());

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -14,11 +15,11 @@ public class SiteClinicGroup extends AbstractClinicGroup {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         SiteAdapter site = getParentFromClass(SiteAdapter.class);
-        return ((SiteWrapper) site.getModelObject())
-            .getWorkingClinicCollection();
+        return new ArrayList<ModelWrapper<?>>(
+            ((SiteWrapper) site.getModelObject()).getWorkingClinicCollection());
     }
 
     @Override

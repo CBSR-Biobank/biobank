@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -51,19 +52,22 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
     private ComboViewer studyComboViewer;
 
+    private CommentCollectionInfoTable commentEntryTable;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ResearchGroupAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
         researchGroupAdapter = (ResearchGroupAdapter) adapter;
-        researchGroup = (ResearchGroupWrapper) adapter.getModelObject();
+        researchGroup = (ResearchGroupWrapper) researchGroupAdapter
+            .getModelObject();
 
         String tabName;
         if (researchGroup.isNew()) {
             tabName = Messages.ResearchGroupEntryForm_title_new;
             researchGroup.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         } else
             tabName = NLS.bind(Messages.ResearchGroupEntryForm_title_edit,
                 researchGroup.getNameShort());
@@ -111,7 +115,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         List<StudyWrapper> availableStudies = ResearchGroupWrapper
-            .getAvailStudies(appService);
+            .getAvailStudies(SessionManager.getAppService());
         if (!researchGroup.isNew())
             availableStudies.add(researchGroup.getStudy());
 
@@ -130,8 +134,8 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            researchGroup.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), researchGroup.getActivityStatus(),
             Messages.ResearchGroupEntryForm_activity_validator_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -141,9 +145,25 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.label_comments, null, researchGroup,
-            ResearchGroupPeer.COMMENT.getName(), null);
+        createCommentSection();
+
+    }
+
+    private void createCommentSection() {
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(client,
+            researchGroup.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_button_add);
+
     }
 
     private void createButtonsSection() {
@@ -173,7 +193,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
         if (researchGroup.isNew()) {
             researchGroup.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
             researchGroup.setStudy(null);
         }
 

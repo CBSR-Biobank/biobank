@@ -20,8 +20,11 @@ import edu.ualberta.med.biobank.model.User;
 public class SiteGetInfoAction implements Action<SiteInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
+    @SuppressWarnings("nls")
     private static final String SITE_INFO_HQL = "SELECT site, COUNT(DISTINCT patients), COUNT(DISTINCT collectionEvents), COUNT(DISTINCT aliquotedSpecimens)"
-        + " FROM " + Site.class.getName() + " site"
+        + " FROM "
+        + Site.class.getName()
+        + " site"
         + " INNER JOIN FETCH site.address address"
         + " INNER JOIN FETCH site.activityStatus activityStatus"
         + " LEFT JOIN site.studyCollection AS studies"
@@ -29,7 +32,9 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
         + " LEFT JOIN patients.collectionEventCollection AS collectionEvents"
         + " LEFT JOIN collectionEvents.allSpecimenCollection AS aliquotedSpecimens"
         + " WHERE site.id = ?"
-        + " AND aliquotedSpecimens.parentSpecimen IS NULL" // count only aliquoted Specimen-s
+        + " AND aliquotedSpecimens.parentSpecimen IS NULL" // count only
+                                                           // aliquoted
+                                                           // Specimen-s
         + " GROUP BY site";
     // @formatter:on
 

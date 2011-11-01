@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -11,6 +10,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class DispatchCenterAdapter extends AdapterBase {
@@ -37,7 +37,7 @@ public class DispatchCenterAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return getTooltipText(Messages.DispatchCenterAdapter_site_label);
     }
 
@@ -56,22 +56,23 @@ public class DispatchCenterAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return searchChildren(searchedClass, objectId);
     }
 
     @Override
-    protected AdapterBase createChildNode() {
+    protected AbstractAdapterBase createChildNode() {
         return null;
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AbstractAdapterBase createChildNode(Object child) {
         return null;
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren() {
+    protected List<? extends ModelWrapper<?>> getWrapperChildren() {
         return null;
     }
 
@@ -92,7 +93,7 @@ public class DispatchCenterAdapter extends AdapterBase {
 
     @Override
     public void rebuild() {
-        for (AdapterBase adaper : getChildren()) {
+        for (AbstractAdapterBase adaper : getChildren()) {
             adaper.rebuild();
         }
     }
@@ -102,4 +103,10 @@ public class DispatchCenterAdapter extends AdapterBase {
 
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof DispatchCenterAdapter)
+            return internalCompareTo(o);
+        return 0;
+    }
 }

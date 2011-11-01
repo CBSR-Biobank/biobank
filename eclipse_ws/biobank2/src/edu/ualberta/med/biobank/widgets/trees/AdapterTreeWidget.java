@@ -26,8 +26,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.dialogs.FilteredTree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.ContainerDragDropListener;
 import edu.ualberta.med.biobank.treeview.util.NodeContentProvider;
 import edu.ualberta.med.biobank.treeview.util.NodeLabelProvider;
@@ -80,8 +79,7 @@ public class AdapterTreeWidget extends Composite {
 
         /*----------------------------DND-----------------------------------*/
 
-        adapterTreeDragDropListener = new ContainerDragDropListener(
-            treeViewer);
+        adapterTreeDragDropListener = new ContainerDragDropListener(treeViewer);
 
         treeViewer.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY,
             new Transfer[] { MultiSelectNodeTransfer.getInstance() },
@@ -105,7 +103,7 @@ public class AdapterTreeWidget extends Composite {
 
                 Object element = ((StructuredSelection) selection)
                     .getFirstElement();
-                ((AdapterBase) element).performDoubleClick();
+                ((AbstractAdapterBase) element).performDoubleClick();
                 treeViewer.expandToLevel(element, 1);
             }
         });
@@ -117,7 +115,7 @@ public class AdapterTreeWidget extends Composite {
 
             @Override
             public void treeExpanded(TreeExpansionEvent e) {
-                ((AdapterBase) e.getElement()).performExpand();
+                ((AbstractAdapterBase) e.getElement()).performExpand();
             }
         });
         treeViewer.setUseHashlookup(true);
@@ -145,7 +143,7 @@ public class AdapterTreeWidget extends Composite {
                 Object element = ((StructuredSelection) treeViewer
                     .getSelection()).getFirstElement();
                 if (element != null) {
-                    ((AdapterBase) element).popupMenu(treeViewer,
+                    ((AbstractAdapterBase) element).popupMenu(treeViewer,
                         treeViewer.getTree(), menu);
                 }
             }
@@ -153,17 +151,12 @@ public class AdapterTreeWidget extends Composite {
         treeViewer.getTree().setMenu(menu);
 
         treeViewer.setComparator(new ViewerComparator() {
-            @SuppressWarnings({ "unchecked", "rawtypes" })
             @Override
             public int compare(Viewer viewer, Object e1, Object e2) {
-                if (e1 instanceof AdapterBase && e2 instanceof AdapterBase) {
-                    ModelWrapper<?> object1 = ((AdapterBase) e1)
-                        .getModelObject();
-                    ModelWrapper<?> object2 = ((AdapterBase) e2)
-                        .getModelObject();
-                    if (object1 != null && object2 != null) {
-                        return ((Comparable) object1).compareTo(object2);
-                    }
+                if (e1 instanceof AbstractAdapterBase
+                    && e2 instanceof AbstractAdapterBase) {
+                    return ((AbstractAdapterBase) e1)
+                        .compareTo((AbstractAdapterBase) e2);
                 }
                 return 0;
             }
@@ -178,7 +171,8 @@ public class AdapterTreeWidget extends Composite {
                 if (cell != null) {
                     Object element = cell.getElement();
                     if ((element != null) && (element != mouseMoveLastElement)) {
-                        tooltip = ((AdapterBase) element).getTooltipText();
+                        tooltip = ((AbstractAdapterBase) element)
+                            .getTooltipText();
                         lastToolTipText = tooltip;
                         mouseMoveLastElement = element;
                     } else {

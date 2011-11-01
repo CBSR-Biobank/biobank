@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerTypeViewForm;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ContainerTypeAdapter extends AdapterBase {
@@ -29,7 +30,7 @@ public class ContainerTypeAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         ContainerTypeWrapper type = (ContainerTypeWrapper) getModelObject();
         if (type != null) {
             SiteWrapper site = type.getSite();
@@ -65,12 +66,12 @@ public class ContainerTypeAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }
@@ -88,6 +89,13 @@ public class ContainerTypeAdapter extends AdapterBase {
     @Override
     public String getViewFormId() {
         return ContainerTypeViewForm.ID;
+    }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof ContainerTypeAdapter)
+            return internalCompareTo(o);
+        return 0;
     }
 
 }

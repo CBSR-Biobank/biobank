@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.EntityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.Entity;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -39,7 +40,7 @@ public abstract class AbstractReportGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
@@ -60,14 +61,15 @@ public abstract class AbstractReportGroup extends AdapterBase {
 
     @Override
     public void rebuild() {
-        for (AdapterBase adaper : getChildren()) {
+        for (AbstractAdapterBase adaper : getChildren()) {
             adaper.rebuild();
         }
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return searchChildren(searchedClass, objectId);
     }
 
     protected abstract Collection<ReportWrapper> getReports();
@@ -94,18 +96,23 @@ public abstract class AbstractReportGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }
 
     @Override
     protected int getWrapperChildCount() throws Exception {
+        return 0;
+    }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
         return 0;
     }
 }

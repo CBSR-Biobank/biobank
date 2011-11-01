@@ -5,6 +5,10 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.forms.messages"; //$NON-NLS-1$
 
+    public static String Comments_button_add;
+
+    public static String Comments_title;
+
     public static String LoggingForm_date_label;
 
     public static String AbstractDispatchEntryForm_add_spec_label;
@@ -864,6 +868,30 @@ public class Messages extends NLS {
 
     public static String DecodeImage_tabTitle;
     public static String DecodeImage_browse_label;
+
+    public static String CommentEntryForm_0;
+
+    public static String CommentEntryForm_1;
+
+    public static String CommentEntryForm_2;
+
+    public static String CommentEntryForm_3;
+
+    public static String CommentEntryForm_4;
+
+    public static String CommentEntryForm_main_title;
+
+    public static String CommentEntryForm_new_title;
+
+    public static String CommentEntryForm_edit_title;
+
+    public static String CommentViewForm_0;
+
+    public static String CommentViewForm_1;
+
+    public static String CommentViewForm_2;
+
+    public static String CommentViewForm_title;
 
     static {
         // initialize resource bundle

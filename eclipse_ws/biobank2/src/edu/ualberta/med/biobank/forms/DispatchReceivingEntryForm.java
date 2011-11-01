@@ -17,16 +17,20 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.SessionSecurityHelper;
+import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcess;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.peer.DispatchPeer;
-import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
 public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
@@ -34,6 +38,14 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm"; //$NON-NLS-1$
     private DispatchSpecimensTreeTable specimensTree;
     private List<SpecimenWrapper> receivedOrExtraSpecimens = new ArrayList<SpecimenWrapper>();
+    private CommentCollectionInfoTable commentEntryTable;
+
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
 
     @Override
     protected void createFormContent() throws Exception {
@@ -87,9 +99,24 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
             .getFormattedDateReceived());
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.DispatchReceivingEntryForm_comments_label, null, dispatch,
-            DispatchPeer.COMMENT.getName(), null);
+        createCommentSection();
+
+    }
+
+    private void createCommentSection() {
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(client,
+            dispatch.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_button_add);
 
     }
 
@@ -121,13 +148,17 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     protected void doSpecimenTextAction(String inventoryId, boolean showMessages)
         throws Exception {
         try {
-            CellProcessResult res = appService.processCellStatus(new Cell(-1,
-                -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
-                false, false), SessionManager.getUser()
-                .getCurrentWorkingCenter().getId(), Locale.getDefault());
+            CellProcessResult res = (CellProcessResult) SessionManager
+                .getAppService().doAction(
+                    new ShipmentReceiveProcess(
+                        new ShipmentProcessData(null, dispatch, false),
+                        SessionManager.getUser().getCurrentWorkingCenter()
+                            .getId(),
+                        new Cell(-1, -1, inventoryId, null),
+                        Locale.getDefault()));
             SpecimenWrapper specimen = null;
             if (res.getCell().getSpecimenId() != null) {
-                specimen = new SpecimenWrapper(appService);
+                specimen = new SpecimenWrapper(SessionManager.getAppService());
                 specimen.getWrappedObject()
                     .setId(res.getCell().getSpecimenId());
                 specimen.reload();
@@ -247,11 +278,10 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         }
     }
 
-    // FIXME very ugly
     @Override
     protected void checkEditAccess() {
         if (adapter != null
-            && adapter.getModelObject() != null
+            && ((AdapterBase) adapter).getId() != null
             && !SessionManager
                 .isAllowed(SessionSecurityHelper.DISPATCH_RECEIVE_KEY_DESC)) {
             BgcPlugin.openAccessDeniedErrorMessage();

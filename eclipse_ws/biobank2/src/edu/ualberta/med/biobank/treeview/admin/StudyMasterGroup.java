@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -36,14 +36,14 @@ public class StudyMasterGroup extends AbstractStudyGroup {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return StudyWrapper.getAllStudies(getAppService());
+        return StudyWrapper.getAllStudies(SessionManager.getAppService());
     }
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        return (int) StudyWrapper.getCount(getAppService());
+        return (int) StudyWrapper.getCount(SessionManager.getAppService());
     }
 
     public void addStudy() {

@@ -4,11 +4,6 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
-import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
@@ -17,8 +12,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * Application service interface obtained through
@@ -60,15 +53,6 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public List<Object> startQuery(QueryHandle qh) throws Exception;
 
     public void stopQuery(QueryHandle qh) throws Exception;
-
-    public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
-        ProcessData processData, boolean rescanMode,
-        Integer currentWorkingCenterId, Locale locale)
-        throws ApplicationException;
-
-    public CellProcessResult processCellStatus(Cell cell,
-        ProcessData processData, Integer currentWorkingCenterId, Locale locale)
-        throws ApplicationException;
 
     public List<String> executeGetSourceSpecimenUniqueInventoryIds(int numIds)
         throws ApplicationException;

@@ -42,4 +42,9 @@ public class OriginInfoLogProvider implements WrapperLogProvider<OriginInfo> {
         Collection<Specimen> specimens = originInfo.getSpecimenCollection();
         return specimens == null ? 0 : specimens.size();
     }
+
+    @Override
+    public Log getObjectLog(Object model) {
+        return getLog((OriginInfo) model);
+    }
 }

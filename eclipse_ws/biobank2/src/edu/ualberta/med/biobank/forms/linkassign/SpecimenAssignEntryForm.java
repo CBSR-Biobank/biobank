@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -34,13 +35,20 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction.ContainerInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.AssignProcess;
+import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.AssignProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenAssignResInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenResInfo;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
-import edu.ualberta.med.biobank.common.scanprocess.data.AssignProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -130,7 +138,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected void init() throws Exception {
         super.init();
         setCanLaunchScan(true);
-        currentMultipleContainer = new ContainerWrapper(appService);
+        currentMultipleContainer = new ContainerWrapper(
+            SessionManager.getAppService());
         initPalletValues();
     }
 
@@ -140,10 +149,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private void initPalletValues() {
         try {
             currentMultipleContainer.initObjectWith(new ContainerWrapper(
-                appService));
+                SessionManager.getAppService()));
             currentMultipleContainer.reset();
             currentMultipleContainer.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
             currentMultipleContainer.setSite(SessionManager.getUser()
                 .getCurrentWorkingSite());
         } catch (Exception e) {
@@ -345,8 +354,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         appendLog(NLS.bind(
             Messages.SpecimenAssignEntryForm_single_activitylog_gettingInfoId,
             singleSpecimen.getInventoryId()));
-        SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(appService,
-            singleSpecimen.getInventoryId());
+        SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(
+            SessionManager.getAppService(), singleSpecimen.getInventoryId());
         foundSpecNull.setValue(false);
         if (foundSpecimen == null) {
             foundSpecNull.setValue(true);
@@ -761,7 +770,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         try {
             initWithProduct = false;
             ContainerWrapper palletFoundWithProductBarcode = ContainerWrapper
-                .getContainerWithProductBarcodeInSite(appService,
+                .getContainerWithProductBarcodeInSite(
+                    SessionManager.getAppService(),
                     currentMultipleContainer.getSite(),
                     currentMultipleContainer.getProductBarcode());
             isNewMultipleContainer = palletFoundWithProductBarcode == null;
@@ -900,7 +910,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      */
     private void initPalletContainerTypes() throws ApplicationException {
         palletContainerTypes = ContainerTypeWrapper.getContainerTypesPallet96(
-            appService, SessionManager.getUser().getCurrentWorkingSite());
+            SessionManager.getAppService(), SessionManager.getUser()
+                .getCurrentWorkingSite());
     }
 
     private void checkPalletContainerTypes() {
@@ -933,8 +944,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        // FIXME might need to use batch query
-
         if (mode.isSingleMode())
             saveSingleSpecimen();
         else
@@ -947,23 +956,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             if (containerToRemove != null) {
                 containerToRemove.delete();
             }
-            currentMultipleContainer.persist();
-            String productBarcode = currentMultipleContainer
-                .getProductBarcode();
-            String containerType = currentMultipleContainer.getContainerType()
-                .getName();
-            String palletLabel = currentMultipleContainer.getLabel();
-            String siteName = currentMultipleContainer.getSite().getNameShort();
-            if (isNewMultipleContainer)
-                appendLog(Messages
-                    .format(
-                        Messages.SpecimenAssignEntryForm_multiple_activitylog_pallet_added,
-                        productBarcode, containerType, palletLabel, siteName));
-            int totalNb = 0;
-            StringBuffer sb = new StringBuffer(
-                Messages.SpecimenAssignEntryForm_multiple_activilylog_save_start);
+            SpecimenAssignResInfo res;
             try {
                 Map<RowColPos, PalletCell> cells = getCells();
+                List<SpecimenInfo> specInfos = new ArrayList<SpecimenAssignSaveAction.SpecimenInfo>();
                 for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
                     RowColPos rcp = entry.getKey();
                     PalletCell cell = entry.getValue();
@@ -972,59 +968,89 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                             .getStatus() == UICellStatus.MOVED)) {
                         SpecimenWrapper specimen = cell.getSpecimen();
                         if (specimen != null) {
-                            specimen.setParent(currentMultipleContainer, rcp);
-                            specimen.persist();
-                            String posStr = specimen.getPositionString(true,
-                                false);
-                            if (posStr == null) {
-                                posStr = Messages.SpecimenAssignEntryForm_EntryForm_position_none;
-                            }
-                            computeActivityLogMessage(sb, cell, specimen,
-                                posStr);
-                            totalNb++;
+                            SpecimenInfo specInfo = new SpecimenInfo();
+                            specInfo.specimenId = specimen.getId();
+                            specInfo.position = rcp;
+                            specInfos.add(specInfo);
                         }
+                    }
+                }
+                if (currentMultipleContainer.getId() == null) {
+                    ContainerInfo ci = new ContainerInfo();
+                    ci.label = currentMultipleContainer.getLabel();
+                    ci.parentId = currentMultipleContainer.getParentContainer()
+                        .getId();
+                    ci.position = currentMultipleContainer
+                        .getPositionAsRowCol();
+                    ci.barcode = currentMultipleContainer.getProductBarcode();
+                    ci.typeId = currentMultipleContainer.getContainerType()
+                        .getId();
+                    ci.statusId = currentMultipleContainer.getActivityStatus()
+                        .getId();
+                    ci.siteId = currentMultipleContainer.getSite().getId();
+                    res = SessionManager.getAppService().doAction(
+                        new SpecimenAssignSaveAction(ci, specInfos));
+                } else {
+                    res = SessionManager.getAppService().doAction(
+                        new SpecimenAssignSaveAction(currentMultipleContainer
+                            .getId(), specInfos));
+                }
+                if (isNewMultipleContainer) {
+                    if (res.parentContainerId != null) {
+                        appendLog(Messages
+                            .format(
+                                Messages.SpecimenAssignEntryForm_multiple_activitylog_pallet_added,
+                                res.parentBarcode, res.parentTypeName,
+                                res.parentLabel, res.siteName));
+                    } else {
+                        throw new RuntimeException(
+                            "problem with parent container creation"); //$NON-NLS-1$
                     }
                 }
             } catch (Exception ex) {
                 setScanHasBeenLaunched(false, true);
                 throw ex;
             }
+            StringBuffer sb = new StringBuffer(
+                Messages.SpecimenAssignEntryForm_multiple_activilylog_save_start);
+            for (SpecimenResInfo sp : res.specimens) {
+                String posStr = sp.position;
+                if (posStr == null) {
+                    posStr = Messages.SpecimenAssignEntryForm_EntryForm_position_none;
+                }
+                sb.append(Messages
+                    .format(
+                        Messages.SpecimenAssignEntryForm_multiple_activitylog_specimen_assigned,
+                        posStr, res.siteName, sp.inventoryId, sp.typeName,
+                        sp.patientPNumber, sp.visitNumber));
+            }
             appendLog(sb.toString());
+
             appendLog(Messages
                 .format(
                     Messages.SpecimenAssignEntryForm_multiple_activitylog_save_summary,
-                    totalNb, currentMultipleContainer.getLabel(),
+                    res.specimens.size(), currentMultipleContainer.getLabel(),
                     currentMultipleContainer.getSite().getNameShort()));
             setFinished(false);
         }
     }
 
-    private void computeActivityLogMessage(StringBuffer sb, PalletCell cell,
-        SpecimenWrapper specimen, String posStr) {
-        CollectionEventWrapper visit = specimen.getCollectionEvent();
-        sb.append(Messages
-            .format(
-                Messages.SpecimenAssignEntryForm_multiple_activitylog_specimen_assigned,
-                posStr, currentMultipleContainer.getSite().getNameShort(), cell
-                    .getValue(), specimen.getSpecimenType().getName(), visit
-                    .getPatient().getPnumber(), visit.getVisitNumber()));
-    }
-
     private void saveSingleSpecimen() throws Exception {
-        singleSpecimen.persist();
+        SpecimenInfo specInfo = new SpecimenInfo();
+        specInfo.specimenId = singleSpecimen.getId();
+        specInfo.position = singleSpecimen.getPosition();
+        SpecimenAssignResInfo res = SessionManager.getAppService().doAction(
+            new SpecimenAssignSaveAction(singleSpecimen.getParentContainer()
+                .getId(), Arrays.asList(specInfo)));
+
+        if (res.specimens.size() != 1) {
+            throw new Exception("result problem"); //$NON-NLS-1$
+        }
+        SpecimenResInfo spRes = res.specimens.get(0);
         appendLog(Messages.format(
             Messages.SpecimenAssignEntryForm_assigned_msg_single,
-            singleSpecimen.getPositionString(true, false), singleSpecimen
-                .getCurrentCenter().getNameShort(), singleSpecimen
-                .getInventoryId(), singleSpecimen.getSpecimenType().getName(),
-            singleSpecimen.getSpecimenType().getNameShort(), singleSpecimen
-                .getCollectionEvent().getPatient().getPnumber(), singleSpecimen
-                .getCollectionEvent().getVisitNumber()));
-    }
-
-    @Override
-    protected ProcessData getProcessData() {
-        return new AssignProcessData(currentMultipleContainer);
+            spRes.position, spRes.centerName, spRes.inventoryId,
+            spRes.typeName, spRes.patientPNumber, spRes.visitNumber));
     }
 
     @Override
@@ -1242,11 +1268,12 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             return palletScanned;
         } else {
             if (isFakeScanLinkedOnly) {
-                return PalletCell.getRandomSpecimensNotAssigned(appService,
-                    currentMultipleContainer.getSite().getId());
+                return PalletCell.getRandomSpecimensNotAssigned(SessionManager
+                    .getAppService(), currentMultipleContainer.getSite()
+                    .getId());
             }
-            return PalletCell.getRandomSpecimensAlreadyAssigned(appService,
-                currentMultipleContainer.getSite().getId());
+            return PalletCell.getRandomSpecimensAlreadyAssigned(SessionManager
+                .getAppService(), currentMultipleContainer.getSite().getId());
         }
     }
 
@@ -1303,4 +1330,21 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         return useScanner;
     }
 
+    @Override
+    protected Action<ProcessResult> getCellProcessAction(Integer centerId,
+        Cell cell, Locale locale) {
+        return new AssignProcess(getProcessData(), centerId, cell, locale);
+    }
+
+    @Override
+    protected Action<ProcessResult> getPalletProcessAction(Integer centerId,
+        Map<RowColPos, Cell> cells, boolean isRescanMode, Locale locale) {
+        return new AssignProcess(getProcessData(), centerId, cells,
+            isRescanMode, locale);
+    }
+
+    protected AssignProcessData getProcessData() {
+        return new AssignProcessData(
+            currentMultipleContainer.getWrappedObject());
+    }
 }

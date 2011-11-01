@@ -27,7 +27,7 @@ public class ShippingMethodInfoTable extends
                 ShippingMethodWrapper item = (ShippingMethodWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.ShippingMethodInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }

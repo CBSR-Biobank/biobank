@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 
 import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.IButton;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
@@ -110,7 +111,7 @@ public class SiteEntryView2 extends EditorPart implements
     }
 
     @Override
-    public HasValue<String> getComment() {
+    public HasValue<Collection<Comment>> getCommentCollection() {
         // TODO Auto-generated method stub
         return null;
     }

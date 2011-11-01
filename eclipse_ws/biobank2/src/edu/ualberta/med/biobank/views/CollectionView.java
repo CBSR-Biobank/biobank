@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.views;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -9,13 +8,13 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
-import edu.ualberta.med.biobank.treeview.patient.StudyWithPatientAdapter;
 
 public class CollectionView extends AbstractAdministrationView {
 
@@ -39,17 +38,6 @@ public class CollectionView extends AbstractAdministrationView {
         createNodes();
     }
 
-    protected List<? extends ModelWrapper<?>> search(String text)
-        throws Exception {
-        PatientWrapper patient = PatientWrapper.getPatient(
-            SessionManager.getAppService(), text.trim(),
-            SessionManager.getUser());
-        if (patient != null) {
-            return Arrays.asList(patient);
-        }
-        return null;
-    }
-
     @Override
     protected void createTreeTextOptions(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
@@ -69,10 +57,9 @@ public class CollectionView extends AbstractAdministrationView {
             Messages.CollectionView_patient_error_title,
             Messages.CollectionView_patient_error_msg);
         if (create) {
-            PatientWrapper patient = new PatientWrapper(
-                SessionManager.getAppService());
+            Patient patient = new Patient();
             patient.setPnumber(text);
-            AdapterBase adapter = new PatientAdapter(null, patient);
+            AbstractAdapterBase adapter = new PatientAdapter(null, null);
             adapter.openEntryForm();
         }
     }
@@ -89,7 +76,7 @@ public class CollectionView extends AbstractAdministrationView {
     }
 
     public static PatientAdapter getCurrentPatient() {
-        AdapterBase selectedNode = currentInstance.getSelectedNode();
+        AbstractAdapterBase selectedNode = currentInstance.getSelectedNode();
         if (selectedNode != null && selectedNode instanceof PatientAdapter) {
             return (PatientAdapter) selectedNode;
         }
@@ -99,13 +86,6 @@ public class CollectionView extends AbstractAdministrationView {
     public static void reloadCurrent() {
         if (currentInstance != null)
             currentInstance.reload();
-    }
-
-    public static void showPatient(PatientWrapper patient) {
-        if (currentInstance != null) {
-            currentInstance.showSearchedObjectsInTree(Arrays.asList(patient),
-                false);
-        }
     }
 
     @Override
@@ -118,49 +98,21 @@ public class CollectionView extends AbstractAdministrationView {
         return Messages.CollectionView_patient_tooltip;
     }
 
-    public void showSearchedObjectsInTree(
-        List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
-        for (ModelWrapper<?> searchedObject : searchedObjects) {
-            List<AdapterBase> nodeRes = rootNode.search(searchedObject);
-            if (nodeRes.size() == 0) {
-                searchedNode.addSearchObject(searchedObject);
-                searchedNode.performExpand();
-                nodeRes = searchedNode.search(searchedObject);
-            }
-            if (nodeRes.size() > 0) {
-                if (doubleClick) {
-                    nodeRes.get(0).performDoubleClick();
-                }
+    public void showSearchedObjectsInTree(Integer patientId, String pnumber,
+        boolean searchIfNotFound, boolean doubleClick) {
+        List<AbstractAdapterBase> nodeRes = rootNode.search(Patient.class,
+            patientId);
+        if (nodeRes.size() == 0 && searchIfNotFound) {
+            // this is happening when a new patient is created.
+            internalSearch(pnumber);
+            // searchedNode.performExpand();
+            // nodeRes = searchedNode.search(Patient.class, patient.getId());
+        }
+        if (nodeRes.size() > 0) {
+            if (doubleClick) {
+                nodeRes.get(0).performDoubleClick();
             }
         }
-    }
-
-    public static AdapterBase addToNode(AdapterBase parentNode,
-        ModelWrapper<?> wrapper) {
-        if (wrapper instanceof PatientWrapper) {
-            PatientWrapper patient = (PatientWrapper) wrapper;
-            List<AdapterBase> res = parentNode.search(patient.getStudy());
-            StudyWithPatientAdapter studyAdapter = null;
-            if (res.size() > 0)
-                studyAdapter = (StudyWithPatientAdapter) res.get(0);
-            if (studyAdapter == null) {
-                studyAdapter = new StudyWithPatientAdapter(parentNode,
-                    patient.getStudy());
-                studyAdapter.setEditable(false);
-                studyAdapter.setLoadChildrenInBackground(false);
-                parentNode.addChild(studyAdapter);
-            }
-            List<AdapterBase> patientAdapterList = studyAdapter.search(patient);
-            PatientAdapter patientAdapter = null;
-            if (patientAdapterList.size() > 0)
-                patientAdapter = (PatientAdapter) patientAdapterList.get(0);
-            else {
-                patientAdapter = new PatientAdapter(studyAdapter, patient);
-                studyAdapter.addChild(patientAdapter);
-            }
-            return patientAdapter;
-        }
-        return null;
     }
 
     @Override
@@ -171,12 +123,19 @@ public class CollectionView extends AbstractAdministrationView {
             return;
         }
 
+        internalSearch(text);
+    }
+
+    protected void internalSearch(String text) {
         try {
-            List<? extends ModelWrapper<?>> searchedObject = search(text);
-            if (searchedObject == null || searchedObject.size() == 0) {
+            SearchedPatientInfo pinfo = SessionManager.getAppService()
+                .doAction(new PatientSearchAction(text.trim()));
+            if (pinfo == null) {
                 notFound(text);
             } else {
-                showSearchedObjectsInTree(searchedObject, true);
+                searchedNode.addPatient(pinfo);
+                showSearchedObjectsInTree(pinfo.patient.getId(),
+                    pinfo.patient.getPnumber(), false, true);
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
@@ -191,13 +150,13 @@ public class CollectionView extends AbstractAdministrationView {
         searchedNode.setParent(rootNode);
     }
 
-    public AdapterBase getSearchedNode() {
+    public PatientSearchedNode getSearchedNode() {
         return searchedNode;
     }
 
     @Override
     public void reload() {
-        for (AdapterBase adapter : rootNode.getChildren())
+        for (AbstractAdapterBase adapter : rootNode.getChildren())
             adapter.rebuild();
         super.reload();
     }
@@ -206,6 +165,11 @@ public class CollectionView extends AbstractAdministrationView {
     public void clear() {
         searchedNode.clear();
         setSearchFieldsEnablement(false);
+    }
+
+    @Override
+    protected void createRootNode() {
+        createNewRootNode();
     }
 
 }

@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 import edu.ualberta.med.biobank.gui.common.forms.BgcFormInput;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 
 public class FormInput extends BgcFormInput {
 
@@ -24,8 +24,8 @@ public class FormInput extends BgcFormInput {
     }
 
     public int getIndex() {
-        if (obj instanceof AdapterBase) {
-            AdapterBase adapter = (AdapterBase) obj;
+        if (obj instanceof AbstractAdapterBase) {
+            AbstractAdapterBase adapter = (AbstractAdapterBase) obj;
             if (adapter != null) {
                 Integer id = adapter.getId();
                 if (id != null)
@@ -57,8 +57,8 @@ public class FormInput extends BgcFormInput {
             return null;
         }
 
-        if (obj instanceof AdapterBase) {
-            return ((AdapterBase) obj).getTooltipText();
+        if (obj instanceof AbstractAdapterBase) {
+            return ((AbstractAdapterBase) obj).getTooltipText();
         }
         return name;
     }
@@ -69,7 +69,8 @@ public class FormInput extends BgcFormInput {
         if (obj == null)
             return null;
 
-        if ((adapter == AdapterBase.class) && (obj instanceof AdapterBase)) {
+        if ((adapter == AbstractAdapterBase.class)
+            && (obj instanceof AbstractAdapterBase)) {
             return obj;
         } else if (adapter == obj.getClass()) {
             return obj;
@@ -89,7 +90,7 @@ public class FormInput extends BgcFormInput {
             if (obj.getClass() != ((FormInput) o).obj.getClass())
                 return false;
 
-            if (obj instanceof AdapterBase) {
+            if (obj instanceof AbstractAdapterBase) {
                 int myIndex = getIndex();
                 int oIndex = ((FormInput) o).getIndex();
 

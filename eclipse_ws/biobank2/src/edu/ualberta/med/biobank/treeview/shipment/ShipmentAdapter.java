@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.shipment;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -14,6 +13,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ShipmentAdapter extends AdapterBase {
@@ -45,7 +45,7 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         OriginInfoWrapper originInfo = (OriginInfoWrapper) getModelObject();
         if (originInfo != null) {
             CenterWrapper<?> center = originInfo.getCenter();
@@ -69,8 +69,10 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, ProcessingEventWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId,
+            ProcessingEventWrapper.class);
     }
 
     @Override
@@ -79,12 +81,12 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }
@@ -114,4 +116,10 @@ public class ShipmentAdapter extends AdapterBase {
         getParent().getParent().rebuild();
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof ShipmentAdapter)
+            return internalCompareTo(o);
+        return 0;
+    }
 }

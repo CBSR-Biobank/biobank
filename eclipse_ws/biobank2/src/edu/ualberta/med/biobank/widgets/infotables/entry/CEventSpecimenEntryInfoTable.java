@@ -13,91 +13,94 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeInfo;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.CEventSourceSpecimenDialog;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.Specimen;
 
-public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
+public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
 
     protected IObservableValue specimensAdded = new WritableValue(
         Boolean.FALSE, Boolean.class);
 
     public CEventSpecimenEntryInfoTable(Composite parent,
-        List<SpecimenWrapper> specs, ColumnsShown columnsShowns) {
+        List<SpecimenInfo> specs, ColumnsShown columnsShowns) {
         super(parent, specs, columnsShowns);
     }
 
     @Override
-    public void reload(List<SpecimenWrapper> specimens) {
+    public void reload(List<SpecimenInfo> specimens) {
         super.reload(specimens);
         specimensAdded.setValue(currentSpecimens.size() > 0);
     }
 
-    public void addOrEditSpecimen(boolean add, SpecimenWrapper specimen,
-        List<SourceSpecimenWrapper> studySourceTypes,
-        List<SpecimenTypeWrapper> allSpecimenTypes,
-        final CollectionEventWrapper cEvent, final Date defaultTimeDrawn) {
+    public void addOrEditSpecimen(boolean add, SpecimenInfo si,
+        List<SourceSpecimen> studySourceTypes,
+        List<SpecimenTypeInfo> allSpecimenTypes, final CollectionEvent cEvent,
+        final Date defaultTimeDrawn) {
         NewListener newListener = null;
-        List<SpecimenWrapper> excludeList = new ArrayList<SpecimenWrapper>(
-            currentSpecimens);
+        List<String> inventoryIdExcludeList = new ArrayList<String>();
+        for (SpecimenInfo sp : currentSpecimens) {
+            inventoryIdExcludeList.add(sp.specimen.getInventoryId());
+        }
         if (add) {
             newListener = new NewListener() {
                 @Override
-                public void newAdded(ModelWrapper<?> mw) {
-                    SpecimenWrapper spec = (SpecimenWrapper) mw;
+                public void newAdded(Object mw) {
+                    Specimen spec = (Specimen) mw;
                     spec.setCollectionEvent(cEvent);
                     spec.setOriginalCollectionEvent(cEvent);
                     spec.setCurrentCenter(SessionManager.getUser()
-                        .getCurrentWorkingCenter());
-                    currentSpecimens.add(spec);
-                    addedorModifiedSpecimens.add(spec);
+                        .getCurrentWorkingCenter().getWrappedObject());
+                    SpecimenInfo info = new SpecimenInfo();
+                    info.specimen = spec;
+                    currentSpecimens.add(info);
                     specimensAdded.setValue(true);
                     reloadCollection(currentSpecimens);
                     notifyListeners();
                 }
             };
         } else {
-            excludeList.remove(specimen);
+            inventoryIdExcludeList.remove(si.specimen.getInventoryId());
         }
-        CEventSourceSpecimenDialog dlg = new CEventSourceSpecimenDialog(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            specimen, studySourceTypes, allSpecimenTypes, excludeList,
-            newListener, defaultTimeDrawn);
+        CEventSourceSpecimenDialog dlg =
+            new CEventSourceSpecimenDialog(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), si == null ? null
+                : si.specimen, studySourceTypes, allSpecimenTypes,
+                inventoryIdExcludeList, newListener, defaultTimeDrawn);
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
-            addedorModifiedSpecimens.add(specimen);
             reloadCollection(currentSpecimens);
             notifyListeners();
         }
     }
 
-    public void addEditSupport(
-        final List<SourceSpecimenWrapper> studySourceTypes,
-        final List<SpecimenTypeWrapper> allSpecimenTypes) {
+    public void addEditSupport(final List<SourceSpecimen> studySourceTypes,
+        final List<SpecimenTypeInfo> allSpecimenTypes) {
         if (SessionManager.canUpdate(SpecimenWrapper.class)) {
-            addEditItemListener(new IInfoTableEditItemListener<SpecimenWrapper>() {
+            addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {
                 @Override
-                public void editItem(InfoTableEvent<SpecimenWrapper> event) {
-                    SpecimenWrapper sw = getSelection();
-                    if (sw != null)
-                        addOrEditSpecimen(false, sw, studySourceTypes,
+                public void editItem(InfoTableEvent<SpecimenInfo> event) {
+                    SpecimenInfo si = getSelection();
+                    if (si != null)
+                        addOrEditSpecimen(false, si, studySourceTypes,
                             allSpecimenTypes, null, null);
                 }
             });
         }
         if (SessionManager.canDelete(SpecimenWrapper.class)) {
-            addDeleteItemListener(new IInfoTableDeleteItemListener<SpecimenWrapper>() {
+            addDeleteItemListener(new IInfoTableDeleteItemListener<SpecimenInfo>() {
                 @Override
-                public void deleteItem(InfoTableEvent<SpecimenWrapper> event) {
-                    SpecimenWrapper sw = getSelection();
-                    if (sw != null) {
+                public void deleteItem(InfoTableEvent<SpecimenInfo> event) {
+                    SpecimenInfo si = getSelection();
+                    if (si != null) {
                         if (!MessageDialog
                             .openConfirm(
                                 PlatformUI.getWorkbench()
@@ -105,22 +108,18 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
                                 Messages.SpecimenEntryInfoTable_delete_title,
                                 NLS.bind(
                                     Messages.SpecimenEntryInfoTable_delete_question,
-                                    sw.getInventoryId()))) {
+                                    si.specimen.getInventoryId()))) {
                             return;
                         }
-
-                        currentSpecimens.remove(sw);
+                        currentSpecimens.remove(si);
                         setList(currentSpecimens);
                         if (currentSpecimens.size() == 0) {
                             specimensAdded.setValue(false);
                         }
-                        addedorModifiedSpecimens.remove(sw);
-                        removedSpecimens.add(sw);
                         notifyListeners();
                     }
                 }
             });
         }
     }
-
 }

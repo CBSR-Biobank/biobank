@@ -39,4 +39,9 @@ public class ProcessingEventLogProvider implements
             .getSpecimenCollection();
         return specimens == null ? 0 : specimens.size();
     }
+
+    @Override
+    public Log getObjectLog(Object model) {
+        return getLog((ProcessingEvent) model);
+    }
 }

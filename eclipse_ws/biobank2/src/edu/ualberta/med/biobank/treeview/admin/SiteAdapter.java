@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -14,6 +13,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class SiteAdapter extends AdapterBase {
@@ -35,16 +35,17 @@ public class SiteAdapter extends AdapterBase {
     }
 
     public ContainerTypeGroup getContainerTypesGroupNode() {
-        AdapterBase adapter = getChild(nodeIdOffset
+        ContainerTypeGroup adapter = (ContainerTypeGroup) getChild(nodeIdOffset
             + CONTAINER_TYPES_BASE_NODE_ID);
         Assert.isNotNull(adapter);
-        return (ContainerTypeGroup) adapter;
+        return adapter;
     }
 
     public ContainerGroup getContainersGroupNode() {
-        AdapterBase adapter = getChild(nodeIdOffset + CONTAINERS_BASE_NODE_ID);
+        ContainerGroup adapter = (ContainerGroup) getChild(nodeIdOffset
+            + CONTAINERS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
-        return (ContainerGroup) adapter;
+        return adapter;
     }
 
     @Override
@@ -55,7 +56,7 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return getTooltipText(Messages.SiteAdapter_tooltip_label);
     }
 
@@ -79,10 +80,11 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        if (searchedObject instanceof SiteWrapper)
-            return Arrays.asList((AdapterBase) this);
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        if (SiteWrapper.class.isAssignableFrom(searchedClass))
+            return Arrays.asList((AbstractAdapterBase) this);
+        return searchChildren(searchedClass, objectId);
     }
 
     @Override
@@ -91,12 +93,12 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren() {
+    protected List<? extends ModelWrapper<?>> getWrapperChildren() {
         return null;
     }
 
@@ -128,4 +130,10 @@ public class SiteAdapter extends AdapterBase {
         createNodes();
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof SiteAdapter)
+            return internalCompareTo(o);
+        return 0;
+    }
 }

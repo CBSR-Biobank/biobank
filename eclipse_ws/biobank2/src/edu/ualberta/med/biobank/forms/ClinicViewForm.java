@@ -12,10 +12,12 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 
 public class ClinicViewForm extends AddressViewFormCommon {
-    public static final String ID = "edu.ualberta.med.biobank.forms.ClinicViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ClinicViewForm"; //$NON-NLS-1$
 
     private ClinicWrapper clinic;
 
@@ -31,7 +33,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private BgcBaseText activityStatusLabel;
 
-    private BgcBaseText commentLabel;
+    private CommentCollectionInfoTable commentTable;
 
     private BgcBaseText patientTotal;
 
@@ -56,6 +58,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createClinicSection();
+        createCommentsSection();
         createAddressSection(clinic);
         createContactsSection();
         createStudiesSection();
@@ -67,20 +70,23 @@ public class ClinicViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_name);
-        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_nameShort);
-        hasShipmentsButton = (Button) createLabelledWidget(client,
-            Button.class, SWT.NONE, Messages.clinic_field_label_sendsShipments);
-        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_activity);
-        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.label_comments);
-        patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ClinicViewForm_field_label_totalPatients);
-        ceventTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ClinicViewForm_field_label_totalCollectionEvents);
+        nameLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, Messages.label_name);
+        nameShortLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.label_nameShort);
+        hasShipmentsButton =
+            (Button) createLabelledWidget(client, Button.class, SWT.NONE,
+                Messages.clinic_field_label_sendsShipments);
+        activityStatusLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.label_activity);
+        patientTotal =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ClinicViewForm_field_label_totalPatients);
+        ceventTotal =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ClinicViewForm_field_label_totalCollectionEvents);
 
         setClinicValues();
     }
@@ -90,22 +96,32 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setTextValue(nameShortLabel, clinic.getNameShort());
         setCheckBoxValue(hasShipmentsButton, clinic.getSendsShipments());
         setTextValue(activityStatusLabel, clinic.getActivityStatus());
-        setTextValue(commentLabel, clinic.getComment());
         setTextValue(patientTotal, clinic.getPatientCount());
         setTextValue(ceventTotal, clinic.getCollectionEventCount());
     }
 
     private void createContactsSection() {
-        Composite client = createSectionWithClient(Messages.clinic_contact_title);
+        Composite client =
+            createSectionWithClient(Messages.clinic_contact_title);
 
-        contactsTable = new ContactInfoTable(client,
-            clinic.getContactCollection(false));
+        contactsTable =
+            new ContactInfoTable(client, clinic.getContactCollection(false));
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
     }
 
+    private void createCommentsSection() {
+        Composite client = createSectionWithClient(Messages.label_comments);
+        commentTable =
+            new CommentCollectionInfoTable(client,
+                clinic.getCommentCollection(false));
+        commentTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(commentTable);
+    }
+
     protected void createStudiesSection() {
-        Composite client = createSectionWithClient(Messages.ClinicViewForm_studies_title);
+        Composite client =
+            createSectionWithClient(Messages.ClinicViewForm_studies_title);
 
         studiesTable = new ClinicStudyInfoTable(client, clinic);
         studiesTable.adaptToToolkit(toolkit, true);
@@ -124,6 +140,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setAddressValues(clinic);
         contactsTable.setList(clinic.getContactCollection(true));
         studiesTable.setList(clinic.getStudyCollection());
+        commentTable.setList(clinic.getCommentCollection(false));
     }
 
 }

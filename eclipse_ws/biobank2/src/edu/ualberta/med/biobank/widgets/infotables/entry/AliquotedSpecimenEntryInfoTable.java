@@ -16,7 +16,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -83,7 +82,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
             // only add to the collection when adding and not editing
             newListener = new NewListener() {
                 @Override
-                public void newAdded(ModelWrapper<?> spec) {
+                public void newAdded(Object spec) {
                     ((AliquotedSpecimenWrapper) spec).setStudy(study);
                     availableSpecimenTypes.remove(aliquotedSpecimen
                         .getSpecimenType());

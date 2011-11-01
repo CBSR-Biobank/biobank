@@ -7,7 +7,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
@@ -34,13 +33,15 @@ public abstract class AbstractResearchGroupGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, ResearchGroupWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId,
+            ResearchGroupWrapper.class);
     }
 
     @Override
@@ -49,7 +50,7 @@ public abstract class AbstractResearchGroupGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof ResearchGroupWrapper);
         return new ResearchGroupAdapter(this, (ResearchGroupWrapper) child);
     }
@@ -69,4 +70,8 @@ public abstract class AbstractResearchGroupGroup extends AdapterBase {
         return null;
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

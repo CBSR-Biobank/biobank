@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.processing;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.forms.ProcessingEventEntryForm;
 import edu.ualberta.med.biobank.forms.ProcessingEventViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ProcessingEventAdapter extends AdapterBase {
@@ -50,7 +51,7 @@ public class ProcessingEventAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         ProcessingEventWrapper pevent = (ProcessingEventWrapper) getModelObject();
         if (pevent == null)
             return Messages.ProvessingEventAdapter_tooltiptext;
@@ -81,12 +82,12 @@ public class ProcessingEventAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }
@@ -104,6 +105,13 @@ public class ProcessingEventAdapter extends AdapterBase {
     @Override
     public String getEntryFormId() {
         return ProcessingEventEntryForm.ID;
+    }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof ProcessingEventAdapter)
+            return internalCompareTo(o);
+        return 0;
     }
 
 }

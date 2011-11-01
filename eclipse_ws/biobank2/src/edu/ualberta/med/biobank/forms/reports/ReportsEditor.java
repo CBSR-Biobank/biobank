@@ -219,7 +219,6 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     }
 
     private void generate() {
-        appService = SessionManager.getAppService();
         try {
             initReport();
         } catch (Exception e1) {
@@ -227,7 +226,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
         }
 
         try {
-            query = appService.createQuery(report);
+            query = SessionManager.getAppService().createQuery(report);
 
             IRunnableContext context = new ProgressMonitorDialog(Display
                 .getDefault().getActiveShell());
@@ -238,7 +237,8 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                         @Override
                         public void run() {
                             try {
-                                reportData = appService.startQuery(query);
+                                reportData = SessionManager.getAppService()
+                                    .startQuery(query);
                             } catch (Exception e) {
                                 reportData = new ArrayList<Object>();
                                 BgcPlugin.openAsyncError("Query Error", e); //$NON-NLS-1$
@@ -251,7 +251,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                     while (true) {
                         if (monitor.isCanceled()) {
                             try {
-                                appService.stopQuery(query);
+                                SessionManager.getAppService().stopQuery(query);
                             } catch (Exception e) {
                                 BgcPlugin.openAsyncError("Stop Failed", e); //$NON-NLS-1$
                             }

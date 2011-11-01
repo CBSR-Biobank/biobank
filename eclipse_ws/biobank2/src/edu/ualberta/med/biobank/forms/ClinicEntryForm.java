@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ContactEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -54,6 +55,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     private ComboViewer activityStatusComboViewer;
 
+    private CommentCollectionInfoTable commentTable;
+
+    private CommentCollectionInfoTable commentEntryTable;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ClinicAdapter),
@@ -66,7 +71,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         if (clinic.isNew()) {
             tabName = Messages.ClinicEntryForm_title_new;
             clinic.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         } else
             tabName = NLS.bind(Messages.ClinicEntryForm_title_edit,
                 clinic.getNameShort());
@@ -119,8 +124,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            clinic.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), clinic.getActivityStatus(),
             Messages.ClinicEntryForm_activity_validator_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -130,9 +135,25 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.label_comments, null, clinic,
-            ClinicPeer.COMMENT.getName(), null);
+        createCommentSection();
+
+    }
+
+    private void createCommentSection() {
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(client,
+            clinic.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_button_add);
+
     }
 
     private void createContactSection() {
@@ -183,7 +204,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         if (clinic.isNew()) {
             clinic.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         }
 
         GuiUtil.reset(activityStatusComboViewer, clinic.getActivityStatus());

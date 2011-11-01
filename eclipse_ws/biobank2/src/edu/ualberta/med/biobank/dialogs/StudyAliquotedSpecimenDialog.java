@@ -69,8 +69,10 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                         .getActiveActivityStatus(origAliquotedSpecimen
                             .getAppService()));
             } catch (Exception e) {
-                BgcPlugin.openAsyncError(Messages.StudyAliquotedSpecimenDialog_activityStatus_retrieve_error_title,
-                    Messages.StudyAliquotedSpecimenDialog_activityStatus_retrieve_error_msg);
+                BgcPlugin
+                    .openAsyncError(
+                        Messages.StudyAliquotedSpecimenDialog_activityStatus_retrieve_error_title,
+                        Messages.StudyAliquotedSpecimenDialog_activityStatus_retrieve_error_msg);
             }
         } else {
             currentTitle = Messages.StudyAliquotedSpecimenDialog_edit_title;
@@ -143,8 +145,10 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                         newAliquotedSpecimen
                             .setActivityStatus((ActivityStatusWrapper) selectedObject);
                     } catch (Exception e) {
-                        BgcPlugin.openAsyncError(
-                            Messages.StudyAliquotedSpecimenDialog_activityStatus_error_title, e);
+                        BgcPlugin
+                            .openAsyncError(
+                                Messages.StudyAliquotedSpecimenDialog_activityStatus_error_title,
+                                e);
                     }
                 }
             }, new BiobankLabelProvider());
@@ -154,18 +158,17 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
             Messages.StudyAliquotedSpecimenDialog_volume_label, new String[0],
             newAliquotedSpecimen, AliquotedSpecimenPeer.VOLUME.getName(),
             new DoubleNumberValidator(
-                Messages.StudyAliquotedSpecimenDialog_volume_validation_msg, false));
+                Messages.StudyAliquotedSpecimenDialog_volume_validation_msg,
+                false));
 
-        quantity = (BgcBaseText) createBoundWidgetWithLabel(
-            contents,
-            BgcBaseText.class,
-            SWT.BORDER,
+        quantity = (BgcBaseText) createBoundWidgetWithLabel(contents,
+            BgcBaseText.class, SWT.BORDER,
             Messages.StudyAliquotedSpecimenDialog_quantity_label,
-            new String[0],
-            newAliquotedSpecimen,
+            new String[0], newAliquotedSpecimen,
             AliquotedSpecimenPeer.QUANTITY.getName(),
             new IntegerNumberValidator(
-                Messages.StudyAliquotedSpecimenDialog_quantity_validation_msg, false));
+                Messages.StudyAliquotedSpecimenDialog_quantity_validation_msg,
+                false));
     }
 
     @Override
@@ -182,7 +185,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
     }
 
     @Override
-    protected void copy(ModelWrapper<?> newModelObject) {
+    protected void copy(Object newModelObject) {
         ((AliquotedSpecimenWrapper) newModelObject)
             .setSpecimenType(newAliquotedSpecimen.getSpecimenType());
         ((AliquotedSpecimenWrapper) newModelObject)
@@ -203,7 +206,8 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         try {
             newAliquotedSpecimen.reset();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.StudyAliquotedSpecimenDialog_error_title, e);
+            BgcPlugin.openAsyncError(
+                Messages.StudyAliquotedSpecimenDialog_error_title, e);
         }
         specimenTypeComboViewer.getCombo().deselectAll();
         quantity.setText(""); //$NON-NLS-1$

@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.expressions;
 import org.eclipse.core.expressions.PropertyTester;
 
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 
 public class AdapterBasePropertyTester extends PropertyTester {
 
@@ -20,8 +20,10 @@ public class AdapterBasePropertyTester extends PropertyTester {
     @Override
     public boolean test(Object receiver, String property, Object[] args,
         Object expectedValue) {
-        if (receiver instanceof AdapterBase) {
-            AdapterBase adapter = (AdapterBase) receiver;
+        // plugin.xml already defines that the type should be
+        // AbstractAdpaterBase
+        if (receiver instanceof AbstractAdapterBase) {
+            AbstractAdapterBase adapter = (AbstractAdapterBase) receiver;
             try {
                 if (CAN_DELETE.equals(property))
                     return adapter.isDeletable();

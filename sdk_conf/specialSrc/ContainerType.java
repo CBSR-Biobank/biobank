@@ -133,22 +133,22 @@ public class ContainerType  implements Serializable
 	* 
 	**/
 	
-	public String comment;
+	public Collection<Comment> commentCollection;
 	/**
 	* Retrieves the value of the comment attribute
 	* @return comment
 	**/
 
-	public String getComment(){
-		return comment;
+	public Collection<Comment> getCommentCollection(){
+		return commentCollection;
 	}
 
 	/**
 	* Sets the value of comment attribute
 	**/
 
-	public void setComment(String comment){
-		this.comment = comment;
+	public void setCommentCollection(Collection<Comment> comments){
+		this.commentCollection = comments;
 	}
 	
 	/**

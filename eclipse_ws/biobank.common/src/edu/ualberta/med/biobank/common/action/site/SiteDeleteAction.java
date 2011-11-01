@@ -25,6 +25,7 @@ public class SiteDeleteAction implements Action<Site> {
     @Override
     public Site run(User user, Session session) throws ActionException {
         // TODO: checks
+        // FIXME permissions
         session.delete(site);
         return null;
     }

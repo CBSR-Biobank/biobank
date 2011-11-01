@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -21,6 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
@@ -60,44 +60,46 @@ public class ContainerGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        List<AdapterBase> res = new ArrayList<AdapterBase>();
-        if (searchedObject instanceof ContainerWrapper) {
-            ContainerWrapper container = (ContainerWrapper) searchedObject;
-            if (container.getContainerType() != null) {
-                if (Boolean.TRUE.equals(container.getContainerType()
-                    .getTopLevel())) {
-                    AdapterBase child = getChild(
-                        (ModelWrapper<?>) searchedObject, true);
-                    if (child != null)
-                        res.add(child);
-                } else {
-                    List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
-                    ContainerWrapper currentContainer = container;
-                    while (currentContainer.hasParentContainer()) {
-                        currentContainer = currentContainer
-                            .getParentContainer();
-                        parents.add(currentContainer);
-                    }
-                    for (AdapterBase child : getChildren()) {
-                        if (child instanceof ContainerAdapter) {
-                            res = searchChildContainers(searchedObject,
-                                (ContainerAdapter) child, parents);
-                        } else {
-                            res = child.search(searchedObject);
-                        }
-                        if (res.size() > 0)
-                            break;
-                    }
-                    if (res.size() == 0)
-                        res = searchChildren(searchedObject);
-                }
-            }
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        List<AbstractAdapterBase> res = new ArrayList<AbstractAdapterBase>();
+        if (ContainerWrapper.class.isAssignableFrom(searchedClass)) {
+            // FIXME search might need to be different now
+            // ContainerWrapper container = (ContainerWrapper) searchedObject;
+            // if (container.getContainerType() != null) {
+            // if (Boolean.TRUE.equals(container.getContainerType()
+            // .getTopLevel())) {
+            // AbstractAdapterBase child = getChild(objectId, true);
+            // if (child != null)
+            // res.add(child);
+            // } else {
+            // List<ContainerWrapper> parents = new
+            // ArrayList<ContainerWrapper>();
+            // ContainerWrapper currentContainer = container;
+            // while (currentContainer.hasParentContainer()) {
+            // currentContainer = currentContainer
+            // .getParentContainer();
+            // parents.add(currentContainer);
+            // }
+            // for (AbstractAdapterBase child : getChildren()) {
+            // if (child instanceof ContainerAdapter) {
+            // res = searchChildContainers(searchedObject,
+            // objectId, (ContainerAdapter) child, parents);
+            // } else {
+            // res = child.search(searchedObject, objectId);
+            // }
+            // if (res.size() > 0)
+            // break;
+            // }
+            // if (res.size() == 0)
+            // res = searchChildren(searchedObject, objectId);
+            // }
+            // }
         }
         return res;
     }
@@ -108,13 +110,13 @@ public class ContainerGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof ContainerWrapper);
         return new ContainerAdapter(this, (ContainerWrapper) child);
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         SiteWrapper parentSite = (SiteWrapper) ((SiteAdapter) getParent())
             .getModelObject();
@@ -165,5 +167,10 @@ public class ContainerGroup extends AdapterBase {
     @Override
     public String getViewFormId() {
         return null;
+    }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
     }
 }

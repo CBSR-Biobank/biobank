@@ -31,7 +31,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             Messages.SpecimenInfoTable_current_center_label,
             Messages.SpecimenInfoTable_position_label,
             Messages.SpecimenInfoTable_created_label,
-            Messages.SpecimenInfoTable_quantity_label,
+            Messages.SpecimenInfoTable_quantity_ml_label,
             Messages.SpecimenInfoTable_status_label,
             Messages.SpecimenInfoTable_comments_label }) {
             @Override
@@ -79,7 +79,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             Messages.SpecimenInfoTable_type_label,
             Messages.SpecimenInfoTable_position_label,
             Messages.SpecimenInfoTable_time_drawn_label,
-            Messages.SpecimenInfoTable_quantity_label,
+            Messages.SpecimenInfoTable_quantity_ml_label,
             Messages.SpecimenInfoTable_status_label,
             Messages.SpecimenInfoTable_study_label,
             Messages.SpecimenInfoTable_pnumber_label,
@@ -120,55 +120,6 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             @Override
             public Image getColumnImage(TableRowData row, int columnIndex) {
                 if (columnIndex == 5
-                    && ActivityStatusWrapper.FLAGGED_STATUS_STRING
-                        .equals(row.activityStatus))
-                    return BgcPlugin.getDefault().getImageRegistry()
-                        .get(BgcPlugin.IMG_ERROR);
-                return null;
-            }
-        },
-        ALIQUOTS(new String[] { Messages.SpecimenInfoTable_inventoryid_label,
-            Messages.SpecimenInfoTable_type_label,
-            Messages.SpecimenInfoTable_position_label,
-            Messages.SpecimenInfoTable_created_label,
-            Messages.SpecimenInfoTable_worksheet_label,
-            Messages.SpecimenInfoTable_quantity_label,
-            Messages.SpecimenInfoTable_status_label,
-            Messages.SpecimenInfoTable_origin_center_label,
-            Messages.SpecimenInfoTable_current_center_label,
-            Messages.SpecimenInfoTable_comments_label }) {
-            @Override
-            public String getColumnValue(TableRowData row, int columnIndex) {
-                switch (columnIndex) {
-                case 0:
-                    return row.inventoryId;
-                case 1:
-                    return row.type;
-                case 2:
-                    return row.position;
-                case 3:
-                    return row.createdAt;
-                case 4:
-                    return row.worksheet;
-                case 5:
-                    return NumberFormatter.format(row.quantity);
-                case 6:
-                    return row.activityStatus;
-                case 7:
-                    return row.originCenter;
-                case 8:
-                    return row.center;
-                case 9:
-                    return (row.comment == null || row.comment.equals("")) ? Messages.SpecimenInfoTable_no_first_letter //$NON-NLS-1$
-                        : Messages.SpecimenInfoTable_yes_first_letter;
-                default:
-                    return ""; //$NON-NLS-1$
-                }
-            }
-
-            @Override
-            public Image getColumnImage(TableRowData row, int columnIndex) {
-                if (columnIndex == 6
                     && ActivityStatusWrapper.FLAGGED_STATUS_STRING
                         .equals(row.activityStatus))
                     return BgcPlugin.getDefault().getImageRegistry()
@@ -244,7 +195,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.SpecimenInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -290,7 +241,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         info.position = info.specimen.getPositionString();
         ActivityStatusWrapper status = info.specimen.getActivityStatus();
         info.activityStatus = (status == null) ? "" : status.getName(); //$NON-NLS-1$
-        info.comment = info.specimen.getComment();
+        info.comment = info.specimen.getCommentCollection(false).toString();
         info.center = info.specimen.getCurrentCenter().getNameShort();
 
         info.originCenter = ""; //$NON-NLS-1$

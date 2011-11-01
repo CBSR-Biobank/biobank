@@ -18,15 +18,35 @@ import edu.ualberta.med.biobank.model.User;
  * 
  */
 public enum PermissionEnum {
-    SPECIMEN_CREATE(1),
-    SPECIMEN_READ(2),
-    SPECIMEN_UPDATE(3),
-    SPECIMEN_DELETE(4),
+    ADMINISTRATION(1),
 
-    SITE_CREATE(5),
-    SITE_READ(6),
-    SITE_UPDATE(7),
-    SITE_DELETE(8);
+    SPECIMEN_CREATE(2),
+    SPECIMEN_READ(3),
+    SPECIMEN_UPDATE(4),
+    SPECIMEN_DELETE(5),
+    SPECIMEN_LINK(6),
+    SPECIMEN_ASSIGN(7),
+
+    SITE_CREATE(8),
+    SITE_READ(9),
+    SITE_UPDATE(10),
+    SITE_DELETE(11),
+
+    PATIENT_CREATE(12),
+    PATIENT_READ(13),
+    PATIENT_UPDATE(14),
+    PATIENT_DELETE(15),
+    PATIENT_MERGE(16),
+
+    COLLECTION_EVENT_CREATE(17),
+    COLLECTION_EVENT_READ(18),
+    COLLECTION_EVENT_UPDATE(19),
+    COLLECTION_EVENT_DELETE(20),
+
+    PROCESSING_EVENT_CREATE(21),
+    PROCESSING_EVENT_READ(22),
+    PROCESSING_EVENT_UPDATE(23),
+    PROCESSING_EVENT_DELETE(24);
 
     private final Integer permissionId;
 
@@ -99,7 +119,8 @@ public enum PermissionEnum {
 
     private boolean isPermissionAllowed(Collection<Permission> permissions) {
         for (Permission permission : permissions) {
-            if (permission.getId().equals(getId())) {
+            if (permission.getId().equals(getId())
+                || permission.getId().equals(ADMINISTRATION.getId())) {
                 return true;
             }
         }

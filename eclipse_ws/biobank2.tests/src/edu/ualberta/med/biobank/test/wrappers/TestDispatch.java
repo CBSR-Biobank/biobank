@@ -253,14 +253,14 @@ public class TestDispatch extends TestDatabase {
             receiverSite, method, name, Utils.getRandomDate());
 
         dispatch.reset();
-        Assert.assertEquals(null, dispatch.getComment());
+        Assert.assertEquals(0, dispatch.getCommentCollection(false).size());
 
         // test reset for an object already in database
         dispatch = DispatchHelper.addDispatch(senderSite, receiverSite, method,
             name, Utils.getRandomDate());
-        dispatch.setComment("test comment");
+        // dispatch.addToCommentCollection(Utils.getRandomComments());
         dispatch.reset();
-        Assert.assertEquals(null, dispatch.getComment());
+        Assert.assertEquals(0, dispatch.getCommentCollection(false).size());
     }
 
     @Test

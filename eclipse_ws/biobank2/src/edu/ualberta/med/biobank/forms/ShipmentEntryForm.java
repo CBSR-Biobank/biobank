@@ -47,6 +47,7 @@ import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget.ItemAction;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.Event;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
@@ -104,6 +105,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     protected boolean tryAgain;
 
+    private CommentCollectionInfoTable commentEntryTable;
+
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ShipmentAdapter,
@@ -144,7 +154,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         senderComboViewer = createComboViewer(client,
             Messages.ShipmentEntryForm_sender_label,
-            ClinicWrapper.getAllClinics(appService),
+            ClinicWrapper.getAllClinics(SessionManager.getAppService()),
             (ClinicWrapper) originInfo.getCenter(),
             Messages.ShipmentEntryForm_sender_validation_msg,
             new ComboSelectionUpdate() {
@@ -159,7 +169,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         receiverComboViewer = createComboViewer(client,
             Messages.ShipmentEntryForm_receiver_label,
-            SiteQuery.getSites(appService), originInfo.getReceiverSite(),
+            SiteQuery.getSites(SessionManager.getAppService()),
+            originInfo.getReceiverSite(),
             Messages.ShipmentEntryForm_receiver_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -181,9 +192,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         shippingMethodComboViewer = createComboViewer(client,
             Messages.ShipmentEntryForm_shipMethod_label,
-            ShippingMethodWrapper.getShippingMethods(appService), originInfo
-                .getShipmentInfo().getShippingMethod(), null,
-            new ComboSelectionUpdate() {
+            ShippingMethodWrapper.getShippingMethods(SessionManager
+                .getAppService()), originInfo.getShipmentInfo()
+                .getShippingMethod(), null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     ShippingMethodWrapper method = (ShippingMethodWrapper) selectedObject;
@@ -227,9 +238,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             ShipmentInfoPeer.RECEIVED_AT.getName(), new NotNullValidator(
                 Messages.ShipmentEntryForm_received_validation_msg));
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.WRAP
-            | SWT.MULTI, Messages.ShipmentEntryForm_comments_label, null,
-            shipmentInfo, ShipmentInfoPeer.COMMENT.getName(), null);
+        createCommentSection();
 
     }
 
@@ -288,7 +297,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             .getSpecimenCollection(true);
 
         specimenEntryWidget = new SpecimenEntryWidget(client, SWT.NONE,
-            toolkit, appService, true);
+            toolkit, SessionManager.getAppService(), true);
         specimenEntryWidget
             .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
                 @Override
@@ -372,6 +381,23 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             vetoListener);
 
         specimenEntryWidget.setSpecimens(specimens);
+    }
+
+    private void createCommentSection() {
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(client,
+            originInfo.getShipmentInfo().getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_button_add);
+
     }
 
     @Override

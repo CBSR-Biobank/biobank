@@ -23,6 +23,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -32,9 +33,9 @@ import edu.ualberta.med.biobank.gui.common.forms.BgcFormBase;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
@@ -49,7 +50,7 @@ import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
  */
 public abstract class BiobankFormBase extends BgcFormBase {
 
-    protected AdapterBase adapter;
+    protected AbstractAdapterBase adapter;
 
     public BiobankFormBase() {
         //
@@ -57,16 +58,17 @@ public abstract class BiobankFormBase extends BgcFormBase {
 
     @Override
     public void setFocus() {
-        if ((adapter != null) && (adapter.getId() != null)) {
-            SessionManager.setSelectedNode(adapter);
-            // if selection fails, then the adapter needs to be matched at the
-            // id level
-            if (SessionManager.getSelectedNode() == null) {
-                AdapterBase node = SessionManager.searchFirstNode(adapter
-                    .getModelObject());
-                SessionManager.setSelectedNode(node);
-            }
-        }
+        // if ((adapter != null) && (adapter.getId() != null)) {
+        // SessionManager.setSelectedNode(adapter);
+        // // if selection fails, then the adapter needs to be matched at the
+        // // id level
+        // if (SessionManager.getSelectedNode() == null
+        // && adapter.getClass() != null) {
+        // AbstractAdapterBase node = SessionManager.searchFirstNode(
+        // adapter.getClass(), adapter.getId());
+        // SessionManager.setSelectedNode(node);
+        // }
+        // }
     }
 
     @Override
@@ -91,10 +93,10 @@ public abstract class BiobankFormBase extends BgcFormBase {
             throw new PartInitException("Invalid editor input"); //$NON-NLS-1$
         FormInput formInput = (FormInput) input;
 
-        adapter = (AdapterBase) formInput.getAdapter(AdapterBase.class);
+        adapter = (AbstractAdapterBase) formInput
+            .getAdapter(AbstractAdapterBase.class);
         if (adapter != null) {
             Assert.isNotNull(adapter, "Bad editor input (null value)"); //$NON-NLS-1$
-            appService = (BiobankApplicationService) adapter.getAppService();
             if (!formInput.hasPreviousForm()) {
                 currentLinkedForms = new ArrayList<BgcFormBase>();
             }
@@ -102,17 +104,21 @@ public abstract class BiobankFormBase extends BgcFormBase {
             linkedForms.add(this);
         }
         super.init(editorSite, formInput);
-        getSite().setSelectionProvider(this);
     }
 
-    protected ModelWrapper<?> getModelObject() throws Exception {
-        ModelWrapper<?> modelObject = adapter.getModelObject();
-
-        if (!modelObject.isNew()) {
-            modelObject = modelObject.getDatabaseClone();
+    protected Object getModelObject() throws Exception {
+        if (adapter instanceof AdapterBase) {
+            AdapterBase ab = (AdapterBase) adapter;
+            Object o = ab.getModelObject();
+            if (o instanceof ModelWrapper) {
+                ModelWrapper<?> modelObject = (ModelWrapper<?>) o;
+                if (!modelObject.isNew()) {
+                    o = modelObject.getDatabaseClone();
+                }
+            }
+            return o;
         }
-
-        return modelObject;
+        return null;
     }
 
     @Override
@@ -121,8 +127,8 @@ public abstract class BiobankFormBase extends BgcFormBase {
         if (selection instanceof StructuredSelection) {
             Object element = ((StructuredSelection) selection)
                 .getFirstElement();
-            if (element instanceof AdapterBase) {
-                ((AdapterBase) element).performDoubleClick();
+            if (element instanceof AbstractAdapterBase) {
+                ((AbstractAdapterBase) element).performDoubleClick();
             } else if (element instanceof ModelWrapper<?>) {
                 SessionManager.openViewForm((ModelWrapper<?>) element);
             }
@@ -161,7 +167,7 @@ public abstract class BiobankFormBase extends BgcFormBase {
             listener, wrapperTypeToAdd, imageKey);
     }
 
-    public AdapterBase getAdapter() {
+    public AbstractAdapterBase getAdapter() {
         return adapter;
     }
 
@@ -222,6 +228,10 @@ public abstract class BiobankFormBase extends BgcFormBase {
                 ex);
             cancelSave(monitor);
         } else if (ex instanceof BiobankSessionException) {
+            BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
+                ex);
+            cancelSave(monitor);
+        } else if (ex instanceof ActionException) {
             BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
                 ex);
             cancelSave(monitor);

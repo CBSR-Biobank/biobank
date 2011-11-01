@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ClinicAdapter extends AdapterBase {
@@ -28,7 +29,7 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return getTooltipText(Messages.ClinicAdapter_clinic_label);
     }
 
@@ -55,12 +56,12 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }
@@ -78,6 +79,13 @@ public class ClinicAdapter extends AdapterBase {
     @Override
     public String getViewFormId() {
         return ClinicViewForm.ID;
+    }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof ClinicAdapter)
+            return internalCompareTo(o);
+        return 0;
     }
 
 }

@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyI
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.mvp.event.AlertEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
@@ -51,15 +52,14 @@ public class SiteEntryPresenter extends AbstractEntryPresenter<View> {
 
         HasValue<String> getNameShort();
 
-        HasValue<String> getComment();
+        HasValue<Collection<Comment>> getCommentCollection();
 
         HasValue<Collection<StudyInfo>> getStudies();
     }
 
     @Inject
     public SiteEntryPresenter(View view, EventBus eventBus,
-        Dispatcher dispatcher,
-        AddressEntryPresenter addressEntryPresenter,
+        Dispatcher dispatcher, AddressEntryPresenter addressEntryPresenter,
         ActivityStatusComboPresenter activityStatusComboPresenter) {
         super(view, eventBus);
         this.dispatcher = dispatcher;
@@ -82,10 +82,13 @@ public class SiteEntryPresenter extends AbstractEntryPresenter<View> {
 
         binder.bind(model.name).to(view.getName());
         binder.bind(model.nameShort).to(view.getNameShort());
-        binder.bind(model.comment).to(view.getComment());
+
+        // TODO: fix comment colletion section
+        // binder.bind(model.comment).to(view.getCommentCollection());
+
         binder.bind(model.studies).to(view.getStudies());
-        binder.bind(model.activityStatus)
-            .to(activityStatusComboPresenter.getActivityStatus());
+        binder.bind(model.activityStatus).to(
+            activityStatusComboPresenter.getActivityStatus());
 
         model.bind();
 
@@ -116,7 +119,7 @@ public class SiteEntryPresenter extends AbstractEntryPresenter<View> {
         saveSite.setId(model.siteId.getValue());
         saveSite.setName(model.name.getValue());
         saveSite.setNameShort(model.nameShort.getValue());
-        saveSite.setComment(model.comment.getValue());
+        // saveSite.setComment(model.comment.getValue());
         saveSite.setAddress(model.address.getValue());
         saveSite.setActivityStatusId(model.getActivityStatusId());
         saveSite.setStudyIds(model.getStudyIds());
@@ -187,25 +190,23 @@ public class SiteEntryPresenter extends AbstractEntryPresenter<View> {
 
             this.addressModel = addressModel;
 
-            siteId = fieldOfType(Integer.class)
-                .boundTo(provider, "site.id");
-            name = fieldOfType(String.class)
-                .boundTo(provider, "site.name");
-            nameShort = fieldOfType(String.class)
-                .boundTo(provider, "site.nameShort");
-            comment = fieldOfType(String.class)
-                .boundTo(provider, "site.comment");
-            activityStatus = fieldOfType(ActivityStatus.class)
-                .boundTo(provider, "site.activityStatus");
-            address = fieldOfType(Address.class)
-                .boundTo(provider, "site.address");
-            studies = listOfType(StudyInfo.class)
-                .boundTo(provider, "studies");
+            siteId = fieldOfType(Integer.class).boundTo(provider, "site.id");
+            name = fieldOfType(String.class).boundTo(provider, "site.name");
+            nameShort =
+                fieldOfType(String.class).boundTo(provider, "site.nameShort");
+            comment =
+                fieldOfType(String.class).boundTo(provider, "site.comment");
+            activityStatus =
+                fieldOfType(ActivityStatus.class).boundTo(provider,
+                    "site.activityStatus");
+            address =
+                fieldOfType(Address.class).boundTo(provider, "site.address");
+            studies = listOfType(StudyInfo.class).boundTo(provider, "studies");
 
-            ValidationPlugin.validateField(name)
-                .using(new NotEmptyValidator("Name is required"));
-            ValidationPlugin.validateField(nameShort)
-                .using(new NotEmptyValidator("Name Short is required"));
+            ValidationPlugin.validateField(name).using(
+                new NotEmptyValidator("Name is required"));
+            ValidationPlugin.validateField(nameShort).using(
+                new NotEmptyValidator("Name Short is required"));
         }
 
         Integer getActivityStatusId() {

@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.patient;
 
-import java.util.Collection;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -9,69 +9,63 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventDeleteAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class CollectionEventAdapter extends AdapterBase {
+public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
-    private static BgcLogger logger = BgcLogger
-        .getLogger(CollectionEventAdapter.class.getName());
+    public SimpleCEventInfo ceventInfo;
 
-    public CollectionEventAdapter(AdapterBase parent,
-        CollectionEventWrapper collectionEventWrapper) {
-        super(parent, collectionEventWrapper);
+    public CollectionEventAdapter(AbstractAdapterBase parent,
+        SimpleCEventInfo ceventInfo) {
+        super(parent, ceventInfo == null ? null : ceventInfo.cevent.getId(),
+            null, null, false);
+        this.ceventInfo = ceventInfo;
         setEditable(parent instanceof PatientAdapter || parent == null);
     }
 
     @Override
     protected String getLabelInternal() {
-        CollectionEventWrapper cevent = (CollectionEventWrapper) getModelObject();
-        Assert.isNotNull(cevent, "collection event is null"); //$NON-NLS-1$
-        long count = -1;
-        try {
-            count = cevent.getSourceSpecimensCount(false);
-        } catch (Exception e) {
-            logger.error("Problem counting specimens", e); //$NON-NLS-1$
-        }
+        Assert.isNotNull(ceventInfo, "collection event is null"); //$NON-NLS-1$
         return new StringBuilder("#") //$NON-NLS-1$ 
-            .append(cevent.getVisitNumber())
-            .append(" - ") //$NON-NLS-1$ 
+            .append(ceventInfo.cevent.getVisitNumber())
+            .append(" - ")//$NON-NLS-1$
             .append(
-                cevent.getMinSourceSpecimenDate() == null ? "No Specimens" //$NON-NLS-1$
-                    : DateFormatter.formatAsDateTime(cevent
-                        .getMinSourceSpecimenDate()))
-            .append(" [").append(count) //$NON-NLS-1$ 
+                ceventInfo.minSourceSpecimenDate == null ? Messages.CollectionEventAdapter_nospecimens_label
+                    : DateFormatter
+                        .formatAsDateTime(ceventInfo.minSourceSpecimenDate))
+            .append(" [").append(ceventInfo.sourceSpecimenCount) //$NON-NLS-1$ 
             .append("]").toString(); //$NON-NLS-1$ 
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         String tabName = null;
-        CollectionEventWrapper cEvent = (CollectionEventWrapper) getModelObject();
-        if (cEvent != null)
-            if (cEvent.isNew()) {
+        if (ceventInfo != null)
+            if (ceventInfo.cevent.getId() == null) {
                 tabName = Messages.CollectionEventEntryForm_title_new;
-                try {
-                    cEvent
-                        .setActivityStatus(ActivityStatusWrapper
-                            .getActiveActivityStatus(SessionManager
-                                .getAppService()));
-                } catch (Exception e) {
-                    BgcPlugin.openAsyncError(
-                        Messages.CollectionEventAdapter_error_title,
-                        Messages.CollectionEventAdapter_create_error_msg);
-                }
+                // FIXME this should not be done in a getter!
+                // try {
+                // cEvent
+                // .setActivityStatus(ActivityStatusWrapper
+                // .getActiveActivityStatus(SessionManager
+                // .getAppService()));
+                // } catch (Exception e) {
+                // BgcPlugin.openAsyncError(
+                // Messages.CollectionEventAdapter_error_title,
+                // Messages.CollectionEventAdapter_create_error_msg);
+                // }
             } else {
                 tabName = NLS.bind(
                     Messages.CollectionEventEntryForm_title_edit,
-                    cEvent.getVisitNumber());
+                    ceventInfo.cevent.getVisitNumber());
             }
         return tabName;
     }
@@ -94,18 +88,17 @@ public class CollectionEventAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
-        throws Exception {
+    protected Map<Integer, ?> getChildrenObjects() throws Exception {
         return null;
     }
 
     @Override
-    protected int getWrapperChildCount() throws Exception {
+    protected int getChildrenCount() throws Exception {
         return 0;
     }
 
@@ -124,4 +117,46 @@ public class CollectionEventAdapter extends AdapterBase {
         return internalIsDeletable();
     }
 
+    public Patient getPatient() {
+        if (ceventInfo != null && ceventInfo.cevent != null)
+            return ceventInfo.cevent.getPatient();
+        return null;
+    }
+
+    // FIXME?
+    // public void setCollectionEventInfo(SimpleCEventInfo ceventInfo) {
+    // this.ceventInfo = ceventInfo;
+    // if (ceventInfo != null)
+    // setId(ceventInfo.cevent.id);
+    // }
+    //
+    // public void setCollectionEventId(Integer id) throws ApplicationException
+    // {
+    // // TODO Auto-generated method stub
+    // // FIXME set id and set retrieve new CollectionEventInfo
+    // // setCollectionEventInfo(SessionManager.getAppService().doAction(
+    // // new GetCollectionEventInfoAction(id)));
+    // }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof CollectionEventAdapter) {
+            CollectionEventAdapter ce2 = (CollectionEventAdapter) o;
+            return ceventInfo.cevent.visitNumber
+                .compareTo(ce2.ceventInfo.cevent.visitNumber);
+        }
+        return 0;
+    }
+
+    @Override
+    public void setValue(Object value) {
+        if (value instanceof SimpleCEventInfo)
+            ceventInfo = (SimpleCEventInfo) value;
+    }
+
+    @Override
+    protected void runDelete() throws Exception {
+        SessionManager.getAppService().doAction(
+            new CollectionEventDeleteAction(getId()));
+    }
 }

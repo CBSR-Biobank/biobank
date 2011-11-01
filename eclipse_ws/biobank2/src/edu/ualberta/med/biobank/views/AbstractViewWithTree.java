@@ -8,8 +8,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 
 public abstract class AbstractViewWithTree<T> extends ViewPart {
 
@@ -50,6 +49,7 @@ public abstract class AbstractViewWithTree<T> extends ViewPart {
         });
     }
 
-    public abstract List<AdapterBase> searchNode(ModelWrapper<?> wrapper);
+    public abstract List<AbstractAdapterBase> searchNode(
+        Class<?> searchedClass, Integer objectId);
 
 }

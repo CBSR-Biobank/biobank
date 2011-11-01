@@ -45,8 +45,7 @@ public class AliquotedSpecimenInfoTable extends
     }
 
     @Override
-    public TableRowData getCollectionModelObject(Object obj)
-        throws Exception {
+    public TableRowData getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
         info.sampleStorage = (AliquotedSpecimenWrapper) obj;
         SpecimenTypeWrapper type = info.sampleStorage.getSpecimenType();
@@ -68,7 +67,7 @@ public class AliquotedSpecimenInfoTable extends
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.AliquotedSpecimenInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }

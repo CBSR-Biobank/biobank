@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.AliquotedSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ClinicAddInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SourceSpecimenEntryInfoTable;
@@ -68,6 +69,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private SourceSpecimenEntryInfoTable sourceSpecimenEntryTable;
 
+    private CommentCollectionInfoTable commentEntryTable;
+
     private static class StudyPvAttrCustom extends PvAttrCustom {
         public PvInfoWidget widget;
         public boolean inStudy;
@@ -91,7 +94,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         if (study.isNew()) {
             tabName = Messages.StudyEntryForm_title_new;
             study.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         } else {
             tabName = NLS.bind(Messages.StudyEntryForm_title_edit,
                 study.getNameShort());
@@ -124,8 +127,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            study.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), study.getActivityStatus(),
             Messages.StudyEntryForm_activity_validator_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -135,10 +138,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.label_comments, null, study, StudyPeer.COMMENT.getName(),
-            null);
-
+        createCommentSection();
         createClinicSection();
         createSourceSpecimensSection();
         createAliquotedSpecimensSection();
@@ -160,6 +160,23 @@ public class StudyEntryForm extends BiobankEntryForm {
                 }
             });
         section.setClient(contactEntryTable);
+    }
+
+    private void createCommentSection() {
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(client,
+            study.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_button_add);
+
     }
 
     private void createAliquotedSpecimensSection() {
@@ -228,7 +245,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             .getStudyEventAttrLabels());
 
         for (GlobalEventAttrWrapper geAttr : GlobalEventAttrWrapper
-            .getAllGlobalEventAttrs(appService)) {
+            .getAllGlobalEventAttrs(SessionManager.getAppService())) {
             String label = geAttr.getLabel();
             boolean selected = false;
             studyPvAttrCustom = new StudyPvAttrCustom();
@@ -331,7 +348,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         if (study.isNew()) {
             study.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         }
 
         GuiUtil.reset(activityStatusComboViewer, study.getActivityStatus());

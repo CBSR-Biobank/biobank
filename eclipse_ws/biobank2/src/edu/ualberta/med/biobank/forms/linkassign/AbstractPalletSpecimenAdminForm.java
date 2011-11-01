@@ -36,10 +36,11 @@ import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -476,11 +477,14 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             palletCell.getValue(), ContainerLabelingSchemeWrapper
                 .rowColToSbs(palletCell.getRowColPos())));
         beforeScanTubeAlone();
-        CellProcessResult res = appService.processCellStatus(
-            palletCell.transformIntoServerCell(), getProcessData(),
-            SessionManager.getUser().getCurrentWorkingCenter().getId(),
-            Locale.getDefault());
-        palletCell.merge(appService, res.getCell());
+        CellProcessResult res = (CellProcessResult) SessionManager
+            .getAppService()
+            .doAction(
+                getCellProcessAction(SessionManager.getUser()
+                    .getCurrentWorkingCenter()
+                    .getId(),
+                    palletCell.transformIntoServerCell(), Locale.getDefault()));
+        palletCell.merge(SessionManager.getAppService(), res.getCell());
         appendLogs(res.getLogs());
         processCellResult(palletCell.getRowColPos(), palletCell);
         currentScanState = currentScanState.mergeWith(palletCell.getStatus());
@@ -491,6 +495,13 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         // setScanValid(ok);
         afterScanAndProcess(palletCell.getRow());
     }
+
+    protected abstract Action<ProcessResult> getCellProcessAction(
+        Integer centerId, Cell cell, Locale locale);
+
+    protected abstract Action<ProcessResult> getPalletProcessAction(
+        Integer centerId, Map<RowColPos, Cell> cells, boolean isRescanMode,
+        Locale locale);
 
     protected void beforeScanTubeAlone() {
         // default does nothing
@@ -566,24 +577,26 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
         // conversion for server side call
-        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells = null;
+        Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.Cell> serverCells = null;
         if (cells != null) {
-            serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell>();
+            serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.Cell>();
             for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
                 serverCells.put(entry.getKey(), entry.getValue()
                     .transformIntoServerCell());
             }
         }
         // server side call
-        ScanProcessResult res = appService.processScanResult(serverCells,
-            getProcessData(), isRescanMode(), SessionManager.getUser()
-                .getCurrentWorkingCenter().getId(), Locale.getDefault());
+        ScanProcessResult res = (ScanProcessResult) SessionManager
+            .getAppService().doAction(
+                getPalletProcessAction(SessionManager.getUser()
+                    .getCurrentWorkingCenter().getId(), serverCells,
+                    isRescanMode(), Locale.getDefault()));
         // print result logs
         appendLogs(res.getLogs());
 
         if (cells != null) {
             // for each cell, convert into a client side cell
-            for (Entry<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> entry : res
+            for (Entry<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.Cell> entry : res
                 .getCells().entrySet()) {
                 RowColPos rcp = entry.getKey();
                 monitor
@@ -599,7 +612,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                         servercell.getValue()));
                     cells.put(rcp, palletCell);
                 }
-                palletCell.merge(appService, servercell);
+                palletCell.merge(SessionManager.getAppService(), servercell);
                 // additional cell specific client conversion if needed
                 processCellResult(rcp, palletCell);
             }
@@ -608,8 +621,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         setScanValid(getCells() != null && !getCells().isEmpty()
             && currentScanState != UICellStatus.ERROR);
     }
-
-    protected abstract ProcessData getProcessData();
 
     protected void processCellResult(@SuppressWarnings("unused") RowColPos rcp,
         @SuppressWarnings("unused") PalletCell palletCell) {

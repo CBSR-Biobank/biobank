@@ -27,18 +27,20 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.DateNode;
+import edu.ualberta.med.biobank.treeview.NewAbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeGroup;
+import edu.ualberta.med.biobank.treeview.admin.NewStudyAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupMasterGroup;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
@@ -94,6 +96,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
         classToImageKey
             .put(ClinicAdapter.class.getName(), BgcPlugin.IMG_CLINIC);
         classToImageKey.put(StudyAdapter.class.getName(), BgcPlugin.IMG_STUDY);
+        classToImageKey.put(NewStudyAdapter.class.getName(),
+            BgcPlugin.IMG_STUDY);
         classToImageKey.put(PatientAdapter.class.getName(),
             BgcPlugin.IMG_PATIENT);
         classToImageKey.put(CollectionEventAdapter.class.getName(),
@@ -101,6 +105,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
         classToImageKey.put(ShipmentAdapter.class.getName(),
             BgcPlugin.IMG_CLINIC_SHIPMENT);
         classToImageKey.put(AbstractSearchedNode.class.getName(),
+            BgcPlugin.IMG_SEARCH);
+        classToImageKey.put(NewAbstractSearchedNode.class.getName(),
             BgcPlugin.IMG_SEARCH);
         classToImageKey.put(AbstractTodayNode.class.getName(),
             BgcPlugin.IMG_TODAY);
@@ -287,9 +293,10 @@ public class BiobankPlugin extends AbstractUIPlugin {
         String imageKey = null;
         if (object == null)
             return null;
-        if (object instanceof AdapterBase) {
+        if (object instanceof AbstractAdapterBase) {
             Class<?> objectClass = object.getClass();
-            while (imageKey == null && !objectClass.equals(AdapterBase.class)) {
+            while (imageKey == null
+                && !objectClass.equals(AbstractAdapterBase.class)) {
                 imageKey = classToImageKey.get(objectClass.getName());
                 objectClass = objectClass.getSuperclass();
             }

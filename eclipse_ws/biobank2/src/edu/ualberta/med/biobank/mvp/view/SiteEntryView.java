@@ -38,6 +38,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.IButton;
 import edu.ualberta.med.biobank.mvp.view.item.ButtonItem;
@@ -62,14 +63,18 @@ public class SiteEntryView implements SiteEntryPresenter.View {
     private final TextItem name = new TextItem();
     private final TextItem nameShort = new TextItem();
     private final TextItem comment = new TextItem();
-    private final TableItem<StudyWrapper> studyWrappers = new TableItem<StudyWrapper>();
-    private final TranslatedItem<Collection<StudyInfo>, Collection<StudyWrapper>> studies = TranslatedItem
-        .from(studyWrappers, STUDY_TRANSLATOR);
+    private final HasValue<Collection<Comment>> comments =
+        new TableItem<Comment>();
+    private final TableItem<StudyWrapper> studyWrappers =
+        new TableItem<StudyWrapper>();
+    private final TranslatedItem<Collection<StudyInfo>, Collection<StudyWrapper>> studies =
+        TranslatedItem.from(studyWrappers, STUDY_TRANSLATOR);
 
     private IView addressEntryView;
     private IView activityStatusComboView;
 
-    private static final StudyTranslator STUDY_TRANSLATOR = new StudyTranslator();
+    private static final StudyTranslator STUDY_TRANSLATOR =
+        new StudyTranslator();
 
     private static class StudyTranslator implements
         Translator<Collection<StudyInfo>, Collection<StudyWrapper>> {
@@ -78,8 +83,8 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             Collection<StudyWrapper> delegate) {
             Collection<StudyInfo> studies = new ArrayList<StudyInfo>();
             for (StudyWrapper study : delegate) {
-                StudyInfo studyInfo = new StudyInfo(study.getWrappedObject(),
-                    -1l, -1l);
+                StudyInfo studyInfo =
+                    new StudyInfo(study.getWrappedObject(), -1l, -1l);
                 studies.add(studyInfo);
             }
             return studies;
@@ -89,10 +94,10 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         public Collection<StudyWrapper> toDelegate(Collection<StudyInfo> foreign) {
             Collection<StudyWrapper> studies = new ArrayList<StudyWrapper>();
             for (StudyInfo study : foreign) {
-                WritableApplicationService appService = SessionManager
-                    .getAppService();
-                StudyWrapper wrapper = new StudyWrapper(appService,
-                    study.getStudy());
+                WritableApplicationService appService =
+                    SessionManager.getAppService();
+                StudyWrapper wrapper =
+                    new StudyWrapper(appService, study.getStudy());
                 studies.add(wrapper);
             }
             return studies;
@@ -125,8 +130,8 @@ public class SiteEntryView implements SiteEntryPresenter.View {
     }
 
     @Override
-    public HasValue<String> getComment() {
-        return comment;
+    public HasValue<Collection<Comment>> getCommentCollection() {
+        return comments;
     }
 
     @Override
@@ -160,7 +165,10 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         name.setText(widget.name);
         nameShort.setValidationControl(widget.nameShortLabel);
         nameShort.setText(widget.nameShort);
-        comment.setText(widget.comment);
+
+        // TODO: fix comment section
+        // comment.setText(widget.comment);
+
         save.setButton(widget.save);
         reload.setButton(widget.reload);
         studyWrappers.setTable(widget.studiesTable);
@@ -174,7 +182,8 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         protected final FormToolkit toolkit;
         protected final ScrolledPageBook book;
         protected final Composite page;
-        private final SectionExpansionAdapter sectionExpansionAdapter = new SectionExpansionAdapter();
+        private final SectionExpansionAdapter sectionExpansionAdapter =
+            new SectionExpansionAdapter();
 
         public BaseForm(Composite parent, int style) {
             super(parent, style);
@@ -219,8 +228,7 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             // });
         }
 
-        private Section createSection(String title, Composite parent,
-            int style) {
+        private Section createSection(String title, Composite parent, int style) {
             Section section = toolkit.createSection(parent, style);
 
             if (title != null) section.setText(title);
@@ -244,8 +252,8 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         }
 
         protected Section createSection(String title, Composite parent) {
-            return createSection(title, parent,
-                Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
+            return createSection(title, parent, Section.TWISTIE
+                | Section.TITLE_BAR | Section.EXPANDED);
         }
 
         protected Section createSection(String title) {
@@ -271,9 +279,8 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         }
 
         protected static void addSectionToolbar(Section section,
-            String tooltip,
-            SelectionListener listener, Class<?> wrapperTypeToAdd,
-            String imageKey) {
+            String tooltip, SelectionListener listener,
+            Class<?> wrapperTypeToAdd, String imageKey) {
             if (wrapperTypeToAdd == null
                 || SessionManager.canCreate(wrapperTypeToAdd)) {
                 ToolBar tbar = (ToolBar) section.getTextClient();
@@ -344,19 +351,18 @@ public class SiteEntryView implements SiteEntryPresenter.View {
             boolean superAdmin = SessionManager.getUser().isSuperAdmin();
             if (superAdmin) {
                 BaseForm.addSectionToolbar(studySection,
-                    Messages.SiteEntryForm_studies_add,
-                    new SelectionAdapter() {
+                    Messages.SiteEntryForm_studies_add, new SelectionAdapter() {
                         @Override
                         public void widgetSelected(SelectionEvent e) {
                             studiesTable.createStudyDlg();
                         }
                     }, ContactWrapper.class, null);
             }
-            WritableApplicationService appService = SessionManager
-                .getAppService();
+            WritableApplicationService appService =
+                SessionManager.getAppService();
             SiteWrapper siteWrapper = new SiteWrapper(appService);
-            studiesTable = new StudyAddInfoTable(studySection, siteWrapper,
-                superAdmin);
+            studiesTable =
+                new StudyAddInfoTable(studySection, siteWrapper, superAdmin);
             studySection.setClient(studiesTable);
 
             save = new Button(client, SWT.NONE);

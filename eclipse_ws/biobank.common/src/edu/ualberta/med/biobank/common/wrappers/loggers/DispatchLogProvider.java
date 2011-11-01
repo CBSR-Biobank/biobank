@@ -72,4 +72,9 @@ public class DispatchLogProvider implements WrapperLogProvider<Dispatch> {
 
         return log;
     }
+
+    @Override
+    public Log getObjectLog(Object model) {
+        return getLog((Dispatch) model);
+    }
 }

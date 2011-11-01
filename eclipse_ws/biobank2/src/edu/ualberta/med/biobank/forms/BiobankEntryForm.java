@@ -119,10 +119,15 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
 
     public void formClosed() throws Exception {
         // TODO: is this necessary if making copies?
-        if ((adapter != null) && (adapter.getModelObject() != null)) {
-            adapter.getModelObject().reload();
-        }
-        SessionManager.updateAdapterTreeNode(adapter);
+        if (adapter instanceof AdapterBase)
+            if ((adapter != null)
+                && (((AdapterBase) adapter).getModelObject() != null)) {
+                ((AdapterBase) adapter).getModelObject().reload();
+            }
+
+        // not everything is well initialized on the adapter before it is really
+        // saved. Should not do that now..
+        // SessionManager.updateAdapterTreeNode(adapter);
     }
 
     @Override
@@ -154,6 +159,11 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                         monitor.beginTask(Messages.BiobankEntryForm_saving,
                             IProgressMonitor.UNKNOWN);
                         saveForm();
+                        // this needs to be done there if we want the new node
+                        // to be in the tree and to be selected and to see the
+                        // right label (needs to be done when save is finished,
+                        // not when the form close)
+                        SessionManager.updateAllSimilarNodes(adapter, true);
                         monitor.done();
                     } catch (Exception ex) {
                         saveErrorCatch(ex, monitor, true);
@@ -205,11 +215,16 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     }
 
     protected void checkEditAccess() {
-        if (adapter != null && adapter.getModelObject() != null
-            && !SessionManager.canUpdate(adapter.getModelObject())) {
-            BgcPlugin.openAccessDeniedErrorMessage();
-            throw new RuntimeException(
-                Messages.BiobankEntryForm_access_denied_error_msg);
+        // FIXME what should be done for new adapters?
+        if (adapter instanceof AdapterBase) {
+            if (adapter != null
+                && ((AdapterBase) adapter).getObjectClazz() != null
+                && !SessionManager.canUpdate(((AdapterBase) adapter)
+                    .getObjectClazz())) {
+                BgcPlugin.openAccessDeniedErrorMessage();
+                throw new RuntimeException(
+                    Messages.BiobankEntryForm_access_denied_error_msg);
+            }
         }
     }
 
@@ -426,11 +441,15 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().saveEditor(this, false);
             if (!isDirty()) {
-                closeEntryOpenView(true, true);
+                closeEntryOpenView(true, openViewAfterSaving());
             }
         } catch (Exception e) {
             logger.error("Can't save the form", e); //$NON-NLS-1$
         }
+    }
+
+    protected boolean openViewAfterSaving() {
+        return true;
     }
 
     protected void closeEntryOpenView(boolean saveOnClose, boolean openView) {
@@ -455,8 +474,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     @Override
     public void cancel() {
         try {
-            boolean openView = adapter.getModelObject() != null
-                && !adapter.getModelObject().isNew();
+            boolean openView = adapter.getId() != null;
+            if (adapter instanceof AdapterBase)
+                openView &= !((AdapterBase) adapter).getModelObject().isNew();
             closeEntryOpenView(true, openView);
         } catch (Exception e) {
             logger.error("Can't cancel the form", e); //$NON-NLS-1$

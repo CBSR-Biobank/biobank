@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.request;
 
-import java.util.Collection;
+import java.util.List;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -15,7 +15,7 @@ public class ReceivingRequestGroup extends AbstractRequestGroup {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return CenterWrapper.getRequestCollection(
             SessionManager.getAppService(), center);

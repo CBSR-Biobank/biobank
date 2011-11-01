@@ -16,4 +16,7 @@ import edu.ualberta.med.biobank.model.Log;
  */
 public interface WrapperLogProvider<E> extends Serializable {
     public Log getLog(E model);
+
+    // FIXME should not need this but the method calling this can't cast...
+    public Log getObjectLog(Object model);
 }

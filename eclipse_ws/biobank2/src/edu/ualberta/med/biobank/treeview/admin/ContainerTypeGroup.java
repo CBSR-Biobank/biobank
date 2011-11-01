@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -17,6 +16,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
@@ -53,13 +53,15 @@ public class ContainerTypeGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, ContainerTypeWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId,
+            ContainerTypeWrapper.class);
     }
 
     @Override
@@ -68,13 +70,13 @@ public class ContainerTypeGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof ContainerTypeWrapper);
         return new ContainerTypeAdapter(this, (ContainerTypeWrapper) child);
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         SiteWrapper currentSite = (SiteWrapper) ((SiteAdapter) getParent())
             .getModelObject();
@@ -97,7 +99,7 @@ public class ContainerTypeGroup extends AdapterBase {
     public void addContainerType(SiteAdapter siteAdapter,
         boolean hasPreviousForm) {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(
-            siteAdapter.getAppService());
+            SessionManager.getAppService());
         ct.setSite((SiteWrapper) siteAdapter.getModelObject());
         ContainerTypeAdapter adapter = new ContainerTypeAdapter(
             siteAdapter.getContainerTypesGroupNode(), ct);
@@ -114,4 +116,8 @@ public class ContainerTypeGroup extends AdapterBase {
         return null;
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

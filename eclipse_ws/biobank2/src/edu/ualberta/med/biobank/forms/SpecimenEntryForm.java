@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -24,6 +26,7 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
@@ -32,8 +35,11 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import edu.ualberta.med.biobank.wizards.SelectCollectionEventWizard;
 
@@ -65,6 +71,15 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     private List<SpecimenWrapper> allchildren;
 
     protected CollectionEventWrapper newCollectionEvent;
+
+    private CommentCollectionInfoTable commentEntryTable;
+
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
 
     @Override
     protected void init() throws Exception {
@@ -187,7 +202,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             @Override
             public void handleEvent(Event event) {
                 SelectCollectionEventWizard wizard = new SelectCollectionEventWizard(
-                    appService);
+                    SessionManager.getAppService());
                 WizardDialog dialog = new BiobankWizardDialog(page.getShell(),
                     wizard);
                 int res = dialog.open();
@@ -268,8 +283,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.SpecimenEntryForm_status_label,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            specimen.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), specimen.getActivityStatus(),
             Messages.SpecimenEntryForm_status_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -279,12 +294,26 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 }
             });
 
-        commentText = (BgcBaseText) createBoundWidgetWithLabel(client,
-            BgcBaseText.class, SWT.WRAP | SWT.MULTI,
-            Messages.SpecimenEntryForm_comments_label, null, specimen,
-            SpecimenPeer.COMMENT.getName(), null);
+        createCommentSection();
 
         setFirstControl(specimenTypeComboViewer.getControl());
+    }
+
+    private void createCommentSection() {
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(client,
+            specimen.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_button_add);
+
     }
 
     protected void transferSpecimen(SpecimenWrapper specimen2,
@@ -296,13 +325,13 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         }
         allchildren.add(specimen2);
         specimen2.setCollectionEvent(collectionEvent);
-        String comment = specimen2.getComment();
-        if (comment == null)
-            comment = ""; //$NON-NLS-1$
-        else
-            comment += "\n"; //$NON-NLS-1$
-        comment += Messages.SpecimenEntryForm_cevent_modification + wcomment;
-        specimen2.setComment(comment);
+        CommentWrapper newComment = new CommentWrapper(
+            SessionManager.getAppService());
+        newComment.setCreatedAt(new Date());
+        newComment.setUser(SessionManager.getUser());
+        newComment.setMessage(Messages.SpecimenEntryForm_cevent_modification
+            + wcomment);
+        specimen2.addToCommentCollection(Arrays.asList(newComment));
         for (SpecimenWrapper spec : specimen2.getChildSpecimenCollection(false)) {
             transferSpecimen(spec, collectionEvent, wcomment);
         }
