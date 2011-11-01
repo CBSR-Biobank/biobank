@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
-import edu.ualberta.med.biobank.common.action.study.GetStudyListForSiteAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetListForSiteAction;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -129,7 +129,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         List<Study> studies = SessionManager.getAppService().doAction(
-            new GetStudyListForSiteAction(SessionManager.getUser()
+            new StudyGetListForSiteAction(SessionManager.getUser()
                 .getCurrentWorkingSite().getId()));
         Study selectedStudy = null;
         if (pInfo == null) {

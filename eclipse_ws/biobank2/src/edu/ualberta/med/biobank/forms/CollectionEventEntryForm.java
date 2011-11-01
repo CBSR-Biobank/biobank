@@ -26,15 +26,15 @@ import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventAttrInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientNextVisitNumberAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetInfosAction;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeInfo;
-import edu.ualberta.med.biobank.common.action.study.GetStudyEventAttrInfoAction;
-import edu.ualberta.med.biobank.common.action.study.GetStudySourceSpecimenInfosAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -255,7 +255,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 .getAppService().doAction(new SpecimenTypeGetInfosAction());
             final List<SourceSpecimen> studySourceSpecimens = SessionManager
                 .getAppService().doAction(
-                    new GetStudySourceSpecimenInfosAction(ceventInfo.cevent
+                    new StudyGetSourceSpecimenInfosAction(ceventInfo.cevent
                         .getPatient().getStudy().getId()));
 
             specimensTable.addEditSupport(studySourceSpecimens,
@@ -281,7 +281,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     private void createEventAttrSection(Composite client) throws Exception {
         Map<Integer, StudyEventAttrInfo> studyAttrInfos = SessionManager
             .getAppService().doAction(
-                new GetStudyEventAttrInfoAction(ceventInfo.cevent.getPatient()
+                new StudyGetEventAttrInfoAction(ceventInfo.cevent.getPatient()
                     .getStudy().getId()));
 
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
@@ -376,9 +376,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             cevents.add(ceSpecInfo);
         }
 
-        List<SaveCEventAttrInfo> ceventAttrList = new ArrayList<CollectionEventSaveAction.SaveCEventAttrInfo>();
+        List<CEventAttrSaveInfo> ceventAttrList = new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
-            SaveCEventAttrInfo ceventAttr = new SaveCEventAttrInfo();
+            CEventAttrSaveInfo ceventAttr = new CEventAttrSaveInfo();
             ceventAttr.studyEventAttrId = combinedPvInfo.getStudyEventAttrId();
             ceventAttr.value = combinedPvInfo.getValue();
             ceventAttr.type = combinedPvInfo.getType();
