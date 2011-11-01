@@ -105,11 +105,13 @@ public class StudySaveAction implements Action<Integer> {
         }
 
         // TODO: set collections based on diffs
-        if (contactIds != null) {
-            Map<Integer, Contact> contacts =
-                sessionUtil.get(Contact.class, contactIds);
-            study.setContactCollection(new HashSet<Contact>(contacts.values()));
+        if (contactIds == null) {
+            throw new NullPointerException("no contact ids specified");
         }
+
+        Map<Integer, Contact> contacts =
+            sessionUtil.get(Contact.class, contactIds);
+        study.setContactCollection(new HashSet<Contact>(contacts.values()));
 
         // TODO: set collections based on diffs
         if (aliquotedSpcTypeIds != null) {

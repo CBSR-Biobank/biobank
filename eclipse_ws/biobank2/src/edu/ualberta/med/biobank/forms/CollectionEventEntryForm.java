@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetInfosAction;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
-import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimenInfosAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimensAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -255,7 +255,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 .getAppService().doAction(new SpecimenTypeGetInfosAction());
             final List<SourceSpecimen> studySourceSpecimens = SessionManager
                 .getAppService().doAction(
-                    new StudyGetSourceSpecimenInfosAction(ceventInfo.cevent
+                    new StudyGetSourceSpecimensAction(ceventInfo.cevent
                         .getPatient().getStudy().getId()));
 
             specimensTable.addEditSupport(studySourceSpecimens,
