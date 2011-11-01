@@ -80,7 +80,7 @@ public class StudySaveAction implements Action<Integer> {
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
         // FIXME: needs implementation
-        return false;
+        return true;
     }
 
     @Override
@@ -98,26 +98,35 @@ public class StudySaveAction implements Action<Integer> {
         study.setName(name);
         study.setNameShort(nameShort);
 
-        ActivityStatus aStatus =
-            sessionUtil.get(ActivityStatus.class, aStatusId);
-        study.setActivityStatus(aStatus);
+        if (aStatusId != null) {
+            ActivityStatus aStatus =
+                sessionUtil.get(ActivityStatus.class, aStatusId);
+            study.setActivityStatus(aStatus);
+        }
 
         // TODO: set collections based on diffs
-        Map<Integer, Contact> contacts =
-            sessionUtil.get(Contact.class, contactIds);
-        study.setContactCollection(new HashSet<Contact>(contacts.values()));
+        if (contactIds != null) {
+            Map<Integer, Contact> contacts =
+                sessionUtil.get(Contact.class, contactIds);
+            study.setContactCollection(new HashSet<Contact>(contacts.values()));
+        }
 
         // TODO: set collections based on diffs
-        Map<Integer, AliquotedSpecimen> aliquotedSpcs =
-            sessionUtil.get(AliquotedSpecimen.class, aliquotedSpcTypeIds);
-        study.setAliquotedSpecimenCollection(new HashSet<AliquotedSpecimen>(
-            aliquotedSpcs.values()));
+        if (aliquotedSpcTypeIds != null) {
+            Map<Integer, AliquotedSpecimen> aliquotedSpcs =
+                sessionUtil.get(AliquotedSpecimen.class, aliquotedSpcTypeIds);
+            study
+                .setAliquotedSpecimenCollection(new HashSet<AliquotedSpecimen>(
+                    aliquotedSpcs.values()));
+        }
 
         // TODO: set collections based on diffs
-        Map<Integer, SourceSpecimen> sourceSpcs =
-            sessionUtil.get(SourceSpecimen.class, sourceSpcIds);
-        study.setSourceSpecimenCollection(new HashSet<SourceSpecimen>(
-            sourceSpcs.values()));
+        if (sourceSpcIds != null) {
+            Map<Integer, SourceSpecimen> sourceSpcs =
+                sessionUtil.get(SourceSpecimen.class, sourceSpcIds);
+            study.setSourceSpecimenCollection(new HashSet<SourceSpecimen>(
+                sourceSpcs.values()));
+        }
 
         setStudyEventAttrs(user, session, sessionUtil, study);
 
@@ -134,25 +143,25 @@ public class StudySaveAction implements Action<Integer> {
 
         if (studyEventAttrInfos == null) {
             // remove existing study event attrs?
+        } else {
+
+            for (StudyEventAttrSaveInfo info : studyEventAttrInfos) {
+                GlobalEventAttrInfo globalAttrInfo =
+                    globalEventAttrInfoList.get(info.globalEventAttrId);
+
+                StudyEventAttr seAttr =
+                    sessionUtil.get(StudyEventAttr.class, null,
+                        new StudyEventAttr());
+
+                seAttr.setLabel(globalAttrInfo.attr.getLabel());
+                seAttr.setPermissible(info.permissible);
+                seAttr.setRequired(info.required);
+                seAttr.setEventAttrType(globalAttrInfo.attr.getEventAttrType());
+                seAttr.setStudy(study);
+
+                CollectionUtils.getCollection(study,
+                    StudyPeer.STUDY_EVENT_ATTR_COLLECTION).add(seAttr);
+            }
         }
-
-        for (StudyEventAttrSaveInfo info : studyEventAttrInfos) {
-            GlobalEventAttrInfo globalAttrInfo =
-                globalEventAttrInfoList.get(info.globalEventAttrId);
-
-            StudyEventAttr seAttr =
-                sessionUtil.get(StudyEventAttr.class, null,
-                    new StudyEventAttr());
-
-            seAttr.setLabel(globalAttrInfo.attr.getLabel());
-            seAttr.setPermissible(info.permissible);
-            seAttr.setRequired(info.required);
-            seAttr.setEventAttrType(globalAttrInfo.attr.getEventAttrType());
-            seAttr.setStudy(study);
-
-            CollectionUtils.getCollection(study,
-                StudyPeer.STUDY_EVENT_ATTR_COLLECTION).add(seAttr);
-        }
-
     }
 }

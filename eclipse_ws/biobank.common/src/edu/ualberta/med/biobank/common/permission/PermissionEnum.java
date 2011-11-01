@@ -46,7 +46,9 @@ public enum PermissionEnum {
     PROCESSING_EVENT_CREATE(21),
     PROCESSING_EVENT_READ(22),
     PROCESSING_EVENT_UPDATE(23),
-    PROCESSING_EVENT_DELETE(24);
+    PROCESSING_EVENT_DELETE(24),
+
+    ORIGIN_INFO_READ(25);
 
     private final Integer permissionId;
 
