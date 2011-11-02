@@ -190,18 +190,20 @@ public class SiteEntryPresenter extends AbstractEntryPresenter<View> {
 
             this.addressModel = addressModel;
 
-            siteId = fieldOfType(Integer.class).boundTo(provider, "site.id");
-            name = fieldOfType(String.class).boundTo(provider, "site.name");
-            nameShort =
-                fieldOfType(String.class).boundTo(provider, "site.nameShort");
-            comment =
-                fieldOfType(String.class).boundTo(provider, "site.comment");
-            activityStatus =
-                fieldOfType(ActivityStatus.class).boundTo(provider,
-                    "site.activityStatus");
-            address =
-                fieldOfType(Address.class).boundTo(provider, "site.address");
-            studies = listOfType(StudyInfo.class).boundTo(provider, "studies");
+            siteId = fieldOfType(Integer.class)
+                .boundTo(provider, "site.id");
+            name = fieldOfType(String.class)
+                .boundTo(provider, "site.name");
+            nameShort = fieldOfType(String.class)
+                .boundTo(provider, "site.nameShort");
+            comment =                fieldOfType(String.class)
+                    .boundTo(provider, "site.comment");
+            activityStatus = fieldOfType(ActivityStatus.class)
+                .boundTo(provider, "site.activityStatus");
+            address = fieldOfType(Address.class)
+                .boundTo(provider, "site.address");
+            studies = listOfType(StudyInfo.class)
+                .boundTo(provider, "studies");
 
             ValidationPlugin.validateField(name).using(
                 new NotEmptyValidator("Name is required"));
