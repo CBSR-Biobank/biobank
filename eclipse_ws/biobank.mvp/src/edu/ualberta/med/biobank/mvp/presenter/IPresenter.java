@@ -5,7 +5,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
-public interface IPresenter<D extends IView> {
+public interface IPresenter<V extends IView> {
     /**
      * Called after the presenter is initialized (i.e. the {@link Dispatcher},
      * display, and {@link EventBus} have been set). This should be called
@@ -34,5 +34,5 @@ public interface IPresenter<D extends IView> {
      * 
      * @return The view.
      */
-    public D getView();
+    public V getView();
 }
