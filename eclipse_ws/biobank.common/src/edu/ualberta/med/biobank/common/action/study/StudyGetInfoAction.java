@@ -72,7 +72,7 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
             info.study = (Study) row[0];
             info.patientCount = (Long) row[1];
             info.ceventCount = (Long) row[2];
-            info.clinicInfo = getClinicInfo.run(user, session);
+            info.clinicInfos = getClinicInfo.run(user, session);
             info.sourceSpcs = getSourceSpecimens.run(user, session);
             info.aliquotedSpcs = getAliquotedSpecimens.run(user, session);
             info.studyEventAttrs = getStudyEventAttrs.run(user, session);
@@ -87,7 +87,7 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
         public Study study;
         public Long patientCount;
         public Long ceventCount;
-        public List<ClinicInfo> clinicInfo;
+        public List<ClinicInfo> clinicInfos;
         public List<SourceSpecimen> sourceSpcs;
         public List<AliquotedSpecimen> aliquotedSpcs;
         public List<StudyEventAttr> studyEventAttrs;
@@ -101,7 +101,7 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
         }
 
         public void setContactIds(List<ClinicInfo> clinicInfo) {
-            this.clinicInfo = clinicInfo;
+            this.clinicInfos = clinicInfo;
         }
 
         public void setSourceSpc(List<SourceSpecimen> sourceSpcs) {

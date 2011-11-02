@@ -2,12 +2,12 @@ package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -28,10 +28,19 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
+import edu.ualberta.med.biobank.common.action.study.GlobalEventAttrInfo;
+import edu.ualberta.med.biobank.common.action.study.GlobalEventAttrInfoGetAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfo.ClinicInfo;
+import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction.StudyEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.EventAttr;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
@@ -91,7 +100,7 @@ public class TestCollectionEvent extends TestAction {
 
     @Test
     public void testSaveWithSpecs() throws Exception {
-        String s = "testSaveWithSpecs" + r.nextInt();
+        String s = testname.getMethodName() + r.nextInt();
         final Integer visitNumber = r.nextInt(20);
         final List<CommentInfo> comments =
             Utils.getRandomCommentInfos(currentUser.getId());
@@ -205,16 +214,18 @@ public class TestCollectionEvent extends TestAction {
 
     @Test
     public void testSaveWithAttrs() throws Exception {
-        // FIXME should not use wrappers for set up
-        addEventAttrs(studyId);
-        List<String> labels = Arrays.asList(studyId.getStudyEventAttrLabels());
-        Assert.assertEquals(5, labels.size());
-        StudyEventAttr studyAttr = null;
-        for (StudyEventAttr o : studyId.getWrappedObject()
-            .getStudyEventAttrCollection()) {
-            if ("Worksheet".equals(o.getLabel())) studyAttr = o;
+        setEventAttrs(studyId);
+        StudyInfo studyInfo =
+            appService.doAction(new StudyGetInfoAction(studyId));
+        Assert.assertEquals(5, studyInfo.studyEventAttrs.size());
+
+        StudyEventAttr phlebotomistStudyAttr = null;
+        for (StudyEventAttr attr : studyInfo.studyEventAttrs) {
+            if ("Phlebotomist".equals(attr.getLabel())) {
+                phlebotomistStudyAttr = attr;
+            }
         }
-        Assert.assertNotNull(studyAttr);
+        Assert.assertNotNull(phlebotomistStudyAttr);
 
         final Integer visitNumber = r.nextInt(20);
         final List<CommentInfo> comments =
@@ -223,10 +234,13 @@ public class TestCollectionEvent extends TestAction {
 
         List<CEventAttrSaveInfo> attrs =
             new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
-        String value1 = "abcdefghi";
+        String value1 = testname.getMethodName() + "abcdefghi";
         CEventAttrSaveInfo attrInfo =
-            CollectionEventHelper.createSaveCEventAttrInfo(studyAttr.getId(),
-                EventAttrTypeEnum.getEventAttrType(studyAttr.getEventAttrType()
+            CollectionEventHelper.createSaveCEventAttrInfo(
+                phlebotomistStudyAttr
+                    .getId(),
+                EventAttrTypeEnum.getEventAttrType(phlebotomistStudyAttr
+                    .getEventAttrType()
                     .getName()), value1);
 
         attrs.add(attrInfo);
@@ -247,12 +261,13 @@ public class TestCollectionEvent extends TestAction {
         Assert.assertEquals(1, cevent.getEventAttrCollection().size());
         EventAttr eventAttr = cevent.getEventAttrCollection().iterator().next();
         Assert.assertEquals(value1, eventAttr.getValue());
-        Assert.assertEquals(studyAttr.getId(), eventAttr.getStudyEventAttr()
+        Assert.assertEquals(phlebotomistStudyAttr.getId(), eventAttr
+            .getStudyEventAttr()
             .getId());
         Integer eventAttrId = eventAttr.getId();
         closeHibernateSession();
 
-        String value2 = "jklmnopqr";
+        String value2 = testname.getMethodName() + "jklmnopqr";
         attrInfo.value = value2;
         // Save with a different value for attrinfo
         appService.doAction(new CollectionEventSaveAction(ceventId, patientId,
@@ -277,27 +292,113 @@ public class TestCollectionEvent extends TestAction {
                     + "join ce.eventAttrCollection as eattr "
                     + "join eattr.studyEventAttr as seattr where ce.id = ? and seattr.label= ?");
         q.setParameter(0, cevent.getId());
-        q.setParameter(1, "Worksheet");
+        q.setParameter(1, "Phlebotomist");
         @SuppressWarnings("unchecked")
         List<EventAttr> results = q.list();
         Assert.assertEquals(1, results.size());
         closeHibernateSession();
     }
 
-    private void addEventAttrs(Integer studyId) throws Exception {
-        // add Event Attr to study
-        Collection<String> types =
-            EventAttrTypeWrapper.getAllEventAttrTypesMap(appService).keySet();
-        Assert.assertTrue("EventAttrTypes not initialized",
-            types.contains("text"));
-        study.setStudyEventAttr("PMBC Count", EventAttrTypeEnum.NUMBER);
-        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
-        study.setStudyEventAttr("Date", EventAttrTypeEnum.DATE_TIME);
-        study.setStudyEventAttr("Consent", EventAttrTypeEnum.SELECT_MULTIPLE,
-            new String[] { "c1", "c2", "c3" });
-        study.setStudyEventAttr("Visit", EventAttrTypeEnum.SELECT_SINGLE,
-            new String[] { "v1", "v2", "v3", "v4" });
-        study.persist();
+    /*
+     * add Event Attr to study
+     */
+    private void setEventAttrs(Integer studyId)
+        throws Exception {
+        StudyInfo studyInfo =
+            appService.doAction(new StudyGetInfoAction(studyId));
+
+        HashMap<Integer, GlobalEventAttrInfo> globalEattrs =
+            appService.doAction(new GlobalEventAttrInfoGetAction());
+        Assert.assertFalse("EventAttrTypes not initialized",
+            globalEattrs.isEmpty());
+
+        HashMap<String, GlobalEventAttrInfo> globalEattrsByLabel =
+            new HashMap<String, GlobalEventAttrInfo>();
+        for (GlobalEventAttrInfo gEattr : globalEattrs.values()) {
+            globalEattrsByLabel.put(gEattr.attr.getLabel(), gEattr);
+        }
+
+        ArrayList<StudyEventAttrSaveInfo> studyEattrs = new
+            ArrayList<StudyEventAttrSaveInfo>();
+
+        // make sure the global event attributes are present
+        Assert.assertTrue(
+            "Missing global event attribute",
+            globalEattrsByLabel.keySet().containsAll(
+                Arrays.asList("PBMC Count (x10^6)", "Consent", "Patient Type",
+                    "Visit Type")));
+
+        StudyEventAttrSaveInfo seAttr = new StudyEventAttrSaveInfo();
+        seAttr.globalEventAttrId =
+            globalEattrsByLabel.get("PBMC Count (x10^6)").attr.getId();
+        seAttr.type = EventAttrTypeEnum.NUMBER;
+        seAttr.required = true;
+        seAttr.aStatusId = ActivityStatusEnum.ACTIVE.getId();
+        studyEattrs.add(seAttr);
+
+        seAttr = new StudyEventAttrSaveInfo();
+        seAttr.globalEventAttrId =
+            globalEattrsByLabel.get("Consent").attr.getId();
+        seAttr.type = EventAttrTypeEnum.SELECT_MULTIPLE;
+        seAttr.required = false;
+        seAttr.permissible = "c1;c2;c3";
+        seAttr.aStatusId = ActivityStatusEnum.ACTIVE.getId();
+        studyEattrs.add(seAttr);
+
+        seAttr = new StudyEventAttrSaveInfo();
+        seAttr.globalEventAttrId =
+            globalEattrsByLabel.get("Patient Type").attr.getId();
+        seAttr.type = EventAttrTypeEnum.TEXT;
+        seAttr.required = true;
+        seAttr.aStatusId = ActivityStatusEnum.ACTIVE.getId();
+        studyEattrs.add(seAttr);
+
+        seAttr = new StudyEventAttrSaveInfo();
+        seAttr.globalEventAttrId =
+            globalEattrsByLabel.get("Visit Type").attr.getId();
+        seAttr.type = EventAttrTypeEnum.SELECT_SINGLE;
+        seAttr.required = false;
+        seAttr.permissible = "v1;v2;v3;v4";
+        seAttr.aStatusId = ActivityStatusEnum.ACTIVE.getId();
+        studyEattrs.add(seAttr);
+
+        seAttr = new StudyEventAttrSaveInfo();
+        seAttr.globalEventAttrId =
+            globalEattrsByLabel.get("Phlebotomist").attr.getId();
+        seAttr.type = EventAttrTypeEnum.TEXT;
+        seAttr.required = false;
+        seAttr.aStatusId = ActivityStatusEnum.ACTIVE.getId();
+        studyEattrs.add(seAttr);
+
+        StudySaveAction saveStudy = new StudySaveAction();
+        saveStudy.setId(studyInfo.study.getId());
+        saveStudy.setName(studyInfo.study.getName());
+        saveStudy.setNameShort(studyInfo.study.getNameShort());
+        saveStudy.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+
+        Set<Integer> ids = new HashSet<Integer>();
+        for (ClinicInfo info : studyInfo.clinicInfos) {
+            Contact c = info.getContact();
+            if (c != null) {
+                ids.add(c.getId());
+            }
+        }
+        saveStudy.setContactIds(ids);
+
+        ids = new HashSet<Integer>();
+        for (SourceSpecimen spc : studyInfo.sourceSpcs) {
+            ids.add(spc.getId());
+        }
+        saveStudy.setSourceSpcIds(ids);
+        saveStudy.setStudyEventAttrSaveInfo(studyEattrs);
+
+        ids = new HashSet<Integer>();
+        for (AliquotedSpecimen spc : studyInfo.aliquotedSpcs) {
+            ids.add(spc.getId());
+        }
+
+        saveStudy.setAliquotedSpcTypeIds(ids);
+        appService.doAction(saveStudy);
     }
 
     @Test
@@ -321,7 +422,8 @@ public class TestCollectionEvent extends TestAction {
         // add specimen type
         final Integer typeId =
             edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-                .addSpecimenType("testSaveWithSpecs" + r.nextInt()).getId();
+                .addSpecimenType(testname.getMethodName() + r.nextInt())
+                .getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,
@@ -372,13 +474,14 @@ public class TestCollectionEvent extends TestAction {
         // add specimen type
         final Integer typeId =
             edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-                .addSpecimenType("testGetInfos" + r.nextInt()).getId();
+                .addSpecimenType(testname.getMethodName() + r.nextInt())
+                .getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,
                 typeId, currentUser.getId());
 
-        addEventAttrs(studyId);
+        setEventAttrs(studyId);
         List<String> labels = Arrays.asList(studyId.getStudyEventAttrLabels());
         Assert.assertEquals(5, labels.size());
         StudyEventAttr studyAttr = null;
@@ -426,7 +529,7 @@ public class TestCollectionEvent extends TestAction {
     @Test
     public void testGetEventAttrInfos() throws Exception {
         // add specimen type
-        addEventAttrs(studyId);
+        setEventAttrs(studyId);
         List<String> labels = Arrays.asList(studyId.getStudyEventAttrLabels());
         Assert.assertEquals(5, labels.size());
         StudyEventAttr studyAttr = null;

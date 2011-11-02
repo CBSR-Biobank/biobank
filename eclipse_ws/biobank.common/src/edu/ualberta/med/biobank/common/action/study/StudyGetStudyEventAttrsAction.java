@@ -8,10 +8,6 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
-import edu.ualberta.med.biobank.common.peer.StudyEventAttrPeer;
-import edu.ualberta.med.biobank.common.peer.StudyPeer;
-import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
@@ -23,12 +19,9 @@ public class StudyGetStudyEventAttrsAction implements
     // @formatter:off
     @SuppressWarnings("nls")
     private static final String SELECT_STUDY_EVENT_ATTR_HQL =
-        " FROM " + StudyEventAttr.class.getName() + " AS srce"
-        + " INNER JOIN FETCH srce."
-        + SourceSpecimenPeer.SPECIMEN_TYPE.getName()
-        + " WHERE srce."
-        + Property.concatNames(StudyEventAttrPeer.STUDY, StudyPeer.ID)
-        + " =?";
+        " FROM " + StudyEventAttr.class.getName() + " AS seattr"
+        + " INNER JOIN FETCH seattr.eventAttrType"
+        + " WHERE seattr.study.id=?";
     // @formatter:on
 
     private final Integer studyId;

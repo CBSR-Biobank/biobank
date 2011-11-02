@@ -22,17 +22,17 @@ public class StudyGetClinicInfo implements Action<ArrayList<ClinicInfo>> {
     // @formatter:off
     @SuppressWarnings("nls")
     private static final String STUDY_INFO_HQL = 
-        "SELECT clinic,COUNT(DISTINCT patients),COUNT(DISTINCT cevents)" 
-        + "contacts" 
-        + "FROM "+ Study.class.getName() + " study"
+        "SELECT clinics,COUNT(DISTINCT patients),"
+        + " COUNT(DISTINCT cevents),contacts"
+        + " FROM "+ Study.class.getName() + " study"
         + " LEFT JOIN study.contactCollection AS contacts"
         + " LEFT JOIN contacts.clinic AS clinics"
         + " LEFT JOIN clinics.originInfoCollection AS originInfo"
         + " LEFT JOIN originInfo.specimenCollection as specimens"
-        + " LEFT JOIN specimens.collectionEvent AS cevent"
-        + " LEFT JOIN cevent.patient as patients"
+        + " LEFT JOIN specimens.collectionEvent AS cevents"
+        + " LEFT JOIN cevents.patient as patients"
         + " WHERE study.id = ?"
-        + " GROUP BY clinic";
+        + " GROUP BY clinics";
     // @formatter:on
 
     private final Integer studyId;
@@ -85,7 +85,6 @@ public class StudyGetClinicInfo implements Action<ArrayList<ClinicInfo>> {
             this.patientCount = patientCount;
             this.ceventCount = ceventCount;
             this.contact = contact;
-
         }
 
         public Clinic getClinic() {
@@ -98,6 +97,10 @@ public class StudyGetClinicInfo implements Action<ArrayList<ClinicInfo>> {
 
         public Long getCeventCount() {
             return ceventCount;
+        }
+
+        public Contact getContact() {
+            return contact;
         }
 
         public String getContactName() {

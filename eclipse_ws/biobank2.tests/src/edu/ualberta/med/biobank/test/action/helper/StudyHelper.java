@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
@@ -17,6 +19,11 @@ public class StudyHelper extends Helper {
         saveStudy.setName(name);
         saveStudy.setNameShort(name);
         saveStudy.setActivityStatusId(activityStatus.getId());
+        saveStudy.setContactIds(new HashSet<Integer>());
+        saveStudy.setSourceSpcIds(new HashSet<Integer>());
+        saveStudy.setAliquotedSpcTypeIds(new HashSet<Integer>());
+        saveStudy
+            .setStudyEventAttrSaveInfo(new ArrayList<StudyEventAttrSaveInfo>());
 
         return appService.doAction(saveStudy);
     }
@@ -28,6 +35,9 @@ public class StudyHelper extends Helper {
         saveStudy.setName(name);
         saveStudy.setNameShort(name);
         saveStudy.setActivityStatusId(activityStatus.getId());
+        saveStudy.setContactIds(new HashSet<Integer>());
+        saveStudy.setSourceSpcIds(new HashSet<Integer>());
+        saveStudy.setAliquotedSpcTypeIds(new HashSet<Integer>());
         saveStudy.setStudyEventAttrSaveInfo(attrInfos);
 
         return appService.doAction(saveStudy);

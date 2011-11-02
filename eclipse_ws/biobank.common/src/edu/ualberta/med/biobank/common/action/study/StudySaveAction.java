@@ -41,6 +41,7 @@ public class StudySaveAction implements Action<Integer> {
         public EventAttrTypeEnum type;
         public Boolean required;
         public String permissible;
+        public Integer aStatusId;
     }
 
     private List<StudyEventAttrSaveInfo> studyEventAttrInfos;
@@ -98,11 +99,13 @@ public class StudySaveAction implements Action<Integer> {
         study.setName(name);
         study.setNameShort(nameShort);
 
-        if (aStatusId != null) {
-            ActivityStatus aStatus =
-                sessionUtil.get(ActivityStatus.class, aStatusId);
-            study.setActivityStatus(aStatus);
+        if (aStatusId == null) {
+            throw new NullPointerException("activity status not specified");
         }
+
+        ActivityStatus aStatus =
+            sessionUtil.get(ActivityStatus.class, aStatusId);
+        study.setActivityStatus(aStatus);
 
         // TODO: set collections based on diffs
         if (contactIds == null) {
@@ -159,6 +162,11 @@ public class StudySaveAction implements Action<Integer> {
                 seAttr.setPermissible(info.permissible);
                 seAttr.setRequired(info.required);
                 seAttr.setEventAttrType(globalAttrInfo.attr.getEventAttrType());
+
+                ActivityStatus aStatus =
+                    sessionUtil.get(ActivityStatus.class, aStatusId);
+                seAttr.setActivityStatus(aStatus);
+
                 seAttr.setStudy(study);
 
                 CollectionUtils.getCollection(study,
