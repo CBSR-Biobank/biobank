@@ -12,8 +12,9 @@ import edu.ualberta.med.biobank.mvp.event.model.site.SiteCreateHandler;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteEditEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteEditHandler;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter.View;
-import edu.ualberta.med.biobank.mvp.view.IView;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
+import edu.ualberta.med.biobank.mvp.view.IFormView;
+import edu.ualberta.med.biobank.mvp.view.IView;
 
 public class FormManagerPresenter extends AbstractPresenter<View> {
     private Provider<SiteEntryPresenter> siteEntryPresenterProvider;
@@ -21,11 +22,10 @@ public class FormManagerPresenter extends AbstractPresenter<View> {
     public interface View extends IView {
         /**
          * 
-         * @param object
-         *            determines uniqueness
+         * @param object determines uniqueness
          * @param view
          */
-        void openForm(Object object, IEntryFormView view);
+        void openForm(Object object, IFormView view);
     }
 
     @Inject

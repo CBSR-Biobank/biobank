@@ -10,8 +10,9 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
 public class FormViewEditorPart extends EditorPart {
-    public static String ID = "edu.ualberta.med.biobank.mvp.view.FormViewEditorPart"; //$NON-NLS-1$
-    private IViewFormView formView;
+    public static String ID =
+        "edu.ualberta.med.biobank.mvp.view.FormViewEditorPart"; //$NON-NLS-1$
+    private IFormView formView;
 
     @Override
     public void doSave(IProgressMonitor monitor) {
@@ -63,13 +64,13 @@ public class FormViewEditorPart extends EditorPart {
     }
 
     public static class FormViewEditorInput implements IEditorInput {
-        private final IViewFormView formView;
+        private final IFormView formView;
 
-        public FormViewEditorInput(IViewFormView formView) {
+        public FormViewEditorInput(IFormView formView) {
             this.formView = formView;
         }
 
-        public IViewFormView getFormView() {
+        public IFormView getFormView() {
             return formView;
         }
 
