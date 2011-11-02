@@ -11,7 +11,7 @@ import org.eclipse.ui.part.EditorPart;
 
 public class FormViewEditorPart extends EditorPart {
     public static String ID = "edu.ualberta.med.biobank.mvp.view.FormViewEditorPart"; //$NON-NLS-1$
-    private IFormView formView;
+    private IViewFormView formView;
 
     @Override
     public void doSave(IProgressMonitor monitor) {
@@ -63,13 +63,13 @@ public class FormViewEditorPart extends EditorPart {
     }
 
     public static class FormViewEditorInput implements IEditorInput {
-        private final IFormView formView;
+        private final IViewFormView formView;
 
-        public FormViewEditorInput(IFormView formView) {
+        public FormViewEditorInput(IViewFormView formView) {
             this.formView = formView;
         }
 
-        public IFormView getFormView() {
+        public IViewFormView getFormView() {
             return formView;
         }
 

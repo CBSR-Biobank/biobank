@@ -5,12 +5,12 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.mvp.presenter.ISaveablePresenter;
-import edu.ualberta.med.biobank.mvp.view.IEntryView;
+import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
 
-public abstract class AbstractEntryPresenter<V extends IEntryView> extends
+public abstract class AbstractEntryFormPresenter<V extends IEntryFormView> extends
     AbstractFormPresenter<V> implements ISaveablePresenter<V> {
 
-    public AbstractEntryPresenter(V view, EventBus eventBus) {
+    public AbstractEntryFormPresenter(V view, EventBus eventBus) {
         super(view, eventBus);
     }
 
