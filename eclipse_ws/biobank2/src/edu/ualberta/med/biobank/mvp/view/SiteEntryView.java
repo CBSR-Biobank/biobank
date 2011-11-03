@@ -30,6 +30,7 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.ui.HasValue;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 import com.pietschy.gwt.pectin.client.form.validation.message.ValidationMessage;
+import com.pietschy.gwt.pectin.client.value.ValueTarget;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
@@ -56,6 +57,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  */
 public class SiteEntryView implements SiteEntryPresenter.View {
     private SiteEntryForm widget;
+    private final DirtyValueTarget dirtyValueTarget = new DirtyValueTarget();
 
     private final ButtonItem save = new ButtonItem();
     private final ButtonItem reload = new ButtonItem();
@@ -381,6 +383,18 @@ public class SiteEntryView implements SiteEntryPresenter.View {
         System.out.println(new Date());
         for (ValidationMessage message : result.getMessages()) {
             System.out.println(message.getMessage());
+        }
+    }
+
+    @Override
+    public ValueTarget<Boolean> getDirty() {
+        return dirtyValueTarget;
+    }
+
+    private class DirtyValueTarget implements ValueTarget<Boolean> {
+        @Override
+        public void setValue(Boolean value) {
+            // TODO: set dirty on the editor part
         }
     }
 }

@@ -90,6 +90,8 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         binder.bind(model.activityStatus).to(
             activityStatusComboPresenter.getActivityStatus());
 
+        binder.bind(model.dirty()).to(view.getDirty());
+
         model.bind();
 
         model.bindValidationTo(view);
@@ -196,8 +198,8 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
                 .boundTo(provider, "site.name");
             nameShort = fieldOfType(String.class)
                 .boundTo(provider, "site.nameShort");
-            comment =                fieldOfType(String.class)
-                    .boundTo(provider, "site.comment");
+            comment = fieldOfType(String.class)
+                .boundTo(provider, "site.comment");
             activityStatus = fieldOfType(ActivityStatus.class)
                 .boundTo(provider, "site.activityStatus");
             address = fieldOfType(Address.class)
