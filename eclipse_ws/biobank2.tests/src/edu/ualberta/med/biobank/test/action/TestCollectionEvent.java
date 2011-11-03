@@ -482,20 +482,25 @@ public class TestCollectionEvent extends TestAction {
                 typeId, currentUser.getId());
 
         setEventAttrs(studyId);
-        List<String> labels = Arrays.asList(studyId.getStudyEventAttrLabels());
-        Assert.assertEquals(5, labels.size());
-        StudyEventAttr studyAttr = null;
-        for (StudyEventAttr o : studyId.getWrappedObject()
-            .getStudyEventAttrCollection()) {
-            if ("Worksheet".equals(o.getLabel())) studyAttr = o;
+        StudyInfo studyInfo =
+            appService.doAction(new StudyGetInfoAction(studyId));
+        Assert.assertEquals(5, studyInfo.studyEventAttrs.size());
+
+        StudyEventAttr phlebotomistStudyAttr = null;
+        for (StudyEventAttr attr : studyInfo.studyEventAttrs) {
+            if ("Phlebotomist".equals(attr.getLabel())) {
+                phlebotomistStudyAttr = attr;
+            }
         }
-        Assert.assertNotNull(studyAttr);
+        Assert.assertNotNull(phlebotomistStudyAttr);
+
         List<CEventAttrSaveInfo> attrs =
             new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
         CEventAttrSaveInfo attrInfo =
-            CollectionEventHelper.createSaveCEventAttrInfo(studyAttr.getId(),
-                EventAttrTypeEnum.getEventAttrType(studyAttr.getEventAttrType()
-                    .getName()), "abcdefghi");
+            CollectionEventHelper.createSaveCEventAttrInfo(
+                phlebotomistStudyAttr.getId(),
+                EventAttrTypeEnum.getEventAttrType(phlebotomistStudyAttr
+                    .getEventAttrType().getName()), "abcdefghi");
         attrs.add(attrInfo);
 
         Integer visitNber = r.nextInt(20);
@@ -523,30 +528,34 @@ public class TestCollectionEvent extends TestAction {
         Assert.assertEquals(attrs.size(), info.eventAttrs.size());
         Assert.assertEquals(specs.size(), info.sourceSpecimenInfos.size());
 
-        // FIXME test with aliquoted specimens added
+        // FIXME need to add test with aliquoted specimens
     }
 
     @Test
     public void testGetEventAttrInfos() throws Exception {
         // add specimen type
         setEventAttrs(studyId);
-        List<String> labels = Arrays.asList(studyId.getStudyEventAttrLabels());
-        Assert.assertEquals(5, labels.size());
-        StudyEventAttr studyAttr = null;
-        for (StudyEventAttr o : studyId.getWrappedObject()
-            .getStudyEventAttrCollection()) {
-            if ("Worksheet".equals(o.getLabel())) studyAttr = o;
+        StudyInfo studyInfo =
+            appService.doAction(new StudyGetInfoAction(studyId));
+        Assert.assertEquals(5, studyInfo.studyEventAttrs.size());
+
+        StudyEventAttr phlebotomistStudyAttr = null;
+        for (StudyEventAttr attr : studyInfo.studyEventAttrs) {
+            if ("Phlebotomist".equals(attr.getLabel())) {
+                phlebotomistStudyAttr = attr;
+            }
         }
-        Assert.assertNotNull(studyAttr);
+        Assert.assertNotNull(phlebotomistStudyAttr);
+
         EventAttrTypeEnum eventAttrType =
-            EventAttrTypeEnum.getEventAttrType(studyAttr.getEventAttrType()
-                .getName());
+            EventAttrTypeEnum.getEventAttrType(phlebotomistStudyAttr
+                .getEventAttrType().getName());
         List<CEventAttrSaveInfo> attrs =
             new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
         String value = "abcdefghi";
         CEventAttrSaveInfo attrInfo =
-            CollectionEventHelper.createSaveCEventAttrInfo(studyAttr.getId(),
-                eventAttrType, value);
+            CollectionEventHelper.createSaveCEventAttrInfo(
+                phlebotomistStudyAttr.getId(), eventAttrType, value);
         attrs.add(attrInfo);
 
         Integer visitNber = r.nextInt(20);
@@ -566,8 +575,8 @@ public class TestCollectionEvent extends TestAction {
         Assert.assertEquals(eventAttrType, info.type);
         Assert.assertEquals(ceventId, info.attr.getCollectionEvent().getId());
         Assert.assertEquals(value, info.attr.getValue());
-        Assert.assertEquals(studyAttr.getId(), info.attr.getStudyEventAttr()
-            .getId());
+        Assert.assertEquals(phlebotomistStudyAttr.getId(), info.attr
+            .getStudyEventAttr().getId());
 
     }
 }
