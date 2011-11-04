@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -19,6 +18,7 @@ import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusGetAllAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
@@ -30,17 +30,13 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.study.GlobalEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.study.GlobalEventAttrInfoGetAction;
-import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfo.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
-import edu.ualberta.med.biobank.common.action.study.StudySaveAction.StudyEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.EventAttr;
-import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
@@ -55,6 +51,7 @@ public class TestCollectionEvent extends TestAction {
     @Rule
     public TestName testname = new TestName();
 
+    private String name;
     private Integer studyId;
     private Integer patientId;
     private Integer siteId;
@@ -63,7 +60,7 @@ public class TestCollectionEvent extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        String name = testname.getMethodName() + r.nextInt();
+        name = testname.getMethodName() + r.nextInt();
         studyId =
             StudyHelper
                 .createStudy(appService, name, ActivityStatusEnum.ACTIVE);
@@ -100,7 +97,7 @@ public class TestCollectionEvent extends TestAction {
 
     @Test
     public void testSaveWithSpecs() throws Exception {
-        String s = testname.getMethodName() + r.nextInt();
+        String s = name + r.nextInt();
         final Integer visitNumber = r.nextInt(20);
         final List<CommentInfo> comments =
             Utils.getRandomCommentInfos(currentUser.getId());
@@ -234,7 +231,7 @@ public class TestCollectionEvent extends TestAction {
 
         List<CEventAttrSaveInfo> attrs =
             new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
-        String value1 = testname.getMethodName() + "abcdefghi";
+        String value1 = name + "abcdefghi";
         CEventAttrSaveInfo attrInfo =
             CollectionEventHelper.createSaveCEventAttrInfo(
                 phlebotomistStudyAttr
@@ -267,7 +264,7 @@ public class TestCollectionEvent extends TestAction {
         Integer eventAttrId = eventAttr.getId();
         closeHibernateSession();
 
-        String value2 = testname.getMethodName() + "jklmnopqr";
+        String value2 = name + "jklmnopqr";
         attrInfo.value = value2;
         // Save with a different value for attrinfo
         appService.doAction(new CollectionEventSaveAction(ceventId, patientId,
@@ -304,8 +301,6 @@ public class TestCollectionEvent extends TestAction {
      */
     private void setEventAttrs(Integer studyId)
         throws Exception {
-        StudyInfo studyInfo =
-            appService.doAction(new StudyGetInfoAction(studyId));
 
         HashMap<Integer, GlobalEventAttrInfo> globalEattrs =
             appService.doAction(new GlobalEventAttrInfoGetAction());
@@ -318,9 +313,6 @@ public class TestCollectionEvent extends TestAction {
             globalEattrsByLabel.put(gEattr.attr.getLabel(), gEattr);
         }
 
-        ArrayList<StudyEventAttrSaveInfo> studyEattrs = new
-            ArrayList<StudyEventAttrSaveInfo>();
-
         // make sure the global event attributes are present
         Assert.assertTrue(
             "Missing global event attribute",
@@ -328,77 +320,63 @@ public class TestCollectionEvent extends TestAction {
                 Arrays.asList("PBMC Count (x10^6)", "Consent", "Patient Type",
                     "Visit Type")));
 
-        StudyEventAttrSaveInfo seAttr = new StudyEventAttrSaveInfo();
-        seAttr.globalEventAttrId =
-            globalEattrsByLabel.get("PBMC Count (x10^6)").attr.getId();
-        seAttr.type = EventAttrTypeEnum.NUMBER;
+        HashMap<Integer, ActivityStatus> astatuses =
+            appService.doAction(new ActivityStatusGetAllAction());
+        ActivityStatus activeAS = astatuses.get(ActivityStatusEnum.ACTIVE
+            .getId());
+        StudyInfo studyInfo =
+            appService.doAction(new StudyGetInfoAction(studyId));
+
+        StudyEventAttr seAttr = new StudyEventAttr();
+        seAttr.setLabel("PBMC Count (x10^6)");
+        seAttr
+            .setEventAttrType(globalEattrsByLabel.get("PBMC Count (x10^6)").attr
+                .getEventAttrType());
+        seAttr.setRequired(true);
+        seAttr.setActivityStatus(activeAS);
+        studyInfo.studyEventAttrs.add(seAttr);
+
+        seAttr = new StudyEventAttr();
+        seAttr.setLabel("Consent");
+        seAttr
+            .setEventAttrType(globalEattrsByLabel.get("Consent").attr
+                .getEventAttrType());
+        seAttr.setRequired(false);
+        seAttr.setPermissible("c1;c2;c3");
+        seAttr.setActivityStatus(activeAS);
+        studyInfo.studyEventAttrs.add(seAttr);
+
+        seAttr = new StudyEventAttr();
+        seAttr.setLabel("Patient Type");
+        seAttr
+            .setEventAttrType(globalEattrsByLabel.get("Patient Type").attr
+                .getEventAttrType());
         seAttr.required = true;
-        seAttr.aStatusId = ActivityStatusEnum.ACTIVE.getId();
-        studyEattrs.add(seAttr);
+        seAttr.setActivityStatus(activeAS);
+        studyInfo.studyEventAttrs.add(seAttr);
 
-        seAttr = new StudyEventAttrSaveInfo();
-        seAttr.globalEventAttrId =
-            globalEattrsByLabel.get("Consent").attr.getId();
-        seAttr.type = EventAttrTypeEnum.SELECT_MULTIPLE;
+        seAttr = new StudyEventAttr();
+        seAttr.setLabel("Visit Type");
+        seAttr
+            .setEventAttrType(globalEattrsByLabel.get("Visit Type").attr
+                .getEventAttrType());
         seAttr.required = false;
-        seAttr.permissible = "c1;c2;c3";
-        seAttr.aStatusId = ActivityStatusEnum.ACTIVE.getId();
-        studyEattrs.add(seAttr);
+        seAttr.setPermissible("v1;v2;v3;v4");
+        seAttr.setActivityStatus(activeAS);
+        studyInfo.studyEventAttrs.add(seAttr);
 
-        seAttr = new StudyEventAttrSaveInfo();
-        seAttr.globalEventAttrId =
-            globalEattrsByLabel.get("Patient Type").attr.getId();
-        seAttr.type = EventAttrTypeEnum.TEXT;
-        seAttr.required = true;
-        seAttr.aStatusId = ActivityStatusEnum.ACTIVE.getId();
-        studyEattrs.add(seAttr);
-
-        seAttr = new StudyEventAttrSaveInfo();
-        seAttr.globalEventAttrId =
-            globalEattrsByLabel.get("Visit Type").attr.getId();
-        seAttr.type = EventAttrTypeEnum.SELECT_SINGLE;
+        seAttr = new StudyEventAttr();
+        seAttr.setLabel("Phlebotomist");
+        seAttr
+            .setEventAttrType(globalEattrsByLabel.get("Phlebotomist").attr
+                .getEventAttrType());
         seAttr.required = false;
-        seAttr.permissible = "v1;v2;v3;v4";
-        seAttr.aStatusId = ActivityStatusEnum.ACTIVE.getId();
-        studyEattrs.add(seAttr);
+        seAttr.setActivityStatus(activeAS);
+        studyInfo.studyEventAttrs.add(seAttr);
 
-        seAttr = new StudyEventAttrSaveInfo();
-        seAttr.globalEventAttrId =
-            globalEattrsByLabel.get("Phlebotomist").attr.getId();
-        seAttr.type = EventAttrTypeEnum.TEXT;
-        seAttr.required = false;
-        seAttr.aStatusId = ActivityStatusEnum.ACTIVE.getId();
-        studyEattrs.add(seAttr);
-
-        StudySaveAction saveStudy = new StudySaveAction();
-        saveStudy.setId(studyInfo.study.getId());
-        saveStudy.setName(studyInfo.study.getName());
-        saveStudy.setNameShort(studyInfo.study.getNameShort());
-        saveStudy.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
-
-        Set<Integer> ids = new HashSet<Integer>();
-        for (ClinicInfo info : studyInfo.clinicInfos) {
-            Contact c = info.getContact();
-            if (c != null) {
-                ids.add(c.getId());
-            }
-        }
-        saveStudy.setContactIds(ids);
-
-        ids = new HashSet<Integer>();
-        for (SourceSpecimen spc : studyInfo.sourceSpcs) {
-            ids.add(spc.getId());
-        }
-        saveStudy.setSourceSpcIds(ids);
-        saveStudy.setStudyEventAttrSaveInfo(studyEattrs);
-
-        ids = new HashSet<Integer>();
-        for (AliquotedSpecimen spc : studyInfo.aliquotedSpcs) {
-            ids.add(spc.getId());
-        }
-
-        saveStudy.setAliquotedSpcTypeIds(ids);
-        appService.doAction(saveStudy);
+        StudySaveAction saveAction =
+            StudyHelper.getSaveAction(appService, studyInfo);
+        appService.doAction(saveAction);
     }
 
     @Test
@@ -422,7 +400,7 @@ public class TestCollectionEvent extends TestAction {
         // add specimen type
         final Integer typeId =
             edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-                .addSpecimenType(testname.getMethodName() + r.nextInt())
+                .addSpecimenType(name + r.nextInt())
                 .getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs =
@@ -474,8 +452,7 @@ public class TestCollectionEvent extends TestAction {
         // add specimen type
         final Integer typeId =
             edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-                .addSpecimenType(testname.getMethodName() + r.nextInt())
-                .getId();
+                .addSpecimenType(name + r.nextInt()).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,
