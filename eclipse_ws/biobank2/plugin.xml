@@ -1651,7 +1651,7 @@
             name="%SiteEntry.editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.mvp.view.FormViewEditorPart"
+            class="edu.ualberta.med.biobank.mvp.view.form.FormViewEditorPart"
             default="false"
             icon="icons/site.png"
             id="edu.ualberta.med.biobank.mvp.view.FormViewEditorPart"

@@ -1,4 +1,7 @@
 package edu.ualberta.med.biobank.mvp.view;
 
-public interface IEntryFormView extends IFormView, ISaveableView {
+import com.pietschy.gwt.pectin.client.form.validation.component.ValidationDisplay;
+
+public interface IEntryFormView extends IFormView, ISaveableView,
+    ValidationDisplay {
 }

@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
 import edu.ualberta.med.biobank.mvp.view.ActivityStatusComboView;
 import edu.ualberta.med.biobank.mvp.view.AddressEntryView;
 import edu.ualberta.med.biobank.mvp.view.FormManagerView;
-import edu.ualberta.med.biobank.mvp.view.SiteEntryView;
+import edu.ualberta.med.biobank.mvp.view.form.SiteEntryFormView;
 
 public class BiobankModule extends AbstractModule {
     @Override
@@ -26,7 +26,7 @@ public class BiobankModule extends AbstractModule {
 
         bind(AddressEntryPresenter.View.class).to(AddressEntryView.class);
 
-        bind(SiteEntryPresenter.View.class).to(SiteEntryView.class);
+        bind(SiteEntryPresenter.View.class).to(SiteEntryFormView.class);
         bind(ActivityStatusComboPresenter.View.class).to(
             ActivityStatusComboView.class);
         bind(FormManagerPresenter.View.class).to(FormManagerView.class);

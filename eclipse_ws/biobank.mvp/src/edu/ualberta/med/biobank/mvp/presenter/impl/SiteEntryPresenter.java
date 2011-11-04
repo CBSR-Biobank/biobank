@@ -80,12 +80,11 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         addressEntryPresenter.bind(); // still necessary to bind view to model
         activityStatusComboPresenter.bind();
 
+        binder.bind(model.siteId).to(view.getIdentifier());
         binder.bind(model.name).to(view.getName());
         binder.bind(model.nameShort).to(view.getNameShort());
-
-        // TODO: fix comment colletion section
-        // binder.bind(model.comment).to(view.getCommentCollection());
-
+        // TODO: the comment collection should be dumped. No need to have it.
+        binder.bind(model.commentCollection).to(view.getCommentCollection());
         binder.bind(model.studies).to(view.getStudies());
         binder.bind(model.activityStatus).to(
             activityStatusComboPresenter.getActivityStatus());
@@ -117,6 +116,8 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
     @Override
     public void doSave() {
+        if (!model.validAndDirty().getValue()) return;
+
         SiteSaveAction saveSite = new SiteSaveAction();
         saveSite.setId(model.siteId.getValue());
         saveSite.setName(model.name.getValue());
@@ -135,6 +136,9 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
             @Override
             public void onSuccess(Integer siteId) {
+                // clear dirty state (so form can close without prompt to save)
+                model.checkpoint();
+
                 eventBus.fireEvent(new SiteChangedEvent(siteId));
                 eventBus.fireEvent(new SiteViewPresenterShowEvent(siteId));
                 close();
@@ -181,7 +185,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         final FieldModel<Integer> siteId;
         final FieldModel<String> name;
         final FieldModel<String> nameShort;
-        final FieldModel<String> comment;
+        final ListFieldModel<Comment> commentCollection;
         final FieldModel<ActivityStatus> activityStatus;
         final FieldModel<Address> address;
         final ListFieldModel<StudyInfo> studies;
@@ -198,8 +202,8 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
                 .boundTo(provider, "site.name");
             nameShort = fieldOfType(String.class)
                 .boundTo(provider, "site.nameShort");
-            comment = fieldOfType(String.class)
-                .boundTo(provider, "site.comment");
+            commentCollection = listOfType(Comment.class)
+                .boundTo(provider, "site.commentCollection");
             activityStatus = fieldOfType(ActivityStatus.class)
                 .boundTo(provider, "site.activityStatus");
             address = fieldOfType(Address.class)
