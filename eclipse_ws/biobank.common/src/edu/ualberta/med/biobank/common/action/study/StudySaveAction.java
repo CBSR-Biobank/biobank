@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -30,9 +31,10 @@ public class StudySaveAction implements Action<Integer> {
     private String name;
     private String nameShort;
     private Integer aStatusId;
+    private Set<Integer> siteIds;
     private Set<Integer> contactIds;
     private Set<Integer> sourceSpcIds;
-    private Set<Integer> aliquotedSpcTypeIds;
+    private Set<Integer> aliquotSpcIds;
 
     public static class StudyEventAttrSaveInfo implements Serializable,
         NotAProxy {
@@ -41,6 +43,7 @@ public class StudySaveAction implements Action<Integer> {
         public EventAttrTypeEnum type;
         public Boolean required;
         public String permissible;
+        public Integer aStatusId;
     }
 
     private List<StudyEventAttrSaveInfo> studyEventAttrInfos;
@@ -61,6 +64,10 @@ public class StudySaveAction implements Action<Integer> {
         this.aStatusId = activityStatusId;
     }
 
+    public void setSiteIds(Set<Integer> siteIds) {
+        this.siteIds = siteIds;
+    }
+
     public void setContactIds(Set<Integer> contactIds) {
         this.contactIds = contactIds;
     }
@@ -69,8 +76,8 @@ public class StudySaveAction implements Action<Integer> {
         this.sourceSpcIds = sourceSpcIds;
     }
 
-    public void setAliquotedSpcTypeIds(Set<Integer> aliquotedSpcTypeIds) {
-        this.aliquotedSpcTypeIds = aliquotedSpcTypeIds;
+    public void setAliquotSpcIds(Set<Integer> aliquotSpcIds) {
+        this.aliquotSpcIds = aliquotSpcIds;
     }
 
     public void setStudyEventAttrSaveInfo(List<StudyEventAttrSaveInfo> infos) {
@@ -85,6 +92,22 @@ public class StudySaveAction implements Action<Integer> {
 
     @Override
     public Integer run(User user, Session session) throws ActionException {
+        if (siteIds == null) {
+            throw new NullPointerException("site ids cannot be null");
+        }
+
+        if (contactIds == null) {
+            throw new NullPointerException("contact ids cannot be null");
+        }
+
+        if (sourceSpcIds == null) {
+            throw new NullPointerException("specimen ids cannot be null");
+        }
+
+        if (aliquotSpcIds == null) {
+            throw new NullPointerException("aliquot ids cannot be null");
+        }
+
         SessionUtil sessionUtil = new SessionUtil(session);
         Study study = sessionUtil.get(Study.class, id, new Study());
 
@@ -98,35 +121,34 @@ public class StudySaveAction implements Action<Integer> {
         study.setName(name);
         study.setNameShort(nameShort);
 
-        if (aStatusId != null) {
-            ActivityStatus aStatus =
-                sessionUtil.get(ActivityStatus.class, aStatusId);
-            study.setActivityStatus(aStatus);
+        if (aStatusId == null) {
+            throw new NullPointerException("activity status not specified");
         }
 
-        // TODO: set collections based on diffs
-        if (contactIds != null) {
-            Map<Integer, Contact> contacts =
-                sessionUtil.get(Contact.class, contactIds);
-            study.setContactCollection(new HashSet<Contact>(contacts.values()));
-        }
+        ActivityStatus aStatus =
+            sessionUtil.get(ActivityStatus.class, aStatusId);
+        study.setActivityStatus(aStatus);
 
         // TODO: set collections based on diffs
-        if (aliquotedSpcTypeIds != null) {
-            Map<Integer, AliquotedSpecimen> aliquotedSpcs =
-                sessionUtil.get(AliquotedSpecimen.class, aliquotedSpcTypeIds);
-            study
-                .setAliquotedSpecimenCollection(new HashSet<AliquotedSpecimen>(
-                    aliquotedSpcs.values()));
-        }
 
-        // TODO: set collections based on diffs
-        if (sourceSpcIds != null) {
-            Map<Integer, SourceSpecimen> sourceSpcs =
-                sessionUtil.get(SourceSpecimen.class, sourceSpcIds);
-            study.setSourceSpecimenCollection(new HashSet<SourceSpecimen>(
-                sourceSpcs.values()));
-        }
+        Map<Integer, Site> sites =
+            sessionUtil.get(Site.class, siteIds);
+        study.setSiteCollection(new HashSet<Site>(sites.values()));
+
+        Map<Integer, Contact> contacts =
+            sessionUtil.get(Contact.class, contactIds);
+        study.setContactCollection(new HashSet<Contact>(contacts.values()));
+
+        Map<Integer, AliquotedSpecimen> aliquotedSpcs =
+            sessionUtil.get(AliquotedSpecimen.class, aliquotSpcIds);
+        study
+            .setAliquotedSpecimenCollection(new HashSet<AliquotedSpecimen>(
+                aliquotedSpcs.values()));
+
+        Map<Integer, SourceSpecimen> sourceSpcs =
+            sessionUtil.get(SourceSpecimen.class, sourceSpcIds);
+        study.setSourceSpecimenCollection(new HashSet<SourceSpecimen>(
+            sourceSpcs.values()));
 
         setStudyEventAttrs(user, session, sessionUtil, study);
 
@@ -157,6 +179,11 @@ public class StudySaveAction implements Action<Integer> {
                 seAttr.setPermissible(info.permissible);
                 seAttr.setRequired(info.required);
                 seAttr.setEventAttrType(globalAttrInfo.attr.getEventAttrType());
+
+                ActivityStatus aStatus =
+                    sessionUtil.get(ActivityStatus.class, aStatusId);
+                seAttr.setActivityStatus(aStatus);
+
                 seAttr.setStudy(study);
 
                 CollectionUtils.getCollection(study,

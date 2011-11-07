@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class StudyGetSourceSpecimenInfosAction implements
+public class StudyGetSourceSpecimensAction implements
     Action<ArrayList<SourceSpecimen>> {
 
     private static final long serialVersionUID = 1L;
@@ -22,18 +22,16 @@ public class StudyGetSourceSpecimenInfosAction implements
 
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String STUDY_SRCE_SPECIMEN_QRY =
-        "select srce"
-            + " from " + SourceSpecimen.class.getName() + " as srce"
-            + " inner join fetch srce."
-            + SourceSpecimenPeer.SPECIMEN_TYPE.getName()
-            + " where srce."
-            + Property.concatNames(SourceSpecimenPeer.STUDY, StudyPeer.ID)
-            + " =?";
-
+    private static final String SELECT_SOURCE_SPCS_HQL =
+        " FROM " + SourceSpecimen.class.getName() + " AS srce"
+        + " INNER JOIN FETCH srce."
+        + SourceSpecimenPeer.SPECIMEN_TYPE.getName()
+        + " WHERE srce."
+        + Property.concatNames(SourceSpecimenPeer.STUDY, StudyPeer.ID)
+        + " =?";
     // @formatter:on
 
-    public StudyGetSourceSpecimenInfosAction(Integer studyId) {
+    public StudyGetSourceSpecimensAction(Integer studyId) {
         this.studyId = studyId;
     }
 
@@ -45,11 +43,17 @@ public class StudyGetSourceSpecimenInfosAction implements
     @Override
     public ArrayList<SourceSpecimen> run(User user, Session session)
         throws ActionException {
-        Query query = session.createQuery(STUDY_SRCE_SPECIMEN_QRY);
+        ArrayList<SourceSpecimen> result = new ArrayList<SourceSpecimen>();
+
+        Query query = session.createQuery(SELECT_SOURCE_SPCS_HQL);
         query.setParameter(0, studyId);
 
         @SuppressWarnings("unchecked")
-        List<SourceSpecimen> rows = query.list();
-        return new ArrayList<SourceSpecimen>(rows);
+        List<SourceSpecimen> srcspcs = query.list();
+        if (srcspcs != null) {
+            result.addAll(srcspcs);
+        }
+
+        return result;
     }
 }

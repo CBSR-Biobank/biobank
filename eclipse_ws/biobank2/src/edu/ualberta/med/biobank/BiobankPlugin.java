@@ -217,6 +217,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
                     "Exception found.", t.getCause());
             ErrorDialog.openError(shell, "Error", t.getLocalizedMessage(),
                 status);
+
+            t.printStackTrace();
         }
     }
 

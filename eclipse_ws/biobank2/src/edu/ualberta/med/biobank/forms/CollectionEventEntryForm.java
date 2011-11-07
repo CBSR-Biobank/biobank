@@ -35,7 +35,8 @@ import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetInfosA
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
-import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimenInfosAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimensAction;
+import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -262,12 +263,11 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);
         try {
-            final List<SpecimenTypeInfo> allSpecimenTypes =
-                SessionManager.getAppService().doAction(
-                    new SpecimenTypeGetInfosAction());
-            final List<SourceSpecimen> studySourceSpecimens =
-                SessionManager.getAppService().doAction(
-                    new StudyGetSourceSpecimenInfosAction(ceventInfo.cevent
+            final List<SpecimenTypeInfo> allSpecimenTypes = SessionManager
+                .getAppService().doAction(new SpecimenTypeGetInfosAction());
+            final List<SourceSpecimen> studySourceSpecimens = SessionManager
+                .getAppService().doAction(
+                    new StudyGetSourceSpecimensAction(ceventInfo.cevent
                         .getPatient().getStudy().getId()));
 
             specimensTable.addEditSupport(studySourceSpecimens,
