@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Listener;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
@@ -497,10 +497,10 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected abstract Action<ProcessResult> getCellProcessAction(
-        Integer centerId, Cell cell, Locale locale);
+        Integer centerId, CellInfo cell, Locale locale);
 
     protected abstract Action<ProcessResult> getPalletProcessAction(
-        Integer centerId, Map<RowColPos, Cell> cells, boolean isRescanMode,
+        Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
         Locale locale);
 
     protected void beforeScanTubeAlone() {
@@ -577,9 +577,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
         // conversion for server side call
-        Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.Cell> serverCells = null;
+        Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> serverCells = null;
         if (cells != null) {
-            serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.Cell>();
+            serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo>();
             for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
                 serverCells.put(entry.getKey(), entry.getValue()
                     .transformIntoServerCell());
@@ -596,7 +596,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
         if (cells != null) {
             // for each cell, convert into a client side cell
-            for (Entry<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.Cell> entry : res
+            for (Entry<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> entry : res
                 .getCells().entrySet()) {
                 RowColPos rcp = entry.getKey();
                 monitor
@@ -605,7 +605,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                             Messages.AbstractPalletSpecimenAdminForm_scan_monitor_position,
                             ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
                 PalletCell palletCell = cells.get(entry.getKey());
-                Cell servercell = entry.getValue();
+                CellInfo servercell = entry.getValue();
                 if (palletCell == null) { // can happened if missing
                     palletCell = new PalletCell(new ScanCell(
                         servercell.getRow(), servercell.getCol(),

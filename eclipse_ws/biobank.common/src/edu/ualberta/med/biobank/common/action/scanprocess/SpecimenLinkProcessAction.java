@@ -17,26 +17,28 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class LinkProcess extends ServerProcess {
+public class SpecimenLinkProcessAction extends ServerProcessAction {
 
     private static final long serialVersionUID = 1L;
     private Integer studyId;
 
-    public LinkProcess(Integer currentWorkingCenterId, Integer studyId,
-        Map<RowColPos, Cell> cells, boolean isRescanMode, Locale locale) {
+    // multiple cells link process
+    public SpecimenLinkProcessAction(Integer currentWorkingCenterId, Integer studyId,
+        Map<RowColPos, CellInfo> cells, boolean isRescanMode, Locale locale) {
         super(currentWorkingCenterId, cells, isRescanMode, locale);
         this.studyId = studyId;
     }
 
-    public LinkProcess(Integer currentWorkingCenterId, Integer studyId,
-        Cell cell, Locale locale) {
+    // single cell link process
+    public SpecimenLinkProcessAction(Integer currentWorkingCenterId, Integer studyId,
+        CellInfo cell, Locale locale) {
         super(currentWorkingCenterId, cell, locale);
         this.studyId = studyId;
     }
 
     @Override
     protected ScanProcessResult getScanProcessResult(Session session,
-        Map<RowColPos, Cell> cells, boolean isRescanMode)
+        Map<RowColPos, CellInfo> cells, boolean isRescanMode)
         throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
         res.setResult(cells,
@@ -44,16 +46,16 @@ public class LinkProcess extends ServerProcess {
         return res;
     }
 
-    protected CellStatus internalProcessScanResult(Session session,
-        Map<RowColPos, Cell> cells, boolean isRescanMode)
+    protected CellInfoStatus internalProcessScanResult(Session session,
+        Map<RowColPos, CellInfo> cells, boolean isRescanMode)
         throws ActionException {
-        CellStatus currentScanState = CellStatus.EMPTY;
+        CellInfoStatus currentScanState = CellInfoStatus.EMPTY;
         if (cells != null) {
-            Map<String, Cell> allValues = new HashMap<String, Cell>();
-            for (Entry<RowColPos, Cell> entry : cells.entrySet()) {
-                Cell cell = entry.getValue();
+            Map<String, CellInfo> allValues = new HashMap<String, CellInfo>();
+            for (Entry<RowColPos, CellInfo> entry : cells.entrySet()) {
+                CellInfo cell = entry.getValue();
                 if (cell != null) {
-                    Cell otherValue = allValues.get(cell.getValue());
+                    CellInfo otherValue = allValues.get(cell.getValue());
                     if (otherValue != null) {
                         String thisPosition = ContainerLabelingSchemeWrapper
                             .rowColToSbs(new RowColPos(cell.getRow(), cell
@@ -69,17 +71,17 @@ public class LinkProcess extends ServerProcess {
                             "ScanLink.activitylog.value.already.scanned", //$NON-NLS-1$
                             locale), thisPosition, cell.getValue(),
                             otherPosition));
-                        cell.setStatus(CellStatus.ERROR);
+                        cell.setStatus(CellInfoStatus.ERROR);
                     } else {
                         allValues.put(cell.getValue(), cell);
                     }
                 }
                 if (!isRescanMode
-                    || (cell != null && cell.getStatus() != CellStatus.TYPE && cell
-                        .getStatus() != CellStatus.NO_TYPE)) {
+                    || (cell != null && cell.getStatus() != CellInfoStatus.TYPE && cell
+                        .getStatus() != CellInfoStatus.NO_TYPE)) {
                     processCellLinkStatus(session, cell);
                 }
-                CellStatus newStatus = CellStatus.EMPTY;
+                CellInfoStatus newStatus = CellInfoStatus.EMPTY;
                 if (cell != null) {
                     newStatus = cell.getStatus();
                 }
@@ -90,7 +92,7 @@ public class LinkProcess extends ServerProcess {
     }
 
     @Override
-    protected CellProcessResult getCellProcessResult(Session session, Cell cell)
+    protected CellProcessResult getCellProcessResult(Session session, CellInfo cell)
         throws ActionException {
         CellProcessResult res = new CellProcessResult();
         processCellLinkStatus(session, cell);
@@ -103,18 +105,18 @@ public class LinkProcess extends ServerProcess {
      * 
      * @throws Exception
      */
-    private CellStatus processCellLinkStatus(Session session, Cell cell)
+    private CellInfoStatus processCellLinkStatus(Session session, CellInfo cell)
         throws ActionException {
         if (cell == null)
-            return CellStatus.EMPTY;
-        if (cell.getStatus() == CellStatus.ERROR)
-            return CellStatus.ERROR;
+            return CellInfoStatus.EMPTY;
+        if (cell.getStatus() == CellInfoStatus.ERROR)
+            return CellInfoStatus.ERROR;
         else {
             String value = cell.getValue();
             if (value != null) {
                 Specimen foundSpecimen = searchSpecimen(session, value);
                 if (foundSpecimen != null) {
-                    cell.setStatus(CellStatus.ERROR);
+                    cell.setStatus(CellInfoStatus.ERROR);
                     cell.setInformation(Messages.getString(
                         "ScanLink.scanStatus.specimen.alreadyExists", locale)); //$NON-NLS-1$
                     String palletPosition = ContainerLabelingSchemeWrapper
@@ -147,10 +149,10 @@ public class LinkProcess extends ServerProcess {
                                     .getPnumber(), foundSpecimen
                                     .getCurrentCenter().getNameShort()));
                 } else {
-                    cell.setStatus(CellStatus.NO_TYPE);
+                    cell.setStatus(CellInfoStatus.NO_TYPE);
                 }
             } else {
-                cell.setStatus(CellStatus.EMPTY);
+                cell.setStatus(CellInfoStatus.EMPTY);
             }
             return cell.getStatus();
         }

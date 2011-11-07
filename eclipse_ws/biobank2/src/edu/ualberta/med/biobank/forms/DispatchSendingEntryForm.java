@@ -20,9 +20,9 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.SessionSecurityHelper;
-import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcess;
-import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcessAction;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
@@ -261,10 +261,10 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         try {
             CellProcessResult res = (CellProcessResult) SessionManager
                 .getAppService().doAction(
-                    new DispatchCreateProcess(new ShipmentProcessData(null,
+                    new DispatchCreateProcessAction(new ShipmentProcessInfo(null,
                         dispatch, true), SessionManager.getUser()
                         .getCurrentWorkingCenter().getId(),
-                        new Cell(-1, -1, inventoryId, null),
+                        new CellInfo(-1, -1, inventoryId, null),
                         Locale.getDefault()));
             switch (res.getProcessStatus()) {
             case FILLED:

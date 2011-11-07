@@ -29,8 +29,8 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.action.scanprocess.CellStatus;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
@@ -165,9 +165,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         if (checkBeforeProcessing(currentCenter)) {
             Map<RowColPos, PalletCell> cells = getCells();
             // conversion for server side call
-            Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.Cell> serverCells = null;
+            Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> serverCells = null;
             if (cells != null) {
-                serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.Cell>();
+                serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo>();
                 for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
                     serverCells.put(entry.getKey(), entry.getValue()
                         .transformIntoServerCell());
@@ -183,14 +183,14 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
             if (cells != null) {
                 // for each cell, convert into a client side cell
-                for (Entry<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.Cell> entry : res
+                for (Entry<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> entry : res
                     .getCells().entrySet()) {
                     RowColPos rcp = entry.getKey();
                     monitor.subTask(NLS.bind(
                         Messages.AbstractScanDialog_processCell_task_position,
                         ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
                     PalletCell palletCell = cells.get(entry.getKey());
-                    Cell servercell = entry.getValue();
+                    CellInfo servercell = entry.getValue();
                     if (palletCell == null) { // can happened if missing
                         palletCell = new PalletCell(new ScanCell(
                             servercell.getRow(), servercell.getCol(),
@@ -202,7 +202,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                     specificScanPosProcess(palletCell);
                 }
             }
-            setScanOkValue(res.getProcessStatus() != CellStatus.ERROR);
+            setScanOkValue(res.getProcessStatus() != CellInfoStatus.ERROR);
         } else {
             setScanOkValue(false);
         }
@@ -471,7 +471,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                     cell.transformIntoServerCell(),
                     Locale.getDefault()));
         cell.merge(SessionManager.getAppService(), res.getCell());
-        if (res.getProcessStatus() == CellStatus.ERROR) {
+        if (res.getProcessStatus() == CellInfoStatus.ERROR) {
             Button okButton = getButton(IDialogConstants.PROCEED_ID);
             okButton.setEnabled(false);
         }
@@ -480,10 +480,10 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     protected abstract Action<ProcessResult> getCellProcessAction(
-        Integer centerId, Cell cell, Locale locale);
+        Integer centerId, CellInfo cell, Locale locale);
 
     protected abstract Action<ProcessResult> getPalletProcessAction(
-        Integer centerId, Map<RowColPos, Cell> cells, boolean isRescanMode,
+        Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
         Locale locale);
 
     protected void resetScan() {

@@ -10,27 +10,21 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
 
-public class AssignProcessData extends ProcessWithPallet {
+public class AssignProcessInfo extends AbstractProcessPalletInfo {
 
     private static final long serialVersionUID = 1L;
 
     private String palletLabel;
     private Integer containerTypeId;
-    private Map<RowColPos, Integer> expectedSpecimens;
 
-    // for new pallet
-    public AssignProcessData(String label, Integer containerTypeId,
-        Map<RowColPos, Integer> expectedSpecimens) {
-        super(null);
-        palletLabel = label;
-        this.containerTypeId = containerTypeId;
-        this.expectedSpecimens = expectedSpecimens;
-    }
 
     // existing pallet
-    public AssignProcessData(Container pallet) {
+    public AssignProcessInfo(Container pallet) {
         super(pallet.getId());
         this.containerTypeId = pallet.getContainerType().getId();
+        if (palletId == null) {
+        	palletLabel = pallet.getLabel();
+        }
     }
 
     public String getPalletLabel(Session session) {
@@ -68,12 +62,8 @@ public class AssignProcessData extends ProcessWithPallet {
 
     public Specimen getExpectedSpecimen(
         Session session, Integer row, Integer col) {
-        if (palletId == null) {
-            Integer specimenId = expectedSpecimens.get(new RowColPos(row, col));
-            if (specimenId == null)
-                return null;
-            return ActionUtil.sessionGet(session, Specimen.class, specimenId);
-        }
+        if (palletId == null) 
+        	return null;
         return getSpecimen(session, row, col);
     }
 }
