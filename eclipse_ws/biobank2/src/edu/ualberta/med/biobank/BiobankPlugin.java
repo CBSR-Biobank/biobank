@@ -4,11 +4,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchWindow;
@@ -18,14 +22,19 @@ import org.osgi.framework.BundleContext;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
+import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
+import edu.ualberta.med.biobank.mvp.event.ExceptionHandler;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
+import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
@@ -186,6 +195,29 @@ public class BiobankPlugin extends AbstractUIPlugin {
         FormManagerPresenter formManagerPresenter = injector
             .getInstance(FormManagerPresenter.class);
         formManagerPresenter.bind();
+
+        injector.getInstance(ExceptionDisplay.class);
+    }
+
+    // TODO: move this somewhere much more appropriate
+    static class ExceptionDisplay implements ExceptionHandler {
+        @Inject
+        ExceptionDisplay(EventBus eventBus) {
+            eventBus.addHandler(ExceptionEvent.getType(), this);
+        }
+
+        @Override
+        public void onException(ExceptionEvent event) {
+            Throwable t = event.getThrowable();
+            Shell shell = PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell();
+
+            IStatus status =
+                new Status(IStatus.ERROR, Application.PLUGIN_ID, IStatus.OK,
+                    "Exception found.", t.getCause());
+            ErrorDialog.openError(shell, "Error", t.getLocalizedMessage(),
+                status);
+        }
     }
 
     /*
