@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.mvp.view.form.FormViewEditorPart;
 
 public class FormManagerView implements FormManagerPresenter.View {
     @Override
-    public void openForm(Object object, IFormView view) {
+    public void openForm(IFormView view) {
         IEditorInput input = new FormViewEditorInput(view);
         String id = FormViewEditorPart.ID;
         try {

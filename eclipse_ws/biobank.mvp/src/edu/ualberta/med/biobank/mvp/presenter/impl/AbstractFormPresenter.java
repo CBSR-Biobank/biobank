@@ -7,8 +7,11 @@ import com.google.web.bindery.event.shared.EventBus;
 import edu.ualberta.med.biobank.mvp.presenter.IFormPresenter;
 import edu.ualberta.med.biobank.mvp.view.IFormView;
 
-public abstract class AbstractFormPresenter<V extends IFormView> extends
-    AbstractCloseablePresenter<V> implements IFormPresenter<V> {
+public abstract class AbstractFormPresenter<V extends IFormView>
+    extends AbstractCloseablePresenter<V>
+    implements IFormPresenter<V> {
+    private final ReloadClickHandler reloadClickHandler =
+        new ReloadClickHandler();
 
     public AbstractFormPresenter(V view, EventBus eventBus) {
         super(view, eventBus);
@@ -24,8 +27,8 @@ public abstract class AbstractFormPresenter<V extends IFormView> extends
     @Override
     protected void onBind() {
         super.onBind();
-        registerHandler(view.getReload().addClickHandler(
-            new ReloadClickHandler()));
+
+        registerHandler(view.getReload().addClickHandler(reloadClickHandler));
     }
 
     private class ReloadClickHandler implements ClickHandler {

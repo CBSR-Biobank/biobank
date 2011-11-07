@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.mvp.event.AlertEvent;
+import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.site.SiteViewPresenterShowEvent;
 import edu.ualberta.med.biobank.mvp.model.BaseModel;
@@ -130,8 +130,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         dispatcher.exec(saveSite, new ActionCallback<Integer>() {
             @Override
             public void onFailure(Throwable caught) {
-                // TODO: better error message and show or log exception?
-                eventBus.fireEvent(new AlertEvent(caught.getLocalizedMessage()));
+                eventBus.fireEvent(new ExceptionEvent(caught));
             }
 
             @Override
@@ -146,37 +145,37 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         });
     }
 
-    public View createSite() {
+    public void createSite() {
         SiteInfo siteInfo = new SiteInfo();
         siteInfo.setSite(new Site());
         siteInfo.getSite().setAddress(new Address());
-        return editSite(siteInfo);
+        editSite(siteInfo);
     }
 
-    public View editSite(Integer siteId) {
-        SiteGetInfoAction getSiteInfo = new SiteGetInfoAction(siteId);
-        dispatcher.exec(getSiteInfo, new ActionCallback<SiteInfo>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                // TODO: better error message and show or log exception?
-                eventBus.fireEvent(new AlertEvent(caught.getLocalizedMessage()));
-                close();
-            }
+    public boolean editSite(Integer siteId) {
+        SiteGetInfoAction siteGetInfoAction = new SiteGetInfoAction(siteId);
 
-            @Override
-            public void onSuccess(SiteInfo siteInfo) {
-                editSite(siteInfo);
-            }
-        });
+        boolean success = dispatcher.exec(siteGetInfoAction,
+            new ActionCallback<SiteInfo>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    eventBus.fireEvent(new ExceptionEvent(caught));
+                    close();
+                }
 
-        return view;
+                @Override
+                public void onSuccess(SiteInfo siteInfo) {
+                    editSite(siteInfo);
+                }
+            });
+
+        return success;
     }
 
-    public View editSite(SiteInfo siteInfo) {
+    public void editSite(SiteInfo siteInfo) {
         // as long as this method is public, get our own (deep) copy of the data
         SiteInfo clone = ObjectCloner.deepCopy(siteInfo);
         model.setValue(clone);
-        return view;
     }
 
     public static class Model extends BaseModel<SiteInfo> {

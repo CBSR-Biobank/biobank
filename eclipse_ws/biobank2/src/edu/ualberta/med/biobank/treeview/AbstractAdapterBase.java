@@ -19,6 +19,11 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.web.bindery.event.shared.EventBus;
+
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -51,6 +56,8 @@ public abstract class AbstractAdapterBase implements
 
     protected List<AbstractAdapterBase> children;
 
+    protected EventBus eventBus;
+
     // used when add or remove children. Initialised to a listener that does
     // nothing. See NodeContentProvider for an implementation
     private IDeltaListener deltaListener = NullDeltaListener.getSoleInstance();
@@ -72,7 +79,19 @@ public abstract class AbstractAdapterBase implements
         this.tooltip = tooltip;
         this.hasChildren = hasChildren;
         listeners = new ArrayList<AdapterChangedListener>();
+
+        // TODO: this class should be injected, not inject itself. Worst case,
+        // have some AdapterBase super-class with an EventBus that injects
+        // itself upon instantiation?
+        Injector injector = BiobankPlugin.getInjector();
+        injector.injectMembers(this);
+
         init();
+    }
+
+    @Inject
+    public void setEventBus(EventBus eventBus) {
+        this.eventBus = eventBus;
     }
 
     protected void init() {
@@ -444,7 +463,8 @@ public abstract class AbstractAdapterBase implements
         Class<?> searchedClass, Integer objectId, Class<?>... clazzList) {
         for (Class<?> clazz : clazzList) {
             if (clazz.isAssignableFrom(searchedClass)) {
-                List<AbstractAdapterBase> res = new ArrayList<AbstractAdapterBase>();
+                List<AbstractAdapterBase> res =
+                    new ArrayList<AbstractAdapterBase>();
                 AbstractAdapterBase child = null;
                 // if (Date.class.isAssignableFrom(clazz))
                 // child = getChild((int) ((Date) searchedObject).getTime());

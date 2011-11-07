@@ -7,18 +7,22 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IEditorPart;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
+import edu.ualberta.med.biobank.mvp.event.model.site.SiteEditEvent;
+import edu.ualberta.med.biobank.mvp.event.model.site.SiteViewEvent;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class SiteAdapter extends AdapterBase {
 
     private int nodeIdOffset = 100;
+    private final SiteWrapper site;
     public static final int STUDIES_BASE_NODE_ID = 0;
     public static final int CLINICS_BASE_ID = 1;
     public static final int CONTAINER_TYPES_BASE_NODE_ID = 2;
@@ -26,6 +30,8 @@ public class SiteAdapter extends AdapterBase {
 
     public SiteAdapter(AdapterBase parent, SiteWrapper site) {
         super(parent, site, false);
+
+        this.site = site;
 
         if (site != null && site.getId() != null) {
             nodeIdOffset *= site.getId();
@@ -135,5 +141,16 @@ public class SiteAdapter extends AdapterBase {
         if (o instanceof SiteAdapter)
             return internalCompareTo(o);
         return 0;
+    }
+
+    @Override
+    public IEditorPart openEntryForm(boolean hasPreviousForm) {
+        eventBus.fireEvent(new SiteEditEvent(site.getId()));
+        return null; // TODO: problem !?
+    }
+
+    @Override
+    public void openViewForm() {
+        eventBus.fireEvent(new SiteViewEvent(site.getId()));
     }
 }

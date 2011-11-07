@@ -186,7 +186,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
         FormManagerPresenter formManagerPresenter = injector
             .getInstance(FormManagerPresenter.class);
         formManagerPresenter.bind();
-
     }
 
     /*
