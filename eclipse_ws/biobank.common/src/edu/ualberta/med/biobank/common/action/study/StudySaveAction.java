@@ -118,6 +118,7 @@ public class StudySaveAction implements Action<Integer> {
 
         // TODO: LocalizedMessage in Exception?
 
+        study.setId(id);
         study.setName(name);
         study.setNameShort(nameShort);
 

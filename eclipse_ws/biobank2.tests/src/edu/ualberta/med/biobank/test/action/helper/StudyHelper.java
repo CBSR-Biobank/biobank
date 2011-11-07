@@ -10,7 +10,7 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.study.GlobalEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.study.GlobalEventAttrInfoGetAction;
-import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfo.ClinicInfo;
+import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.StudyEventAttrSaveInfo;
@@ -31,6 +31,7 @@ public class StudyHelper extends Helper {
         saveStudy.setName(name);
         saveStudy.setNameShort(name);
         saveStudy.setActivityStatusId(activityStatus.getId());
+        saveStudy.setSiteIds(new HashSet<Integer>());
         saveStudy.setContactIds(new HashSet<Integer>());
         saveStudy.setSourceSpcIds(new HashSet<Integer>());
         saveStudy.setAliquotSpcIds(new HashSet<Integer>());
@@ -47,6 +48,7 @@ public class StudyHelper extends Helper {
         saveStudy.setName(name);
         saveStudy.setNameShort(name);
         saveStudy.setActivityStatusId(activityStatus.getId());
+        saveStudy.setSiteIds(new HashSet<Integer>());
         saveStudy.setContactIds(new HashSet<Integer>());
         saveStudy.setSourceSpcIds(new HashSet<Integer>());
         saveStudy.setAliquotSpcIds(new HashSet<Integer>());
@@ -64,6 +66,8 @@ public class StudyHelper extends Helper {
         saveStudy.setNameShort(studyInfo.study.getNameShort());
         saveStudy.setActivityStatusId(studyInfo.study.getActivityStatus()
             .getId());
+
+        saveStudy.setSiteIds(new HashSet<Integer>());
 
         Set<Integer> ids = new HashSet<Integer>();
         for (ClinicInfo info : studyInfo.clinicInfos) {

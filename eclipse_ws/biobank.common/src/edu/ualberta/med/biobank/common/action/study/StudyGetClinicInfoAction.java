@@ -9,14 +9,14 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfo.ClinicInfo;
+import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class StudyGetClinicInfo implements Action<ArrayList<ClinicInfo>> {
+public class StudyGetClinicInfoAction implements Action<ArrayList<ClinicInfo>> {
     private static final long serialVersionUID = 1L;
 
     // @formatter:off
@@ -37,11 +37,11 @@ public class StudyGetClinicInfo implements Action<ArrayList<ClinicInfo>> {
 
     private final Integer studyId;
 
-    public StudyGetClinicInfo(Integer studyId) {
+    public StudyGetClinicInfoAction(Integer studyId) {
         this.studyId = studyId;
     }
 
-    public StudyGetClinicInfo(Study study) {
+    public StudyGetClinicInfoAction(Study study) {
         this(study.getId());
     }
 
