@@ -53,7 +53,7 @@ public class StudyGetClinicInfo implements Action<ArrayList<ClinicInfo>> {
     @Override
     public ArrayList<ClinicInfo> run(User user, Session session)
         throws ActionException {
-        ArrayList<ClinicInfo> studies = new ArrayList<ClinicInfo>();
+        ArrayList<ClinicInfo> infos = new ArrayList<ClinicInfo>();
 
         Query query = session.createQuery(STUDY_INFO_HQL);
         query.setParameter(0, studyId);
@@ -65,10 +65,10 @@ public class StudyGetClinicInfo implements Action<ArrayList<ClinicInfo>> {
             ClinicInfo info = new ClinicInfo((Clinic) row[0], (Long) row[1],
                 (Long) row[2], (Contact) row[3]);
 
-            studies.add(info);
+            infos.add(info);
         }
 
-        return studies;
+        return infos;
     }
 
     public static class ClinicInfo implements Serializable, NotAProxy {
