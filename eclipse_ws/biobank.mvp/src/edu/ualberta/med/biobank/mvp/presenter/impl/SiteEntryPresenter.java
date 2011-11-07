@@ -166,12 +166,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         return success;
     }
 
-    public void editSite(SiteInfo siteInfo) {
-        // as long as this method is public, get our own (deep) copy of the data
-        // TODO: can't clone this now because it contains model objects from
-        // hibernate that are actually proxies.
-        // SiteInfo clone = ObjectCloner.deepCopy(siteInfo);
-        // model.setValue(clone);
+    private void editSite(SiteInfo siteInfo) {
         model.setValue(siteInfo);
     }
 
