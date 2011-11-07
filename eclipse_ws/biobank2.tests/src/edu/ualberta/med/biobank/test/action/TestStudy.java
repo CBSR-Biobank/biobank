@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.aliquotedspecimen.AliquotedSpecimenSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.sourcespecimen.SourceSpecimenSaveAction;
@@ -20,6 +21,7 @@ import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -127,6 +129,36 @@ public class TestStudy extends TestAction {
 
     @Test
     public void testAliquotedSpecimens() throws Exception {
+        openHibernateSession();
+        Query q = session.createQuery("from " + SpecimenType.class.getName());
+        @SuppressWarnings("unchecked")
+        List<SpecimenType> spcTypes = q.list();
+        closeHibernateSession();
+
+        List<Integer> aqSpcIds = new ArrayList<Integer>();
+        for (int i = 0, n = r.nextInt(5) + 2; i < n; ++i) {
+            AliquotedSpecimenSaveAction aqSpcSaveAction =
+                new AliquotedSpecimenSaveAction();
+            aqSpcSaveAction.setQuantity(r.nextInt());
+            aqSpcSaveAction.setVolume(r.nextDouble());
+            aqSpcSaveAction.setStudyId(studyId);
+            aqSpcSaveAction.setSpecimenTypeId(spcTypes.get(
+                r.nextInt(spcTypes.size()))
+                .getId());
+            aqSpcIds.add(appService.doAction(aqSpcSaveAction));
+        }
+
+        StudyInfo studyInfo =
+            appService.doAction(new StudyGetInfoAction(studyId));
+
+        List<Integer> actualAqSpcIds = new ArrayList<Integer>();
+        for (AliquotedSpecimen aqSpc : studyInfo.aliquotedSpcs) {
+            actualAqSpcIds.add(aqSpc.getId());
+        }
+
+        Assert.assertEquals(aqSpcIds, actualAqSpcIds);
+
+        // TODO: test removal of source specimens from study
 
     }
 }
