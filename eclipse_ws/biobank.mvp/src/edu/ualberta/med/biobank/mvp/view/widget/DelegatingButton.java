@@ -13,7 +13,7 @@ public class DelegatingButton implements IButton {
     private final ClickMonitor clickMonitor = new ClickMonitor();
     private HandlerRegistration handlerRegistration;
     private IButton button;
-    private boolean enabled;
+    private boolean enabled = true;
 
     public synchronized void setDelegate(IButton button) {
         removeOldHandler();

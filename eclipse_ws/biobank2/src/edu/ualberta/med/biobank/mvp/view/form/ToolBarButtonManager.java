@@ -46,10 +46,10 @@ public class ToolBarButtonManager {
         }
     }
 
-    private final IToolBarManager toolbarManager;
+    private final IToolBarManager toolBarManager;
 
     public ToolBarButtonManager(IToolBarManager toolbarManager) {
-        this.toolbarManager = toolbarManager;
+        this.toolBarManager = toolbarManager;
     }
 
     /**
@@ -64,7 +64,8 @@ public class ToolBarButtonManager {
         if (button == null) {
             button = new ButtonImpl(buttonType);
             actions.put(buttonType, button);
-            toolbarManager.add(button.getContributionItem());
+            toolBarManager.add(button.getContributionItem());
+            toolBarManager.update(true);
         }
         return button;
     }
@@ -86,7 +87,6 @@ public class ToolBarButtonManager {
             action.setImageDescriptor(buttonType.image);
 
             contributionItem = new ActionContributionItem(action);
-            
             contributionItem.setVisible(true);
         }
 

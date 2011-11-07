@@ -23,6 +23,7 @@ public abstract class AbstractFormPresenter<V extends IFormView> extends
 
     @Override
     protected void onBind() {
+        super.onBind();
         registerHandler(view.getReload().addClickHandler(
             new ReloadClickHandler()));
     }
