@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
@@ -43,17 +42,15 @@ public class TestStudy extends TestAction {
 
         int numClinics = r.nextInt(5) + 2;
         int numContacts = 2;
-        Set<Integer> clinicIds = ClinicHelper.createClinicsWithContacts(appService, 
-            name, numClinics, numContacts);
-        
+        Set<Integer> clinicIds =
+            ClinicHelper.createClinicsWithContacts(appService,
+                name, numClinics, numContacts);
+
         for (Integer clinicId : clinicIds) {
-            
+
         }
 
         StudyInfo studyInfo =
             appService.doAction(new StudyGetInfoAction(studyId));
-        
-        studyInfo.
-        
     }
 }

@@ -21,14 +21,12 @@ import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyI
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.site.SiteViewPresenterShowEvent;
 import edu.ualberta.med.biobank.mvp.model.BaseModel;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
-import edu.ualberta.med.biobank.mvp.util.ObjectCloner;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
@@ -51,8 +49,6 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         HasValue<String> getName();
 
         HasValue<String> getNameShort();
-
-        HasValue<Collection<Comment>> getCommentCollection();
 
         HasValue<Collection<StudyInfo>> getStudies();
     }
@@ -83,8 +79,6 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         binder.bind(model.siteId).to(view.getIdentifier());
         binder.bind(model.name).to(view.getName());
         binder.bind(model.nameShort).to(view.getNameShort());
-        // TODO: the comment collection should be dumped. No need to have it.
-        binder.bind(model.commentCollection).to(view.getCommentCollection());
         binder.bind(model.studies).to(view.getStudies());
         binder.bind(model.activityStatus).to(
             activityStatusComboPresenter.getActivityStatus());
@@ -174,8 +168,11 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
     public void editSite(SiteInfo siteInfo) {
         // as long as this method is public, get our own (deep) copy of the data
-        SiteInfo clone = ObjectCloner.deepCopy(siteInfo);
-        model.setValue(clone);
+        // TODO: can't clone this now because it contains model objects from
+        // hibernate that are actually proxies.
+        // SiteInfo clone = ObjectCloner.deepCopy(siteInfo);
+        // model.setValue(clone);
+        model.setValue(siteInfo);
     }
 
     public static class Model extends BaseModel<SiteInfo> {
@@ -184,7 +181,6 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         final FieldModel<Integer> siteId;
         final FieldModel<String> name;
         final FieldModel<String> nameShort;
-        final ListFieldModel<Comment> commentCollection;
         final FieldModel<ActivityStatus> activityStatus;
         final FieldModel<Address> address;
         final ListFieldModel<StudyInfo> studies;
@@ -201,8 +197,6 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
                 .boundTo(provider, "site.name");
             nameShort = fieldOfType(String.class)
                 .boundTo(provider, "site.nameShort");
-            commentCollection = listOfType(Comment.class)
-                .boundTo(provider, "site.commentCollection");
             activityStatus = fieldOfType(ActivityStatus.class)
                 .boundTo(provider, "site.activityStatus");
             address = fieldOfType(Address.class)

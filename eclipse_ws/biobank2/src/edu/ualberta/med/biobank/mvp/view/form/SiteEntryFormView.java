@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.Messages;
-import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
 import edu.ualberta.med.biobank.mvp.view.IView;
 import edu.ualberta.med.biobank.mvp.view.item.TableItem;
@@ -36,8 +35,6 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
     SiteEntryPresenter.View {
     private final TextItem name = new TextItem();
     private final TextItem nameShort = new TextItem();
-    private final HasValue<Collection<Comment>> comments =
-        new TableItem<Comment>();
     private final TableItem<StudyWrapper> studyWrappers =
         new TableItem<StudyWrapper>();
     private final TranslatedItem<Collection<StudyInfo>, Collection<StudyWrapper>> studies =
@@ -95,11 +92,6 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
     @Override
     public HasValue<String> getNameShort() {
         return nameShort;
-    }
-
-    @Override
-    public HasValue<Collection<Comment>> getCommentCollection() {
-        return comments;
     }
 
     @Override
