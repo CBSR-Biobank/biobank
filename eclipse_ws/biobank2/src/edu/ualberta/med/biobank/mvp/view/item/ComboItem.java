@@ -33,15 +33,17 @@ public class ComboItem<T> implements HasSelectedValue<T> {
         }
     };
     private final HandlerManager handlerManager = new HandlerManager(this);
-    private final ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
-        @Override
-        public void selectionChanged(SelectionChangedEvent event) {
-            if (fireEvents) {
-                T value = getValue();
-                handlerManager.fireEvent(new SimpleValueChangeEvent<T>(value));
+    private final ISelectionChangedListener selectionChangedListener =
+        new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                if (fireEvents) {
+                    T value = getValue();
+                    handlerManager.fireEvent(new SimpleValueChangeEvent<T>(
+                        value));
+                }
             }
-        }
-    };
+        };
     private ComboViewer comboViewer;
     private T value = null; // track value while Widget not bound
     private List<T> options = new ArrayList<T>();
@@ -54,8 +56,8 @@ public class ComboItem<T> implements HasSelectedValue<T> {
         this.comboViewer = comboViewer;
         comboViewer.setContentProvider(new ArrayContentProvider());
         comboViewer.setLabelProvider(new CustomLabelProvider());
-        setValue(value);
         setOptions(options);
+        setValue(value);
 
         comboViewer.addSelectionChangedListener(selectionChangedListener);
         disableMouseWheel();
@@ -93,8 +95,9 @@ public class ComboItem<T> implements HasSelectedValue<T> {
         this.value = value;
 
         if (comboViewer != null) {
-            IStructuredSelection selection = value != null ? new StructuredSelection(
-                value) : new StructuredSelection();
+            IStructuredSelection selection =
+                value != null ? new StructuredSelection(
+                    value) : new StructuredSelection();
             comboViewer.setSelection(selection, true);
         }
     }
