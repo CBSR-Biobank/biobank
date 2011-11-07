@@ -13,10 +13,12 @@ import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.peer.CommentPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.User;
 
 public class CollectionEventGetInfoAction implements Action<CEventInfo> {
@@ -32,6 +34,8 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
             + CollectionEventPeer.ACTIVITY_STATUS.getName() + " status"
             + " left join fetch cevent."
             + CollectionEventPeer.COMMENT_COLLECTION.getName() + " comments"
+            + " left join fetch comments."
+            + CommentPeer.USER.getName() + " commentsUser"
             + " inner join fetch patient." + PatientPeer.STUDY.getName()
             + " study"
             + " where cevent." + CollectionEventPeer.ID.getName() + "=?"
