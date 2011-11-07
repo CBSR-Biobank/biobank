@@ -175,9 +175,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
         super.start(context);
         bundleContext = context;
         plugin = this;
-        SessionManager.getInstance();
-
         injector = Guice.createInjector(Stage.PRODUCTION, new BiobankModule());
+        SessionManager.getInstance();
 
         // attach the FormManager
         // TODO: this will have to be unbound/ destroyed on perspective changes?
@@ -304,8 +303,9 @@ public class BiobankPlugin extends AbstractUIPlugin {
                 && ((object instanceof ContainerAdapter) || (object instanceof ContainerTypeAdapter))) {
                 String ctName;
                 if (object instanceof ContainerAdapter) {
-                    ContainerWrapper container = (ContainerWrapper) ((ContainerAdapter) object)
-                        .getModelObject();
+                    ContainerWrapper container =
+                        (ContainerWrapper) ((ContainerAdapter) object)
+                            .getModelObject();
                     if (container == null
                         || container.getContainerType() == null)
                         return null;
