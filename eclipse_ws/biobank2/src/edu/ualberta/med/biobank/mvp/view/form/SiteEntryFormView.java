@@ -3,10 +3,8 @@ package edu.ualberta.med.biobank.mvp.view.form;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -151,11 +149,6 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
 
         // TODO: fix comment section
         // comment.setText(widget.comment);
-
-        Button save = new Button(baseForm.getPage(), SWT.NONE);
-        save.setText("save");
-        Button reload = new Button(baseForm.getPage(), SWT.NONE);
-        reload.setText("reload");
     }
 
     @Override
