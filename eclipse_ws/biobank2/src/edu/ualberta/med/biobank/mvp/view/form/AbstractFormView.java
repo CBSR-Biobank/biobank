@@ -8,17 +8,19 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.pietschy.gwt.pectin.client.value.ValueHolder;
 import com.pietschy.gwt.pectin.client.value.ValueTarget;
 
+import edu.ualberta.med.biobank.mvp.user.ui.IButton;
 import edu.ualberta.med.biobank.mvp.view.AbstractView;
 import edu.ualberta.med.biobank.mvp.view.IFormView;
-import edu.ualberta.med.biobank.mvp.view.item.ButtonItem;
+import edu.ualberta.med.biobank.mvp.view.form.ToolBarButtonManager.ButtonType;
+import edu.ualberta.med.biobank.mvp.view.widget.DelegatingButton;
 
 public abstract class AbstractFormView extends AbstractView implements
     IFormView, IHasEditor {
-    protected final ButtonItem reload = new ButtonItem();
-    protected final ButtonItem close = new ButtonItem();
+    protected final DelegatingButton reload = new DelegatingButton();
+    protected final DelegatingButton close = new DelegatingButton();
     protected FormViewEditorPart editor;
     private final ValueTarget<Object> identifier = new ValueHolder<Object>();
-    private BaseForm baseForm;
+    private BaseForm form;
 
     @Override
     public void setEditor(FormViewEditorPart editor) {
@@ -50,23 +52,29 @@ public abstract class AbstractFormView extends AbstractView implements
         return identifier;
     }
 
-    public BaseForm getBaseForm() {
-        return baseForm;
+    public BaseForm getForm() {
+        return form;
     }
 
     @Override
     protected final void onCreate(Composite parent) {
-        baseForm = new BaseForm(parent);
+        form = new BaseForm(parent);
 
-        // TODO: some initialisation for actions (close and reload button)
+        initActions();
 
-        onCreate(baseForm);
+        onCreate(form);
 
-        baseForm.adapt();
-        baseForm.reflow(true);
+        form.adapt();
+        form.reflow(true);
     }
 
-    // TODO: not sure if this is the best way to do this?
-    // use more and more specific onCreate methods?
     protected abstract void onCreate(BaseForm baseForm);
+
+    private void initActions() {
+        IButton closeButton = form.getToolbar().get(ButtonType.CLOSE);
+        IButton reloadButton = form.getToolbar().get(ButtonType.RELOAD);
+
+        close.setDelegate(closeButton);
+        reload.setDelegate(reloadButton);
+    }
 }

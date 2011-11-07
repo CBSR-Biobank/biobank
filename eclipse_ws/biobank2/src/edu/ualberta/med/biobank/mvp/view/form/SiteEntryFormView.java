@@ -111,8 +111,9 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
 
     @Override
     public void onCreate(BaseForm baseForm) {
+        super.onCreate(baseForm);
+
         baseForm.setTitle(Messages.StudyEntryForm_main_title);
-        baseForm.setMessage("asdfadsf");
 
         InputTable table = new InputTable(baseForm.getPage());
 
@@ -155,5 +156,10 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
         save.setText("save");
         Button reload = new Button(baseForm.getPage(), SWT.NONE);
         reload.setText("reload");
+    }
+
+    @Override
+    public String getOkMessage() {
+        return "Everything is A-Okay";
     }
 }

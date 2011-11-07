@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.mvp.view.form;
 
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
@@ -26,6 +27,7 @@ public class BaseForm {
     private final ScrolledForm scrolledForm;
     private final Composite page;
     private final FormToolkit toolkit;
+    private final ToolBarButtonManager toolBarButtonManager;
 
     public BaseForm(Composite parent) {
         ManagedForm managedForm = new ManagedForm(parent);
@@ -45,7 +47,14 @@ public class BaseForm {
         page.setLayout(new GridLayout());
         page.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+        IToolBarManager toolBarManager = scrolledForm.getToolBarManager();
+        toolBarButtonManager = new ToolBarButtonManager(toolBarManager);
+
         book.showPage(PAGE_KEY);
+    }
+
+    public ToolBarButtonManager getToolbar() {
+        return toolBarButtonManager;
     }
 
     public void setTitle(String title) {
@@ -53,7 +62,16 @@ public class BaseForm {
     }
 
     public void setMessage(String message) {
-        scrolledForm.setMessage(message, IMessageProvider.NONE);
+        setMessage(message, IMessageProvider.NONE);
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        setMessage(errorMessage, IMessageProvider.ERROR);
+    }
+
+    private void setMessage(String message, int newType) {
+        // TODO: there is a list of IMessages that can be set?
+        scrolledForm.setMessage(message, newType);
     }
 
     public Composite getPage() {
@@ -100,6 +118,7 @@ public class BaseForm {
     public static void addSectionToolbar(Section section,
         String tooltip, SelectionListener listener,
         Class<?> wrapperTypeToAdd, String imageKey) {
+        // TODO: remove canCreate stuff? Ungh...
         if (wrapperTypeToAdd == null
             || SessionManager.canCreate(wrapperTypeToAdd)) {
             ToolBar tbar = (ToolBar) section.getTextClient();
