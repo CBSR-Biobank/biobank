@@ -142,6 +142,8 @@ public class TestStudy extends TestAction {
             aqSpcSaveAction.setQuantity(r.nextInt());
             aqSpcSaveAction.setVolume(r.nextDouble());
             aqSpcSaveAction.setStudyId(studyId);
+            aqSpcSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE
+                .getId());
             aqSpcSaveAction.setSpecimenTypeId(spcTypes.get(
                 r.nextInt(spcTypes.size()))
                 .getId());

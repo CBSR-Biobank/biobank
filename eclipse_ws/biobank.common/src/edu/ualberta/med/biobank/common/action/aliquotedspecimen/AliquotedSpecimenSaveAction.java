@@ -5,6 +5,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
@@ -17,6 +18,7 @@ public class AliquotedSpecimenSaveAction implements Action<Integer> {
     private Integer quantity;
     private Double volume;
     private Integer studyId;
+    private Integer aStatusId;
     private Integer specimenTypeId;
 
     public void setId(Integer id) {
@@ -33,6 +35,10 @@ public class AliquotedSpecimenSaveAction implements Action<Integer> {
 
     public void setStudyId(Integer id) {
         this.studyId = id;
+    }
+
+    public void setActivityStatusId(Integer activityStatusId) {
+        this.aStatusId = activityStatusId;
     }
 
     public void setSpecimenTypeId(Integer specimenTypeId) {
@@ -57,24 +63,32 @@ public class AliquotedSpecimenSaveAction implements Action<Integer> {
             throw new NullPointerException("specimen type id cannot be null");
         }
 
+        if (aStatusId == null) {
+            throw new NullPointerException("activity status not specified");
+        }
+
         SessionUtil sessionUtil = new SessionUtil(session);
-        AliquotedSpecimen srcSpc =
+        AliquotedSpecimen aqSpc =
             sessionUtil.get(AliquotedSpecimen.class, id,
                 new AliquotedSpecimen());
-        srcSpc.setQuantity(quantity);
-        srcSpc.setVolume(volume);
+        aqSpc.setQuantity(quantity);
+        aqSpc.setVolume(volume);
 
         Study study = sessionUtil.get(Study.class, studyId, new Study());
-        srcSpc.setStudy(study);
+        aqSpc.setStudy(study);
+
+        ActivityStatus aStatus =
+            sessionUtil.get(ActivityStatus.class, aStatusId);
+        aqSpc.setActivityStatus(aStatus);
 
         SpecimenType specimenType =
             sessionUtil.get(SpecimenType.class, specimenTypeId,
                 new SpecimenType());
-        srcSpc.setSpecimenType(specimenType);
+        aqSpc.setSpecimenType(specimenType);
 
-        session.saveOrUpdate(srcSpc);
+        session.saveOrUpdate(aqSpc);
         session.flush();
 
-        return srcSpc.getId();
+        return aqSpc.getId();
     }
 }

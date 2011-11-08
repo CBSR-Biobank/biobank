@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.action.study;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
+import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -108,6 +110,10 @@ public class StudySaveAction implements Action<Integer> {
             throw new NullPointerException("aliquot ids cannot be null");
         }
 
+        if (aStatusId == null) {
+            throw new NullPointerException("activity status not specified");
+        }
+
         SessionUtil sessionUtil = new SessionUtil(session);
         Study study = sessionUtil.get(Study.class, id, new Study());
 
@@ -122,10 +128,6 @@ public class StudySaveAction implements Action<Integer> {
         study.setName(name);
         study.setNameShort(nameShort);
 
-        if (aStatusId == null) {
-            throw new NullPointerException("activity status not specified");
-        }
-
         ActivityStatus aStatus =
             sessionUtil.get(ActivityStatus.class, aStatusId);
         study.setActivityStatus(aStatus);
@@ -134,7 +136,24 @@ public class StudySaveAction implements Action<Integer> {
 
         Map<Integer, Site> sites =
             sessionUtil.get(Site.class, siteIds);
-        study.setSiteCollection(new HashSet<Site>(sites.values()));
+
+        // TODO: check for null in sites
+
+        SetDifference<Site> siteDiff =
+            new SetDifference<Site>(study.getSiteCollection(), sites.values());
+
+        study.setSiteCollection(sites.values());
+
+        // remove this study from sites in removed list
+        for (Site site : siteDiff.getRemoveSet()) {
+            Collection<Study> siteStudies = site.getStudyCollection();
+            if (siteStudies.remove(study)) {
+                site.setStudyCollection(siteStudies);
+            } else {
+                throw new ActionException(
+                    "study not found in removed site's collection");
+            }
+        }
 
         Map<Integer, Contact> contacts =
             sessionUtil.get(Contact.class, contactIds);
