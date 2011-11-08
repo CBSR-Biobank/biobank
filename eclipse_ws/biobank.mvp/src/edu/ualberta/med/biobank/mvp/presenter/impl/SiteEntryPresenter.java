@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.site.SiteViewPresenterShowEvent;
-import edu.ualberta.med.biobank.mvp.model.BaseModel;
+import edu.ualberta.med.biobank.mvp.model.AbstractModel;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
 import edu.ualberta.med.biobank.mvp.view.IView;
@@ -170,8 +170,8 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         model.setValue(siteInfo);
     }
 
-    public static class Model extends BaseModel<SiteInfo> {
-        private final BaseModel<Address> addressModel;
+    public static class Model extends AbstractModel<SiteInfo> {
+        private final AbstractModel<Address> addressModel;
 
         final FieldModel<Integer> siteId;
         final FieldModel<String> name;
@@ -181,7 +181,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         final ListFieldModel<StudyInfo> studies;
 
         @SuppressWarnings("unchecked")
-        private Model(BaseModel<Address> addressModel) {
+        private Model(AbstractModel<Address> addressModel) {
             super(SiteInfo.class);
 
             this.addressModel = addressModel;

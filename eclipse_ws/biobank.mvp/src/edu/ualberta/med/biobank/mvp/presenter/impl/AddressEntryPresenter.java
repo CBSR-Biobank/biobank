@@ -8,7 +8,7 @@ import com.pietschy.gwt.pectin.client.form.validation.ValidationPlugin;
 import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidator;
 
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.mvp.model.BaseModel;
+import edu.ualberta.med.biobank.mvp.model.AbstractModel;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
@@ -63,7 +63,7 @@ public class AddressEntryPresenter extends AbstractPresenter<View> {
         model.unbind();
     }
 
-    public static class Model extends BaseModel<Address> {
+    public static class Model extends AbstractModel<Address> {
         final FieldModel<String> street1;
         final FieldModel<String> street2;
         final FieldModel<String> city;

@@ -38,9 +38,9 @@ import edu.ualberta.med.biobank.mvp.util.HandlerRegManager;
 
 /**
  * For use by {@link edu.ualberta.med.biobank.mvp.presenter.IPresenter}-s.
- * {@link BaseModel}-s should only have knowledge of other models and only
+ * {@link AbstractModel}-s should only have knowledge of other models and only
  * supply validation. It is the presenter's responsibility to call
- * {@link BaseModel#bind()} and {@link BaseModel#unbind()} on a model and to
+ * {@link AbstractModel#bind()} and {@link AbstractModel#unbind()} on a model and to
  * bind the model's attributes to the view, and bind the validation to the view.
  * <p>
  * However, note that when a model's {@link FieldModel}-s are bound to a widget/
@@ -53,14 +53,14 @@ import edu.ualberta.med.biobank.mvp.util.HandlerRegManager;
  * 
  * @param <T>
  */
-public abstract class BaseModel<T> extends FormModel {
+public abstract class AbstractModel<T> extends FormModel {
     protected final ReflectionBeanModelProvider<T> provider;
     private final FormBinder binder = new FormBinder();
     private final ValidationBinder validationBinder = new ValidationBinder();
     private final ValidationTree validationTree = new ValidationTree();
     private final DelegatingCondition dirty = new DelegatingCondition(false);
     private final ValueHolder<Boolean> valid = new ValueHolder<Boolean>(false);
-    private final List<BaseModel<?>> models = new ArrayList<BaseModel<?>>();
+    private final List<AbstractModel<?>> models = new ArrayList<AbstractModel<?>>();
     private final HandlerRegManager hrManager = new HandlerRegManager();
     private final ValidationMonitor validationMonitor = new ValidationMonitor();
     private boolean bound = false;
@@ -68,7 +68,7 @@ public abstract class BaseModel<T> extends FormModel {
     @SuppressWarnings("unchecked")
     private final Condition validAndDirty = Conditions.and(valid, dirty);
 
-    public BaseModel(Class<T> beanModelClass) {
+    public AbstractModel(Class<T> beanModelClass) {
         // TODO: could read the .class from the generic parameter?
         // TODO: should get this from an injected provider in the future if ever
         // go the GWT-way since it this specific implementation won't work with
@@ -97,14 +97,14 @@ public abstract class BaseModel<T> extends FormModel {
     }
 
     /**
-     * Creates a new checkpoint for {@link BaseModel#revert()} to revert to, if
+     * Creates a new checkpoint for {@link AbstractModel#revert()} to revert to, if
      * called, and clears the dirty state (including that of added inner
-     * {@link BaseModel}-s).
+     * {@link AbstractModel}-s).
      */
     public void checkpoint() {
         provider.checkpoint();
 
-        for (BaseModel<?> model : models) {
+        for (AbstractModel<?> model : models) {
             model.checkpoint();
         }
     }
@@ -126,9 +126,9 @@ public abstract class BaseModel<T> extends FormModel {
     }
 
     /**
-     * Reverts this {@link BaseModel} to the value it was originally provided
-     * with (via {@link BaseModel#setValue(Object)}) or the value when
-     * {@link BaseModel#checkpoint()} was last called.
+     * Reverts this {@link AbstractModel} to the value it was originally provided
+     * with (via {@link AbstractModel#setValue(Object)}) or the value when
+     * {@link AbstractModel#checkpoint()} was last called.
      */
     public void revert() {
         provider.revert();
@@ -137,7 +137,7 @@ public abstract class BaseModel<T> extends FormModel {
         // models will revert to the checkpoint we just made (and not their
         // "original" value, which would have been overwritten by the
         // checkpoint).
-        for (BaseModel<?> model : models) {
+        for (AbstractModel<?> model : models) {
             model.revert();
         }
 
@@ -152,9 +152,9 @@ public abstract class BaseModel<T> extends FormModel {
      * Binds a field to a model. The {@link FieldModel} <em>must</em> belong to
      * this {@link FormModel}.
      * <p>
-     * Adds a {@link BaseModel} to this {@link BaseModel}, so that the former is
+     * Adds a {@link AbstractModel} to this {@link AbstractModel}, so that the former is
      * reverted, checkpoint-ed, validated, bound, unbound, dirty-checked, etc.
-     * whenever this {@link BaseModel} is.
+     * whenever this {@link AbstractModel} is.
      * 
      * @param field
      *            bound to the model.
@@ -163,7 +163,7 @@ public abstract class BaseModel<T> extends FormModel {
      * @param binder
      *            used to bind the model and field.
      */
-    public <E> void bind(FieldModel<E> field, BaseModel<E> model) {
+    public <E> void bind(FieldModel<E> field, AbstractModel<E> model) {
         if (!field.getFormModel().equals(this)) {
             throw new IllegalArgumentException("field is not from this model");
         }
@@ -274,14 +274,14 @@ public abstract class BaseModel<T> extends FormModel {
     }
 
     /**
-     * Make this {@link BaseModel}'s dirty value depend on the inner
-     * {@link BaseModel}-s, if there are any.
+     * Make this {@link AbstractModel}'s dirty value depend on the inner
+     * {@link AbstractModel}-s, if there are any.
      */
     private void updateDirtyDelegate() {
         List<ValueModel<Boolean>> values = new ArrayList<ValueModel<Boolean>>();
         values.add(provider.dirty());
 
-        for (BaseModel<?> model : models) {
+        for (AbstractModel<?> model : models) {
             values.add(model.dirty());
         }
 
@@ -289,13 +289,13 @@ public abstract class BaseModel<T> extends FormModel {
     }
 
     private void bindModels() {
-        for (BaseModel<?> model : models) {
+        for (AbstractModel<?> model : models) {
             model.bind();
         }
     }
 
     private void unbindModels() {
-        for (BaseModel<?> model : models) {
+        for (AbstractModel<?> model : models) {
             model.unbind();
         }
     }
