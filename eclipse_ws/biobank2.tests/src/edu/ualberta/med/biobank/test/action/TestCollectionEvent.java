@@ -16,9 +16,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusGetAllAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
@@ -27,14 +25,14 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
+import edu.ualberta.med.biobank.common.action.eventattr.GlobalEventAttrInfo;
+import edu.ualberta.med.biobank.common.action.eventattr.GlobalEventAttrInfoGetAction;
+import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
-import edu.ualberta.med.biobank.common.action.study.GlobalEventAttrInfo;
-import edu.ualberta.med.biobank.common.action.study.GlobalEventAttrInfoGetAction;
+import edu.ualberta.med.biobank.common.action.study.StudyEventAttrSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
-import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -320,63 +318,63 @@ public class TestCollectionEvent extends TestAction {
                 Arrays.asList("PBMC Count (x10^6)", "Consent", "Patient Type",
                     "Visit Type")));
 
-        HashMap<Integer, ActivityStatus> astatuses =
-            appService.doAction(new ActivityStatusGetAllAction());
-        ActivityStatus activeAS = astatuses.get(ActivityStatusEnum.ACTIVE
+        StudyEventAttrSaveAction seAttrSave = new StudyEventAttrSaveAction();
+        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
+            .get("PBMC Count (x10^6)").attr
             .getId());
-        StudyInfo studyInfo =
-            appService.doAction(new StudyGetInfoAction(studyId));
+        seAttrSave
+            .setEventAttrTypeId(globalEattrsByLabel.get("PBMC Count (x10^6)").attr
+                .getEventAttrType().getId());
+        seAttrSave.setRequired(true);
+        seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setStudyId(studyId);
+        appService.doAction(seAttrSave);
 
-        StudyEventAttr seAttr = new StudyEventAttr();
-        seAttr.setLabel("PBMC Count (x10^6)");
-        seAttr
-            .setEventAttrType(globalEattrsByLabel.get("PBMC Count (x10^6)").attr
-                .getEventAttrType());
-        seAttr.setRequired(true);
-        seAttr.setActivityStatus(activeAS);
-        studyInfo.studyEventAttrs.add(seAttr);
+        seAttrSave = new StudyEventAttrSaveAction();
+        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
+            .get("Consent").attr.getId());
+        seAttrSave
+            .setEventAttrTypeId(globalEattrsByLabel.get("Consent").attr
+                .getEventAttrType().getId());
+        seAttrSave.setRequired(false);
+        seAttrSave.setPermissible("c1;c2;c3");
+        seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setStudyId(studyId);
+        appService.doAction(seAttrSave);
 
-        seAttr = new StudyEventAttr();
-        seAttr.setLabel("Consent");
-        seAttr
-            .setEventAttrType(globalEattrsByLabel.get("Consent").attr
-                .getEventAttrType());
-        seAttr.setRequired(false);
-        seAttr.setPermissible("c1;c2;c3");
-        seAttr.setActivityStatus(activeAS);
-        studyInfo.studyEventAttrs.add(seAttr);
+        seAttrSave = new StudyEventAttrSaveAction();
+        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
+            .get("Patient Type").attr.getId());
+        seAttrSave
+            .setEventAttrTypeId(globalEattrsByLabel.get("Patient Type").attr
+                .getEventAttrType().getId());
+        seAttrSave.required = true;
+        seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setStudyId(studyId);
+        appService.doAction(seAttrSave);
 
-        seAttr = new StudyEventAttr();
-        seAttr.setLabel("Patient Type");
-        seAttr
-            .setEventAttrType(globalEattrsByLabel.get("Patient Type").attr
-                .getEventAttrType());
-        seAttr.required = true;
-        seAttr.setActivityStatus(activeAS);
-        studyInfo.studyEventAttrs.add(seAttr);
+        seAttrSave = new StudyEventAttrSaveAction();
+        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
+            .get("Visit Type").attr.getId());
+        seAttrSave
+            .setEventAttrTypeId(globalEattrsByLabel.get("Visit Type").attr
+                .getEventAttrType().getId());
+        seAttrSave.required = false;
+        seAttrSave.setPermissible("v1;v2;v3;v4");
+        seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setStudyId(studyId);
+        appService.doAction(seAttrSave);
 
-        seAttr = new StudyEventAttr();
-        seAttr.setLabel("Visit Type");
-        seAttr
-            .setEventAttrType(globalEattrsByLabel.get("Visit Type").attr
-                .getEventAttrType());
-        seAttr.required = false;
-        seAttr.setPermissible("v1;v2;v3;v4");
-        seAttr.setActivityStatus(activeAS);
-        studyInfo.studyEventAttrs.add(seAttr);
-
-        seAttr = new StudyEventAttr();
-        seAttr.setLabel("Phlebotomist");
-        seAttr
-            .setEventAttrType(globalEattrsByLabel.get("Phlebotomist").attr
-                .getEventAttrType());
-        seAttr.required = false;
-        seAttr.setActivityStatus(activeAS);
-        studyInfo.studyEventAttrs.add(seAttr);
-
-        StudySaveAction saveAction =
-            StudyHelper.getSaveAction(appService, studyInfo);
-        appService.doAction(saveAction);
+        seAttrSave = new StudyEventAttrSaveAction();
+        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
+            .get("Phlebotomist").attr.getId());
+        seAttrSave
+            .setEventAttrTypeId(globalEattrsByLabel.get("Phlebotomist").attr
+                .getEventAttrType().getId());
+        seAttrSave.required = false;
+        seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setStudyId(studyId);
+        appService.doAction(seAttrSave);
     }
 
     @Test
