@@ -30,7 +30,7 @@ public class PaginationWidget extends Composite {
 
     public static final int TOTAL_PAGES_UNKNOWN = -1;
 
-    private IInfoTalePagination paginator;
+    private IInfoTablePagination paginator;
 
     private Button firstButton;
 
@@ -45,7 +45,7 @@ public class PaginationWidget extends Composite {
     protected PageInformation pageInfo;
 
     public PaginationWidget(Composite parent, int style,
-        IInfoTalePagination paginator, int buttonsEnabledOnInit, int rowsPerPage) {
+        IInfoTablePagination paginator, int buttonsEnabledOnInit, int rowsPerPage) {
         super(parent, style);
         this.paginator = paginator;
 

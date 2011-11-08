@@ -16,7 +16,8 @@ import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShow
 
 public class ProcessingEventViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ProcessingEventViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ProcessingEventViewForm"; //$NON-NLS-1$
 
     private ProcessingEventWrapper pEvent;
 
@@ -61,14 +62,18 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        centerLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ProcessingEvent_field_center_label);
-        worksheetLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ProcessingEvent_field_worksheet_label);
-        dateCreationLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ProcessingEvent_field_date_label);
-        activityLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_activity);
+        centerLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ProcessingEvent_field_center_label);
+        worksheetLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ProcessingEvent_field_worksheet_label);
+        dateCreationLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ProcessingEvent_field_date_label);
+        activityLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.label_activity);
 
         createCommentsSection();
 
@@ -77,8 +82,9 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
-        commentTable = new CommentCollectionInfoTable(client,
-            pEvent.getCommentCollection(false));
+        commentTable =
+            new CommentCollectionInfoTable(client,
+                pEvent.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
     }
@@ -91,10 +97,11 @@ public class ProcessingEventViewForm extends BiobankViewForm {
     }
 
     private void createSourceSpecimensSection() {
-        Composite client = createSectionWithClient(Messages.ProcessingEventViewForm_specimens_title);
-        sourceSpecimenTable = new SpecimenInfoTable(client,
-            pEvent.getSpecimenCollection(true), ColumnsShown.SOURCE_SPECIMENS,
-            10);
+        Composite client =
+            createSectionWithClient(Messages.ProcessingEventViewForm_specimens_title);
+        sourceSpecimenTable =
+            new SpecimenInfoTable(client, pEvent.getSpecimenCollection(true),
+                ColumnsShown.SOURCE_SPECIMENS, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
         sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
         sourceSpecimenTable.createDefaultEditItem();
@@ -108,8 +115,8 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         form.setText(NLS.bind(Messages.ProcessingEventViewForm_title,
             pEvent.getFormattedCreatedAt()));
         setValues();
-        sourceSpecimenTable.setCollection(pEvent.getSpecimenCollection(true));
-        commentTable.setCollection(pEvent.getCommentCollection(false));
+        sourceSpecimenTable.setList(pEvent.getSpecimenCollection(true));
+        commentTable.setList(pEvent.getCommentCollection(false));
     }
 
 }

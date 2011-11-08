@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class SpecimenInfoTable extends InfoTableWidget {
+public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
 
     public static enum ColumnsShown {
         ALL(new String[] { Messages.SpecimenInfoTable_inventoryid_label,

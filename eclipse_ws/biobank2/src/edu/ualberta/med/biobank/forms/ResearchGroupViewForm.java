@@ -37,7 +37,8 @@ import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 
 public class ResearchGroupViewForm extends AddressViewFormCommon implements
     IBgcFileBrowserListener {
-    public static final String ID = "edu.ualberta.med.biobank.forms.ResearchGroupViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ResearchGroupViewForm"; //$NON-NLS-1$
 
     private ResearchGroupWrapper researchGroup;
 
@@ -80,15 +81,17 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
     }
 
     private void createUploadSection() {
-        Composite client = createSectionWithClient(Messages.ResearchGroupViewForm_request_upload_title);
+        Composite client =
+            createSectionWithClient(Messages.ResearchGroupViewForm_request_upload_title);
         client.setLayout(new GridLayout(3, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
         toolkit.createLabel(client,
             Messages.ResearchGroupViewForm_submit_request_rg_label);
-        csvSelector = new BgcFileBrowser(client,
-            Messages.ResearchGroupViewForm_csv_file_label, SWT.NONE,
-            new String[] { "*.csv" }); //$NON-NLS-1$
+        csvSelector =
+            new BgcFileBrowser(client,
+                Messages.ResearchGroupViewForm_csv_file_label, SWT.NONE,
+                new String[] { "*.csv" }); //$NON-NLS-1$
         csvSelector.addFileSelectedListener(this);
         csvSelector.adaptToToolkit(toolkit, true);
         uploadButton = new Button(client, SWT.PUSH);
@@ -113,22 +116,22 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
     }
 
     public void saveRequest() throws Exception {
-        RequestWrapper request = new RequestWrapper(
-            SessionManager.getAppService());
+        RequestWrapper request =
+            new RequestWrapper(SessionManager.getAppService());
 
         FileReader f = new FileReader(csvSelector.getFilePath());
         int newLines = 0;
         while (f.ready() && newLines < 4) {
             char c = (char) f.read();
-            if (c == '\n')
-                newLines++;
+            if (c == '\n') newLines++;
         }
 
-        ICsvBeanReader reader = new CsvBeanReader(f,
-            CsvPreference.STANDARD_PREFERENCE);
+        ICsvBeanReader reader =
+            new CsvBeanReader(f, CsvPreference.STANDARD_PREFERENCE);
 
-        final CellProcessor[] processors = new CellProcessor[] { null, null,
-            new ParseDate("yyyy-MM-dd"), null, null, null }; //$NON-NLS-1$
+        final CellProcessor[] processors =
+            new CellProcessor[] { null, null,
+                new ParseDate("yyyy-MM-dd"), null, null, null }; //$NON-NLS-1$
 
         List<RequestInput> requests = new ArrayList<RequestInput>();
 
@@ -138,8 +141,8 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
                 "dateDrawn", "specimenTypeNameShort", "location", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 "activityStatus" }; //$NON-NLS-1$
             RequestInput srequest;
-            while ((srequest = reader.read(RequestInput.class, header,
-                processors)) != null) {
+            while ((srequest =
+                reader.read(RequestInput.class, header, processors)) != null) {
                 requests.add(srequest);
             }
         } catch (SuperCSVException e) {
@@ -151,16 +154,17 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             reader.close();
         }
 
-        List<RequestSpecimenWrapper> specs = new ArrayList<RequestSpecimenWrapper>();
+        List<RequestSpecimenWrapper> specs =
+            new ArrayList<RequestSpecimenWrapper>();
         for (RequestInput ob : requests) {
-            RequestSpecimenWrapper r = new RequestSpecimenWrapper(
-                SessionManager.getAppService());
+            RequestSpecimenWrapper r =
+                new RequestSpecimenWrapper(SessionManager.getAppService());
             r.setRequest(request);
             r.setState(RequestSpecimenState.AVAILABLE_STATE);
-            SpecimenWrapper spec = SpecimenWrapper.getSpecimen(
-                SessionManager.getAppService(), ob.getInventoryID());
-            if (spec == null)
-                continue;
+            SpecimenWrapper spec =
+                SpecimenWrapper.getSpecimen(SessionManager.getAppService(),
+                    ob.getInventoryID());
+            if (spec == null) continue;
             r.setSpecimen(spec);
             specs.add(r);
         }
@@ -184,13 +188,15 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_name);
-        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_nameShort);
+        nameLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, Messages.label_name);
+        nameShortLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.label_nameShort);
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study"); //$NON-NLS-1$
-        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_activity);
+        activityStatusLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.label_activity);
 
         createCommentsSection();
         setResearchGroupValues();
@@ -198,8 +204,9 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
-        commentTable = new CommentCollectionInfoTable(client,
-            researchGroup.getCommentCollection(false));
+        commentTable =
+            new CommentCollectionInfoTable(client,
+                researchGroup.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
     }
@@ -220,7 +227,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             researchGroup.getName()));
         setResearchGroupValues();
         setAddressValues(researchGroup);
-        commentTable.setCollection(researchGroup.getCommentCollection(false));
+        commentTable.setList(researchGroup.getCommentCollection(false));
     }
 
 }

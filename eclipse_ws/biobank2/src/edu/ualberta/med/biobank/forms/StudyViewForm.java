@@ -24,9 +24,11 @@ import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
 
 public class StudyViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.StudyViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.StudyViewForm"; //$NON-NLS-1$
 
-    private static final String DATE_PROCESSED_INFO_FIELD_NAME = Messages.study_visit_info_dateProcessed;
+    private static final String DATE_PROCESSED_INFO_FIELD_NAME =
+        Messages.study_visit_info_dateProcessed;
 
     private StudyWrapper study;
 
@@ -75,16 +77,20 @@ public class StudyViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_name);
-        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_nameShort);
-        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_activity);
-        patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.StudyViewForm_field_label_total_patients);
-        visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.StudyViewForm_field_label_total_cEvents);
+        nameLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, Messages.label_name);
+        nameShortLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.label_nameShort);
+        activityStatusLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.label_activity);
+        patientTotal =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.StudyViewForm_field_label_total_patients);
+        visitTotal =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.StudyViewForm_field_label_total_cEvents);
 
         createCommentsSection();
         createClinicSection();
@@ -97,14 +103,16 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
-        commentTable = new CommentCollectionInfoTable(client,
-            study.getCommentCollection(false));
+        commentTable =
+            new CommentCollectionInfoTable(client,
+                study.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
     }
 
     private void createClinicSection() {
-        Composite client = createSectionWithClient(Messages.StudyViewForm_clinic_title);
+        Composite client =
+            createSectionWithClient(Messages.StudyViewForm_clinic_title);
 
         contactsTable = new StudyContactInfoTable(client, study);
         contactsTable.addClickListener(collectionDoubleClickListener);
@@ -146,27 +154,32 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createAliquotedSpecimenSection() {
-        Section section = createSection(Messages.StudyViewForm_aliquoted_specimen_title);
+        Section section =
+            createSection(Messages.StudyViewForm_aliquoted_specimen_title);
 
-        aliquotedSpecimenTable = new AliquotedSpecimenInfoTable(section,
-            study.getAliquotedSpecimenCollection(true));
+        aliquotedSpecimenTable =
+            new AliquotedSpecimenInfoTable(section,
+                study.getAliquotedSpecimenCollection(true));
         section.setClient(aliquotedSpecimenTable);
         aliquotedSpecimenTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(aliquotedSpecimenTable);
     }
 
     private void createSourceSpecimenSection() {
-        Section section = createSection(Messages.StudyViewForm_source_specimen_title);
+        Section section =
+            createSection(Messages.StudyViewForm_source_specimen_title);
 
-        sourceSpecimenTable = new SourceSpecimenInfoTable(section,
-            study.getSourceSpecimenCollection(true));
+        sourceSpecimenTable =
+            new SourceSpecimenInfoTable(section,
+                study.getSourceSpecimenCollection(true));
         section.setClient(sourceSpecimenTable);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(sourceSpecimenTable);
     }
 
     private void createPvCustomInfoSection() throws Exception {
-        Composite client = createSectionWithClient(Messages.StudyViewForm_visit_info_attributes_title);
+        Composite client =
+            createSectionWithClient(Messages.StudyViewForm_visit_info_attributes_title);
         client.setLayout(new GridLayout(1, false));
 
         StudyPvCustomInfo combinedPvInfo;
@@ -198,8 +211,9 @@ public class StudyViewForm extends BiobankViewForm {
             if (pvCustomInfo.getAllowedValues() != null) {
                 subcomp.setLayout(new GridLayout(2, false));
 
-                pvCustomInfo.widget = createReadOnlyLabelledField(subcomp,
-                    SWT.NONE, pvCustomInfo.getLabel());
+                pvCustomInfo.widget =
+                    createReadOnlyLabelledField(subcomp, SWT.NONE,
+                        pvCustomInfo.getLabel());
             } else {
                 subcomp.setLayout(new GridLayout(1, false));
                 toolkit.createLabel(subcomp, pvCustomInfo.getLabel());
@@ -227,11 +241,10 @@ public class StudyViewForm extends BiobankViewForm {
         form.setText(NLS.bind(Messages.StudyViewForm_title, study.getName()));
         setStudySectionValues();
         setPvDataSectionValues();
-        aliquotedSpecimenTable.setCollection(study
+        aliquotedSpecimenTable.setList(study
             .getAliquotedSpecimenCollection(true));
-        sourceSpecimenTable.setCollection(study
-            .getSourceSpecimenCollection(true));
+        sourceSpecimenTable.setList(study.getSourceSpecimenCollection(true));
         contactsTable.setCollectionByStudy(study);
-        commentTable.setCollection(study.getCommentCollection(false));
+        commentTable.setList(study.getCommentCollection(false));
     }
 }

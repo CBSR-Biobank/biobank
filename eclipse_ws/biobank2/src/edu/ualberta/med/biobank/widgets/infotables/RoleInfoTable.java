@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 
-public abstract class RoleInfoTable extends InfoTableWidget {
+public abstract class RoleInfoTable extends InfoTableWidget<RoleWrapper> {
     public static final int ROWS_PER_PAGE = 12;
 
     private static final String[] HEADINGS = new String[] { Messages.RoleInfoTable_name_label };
@@ -37,17 +37,17 @@ public abstract class RoleInfoTable extends InfoTableWidget {
 
     public RoleInfoTable(Composite parent, List<RoleWrapper> collection) {
         super(parent, collection, HEADINGS, ROWS_PER_PAGE, RoleWrapper.class);
-        addEditItemListener(new IInfoTableEditItemListener() {
+        addEditItemListener(new IInfoTableEditItemListener<RoleWrapper>() {
             @Override
-            public void editItem(InfoTableEvent event) {
+            public void editItem(InfoTableEvent<RoleWrapper> event) {
                 RoleWrapper role = ((TableRowData) getSelection()).role;
                 editRole(role);
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<RoleWrapper>() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
+            public void deleteItem(InfoTableEvent<RoleWrapper> event) {
                 RoleWrapper role = ((TableRowData) getSelection()).role;
                 deleteRole(role);
             }
@@ -107,7 +107,7 @@ public abstract class RoleInfoTable extends InfoTableWidget {
             .getActiveWorkbenchWindow().getShell(), role);
         int res = dlg.open();
         if (res == Dialog.OK) {
-            reloadCollection(getCollection(), role);
+            reloadCollection(getList(), role);
             notifyListeners();
         }
     }
@@ -123,8 +123,8 @@ public abstract class RoleInfoTable extends InfoTableWidget {
                 Messages.RoleInfoTable_delete_confirm_title, message)) {
                 role.delete();
                 // remove the role from the collection
-                getCollection().remove(role);
-                reloadCollection(getCollection(), null);
+                getList().remove(role);
+                reloadCollection(getList(), null);
                 notifyListeners();
                 return true;
             }

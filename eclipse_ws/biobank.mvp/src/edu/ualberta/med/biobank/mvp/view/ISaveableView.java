@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.mvp.view;
 
-import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
+import com.pietschy.gwt.pectin.client.value.ValueTarget;
+
+import edu.ualberta.med.biobank.mvp.user.ui.IButton;
 
 public interface ISaveableView extends IView {
-    // TODO: should probably use an interface that allows this "button" to be
-    // enabled or disabled
-    HasButton getSave();
+    IButton getSave();
+
+    ValueTarget<Boolean> getDirty();
 }

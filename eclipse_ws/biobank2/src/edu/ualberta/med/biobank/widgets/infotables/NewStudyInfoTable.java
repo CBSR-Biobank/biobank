@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class NewStudyInfoTable extends AbstractInfoTableWidget {
+public class NewStudyInfoTable extends AbstractInfoTableWidget<StudyInfo> {
     private static final String[] HEADINGS = new String[] {
         Messages.StudyInfoTable_name_label,
         Messages.StudyInfoTable_nameshort_label,

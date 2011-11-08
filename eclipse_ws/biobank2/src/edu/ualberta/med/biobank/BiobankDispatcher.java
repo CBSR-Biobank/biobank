@@ -22,14 +22,19 @@ public class BiobankDispatcher implements Dispatcher {
     }
 
     @Override
-    public <T extends Serializable> void exec(Action<T> action,
+    public <T extends Serializable> boolean exec(Action<T> action,
         ActionCallback<T> callback) {
+        boolean success = false;
+
         try {
             BiobankApplicationService service = SessionManager.getAppService();
             T result = service.doAction(action);
+            success = true;
             callback.onSuccess(result);
         } catch (Throwable caught) {
             callback.onFailure(caught);
         }
+
+        return success;
     }
 }

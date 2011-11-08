@@ -60,7 +60,7 @@ public class SelectStudyDialog extends BgcBaseDialog {
                         .setEnabled(true);
             }
         });
-        studyInfoTable.setCollection(studies);
+        studyInfoTable.setList(studies);
         studyInfoTable.setEnabled(true);
     }
 

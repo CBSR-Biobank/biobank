@@ -21,23 +21,23 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 
-public abstract class GroupInfoTable extends InfoTableWidget {
+public abstract class GroupInfoTable extends InfoTableWidget<BbGroupWrapper> {
     public static final int ROWS_PER_PAGE = 12;
     private static final String[] HEADINGS = new String[] { Messages.GroupInfoTable_name_label };
 
     public GroupInfoTable(Composite parent, List<BbGroupWrapper> collection) {
         super(parent, collection, HEADINGS, ROWS_PER_PAGE, BbGroupWrapper.class);
 
-        addEditItemListener(new IInfoTableEditItemListener() {
+        addEditItemListener(new IInfoTableEditItemListener<BbGroupWrapper>() {
             @Override
-            public void editItem(InfoTableEvent event) {
+            public void editItem(InfoTableEvent<BbGroupWrapper> event) {
                 editGroup((BbGroupWrapper) getSelection());
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<BbGroupWrapper>() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
+            public void deleteItem(InfoTableEvent<BbGroupWrapper> event) {
                 deleteGroup((BbGroupWrapper) getSelection());
             }
         });
@@ -109,7 +109,7 @@ public abstract class GroupInfoTable extends InfoTableWidget {
             .getActiveWorkbenchWindow().getShell(), group);
         int res = dlg.open();
         if (res == Dialog.OK) {
-            reloadCollection(getCollection(), group);
+            reloadCollection(getList(), group);
             notifyListeners();
         }
     }
@@ -125,8 +125,8 @@ public abstract class GroupInfoTable extends InfoTableWidget {
                 Messages.GroupInfoTable_delete_confirm_title, message)) {
                 group.delete();
                 // remove the group from the collection
-                getCollection().remove(group);
-                reloadCollection(getCollection(), null);
+                getList().remove(group);
+                reloadCollection(getList(), null);
                 notifyListeners();
                 return true;
             }

@@ -49,7 +49,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
                     List<ContactWrapper> dummyList = new ArrayList<ContactWrapper>();
                     dummyList.add(contact);
                     study.addToContactCollection(dummyList);
-                    setCollection(study.getContactCollection(true));
+                    setList(study.getContactCollection(true));
                 }
             }
         } catch (Exception e) {
@@ -59,16 +59,16 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
     }
 
     private void addDeleteSupport() {
-        addAddItemListener(new IInfoTableAddItemListener() {
+        addAddItemListener(new IInfoTableAddItemListener<ContactWrapper>() {
             @Override
-            public void addItem(InfoTableEvent event) {
+            public void addItem(InfoTableEvent<ContactWrapper> event) {
                 createClinicContact();
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<ContactWrapper>() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
+            public void deleteItem(InfoTableEvent<ContactWrapper> event) {
                 ContactWrapper contact = getSelection();
                 if (contact != null) {
                     if (!BgcPlugin.openConfirm(
@@ -80,7 +80,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
                     }
 
                     study.removeFromContactCollection(Arrays.asList(contact));
-                    setCollection(study.getContactCollection(true));
+                    setList(study.getContactCollection(true));
                     notifyListeners();
                 }
             }
@@ -88,12 +88,12 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
     }
 
     public void setContacts(List<ContactWrapper> contacts) {
-        setCollection(contacts);
+        setList(contacts);
     }
 
     @Override
     public void reload() {
-        setCollection(study.getContactCollection(true));
+        setList(study.getContactCollection(true));
     }
 
 }

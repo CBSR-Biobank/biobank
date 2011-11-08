@@ -1,14 +1,13 @@
 package edu.ualberta.med.biobank.mvp.view;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 import com.google.gwt.user.client.ui.HasValue;
 
+import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
+import edu.ualberta.med.biobank.mvp.view.util.InputTable;
 
 public class AddressEntryView extends AbstractView implements
     AddressEntryPresenter.View {
@@ -20,6 +19,7 @@ public class AddressEntryView extends AbstractView implements
     private final TextItem phoneNumber = new TextItem();
     private final TextItem faxNumber = new TextItem();
     private final TextItem country = new TextItem();
+    private InputTable table;
 
     @Override
     public HasValue<String> getStreet1() {
@@ -63,14 +63,30 @@ public class AddressEntryView extends AbstractView implements
 
     @Override
     protected void onCreate(Composite parent) {
-        Label street1Label = new Label(parent, SWT.NONE);
-        street1Label.setText("street1");
-        street1.setValidationControl(street1Label);
-        street1.setText(new Text(parent, SWT.BORDER));
+        table = new InputTable(parent);
 
-        Label cityLabel = new Label(parent, SWT.NONE);
-        cityLabel.setText("city");
-        city.setValidationControl(cityLabel);
-        city.setText(new Text(parent, SWT.BORDER));
+        street1.setValidationControl(
+            table.addLabel(Messages.AddressEntryFormCommon_street1_label));
+        street1.setText(table.addText());
+
+        street2.setValidationControl(
+            table.addLabel(Messages.AddressEntryFormCommon_street2_label));
+        street2.setText(table.addText());
+
+        city.setValidationControl(table
+            .addLabel(Messages.AddressEntryFormCommon_city_label));
+        city.setText(table.addText());
+
+        province.setValidationControl(table
+            .addLabel(Messages.AddressEntryFormCommon_province_label));
+        province.setText(table.addText());
+
+        postalCode.setValidationControl(table
+            .addLabel(Messages.AddressEntryFormCommon_postalCode_label));
+        postalCode.setText(table.addText());
+
+        country.setValidationControl(table
+            .addLabel(Messages.AddressEntryFormCommon_country_label));
+        country.setText(table.addText());
     }
 }

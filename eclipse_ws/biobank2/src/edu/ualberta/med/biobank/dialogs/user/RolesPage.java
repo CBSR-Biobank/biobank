@@ -68,7 +68,7 @@ public abstract class RolesPage extends BgcDialogPage {
                 addRole(newRole);
             }
         };
-        roleInfoTable.setCollection(getCurrentAllRolesList());
+        roleInfoTable.setList(getCurrentAllRolesList());
         setControl(content);
     }
 

@@ -68,7 +68,7 @@ public abstract class GroupsPage extends BgcDialogPage {
                 addGroup(newGroup);
             }
         };
-        groupInfoTable.setCollection(getCurrentAllGroupsList());
+        groupInfoTable.setList(getCurrentAllGroupsList());
         setControl(content);
     }
 

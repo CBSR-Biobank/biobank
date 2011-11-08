@@ -313,7 +313,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
                             resultsTable.adaptToToolkit(toolkit, true);
 
-                            resultsTable.setCollection(results);
+                            resultsTable.setList(results);
 
                             if (!report.getIsCount()) {
                                 resultsTable

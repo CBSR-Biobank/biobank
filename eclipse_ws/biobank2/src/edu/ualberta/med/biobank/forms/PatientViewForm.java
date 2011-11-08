@@ -17,7 +17,8 @@ import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.NewCollectionEventInfoTable;
 
 public class PatientViewForm extends BiobankViewForm {
-    public static final String ID = "edu.ualberta.med.biobank.forms.PatientViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.PatientViewForm"; //$NON-NLS-1$
 
     private BgcBaseText studyLabel;
 
@@ -47,8 +48,9 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     private void updatePatientInfo() throws Exception {
-        patientInfo = SessionManager.getAppService().doAction(
-            new PatientGetInfoAction(adapter.getId()));
+        patientInfo =
+            SessionManager.getAppService().doAction(
+                new PatientGetInfoAction(adapter.getId()));
     }
 
     @Override
@@ -71,23 +73,28 @@ public class PatientViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.patient_field_label_study);
-        createdAtLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.PatientViewForm_label_createdAt);
-        visitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.PatientViewForm_label_totalVisits);
-        sourceSpecimenCountLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, Messages.PatientViewForm_label_totalSourceSpecimens);
-        aliquotedSpecimenCountLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, Messages.PatientViewForm_label_totalAliquotedSpecimens);
+        studyLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.patient_field_label_study);
+        createdAtLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.PatientViewForm_label_createdAt);
+        visitCountLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.PatientViewForm_label_totalVisits);
+        sourceSpecimenCountLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.PatientViewForm_label_totalSourceSpecimens);
+        aliquotedSpecimenCountLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.PatientViewForm_label_totalAliquotedSpecimens);
     }
 
     private void createCollectionEventSection() {
         Section section = createSection(Messages.PatientViewForm_visits_title);
 
-        collectionEventTable = new NewCollectionEventInfoTable(section,
-            patientInfo.cevents);
+        collectionEventTable =
+            new NewCollectionEventInfoTable(section, patientInfo.cevents);
         section.setClient(collectionEventTable);
         collectionEventTable.adaptToToolkit(toolkit, true);
         collectionEventTable.addClickListener(collectionDoubleClickListener);
@@ -112,7 +119,7 @@ public class PatientViewForm extends BiobankViewForm {
             patientInfo.patient.getPnumber()));
         form.setText(NLS.bind(Messages.PatientViewForm_title,
             patientInfo.patient.getPnumber()));
-        collectionEventTable.setCollection(patientInfo.cevents);
+        collectionEventTable.setList(patientInfo.cevents);
     }
 
 }

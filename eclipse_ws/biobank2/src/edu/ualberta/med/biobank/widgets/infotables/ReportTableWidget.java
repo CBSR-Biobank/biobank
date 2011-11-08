@@ -19,23 +19,23 @@ import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.PaginationWidget;
 
-public class ReportTableWidget<T> extends InfoTableBgrLoader {
+public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
 
     private static BgcLogger logger = BgcLogger
         .getLogger(ReportTableWidget.class.getName());
 
-    public ReportTableWidget(Composite parent, List<T> collection,
+    public ReportTableWidget(Composite parent, List<T> list,
         String[] headings) {
-        super(parent, collection, headings, null, 24);
+        super(parent, list, headings, null, 24);
     }
 
-    public ReportTableWidget(Composite parent, List<T> collection,
+    public ReportTableWidget(Composite parent, List<T> list,
         String[] headings, int rowsPerPage) {
-        super(parent, collection, headings, null, rowsPerPage);
+        super(parent, list, headings, null, rowsPerPage);
     }
 
     @Override
-    protected void setPaginationParams(List<?> collection) {
+    protected void setPaginationParams(List<T> collection) {
         if (collection != null) {
             int rowsPerPage = paginationWidget.getRowsPerPage();
             int size = collection.size();
@@ -79,7 +79,7 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader {
     }
 
     @Override
-    public void tableLoader(final List<?> collection, final Object selection) {
+    public void tableLoader(final List<T> collection, final T selection) {
         final TableViewer viewer = getTableViewer();
         final Table table = viewer.getTable();
         Display display = viewer.getTable().getDisplay();
@@ -165,13 +165,13 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader {
     }
 
     @Override
-    protected void init(List<?> collection) {
+    protected void init(List<T> list) {
         if (paginationWidget.getTotalPages() == PaginationWidget.TOTAL_PAGES_UNKNOWN) {
             int size;
-            if (collection instanceof AbstractBiobankListProxy) {
-                size = ((AbstractBiobankListProxy<?>) collection).getRealSize();
+            if (list instanceof AbstractBiobankListProxy) {
+                size = ((AbstractBiobankListProxy<?>) list).getRealSize();
             } else {
-                size = collection.size();
+                size = list.size();
             }
 
             if (size > 0) {

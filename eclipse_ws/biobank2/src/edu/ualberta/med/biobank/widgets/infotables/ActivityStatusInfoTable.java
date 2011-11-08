@@ -8,7 +8,8 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class ActivityStatusInfoTable extends InfoTableWidget {
+public class ActivityStatusInfoTable extends
+    InfoTableWidget<ActivityStatusWrapper> {
 
     private static final String[] HEADINGS = new String[] { Messages.ActivityStatusInfoTable_status_label };
 

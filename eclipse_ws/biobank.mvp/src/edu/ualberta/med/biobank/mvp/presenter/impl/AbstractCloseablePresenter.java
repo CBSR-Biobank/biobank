@@ -7,17 +7,18 @@ import com.google.web.bindery.event.shared.EventBus;
 import edu.ualberta.med.biobank.mvp.presenter.ICloseablePresenter;
 import edu.ualberta.med.biobank.mvp.view.ICloseableView;
 
-public abstract class BaseCloseablePresenter<V extends ICloseableView> extends
-    BasePresenter<V> implements ICloseablePresenter<V> {
+public abstract class AbstractCloseablePresenter<V extends ICloseableView>
+    extends AbstractPresenter<V>
+    implements ICloseablePresenter<V> {
+    private final CloseClickHandler closeClickHandler = new CloseClickHandler();
 
-    public BaseCloseablePresenter(V view, EventBus eventBus) {
+    public AbstractCloseablePresenter(V view, EventBus eventBus) {
         super(view, eventBus);
     }
 
     @Override
     protected void onBind() {
-        registerHandler(view.getClose()
-            .addClickHandler(new CloseClickHandler()));
+        registerHandler(view.getClose().addClickHandler(closeClickHandler));
     }
 
     @Override

@@ -5,21 +5,22 @@ import java.util.List;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
+import edu.ualberta.med.biobank.common.util.ListChangeEvent;
+import edu.ualberta.med.biobank.common.util.ListChangeHandler;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 import edu.ualberta.med.biobank.gui.common.widgets.Messages;
 
-public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
+public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
+    protected Thread backgroundThread;
+    private final InfoTableListChangeHandler infoTableListChangeHandler = new InfoTableListChangeHandler();
 
-    private int size;
-
-    private List<?> collection;
-
-    public InfoTableBgrLoader(Composite parent, List<?> collection,
+    public InfoTableBgrLoader(Composite parent, List<T> list,
         String[] headings, int[] columnWidths, int rowsPerPage) {
         super(parent, headings, columnWidths, rowsPerPage);
-        setCollection(collection);
+        addListChangeHandler(infoTableListChangeHandler);
+        setList(list);
     }
 
     /**
@@ -31,27 +32,22 @@ public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
      * 
      * @throws Exception
      */
-    protected abstract void tableLoader(final List<?> collection,
-        final Object Selection);
+    protected abstract void tableLoader(final List<T> list, final T Selection);
 
-    public void setCollection(List<?> collection) {
-        setCollection(collection, null);
-        if (collection != null) {
-            size = collection.size();
-        }
+    @Override
+    public void setList(List<T> collection) {
+        setList(collection, null);
     }
 
-    public void setCollection(final List<?> collection, final Object selection) {
+    public void setList(final List<T> list, final T selection) {
         try {
-            if ((collection == null)
+            if ((list == null)
                 || ((backgroundThread != null) && backgroundThread.isAlive())) {
                 return;
-            } else if ((this.collection != collection)
-                || (size != collection.size())) {
-                this.collection = collection;
-                init(collection);
-                setPaginationParams(collection);
             }
+
+            super.setList(list);
+
             if (paginationRequired) {
                 showPaginationWidget();
                 paginationWidget.setPageLabelText();
@@ -65,7 +61,7 @@ public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
             backgroundThread = new Thread() {
                 @Override
                 public void run() {
-                    tableLoader(collection, selection);
+                    tableLoader(list, selection);
                     if (autoSizeColumns) {
                         display.syncExec(new Runnable() {
                             @Override
@@ -83,13 +79,9 @@ public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
         }
     }
 
-    protected abstract void init(List<?> collection);
+    protected abstract void init(List<T> list);
 
-    protected abstract void setPaginationParams(List<?> collection);
-
-    public List<?> getCollection() {
-        return collection;
-    }
+    protected abstract void setPaginationParams(List<T> list);
 
     @Override
     protected BgcTableSorter getTableSorter() {
@@ -100,27 +92,46 @@ public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
 
     @Override
     public void firstPage() {
-        setCollection(collection);
+        setList(getList());
     }
 
     @Override
     public void lastPage() {
-        setCollection(collection);
+        setList(getList());
     }
 
     @Override
     public void prevPage() {
-        setCollection(collection);
+        setList(getList());
     }
 
     @Override
     public void nextPage() {
-        setCollection(collection);
+        setList(getList());
     }
 
     @Override
     public void reload() {
-        setCollection(collection);
+        setList(getList());
     }
 
+    private class InfoTableListChangeHandler implements ListChangeHandler<T> {
+        private boolean ignoreEvents = false;
+
+        @Override
+        public void onListChange(ListChangeEvent<T> event) {
+            // init() may cause ListChangeEvent-s to be fired, so don't listen
+            // for them when init() is called.
+            if (!ignoreEvents) {
+                try {
+                    ignoreEvents = true;
+                    List<T> list = getList();
+                    init(list);
+                    setPaginationParams(list);
+                } finally {
+                    ignoreEvents = false;
+                }
+            }
+        }
+    }
 }

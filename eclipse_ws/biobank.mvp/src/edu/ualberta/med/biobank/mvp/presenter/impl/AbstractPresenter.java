@@ -10,7 +10,8 @@ import com.pietschy.gwt.pectin.client.form.binding.FormBinder;
 import edu.ualberta.med.biobank.mvp.presenter.IPresenter;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
-public abstract class BasePresenter<V extends IView> implements IPresenter<V> {
+public abstract class AbstractPresenter<V extends IView>
+    implements IPresenter<V> {
     private final List<HandlerRegistration> handlerRegistrations =
         new ArrayList<HandlerRegistration>();
     protected final FormBinder binder = new FormBinder();
@@ -18,7 +19,7 @@ public abstract class BasePresenter<V extends IView> implements IPresenter<V> {
     protected final EventBus eventBus;
     private boolean bound = false;
 
-    protected BasePresenter(V view, EventBus eventBus) {
+    protected AbstractPresenter(V view, EventBus eventBus) {
         this.view = view;
         this.eventBus = eventBus;
 
@@ -73,8 +74,7 @@ public abstract class BasePresenter<V extends IView> implements IPresenter<V> {
      * {@link #unbind()} is called. This provides a handy way to track event
      * handler registrations when binding and unbinding.
      * 
-     * @param handlerRegistration
-     *            The registration.
+     * @param handlerRegistration The registration.
      */
     protected void registerHandler(HandlerRegistration handlerRegistration) {
         handlerRegistrations.add(handlerRegistration);
