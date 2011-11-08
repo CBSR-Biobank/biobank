@@ -40,8 +40,9 @@ import edu.ualberta.med.biobank.mvp.util.HandlerRegManager;
  * For use by {@link edu.ualberta.med.biobank.mvp.presenter.IPresenter}-s.
  * {@link AbstractModel}-s should only have knowledge of other models and only
  * supply validation. It is the presenter's responsibility to call
- * {@link AbstractModel#bind()} and {@link AbstractModel#unbind()} on a model and to
- * bind the model's attributes to the view, and bind the validation to the view.
+ * {@link AbstractModel#bind()} and {@link AbstractModel#unbind()} on a model
+ * and to bind the model's attributes to the view, and bind the validation to
+ * the view.
  * <p>
  * However, note that when a model's {@link FieldModel}-s are bound to a widget/
  * component that implements {@link ValidationDisplay}, then the widget will be
@@ -60,7 +61,8 @@ public abstract class AbstractModel<T> extends FormModel {
     private final ValidationTree validationTree = new ValidationTree();
     private final DelegatingCondition dirty = new DelegatingCondition(false);
     private final ValueHolder<Boolean> valid = new ValueHolder<Boolean>(false);
-    private final List<AbstractModel<?>> models = new ArrayList<AbstractModel<?>>();
+    private final List<AbstractModel<?>> models =
+        new ArrayList<AbstractModel<?>>();
     private final HandlerRegManager hrManager = new HandlerRegManager();
     private final ValidationMonitor validationMonitor = new ValidationMonitor();
     private boolean bound = false;
@@ -73,11 +75,6 @@ public abstract class AbstractModel<T> extends FormModel {
         // TODO: should get this from an injected provider in the future if ever
         // go the GWT-way since it this specific implementation won't work with
         // GWT
-        // TODO: should subclass this (ReflectionBeanModelProvider) and use a
-        // custom implementation of BeanPropertyListModel and
-        // BeanPropertyValueModel.
-        // TODO: NEED to override BeanPropertyListModel at least to work with
-        // dirty states
         provider = new ReflectionBeanModelProvider<T>(beanModelClass);
 
         // auto-commit so models can be bound to other models and are
@@ -97,8 +94,8 @@ public abstract class AbstractModel<T> extends FormModel {
     }
 
     /**
-     * Creates a new checkpoint for {@link AbstractModel#revert()} to revert to, if
-     * called, and clears the dirty state (including that of added inner
+     * Creates a new checkpoint for {@link AbstractModel#revert()} to revert to,
+     * if called, and clears the dirty state (including that of added inner
      * {@link AbstractModel}-s).
      */
     public void checkpoint() {
@@ -126,9 +123,9 @@ public abstract class AbstractModel<T> extends FormModel {
     }
 
     /**
-     * Reverts this {@link AbstractModel} to the value it was originally provided
-     * with (via {@link AbstractModel#setValue(Object)}) or the value when
-     * {@link AbstractModel#checkpoint()} was last called.
+     * Reverts this {@link AbstractModel} to the value it was originally
+     * provided with (via {@link AbstractModel#setValue(Object)}) or the value
+     * when {@link AbstractModel#checkpoint()} was last called.
      */
     public void revert() {
         provider.revert();
@@ -152,16 +149,13 @@ public abstract class AbstractModel<T> extends FormModel {
      * Binds a field to a model. The {@link FieldModel} <em>must</em> belong to
      * this {@link FormModel}.
      * <p>
-     * Adds a {@link AbstractModel} to this {@link AbstractModel}, so that the former is
-     * reverted, checkpoint-ed, validated, bound, unbound, dirty-checked, etc.
-     * whenever this {@link AbstractModel} is.
+     * Adds a {@link AbstractModel} to this {@link AbstractModel}, so that the
+     * former is reverted, checkpoint-ed, validated, bound, unbound,
+     * dirty-checked, etc. whenever this {@link AbstractModel} is.
      * 
-     * @param field
-     *            bound to the model.
-     * @param model
-     *            bound to the field.
-     * @param binder
-     *            used to bind the model and field.
+     * @param field bound to the model.
+     * @param model bound to the field.
+     * @param binder used to bind the model and field.
      */
     public <E> void bind(FieldModel<E> field, AbstractModel<E> model) {
         if (!field.getFormModel().equals(this)) {
