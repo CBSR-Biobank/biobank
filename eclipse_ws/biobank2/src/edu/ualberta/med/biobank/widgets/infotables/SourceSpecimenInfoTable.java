@@ -12,7 +12,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 /**
  * this need to be rename ? to study source specimen ??
  */
-public class SourceSpecimenInfoTable extends InfoTableWidget {
+public class SourceSpecimenInfoTable extends
+    InfoTableWidget<SourceSpecimenWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 5;
 

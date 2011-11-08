@@ -107,25 +107,25 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
     }
 
     private void addEditSupport() {
-        addAddItemListener(new IInfoTableAddItemListener() {
+        addAddItemListener(new IInfoTableAddItemListener<ShippingMethodWrapper>() {
             @Override
-            public void addItem(InfoTableEvent event) {
+            public void addItem(InfoTableEvent<ShippingMethodWrapper> event) {
                 addShippingMethod();
             }
         });
 
-        addEditItemListener(new IInfoTableEditItemListener() {
+        addEditItemListener(new IInfoTableEditItemListener<ShippingMethodWrapper>() {
             @Override
-            public void editItem(InfoTableEvent event) {
+            public void editItem(InfoTableEvent<ShippingMethodWrapper> event) {
                 ShippingMethodWrapper type = getSelection();
                 if (type != null)
                     addOrEditShippingMethod(false, type, editMessage);
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<ShippingMethodWrapper>() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
+            public void deleteItem(InfoTableEvent<ShippingMethodWrapper> event) {
                 ShippingMethodWrapper type = getSelection();
                 if (type != null) {
                     try {
@@ -154,7 +154,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                         // ids are null.
                         selectedShippingMethod.remove(type);
                         type.delete();
-                        setCollection(selectedShippingMethod);
+                        setList(selectedShippingMethod);
                     } catch (final RemoteConnectFailureException exp) {
                         BgcPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {

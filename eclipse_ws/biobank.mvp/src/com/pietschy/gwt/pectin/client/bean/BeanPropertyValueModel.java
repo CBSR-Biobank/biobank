@@ -1,3 +1,5 @@
+// @formatter:off
+// JMF: 
 /*
  * Copyright 2009 Andrew Pietsch 
  *
@@ -25,310 +27,291 @@ import com.pietschy.gwt.pectin.client.value.ValueModel;
 /**
  *
  */
-public class BeanPropertyValueModel<T> extends AbstractMutableValueModel<T>
-    implements BeanPropertyModelBase, HasMutableModel
+public class BeanPropertyValueModel<T> extends AbstractMutableValueModel<T> implements BeanPropertyModelBase, HasMutableModel
 {
-    private PropertyDescriptor propertyDescriptor;
-    private T checkpointValue;
-    private T currentValue;
-    private ValueHolder<Boolean> dirtyModel = new ValueHolder<Boolean>(false);
-    private ValueHolder<Boolean> mutableModel = new ValueHolder<Boolean>(false);
-    private ValueModel<?> source;
-    private ValueModel<Boolean> autoCommit;
-    private UpdateStrategy<T> defaultUpdateStrategy =
-        new DefaultUpdateStrategy();
-    private UpdateStrategy<T> autoCommitUpdateStrategy =
-        new AutoCommitUpdateStrategy();
+   private PropertyDescriptor propertyDescriptor;
+   private T checkpointValue;
+   private T currentValue;
+   private ValueHolder<Boolean> dirtyModel = new ValueHolder<Boolean>(false);
+   private ValueHolder<Boolean> mutableModel = new ValueHolder<Boolean>(false);
+   private ValueModel<?> source;
+   private ValueModel<Boolean> autoCommit;
+   private UpdateStrategy<T> defaultUpdateStrategy = new DefaultUpdateStrategy();
+   private UpdateStrategy<T> autoCommitUpdateStrategy = new AutoCommitUpdateStrategy();
 
-    public BeanPropertyValueModel(ValueModel<?> sourceModel,
-        PropertyDescriptor descriptor, ValueModel<Boolean> autoCommit)
-    {
-        this.source = sourceModel;
-        this.propertyDescriptor = descriptor;
-        this.autoCommit = autoCommit;
-        dirtyModel.setFireEventsEvenWhenValuesEqual(false);
 
-        installValueChangeHandler(source);
-        handleSourceModelChange();
-    }
+   public BeanPropertyValueModel(ValueModel<?> sourceModel, PropertyDescriptor descriptor, ValueModel<Boolean> autoCommit)
+   {
+      this.source = sourceModel;
+      this.propertyDescriptor = descriptor;
+      this.autoCommit = autoCommit;
+      dirtyModel.setFireEventsEvenWhenValuesEqual(false);
 
-    @SuppressWarnings("unchecked")
-    private void installValueChangeHandler(ValueModel<?> source)
-    {
-        // yep I know, no generics... I don't know or care what the type is
-        // since the generated accessor handles
-        // all that. We could get around this if ValueChangeHandler allowed for
-        // ValueChangeHandler<? super T>.
-        source.addValueChangeHandler(new ValueChangeHandler()
-        {
-            public void onValueChange(ValueChangeEvent event)
-            {
-                handleSourceModelChange();
-            }
-        });
-    }
+      installValueChangeHandler(source);
+      handleSourceModelChange();
+   }
 
-    private void handleSourceModelChange()
-    {
-        readFromSource();
-        onSourceModelChanged(source.getValue());
-    }
+   @SuppressWarnings("unchecked")
+   private void installValueChangeHandler(ValueModel<?> source)
+   {
+      // yep I know, no generics... I don't know or care what the type is since the generated accessor handles
+      // all that.  We could get around this if ValueChangeHandler allowed for ValueChangeHandler<? super T>.
+      source.addValueChangeHandler(new ValueChangeHandler()
+      {
+         public void onValueChange(ValueChangeEvent event)
+         {
+            handleSourceModelChange();
+         }
+      });
+   }
 
-    /**
-     * This is an empty method that subclasses can override to perform actions
-     * when the source bean changes.
-     * 
-     * @param sourceBean
-     *            the new value of the source bean.
-     */
-    protected void onSourceModelChanged(Object sourceBean)
-    {
-    }
+   private void handleSourceModelChange()
+   {
+      readFromSource();
+      onSourceModelChanged(source.getValue());
+   }
 
-    public String getPropertyName()
-    {
-        return propertyDescriptor.getPropertyName();
-    }
+   /**
+    * This is an empty method that subclasses can override to perform
+    * actions when the source bean changes.
+    *
+    * @param sourceBean the new value of the source bean.
+    */
+   protected void onSourceModelChanged(Object sourceBean)
+   {
+   }
 
-    public Class getValueType()
-    {
-        return propertyDescriptor.getValueType();
-    }
+   public String getPropertyName()
+   {
+      return propertyDescriptor.getPropertyName();
+   }
 
-    protected boolean isAutoCommit()
-    {
-        // only true if not null and true.
-        return Boolean.TRUE.equals(autoCommit.getValue());
-    }
+   public Class getValueType()
+   {
+      return propertyDescriptor.getValueType();
+   }
 
-    private void ensureMutable()
-    {
-        if (!isMutableProperty())
-        {
-            throw new ReadOnlyPropertyException(propertyDescriptor);
-        }
-        else if (!isNonNullSource())
-        {
-            throw new SourceBeanIsNullException(propertyDescriptor);
-        }
-    }
+   protected boolean isAutoCommit()
+   {
+      // only true if not null and true.
+      return Boolean.TRUE.equals(autoCommit.getValue());
+   }
 
-    public void setValue(T value)
-    {
-        getUpdateStrategy().setValue(value);
-    }
+   private void ensureMutable()
+   {
+      if (!isMutableProperty())
+      {
+         throw new ReadOnlyPropertyException(propertyDescriptor);
+      }
+      else if (!isNonNullSource())
+      {
+         throw new SourceBeanIsNullException(propertyDescriptor);
+      }
+   }
 
-    public T getValue()
-    {
-        return getUpdateStrategy().getValue();
-    }
+   public void setValue(T value)
+   {
+      getUpdateStrategy().setValue(value);
+   }
 
-    public void writeToSource(boolean checkpoint)
-    {
-        getUpdateStrategy().writeToSource(checkpoint);
-    }
+   public T getValue()
+   {
+      return getUpdateStrategy().getValue();
+   }
 
-    public void readFromSource()
-    {
-        getUpdateStrategy().readFromSource();
-    }
+   public void writeToSource(boolean checkpoint)
+   {
+      getUpdateStrategy().writeToSource(checkpoint);
+   }
 
-    /**
-     * Checkpoints the models dirty state to the current value of the model.
-     * After calling this method the dirty state will be <code>false</code>.
-     * 
-     * @see revertToCheckpoint()
-     */
-    public void checkpoint()
-    {
-        getUpdateStrategy().checkpoint();
-    }
+   public void readFromSource()
+   {
+      getUpdateStrategy().readFromSource();
+   }
 
-    /**
-     * Reverts the value of this model to the previous checkpoint. If checkpoint
-     * hasn't been called then it will revert to the last call to readFrom.
-     */
-    public void revert()
-    {
-        getUpdateStrategy().revertToCheckpoint();
-    }
+   /**
+    * Checkpoints the models dirty state to the current value of the model.  After calling this
+    * method the dirty state will be <code>false</code>.
+    *
+    * @see revertToCheckpoint()
+    */
+   public void checkpoint()
+   {
+      getUpdateStrategy().checkpoint();
+   }
 
-    public ValueModel<Boolean> mutable()
-    {
-        return mutableModel;
-    }
+   /**
+    * Reverts the value of this model to the previous checkpoint.  If checkpoint hasn't been called
+    * then it will revert to the last call to readFrom.
+    */
+   public void revert()
+   {
+      getUpdateStrategy().revertToCheckpoint();
+   }
 
-    public boolean isMutable()
-    {
-        return mutable().getValue();
-    }
+   public ValueModel<Boolean> mutable()
+   {
+      return mutableModel;
+   }
 
-    private void updateMutableState()
-    {
-        mutableModel.setValue(isMutableProperty() && isNonNullSource());
-    }
+   public boolean isMutable()
+   {
+      return mutable().getValue();
+   }
 
-    private boolean isNonNullSource()
-    {
-        return source.getValue() != null;
-    }
+   private void updateMutableState()
+   {
+      mutableModel.setValue(isMutableProperty() && isNonNullSource());
+   }
 
-    public boolean isMutableProperty()
-    {
-        return propertyDescriptor.isMutable();
-    }
+   private boolean isNonNullSource()
+   {
+      return source.getValue() != null;
+   }
 
-    /**
-     * @deprecated use {@link #dirty()} instead.
-     */
-    @Deprecated
-    public ValueModel<Boolean> getDirtyModel()
-    {
-        return dirty();
-    }
+   public boolean isMutableProperty()
+   {
+      return propertyDescriptor.isMutable();
+   }
 
-    public ValueModel<Boolean> dirty()
-    {
-        return dirtyModel;
-    }
+   /**
+    * @deprecated use {@link #dirty()} instead.
+    */
+   @Deprecated
+   public ValueModel<Boolean> getDirtyModel()
+   {
+      return dirty();
+   }
 
-    protected UpdateStrategy<T> getUpdateStrategy()
-    {
-        return isAutoCommit() ? autoCommitUpdateStrategy
-            : defaultUpdateStrategy;
-    }
+   public ValueModel<Boolean> dirty()
+   {
+      return dirtyModel;
+   }
 
-    private interface UpdateStrategy<T>
-    {
-        void readFromSource();
+   protected UpdateStrategy<T> getUpdateStrategy()
+   {
+      return isAutoCommit() ? autoCommitUpdateStrategy : defaultUpdateStrategy;
+   }
 
-        void writeToSource(boolean checkpoint);
+   private interface UpdateStrategy<T>
+   {
+      void readFromSource();
 
-        void setValue(T value);
+      void writeToSource(boolean checkpoint);
 
-        void checkpoint();
+      void setValue(T value);
 
-        void revertToCheckpoint();
+      void checkpoint();
 
-        T getValue();
-    }
+      void revertToCheckpoint();
 
-    private class DefaultUpdateStrategy implements UpdateStrategy<T>
-    {
-        @SuppressWarnings("unchecked")
-        public void readFromSource()
-        {
-            checkpointValue =
-                (T) propertyDescriptor.readProperty(source.getValue());
-            updateMutableState();
-            setValueInternal(checkpointValue);
-        }
+      T getValue();
+   }
 
-        public void writeToSource(boolean checkpoint)
-        {
-            ensureMutable();
-            T value = getValue();
-            propertyDescriptor.writeProperty(source.getValue(), value);
-            if (checkpoint)
-            {
-                checkpoint();
-            }
-        }
+   private class DefaultUpdateStrategy implements UpdateStrategy<T>
+   {
+      @SuppressWarnings("unchecked")
+      public void readFromSource()
+      {
+         checkpointValue = (T) propertyDescriptor.readProperty(source.getValue());
+         updateMutableState();
+         setValueInternal(checkpointValue);
+      }
 
-        public void setValue(T value)
-        {
-            ensureMutable();
-            setValueInternal(value);
-        }
+      public void writeToSource(boolean checkpoint)
+      {
+         ensureMutable();
+         T value = getValue();
+         propertyDescriptor.writeProperty(source.getValue(), value);
+         if (checkpoint)
+         {
+            checkpoint();
+         }
+      }
 
-        public T getValue()
-        {
-            return currentValue;
-        }
+      public void setValue(T value)
+      {
+         ensureMutable();
+         setValueInternal(value);
+      }
 
-        public void checkpoint()
-        {
-            checkpointValue = getValue();
-            dirtyModel.setValue(false);
-        }
+      public T getValue()
+      {
+         return currentValue;
+      }
 
-        public void revertToCheckpoint()
-        {
-            setValueInternal(checkpointValue);
-        }
+      public void checkpoint()
+      {
+         checkpointValue = getValue();
+         dirtyModel.setValue(false);
+      }
 
-        protected void setValueInternal(T value)
-        {
-            T oldValue = currentValue;
-            currentValue = value;
-            fireValueChangeEvent(oldValue, value);
-            afterMutate();
-        }
+      public void revertToCheckpoint()
+      {
+         setValueInternal(checkpointValue);
+      }
 
-        protected void afterMutate()
-        {
+      protected void setValueInternal(T value)
+      {
+         T oldValue = currentValue;
+         currentValue = value;
+         fireValueChangeEvent(oldValue, value);
+         afterMutate();
+      }
+
+      protected void afterMutate()
+      {
+         updateDirtyState();
+      }
+
+      void updateDirtyState()
+      {
+         dirtyModel.setValue(computeDirty());
+      }
+
+      boolean computeDirty()
+      {
+         return currentValue == null ? checkpointValue != null : !currentValue.equals(checkpointValue);
+      }
+
+   }
+
+   private class AutoCommitUpdateStrategy extends DefaultUpdateStrategy
+   {
+      boolean inReadFromSource = false;
+
+      @Override
+      public void readFromSource()
+      {
+         // this is a bit of a hack, but we flag that we're inside a
+         // readFromSource call so that we can re-use setValueInternal without
+         // causing a write back to the source.
+         boolean oldInReadFromSource = inReadFromSource;
+         inReadFromSource = true;
+         try
+         {
+            super.readFromSource();
+         }
+         finally
+         {
+            inReadFromSource = oldInReadFromSource;
+         }
+      }
+
+      @Override
+      protected void afterMutate()
+      {
+         // We don't write if we're currently reading from the source;
+         if (!inReadFromSource)
+         {
+            // we don't checkpoint so the user can still checkpoint and revert
+            // even though were writing through to the bean.
+            writeToSource(false);
+            
+            // JMF: update dirty state since we still want to use dirty until
+            // we call checkpoint
             updateDirtyState();
-        }
-
-        void updateDirtyState()
-        {
-            dirtyModel.setValue(computeDirty());
-        }
-
-        boolean computeDirty()
-        {
-            return currentValue == null ? checkpointValue != null
-                : !currentValue.equals(checkpointValue);
-        }
-
-    }
-
-    private class AutoCommitUpdateStrategy extends DefaultUpdateStrategy
-    {
-        boolean inReadFromSource = false;
-
-        @Override
-        public void readFromSource()
-        {
-            // this is a bit of a hack, but we flag that we're inside a
-            // readFromSource call so that we can re-use setValueInternal
-            // without
-            // causing a write back to the source.
-            boolean oldInReadFromSource = inReadFromSource;
-            inReadFromSource = true;
-            try
-            {
-                super.readFromSource();
-            }
-            finally
-            {
-                inReadFromSource = oldInReadFromSource;
-            }
-        }
-
-        @Override
-        protected void afterMutate()
-        {
-            // We don't write if we're currently reading from the source;
-            if (!inReadFromSource)
-            {
-                // we don't checkpoint so the user can still checkpoint and
-                // revert
-                // even though were writing through to the bean.
-                writeToSource(false);
-
-                // JMF: added to update dirty state
-                updateDirtyState();
-            }
-        }
-
-        @Override
-        boolean computeDirty()
-        {
-            // JMF: added because we still want to check if an autocommitted
-            // value is dirty
-            return currentValue == null ? checkpointValue != null
-                : !currentValue.equals(checkpointValue);
-        }
-    }
+         }
+      }
+   }
 }

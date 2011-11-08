@@ -136,105 +136,6 @@ CREATE TABLE `csm_pg_pe` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `csm_pg_pe`
---
-
-LOCK TABLES `csm_pg_pe` WRITE;
-/*!40000 ALTER TABLE `csm_pg_pe` DISABLE KEYS */;
-INSERT INTO `csm_pg_pe` VALUES (1428,1,186,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1429,1,18,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1430,1,25,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1431,1,7,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1432,1,10,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1433,1,180,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1434,1,21,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1435,1,36,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1436,1,204,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1437,1,170,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1438,1,8,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1439,1,201,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1440,1,24,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1441,1,32,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1442,1,27,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1443,1,65,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1444,1,183,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1445,1,13,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1446,1,195,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1447,1,187,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1448,1,192,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1449,1,200,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1450,1,11,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1451,1,177,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1452,1,181,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1453,1,196,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1454,1,184,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1455,1,35,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1456,1,176,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1457,1,185,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1458,1,3,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1459,1,12,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1460,1,182,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1461,1,206,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1462,1,205,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1463,1,199,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1464,1,178,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1465,1,197,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1466,1,203,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1467,1,6,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1468,1,188,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1469,1,51,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1470,1,151,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1471,1,20,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1472,1,19,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1473,1,179,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1474,1,16,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1475,1,5,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1476,1,30,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1477,1,193,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1478,1,15,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1479,1,175,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1480,1,198,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1481,1,171,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1482,1,4,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1483,1,202,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1484,1,207,'0000-00-00');
-/*!40000 ALTER TABLE `csm_pg_pe` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `csm_privilege`
---
-
-DROP TABLE IF EXISTS `csm_privilege`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `csm_privilege` (
-  `PRIVILEGE_ID` bigint(20) NOT NULL AUTO_INCREMENT,
-  `PRIVILEGE_NAME` varchar(100) NOT NULL,
-  `PRIVILEGE_DESCRIPTION` varchar(200) DEFAULT NULL,
-  `UPDATE_DATE` date NOT NULL DEFAULT '0000-00-00',
-  PRIMARY KEY (`PRIVILEGE_ID`),
-  UNIQUE KEY `UQ_PRIVILEGE_NAME` (`PRIVILEGE_NAME`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `csm_privilege`
---
-
-LOCK TABLES `csm_privilege` WRITE;
-/*!40000 ALTER TABLE `csm_privilege` DISABLE KEYS */;
-INSERT INTO `csm_privilege` VALUES (1,'CREATE','This privilege grants permission to a user to create an entity. This entity can be an object, a database entry, or a resource such as a network connection','2009-07-22');
-INSERT INTO `csm_privilege` VALUES (2,'ACCESS','This privilege allows a user to access a particular resource.  Examples of resources include a network or database connection, socket, module of the application, or even the application itself','2009-07-22');
-INSERT INTO `csm_privilege` VALUES (3,'READ','This privilege permits the user to read data from a file, URL, database, an object, etc. This can be used at an entity level signifying that the user is allowed to read data about a particular entry','2009-07-22');
-INSERT INTO `csm_privilege` VALUES (4,'WRITE','This privilege allows a user to write data to a file, URL, database, an object, etc. This can be used at an entity level signifying that the user is allowed to write data about a particular entity','2009-07-22');
-INSERT INTO `csm_privilege` VALUES (5,'UPDATE','This privilege grants permission at an entity level and signifies that the user is allowed to update data for a particular entity. Entities may include an object, object attribute, database row etc','2009-07-22');
-INSERT INTO `csm_privilege` VALUES (6,'DELETE','This privilege permits a user to delete a logical entity. This entity can be an object, a database entry, a resource such as a network connection, etc','2009-07-22');
-INSERT INTO `csm_privilege` VALUES (7,'EXECUTE','This privilege allows a user to execute a particular resource. The resource can be a method, function, behavior of the application, URL, button etc','2009-07-22');
-/*!40000 ALTER TABLE `csm_privilege` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `csm_protection_element`
 --
 
@@ -317,12 +218,116 @@ INSERT INTO `csm_protection_element` VALUES (198,'edu.ualberta.med.biobank.model
 INSERT INTO `csm_protection_element` VALUES (199,'edu.ualberta.med.biobank.model.BbGroup','','edu.ualberta.med.biobank.model.BbGroup','','','',2,'2011-08-15');
 INSERT INTO `csm_protection_element` VALUES (200,'edu.ualberta.med.biobank.model.Principal','','edu.ualberta.med.biobank.model.Principal','','','',2,'2011-08-15');
 INSERT INTO `csm_protection_element` VALUES (201,'edu.ualberta.med.biobank.model.Membership','','edu.ualberta.med.biobank.model.Membership','','','',2,'2011-08-15');
-INSERT INTO `csm_protection_element` VALUES (204,'edu.ualberta.med.biobank.model.Permission','','edu.ualberta.med.biobank.model.Permission','','','',2,'2011-08-15');
-INSERT INTO `csm_protection_element` VALUES (205,'edu.ualberta.med.biobank.model.BbRight','','edu.ualberta.med.biobank.model.BbRight','','','',2,'2011-08-15');
-INSERT INTO `csm_protection_element` VALUES (206,'edu.ualberta.med.biobank.model.Privilege','','edu.ualberta.med.biobank.model.Privilege','','','',2,'2011-08-15');
-INSERT INTO `csm_protection_element` VALUES (207,'edu.ualberta.med.biobank.model.Role','','edu.ualberta.med.biobank.model.Role','','','',2,'2011-08-15');
+INSERT INTO `csm_protection_element` VALUES (202,'edu.ualberta.med.biobank.model.Permission','','edu.ualberta.med.biobank.model.Permission','','','',2,'2011-08-15');
+INSERT INTO `csm_protection_element` VALUES (203,'edu.ualberta.med.biobank.model.Role','','edu.ualberta.med.biobank.model.Role','','','',2,'2011-08-15');
+
+insert into csm_protection_element (protection_element_name, object_id, application_id, update_date) values
+('edu.ualberta.med.biobank.model.Comment','edu.ualberta.med.biobank.model.Comment',2,sysdate());
+
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping data for table `csm_pg_pe`
+--
+
+LOCK TABLES `csm_pg_pe` WRITE, csm_protection_element READ;
+/*!40000 ALTER TABLE `csm_pg_pe` DISABLE KEYS */;
+INSERT INTO `csm_pg_pe` VALUES (1428,1,10,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1429,1,11,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1430,1,12,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1431,1,13,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1432,1,15,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1433,1,151,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1434,1,16,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1435,1,170,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1437,1,171,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1438,1,175,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1439,1,176,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1440,1,177,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1441,1,178,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1442,1,179,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1443,1,18,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1444,1,180,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1445,1,181,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1446,1,182,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1447,1,183,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1448,1,184,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1449,1,185,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1450,1,186,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1451,1,187,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1452,1,188,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1453,1,19,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1454,1,192,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1455,1,193,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1456,1,195,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1457,1,196,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1458,1,197,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1459,1,198,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1460,1,199,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1462,1,20,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1463,1,200,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1464,1,201,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1465,1,202,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1466,1,203,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1467,1,205,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1468,1,21,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1469,1,24,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1470,1,25,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1471,1,27,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1472,1,3,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1473,1,30,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1474,1,32,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1475,1,35,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1476,1,36,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1477,1,4,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1478,1,5,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1479,1,51,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1480,1,6,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1481,1,65,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1482,1,7,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1483,1,8,'0000-00-00');
+
+insert into csm_pg_pe (protection_group_id, protection_element_id, update_date)
+select 1, protection_element_id, sysdate() from csm_protection_element
+where protection_element_name = 'edu.ualberta.med.biobank.model.Comment';
+
+/*!40000 ALTER TABLE `csm_pg_pe` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `csm_privilege`
+--
+
+DROP TABLE IF EXISTS `csm_privilege`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `csm_privilege` (
+  `PRIVILEGE_ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `PRIVILEGE_NAME` varchar(100) NOT NULL,
+  `PRIVILEGE_DESCRIPTION` varchar(200) DEFAULT NULL,
+  `UPDATE_DATE` date NOT NULL DEFAULT '0000-00-00',
+  PRIMARY KEY (`PRIVILEGE_ID`),
+  UNIQUE KEY `UQ_PRIVILEGE_NAME` (`PRIVILEGE_NAME`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `csm_privilege`
+--
+
+LOCK TABLES `csm_privilege` WRITE;
+/*!40000 ALTER TABLE `csm_privilege` DISABLE KEYS */;
+INSERT INTO `csm_privilege` VALUES (1,'CREATE','This privilege grants permission to a user to create an entity. This entity can be an object, a database entry, or a resource such as a network connection','2009-07-22');
+INSERT INTO `csm_privilege` VALUES (2,'ACCESS','This privilege allows a user to access a particular resource.  Examples of resources include a network or database connection, socket, module of the application, or even the application itself','2009-07-22');
+INSERT INTO `csm_privilege` VALUES (3,'READ','This privilege permits the user to read data from a file, URL, database, an object, etc. This can be used at an entity level signifying that the user is allowed to read data about a particular entry','2009-07-22');
+INSERT INTO `csm_privilege` VALUES (4,'WRITE','This privilege allows a user to write data to a file, URL, database, an object, etc. This can be used at an entity level signifying that the user is allowed to write data about a particular entity','2009-07-22');
+INSERT INTO `csm_privilege` VALUES (5,'UPDATE','This privilege grants permission at an entity level and signifies that the user is allowed to update data for a particular entity. Entities may include an object, object attribute, database row etc','2009-07-22');
+INSERT INTO `csm_privilege` VALUES (6,'DELETE','This privilege permits a user to delete a logical entity. This entity can be an object, a database entry, a resource such as a network connection, etc','2009-07-22');
+INSERT INTO `csm_privilege` VALUES (7,'EXECUTE','This privilege allows a user to execute a particular resource. The resource can be a method, function, behavior of the application, URL, button etc','2009-07-22');
+/*!40000 ALTER TABLE `csm_privilege` ENABLE KEYS */;
+UNLOCK TABLES;
+
 
 --
 -- Table structure for table `csm_protection_group`

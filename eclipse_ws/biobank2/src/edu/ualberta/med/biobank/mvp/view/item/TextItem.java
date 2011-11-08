@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.mvp.event.SimpleValueChangeEvent;
 
 public class TextItem extends ValidationItem<String> {
     private final static String EMPTY_STRING = ""; //$NON-NLS-1$
-    final ModifyListener modifyListener = new ModifyListener() {
+    private final ModifyListener modifyListener = new ModifyListener() {
         @Override
         public void modifyText(ModifyEvent e) {
             if (fireEvents) {

@@ -29,7 +29,7 @@ public class SelectCollectionEventPage extends BgcWizardPage {
     }
 
     public void setCollectionEventList(List<CollectionEventWrapper> cevents) {
-        ceventsTable.setCollection(cevents);
+        ceventsTable.setList(cevents);
     }
 
     public CollectionEventWrapper getCollectionEvent() {

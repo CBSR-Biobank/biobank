@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class UserInfoTable extends InfoTableWidget {
+public abstract class UserInfoTable extends InfoTableWidget<UserWrapper> {
 
     public static final int ROWS_PER_PAGE = 12;
 
@@ -53,17 +53,17 @@ public abstract class UserInfoTable extends InfoTableWidget {
 
     public UserInfoTable(Composite parent, List<UserWrapper> collection) {
         super(parent, collection, HEADINGS, ROWS_PER_PAGE, UserWrapper.class);
-        addEditItemListener(new IInfoTableEditItemListener() {
+        addEditItemListener(new IInfoTableEditItemListener<UserWrapper>() {
             @Override
-            public void editItem(InfoTableEvent event) {
+            public void editItem(InfoTableEvent<UserWrapper> event) {
                 UserWrapper user = ((TableRowData) getSelection()).user;
                 editUser(user);
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<UserWrapper>() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
+            public void deleteItem(InfoTableEvent<UserWrapper> event) {
                 UserWrapper user = ((TableRowData) getSelection()).user;
                 deleteUser(user);
             }
@@ -79,7 +79,7 @@ public abstract class UserInfoTable extends InfoTableWidget {
                 try {
                     SessionManager.getAppService().unlockUser(userName);
                     user.setLockedOut(false);
-                    reloadCollection(getCollection(), user);
+                    reloadCollection(getList(), user);
                 } catch (ApplicationException e) {
                     BgcPlugin.openAsyncError(MessageFormat.format(
                         Messages.UserInfoTable_unlock_error_msg,
@@ -155,7 +155,7 @@ public abstract class UserInfoTable extends InfoTableWidget {
             .getActiveWorkbenchWindow().getShell(), user);
         int res = dlg.open();
         if (res == Dialog.OK) {
-            reloadCollection(getCollection(), user);
+            reloadCollection(getList(), user);
             notifyListeners();
         }
         return res;
@@ -182,9 +182,9 @@ public abstract class UserInfoTable extends InfoTableWidget {
                 user.delete();
 
                 // remove the user from the collection
-                getCollection().remove(user);
+                getList().remove(user);
 
-                reloadCollection(getCollection(), null);
+                reloadCollection(getList(), null);
                 notifyListeners();
                 return true;
             }

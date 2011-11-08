@@ -8,7 +8,7 @@ import org.eclipse.jface.viewers.ISelection;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 import edu.ualberta.med.biobank.widgets.trees.infos.InfoTreeWidget;
 
-public class InfoTreeEvent extends EventObject {
+public class InfoTreeEvent<T> extends EventObject {
 
     /**
      * Generated serial version UID for this class.
@@ -17,7 +17,7 @@ public class InfoTreeEvent extends EventObject {
 
     protected transient ISelection selection;
 
-    public InfoTreeEvent(InfoTreeWidget<?> source, ISelection selection) {
+    public InfoTreeEvent(InfoTreeWidget<T> source, ISelection selection) {
         super(source);
         Assert.isNotNull(selection);
         this.selection = selection;
@@ -37,8 +37,9 @@ public class InfoTreeEvent extends EventObject {
      * 
      * @return the originating viewer
      */
-    public InfoTableWidget getInfoTable() {
-        return (InfoTableWidget) getSource();
+    @SuppressWarnings("unchecked")
+    public InfoTableWidget<T> getInfoTable() {
+        return (InfoTableWidget<T>) getSource();
     }
 
 }

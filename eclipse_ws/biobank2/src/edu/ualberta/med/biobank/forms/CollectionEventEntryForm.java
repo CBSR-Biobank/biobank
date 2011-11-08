@@ -22,20 +22,20 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
+import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientNextVisitNumberAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetInfosAction;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
-import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimenInfosAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimensAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -266,7 +266,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                     new SpecimenTypeGetInfosAction());
             final List<SourceSpecimen> studySourceSpecimens =
                 SessionManager.getAppService().doAction(
-                    new StudyGetSourceSpecimenInfosAction(ceventInfo.cevent
+                    new StudyGetSourceSpecimensAction(ceventInfo.cevent
                         .getPatient().getStudy().getId()));
 
             specimensTable.addEditSupport(studySourceSpecimens,
@@ -386,7 +386,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     protected void saveForm() throws Exception {
         List<SaveCEventSpecimenInfo> cevents =
             new ArrayList<CollectionEventSaveAction.SaveCEventSpecimenInfo>();
-        for (Object o : specimensTable.getCollection()) {
+        for (Object o : specimensTable.getList()) {
             SpecimenInfo specInfo = (SpecimenInfo) o;
             SaveCEventSpecimenInfo ceSpecInfo = new SaveCEventSpecimenInfo();
             ceSpecInfo.comments = specInfo.specimen.getCommentCollection();

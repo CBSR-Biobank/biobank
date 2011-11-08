@@ -10,7 +10,8 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 
-public class NewCollectionEventInfoTable extends InfoTableWidget {
+public class NewCollectionEventInfoTable extends
+    InfoTableWidget<PatientCEventInfo> {
 
     private static final String[] HEADINGS = new String[] {
         Messages.CollectionEventInfoTable_header_visitNumber,
@@ -28,7 +29,8 @@ public class NewCollectionEventInfoTable extends InfoTableWidget {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                PatientCEventInfo info = (PatientCEventInfo) ((BiobankCollectionModel) element).o;
+                PatientCEventInfo info =
+                    (PatientCEventInfo) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -55,16 +57,14 @@ public class NewCollectionEventInfoTable extends InfoTableWidget {
 
     @Override
     protected String getCollectionModelObjectToString(Object o) {
-        if (o == null)
-            return null;
+        if (o == null) return null;
         return ((PatientCEventInfo) o).toString();
     }
 
     @Override
     public CollectionEvent getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
-        if (item == null)
-            return null;
+        if (item == null) return null;
         PatientCEventInfo row = (PatientCEventInfo) item.o;
         Assert.isNotNull(row);
         return row.cevent;

@@ -70,11 +70,11 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
         } else {
             inventoryIdExcludeList.remove(si.specimen.getInventoryId());
         }
-        CEventSourceSpecimenDialog dlg = new CEventSourceSpecimenDialog(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            si == null ? null : si.specimen, studySourceTypes,
-            allSpecimenTypes, inventoryIdExcludeList, newListener,
-            defaultTimeDrawn);
+        CEventSourceSpecimenDialog dlg =
+            new CEventSourceSpecimenDialog(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), si == null ? null
+                : si.specimen, studySourceTypes, allSpecimenTypes,
+                inventoryIdExcludeList, newListener, defaultTimeDrawn);
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
             reloadCollection(currentSpecimens);
@@ -85,9 +85,9 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
     public void addEditSupport(final List<SourceSpecimen> studySourceTypes,
         final List<SpecimenTypeInfo> allSpecimenTypes) {
         if (SessionManager.canUpdate(SpecimenWrapper.class)) {
-            addEditItemListener(new IInfoTableEditItemListener() {
+            addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {
                 @Override
-                public void editItem(InfoTableEvent event) {
+                public void editItem(InfoTableEvent<SpecimenInfo> event) {
                     SpecimenInfo si = getSelection();
                     if (si != null)
                         addOrEditSpecimen(false, si, studySourceTypes,
@@ -96,9 +96,9 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
             });
         }
         if (SessionManager.canDelete(SpecimenWrapper.class)) {
-            addDeleteItemListener(new IInfoTableDeleteItemListener() {
+            addDeleteItemListener(new IInfoTableDeleteItemListener<SpecimenInfo>() {
                 @Override
-                public void deleteItem(InfoTableEvent event) {
+                public void deleteItem(InfoTableEvent<SpecimenInfo> event) {
                     SpecimenInfo si = getSelection();
                     if (si != null) {
                         if (!MessageDialog
@@ -112,7 +112,7 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                             return;
                         }
                         currentSpecimens.remove(si);
-                        setCollection(currentSpecimens);
+                        setList(currentSpecimens);
                         if (currentSpecimens.size() == 0) {
                             specimensAdded.setValue(false);
                         }

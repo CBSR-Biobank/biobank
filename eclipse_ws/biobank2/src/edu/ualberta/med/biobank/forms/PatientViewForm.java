@@ -147,7 +147,7 @@ public class PatientViewForm extends BiobankViewForm {
             patientInfo.patient.getPnumber()));
         form.setText(NLS.bind(Messages.PatientViewForm_title,
             patientInfo.patient.getPnumber()));
-        collectionEventTable.setCollection(patientInfo.cevents);
+        collectionEventTable.setList(patientInfo.cevents);
     }
 
 }

@@ -2,14 +2,13 @@ package edu.ualberta.med.biobank.common.action.shipment;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.List;
 
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.info.OiInfo;
+import edu.ualberta.med.biobank.common.action.info.SiInfo;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoSavePermission;
 import edu.ualberta.med.biobank.model.Center;
@@ -25,64 +24,46 @@ public class OriginInfoSaveAction implements Action<Integer> {
      * 
      */
     private static final long serialVersionUID = 1L;
+    private OiInfo oiInfo;
+    private SiInfo siInfo;
 
-    public class OiInfo {
-        private Integer oiId;
-        private Integer siteId;
-        private Integer centerId;
-        private Integer siId;
-        private List<Integer> specIds;
-    }
-
-    public class SiInfo {
-
-        private String boxNumber;
-        private Date packedAt;
-        private Date receivedAt;
-        private String waybill;
-        private CommentInfo commentInfo;
-
-    }
-
-    public OriginInfoSaveAction(Integer oiId, Integer siteId, Integer centerId,
-        Integer siId, String boxNumber, Date packedAt, Date receivedAt,
-        String waybill, String comment, List<Integer> specIds) {
-        this.oiId = oiId;
-        this.siteId = siteId;
-        this.centerId = centerId;
-        this.siId = siId;
-        this.boxNumber = boxNumber;
-        this.packedAt = packedAt;
-        this.receivedAt = receivedAt;
-        this.waybill = waybill;
-        this.comment = comment;
-        this.specIds = specIds;
+    public OriginInfoSaveAction(OiInfo oiInfo, SiInfo siInfo) {
+        this.oiInfo = oiInfo;
+        this.siInfo = siInfo;
     }
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        return new OriginInfoSavePermission(oiId).isAllowed(user, session);
+        return new OriginInfoSavePermission(oiInfo.oiId).isAllowed(user,
+            session);
     }
 
     @Override
     public Integer run(User user, Session session) throws ActionException {
         SessionUtil sessionUtil = new SessionUtil(session);
         OriginInfo oi =
-            sessionUtil.get(OriginInfo.class, oiId, new OriginInfo());
+            sessionUtil.get(OriginInfo.class, oiInfo.oiId, new OriginInfo());
 
-        oi.setReceiverSite(sessionUtil.get(Site.class, siteId));
-        oi.setCenter(sessionUtil.get(Center.class, centerId));
+        oi.setReceiverSite(sessionUtil.get(Site.class, oiInfo.siteId));
+        oi.setCenter(sessionUtil.get(Center.class, oiInfo.centerId));
 
         ShipmentInfo si =
-            sessionUtil.get(ShipmentInfo.class, siId, new ShipmentInfo());
-        si.boxNumber = boxNumber;
-        si.packedAt = packedAt;
-        si.receivedAt = receivedAt;
-        si.waybill = waybill;
+            sessionUtil
+                .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
+        si.boxNumber = siInfo.boxNumber;
+        si.packedAt = siInfo.packedAt;
+        si.receivedAt = siInfo.receivedAt;
+        si.waybill = siInfo.waybill;
 
+        // This stuff could be extracted to a util method. need to think about
+        // how
         Collection<Comment> comments = si.getCommentCollection();
         if (comments == null) comments = new ArrayList<Comment>();
-        comments.add(comment);
+        Comment newComment = new Comment();
+        newComment.setCreatedAt(siInfo.commentInfo.createdAt);
+        newComment.setMessage(siInfo.commentInfo.message);
+        newComment.setUser(user);
+        comments.add(newComment);
         si.setCommentCollection(comments);
 
         oi.setShipmentInfo(si);

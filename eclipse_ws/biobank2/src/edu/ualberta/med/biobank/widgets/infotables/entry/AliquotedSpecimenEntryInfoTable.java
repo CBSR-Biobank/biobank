@@ -49,7 +49,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
         if (selectedAliquotedSpecimen == null) {
             selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         }
-        setCollection(selectedAliquotedSpecimen);
+        setList(selectedAliquotedSpecimen);
         addedOrModifiedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         deletedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
 
@@ -118,17 +118,19 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
 
     private void addEditSupport() {
         if (SessionManager.canCreate(AliquotedSpecimenWrapper.class)) {
-            addAddItemListener(new IInfoTableAddItemListener() {
+            addAddItemListener(new IInfoTableAddItemListener<AliquotedSpecimenWrapper>() {
                 @Override
-                public void addItem(InfoTableEvent event) {
+                public void addItem(
+                    InfoTableEvent<AliquotedSpecimenWrapper> event) {
                     addAliquotedSpecimen();
                 }
             });
         }
         if (SessionManager.canUpdate(AliquotedSpecimenWrapper.class)) {
-            addEditItemListener(new IInfoTableEditItemListener() {
+            addEditItemListener(new IInfoTableEditItemListener<AliquotedSpecimenWrapper>() {
                 @Override
-                public void editItem(InfoTableEvent event) {
+                public void editItem(
+                    InfoTableEvent<AliquotedSpecimenWrapper> event) {
                     AliquotedSpecimenWrapper aliquotedSpecimen = getSelection();
                     if (aliquotedSpecimen != null)
                         addOrEditAliquotedSpecimen(false, aliquotedSpecimen);
@@ -136,9 +138,10 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
             });
         }
         if (SessionManager.canDelete(AliquotedSpecimenWrapper.class)) {
-            addDeleteItemListener(new IInfoTableDeleteItemListener() {
+            addDeleteItemListener(new IInfoTableDeleteItemListener<AliquotedSpecimenWrapper>() {
                 @Override
-                public void deleteItem(InfoTableEvent event) {
+                public void deleteItem(
+                    InfoTableEvent<AliquotedSpecimenWrapper> event) {
                     AliquotedSpecimenWrapper aliquotedSpecimen = getSelection();
                     if (aliquotedSpecimen != null) {
                         if (!MessageDialog
@@ -154,7 +157,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                         }
 
                         selectedAliquotedSpecimen.remove(aliquotedSpecimen);
-                        setCollection(selectedAliquotedSpecimen);
+                        setList(selectedAliquotedSpecimen);
                         deletedAliquotedSpecimen.add(aliquotedSpecimen);
                         notifyListeners();
                     }

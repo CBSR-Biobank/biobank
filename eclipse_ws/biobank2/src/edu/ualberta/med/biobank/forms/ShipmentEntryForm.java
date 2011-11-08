@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction.ShipInfo;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
@@ -471,9 +470,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
 
-        OriginInfoSaveAction save =
-            new OriginInfoSaveAction(originInfo.getId(), addedSpecIds,
-                removedSpecIds);
+        // OriginInfoSaveAction save =
+        // new OriginInfoSaveAction(originInfo.getId(), addedSpecIds,
+        // removedSpecIds);
 
         /*
          * if (shipmentInfo.getWaybill() != null &&

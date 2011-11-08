@@ -16,12 +16,12 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
+import edu.ualberta.med.biobank.mvp.event.model.site.SiteCreateEvent;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public class SiteGroup extends AdapterBase {
-
     public SiteGroup(SessionAdapter parent, int id) {
         super(parent, id, Messages.SiteGroup_sites_node_label, true, false);
     }
@@ -97,9 +97,7 @@ public class SiteGroup extends AdapterBase {
     }
 
     public void addSite() {
-        SiteWrapper site = new SiteWrapper(SessionManager.getAppService());
-        SiteAdapter adapter = new SiteAdapter(this, site);
-        adapter.openEntryForm();
+        eventBus.fireEvent(new SiteCreateEvent());
     }
 
     @Override

@@ -22,10 +22,10 @@ public class StudyGetListForSiteAction implements Action<ArrayList<Study>> {
     @SuppressWarnings("nls")
     private static final String STUDIES_QRY =
         "select study"
-            + " from " + Study.class.getName() + " as study"
-            + " left join study." + StudyPeer.SITE_COLLECTION.getName()
-            + " as site"
-            + " where site." + SitePeer.ID.getName() + " =?";
+        + " from " + Study.class.getName() + " as study"
+        + " left join study." + StudyPeer.SITE_COLLECTION.getName()
+        + " as site"
+        + " where site." + SitePeer.ID.getName() + " =?";
 
     // @formatter:on
 

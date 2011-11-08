@@ -188,7 +188,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
                 Messages.PatientMergeForm_retrieve_error_title, e);
-            patient2VisitsTable.setCollection(newContents);
+            patient2VisitsTable.setList(newContents);
             study2Text.setText(""); //$NON-NLS-1$
             return;
         }
@@ -196,7 +196,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             BgcPlugin.openAsyncError(
                 Messages.PatientMergeForm_pnber_invalid_error_title,
                 Messages.PatientMergeForm_pnber_invalid_error_msg);
-            patient2VisitsTable.setCollection(newContents);
+            patient2VisitsTable.setList(newContents);
             study2Text.setText(""); //$NON-NLS-1$
             return;
         }
@@ -205,19 +205,19 @@ public class PatientMergeForm extends BiobankEntryForm {
             BgcPlugin.openAsyncError(
                 Messages.PatientMergeForm_duplicate_error_title,
                 Messages.PatientMergeForm_duplicate_error_msg);
-            patient2VisitsTable.setCollection(newContents);
+            patient2VisitsTable.setList(newContents);
             return;
         }
 
         study2Text.setText(patient2.getStudy().getNameShort());
 
         if (!patient2.getStudy().equals(patient1.getStudy())) {
-            patient2VisitsTable.setCollection(newContents);
+            patient2VisitsTable.setList(newContents);
             BgcPlugin.openAsyncError(
                 Messages.PatientMergeForm_pnber_invalid_error_title,
                 Messages.PatientMergeForm_studies_error_msg);
         } else {
-            patient2VisitsTable.setCollection(patient2
+            patient2VisitsTable.setList(patient2
                 .getCollectionEventCollection(true));
             patientNotNullValue.setValue(Boolean.TRUE);
         }
@@ -275,12 +275,12 @@ public class PatientMergeForm extends BiobankEntryForm {
     protected void onReset() throws Exception {
         pnumber1Text.setText(patient1.getPnumber());
         study1Text.setText(patient1.getStudy().getNameShort());
-        patient1VisitsTable.setCollection(patient1
+        patient1VisitsTable.setList(patient1
             .getCollectionEventCollection(true));
         pnumber2Text.setText(""); //$NON-NLS-1$
         study2Text.setText(""); //$NON-NLS-1$
         patient2VisitsTable
-            .setCollection(new ArrayList<CollectionEventWrapper>());
+            .setList(new ArrayList<CollectionEventWrapper>());
         patient2 = null;
     }
 

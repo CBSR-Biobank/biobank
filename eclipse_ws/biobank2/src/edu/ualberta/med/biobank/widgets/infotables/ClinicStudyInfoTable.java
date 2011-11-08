@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class ClinicStudyInfoTable extends InfoTableWidget {
+public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     private static class TableRowData {
         public StudyWrapper study;
@@ -35,7 +35,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget {
     public ClinicStudyInfoTable(Composite parent, ClinicWrapper clinic) {
         super(parent, null, HEADINGS, 10, StudyWrapper.class);
         this.clinic = clinic;
-        setCollection(clinic.getStudyCollection());
+        setList(clinic.getStudyCollection());
     }
 
     @Override

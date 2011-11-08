@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class RequestDispatchInfoTable extends InfoTableWidget {
+public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
     private static final String[] HEADINGS = new String[] {
         Messages.RequestDispatchInfoTable_sender_label,

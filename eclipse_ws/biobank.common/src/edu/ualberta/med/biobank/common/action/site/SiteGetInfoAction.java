@@ -21,10 +21,11 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String SITE_INFO_HQL = "SELECT site, COUNT(DISTINCT patients), COUNT(DISTINCT collectionEvents), COUNT(DISTINCT aliquotedSpecimens)"
-        + " FROM "
-        + Site.class.getName()
-        + " site"
+    private static final String SITE_INFO_HQL = 
+        "SELECT site, COUNT(DISTINCT patients), " 
+        + "COUNT(DISTINCT collectionEvents), " 
+        + "COUNT(DISTINCT aliquotedSpecimens)"
+        + " FROM " + Site.class.getName() + " site"
         + " INNER JOIN FETCH site.address address"
         + " INNER JOIN FETCH site.activityStatus activityStatus"
         + " LEFT JOIN site.studyCollection AS studies"

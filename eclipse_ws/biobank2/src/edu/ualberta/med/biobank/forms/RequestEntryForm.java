@@ -340,7 +340,7 @@ public class RequestEntryForm extends BiobankViewForm {
     public void reload() throws Exception {
         request.reload();
         specimensTree.refresh();
-        dispatchTable.setCollection(request.getDispatchCollection(false));
+        dispatchTable.setList(request.getDispatchCollection(false));
         dispatchTable.setSelection(null);
         setEnabledActions();
     }

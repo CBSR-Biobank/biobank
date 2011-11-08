@@ -14,12 +14,13 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable.ClinicContacts;
 
 /**
  * Used to display clinic and contact information. Meant to be used by
  * StudyViewForm only.
  */
-public class StudyContactInfoTable extends InfoTableWidget {
+public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
 
     protected static class TableRowData {
         ClinicWrapper clinic;
@@ -52,7 +53,7 @@ public class StudyContactInfoTable extends InfoTableWidget {
         setCollectionByStudy(study);
     }
 
-    private class ClinicContacts {
+    public static class ClinicContacts {
         public ClinicWrapper clinic;
         public String contacts;
 
@@ -63,7 +64,7 @@ public class StudyContactInfoTable extends InfoTableWidget {
     }
 
     public void setCollectionByStudy(StudyWrapper study) {
-        super.setCollection(new ArrayList<ClinicContacts>(processClinics(study
+        super.setList(new ArrayList<ClinicContacts>(processClinics(study
             .getContactCollection(true))));
     }
 

@@ -45,7 +45,8 @@ public class DispatchViewForm extends BiobankViewForm {
     private static BgcLogger logger = BgcLogger
         .getLogger(DispatchViewForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.DispatchViewForm"; //$NON-NLS-1$
 
     private DispatchAdapter dispatchAdapter;
 
@@ -91,7 +92,7 @@ public class DispatchViewForm extends BiobankViewForm {
             logger.error(Messages.DispatchViewForm_retrieve_ship_error_msg
                 + dispatch.getShipmentInfo().getWaybill(), ex);
         }
-        commentTable.setCollection(dispatch.getCommentCollection(false));
+        commentTable.setList(dispatch.getCommentCollection(false));
     }
 
     @Override
@@ -164,15 +165,17 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private void createTreeTableSection() {
         if (dispatch.isInCreationState()) {
-            Composite parent = createSectionWithClient(Messages.DispatchViewForm_specimen_section_label);
-            specimensNonProcessedTable = new DispatchSpecimenListInfoTable(
-                parent, dispatch, false) {
-                @Override
-                public List<DispatchSpecimenWrapper> getInternalDispatchSpecimens() {
-                    return dispatch.getNonProcessedDispatchSpecimenCollection();
-                }
+            Composite parent =
+                createSectionWithClient(Messages.DispatchViewForm_specimen_section_label);
+            specimensNonProcessedTable =
+                new DispatchSpecimenListInfoTable(parent, dispatch, false) {
+                    @Override
+                    public List<DispatchSpecimenWrapper> getInternalDispatchSpecimens() {
+                        return dispatch
+                            .getNonProcessedDispatchSpecimenCollection();
+                    }
 
-            };
+                };
             specimensNonProcessedTable.adaptToToolkit(toolkit, true);
             specimensNonProcessedTable
                 .addClickListener(new IDoubleClickListener() {
@@ -180,9 +183,11 @@ public class DispatchViewForm extends BiobankViewForm {
                     public void doubleClick(DoubleClickEvent event) {
                         Object selection = event.getSelection();
                         if (selection instanceof InfoTableSelection) {
-                            InfoTableSelection tableSelection = (InfoTableSelection) selection;
-                            DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) tableSelection
-                                .getObject();
+                            InfoTableSelection tableSelection =
+                                (InfoTableSelection) selection;
+                            DispatchSpecimenWrapper dsa =
+                                (DispatchSpecimenWrapper) tableSelection
+                                    .getObject();
                             if (dsa != null) {
                                 SessionManager.openViewForm(dsa.getSpecimen());
                             }
@@ -198,8 +203,8 @@ public class DispatchViewForm extends BiobankViewForm {
                 });
             specimensNonProcessedTable.createDefaultEditItem();
         } else {
-            specimensTree = new DispatchSpecimensTreeTable(page, dispatch,
-                false, false);
+            specimensTree =
+                new DispatchSpecimensTreeTable(page, dispatch, false, false);
             specimensTree.addClickListener();
         }
     }
@@ -207,8 +212,9 @@ public class DispatchViewForm extends BiobankViewForm {
     private void createReceiveButtons() {
         Composite composite = toolkit.createComposite(page);
         composite.setLayout(new GridLayout(3, false));
-        Button sendButton = toolkit.createButton(composite,
-            Messages.DispatchViewForm_receive_button_label, SWT.PUSH);
+        Button sendButton =
+            toolkit.createButton(composite,
+                Messages.DispatchViewForm_receive_button_label, SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -216,8 +222,10 @@ public class DispatchViewForm extends BiobankViewForm {
             }
         });
 
-        Button sendProcessButton = toolkit.createButton(composite,
-            Messages.DispatchViewForm_receive_process_button_label, SWT.PUSH);
+        Button sendProcessButton =
+            toolkit.createButton(composite,
+                Messages.DispatchViewForm_receive_process_button_label,
+                SWT.PUSH);
         sendProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -225,8 +233,9 @@ public class DispatchViewForm extends BiobankViewForm {
             }
         });
 
-        Button lostProcessButton = toolkit.createButton(composite,
-            Messages.DispatchViewForm_lost_button_label, SWT.PUSH);
+        Button lostProcessButton =
+            toolkit.createButton(composite,
+                Messages.DispatchViewForm_lost_button_label, SWT.PUSH);
         lostProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -238,8 +247,9 @@ public class DispatchViewForm extends BiobankViewForm {
     private void createCloseButton() {
         Composite composite = toolkit.createComposite(page);
         composite.setLayout(new GridLayout(2, false));
-        Button sendButton = toolkit.createButton(composite,
-            Messages.DispatchViewForm_done_button_label, SWT.PUSH);
+        Button sendButton =
+            toolkit.createButton(composite,
+                Messages.DispatchViewForm_done_button_label, SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -249,15 +259,17 @@ public class DispatchViewForm extends BiobankViewForm {
     }
 
     private void createSendButton() {
-        final Button sendButton = toolkit.createButton(page,
-            Messages.DispatchViewForm_send_button_label, SWT.PUSH);
+        final Button sendButton =
+            toolkit.createButton(page,
+                Messages.DispatchViewForm_send_button_label, SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (new SendDispatchDialog(Display.getDefault()
                     .getActiveShell(), dispatch).open() == Dialog.OK) {
-                    IRunnableContext context = new ProgressMonitorDialog(
-                        Display.getDefault().getActiveShell());
+                    IRunnableContext context =
+                        new ProgressMonitorDialog(Display.getDefault()
+                            .getActiveShell());
                     try {
                         context.run(true, true, new IRunnableWithProgress() {
                             @Override
@@ -266,8 +278,8 @@ public class DispatchViewForm extends BiobankViewForm {
                                     Messages.DispatchViewForm_saving_text,
                                     IProgressMonitor.UNKNOWN);
                                 try {
-                                    ShipmentInfoWrapper si = dispatch
-                                        .getShipmentInfo();
+                                    ShipmentInfoWrapper si =
+                                        dispatch.getShipmentInfo();
                                     dispatch.reload();
                                     dispatch.setShipmentInfo(si);
                                     dispatch.setState(DispatchState.IN_TRANSIT);
@@ -304,8 +316,9 @@ public class DispatchViewForm extends BiobankViewForm {
         else if (dispatch.isInClosedState())
             stateMessage = Messages.DispatchViewForm_complete_msg;
         if (stateMessage != null) {
-            Label label = widgetCreator.createLabel(client, stateMessage,
-                SWT.CENTER, false);
+            Label label =
+                widgetCreator.createLabel(client, stateMessage, SWT.CENTER,
+                    false);
             label.setBackground(Display.getDefault().getSystemColor(
                 SWT.COLOR_RED));
             label.setForeground(Display.getDefault().getSystemColor(
@@ -317,29 +330,36 @@ public class DispatchViewForm extends BiobankViewForm {
             label.setLayoutData(gd);
         }
 
-        senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.DispatchViewForm_sender_label);
-        receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.DispatchViewForm_receiver_label);
+        senderLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.DispatchViewForm_sender_label);
+        receiverLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.DispatchViewForm_receiver_label);
         if (!dispatch.isInCreationState()) {
-            departedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.DispatchViewForm_packedAt_label);
-            shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.DispatchViewForm_shippingMethod_label);
-            waybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.DispatchViewForm_waybill_label);
+            departedLabel =
+                createReadOnlyLabelledField(client, SWT.NONE,
+                    Messages.DispatchViewForm_packedAt_label);
+            shippingMethodLabel =
+                createReadOnlyLabelledField(client, SWT.NONE,
+                    Messages.DispatchViewForm_shippingMethod_label);
+            waybillLabel =
+                createReadOnlyLabelledField(client, SWT.NONE,
+                    Messages.DispatchViewForm_waybill_label);
         }
         if (dispatch.hasBeenReceived()) {
-            dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.DispatchViewForm_received_label);
+            dateReceivedLabel =
+                createReadOnlyLabelledField(client, SWT.NONE,
+                    Messages.DispatchViewForm_received_label);
         }
         createCommentsSection();
     }
 
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
-        commentTable = new CommentCollectionInfoTable(client,
-            dispatch.getCommentCollection(false));
+        commentTable =
+            new CommentCollectionInfoTable(client,
+                dispatch.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
     }
