@@ -15,13 +15,12 @@ import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidato
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
+import edu.ualberta.med.biobank.common.action.info.SiteInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
-import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction.SiteInfo;
-import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.site.SiteViewPresenterShowEvent;
@@ -140,9 +139,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
     }
 
     public void createSite() {
-        SiteInfo siteInfo = new SiteInfo();
-        siteInfo.setSite(new Site());
-        siteInfo.getSite().setAddress(new Address());
+        SiteInfo siteInfo = new SiteInfo.Builder().build();
         editSite(siteInfo);
     }
 
@@ -170,6 +167,13 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         model.setValue(siteInfo);
     }
 
+    /**
+     * The {@link Model} holds the data that the {@link View} needs and supplies
+     * validation.
+     * 
+     * @author jferland
+     * 
+     */
     public static class Model extends AbstractModel<SiteInfo> {
         private final AbstractModel<Address> addressModel;
 
@@ -185,6 +189,9 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
             super(SiteInfo.class);
 
             this.addressModel = addressModel;
+
+            // TODO: have a provider(x.class) method that creates and returns a
+            // provider? (while adding the dirty listener, etc.)
 
             siteId = fieldOfType(Integer.class)
                 .boundTo(provider, "site.id");

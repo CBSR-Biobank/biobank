@@ -1,13 +1,9 @@
 package edu.ualberta.med.biobank.mvp.view.item;
 
-import java.util.Collection;
-
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.HasValue;
 
-import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.mvp.event.SimpleValueChangeEvent;
 
 // TODO: describe this class!
@@ -16,13 +12,6 @@ public class TranslatedItem<T, U> extends ValidationItem<T>
     private final DelegateMonitor delegateMonitor = new DelegateMonitor();
     private final ValidationItem<U> delegate;
     private final Translator<T, U> translator;
-
-    public static void main() {
-        // TODO: static constructor so smaller.
-        TranslatedItem<Collection<StudyInfo>, Collection<StudyWrapper>> studies =
-            new TranslatedItem<Collection<StudyInfo>, Collection<StudyWrapper>>(
-                new TableItem<StudyWrapper>(), null);
-    }
 
     public interface Translator<T, U> {
         T fromDelegate(U delegate);

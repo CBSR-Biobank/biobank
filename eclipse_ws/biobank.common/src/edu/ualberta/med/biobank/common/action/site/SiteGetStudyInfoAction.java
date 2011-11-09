@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.site;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,40 +8,12 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
+import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
 public class SiteGetStudyInfoAction implements Action<ArrayList<StudyInfo>> {
-    public static class StudyInfo implements Serializable, NotAProxy {
-        private static final long serialVersionUID = 1L;
-
-        private final Study study;
-        private final Long patientCount;
-        private final Long collectionEventCount;
-
-        public StudyInfo(Study study, Long patientCount,
-            Long collectionEventCount) {
-            this.study = study;
-            this.patientCount = patientCount;
-            this.collectionEventCount = collectionEventCount;
-        }
-
-        public Study getStudy() {
-            return study;
-        }
-
-        public Long getPatientCount() {
-            return patientCount;
-        }
-
-        public Long getCollectionEventCount() {
-            return collectionEventCount;
-        }
-    }
-
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
