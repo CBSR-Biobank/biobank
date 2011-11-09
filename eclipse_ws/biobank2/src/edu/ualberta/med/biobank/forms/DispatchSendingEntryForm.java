@@ -150,7 +150,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_button_add);
+            Messages.Comments_add);
 
     }
 

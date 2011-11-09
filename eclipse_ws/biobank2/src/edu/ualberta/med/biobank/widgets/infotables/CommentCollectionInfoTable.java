@@ -87,6 +87,8 @@ public class CommentCollectionInfoTable extends InfoTableWidget<CommentWrapper> 
 
             @Override
             public int compare(Object o, Object o2) {
+                if (o == null || o2 == null)
+                    return 0;
                 CommentWrapper comment1 = (CommentWrapper) o;
                 CommentWrapper comment2 = (CommentWrapper) o2;
                 return comment1.getCreatedAt().compareTo(

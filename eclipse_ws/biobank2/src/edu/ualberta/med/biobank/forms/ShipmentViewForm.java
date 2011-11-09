@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 
 public class ShipmentViewForm extends BiobankViewForm {
 
@@ -37,9 +38,10 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private BgcBaseText boxNumberLabel;
 
-    private BgcBaseText commentLabel;
 
     private SpecimenEntryWidget specimenWidget;
+
+    private CommentCollectionInfoTable commentEntryTable;
 
     @Override
     protected void init() throws Exception {
@@ -105,13 +107,28 @@ public class ShipmentViewForm extends BiobankViewForm {
         dateReceivedLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
                 Messages.ShipmentViewForm_received_label);
-        commentLabel =
-            createReadOnlyLabelledField(client, SWT.WRAP | SWT.MULTI,
-                Messages.ShipmentViewForm_comment_label);
 
+        createCommentSection();
+        
         setShipmentValues();
     }
 
+    private void createCommentSection() {
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable =
+            new CommentCollectionInfoTable(client,
+                    originInfo.getShipmentInfo().getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+
+    }
+    
     private void setShipmentValues() {
         ShipmentInfoWrapper shipInfo = originInfo.getShipmentInfo();
         ShippingMethodWrapper shipMethod = shipInfo.getShippingMethod();
@@ -130,7 +147,6 @@ public class ShipmentViewForm extends BiobankViewForm {
 
         setTextValue(boxNumberLabel, shipInfo.getBoxNumber());
         setTextValue(dateReceivedLabel, shipInfo.getFormattedDateReceived());
-        setTextValue(commentLabel, shipInfo.getCommentCollection(false));
     }
 
     @Override
@@ -139,7 +155,8 @@ public class ShipmentViewForm extends BiobankViewForm {
         setPartName();
         setFormText();
         setShipmentValues();
-
+        
+        commentEntryTable.setList(originInfo.getShipmentInfo().getCommentCollection(false));
         specimenWidget.setSpecimens(originInfo.getSpecimenCollection());
     }
 

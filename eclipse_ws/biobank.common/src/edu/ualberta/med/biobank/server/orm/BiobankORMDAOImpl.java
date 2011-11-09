@@ -72,7 +72,7 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         if (!action.isAllowed(user, session))
             throw new AccessDeniedException();
 
-        T actionResult = action.run(null, session);
+        T actionResult = action.run(user, session);
 
         session.flush();
         session.clear();

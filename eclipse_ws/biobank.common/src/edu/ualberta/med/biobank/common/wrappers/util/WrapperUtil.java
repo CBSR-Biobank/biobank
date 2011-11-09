@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.cglib.proxy.Enhancer;
@@ -158,4 +159,14 @@ public class WrapperUtil {
 
         return unwrapped;
     }
+    
+    public static List<Integer> getCollectionIds(List<? extends ModelWrapper<?>> wrapperCollection) {
+        List<Integer> ids = new ArrayList<Integer>();
+
+        for (ModelWrapper<?> wrapper : wrapperCollection) {
+            ids.add(wrapper.getId());
+        }
+        return ids;
+    }
+    
 }

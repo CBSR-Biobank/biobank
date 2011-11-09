@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.common.action.shipment;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
 
 import org.hibernate.Session;
 
@@ -15,6 +17,7 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 
@@ -54,15 +57,22 @@ public class OriginInfoSaveAction implements Action<Integer> {
         si.packedAt = siInfo.packedAt;
         si.receivedAt = siInfo.receivedAt;
         si.waybill = siInfo.waybill;
+        
+        ShippingMethod sm = sessionUtil
+            .get(ShippingMethod.class, siInfo.method.id, new ShippingMethod());
+        
+        si.setShippingMethod(sm);
 
         // This stuff could be extracted to a util method. need to think about
         // how
         Collection<Comment> comments = si.getCommentCollection();
-        if (comments == null) comments = new ArrayList<Comment>();
+        if (comments == null) comments = new HashSet<Comment>();
         Comment newComment = new Comment();
-        newComment.setCreatedAt(siInfo.commentInfo.createdAt);
+        newComment.setCreatedAt(new Date());
         newComment.setMessage(siInfo.commentInfo.message);
         newComment.setUser(user);
+        session.saveOrUpdate(newComment);
+        
         comments.add(newComment);
         si.setCommentCollection(comments);
 

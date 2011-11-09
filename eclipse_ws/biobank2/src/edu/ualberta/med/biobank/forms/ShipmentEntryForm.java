@@ -17,20 +17,28 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.info.CommentInfo;
+import edu.ualberta.med.biobank.common.action.info.OiInfo;
+import edu.ualberta.med.biobank.common.action.info.ShippingMethodInfo;
+import edu.ualberta.med.biobank.common.action.info.SiInfo;
+import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction.ShipInfo;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
+import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.dialogs.SpecimenOriginSelectDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -121,12 +129,17 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private OriginInfoWrapper originInfo;
     private ShipmentInfoWrapper shipmentInfo;
 
+    private BgcBaseText commentWidget;
+    private CommentWrapper comment;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ShipmentAdapter,
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
+        comment = new CommentWrapper(SessionManager.getAppService());
+        
         oiCopy = new OriginInfo();
         if (adapter.getId() != null) {
             oiInfo =
@@ -452,8 +465,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_button_add);
+        commentWidget = (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
+           Messages.Comments_add, null, comment, "message", null);
 
     }
 
@@ -469,10 +482,16 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-
-        // OriginInfoSaveAction save =
-        // new OriginInfoSaveAction(originInfo.getId(), addedSpecIds,
-        // removedSpecIds);
+        
+        List<Integer> addedSpecimenIds = WrapperUtil.getCollectionIds(specimenEntryWidget.getAddedSpecimens());
+        List<Integer> removedSpecimenIds = WrapperUtil.getCollectionIds(specimenEntryWidget.getRemovedSpecimens());
+        
+        CommentInfo commentInfo = new CommentInfo(comment.getMessage(), null, null);
+        ShippingMethodInfo methodInfo = new ShippingMethodInfo(shipmentInfo.getShippingMethod().getId());
+        OiInfo oiInfo = new OiInfo(originInfo.getId(), originInfo.getReceiverSite().getId(), originInfo.getCenter().getId(), addedSpecimenIds, removedSpecimenIds);
+        SiInfo siInfo = new SiInfo(shipmentInfo.getId(), shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(), shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(), commentInfo, methodInfo);
+        OriginInfoSaveAction save = new OriginInfoSaveAction(oiInfo, siInfo);
+        SessionManager.getAppService().doAction(save);
 
         /*
          * if (shipmentInfo.getWaybill() != null &&
