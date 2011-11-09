@@ -1,22 +1,16 @@
 package edu.ualberta.med.biobank.common.action.study;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
-import edu.ualberta.med.biobank.common.peer.StudyPeer;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.util.SetDifference;
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
@@ -37,18 +31,7 @@ public class StudySaveAction implements Action<Integer> {
     private Set<Integer> contactIds;
     private Set<Integer> sourceSpcIds;
     private Set<Integer> aliquotSpcIds;
-
-    public static class StudyEventAttrSaveInfo implements Serializable,
-        NotAProxy {
-        private static final long serialVersionUID = 1L;
-        public Integer globalEventAttrId;
-        public EventAttrTypeEnum type;
-        public Boolean required;
-        public String permissible;
-        public Integer aStatusId;
-    }
-
-    private List<StudyEventAttrSaveInfo> studyEventAttrInfos;
+    private Set<Integer> studyEventAttrIds;
 
     public void setId(Integer id) {
         this.id = id;
@@ -82,8 +65,8 @@ public class StudySaveAction implements Action<Integer> {
         this.aliquotSpcIds = aliquotSpcIds;
     }
 
-    public void setStudyEventAttrSaveInfo(List<StudyEventAttrSaveInfo> infos) {
-        this.studyEventAttrInfos = infos;
+    public void setStudyEventAttrSaveIds(Set<Integer> attrIds) {
+        this.studyEventAttrIds = attrIds;
     }
 
     @Override
@@ -129,23 +112,19 @@ public class StudySaveAction implements Action<Integer> {
         study.setNameShort(nameShort);
 
         ActivityStatus aStatus =
-            sessionUtil.get(ActivityStatus.class, aStatusId);
+            sessionUtil.load(ActivityStatus.class, aStatusId);
         study.setActivityStatus(aStatus);
 
-        // TODO: set collections based on diffs
-
         Map<Integer, Site> sites =
-            sessionUtil.get(Site.class, siteIds);
+            sessionUtil.load(Site.class, siteIds);
 
-        // TODO: check for null in sites
-
-        SetDifference<Site> siteDiff =
-            new SetDifference<Site>(study.getSiteCollection(), sites.values());
-
-        study.setSiteCollection(sites.values());
+        study.setSiteCollection(new HashSet<Site>(sites.values()));
+        SetDifference<Site> sitesDiff =
+            new SetDifference<Site>(study.getSiteCollection(),
+                sites.values());
 
         // remove this study from sites in removed list
-        for (Site site : siteDiff.getRemoveSet()) {
+        for (Site site : sitesDiff.getRemoveSet()) {
             Collection<Study> siteStudies = site.getStudyCollection();
             if (siteStudies.remove(study)) {
                 site.setStudyCollection(siteStudies);
@@ -156,59 +135,75 @@ public class StudySaveAction implements Action<Integer> {
         }
 
         Map<Integer, Contact> contacts =
-            sessionUtil.get(Contact.class, contactIds);
+            sessionUtil.load(Contact.class, contactIds);
         study.setContactCollection(new HashSet<Contact>(contacts.values()));
+        SetDifference<Contact> contactsDiff =
+            new SetDifference<Contact>(study.getContactCollection(),
+                contacts.values());
+
+        for (Contact contact : contactsDiff.getAddSet()) {
+            Collection<Study> contactStudies = contact.getStudyCollection();
+            contactStudies.add(study);
+            contact.setStudyCollection(contactStudies);
+        }
+
+        // remove this study from contacts in removed list
+        for (Contact contact : contactsDiff.getRemoveSet()) {
+            Collection<Study> contactStudies = contact.getStudyCollection();
+            if (contactStudies.remove(study)) {
+                contact.setStudyCollection(contactStudies);
+            } else {
+                throw new ActionException(
+                    "study not found in removed site's collection");
+            }
+        }
 
         Map<Integer, AliquotedSpecimen> aliquotedSpcs =
-            sessionUtil.get(AliquotedSpecimen.class, aliquotSpcIds);
+            sessionUtil.load(AliquotedSpecimen.class, aliquotSpcIds);
         study
             .setAliquotedSpecimenCollection(new HashSet<AliquotedSpecimen>(
                 aliquotedSpcs.values()));
+        SetDifference<AliquotedSpecimen> aqSpcsDiff =
+            new SetDifference<AliquotedSpecimen>(
+                study.getAliquotedSpecimenCollection(),
+                aliquotedSpcs.values());
+
+        // delete aliquoted specimens no longer in use
+        for (AliquotedSpecimen aqSpc : aqSpcsDiff.getRemoveSet()) {
+            session.delete(aqSpc);
+        }
 
         Map<Integer, SourceSpecimen> sourceSpcs =
-            sessionUtil.get(SourceSpecimen.class, sourceSpcIds);
+            sessionUtil.load(SourceSpecimen.class, sourceSpcIds);
         study.setSourceSpecimenCollection(new HashSet<SourceSpecimen>(
             sourceSpcs.values()));
+        SetDifference<SourceSpecimen> srcSpcsDiff =
+            new SetDifference<SourceSpecimen>(
+                study.getSourceSpecimenCollection(),
+                sourceSpcs.values());
 
-        setStudyEventAttrs(user, session, sessionUtil, study);
+        // delete source specimens no longer in use
+        for (SourceSpecimen srcSpc : srcSpcsDiff.getRemoveSet()) {
+            session.delete(srcSpc);
+        }
+
+        Map<Integer, StudyEventAttr> studyEventAttrs =
+            sessionUtil.load(StudyEventAttr.class, studyEventAttrIds);
+        study.setStudyEventAttrCollection(new HashSet<StudyEventAttr>(
+            studyEventAttrs.values()));
+        SetDifference<StudyEventAttr> attrsDiff =
+            new SetDifference<StudyEventAttr>(
+                study.getStudyEventAttrCollection(),
+                studyEventAttrs.values());
+
+        // delete study event attrs no longer in use
+        for (StudyEventAttr attr : attrsDiff.getRemoveSet()) {
+            session.delete(attr);
+        }
 
         session.saveOrUpdate(study);
         session.flush();
 
         return study.getId();
-    }
-
-    private void setStudyEventAttrs(User user, Session session,
-        SessionUtil sessionUtil, Study study) {
-        Map<Integer, GlobalEventAttrInfo> globalEventAttrInfoList =
-            new GlobalEventAttrInfoGetAction().run(user, session);
-
-        if (studyEventAttrInfos == null) {
-            // remove existing study event attrs?
-        } else {
-
-            for (StudyEventAttrSaveInfo info : studyEventAttrInfos) {
-                GlobalEventAttrInfo globalAttrInfo =
-                    globalEventAttrInfoList.get(info.globalEventAttrId);
-
-                StudyEventAttr seAttr =
-                    sessionUtil.get(StudyEventAttr.class, null,
-                        new StudyEventAttr());
-
-                seAttr.setLabel(globalAttrInfo.attr.getLabel());
-                seAttr.setPermissible(info.permissible);
-                seAttr.setRequired(info.required);
-                seAttr.setEventAttrType(globalAttrInfo.attr.getEventAttrType());
-
-                ActivityStatus aStatus =
-                    sessionUtil.get(ActivityStatus.class, aStatusId);
-                seAttr.setActivityStatus(aStatus);
-
-                seAttr.setStudy(study);
-
-                CollectionUtils.getCollection(study,
-                    StudyPeer.STUDY_EVENT_ATTR_COLLECTION).add(seAttr);
-            }
-        }
     }
 }

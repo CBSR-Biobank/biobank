@@ -1,20 +1,12 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
-import edu.ualberta.med.biobank.common.action.study.GlobalEventAttrInfo;
-import edu.ualberta.med.biobank.common.action.study.GlobalEventAttrInfoGetAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
-import edu.ualberta.med.biobank.common.action.study.StudySaveAction.StudyEventAttrSaveInfo;
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
@@ -35,24 +27,7 @@ public class StudyHelper extends Helper {
         saveStudy.setContactIds(new HashSet<Integer>());
         saveStudy.setSourceSpcIds(new HashSet<Integer>());
         saveStudy.setAliquotSpcIds(new HashSet<Integer>());
-        saveStudy
-            .setStudyEventAttrSaveInfo(new ArrayList<StudyEventAttrSaveInfo>());
-
-        return appService.doAction(saveStudy);
-    }
-
-    public static Integer createStudy(BiobankApplicationService appService,
-        String name, ActivityStatusEnum activityStatus,
-        List<StudyEventAttrSaveInfo> attrInfos) throws ApplicationException {
-        StudySaveAction saveStudy = new StudySaveAction();
-        saveStudy.setName(name);
-        saveStudy.setNameShort(name);
-        saveStudy.setActivityStatusId(activityStatus.getId());
-        saveStudy.setSiteIds(new HashSet<Integer>());
-        saveStudy.setContactIds(new HashSet<Integer>());
-        saveStudy.setSourceSpcIds(new HashSet<Integer>());
-        saveStudy.setAliquotSpcIds(new HashSet<Integer>());
-        saveStudy.setStudyEventAttrSaveInfo(attrInfos);
+        saveStudy.setStudyEventAttrSaveIds(new HashSet<Integer>());
 
         return appService.doAction(saveStudy);
     }
@@ -88,34 +63,13 @@ public class StudyHelper extends Helper {
         for (AliquotedSpecimen spc : studyInfo.aliquotedSpcs) {
             ids.add(spc.getId());
         }
-
         saveStudy.setAliquotSpcIds(ids);
 
-        Map<Integer, GlobalEventAttrInfo> globalEventAttrInfoList =
-            appService.doAction(new GlobalEventAttrInfoGetAction());
-        HashMap<String, GlobalEventAttrInfo> globalEventAttrByLabel =
-            new HashMap<String, GlobalEventAttrInfo>();
-
-        for (GlobalEventAttrInfo geAttr : globalEventAttrInfoList.values()) {
-            globalEventAttrByLabel.put(geAttr.attr.getLabel(), geAttr);
+        ids = new HashSet<Integer>();
+        for (StudyEventAttr attr : studyInfo.studyEventAttrs) {
+            ids.add(attr.getId());
         }
-
-        List<StudyEventAttrSaveInfo> saveSeAttrs =
-            new ArrayList<StudyEventAttrSaveInfo>();
-        for (StudyEventAttr seAttr : studyInfo.studyEventAttrs) {
-            StudyEventAttrSaveInfo saveSeAttr = new StudyEventAttrSaveInfo();
-            saveSeAttr.globalEventAttrId =
-                globalEventAttrByLabel.get(seAttr.getLabel()).attr.getId();
-            saveSeAttr.type =
-                EventAttrTypeEnum.getEventAttrType(seAttr.getEventAttrType()
-                    .getName());
-            saveSeAttr.required = seAttr.getRequired();
-            saveSeAttr.permissible = seAttr.getPermissible();
-            saveSeAttr.aStatusId = seAttr.getActivityStatus().getId();
-            saveSeAttrs.add(saveSeAttr);
-        }
-
-        saveStudy.setStudyEventAttrSaveInfo(saveSeAttrs);
+        saveStudy.setStudyEventAttrSaveIds(ids);
 
         return saveStudy;
     }
