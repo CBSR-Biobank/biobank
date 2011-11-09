@@ -45,6 +45,8 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
     }
 
     public synchronized void setList(final List<T> list, final T selection) {
+        if (list == null) return;
+
         final ListUpdater updater = new ListUpdater(list, selection);
         final Thread previousThread = this.previousThread;
 
