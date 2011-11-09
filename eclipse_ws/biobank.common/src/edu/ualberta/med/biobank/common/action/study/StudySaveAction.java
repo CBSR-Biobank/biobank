@@ -141,6 +141,12 @@ public class StudySaveAction implements Action<Integer> {
             new SetDifference<Contact>(study.getContactCollection(),
                 contacts.values());
 
+        for (Contact contact : contactsDiff.getAddSet()) {
+            Collection<Study> contactStudies = contact.getStudyCollection();
+            contactStudies.add(study);
+            contact.setStudyCollection(contactStudies);
+        }
+
         // remove this study from contacts in removed list
         for (Contact contact : contactsDiff.getRemoveSet()) {
             Collection<Study> contactStudies = contact.getStudyCollection();
@@ -182,7 +188,7 @@ public class StudySaveAction implements Action<Integer> {
         }
 
         Map<Integer, StudyEventAttr> studyEventAttrs =
-            sessionUtil.load(StudyEventAttr.class, sourceSpcIds);
+            sessionUtil.load(StudyEventAttr.class, studyEventAttrIds);
         study.setStudyEventAttrCollection(new HashSet<StudyEventAttr>(
             studyEventAttrs.values()));
         SetDifference<StudyEventAttr> attrsDiff =

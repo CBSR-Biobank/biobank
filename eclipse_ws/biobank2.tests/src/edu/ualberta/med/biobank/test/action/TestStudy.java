@@ -59,39 +59,46 @@ public class TestStudy extends TestAction {
             ClinicHelper.createClinicsWithContacts(appService,
                 name, numClinics, numContacts);
 
-        StudyInfo studyInfo =
-            appService.doAction(new StudyGetInfoAction(studyId));
+        Set<Contact> allStudyContacts = new HashSet<Contact>();
         Set<Contact> expectedStudyContacts = new HashSet<Contact>();
 
-        // get a contact ids from each clinic
-        List<StudyGetClinicInfoAction.ClinicInfo> clinicInfos =
-            new ArrayList<StudyGetClinicInfoAction.ClinicInfo>();
+        // get a contact id from each clinic
         for (Integer clinicId : clinicIds) {
             ClinicInfo clinicInfo =
                 appService.doAction(new ClinicGetInfoAction(clinicId));
             List<Contact> contacts =
                 new ArrayList<Contact>(clinicInfo.clinic.getContactCollection());
             Assert.assertNotNull(contacts);
-            clinicInfos.add(new StudyGetClinicInfoAction.ClinicInfo(
-                clinicInfo.clinic, 0L, 0L, contacts.get(0)));
-            expectedStudyContacts.add(contacts.get(0));
-        }
-        studyInfo.setClinicInfos(clinicInfos);
-
-        StudySaveAction studySave =
-            StudyHelper.getSaveAction(appService, studyInfo);
-        appService.doAction(studySave);
-
-        studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
-
-        Set<Contact> actualStudyContacts = new HashSet<Contact>();
-        for (StudyGetClinicInfoAction.ClinicInfo clinicInfo : studyInfo.clinicInfos) {
-            actualStudyContacts.add(clinicInfo.getContact());
+            allStudyContacts.add(contacts.get(0));
         }
 
-        Assert.assertEquals(expectedStudyContacts, actualStudyContacts);
+        // add each contact one by one
+        for (Contact c : allStudyContacts) {
+            expectedStudyContacts.add(c);
+            StudyInfo studyInfo =
+                appService.doAction(new StudyGetInfoAction(studyId));
+            studyInfo.clinicInfos.add(new StudyGetClinicInfoAction.ClinicInfo(
+                c.getClinic(), 0L, 0L, c));
+            StudySaveAction studySave =
+                StudyHelper.getSaveAction(appService, studyInfo);
+            appService.doAction(studySave);
 
-        // TODO: test removal of contacts from study
+            studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
+
+            Set<Contact> actualStudyContacts = new HashSet<Contact>();
+            for (StudyGetClinicInfoAction.ClinicInfo clinicInfo : studyInfo.clinicInfos) {
+                actualStudyContacts.add(clinicInfo.getContact());
+            }
+
+            Assert.assertEquals(expectedStudyContacts, actualStudyContacts);
+        }
+
+        // attempt to add more than contact from a single clinic
+
+        // remove all contacts from study randomly
+        for (Contact c : allStudyContacts) {
+
+        }
     }
 
     @Test
