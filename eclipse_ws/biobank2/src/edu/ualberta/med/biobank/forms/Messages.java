@@ -6,7 +6,7 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME =
         "edu.ualberta.med.biobank.forms.messages"; //$NON-NLS-1$
 
-    public static String Comments_button_add;
+    public static String Comments_add;
 
     public static String Comments_title;
 
