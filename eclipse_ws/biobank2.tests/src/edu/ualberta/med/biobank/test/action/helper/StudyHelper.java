@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
-import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -45,11 +44,8 @@ public class StudyHelper extends Helper {
         saveStudy.setSiteIds(new HashSet<Integer>());
 
         Set<Integer> ids = new HashSet<Integer>();
-        for (ClinicInfo info : studyInfo.clinicInfos) {
-            Contact c = info.getContact();
-            if (c != null) {
-                ids.add(c.getId());
-            }
+        for (Contact c : studyInfo.contacts) {
+            ids.add(c.getId());
         }
         saveStudy.setContactIds(ids);
 

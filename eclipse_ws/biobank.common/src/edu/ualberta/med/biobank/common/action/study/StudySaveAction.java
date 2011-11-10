@@ -1,15 +1,19 @@
 package edu.ualberta.med.biobank.common.action.study;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -32,6 +36,7 @@ public class StudySaveAction implements Action<Integer> {
     private Set<Integer> sourceSpcIds;
     private Set<Integer> aliquotSpcIds;
     private Set<Integer> studyEventAttrIds;
+    private Session session = null;
 
     public void setId(Integer id) {
         this.id = id;
@@ -77,35 +82,36 @@ public class StudySaveAction implements Action<Integer> {
 
     @Override
     public Integer run(User user, Session session) throws ActionException {
+        if (name == null) {
+            throw new NullPointerException("name not specified");
+        }
+        if (nameShort == null) {
+            throw new NullPointerException("name short not specified");
+        }
         if (siteIds == null) {
             throw new NullPointerException("site ids cannot be null");
         }
-
         if (contactIds == null) {
             throw new NullPointerException("contact ids cannot be null");
         }
-
         if (sourceSpcIds == null) {
             throw new NullPointerException("specimen ids cannot be null");
         }
-
         if (aliquotSpcIds == null) {
             throw new NullPointerException("aliquot ids cannot be null");
         }
-
         if (aStatusId == null) {
             throw new NullPointerException("activity status not specified");
         }
 
+        this.session = session;
         SessionUtil sessionUtil = new SessionUtil(session);
         Study study = sessionUtil.get(Study.class, id, new Study());
 
+        performChecks(session);
+
         // TODO: check permission? (can edit site?)
-
-        // TODO: error checks
         // TODO: version check?
-
-        // TODO: LocalizedMessage in Exception?
 
         study.setId(id);
         study.setName(name);
@@ -205,5 +211,38 @@ public class StudySaveAction implements Action<Integer> {
         session.flush();
 
         return study.getId();
+    }
+
+    private static final String STUDY_UNIQUE_ATTR_HQL =
+        "SELECT COUNT(*) FROM " + Study.class.getName()
+            + " s WHERE {0}=? {2}"; //$NON-NLS-1$
+
+    private void performChecks(Session session) throws ActionException {
+        if (session == null) {
+            throw new NullPointerException("session not initialized");
+        }
+
+        if (!peformUniqueQuery("name").equals(0L)) {
+            throw new ActionCheckException("duplicate name");
+        }
+
+        if (!peformUniqueQuery("nameShort").equals(0L)) {
+            throw new ActionCheckException("duplicate name short");
+        }
+    }
+
+    private Long peformUniqueQuery(String attribute) {
+        String msg;
+
+        if (id == null) {
+            msg = MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, "name", "?", "");
+        } else {
+            msg = MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, "name", "?",
+                "AND id<>" + id);
+        }
+
+        Query query = session.createQuery(msg);
+        query.setParameter(0, name);
+        return HibernateUtil.getCountFromQuery(query);
     }
 }

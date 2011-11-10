@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,10 +15,8 @@ import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.aliquotedspecimen.AliquotedSpecimenSaveAction;
-import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
-import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.sourcespecimen.SourceSpecimenSaveAction;
-import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
@@ -28,6 +27,7 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestStudy extends TestAction {
 
@@ -53,52 +53,64 @@ public class TestStudy extends TestAction {
 
     @Test
     public void testGetContactCollection() throws Exception {
+        // check for empty contact list after creation of study
+        Assert.assertTrue(getStudyContacts().isEmpty());
+
         int numClinics = r.nextInt(5) + 2;
         int numContacts = 2;
         Set<Integer> clinicIds =
             ClinicHelper.createClinicsWithContacts(appService,
                 name, numClinics, numContacts);
 
-        Set<Contact> allStudyContacts = new HashSet<Contact>();
-        Set<Contact> expectedStudyContacts = new HashSet<Contact>();
+        List<Contact> studyContactsSet1 = new ArrayList<Contact>();
+        List<Contact> studyContactsSet2 = new ArrayList<Contact>();
+        List<Contact> expectedStudyContacts = new ArrayList<Contact>();
 
         // get a contact id from each clinic
         for (Integer clinicId : clinicIds) {
-            ClinicInfo clinicInfo =
-                appService.doAction(new ClinicGetInfoAction(clinicId));
-            List<Contact> contacts =
-                new ArrayList<Contact>(clinicInfo.clinic.getContactCollection());
+            ArrayList<Contact> contacts =
+                appService.doAction(new ClinicGetContactsAction(clinicId));
             Assert.assertNotNull(contacts);
-            allStudyContacts.add(contacts.get(0));
+            Assert.assertNotNull(contacts.get(0));
+            Assert.assertNotNull(contacts.get(1));
+            studyContactsSet1.add(contacts.get(0));
+            studyContactsSet2.add(contacts.get(1));
         }
 
-        // add each contact one by one
-        for (Contact c : allStudyContacts) {
+        // add a contact one by one from set 1
+        for (Contact c : studyContactsSet1) {
+            studyAddContacts(Arrays.asList(c));
             expectedStudyContacts.add(c);
+            Assert.assertEquals(expectedStudyContacts, getStudyContacts());
+        }
+
+        // add contact set 2
+        studyAddContacts(studyContactsSet2);
+        expectedStudyContacts.addAll(studyContactsSet2);
+        Assert.assertEquals(expectedStudyContacts, getStudyContacts());
+
+        // remove all contacts from study randomly
+        for (Contact c : studyContactsSet1) {
+
+        }
+    }
+
+    private void studyAddContacts(List<Contact> contacts)
+        throws ApplicationException {
+        for (Contact c : contacts) {
             StudyInfo studyInfo =
                 appService.doAction(new StudyGetInfoAction(studyId));
-            studyInfo.clinicInfos.add(new StudyGetClinicInfoAction.ClinicInfo(
-                c.getClinic(), 0L, 0L, c));
+            studyInfo.contacts.add(c);
             StudySaveAction studySave =
                 StudyHelper.getSaveAction(appService, studyInfo);
             appService.doAction(studySave);
-
-            studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
-
-            Set<Contact> actualStudyContacts = new HashSet<Contact>();
-            for (StudyGetClinicInfoAction.ClinicInfo clinicInfo : studyInfo.clinicInfos) {
-                actualStudyContacts.add(clinicInfo.getContact());
-            }
-
-            Assert.assertEquals(expectedStudyContacts, actualStudyContacts);
         }
+    }
 
-        // attempt to add more than contact from a single clinic
-
-        // remove all contacts from study randomly
-        for (Contact c : allStudyContacts) {
-
-        }
+    private List<Contact> getStudyContacts() throws ApplicationException {
+        StudyInfo studyInfo = appService.doAction(new
+            StudyGetInfoAction(studyId));
+        return studyInfo.contacts;
     }
 
     @Test

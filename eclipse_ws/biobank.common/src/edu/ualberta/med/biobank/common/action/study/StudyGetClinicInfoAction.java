@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
@@ -22,15 +21,15 @@ public class StudyGetClinicInfoAction implements Action<ArrayList<ClinicInfo>> {
     // @formatter:off
     @SuppressWarnings("nls")
     private static final String STUDY_INFO_HQL = 
-        "SELECT clinics,COUNT(DISTINCT patients),"
-        + " COUNT(DISTINCT cevents),contacts"
-        + " FROM "+ Study.class.getName() + " study"
-        + " LEFT JOIN study.contactCollection AS contacts"
-        + " LEFT JOIN contacts.clinic AS clinics"
-        + " LEFT JOIN clinics.originInfoCollection AS originInfo"
-        + " LEFT JOIN originInfo.specimenCollection as specimens"
-        + " LEFT JOIN specimens.collectionEvent AS cevents"
-        + " LEFT JOIN cevents.patient as patients"
+        "SELECT clinics,COUNT(DISTINCT patients)," 
+        + " COUNT(DISTINCT cevents)"
+        + " FROM " + Study.class.getName() + " study"
+        + " LEFT JOIN study.contactCollection contacts"
+        + " LEFT JOIN contacts.clinic clinics"
+        + " LEFT JOIN clinics.originInfoCollection originInfo"
+        + " LEFT JOIN originInfo.specimenCollection specimens"
+        + " LEFT JOIN specimens.collectionEvent cevents"
+        + " LEFT JOIN cevents.patient patients"
         + " WHERE study.id = ?"
         + " GROUP BY clinics";
     // @formatter:on
@@ -61,10 +60,8 @@ public class StudyGetClinicInfoAction implements Action<ArrayList<ClinicInfo>> {
         @SuppressWarnings("unchecked")
         List<Object[]> results = query.list();
         for (Object[] row : results) {
-
             ClinicInfo info = new ClinicInfo((Clinic) row[0], (Long) row[1],
-                (Long) row[2], (Contact) row[3]);
-
+                (Long) row[2]);
             infos.add(info);
         }
 
@@ -77,14 +74,11 @@ public class StudyGetClinicInfoAction implements Action<ArrayList<ClinicInfo>> {
         private final Clinic clinic;
         private final Long patientCount;
         private final Long ceventCount;
-        private final Contact contact;
 
-        public ClinicInfo(Clinic clinic, Long patientCount, Long ceventCount,
-            Contact contact) {
+        public ClinicInfo(Clinic clinic, Long patientCount, Long ceventCount) {
             this.clinic = clinic;
             this.patientCount = patientCount;
             this.ceventCount = ceventCount;
-            this.contact = contact;
         }
 
         public Clinic getClinic() {
@@ -97,18 +91,6 @@ public class StudyGetClinicInfoAction implements Action<ArrayList<ClinicInfo>> {
 
         public Long getCeventCount() {
             return ceventCount;
-        }
-
-        public Contact getContact() {
-            return contact;
-        }
-
-        public String getContactName() {
-            return contact.getName();
-        }
-
-        public String getContactTitle() {
-            return contact.getTitle();
         }
     }
 }

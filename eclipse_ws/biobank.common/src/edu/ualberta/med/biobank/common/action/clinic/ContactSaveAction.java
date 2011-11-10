@@ -79,6 +79,7 @@ public class ContactSaveAction implements Action<Integer> {
         contact.setOfficeNumber(officeNumber);
         contact.setPagerNumber(pagerNumber);
         contact.setFaxNumber(faxNumber);
+        contact.setEmailAddress(emailAddress);
 
         Clinic clinic = sessionUtil.get(Clinic.class, clinicId);
         contact.setClinic(clinic);

@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetStudyInfoAction.St
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.User;
 
 public class ClinicGetInfoAction implements Action<ClinicInfo> {
@@ -22,7 +23,6 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
     private static final String CLINIC_INFO_HQL = 
         "SELECT clinic,COUNT(DISTINCT patients),COUNT(DISTINCT cevents)"
         + " FROM "+ Clinic.class.getName() + " clinic"
-        + " INNER JOIN FETCH clinic.contactCollection"
         + " LEFT JOIN clinic.originInfoCollection oi"
         + " LEFT JOIN oi.specimenCollection spcs"
         + " LEFT JOIN spcs.collectionEvent cevents"
@@ -31,10 +31,12 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
     // @formatter:on
 
     private final Integer clinicId;
+    private final ClinicGetContactsAction getContacts;
     private final ClinicGetStudyInfoAction getStudyInfo;
 
     public ClinicGetInfoAction(Integer clinicId) {
         this.clinicId = clinicId;
+        this.getContacts = new ClinicGetContactsAction(clinicId);
         this.getStudyInfo = new ClinicGetStudyInfoAction(clinicId);
     }
 
@@ -59,6 +61,7 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
             info.clinic = (Clinic) row[0];
             info.patientCount = (Long) row[1];
             info.ceventCount = (Long) row[2];
+            info.contacts = getContacts.run(user, session);
             info.studyInfos = getStudyInfo.run(user, session);
         }
 
@@ -71,6 +74,7 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
         public Clinic clinic;
         public Long patientCount;
         public Long ceventCount;
+        public List<Contact> contacts;
         public List<StudyInfo> studyInfos;
 
         public Clinic getClinic() {
