@@ -20,6 +20,12 @@ public class CommentInfo implements NotAProxy, Serializable {
     public Integer userId;
     public Date createdAt;
 
+    public CommentInfo(String message, Date createdAt, Integer userId) {
+        this.message = message;
+        this.createdAt = createdAt;
+        this.userId = userId;
+    }
+
     public Comment getCommentModel(Session session) {
         Comment dbComment;
         if (id == null)
@@ -43,15 +49,10 @@ public class CommentInfo implements NotAProxy, Serializable {
     }
 
     public static CommentInfo createFromModel(Comment c) {
-        CommentInfo ci = new CommentInfo(c.getMessage(), c.getCreatedAt(), c.getUser().getId());
-        ci.id=c.getId();
+        CommentInfo ci =
+            new CommentInfo(c.getMessage(), c.getCreatedAt(), c.getUser()
+                .getId());
+        ci.id = c.getId();
         return ci;
     }
-
-    public CommentInfo(String message, Date createdAt, Integer userId) {
-        this.message=message;
-        this.createdAt=createdAt;
-        this.userId=userId;
-    }
-    
 }
