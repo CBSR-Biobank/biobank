@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.Cli
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
-import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -32,7 +31,6 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     // @formatter:on
 
     private final Integer studyId;
-    private final StudyGetContactsAction getContacts;
     private final StudyGetClinicInfoAction getClinicInfo;
     private final StudyGetSourceSpecimensAction getSourceSpecimens;
     private final StudyGetAliquotedSpecimensAction getAliquotedSpecimens;
@@ -41,7 +39,6 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     public StudyGetInfoAction(Integer studyId) {
         this.studyId = studyId;
 
-        getContacts = new StudyGetContactsAction(studyId);
         getClinicInfo = new StudyGetClinicInfoAction(studyId);
         getSourceSpecimens = new StudyGetSourceSpecimensAction(studyId);
         getAliquotedSpecimens = new StudyGetAliquotedSpecimensAction(studyId);
@@ -75,7 +72,6 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
             info.study = (Study) row[0];
             info.patientCount = (Long) row[1];
             info.ceventCount = (Long) row[2];
-            info.contacts = getContacts.run(user, session);
             info.clinicInfos = getClinicInfo.run(user, session);
             info.sourceSpcs = getSourceSpecimens.run(user, session);
             info.aliquotedSpcs = getAliquotedSpecimens.run(user, session);
@@ -91,7 +87,6 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
         public Study study;
         public Long patientCount;
         public Long ceventCount;
-        public List<Contact> contacts;
         public List<ClinicInfo> clinicInfos;
         public List<SourceSpecimen> sourceSpcs;
         public List<AliquotedSpecimen> aliquotedSpcs;
@@ -103,10 +98,6 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
 
         public void setStudyEventAttrs(List<StudyEventAttr> studyEventAttrs) {
             this.studyEventAttrs = studyEventAttrs;
-        }
-
-        public void setContacts(List<Contact> contacts) {
-            this.contacts = contacts;
         }
 
         public void setClinicInfos(List<ClinicInfo> clinicInfo) {

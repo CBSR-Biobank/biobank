@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.aliquotedspecimen.AliquotedSpecimenSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.sourcespecimen.SourceSpecimenSaveAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
@@ -79,8 +80,8 @@ public class TestStudy extends TestAction {
 
         // add a contact one by one from set 1
         for (Contact c : studyContactsSet1) {
-            studyAddContacts(Arrays.asList(c));
             expectedStudyContacts.add(c);
+            studyAddContacts(Arrays.asList(c));
             Assert.assertEquals(expectedStudyContacts, getStudyContacts());
         }
 
@@ -97,20 +98,26 @@ public class TestStudy extends TestAction {
 
     private void studyAddContacts(List<Contact> contacts)
         throws ApplicationException {
+        StudyInfo studyInfo =
+            appService.doAction(new StudyGetInfoAction(studyId));
         for (Contact c : contacts) {
-            StudyInfo studyInfo =
-                appService.doAction(new StudyGetInfoAction(studyId));
-            studyInfo.contacts.add(c);
-            StudySaveAction studySave =
-                StudyHelper.getSaveAction(appService, studyInfo);
-            appService.doAction(studySave);
+            ClinicInfo clinicInfo =
+                new ClinicInfo(c.getClinic(), 0L, 0L, Arrays.asList(c));
+            studyInfo.clinicInfos.add(clinicInfo);
         }
+        StudySaveAction studySave =
+            StudyHelper.getSaveAction(appService, studyInfo);
+        appService.doAction(studySave);
     }
 
     private List<Contact> getStudyContacts() throws ApplicationException {
         StudyInfo studyInfo = appService.doAction(new
             StudyGetInfoAction(studyId));
-        return studyInfo.contacts;
+        List<Contact> contacts = new ArrayList<Contact>();
+        for (ClinicInfo clinicInfo : studyInfo.clinicInfos) {
+            contacts.addAll(clinicInfo.getContacts());
+        }
+        return contacts;
     }
 
     @Test
