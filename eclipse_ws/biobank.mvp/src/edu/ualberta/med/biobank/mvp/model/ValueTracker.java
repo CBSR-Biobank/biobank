@@ -45,6 +45,7 @@ public class ValueTracker<T> implements HasDirtyModel, Disposable {
     private class ChangeMonitor implements ValueChangeHandler<T> {
         @Override
         public void onValueChange(ValueChangeEvent<T> event) {
+            T value = event.getValue();
         }
     }
 }
