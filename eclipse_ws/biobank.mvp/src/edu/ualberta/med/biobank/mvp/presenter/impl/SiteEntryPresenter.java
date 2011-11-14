@@ -206,10 +206,10 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
             studies = listOfType(StudyInfo.class)
                 .boundTo(provider, "studies");
 
-            ValidationPlugin.validateField(name).using(
-                new NotEmptyValidator("Name is required"));
-            ValidationPlugin.validateField(nameShort).using(
-                new NotEmptyValidator("Name Short is required"));
+            ValidationPlugin.validateField(name)
+                .using(new NotEmptyValidator("Name is required"));
+            ValidationPlugin.validateField(nameShort)
+                .using(new NotEmptyValidator("Name Short is required"));
         }
 
         Integer getActivityStatusId() {
