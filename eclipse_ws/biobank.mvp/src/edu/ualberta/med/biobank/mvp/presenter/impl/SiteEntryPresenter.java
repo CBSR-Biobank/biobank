@@ -204,7 +204,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
             address = fieldOfType(Address.class)
                 .boundTo(provider, "site.address");
             studies = listOfType(StudyInfo.class)
-                .boundTo(provider, "studies");
+                .boundTo(provider, "studyCollection");
 
             ValidationPlugin.validateField(name)
                 .using(new NotEmptyValidator("Name is required"));

@@ -14,9 +14,9 @@ public class TranslatedItem<T, U> extends ValidationItem<T>
     private final Translator<T, U> translator;
 
     public interface Translator<T, U> {
-        T fromDelegate(U delegate);
+        T fromDelegate(U delegateValue);
 
-        U toDelegate(T foreign);
+        U toDelegate(T value);
     }
 
     public static <T, U> TranslatedItem<T, U> from(ValidationItem<U> delegate,

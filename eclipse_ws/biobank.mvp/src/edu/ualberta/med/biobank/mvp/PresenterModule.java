@@ -6,6 +6,7 @@ import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
+import edu.ualberta.med.biobank.mvp.presenter.impl.SiteViewPresenter;
 
 public class PresenterModule extends AbstractModule {
     @Override
@@ -14,5 +15,6 @@ public class PresenterModule extends AbstractModule {
         bind(AddressEntryPresenter.class);
         bind(FormManagerPresenter.class);
         bind(SiteEntryPresenter.class);
+        bind(SiteViewPresenter.class);
     }
 }

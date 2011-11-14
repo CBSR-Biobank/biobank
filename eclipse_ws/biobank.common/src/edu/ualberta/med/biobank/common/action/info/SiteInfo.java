@@ -27,16 +27,28 @@ public class SiteInfo implements Info {
         return site;
     }
 
-    public List<ContainerTypeInfo> getContainerTypes() {
+    public List<ContainerTypeInfo> getContainerTypeCollection() {
         return Collections.unmodifiableList(containerTypes);
     }
 
-    public List<StudyInfo> getStudies() {
+    public List<StudyInfo> getStudyCollection() {
         return Collections.unmodifiableList(studies);
     }
 
-    public List<Container> getTopContainers() {
+    public List<Container> getTopContainerCollection() {
         return Collections.unmodifiableList(topContainers);
+    }
+
+    public Long getContainerTypeCount() {
+        return new Long(containerTypes.size());
+    }
+
+    public Long getStudyCount() {
+        return new Long(studies.size());
+    }
+
+    public Long getTopContainerCount() {
+        return new Long(topContainers.size());
     }
 
     public Long getPatientCount() {

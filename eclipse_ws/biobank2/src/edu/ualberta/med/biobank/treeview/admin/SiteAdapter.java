@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteEditEvent;
+import edu.ualberta.med.biobank.mvp.event.model.site.SiteViewEvent;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
@@ -148,8 +149,9 @@ public class SiteAdapter extends AdapterBase {
         return null; // TODO: problem !?
     }
 
-    // @Override
-    // public void openViewForm() {
-    // eventBus.fireEvent(new SiteViewEvent(site.getId()));
-    // }
+    @Override
+    public void openViewForm() {
+        super.openViewForm();
+        eventBus.fireEvent(new SiteViewEvent(site.getId()));
+    }
 }
