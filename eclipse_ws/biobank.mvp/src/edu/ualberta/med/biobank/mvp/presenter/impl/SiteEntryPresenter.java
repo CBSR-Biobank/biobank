@@ -39,6 +39,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
     private final AddressEntryPresenter addressEntryPresenter;
     private final ActivityStatusComboPresenter activityStatusComboPresenter;
     private final Model model;
+    private Integer siteId;
 
     public interface View extends IEntryFormView, ValidationDisplay {
         void setActivityStatusComboView(IView view);
@@ -101,10 +102,11 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
     @Override
     public void doReload() {
-        // TODO: this resets the form. To reload it from the database, something
-        // different must be done (e.g. setting a Command that is re-run on
-        // reload).
-        model.revert();
+        if (siteId != null) {
+            editSite(siteId);
+        } else {
+            createSite();
+        }
     }
 
     @Override
@@ -144,6 +146,8 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
     }
 
     public boolean editSite(Integer siteId) {
+        this.siteId = siteId;
+
         SiteGetInfoAction siteGetInfoAction = new SiteGetInfoAction(siteId);
 
         boolean success = dispatcher.exec(siteGetInfoAction,
@@ -191,7 +195,8 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
             this.addressModel = addressModel;
 
             // TODO: have a provider(x.class) method that creates and returns a
-            // provider? (while adding the dirty listener, etc.)
+            // provider? (while adding the dirty listener, etc.) Keep a refernce
+            // to the provider to allow getters and setters to be called on it.
 
             siteId = fieldOfType(Integer.class)
                 .boundTo(provider, "site.id");
