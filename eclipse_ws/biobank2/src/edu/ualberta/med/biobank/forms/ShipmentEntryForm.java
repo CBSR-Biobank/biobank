@@ -22,12 +22,12 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.CommentInfo;
-import edu.ualberta.med.biobank.common.action.info.OiInfo;
+import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentFormReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ShippingMethodInfo;
-import edu.ualberta.med.biobank.common.action.info.SiInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
-import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction.ShipInfo;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -124,7 +124,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private OriginInfo oiCopy;
 
-    private ShipInfo oiInfo;
+    private ShipmentFormReadInfo oiInfo;
 
     private OriginInfoWrapper originInfo;
     private ShipmentInfoWrapper shipmentInfo;
@@ -488,8 +488,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         
         CommentInfo commentInfo = new CommentInfo(comment.getMessage(), null, null);
         ShippingMethodInfo methodInfo = new ShippingMethodInfo(shipmentInfo.getShippingMethod().getId());
-        OiInfo oiInfo = new OiInfo(originInfo.getId(), originInfo.getReceiverSite().getId(), originInfo.getCenter().getId(), addedSpecimenIds, removedSpecimenIds);
-        SiInfo siInfo = new SiInfo(shipmentInfo.getId(), shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(), shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(), commentInfo, methodInfo);
+        OriginInfoSaveInfo oiInfo = new OriginInfoSaveInfo(originInfo.getId(), originInfo.getReceiverSite().getId(), originInfo.getCenter().getId(), addedSpecimenIds, removedSpecimenIds);
+        ShipmentInfoSaveInfo siInfo = new ShipmentInfoSaveInfo(shipmentInfo.getId(), shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(), shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(), commentInfo, methodInfo);
         OriginInfoSaveAction save = new OriginInfoSaveAction(oiInfo, siInfo);
         SessionManager.getAppService().doAction(save);
 

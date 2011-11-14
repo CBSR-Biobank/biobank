@@ -9,7 +9,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction.ShipInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentFormReadInfo;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.OriginInfo;
@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.model.User;
  * @author aaron
  * 
  */
-public class ShipmentGetInfoAction implements Action<ShipInfo> {
+public class ShipmentGetInfoAction implements Action<ShipmentFormReadInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -32,14 +32,6 @@ public class ShipmentGetInfoAction implements Action<ShipInfo> {
     // @formatter:on
 
     private final Integer oiId;
-
-    public static class ShipInfo implements Serializable, NotAProxy {
-        private static final long serialVersionUID = 1L;
-
-        public OriginInfo oi;
-        public Collection<Specimen> specimens;
-
-    }
 
     public ShipmentGetInfoAction(Integer oiId) {
         this.oiId = oiId;
@@ -51,8 +43,8 @@ public class ShipmentGetInfoAction implements Action<ShipInfo> {
     }
 
     @Override
-    public ShipInfo run(User user, Session session) throws ActionException {
-        ShipInfo sInfo = new ShipInfo();
+    public ShipmentFormReadInfo run(User user, Session session) throws ActionException {
+        ShipmentFormReadInfo sInfo = new ShipmentFormReadInfo();
 
         Query query = session.createQuery(ORIGIN_INFO_HQL);
         query.setParameter(0, oiId);

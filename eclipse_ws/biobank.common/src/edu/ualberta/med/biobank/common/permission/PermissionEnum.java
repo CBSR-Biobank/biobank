@@ -51,7 +51,12 @@ public enum PermissionEnum {
     ORIGIN_INFO_CREATE(25),
     ORIGIN_INFO_READ(26),
     ORIGIN_INFO_UPDATE(27),
-    ORIGIN_INFO_DELETE(28);
+    ORIGIN_INFO_DELETE(28),
+    
+    DISPATCH_CREATE(29),
+    DISPATCH_READ(30),
+    DISPATCH_UPDATE(31),
+    DISPATCH_DELETE(32);
 
     private final Integer permissionId;
 

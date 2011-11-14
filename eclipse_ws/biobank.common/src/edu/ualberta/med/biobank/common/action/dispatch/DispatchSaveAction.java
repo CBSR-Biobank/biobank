@@ -1,6 +1,5 @@
-package edu.ualberta.med.biobank.common.action.shipment;
+package edu.ualberta.med.biobank.common.action.dispatch;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -9,46 +8,46 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
-import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoSavePermission;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchSavePermission;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 
-public class OriginInfoSaveAction implements Action<Integer> {
+public class DispatchSaveAction implements Action<Integer> {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-    private OriginInfoSaveInfo oiInfo;
+    private DispatchSaveInfo dInfo;
     private ShipmentInfoSaveInfo siInfo;
 
-    public OriginInfoSaveAction(OriginInfoSaveInfo oiInfo, ShipmentInfoSaveInfo siInfo) {
-        this.oiInfo = oiInfo;
+    public DispatchSaveAction(DispatchSaveInfo dInfo, ShipmentInfoSaveInfo siInfo) {
+        this.dInfo = dInfo;
         this.siInfo = siInfo;
     }
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        return new OriginInfoSavePermission(oiInfo.oiId).isAllowed(user,
+        return new DispatchSavePermission(dInfo.id).isAllowed(user,
             session);
     }
 
     @Override
     public Integer run(User user, Session session) throws ActionException {
         SessionUtil sessionUtil = new SessionUtil(session);
-        OriginInfo oi =
-            sessionUtil.get(OriginInfo.class, oiInfo.oiId, new OriginInfo());
+        Dispatch oi =
+            sessionUtil.get(Dispatch.class, dInfo.id, new Dispatch());
 
-        oi.setReceiverSite(sessionUtil.get(Site.class, oiInfo.siteId));
-        oi.setCenter(sessionUtil.get(Center.class, oiInfo.centerId));
+        oi.setReceiverCenter(sessionUtil.get(Site.class, dInfo.receiverId));
+        oi.setSenderCenter(sessionUtil.get(Center.class, dInfo.senderId));
 
         ShipmentInfo si =
             sessionUtil

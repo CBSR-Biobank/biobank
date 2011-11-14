@@ -160,7 +160,7 @@ public class WrapperUtil {
         return unwrapped;
     }
     
-    public static List<Integer> getCollectionIds(List<? extends ModelWrapper<?>> wrapperCollection) {
+    public static List<Integer> getCollectionIds(Collection<? extends ModelWrapper<?>> wrapperCollection) {
         List<Integer> ids = new ArrayList<Integer>();
 
         for (ModelWrapper<?> wrapper : wrapperCollection) {

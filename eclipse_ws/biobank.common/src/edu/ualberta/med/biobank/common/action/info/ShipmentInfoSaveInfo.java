@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.action.info;
 import java.io.Serializable;
 import java.util.Date;
 
-public class SiInfo implements Serializable {
+public class ShipmentInfoSaveInfo implements Serializable {
 
     /**
      * 
@@ -17,7 +17,7 @@ public class SiInfo implements Serializable {
     public CommentInfo commentInfo;
     public ShippingMethodInfo method;
 
-    public SiInfo(Integer siId, String boxNumber, Date packedAt,
+    public ShipmentInfoSaveInfo(Integer siId, String boxNumber, Date packedAt,
         Date receivedAt, String waybill, CommentInfo commentInfo, ShippingMethodInfo method) {
         this.siId = siId;
         this.boxNumber = boxNumber;

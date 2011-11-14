@@ -289,4 +289,10 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                 Messages.BiobankEntryForm_access_denied_error_msg);
         }
     }
+    
+    @Override
+    public void saveForm() {
+        //???
+    }
+    
 }
