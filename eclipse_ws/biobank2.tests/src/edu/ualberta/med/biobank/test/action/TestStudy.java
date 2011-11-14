@@ -16,6 +16,7 @@ import org.junit.rules.TestName;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.aliquotedspecimen.AliquotedSpecimenSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction.Response;
 import edu.ualberta.med.biobank.common.action.sourcespecimen.SourceSpecimenSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
@@ -65,12 +66,13 @@ public class TestStudy extends TestAction {
 
         List<Contact> studyContactsSet1 = new ArrayList<Contact>();
         List<Contact> studyContactsSet2 = new ArrayList<Contact>();
-        List<Contact> expectedStudyContacts = new ArrayList<Contact>();
+        Set<Contact> expectedStudyContacts = new HashSet<Contact>();
 
         // get a contact id from each clinic
         for (Integer clinicId : clinicIds) {
-            ArrayList<Contact> contacts =
+            Response response =
                 appService.doAction(new ClinicGetContactsAction(clinicId));
+            List<Contact> contacts = response.getContacts();
             Assert.assertNotNull(contacts);
             Assert.assertNotNull(contacts.get(0));
             Assert.assertNotNull(contacts.get(1));
@@ -90,10 +92,18 @@ public class TestStudy extends TestAction {
         expectedStudyContacts.addAll(studyContactsSet2);
         Assert.assertEquals(expectedStudyContacts, getStudyContacts());
 
-        // remove all contacts from study randomly
+        // remove all contacts from set 1 individually
         for (Contact c : studyContactsSet1) {
-
+            expectedStudyContacts.remove(c);
+            studyRemoveContacts(Arrays.asList(c));
+            Assert.assertEquals(expectedStudyContacts, getStudyContacts());
         }
+
+        // remove contact set 2
+        studyRemoveContacts(studyContactsSet2);
+        expectedStudyContacts.removeAll(studyContactsSet2);
+        Assert.assertEquals(expectedStudyContacts, getStudyContacts());
+        Assert.assertTrue(getStudyContacts().isEmpty());
     }
 
     private void studyAddContacts(List<Contact> contacts)
@@ -110,10 +120,35 @@ public class TestStudy extends TestAction {
         appService.doAction(studySave);
     }
 
-    private List<Contact> getStudyContacts() throws ApplicationException {
+    private void studyRemoveContacts(List<Contact> contactsToRemove)
+        throws ApplicationException {
+        // get a list of contact IDs to remove
+        List<Integer> idsToRemove = new ArrayList<Integer>();
+        for (Contact c : contactsToRemove) {
+            idsToRemove.add(c.getId());
+        }
+
+        // get a list of current contact IDs
+        StudyInfo studyInfo =
+            appService.doAction(new StudyGetInfoAction(studyId));
+        Set<Integer> studyContactIds = new HashSet<Integer>();
+        for (ClinicInfo infos : studyInfo.clinicInfos) {
+            for (Contact c : infos.getContacts()) {
+                studyContactIds.add(c.getId());
+            }
+        }
+        studyContactIds.removeAll(idsToRemove);
+
+        StudySaveAction studySave =
+            StudyHelper.getSaveAction(appService, studyInfo);
+        studySave.setContactIds(studyContactIds);
+        appService.doAction(studySave);
+    }
+
+    private Set<Contact> getStudyContacts() throws ApplicationException {
         StudyInfo studyInfo = appService.doAction(new
             StudyGetInfoAction(studyId));
-        List<Contact> contacts = new ArrayList<Contact>();
+        Set<Contact> contacts = new HashSet<Contact>();
         for (ClinicInfo clinicInfo : studyInfo.clinicInfos) {
             contacts.addAll(clinicInfo.getContacts());
         }

@@ -28,8 +28,7 @@ public class StudyGetClinicInfoAction implements Action<ArrayList<ClinicInfo>> {
         + "FROM " + Study.class.getName() + " study"
         + " INNER JOIN study.contactCollection contacts"
         + " INNER JOIN contacts.clinic clinics"
-        + " WHERE study.id=?"
-        + " GROUP BY clinics";
+        + " WHERE study.id=?";
     // @formatter:on
 
     // @formatter:off
