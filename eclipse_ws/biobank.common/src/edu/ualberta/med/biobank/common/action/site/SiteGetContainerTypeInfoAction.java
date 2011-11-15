@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.site;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,9 +8,8 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypeInfoAction.ContainerTypeInfo;
+import edu.ualberta.med.biobank.common.action.info.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.permission.site.SiteReadPermission;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
@@ -19,27 +17,6 @@ import edu.ualberta.med.biobank.model.User;
 
 public class SiteGetContainerTypeInfoAction implements
     Action<ArrayList<ContainerTypeInfo>> {
-    public static class ContainerTypeInfo implements Serializable, NotAProxy {
-        private static final long serialVersionUID = 1L;
-
-        private final ContainerType containerType;
-        private final Long containerCount;
-
-        public ContainerTypeInfo(ContainerType containerType,
-            Long containerCount) {
-            this.containerType = containerType;
-            this.containerCount = containerCount;
-        }
-
-        public ContainerType getContainerType() {
-            return containerType;
-        }
-
-        public Long getContainerCount() {
-            return containerCount;
-        }
-    }
-
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -73,7 +50,8 @@ public class SiteGetContainerTypeInfoAction implements
     public ArrayList<ContainerTypeInfo> run(User user, Session session)
         throws ActionException {
 
-        ArrayList<ContainerTypeInfo> containerTypes = new ArrayList<ContainerTypeInfo>();
+        ArrayList<ContainerTypeInfo> containerTypes =
+            new ArrayList<ContainerTypeInfo>();
 
         Query query = session.createQuery(SELECT_CONTAINER_TYPE_INFO_HQL);
         query.setParameter(0, siteId);

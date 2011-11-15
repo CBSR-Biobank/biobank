@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.clinic;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,9 +7,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.clinic.ClinicGetStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
+import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
@@ -68,31 +66,4 @@ public class ClinicGetStudyInfoAction implements
         }
         return infos;
     }
-
-    public static class StudyInfo implements Serializable, NotAProxy {
-        private static final long serialVersionUID = 1L;
-
-        private final Study study;
-        private final Long patientCount;
-        private final Long ceventCount;
-
-        public StudyInfo(Study study, Long patientCount, Long ceventCount) {
-            this.study = study;
-            this.patientCount = patientCount;
-            this.ceventCount = ceventCount;
-        }
-
-        public Study getStudy() {
-            return study;
-        }
-
-        public Long getPatientCount() {
-            return patientCount;
-        }
-
-        public Long getCeventCount() {
-            return ceventCount;
-        }
-    }
-
 }

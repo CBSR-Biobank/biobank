@@ -29,7 +29,15 @@ public class InputTable extends Composite {
     }
 
     public Text addText() {
-        Text text = new Text(this, SWT.BORDER);
+        return addText(SWT.NONE);
+    }
+
+    public Text addReadOnlyText() {
+        return addText(SWT.READ_ONLY);
+    }
+
+    private Text addText(int style) {
+        Text text = new Text(this, SWT.BORDER | style);
         text.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
         return text;
     }
@@ -59,7 +67,7 @@ public class InputTable extends Composite {
         GridData data = new GridData(SWT.LEFT, SWT.TOP, false, true);
         data.verticalIndent = 0;
         data.horizontalIndent = 0;
-        data.widthHint = 130;
+        data.widthHint = 140;
         box.setLayoutData(data);
 
         return box;

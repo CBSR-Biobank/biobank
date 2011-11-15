@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -13,8 +15,11 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 import edu.ualberta.med.biobank.gui.common.widgets.Messages;
 
 public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
-    protected Thread backgroundThread;
-    private final InfoTableListChangeHandler infoTableListChangeHandler = new InfoTableListChangeHandler();
+    private final Queue<ListUpdater> updateListQueue =
+        new LinkedList<ListUpdater>();
+    private final InfoTableListChangeHandler infoTableListChangeHandler =
+        new InfoTableListChangeHandler();
+    private Thread previousThread;
 
     public InfoTableBgrLoader(Composite parent, List<T> list,
         String[] headings, int[] columnWidths, int rowsPerPage) {
@@ -35,47 +40,83 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
     protected abstract void tableLoader(final List<T> list, final T Selection);
 
     @Override
-    public void setList(List<T> collection) {
+    public synchronized void setList(List<T> collection) {
         setList(collection, null);
     }
 
-    public void setList(final List<T> list, final T selection) {
-        try {
-            if ((list == null)
-                || ((backgroundThread != null) && backgroundThread.isAlive())) {
-                return;
-            }
+    public synchronized void setList(final List<T> list, final T selection) {
+        if (list == null) return;
 
-            super.setList(list);
+        final ListUpdater updater = new ListUpdater(list, selection);
+        final Thread previousThread = this.previousThread;
 
-            if (paginationRequired) {
-                showPaginationWidget();
-                paginationWidget.setPageLabelText();
-                enablePaginationWidget(false);
-            } else if (paginationWidget != null) {
-                paginationWidget.setVisible(false);
-            }
-            final Display display = getTableViewer().getTable().getDisplay();
+        // set the list here, which sets the delegate, so events fired by the
+        // delegate can be properly paid attention to or ignored.
+        super.setList(list);
 
-            resizeTable();
-            backgroundThread = new Thread() {
-                @Override
-                public void run() {
-                    tableLoader(list, selection);
-                    if (autoSizeColumns) {
-                        display.syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                autoSizeColumns();
-                            }
-                        });
+        resizeTable();
+
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                boolean ran = false;
+                while (!ran) {
+                    try {
+                        if (previousThread != null) {
+                            // if there is a previous thread, wait until it
+                            // finishes
+                            previousThread.join();
+                        }
+
+                        ran = true;
+                        updater.run();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
-            };
-            backgroundThread.start();
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError(
-                Messages.AbstractInfoTableWidget_load_error_title, e);
+            }
+        };
+
+        thread.start();
+        this.previousThread = thread;
+    }
+
+    private class ListUpdater implements Runnable {
+        private final List<T> list;
+        private final T selection;
+
+        private ListUpdater(List<T> list, T selection) {
+            this.list = list;
+            this.selection = selection;
+        }
+
+        @Override
+        public void run() {
+            try {
+                final Display display = getTableViewer()
+                    .getTable().getDisplay();
+                display.syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (paginationRequired) {
+                            showPaginationWidget();
+                            paginationWidget.setPageLabelText();
+                            enablePaginationWidget(false);
+                        } else if (paginationWidget != null) {
+                            paginationWidget.setVisible(false);
+                        }
+
+                        tableLoader(list, selection);
+
+                        if (autoSizeColumns) {
+                            autoSizeColumns();
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                BgcPlugin.openAsyncError(
+                    Messages.AbstractInfoTableWidget_load_error_title, e);
+            }
         }
     }
 

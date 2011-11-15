@@ -151,6 +151,7 @@ public class SiteAdapter extends AdapterBase {
 
     @Override
     public void openViewForm() {
+        super.openViewForm();
         eventBus.fireEvent(new SiteViewEvent(site.getId()));
     }
 }

@@ -179,6 +179,8 @@ public abstract class AbstractModel<T> extends FormModel {
 
             onBind();
 
+            // TODO: add checkpoint and dirty watchers for all values.
+
             addValidationHandlers();
             updateDirtyDelegate();
 
