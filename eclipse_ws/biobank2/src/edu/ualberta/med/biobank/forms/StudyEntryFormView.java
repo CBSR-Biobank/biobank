@@ -1,87 +1,81 @@
-package edu.ualberta.med.biobank.mvp.view.form;
+package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import com.google.gwt.user.client.ui.HasValue;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.forms.Messages;
-import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
+import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter;
 import edu.ualberta.med.biobank.mvp.view.IView;
+import edu.ualberta.med.biobank.mvp.view.form.AbstractEntryFormView;
+import edu.ualberta.med.biobank.mvp.view.form.BaseForm;
 import edu.ualberta.med.biobank.mvp.view.item.TableItem;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
 import edu.ualberta.med.biobank.mvp.view.item.TranslatedItem;
 import edu.ualberta.med.biobank.mvp.view.item.TranslatedItem.Translator;
 import edu.ualberta.med.biobank.mvp.view.util.InputTable;
-import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.ClinicAddInfoTable;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-/**
- * 
- * @author jferland
- * 
- */
-public class SiteEntryFormView extends AbstractEntryFormView implements
-    SiteEntryPresenter.View {
+public class StudyEntryFormView extends AbstractEntryFormView implements
+    StudyEntryPresenter.View {
+
     private final TextItem name = new TextItem();
     private final TextItem nameShort = new TextItem();
-    private final TableItem<StudyWrapper> studyWrappers =
-        new TableItem<StudyWrapper>();
-    private final TranslatedItem<Collection<StudyInfo>, Collection<StudyWrapper>> studies =
-        TranslatedItem.from(studyWrappers, STUDY_TRANSLATOR);
-
-    private IView addressEntryView;
     private IView activityStatusComboView;
+    private final TableItem<ContactWrapper> contactWrappers =
+        new TableItem<ContactWrapper>();
+    private final TranslatedItem<Collection<ClinicInfo>, Collection<ContactWrapper>> clinics =
+        TranslatedItem.from(contactWrappers, CONTACT_TRANSLATOR);
 
-    private static final StudyTranslator STUDY_TRANSLATOR =
-        new StudyTranslator();
+    private static final ContactTranslator CONTACT_TRANSLATOR =
+        new ContactTranslator();
 
-    private static class StudyTranslator implements
-        Translator<Collection<StudyInfo>, Collection<StudyWrapper>> {
+    private static class ContactTranslator implements
+        Translator<Collection<ClinicInfo>, Collection<ContactWrapper>> {
         @Override
-        public Collection<StudyInfo> fromDelegate(
-            Collection<StudyWrapper> delegate) {
-            Collection<StudyInfo> studies = new ArrayList<StudyInfo>();
-            for (StudyWrapper study : delegate) {
-                StudyInfo studyInfo =
-                    new StudyInfo(study.getWrappedObject(), -1l, -1l);
-                studies.add(studyInfo);
+        public Collection<ClinicInfo> fromDelegate(
+            Collection<ContactWrapper> delegate) {
+            Collection<ClinicInfo> clinicInfos = new ArrayList<ClinicInfo>();
+            for (ContactWrapper contact : delegate) {
+                ClinicInfo clinicInfo =
+                    new ClinicInfo(contact.getClinic().getWrappedObject(), -1l,
+                        -1l, Arrays.asList(contact.getWrappedObject()));
+                clinicInfos.add(clinicInfo);
             }
-            return studies;
+            return clinicInfos;
         }
 
         @Override
-        public Collection<StudyWrapper> toDelegate(Collection<StudyInfo> foreign) {
-            Collection<StudyWrapper> studies = new ArrayList<StudyWrapper>();
+        public Collection<ContactWrapper> toDelegate(
+            Collection<ClinicInfo> foreign) {
+            Collection<ContactWrapper> contacts =
+                new ArrayList<ContactWrapper>();
             WritableApplicationService appService =
                 SessionManager.getAppService();
-            for (StudyInfo study : foreign) {
-                StudyWrapper wrapper =
-                    new StudyWrapper(appService, study.getStudy());
-                studies.add(wrapper);
+            for (ClinicInfo info : foreign) {
+                for (Contact c : info.getContacts()) {
+                    ContactWrapper wrapper = new ContactWrapper(appService, c);
+                    contacts.add(wrapper);
+                }
             }
-            return studies;
+            return contacts;
         }
     }
 
     @Override
     public void setActivityStatusComboView(IView view) {
         this.activityStatusComboView = view;
-    }
-
-    @Override
-    public void setAddressEditView(IView view) {
-        this.addressEntryView = view;
     }
 
     @Override
@@ -95,15 +89,15 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
     }
 
     @Override
-    public HasValue<Collection<StudyInfo>> getStudies() {
-        return studies;
+    public HasValue<Collection<ClinicInfo>> getClinics() {
+        return clinics;
     }
 
     @Override
     public void onCreate(BaseForm baseForm) {
         super.onCreate(baseForm);
 
-        baseForm.setTitle(Messages.SiteEntryForm_main_title);
+        baseForm.setTitle(Messages.StudyEntryForm_main_title);
 
         InputTable table = new InputTable(baseForm.getPage());
 
@@ -117,27 +111,24 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
         table.addLabel("activityStatus");
         activityStatusComboView.create(table);
 
-        Composite addressClient = baseForm.createSectionWithClient("Address");
-        addressEntryView.create(addressClient);
-
-        Section studySection = baseForm.createSection("Studies");
+        Section studySection = baseForm.createSection("Clinics");
         WritableApplicationService appService =
             SessionManager.getAppService();
-        SiteWrapper siteWrapper = new SiteWrapper(appService);
+        StudyWrapper studyWrapper = new StudyWrapper(appService);
         boolean superAdmin = SessionManager.getUser().isSuperAdmin();
-        final StudyAddInfoTable studiesTable =
-            new StudyAddInfoTable(studySection, siteWrapper, superAdmin);
-        studySection.setClient(studiesTable);
+        final ClinicAddInfoTable clinicsTable =
+            new ClinicAddInfoTable(studySection, studyWrapper);
+        studySection.setClient(clinicsTable);
         if (superAdmin) {
             BaseForm.addSectionToolbar(studySection,
                 Messages.SiteEntryForm_studies_add, new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
-                        studiesTable.createStudyDlg();
+                        clinicsTable.createClinicContact();
                     }
                 }, ContactWrapper.class, null);
         }
-        studyWrappers.setTable(studiesTable);
+        contactWrappers.setTable(clinicsTable);
 
         // TODO: fix comment section
         // comment.setText(widget.comment);

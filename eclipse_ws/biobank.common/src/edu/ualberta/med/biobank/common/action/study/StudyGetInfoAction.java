@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.study;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -8,9 +7,9 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.info.Info;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
@@ -81,7 +80,7 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
         return info;
     }
 
-    public static class StudyInfo implements Serializable, NotAProxy {
+    public static class StudyInfo implements Info {
         private static final long serialVersionUID = 1L;
 
         public Study study;

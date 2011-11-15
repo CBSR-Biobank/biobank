@@ -5,19 +5,29 @@ import java.util.List;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IEditorPart;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
+import edu.ualberta.med.biobank.mvp.event.model.study.StudyEditEvent;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class StudyAdapter extends AdapterBase {
 
-    public StudyAdapter(AdapterBase parent, StudyWrapper studyWrapper) {
-        super(parent, studyWrapper);
+    private StudyWrapper study;
+
+    public StudyAdapter(AdapterBase parent, StudyWrapper study) {
+        super(parent, study);
+        this.study = study;
         setEditable(parent instanceof StudyMasterGroup || parent == null);
+    }
+
+    @Override
+    protected void setModelObject(Object modelObject) {
+        super.setModelObject(modelObject);
+        this.study = (StudyWrapper) modelObject;
     }
 
     @Override
@@ -71,7 +81,7 @@ public class StudyAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        return StudyEntryForm.ID;
+        return null;
     }
 
     @Override
@@ -84,5 +94,17 @@ public class StudyAdapter extends AdapterBase {
         if (o instanceof StudyAdapter)
             return internalCompareTo(o);
         return 0;
+    }
+
+    @Override
+    public IEditorPart openEntryForm(boolean hasPreviousForm) {
+        eventBus.fireEvent(new StudyEditEvent(study.getId()));
+        return null; // TODO: problem !?
+    }
+
+    @Override
+    public void openViewForm() {
+        super.openViewForm();
+        // eventBus.fireEvent(new StudyViewEvent(study.getId()));
     }
 }
