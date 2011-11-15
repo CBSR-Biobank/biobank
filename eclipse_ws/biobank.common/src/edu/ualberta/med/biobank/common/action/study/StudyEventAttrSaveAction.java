@@ -17,7 +17,6 @@ public class StudyEventAttrSaveAction implements Action<Integer> {
 
     private Integer id = null;
     public Integer globalEventAttrId;
-    public Integer typeId;
     public Boolean required;
     public String permissible;
     public Integer aStatusId;
@@ -29,10 +28,6 @@ public class StudyEventAttrSaveAction implements Action<Integer> {
 
     public void setGlobalEventAttrId(Integer globalEventAttrId) {
         this.globalEventAttrId = globalEventAttrId;
-    }
-
-    public void setEventAttrTypeId(Integer typeId) {
-        this.typeId = typeId;
     }
 
     public void setRequired(Boolean required) {
@@ -79,7 +74,8 @@ public class StudyEventAttrSaveAction implements Action<Integer> {
         attr.setLabel(globalAttr.getLabel());
         attr.setPermissible(permissible);
         attr.setRequired(required);
-        attr.setEventAttrType(sessionUtil.load(EventAttrType.class, typeId));
+        attr.setEventAttrType(sessionUtil.load(EventAttrType.class, globalAttr
+            .getEventAttrType().getId()));
         attr.setActivityStatus(sessionUtil
             .load(ActivityStatus.class, aStatusId));
         attr.setStudy(sessionUtil.load(Study.class, studyId));

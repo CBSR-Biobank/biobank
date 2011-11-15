@@ -72,7 +72,7 @@ public class StudySaveAction implements Action<Integer> {
         this.aliquotSpcIds = aliquotSpcIds;
     }
 
-    public void setStudyEventAttrSaveIds(Set<Integer> attrIds) {
+    public void setStudyEventAttrIds(Set<Integer> attrIds) {
         this.studyEventAttrIds = attrIds;
     }
 
@@ -135,27 +135,28 @@ public class StudySaveAction implements Action<Integer> {
             throw new NullPointerException("session not initialized");
         }
 
-        if (!peformUniqueQuery("name").equals(0L)) {
+        if (!peformUniqueQuery("name", name).equals(0L)) {
             throw new ActionCheckException("duplicate name");
         }
 
-        if (!peformUniqueQuery("nameShort").equals(0L)) {
+        if (!peformUniqueQuery("nameShort", nameShort).equals(0L)) {
             throw new ActionCheckException("duplicate name short");
         }
     }
 
-    private Long peformUniqueQuery(String attribute) {
+    private Long peformUniqueQuery(String attribute, String value) {
         String msg;
 
         if (id == null) {
-            msg = MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, "name", "?", "");
+            msg =
+                MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, attribute, "?", "");
         } else {
-            msg = MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, "name", "?",
+            msg = MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, attribute, "?",
                 "AND id<>" + id);
         }
 
         Query query = session.createQuery(msg);
-        query.setParameter(0, name);
+        query.setParameter(0, value);
         return HibernateUtil.getCountFromQuery(query);
     }
 

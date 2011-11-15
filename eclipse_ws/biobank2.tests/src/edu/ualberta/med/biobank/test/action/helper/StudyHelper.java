@@ -16,9 +16,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyHelper extends Helper {
 
-    public static Integer createStudy(BiobankApplicationService appService,
-        String name, ActivityStatusEnum activityStatus)
-        throws ApplicationException {
+    public static StudySaveAction getSaveAction(String name, String nameShort,
+        ActivityStatusEnum activityStatus) {
         StudySaveAction saveStudy = new StudySaveAction();
         saveStudy.setName(name);
         saveStudy.setNameShort(name);
@@ -27,8 +26,14 @@ public class StudyHelper extends Helper {
         saveStudy.setContactIds(new HashSet<Integer>());
         saveStudy.setSourceSpcIds(new HashSet<Integer>());
         saveStudy.setAliquotSpcIds(new HashSet<Integer>());
-        saveStudy.setStudyEventAttrSaveIds(new HashSet<Integer>());
+        saveStudy.setStudyEventAttrIds(new HashSet<Integer>());
+        return saveStudy;
+    }
 
+    public static Integer createStudy(BiobankApplicationService appService,
+        String name, ActivityStatusEnum activityStatus)
+        throws ApplicationException {
+        StudySaveAction saveStudy = getSaveAction(name, name, activityStatus);
         return appService.doAction(saveStudy);
     }
 
@@ -68,7 +73,7 @@ public class StudyHelper extends Helper {
         for (StudyEventAttr attr : studyInfo.studyEventAttrs) {
             ids.add(attr.getId());
         }
-        saveStudy.setStudyEventAttrSaveIds(ids);
+        saveStudy.setStudyEventAttrIds(ids);
 
         return saveStudy;
     }

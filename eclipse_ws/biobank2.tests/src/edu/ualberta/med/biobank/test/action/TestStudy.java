@@ -17,7 +17,9 @@ import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.aliquotedspecimen.AliquotedSpecimenSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction.Response;
+import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.sourcespecimen.SourceSpecimenSaveAction;
+import edu.ualberta.med.biobank.common.action.study.StudyEventAttrSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
@@ -25,10 +27,12 @@ import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.StudyEventAttr;
+import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
-import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -38,7 +42,6 @@ public class TestStudy extends TestAction {
     public TestName testname = new TestName();
 
     private String name;
-    private Integer siteId;
     private Integer studyId;
 
     @Override
@@ -46,12 +49,51 @@ public class TestStudy extends TestAction {
     public void setUp() throws Exception {
         super.setUp();
         name = testname.getMethodName() + r.nextInt();
-        siteId =
-            SiteHelper.createSite(appService, name, "Edmonton",
-                ActivityStatusEnum.ACTIVE, new HashSet<Integer>());
         studyId =
             StudyHelper
                 .createStudy(appService, name, ActivityStatusEnum.ACTIVE);
+    }
+
+    @Test
+    public void testNameChecks() throws Exception {
+        // ensure we can change name on existing study
+        StudyInfo studyInfo =
+            appService.doAction(new StudyGetInfoAction(studyId));
+        studyInfo.study.setName(name + "_2");
+        StudySaveAction studySave =
+            StudyHelper.getSaveAction(appService, studyInfo);
+        appService.doAction(studySave);
+
+        // ensure we can change short name on existing study
+        studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
+        studyInfo.study.setNameShort(name + "_2");
+        studySave = StudyHelper.getSaveAction(appService, studyInfo);
+        appService.doAction(studySave);
+
+        // test for duplicate name
+        StudySaveAction saveStudy =
+            StudyHelper.getSaveAction(name + "_2", name,
+                ActivityStatusEnum.ACTIVE);
+        try {
+            appService.doAction(saveStudy);
+            Assert
+                .fail("should not be allowed to add study with same name");
+        } catch (ActionCheckException e) {
+            Assert.assertTrue(true);
+        }
+
+        // test for duplicate name short
+        saveStudy.setName(Utils.getRandomString(5, 10));
+        saveStudy.setNameShort(name + "_2");
+
+        try {
+            appService.doAction(saveStudy);
+            Assert
+                .fail("should not be allowed to add study with same name short");
+        } catch (ActionCheckException e) {
+            Assert.assertTrue(true);
+        }
+
     }
 
     @Test
@@ -295,6 +337,95 @@ public class TestStudy extends TestAction {
         throws ApplicationException {
         Set<Integer> actualIds = new HashSet<Integer>();
         for (AliquotedSpecimen aqSpc : studyInfo.aliquotedSpcs) {
+            actualIds.add(aqSpc.getId());
+        }
+        return actualIds;
+    }
+
+    @Test
+    public void testStudyEventAttrs() throws Exception {
+        openHibernateSession();
+        Query q = session.createQuery("FROM " + GlobalEventAttr.class.getName()
+            + " gea INNER JOIN FETCH gea.eventAttrType");
+        @SuppressWarnings("unchecked")
+        List<GlobalEventAttr> globalEvAttrs = q.list();
+        closeHibernateSession();
+
+        Set<Integer> idsAll = new HashSet<Integer>();
+
+        // add a study event attribute for each global event attribute
+        for (GlobalEventAttr gEvAttr : globalEvAttrs) {
+            StudyEventAttrSaveAction stEvAttrSave =
+                new StudyEventAttrSaveAction();
+
+            stEvAttrSave.setGlobalEventAttrId(gEvAttr.getId());
+            stEvAttrSave.setRequired(r.nextBoolean());
+
+            if (gEvAttr.getEventAttrType().getName().startsWith("select_")) {
+                stEvAttrSave.setPermissible("a;b;c;d;e;f");
+            }
+            stEvAttrSave.setStudyId(studyId);
+            stEvAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE
+                .getId());
+            Integer id = appService.doAction(stEvAttrSave);
+            idsAll.add(id);
+        }
+
+        StudyInfo studyInfo =
+            appService.doAction(new StudyGetInfoAction(studyId));
+        Assert.assertEquals(idsAll, getStudyEventAttrIds(studyInfo));
+
+        // attempt to add 1 of each global type again - should not be allowed
+        for (GlobalEventAttr gEvAttr : globalEvAttrs) {
+            StudyEventAttrSaveAction stEvAttrSave =
+                new StudyEventAttrSaveAction();
+
+            stEvAttrSave.setGlobalEventAttrId(gEvAttr.getId());
+            stEvAttrSave.setRequired(r.nextBoolean());
+
+            if (gEvAttr.getEventAttrType().getName().startsWith("select_")) {
+                stEvAttrSave.setPermissible("a;b;c;d;e;f");
+            }
+            stEvAttrSave.setStudyId(studyId);
+            stEvAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE
+                .getId());
+
+            try {
+                appService.doAction(stEvAttrSave);
+                Assert
+                    .fail("should not be allowed to add more than 1 global type");
+            } catch (ApplicationException e) {
+                Assert.assertTrue(true);
+            }
+        }
+
+        // remove each study event attr
+        Set<Integer> idsRemaining = new HashSet<Integer>(idsAll);
+        for (Integer id : idsAll) {
+            idsRemaining.remove(id);
+            StudySaveAction studySave =
+                StudyHelper.getSaveAction(appService, studyInfo);
+            studySave.setStudyEventAttrIds(idsRemaining);
+            appService.doAction(studySave);
+
+            studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
+            Assert.assertEquals(idsRemaining, getStudyEventAttrIds(studyInfo));
+        }
+
+        // check that this study no longer has any study event attributes
+        openHibernateSession();
+        q = session.createQuery("SELECT COUNT(*) FROM "
+            + StudyEventAttr.class.getName()
+            + " sea WHERE sea.study.id=?");
+        q.setParameter(0, studyId);
+        Assert.assertTrue(HibernateUtil.getCountFromQuery(q).equals(0L));
+        closeHibernateSession();
+    }
+
+    private Set<Integer> getStudyEventAttrIds(StudyInfo studyInfo)
+        throws ApplicationException {
+        Set<Integer> actualIds = new HashSet<Integer>();
+        for (StudyEventAttr aqSpc : studyInfo.studyEventAttrs) {
             actualIds.add(aqSpc.getId());
         }
         return actualIds;
