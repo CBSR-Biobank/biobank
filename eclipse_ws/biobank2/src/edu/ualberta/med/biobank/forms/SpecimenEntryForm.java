@@ -45,7 +45,8 @@ import edu.ualberta.med.biobank.wizards.SelectCollectionEventWizard;
 
 public class SpecimenEntryForm extends BiobankEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.SpecimenEntryForm"; //$NON-NLS-1$
 
     public static final String OK_MESSAGE = Messages.SpecimenEntryForm_ok_msg;
 
@@ -74,12 +75,13 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private CommentCollectionInfoTable commentEntryTable;
 
-    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BgcEntryFormWidgetListener listener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     @Override
     protected void init() throws Exception {
@@ -120,7 +122,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             containerSpecimenTypeList = ct.getSpecimenTypeCollection();
         }
 
-        List<SpecimenTypeWrapper> specimenTypes = new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> specimenTypes =
+            new ArrayList<SpecimenTypeWrapper>();
         for (AliquotedSpecimenWrapper ss : allowedAliquotedSpecimen) {
             SpecimenTypeWrapper sst = ss.getSpecimenType();
             if (containerSpecimenTypeList == null) {
@@ -201,8 +204,9 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         editPatientButton.addListener(SWT.MouseUp, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                SelectCollectionEventWizard wizard = new SelectCollectionEventWizard(
-                    SessionManager.getAppService());
+                SelectCollectionEventWizard wizard =
+                    new SelectCollectionEventWizard(
+                        SessionManager.getAppService());
                 WizardDialog dialog = new BiobankWizardDialog(page.getShell(),
                     wizard);
                 int res = dialog.open();
@@ -311,8 +315,9 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_button_add);
+        commentText =
+            (BgcBaseText) createLabelledWidget(client, BgcBaseText.class,
+                SWT.MULTI, Messages.Comments_button_add);
 
     }
 
