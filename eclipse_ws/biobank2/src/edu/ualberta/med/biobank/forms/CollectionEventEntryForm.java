@@ -36,7 +36,6 @@ import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimensAction;
-import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -176,12 +175,17 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         Composite client = createSectionWithClient(Messages.Comments_title);
         GridLayout gl = new GridLayout(2, false);
 
+        ArrayList<Comment> comments = new ArrayList<Comment>();
+        if (ceventInfo.cevent != null &&
+            ceventInfo.cevent.getCommentCollection() != null) {
+            comments.addAll(ceventInfo.cevent.getCommentCollection());
+        }
+
         client.setLayout(gl);
         commentEntryTable =
             new CommentCollectionInfoTable(client,
                 ModelWrapper.wrapModelCollection(
-                    SessionManager.getAppService(), new ArrayList<Comment>(
-                        ceventInfo.cevent.getCommentCollection()),
+                    SessionManager.getAppService(), comments,
                     CommentWrapper.class));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
@@ -459,7 +463,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     public void reset() {
         super.reset();
         if (adapter.getId() == null)
-        // because we set the visit number and the activity status default
+            // because we set the visit number and the activity status default
             setDirty(true);
     }
 
