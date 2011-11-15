@@ -394,7 +394,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         for (Object o : specimensTable.getList()) {
             SpecimenInfo specInfo = (SpecimenInfo) o;
             SaveCEventSpecimenInfo ceSpecInfo = new SaveCEventSpecimenInfo();
-            ceSpecInfo.comments = specInfo.specimen.getCommentCollection();
+            // TODO: why is this even being sent to the server, unless comments
+            // were modified here and need to be saved?
+            // ceSpecInfo.comments = specInfo.specimen.getCommentCollection();
             ceSpecInfo.id = specInfo.specimen.getId();
             ceSpecInfo.inventoryId = specInfo.specimen.getInventoryId();
             ceSpecInfo.quantity = specInfo.specimen.getQuantity();

@@ -46,7 +46,8 @@ import org.springframework.orm.hibernate3.HibernateCallback;
  */
 public class BiobankORMDAOImpl extends WritableORMDAOImpl {
     private static AtomicInteger nextHandleId = new AtomicInteger(0);
-    private static final HashMap<QueryHandle, QueryProcess> queryMap = new HashMap<QueryHandle, QueryProcess>();
+    private static final HashMap<QueryHandle, QueryProcess> queryMap =
+        new HashMap<QueryHandle, QueryProcess>();
 
     @Override
     public Response query(Request request) throws DAOException {
@@ -72,7 +73,7 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         if (!action.isAllowed(user, session))
             throw new AccessDeniedException();
 
-        T actionResult = action.run(null, session);
+        T actionResult = action.run(user, session);
 
         session.flush();
         session.clear();
@@ -132,7 +133,8 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         CommandType command = qhr.getCommandType();
 
         if (command.equals(CommandType.CREATE)) {
-            QueryHandle handle = new QueryHandle(nextHandleId.incrementAndGet());
+            QueryHandle handle =
+                new QueryHandle(nextHandleId.incrementAndGet());
             try {
                 queryMap.put(handle, new QueryProcess(qhr.getQueryCommand(),
                     qhr.getAppService()));

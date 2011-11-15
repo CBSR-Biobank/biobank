@@ -20,9 +20,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenUpdateAction;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.util.Holder;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -344,13 +346,24 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        if (newCollectionEvent == null)
-            specimen.persist();
-        else {
-            newCollectionEvent.addToAllSpecimenCollection(allchildren);
-            newCollectionEvent.addToOriginalSpecimenCollection(origchildren);
-            newCollectionEvent.persist();
-        }
+        SpecimenUpdateAction updateAction = new SpecimenUpdateAction();
+        updateAction.setSpecimenId(specimen.getId());
+        updateAction.setSpecimenTypeId(specimen.getSpecimenType().getId());
+        updateAction
+            .setCollectionEventId(specimen.getCollectionEvent().getId());
+
+        final Holder<String> commentMessage = new Holder<String>(null);
+        commentText.getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                commentMessage.setValue(commentText.getText());
+            }
+        });
+
+        updateAction.setCommentMessage(commentMessage.getValue());
+        updateAction.setActivityStatusId(specimen.getActivityStatus().getId());
+
+        SessionManager.getAppService().doAction(updateAction);
     }
 
     @Override

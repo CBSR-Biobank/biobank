@@ -73,7 +73,7 @@ public class Specimen  implements Serializable
 	* @return comment
 	**/
 
-	public Collection getCommentCollection(){
+	public Collection<Comment> getCommentCollection(){
 		return commentCollection;
 	}
 

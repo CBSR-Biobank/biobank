@@ -16,6 +16,10 @@ public class SessionUtil {
         this.session = session;
     }
 
+    public Session getSession() {
+        return session;
+    }
+
     public <E> E get(Class<E> klazz, Serializable id) {
         if (id == null) return null;
 
@@ -62,7 +66,8 @@ public class SessionUtil {
 
     /**
      * The same as {@link #get(Class, Serializable, Object)}, but throws a
-     * {@link ModelNotFoundException} if any object in the given set of ids does not exist
+     * {@link ModelNotFoundException} if any object in the given set of ids does
+     * not exist
      * 
      * @param klazz
      * @param ids
