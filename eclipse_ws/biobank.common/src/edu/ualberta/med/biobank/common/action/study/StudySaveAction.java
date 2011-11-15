@@ -37,6 +37,8 @@ public class StudySaveAction implements Action<Integer> {
     private Set<Integer> aliquotSpcIds;
     private Set<Integer> studyEventAttrIds;
     private Session session = null;
+    private SessionUtil sessionUtil = null;
+    private Study study = null;
 
     public void setId(Integer id) {
         this.id = id;
@@ -105,14 +107,59 @@ public class StudySaveAction implements Action<Integer> {
         }
 
         this.session = session;
-        SessionUtil sessionUtil = new SessionUtil(session);
-        Study study = sessionUtil.get(Study.class, id, new Study());
+        sessionUtil = new SessionUtil(session);
+        study = sessionUtil.get(Study.class, id, new Study());
 
         performChecks(session);
 
         // TODO: check permission? (can edit site?)
         // TODO: version check?
 
+        saveContacts();
+        saveSourceSpecimens();
+        saveAliquotedSpecimens();
+        saveEventAttributes();
+
+        session.saveOrUpdate(study);
+        session.flush();
+
+        return study.getId();
+    }
+
+    private static final String STUDY_UNIQUE_ATTR_HQL =
+        "SELECT COUNT(*) FROM " + Study.class.getName()
+            + " s WHERE {0}=? {2}"; //$NON-NLS-1$
+
+    private void performChecks(Session session) throws ActionException {
+        if (session == null) {
+            throw new NullPointerException("session not initialized");
+        }
+
+        if (!peformUniqueQuery("name").equals(0L)) {
+            throw new ActionCheckException("duplicate name");
+        }
+
+        if (!peformUniqueQuery("nameShort").equals(0L)) {
+            throw new ActionCheckException("duplicate name short");
+        }
+    }
+
+    private Long peformUniqueQuery(String attribute) {
+        String msg;
+
+        if (id == null) {
+            msg = MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, "name", "?", "");
+        } else {
+            msg = MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, "name", "?",
+                "AND id<>" + id);
+        }
+
+        Query query = session.createQuery(msg);
+        query.setParameter(0, name);
+        return HibernateUtil.getCountFromQuery(query);
+    }
+
+    private void saveContacts() {
         study.setId(id);
         study.setName(name);
         study.setNameShort(nameShort);
@@ -163,12 +210,28 @@ public class StudySaveAction implements Action<Integer> {
                     "study not found in removed site's collection");
             }
         }
+    }
 
+    private void saveSourceSpecimens() {
+        // delete source specimens no longer in use
+        Map<Integer, SourceSpecimen> sourceSpcs =
+            sessionUtil.load(SourceSpecimen.class, sourceSpcIds);
+
+        SetDifference<SourceSpecimen> srcSpcsDiff =
+            new SetDifference<SourceSpecimen>(
+                study.getSourceSpecimenCollection(),
+                sourceSpcs.values());
+
+        for (SourceSpecimen srcSpc : srcSpcsDiff.getRemoveSet()) {
+            session.delete(srcSpc);
+        }
+        study.setSourceSpecimenCollection(new HashSet<SourceSpecimen>(
+            sourceSpcs.values()));
+    }
+
+    private void saveAliquotedSpecimens() {
         Map<Integer, AliquotedSpecimen> aliquotedSpcs =
             sessionUtil.load(AliquotedSpecimen.class, aliquotSpcIds);
-        study
-            .setAliquotedSpecimenCollection(new HashSet<AliquotedSpecimen>(
-                aliquotedSpcs.values()));
         SetDifference<AliquotedSpecimen> aqSpcsDiff =
             new SetDifference<AliquotedSpecimen>(
                 study.getAliquotedSpecimenCollection(),
@@ -178,25 +241,13 @@ public class StudySaveAction implements Action<Integer> {
         for (AliquotedSpecimen aqSpc : aqSpcsDiff.getRemoveSet()) {
             session.delete(aqSpc);
         }
+        study.setAliquotedSpecimenCollection(new HashSet<AliquotedSpecimen>(
+            aliquotedSpcs.values()));
+    }
 
-        Map<Integer, SourceSpecimen> sourceSpcs =
-            sessionUtil.load(SourceSpecimen.class, sourceSpcIds);
-        study.setSourceSpecimenCollection(new HashSet<SourceSpecimen>(
-            sourceSpcs.values()));
-        SetDifference<SourceSpecimen> srcSpcsDiff =
-            new SetDifference<SourceSpecimen>(
-                study.getSourceSpecimenCollection(),
-                sourceSpcs.values());
-
-        // delete source specimens no longer in use
-        for (SourceSpecimen srcSpc : srcSpcsDiff.getRemoveSet()) {
-            session.delete(srcSpc);
-        }
-
+    private void saveEventAttributes() {
         Map<Integer, StudyEventAttr> studyEventAttrs =
             sessionUtil.load(StudyEventAttr.class, studyEventAttrIds);
-        study.setStudyEventAttrCollection(new HashSet<StudyEventAttr>(
-            studyEventAttrs.values()));
         SetDifference<StudyEventAttr> attrsDiff =
             new SetDifference<StudyEventAttr>(
                 study.getStudyEventAttrCollection(),
@@ -206,43 +257,7 @@ public class StudySaveAction implements Action<Integer> {
         for (StudyEventAttr attr : attrsDiff.getRemoveSet()) {
             session.delete(attr);
         }
-
-        session.saveOrUpdate(study);
-        session.flush();
-
-        return study.getId();
-    }
-
-    private static final String STUDY_UNIQUE_ATTR_HQL =
-        "SELECT COUNT(*) FROM " + Study.class.getName()
-            + " s WHERE {0}=? {2}"; //$NON-NLS-1$
-
-    private void performChecks(Session session) throws ActionException {
-        if (session == null) {
-            throw new NullPointerException("session not initialized");
-        }
-
-        if (!peformUniqueQuery("name").equals(0L)) {
-            throw new ActionCheckException("duplicate name");
-        }
-
-        if (!peformUniqueQuery("nameShort").equals(0L)) {
-            throw new ActionCheckException("duplicate name short");
-        }
-    }
-
-    private Long peformUniqueQuery(String attribute) {
-        String msg;
-
-        if (id == null) {
-            msg = MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, "name", "?", "");
-        } else {
-            msg = MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, "name", "?",
-                "AND id<>" + id);
-        }
-
-        Query query = session.createQuery(msg);
-        query.setParameter(0, name);
-        return HibernateUtil.getCountFromQuery(query);
+        study.setStudyEventAttrCollection(new HashSet<StudyEventAttr>(
+            studyEventAttrs.values()));
     }
 }
