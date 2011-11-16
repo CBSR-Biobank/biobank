@@ -111,16 +111,16 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
         table.addLabel("activityStatus");
         activityStatusComboView.create(table);
 
-        Section studySection = baseForm.createSection("Clinics");
+        Section clinicSection = baseForm.createSection("Clinics");
         WritableApplicationService appService =
             SessionManager.getAppService();
         StudyWrapper studyWrapper = new StudyWrapper(appService);
         boolean superAdmin = SessionManager.getUser().isSuperAdmin();
         final ClinicAddInfoTable clinicsTable =
-            new ClinicAddInfoTable(studySection, studyWrapper);
-        studySection.setClient(clinicsTable);
+            new ClinicAddInfoTable(clinicSection, studyWrapper);
+        clinicSection.setClient(clinicsTable);
         if (superAdmin) {
-            BaseForm.addSectionToolbar(studySection,
+            BaseForm.addSectionToolbar(clinicSection,
                 Messages.SiteEntryForm_studies_add, new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {

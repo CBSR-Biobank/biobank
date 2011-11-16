@@ -37,7 +37,7 @@ public class BaseForm {
 
         Composite formBody = scrolledForm.getBody();
         formBody.setLayout(new GridLayout());
-        formBody.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        formBody.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
         ScrolledPageBook book = toolkit.createPageBook(formBody, SWT.V_SCROLL);
         book.setLayout(new GridLayout());
@@ -45,7 +45,8 @@ public class BaseForm {
 
         page = book.createPage(PAGE_KEY);
         page.setLayout(new GridLayout());
-        page.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        page.setLayoutData(new GridData(SWT.FILL, SWT.FILL | SWT.TOP, true,
+            false));
 
         IToolBarManager toolBarManager = scrolledForm.getToolBarManager();
         toolBarButtonManager = new ToolBarButtonManager(toolBarManager);
@@ -144,7 +145,8 @@ public class BaseForm {
         if (title != null) section.setText(title);
 
         section.setLayout(new GridLayout());
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        section.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
+            false));
         section.addExpansionListener(sectionMonitor);
 
         return section;
@@ -156,7 +158,19 @@ public class BaseForm {
     }
 
     private void adaptAllChildren(Composite container, FormToolkit toolkit) {
-        Control[] children = container.getChildren();
+        Control[] children = null;
+
+        if ((container instanceof Section)) {
+            // kludge to get around the way eclipse sets the section background
+            // colour in forms
+            Composite client =
+                (Composite) ((Section) container).getClient();
+            toolkit.adapt(client, true, true);
+            children = client.getChildren();
+        } else {
+            children = container.getChildren();
+        }
+
         for (Control child : children) {
             toolkit.adapt(child, true, true);
             if (child instanceof Composite) {
