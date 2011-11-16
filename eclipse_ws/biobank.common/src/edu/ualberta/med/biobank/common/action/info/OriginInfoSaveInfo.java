@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.action.info;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 public class OriginInfoSaveInfo implements Serializable {
     /**
@@ -12,16 +13,16 @@ public class OriginInfoSaveInfo implements Serializable {
     public Integer oiId;
     public Integer siteId;
     public Integer centerId;
-    public List<Integer> addedSpecIds;
-    public List<Integer> removedSpecIds;
+    public Set<Integer> addedSpecIds;
+    public Set<Integer> removedSpecIds;
 
     public OriginInfoSaveInfo(Integer oiId, Integer siteId, Integer centerId, 
-        List<Integer> addedSpecIds, List<Integer> removedSpecIds) {
+        Set<Integer> addedSpecimenIds, Set<Integer> removedSpecimenIds) {
         this.oiId = oiId;
         this.siteId = siteId;
         this.centerId = centerId;
-        this.addedSpecIds = addedSpecIds;
-        this.removedSpecIds = removedSpecIds;
+        this.addedSpecIds = addedSpecimenIds;
+        this.removedSpecIds = removedSpecimenIds;
     }
 
 }

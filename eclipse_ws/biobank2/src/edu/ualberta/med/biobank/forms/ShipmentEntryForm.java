@@ -483,13 +483,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         
-        List<Integer> addedSpecimenIds = WrapperUtil.getCollectionIds(specimenEntryWidget.getAddedSpecimens());
-        List<Integer> removedSpecimenIds = WrapperUtil.getCollectionIds(specimenEntryWidget.getRemovedSpecimens());
+        Set<Integer> addedSpecimenIds = WrapperUtil.getCollectionIds(specimenEntryWidget.getAddedSpecimens());
+        Set<Integer> removedSpecimenIds = WrapperUtil.getCollectionIds(specimenEntryWidget.getRemovedSpecimens());
         
-        CommentInfo commentInfo = new CommentInfo(comment.getMessage(), null, null);
         ShippingMethodInfo methodInfo = new ShippingMethodInfo(shipmentInfo.getShippingMethod().getId());
         OriginInfoSaveInfo oiInfo = new OriginInfoSaveInfo(originInfo.getId(), originInfo.getReceiverSite().getId(), originInfo.getCenter().getId(), addedSpecimenIds, removedSpecimenIds);
-        ShipmentInfoSaveInfo siInfo = new ShipmentInfoSaveInfo(shipmentInfo.getId(), shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(), shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(), commentInfo, methodInfo);
+        ShipmentInfoSaveInfo siInfo = new ShipmentInfoSaveInfo(shipmentInfo.getId(), shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(), shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(), comment.getMessage(), methodInfo);
         OriginInfoSaveAction save = new OriginInfoSaveAction(oiInfo, siInfo);
         SessionManager.getAppService().doAction(save);
 

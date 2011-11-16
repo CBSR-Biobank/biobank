@@ -205,7 +205,7 @@ public abstract class AbstractAdapterBase implements
         AbstractAdapterBase itemToRemove = null;
         for (AbstractAdapterBase child : children) {
             if ((child.getId() == null && item.getId() == null)
-                || (child.getId().equals(item.getId()) && child.getLabel()
+                || (child.getId()!=null && child.getId().equals(item.getId()) && child.getLabel()!=null && child.getLabel()
                     .equals(item.getLabel())))
                 itemToRemove = child;
         }

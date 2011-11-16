@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.shipment;
 
-import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -10,10 +8,10 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ShipmentFormReadInfo;
+import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.OriginInfo;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
 /**
@@ -28,7 +26,11 @@ public class ShipmentGetInfoAction implements Action<ShipmentFormReadInfo> {
     @SuppressWarnings("nls")
     private static final String ORIGIN_INFO_HQL = "select oi from "
     + OriginInfo.class.getName() 
-    + " oi join fetch oi.shipmentInfo si join fetch si.shippingMethod join fetch oi.center left join fetch si.commentCollection where oi.id=? group by oi";
+    + " oi join fetch oi." + OriginInfoPeer.SHIPMENT_INFO.getName()
+    + " si join fetch si." + ShipmentInfoPeer.SHIPPING_METHOD.getName()
+    + " join fetch oi." + OriginInfoPeer.CENTER.getName() 
+    + " left join fetch si." + ShipmentInfoPeer.COMMENT_COLLECTION.getName()
+    + " where oi." + OriginInfoPeer.ID.getName()+"=? group by oi";
     // @formatter:on
 
     private final Integer oiId;
