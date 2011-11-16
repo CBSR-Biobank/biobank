@@ -11,7 +11,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import com.google.gwt.user.client.ui.HasValue;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -63,9 +63,9 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
         @Override
         public Collection<StudyWrapper> toDelegate(Collection<StudyInfo> foreign) {
             Collection<StudyWrapper> studies = new ArrayList<StudyWrapper>();
+            WritableApplicationService appService =
+                SessionManager.getAppService();
             for (StudyInfo study : foreign) {
-                WritableApplicationService appService =
-                    SessionManager.getAppService();
                 StudyWrapper wrapper =
                     new StudyWrapper(appService, study.getStudy());
                 studies.add(wrapper);
@@ -103,7 +103,7 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
     public void onCreate(BaseForm baseForm) {
         super.onCreate(baseForm);
 
-        baseForm.setTitle(Messages.StudyEntryForm_main_title);
+        baseForm.setTitle(Messages.SiteEntryForm_main_title);
 
         InputTable table = new InputTable(baseForm.getPage());
 

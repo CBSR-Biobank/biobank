@@ -12,7 +12,6 @@ import org.eclipse.ui.IEditorPart;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteEditEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteViewEvent;
@@ -23,10 +22,8 @@ public class SiteAdapter extends AdapterBase {
 
     private int nodeIdOffset = 100;
     private final SiteWrapper site;
-    public static final int STUDIES_BASE_NODE_ID = 0;
-    public static final int CLINICS_BASE_ID = 1;
-    public static final int CONTAINER_TYPES_BASE_NODE_ID = 2;
-    public static final int CONTAINERS_BASE_NODE_ID = 3;
+    public static final int CONTAINER_TYPES_BASE_NODE_ID = 0;
+    public static final int CONTAINERS_BASE_NODE_ID = 1;
 
     public SiteAdapter(AdapterBase parent, SiteWrapper site) {
         super(parent, site, false);
@@ -115,7 +112,7 @@ public class SiteAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        return SiteEntryForm.ID;
+        return null;
     }
 
     @Override
@@ -151,6 +148,7 @@ public class SiteAdapter extends AdapterBase {
 
     @Override
     public void openViewForm() {
+        super.openViewForm();
         eventBus.fireEvent(new SiteViewEvent(site.getId()));
     }
 }

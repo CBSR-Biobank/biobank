@@ -8,8 +8,8 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
-import edu.ualberta.med.biobank.common.action.clinic.ClinicGetStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
@@ -61,7 +61,7 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
             info.clinic = (Clinic) row[0];
             info.patientCount = (Long) row[1];
             info.ceventCount = (Long) row[2];
-            info.contacts = getContacts.run(user, session);
+            info.contacts = getContacts.run(user, session).getContacts();
             info.studyInfos = getStudyInfo.run(user, session);
         }
 

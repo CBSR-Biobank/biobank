@@ -261,11 +261,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);
         try {
-            final List<SpecimenTypeInfo> allSpecimenTypes =
-                SessionManager.getAppService().doAction(
-                    new SpecimenTypeGetInfosAction());
-            final List<SourceSpecimen> studySourceSpecimens =
-                SessionManager.getAppService().doAction(
+            final List<SpecimenTypeInfo> allSpecimenTypes = SessionManager
+                .getAppService().doAction(new SpecimenTypeGetInfosAction());
+            final List<SourceSpecimen> studySourceSpecimens = SessionManager
+                .getAppService().doAction(
                     new StudyGetSourceSpecimensAction(ceventInfo.cevent
                         .getPatient().getStudy().getId()));
 
@@ -458,7 +457,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     public void reset() {
         super.reset();
         if (adapter.getId() == null)
-        // because we set the visit number and the activity status default
+            // because we set the visit number and the activity status default
             setDirty(true);
     }
 

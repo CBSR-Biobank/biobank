@@ -8,12 +8,18 @@ import edu.ualberta.med.biobank.mvp.event.model.site.SiteCreateEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteCreateHandler;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteEditEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteEditHandler;
+import edu.ualberta.med.biobank.mvp.event.model.site.SiteViewEvent;
+import edu.ualberta.med.biobank.mvp.event.model.site.SiteViewHandler;
+import edu.ualberta.med.biobank.mvp.event.model.study.StudyEditEvent;
+import edu.ualberta.med.biobank.mvp.event.model.study.StudyEditHandler;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter.View;
 import edu.ualberta.med.biobank.mvp.view.IFormView;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
 public class FormManagerPresenter extends AbstractPresenter<View> {
     private Provider<SiteEntryPresenter> siteEntryPresenterProvider;
+    private Provider<SiteViewPresenter> siteViewPresenterProvider;
+    private Provider<StudyEntryPresenter> studyEntryPresenterProvider;
 
     public interface View extends IView {
         void openForm(IFormView view);
@@ -21,9 +27,13 @@ public class FormManagerPresenter extends AbstractPresenter<View> {
 
     @Inject
     public FormManagerPresenter(View view, EventBus eventBus,
-        Provider<SiteEntryPresenter> siteEntryPresenterProvider) {
+        Provider<SiteEntryPresenter> siteEntryPresenterProvider,
+        Provider<SiteViewPresenter> siteViewPresenterProvider,
+        Provider<StudyEntryPresenter> studyEntryPresenterProvider) {
         super(view, eventBus);
         this.siteEntryPresenterProvider = siteEntryPresenterProvider;
+        this.siteViewPresenterProvider = siteViewPresenterProvider;
+        this.studyEntryPresenterProvider = studyEntryPresenterProvider;
     }
 
     @Override
@@ -41,6 +51,22 @@ public class FormManagerPresenter extends AbstractPresenter<View> {
                 @Override
                 public void onSiteCreate(SiteCreateEvent event) {
                     doSiteCreate();
+                }
+            }));
+
+        registerHandler(eventBus.addHandler(SiteViewEvent.getType(),
+            new SiteViewHandler() {
+                @Override
+                public void onSiteView(SiteViewEvent event) {
+                    doSiteView(event.getSiteId());
+                }
+            }));
+
+        registerHandler(eventBus.addHandler(StudyEditEvent.getType(),
+            new StudyEditHandler() {
+                @Override
+                public void onStudyEdit(StudyEditEvent event) {
+                    doStudyEdit(event.getStudyId());
                 }
             }));
     }
@@ -64,5 +90,23 @@ public class FormManagerPresenter extends AbstractPresenter<View> {
         presenter.createSite();
 
         view.openForm(presenter.getView());
+    }
+
+    private void doSiteView(Integer siteId) {
+        SiteViewPresenter presenter = siteViewPresenterProvider.get();
+        presenter.bind();
+
+        if (presenter.viewSite(siteId)) {
+            view.openForm(presenter.getView());
+        }
+    }
+
+    private void doStudyEdit(Integer studyId) {
+        StudyEntryPresenter presenter = studyEntryPresenterProvider.get();
+        presenter.bind();
+
+        if (presenter.editStudy(studyId)) {
+            view.openForm(presenter.getView());
+        }
     }
 }

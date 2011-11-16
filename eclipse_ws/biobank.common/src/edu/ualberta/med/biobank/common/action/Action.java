@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.User;
 
 /**
@@ -16,7 +17,7 @@ import edu.ualberta.med.biobank.model.User;
  * 
  * @param <T>
  */
-public interface Action<T extends Serializable> extends Serializable {
+public interface Action<T extends Serializable> extends NotAProxy, Serializable {
     public boolean isAllowed(User user, Session session) throws ActionException;
 
     public T run(User user, Session session) throws ActionException;

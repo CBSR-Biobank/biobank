@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -15,9 +16,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyHelper extends Helper {
 
-    public static Integer createStudy(BiobankApplicationService appService,
-        String name, ActivityStatusEnum activityStatus)
-        throws ApplicationException {
+    public static StudySaveAction getSaveAction(String name, String nameShort,
+        ActivityStatusEnum activityStatus) {
         StudySaveAction saveStudy = new StudySaveAction();
         saveStudy.setName(name);
         saveStudy.setNameShort(name);
@@ -26,8 +26,14 @@ public class StudyHelper extends Helper {
         saveStudy.setContactIds(new HashSet<Integer>());
         saveStudy.setSourceSpcIds(new HashSet<Integer>());
         saveStudy.setAliquotSpcIds(new HashSet<Integer>());
-        saveStudy.setStudyEventAttrSaveIds(new HashSet<Integer>());
+        saveStudy.setStudyEventAttrIds(new HashSet<Integer>());
+        return saveStudy;
+    }
 
+    public static Integer createStudy(BiobankApplicationService appService,
+        String name, ActivityStatusEnum activityStatus)
+        throws ApplicationException {
+        StudySaveAction saveStudy = getSaveAction(name, name, activityStatus);
         return appService.doAction(saveStudy);
     }
 
@@ -44,8 +50,10 @@ public class StudyHelper extends Helper {
         saveStudy.setSiteIds(new HashSet<Integer>());
 
         Set<Integer> ids = new HashSet<Integer>();
-        for (Contact c : studyInfo.contacts) {
-            ids.add(c.getId());
+        for (ClinicInfo infos : studyInfo.clinicInfos) {
+            for (Contact c : infos.getContacts()) {
+                ids.add(c.getId());
+            }
         }
         saveStudy.setContactIds(ids);
 
@@ -65,7 +73,7 @@ public class StudyHelper extends Helper {
         for (StudyEventAttr attr : studyInfo.studyEventAttrs) {
             ids.add(attr.getId());
         }
-        saveStudy.setStudyEventAttrSaveIds(ids);
+        saveStudy.setStudyEventAttrIds(ids);
 
         return saveStudy;
     }

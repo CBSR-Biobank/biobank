@@ -34,8 +34,13 @@ public class SetDifference<T> {
         addSet.removeAll(intersection);
     }
 
+    /**
+     * May be called with one of the parameters being the getXxxxCollection()
+     * method on a model object, so check for null.
+     */
     public SetDifference(Collection<T> oldSet, Collection<T> newSet) {
-        this(new HashSet<T>(oldSet), new HashSet<T>(newSet));
+        this(oldSet != null ? new HashSet<T>(oldSet) : new HashSet<T>(),
+            newSet != null ? new HashSet<T>(newSet) : new HashSet<T>());
     }
 
     public Set<T> getOldSet() {

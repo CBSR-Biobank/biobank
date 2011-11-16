@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.action.study;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -8,11 +8,10 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.info.Info;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
-import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -26,13 +25,13 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     private static final String STUDY_INFO_HQL = 
         "SELECT study,COUNT(DISTINCT patients),COUNT(DISTINCT cevents)"
         + " FROM "+ Study.class.getName() + " study"
+        + " LEFT JOIN FETCH study.activityStatus"
         + " LEFT JOIN study.patientCollection as patients"
         + " LEFT JOIN patients.collectionEventCollection AS cevents"
         + " WHERE study.id = ?";
     // @formatter:on
 
     private final Integer studyId;
-    private final StudyGetContactsAction getContacts;
     private final StudyGetClinicInfoAction getClinicInfo;
     private final StudyGetSourceSpecimensAction getSourceSpecimens;
     private final StudyGetAliquotedSpecimensAction getAliquotedSpecimens;
@@ -41,7 +40,6 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     public StudyGetInfoAction(Integer studyId) {
         this.studyId = studyId;
 
-        getContacts = new StudyGetContactsAction(studyId);
         getClinicInfo = new StudyGetClinicInfoAction(studyId);
         getSourceSpecimens = new StudyGetSourceSpecimensAction(studyId);
         getAliquotedSpecimens = new StudyGetAliquotedSpecimensAction(studyId);
@@ -62,8 +60,6 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     @Override
     public StudyInfo run(
         User user, Session session) throws ActionException {
-        StudyInfo info = new StudyInfo();
-
         Query query = session.createQuery(STUDY_INFO_HQL);
         query.setParameter(0, studyId);
 
@@ -72,58 +68,74 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
         if (rows.size() == 1) {
             Object[] row = rows.get(0);
 
-            info.study = (Study) row[0];
-            info.patientCount = (Long) row[1];
-            info.ceventCount = (Long) row[2];
-            info.contacts = getContacts.run(user, session);
-            info.clinicInfos = getClinicInfo.run(user, session);
-            info.sourceSpcs = getSourceSpecimens.run(user, session);
-            info.aliquotedSpcs = getAliquotedSpecimens.run(user, session);
-            info.studyEventAttrs = getStudyEventAttrs.run(user, session);
-        }
+            StudyInfo info = new StudyInfo(
+                (Study) row[0], (Long) row[1], (Long) row[2],
+                getClinicInfo.run(user, session),
+                getSourceSpecimens.run(user, session),
+                getAliquotedSpecimens.run(user, session),
+                getStudyEventAttrs.run(user, session));
 
-        return info;
+            return info;
+        }
+        return null;
     }
 
-    public static class StudyInfo implements Serializable, NotAProxy {
+    public static class StudyInfo implements Info {
         private static final long serialVersionUID = 1L;
 
-        public Study study;
-        public Long patientCount;
-        public Long ceventCount;
-        public List<Contact> contacts;
-        public List<ClinicInfo> clinicInfos;
-        public List<SourceSpecimen> sourceSpcs;
-        public List<AliquotedSpecimen> aliquotedSpcs;
-        public List<StudyEventAttr> studyEventAttrs;
+        public final Study study;
+        public final Long patientCount;
+        public final Long ceventCount;
+        public final List<ClinicInfo> clinicInfos;
+        public final List<SourceSpecimen> sourceSpcs;
+        public final List<AliquotedSpecimen> aliquotedSpcs;
+        public final List<StudyEventAttr> studyEventAttrs;
 
-        public void setStudy(Study study) {
-            this.study = study;
+        public StudyInfo() {
+            this.study = null;
+            this.patientCount = 0L;
+            this.ceventCount = 0L;
+            this.clinicInfos = new ArrayList<ClinicInfo>();
+            this.sourceSpcs = new ArrayList<SourceSpecimen>();
+            this.aliquotedSpcs = new ArrayList<AliquotedSpecimen>();
+            this.studyEventAttrs = new ArrayList<StudyEventAttr>();
         }
 
-        public void setStudyEventAttrs(List<StudyEventAttr> studyEventAttrs) {
+        public StudyInfo(Study study, Long patientCount, Long ceventCount,
+            List<ClinicInfo> clinicInfos, List<SourceSpecimen> sourceSpcs,
+            List<AliquotedSpecimen> aliquotedSpcs,
+            List<StudyEventAttr> studyEventAttrs) {
+            this.study = study;
+            this.patientCount = patientCount;
+            this.ceventCount = ceventCount;
+            this.clinicInfos = clinicInfos;
+            this.sourceSpcs = sourceSpcs;
+            this.aliquotedSpcs = aliquotedSpcs;
             this.studyEventAttrs = studyEventAttrs;
         }
 
-        public void setContacts(List<Contact> contacts) {
-            this.contacts = contacts;
+        public Study getStudy() {
+            return study;
         }
 
-        public void setClinicInfos(List<ClinicInfo> clinicInfo) {
-            this.clinicInfos = clinicInfo;
+        public List<StudyEventAttr> getStudyEventAttrs() {
+            return studyEventAttrs;
         }
 
-        public void setSourceSpc(List<SourceSpecimen> sourceSpcs) {
-            this.sourceSpcs = sourceSpcs;
+        public List<ClinicInfo> getClinicInfos() {
+            return clinicInfos;
         }
 
-        public void setAliquotedSpcTypeIds(
-            List<AliquotedSpecimen> aliquotedSpcs) {
-            this.aliquotedSpcs = aliquotedSpcs;
+        public List<SourceSpecimen> getSourceSpc() {
+            return sourceSpcs;
         }
 
-        public void setStudyEventattrs(List<StudyEventAttr> attrs) {
-            this.studyEventAttrs = attrs;
+        public List<AliquotedSpecimen> getAliquotedSpcTypeIds() {
+            return aliquotedSpcs;
+        }
+
+        public List<StudyEventAttr> getStudyEventattrs() {
+            return studyEventAttrs;
         }
     }
 

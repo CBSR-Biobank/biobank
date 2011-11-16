@@ -322,9 +322,6 @@ public class TestCollectionEvent extends TestAction {
         seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
             .get("PBMC Count (x10^6)").attr
             .getId());
-        seAttrSave
-            .setEventAttrTypeId(globalEattrsByLabel.get("PBMC Count (x10^6)").attr
-                .getEventAttrType().getId());
         seAttrSave.setRequired(true);
         seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
         seAttrSave.setStudyId(studyId);
@@ -333,9 +330,6 @@ public class TestCollectionEvent extends TestAction {
         seAttrSave = new StudyEventAttrSaveAction();
         seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
             .get("Consent").attr.getId());
-        seAttrSave
-            .setEventAttrTypeId(globalEattrsByLabel.get("Consent").attr
-                .getEventAttrType().getId());
         seAttrSave.setRequired(false);
         seAttrSave.setPermissible("c1;c2;c3");
         seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
@@ -345,9 +339,6 @@ public class TestCollectionEvent extends TestAction {
         seAttrSave = new StudyEventAttrSaveAction();
         seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
             .get("Patient Type").attr.getId());
-        seAttrSave
-            .setEventAttrTypeId(globalEattrsByLabel.get("Patient Type").attr
-                .getEventAttrType().getId());
         seAttrSave.required = true;
         seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
         seAttrSave.setStudyId(studyId);
@@ -356,9 +347,6 @@ public class TestCollectionEvent extends TestAction {
         seAttrSave = new StudyEventAttrSaveAction();
         seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
             .get("Visit Type").attr.getId());
-        seAttrSave
-            .setEventAttrTypeId(globalEattrsByLabel.get("Visit Type").attr
-                .getEventAttrType().getId());
         seAttrSave.required = false;
         seAttrSave.setPermissible("v1;v2;v3;v4");
         seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
@@ -368,9 +356,6 @@ public class TestCollectionEvent extends TestAction {
         seAttrSave = new StudyEventAttrSaveAction();
         seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
             .get("Phlebotomist").attr.getId());
-        seAttrSave
-            .setEventAttrTypeId(globalEattrsByLabel.get("Phlebotomist").attr
-                .getEventAttrType().getId());
         seAttrSave.required = false;
         seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
         seAttrSave.setStudyId(studyId);
