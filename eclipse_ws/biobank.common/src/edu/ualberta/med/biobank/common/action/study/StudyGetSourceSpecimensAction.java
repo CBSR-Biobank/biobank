@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.action.study;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,11 +9,12 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimensAction.Response;
+import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class StudyGetSourceSpecimensAction implements
-    Action<ArrayList<SourceSpecimen>> {
+public class StudyGetSourceSpecimensAction implements Action<Response> {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,9 +38,9 @@ public class StudyGetSourceSpecimensAction implements
     }
 
     @Override
-    public ArrayList<SourceSpecimen> run(User user, Session session)
+    public Response run(User user, Session session)
         throws ActionException {
-        ArrayList<SourceSpecimen> result = new ArrayList<SourceSpecimen>();
+        Response response = new Response();
 
         Query query = session.createQuery(SELECT_SOURCE_SPCS_HQL);
         query.setParameter(0, studyId);
@@ -46,9 +48,27 @@ public class StudyGetSourceSpecimensAction implements
         @SuppressWarnings("unchecked")
         List<SourceSpecimen> srcspcs = query.list();
         if (srcspcs != null) {
-            result.addAll(srcspcs);
+            response.sourceSpecimens.addAll(srcspcs);
         }
 
-        return result;
+        return response;
+    }
+
+    public static class Response implements Serializable, NotAProxy {
+        private static final long serialVersionUID = 1L;
+
+        private List<SourceSpecimen> sourceSpecimens;
+
+        public Response() {
+            sourceSpecimens = new ArrayList<SourceSpecimen>();
+        }
+
+        public Response(List<SourceSpecimen> sourceSpecimens) {
+            this.sourceSpecimens = sourceSpecimens;
+        }
+
+        public List<SourceSpecimen> getSourceSpecimens() {
+            return sourceSpecimens;
+        }
     }
 }

@@ -102,14 +102,15 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
         }
 
         public StudyInfo(Study study, Long patientCount, Long ceventCount,
-            List<ClinicInfo> clinicInfos, List<SourceSpecimen> sourceSpcs,
+            List<ClinicInfo> clinicInfos,
+            StudyGetSourceSpecimensAction.Response ssResponse,
             List<AliquotedSpecimen> aliquotedSpcs,
             List<StudyEventAttr> studyEventAttrs) {
             this.study = study;
             this.patientCount = patientCount;
             this.ceventCount = ceventCount;
             this.clinicInfos = clinicInfos;
-            this.sourceSpcs = sourceSpcs;
+            this.sourceSpcs = ssResponse.getSourceSpecimens();
             this.aliquotedSpcs = aliquotedSpcs;
             this.studyEventAttrs = studyEventAttrs;
         }

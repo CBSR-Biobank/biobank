@@ -12,9 +12,12 @@ import com.google.gwt.user.client.ui.HasValue;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
+import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimensAction;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter;
 import edu.ualberta.med.biobank.mvp.view.IView;
 import edu.ualberta.med.biobank.mvp.view.form.AbstractEntryFormView;
@@ -35,6 +38,9 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
     private IView activityStatusComboView;
     private final TableItem<ContactWrapper> contactWrappers =
         new TableItem<ContactWrapper>();
+    private final TableItem<SourceSpecimenWrapper> srcSpcWrappers =
+        new TableItem<SourceSpecimenWrapper>();
+
     private final TranslatedItem<Collection<ClinicInfo>, Collection<ContactWrapper>> clinics =
         TranslatedItem.from(contactWrappers, CONTACT_TRANSLATOR);
 
@@ -59,17 +65,59 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
         @Override
         public Collection<ContactWrapper> toDelegate(
             Collection<ClinicInfo> foreign) {
-            Collection<ContactWrapper> contacts =
+            Collection<ContactWrapper> contactWrappers =
                 new ArrayList<ContactWrapper>();
             WritableApplicationService appService =
                 SessionManager.getAppService();
             for (ClinicInfo info : foreign) {
                 for (Contact c : info.getContacts()) {
                     ContactWrapper wrapper = new ContactWrapper(appService, c);
-                    contacts.add(wrapper);
+                    contactWrappers.add(wrapper);
                 }
             }
-            return contacts;
+            return contactWrappers;
+        }
+    }
+
+    private final TranslatedItem<Collection<StudyGetSourceSpecimensAction.Response>, Collection<SourceSpecimenWrapper>> srcSpcs =
+        TranslatedItem.from(srcSpcWrappers, SOURCE_SPC_TRANSLATOR);
+
+    private static final SrcSpcTranslator SOURCE_SPC_TRANSLATOR =
+        new SrcSpcTranslator();
+
+    private static class SrcSpcTranslator
+        implements
+        Translator<Collection<StudyGetSourceSpecimensAction.Response>,
+        Collection<SourceSpecimenWrapper>> {
+        @Override
+        public Collection<StudyGetSourceSpecimensAction.Response> fromDelegate(
+            Collection<SourceSpecimenWrapper> delegate) {
+            Collection<StudyGetSourceSpecimensAction.Response> clinicInfos =
+                new ArrayList<StudyGetSourceSpecimensAction.Response>();
+            for (SourceSpecimenWrapper ssWrapper : delegate) {
+                StudyGetSourceSpecimensAction.Response ssResponse =
+                    new StudyGetSourceSpecimensAction.Response(
+                        Arrays.asList(ssWrapper.getWrappedObject()));
+                clinicInfos.add(ssResponse);
+            }
+            return clinicInfos;
+        }
+
+        @Override
+        public Collection<SourceSpecimenWrapper> toDelegate(
+            Collection<StudyGetSourceSpecimensAction.Response> foreign) {
+            Collection<SourceSpecimenWrapper> ssWrappers =
+                new ArrayList<SourceSpecimenWrapper>();
+            WritableApplicationService appService =
+                SessionManager.getAppService();
+            for (StudyGetSourceSpecimensAction.Response ssResponse : foreign) {
+                for (SourceSpecimen ss : ssResponse.getSourceSpecimens()) {
+                    SourceSpecimenWrapper wrapper =
+                        new SourceSpecimenWrapper(appService, ss);
+                    ssWrappers.add(wrapper);
+                }
+            }
+            return ssWrappers;
         }
     }
 

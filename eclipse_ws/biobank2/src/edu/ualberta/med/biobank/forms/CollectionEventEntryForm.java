@@ -51,7 +51,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
-import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
@@ -263,12 +262,13 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         try {
             final List<SpecimenTypeInfo> allSpecimenTypes = SessionManager
                 .getAppService().doAction(new SpecimenTypeGetInfosAction());
-            final List<SourceSpecimen> studySourceSpecimens = SessionManager
-                .getAppService().doAction(
-                    new StudyGetSourceSpecimensAction(ceventInfo.cevent
-                        .getPatient().getStudy().getId()));
+            final StudyGetSourceSpecimensAction.Response ssResponse =
+                SessionManager
+                    .getAppService().doAction(
+                        new StudyGetSourceSpecimensAction(ceventInfo.cevent
+                            .getPatient().getStudy().getId()));
 
-            specimensTable.addEditSupport(studySourceSpecimens,
+            specimensTable.addEditSupport(ssResponse.getSourceSpecimens(),
                 allSpecimenTypes);
             addSectionToolbar(section,
                 Messages.CollectionEventEntryForm_specimens_add_title,
@@ -277,8 +277,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                     public void widgetSelected(SelectionEvent e) {
                         form.setFocus();
                         specimensTable.addOrEditSpecimen(true, null,
-                            studySourceSpecimens, allSpecimenTypes, ceventCopy,
-                            timeDrawnWidget.getDate());
+                            ssResponse.getSourceSpecimens(), allSpecimenTypes,
+                            ceventCopy, timeDrawnWidget.getDate());
                     }
                 });
         } catch (ApplicationException e) {
