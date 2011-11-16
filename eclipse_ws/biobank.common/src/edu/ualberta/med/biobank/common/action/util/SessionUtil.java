@@ -46,7 +46,8 @@ public class SessionUtil {
 
     /**
      * The same as {@link #get(Class, Serializable)}, but throws a
-     * {@link ModelNotFoundException} if no object exists with the given id.
+     * {@link ModelNotFoundException} if no object exists with the given id,
+     * unless the id is null;
      * 
      * @param klazz
      * @param id
@@ -57,7 +58,29 @@ public class SessionUtil {
         throws ModelNotFoundException {
         E result = get(klazz, id);
 
-        if (result == null) {
+        if (id != null && result == null) {
+            throw new ModelNotFoundException(klazz, id);
+        }
+
+        return result;
+    }
+
+    /**
+     * The same as {@link #load(Class, Serializable)}, but throws a
+     * {@link ModelNotFoundException} if no object exists with the given id,
+     * unless the given id is null, then the default value is returned.
+     * 
+     * @param klazz
+     * @param id
+     * @param defaultValue
+     * @return
+     * @throws ModelNotFoundException
+     */
+    public <E> E load(Class<E> klazz, Serializable id, E defaultValue)
+        throws ModelNotFoundException {
+        E result = get(klazz, id, defaultValue);
+
+        if (id != null && result == defaultValue) {
             throw new ModelNotFoundException(klazz, id);
         }
 
