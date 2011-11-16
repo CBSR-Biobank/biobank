@@ -1,38 +1,39 @@
 package edu.ualberta.med.biobank.mvp.presenter.impl;
 
-import java.util.Arrays;
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteCreateEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteCreateHandler;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteEditEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteEditHandler;
+import edu.ualberta.med.biobank.mvp.event.model.site.SiteViewEvent;
+import edu.ualberta.med.biobank.mvp.event.model.site.SiteViewHandler;
+import edu.ualberta.med.biobank.mvp.event.model.study.StudyEditEvent;
+import edu.ualberta.med.biobank.mvp.event.model.study.StudyEditHandler;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter.View;
-import edu.ualberta.med.biobank.mvp.view.IView;
 import edu.ualberta.med.biobank.mvp.view.IFormView;
+import edu.ualberta.med.biobank.mvp.view.IView;
 
-public class FormManagerPresenter extends BasePresenter<View> {
+public class FormManagerPresenter extends AbstractPresenter<View> {
     private Provider<SiteEntryPresenter> siteEntryPresenterProvider;
+    private Provider<SiteViewPresenter> siteViewPresenterProvider;
+    private Provider<StudyEntryPresenter> studyEntryPresenterProvider;
 
     public interface View extends IView {
-        /**
-         * 
-         * @param object
-         *            determines uniqueness
-         * @param view
-         */
-        void openForm(Object object, IFormView view);
+        void openForm(IFormView view);
     }
 
     @Inject
     public FormManagerPresenter(View view, EventBus eventBus,
-        Provider<SiteEntryPresenter> siteEntryPresenterProvider) {
+        Provider<SiteEntryPresenter> siteEntryPresenterProvider,
+        Provider<SiteViewPresenter> siteViewPresenterProvider,
+        Provider<StudyEntryPresenter> studyEntryPresenterProvider) {
         super(view, eventBus);
         this.siteEntryPresenterProvider = siteEntryPresenterProvider;
+        this.siteViewPresenterProvider = siteViewPresenterProvider;
+        this.studyEntryPresenterProvider = studyEntryPresenterProvider;
     }
 
     @Override
@@ -52,6 +53,22 @@ public class FormManagerPresenter extends BasePresenter<View> {
                     doSiteCreate();
                 }
             }));
+
+        registerHandler(eventBus.addHandler(SiteViewEvent.getType(),
+            new SiteViewHandler() {
+                @Override
+                public void onSiteView(SiteViewEvent event) {
+                    doSiteView(event.getSiteId());
+                }
+            }));
+
+        registerHandler(eventBus.addHandler(StudyEditEvent.getType(),
+            new StudyEditHandler() {
+                @Override
+                public void onStudyEdit(StudyEditEvent event) {
+                    doStudyEdit(event.getStudyId());
+                }
+            }));
     }
 
     @Override
@@ -59,22 +76,37 @@ public class FormManagerPresenter extends BasePresenter<View> {
     }
 
     private void doSiteEdit(Integer siteId) {
-        SiteEntryPresenter siteEntryPres = siteEntryPresenterProvider.get();
-        siteEntryPres.bind();
-        IFormView formView = siteEntryPres.editSite(siteId);
+        SiteEntryPresenter presenter = siteEntryPresenterProvider.get();
+        presenter.bind();
 
-        // TODO: think about unique object
-        // TODO: the view could implement a method that explains how it's
-        // unique?
-        view.openForm(Arrays.asList(Site.class, siteId), formView);
+        if (presenter.editSite(siteId)) {
+            view.openForm(presenter.getView());
+        }
     }
 
     private void doSiteCreate() {
-        SiteEntryPresenter siteEntryPres = siteEntryPresenterProvider.get();
-        siteEntryPres.bind();
-        IFormView formView = siteEntryPres.createSite();
+        SiteEntryPresenter presenter = siteEntryPresenterProvider.get();
+        presenter.bind();
+        presenter.createSite();
 
-        // TODO: think about unique object
-        view.openForm(new Object(), formView);
+        view.openForm(presenter.getView());
+    }
+
+    private void doSiteView(Integer siteId) {
+        SiteViewPresenter presenter = siteViewPresenterProvider.get();
+        presenter.bind();
+
+        if (presenter.viewSite(siteId)) {
+            view.openForm(presenter.getView());
+        }
+    }
+
+    private void doStudyEdit(Integer studyId) {
+        StudyEntryPresenter presenter = studyEntryPresenterProvider.get();
+        presenter.bind();
+
+        if (presenter.editStudy(studyId)) {
+            view.openForm(presenter.getView());
+        }
     }
 }

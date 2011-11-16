@@ -6,7 +6,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -61,7 +60,7 @@ public class NewStudyAdapter extends AbstractNewAdapterBase {
 
     @Override
     public String getEntryFormId() {
-        return StudyEntryForm.ID;
+        return null;
     }
 
     @Override

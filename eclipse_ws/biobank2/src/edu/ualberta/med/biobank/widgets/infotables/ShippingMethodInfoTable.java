@@ -8,7 +8,8 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class ShippingMethodInfoTable extends InfoTableWidget {
+public class ShippingMethodInfoTable extends
+    InfoTableWidget<ShippingMethodWrapper> {
 
     private static final String[] HEADINGS = new String[] { Messages.ShippingMethodInfoTable_ship_label };
 

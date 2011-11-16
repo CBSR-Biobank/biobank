@@ -1,20 +1,20 @@
 package edu.ualberta.med.biobank.common.action.study;
 
-import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.CollectionUtils;
+import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
-import edu.ualberta.med.biobank.common.peer.StudyPeer;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
+import edu.ualberta.med.biobank.common.util.HibernateUtil;
+import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
@@ -35,18 +35,10 @@ public class StudySaveAction implements Action<Integer> {
     private Set<Integer> contactIds;
     private Set<Integer> sourceSpcIds;
     private Set<Integer> aliquotSpcIds;
-
-    public static class StudyEventAttrSaveInfo implements Serializable,
-        NotAProxy {
-        private static final long serialVersionUID = 1L;
-        public Integer globalEventAttrId;
-        public EventAttrTypeEnum type;
-        public Boolean required;
-        public String permissible;
-        public Integer aStatusId;
-    }
-
-    private List<StudyEventAttrSaveInfo> studyEventAttrInfos;
+    private Set<Integer> studyEventAttrIds;
+    private Session session = null;
+    private SessionUtil sessionUtil = null;
+    private Study study = null;
 
     public void setId(Integer id) {
         this.id = id;
@@ -80,8 +72,8 @@ public class StudySaveAction implements Action<Integer> {
         this.aliquotSpcIds = aliquotSpcIds;
     }
 
-    public void setStudyEventAttrSaveInfo(List<StudyEventAttrSaveInfo> infos) {
-        this.studyEventAttrInfos = infos;
+    public void setStudyEventAttrIds(Set<Integer> attrIds) {
+        this.studyEventAttrIds = attrIds;
     }
 
     @Override
@@ -92,65 +84,41 @@ public class StudySaveAction implements Action<Integer> {
 
     @Override
     public Integer run(User user, Session session) throws ActionException {
+        if (name == null) {
+            throw new NullPointerException("name not specified");
+        }
+        if (nameShort == null) {
+            throw new NullPointerException("name short not specified");
+        }
         if (siteIds == null) {
             throw new NullPointerException("site ids cannot be null");
         }
-
         if (contactIds == null) {
             throw new NullPointerException("contact ids cannot be null");
         }
-
         if (sourceSpcIds == null) {
             throw new NullPointerException("specimen ids cannot be null");
         }
-
         if (aliquotSpcIds == null) {
             throw new NullPointerException("aliquot ids cannot be null");
         }
-
-        SessionUtil sessionUtil = new SessionUtil(session);
-        Study study = sessionUtil.get(Study.class, id, new Study());
-
-        // TODO: check permission? (can edit site?)
-
-        // TODO: error checks
-        // TODO: version check?
-
-        // TODO: LocalizedMessage in Exception?
-
-        study.setName(name);
-        study.setNameShort(nameShort);
-
         if (aStatusId == null) {
             throw new NullPointerException("activity status not specified");
         }
 
-        ActivityStatus aStatus =
-            sessionUtil.get(ActivityStatus.class, aStatusId);
-        study.setActivityStatus(aStatus);
+        this.session = session;
+        sessionUtil = new SessionUtil(session);
+        study = sessionUtil.get(Study.class, id, new Study());
 
-        // TODO: set collections based on diffs
+        performChecks(session);
 
-        Map<Integer, Site> sites =
-            sessionUtil.get(Site.class, siteIds);
-        study.setSiteCollection(new HashSet<Site>(sites.values()));
+        // TODO: check permission? (can edit site?)
+        // TODO: version check?
 
-        Map<Integer, Contact> contacts =
-            sessionUtil.get(Contact.class, contactIds);
-        study.setContactCollection(new HashSet<Contact>(contacts.values()));
-
-        Map<Integer, AliquotedSpecimen> aliquotedSpcs =
-            sessionUtil.get(AliquotedSpecimen.class, aliquotSpcIds);
-        study
-            .setAliquotedSpecimenCollection(new HashSet<AliquotedSpecimen>(
-                aliquotedSpcs.values()));
-
-        Map<Integer, SourceSpecimen> sourceSpcs =
-            sessionUtil.get(SourceSpecimen.class, sourceSpcIds);
-        study.setSourceSpecimenCollection(new HashSet<SourceSpecimen>(
-            sourceSpcs.values()));
-
-        setStudyEventAttrs(user, session, sessionUtil, study);
+        saveContacts();
+        saveSourceSpecimens();
+        saveAliquotedSpecimens();
+        saveEventAttributes();
 
         session.saveOrUpdate(study);
         session.flush();
@@ -158,37 +126,139 @@ public class StudySaveAction implements Action<Integer> {
         return study.getId();
     }
 
-    private void setStudyEventAttrs(User user, Session session,
-        SessionUtil sessionUtil, Study study) {
-        Map<Integer, GlobalEventAttrInfo> globalEventAttrInfoList =
-            new GlobalEventAttrInfoGetAction().run(user, session);
+    private static final String STUDY_UNIQUE_ATTR_HQL =
+        "SELECT COUNT(*) FROM " + Study.class.getName()
+            + " s WHERE {0}=? {2}"; //$NON-NLS-1$
 
-        if (studyEventAttrInfos == null) {
-            // remove existing study event attrs?
+    private void performChecks(Session session) throws ActionException {
+        if (session == null) {
+            throw new NullPointerException("session not initialized");
+        }
+
+        if (!peformUniqueQuery("name", name).equals(0L)) {
+            throw new ActionCheckException("duplicate name");
+        }
+
+        if (!peformUniqueQuery("nameShort", nameShort).equals(0L)) {
+            throw new ActionCheckException("duplicate name short");
+        }
+    }
+
+    private Long peformUniqueQuery(String attribute, String value) {
+        String msg;
+
+        if (id == null) {
+            msg =
+                MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, attribute, "?", "");
         } else {
+            msg = MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, attribute, "?",
+                "AND id<>" + id);
+        }
 
-            for (StudyEventAttrSaveInfo info : studyEventAttrInfos) {
-                GlobalEventAttrInfo globalAttrInfo =
-                    globalEventAttrInfoList.get(info.globalEventAttrId);
+        Query query = session.createQuery(msg);
+        query.setParameter(0, value);
+        return HibernateUtil.getCountFromQuery(query);
+    }
 
-                StudyEventAttr seAttr =
-                    sessionUtil.get(StudyEventAttr.class, null,
-                        new StudyEventAttr());
+    private void saveContacts() {
+        study.setId(id);
+        study.setName(name);
+        study.setNameShort(nameShort);
 
-                seAttr.setLabel(globalAttrInfo.attr.getLabel());
-                seAttr.setPermissible(info.permissible);
-                seAttr.setRequired(info.required);
-                seAttr.setEventAttrType(globalAttrInfo.attr.getEventAttrType());
+        ActivityStatus aStatus =
+            sessionUtil.load(ActivityStatus.class, aStatusId);
+        study.setActivityStatus(aStatus);
 
-                ActivityStatus aStatus =
-                    sessionUtil.get(ActivityStatus.class, aStatusId);
-                seAttr.setActivityStatus(aStatus);
+        Map<Integer, Site> sites =
+            sessionUtil.load(Site.class, siteIds);
 
-                seAttr.setStudy(study);
+        study.setSiteCollection(new HashSet<Site>(sites.values()));
+        SetDifference<Site> sitesDiff =
+            new SetDifference<Site>(study.getSiteCollection(),
+                sites.values());
 
-                CollectionUtils.getCollection(study,
-                    StudyPeer.STUDY_EVENT_ATTR_COLLECTION).add(seAttr);
+        // remove this study from sites in removed list
+        for (Site site : sitesDiff.getRemoveSet()) {
+            Collection<Study> siteStudies = site.getStudyCollection();
+            if (siteStudies.remove(study)) {
+                site.setStudyCollection(siteStudies);
+            } else {
+                throw new ActionException(
+                    "study not found in removed site's collection");
             }
         }
+
+        Map<Integer, Contact> contacts =
+            sessionUtil.load(Contact.class, contactIds);
+        study.setContactCollection(new HashSet<Contact>(contacts.values()));
+        SetDifference<Contact> contactsDiff =
+            new SetDifference<Contact>(study.getContactCollection(),
+                contacts.values());
+
+        for (Contact contact : contactsDiff.getAddSet()) {
+            Collection<Study> contactStudies = contact.getStudyCollection();
+            contactStudies.add(study);
+            contact.setStudyCollection(contactStudies);
+        }
+
+        // remove this study from contacts in removed list
+        for (Contact contact : contactsDiff.getRemoveSet()) {
+            Collection<Study> contactStudies = contact.getStudyCollection();
+            if (contactStudies.remove(study)) {
+                contact.setStudyCollection(contactStudies);
+            } else {
+                throw new ActionException(
+                    "study not found in removed site's collection");
+            }
+        }
+    }
+
+    private void saveSourceSpecimens() {
+        // delete source specimens no longer in use
+        Map<Integer, SourceSpecimen> sourceSpcs =
+            sessionUtil.load(SourceSpecimen.class, sourceSpcIds);
+
+        SetDifference<SourceSpecimen> srcSpcsDiff =
+            new SetDifference<SourceSpecimen>(
+                study.getSourceSpecimenCollection(),
+                sourceSpcs.values());
+
+        for (SourceSpecimen srcSpc : srcSpcsDiff.getRemoveSet()) {
+            session.delete(srcSpc);
+        }
+        study.setSourceSpecimenCollection(new HashSet<SourceSpecimen>(
+            sourceSpcs.values()));
+    }
+
+    private void saveAliquotedSpecimens() {
+        Map<Integer, AliquotedSpecimen> aliquotedSpcs =
+            sessionUtil.load(AliquotedSpecimen.class, aliquotSpcIds);
+        SetDifference<AliquotedSpecimen> aqSpcsDiff =
+            new SetDifference<AliquotedSpecimen>(
+                study.getAliquotedSpecimenCollection(),
+                aliquotedSpcs.values());
+
+        // delete aliquoted specimens no longer in use
+        for (AliquotedSpecimen aqSpc : aqSpcsDiff.getRemoveSet()) {
+            session.delete(aqSpc);
+        }
+        study.setAliquotedSpecimenCollection(new HashSet<AliquotedSpecimen>(
+            aliquotedSpcs.values()));
+    }
+
+    private void saveEventAttributes() {
+        Map<Integer, StudyEventAttr> studyEventAttrs =
+            sessionUtil.load(StudyEventAttr.class, studyEventAttrIds);
+        SetDifference<StudyEventAttr> attrsDiff =
+            new SetDifference<StudyEventAttr>(
+                study.getStudyEventAttrCollection(),
+                studyEventAttrs.values());
+
+        // delete study event attrs no longer in use
+        for (StudyEventAttr attr : attrsDiff.getRemoveSet()) {
+            session.delete(attr);
+        }
+        study.setStudyEventAttrCollection(new HashSet<StudyEventAttr>(
+            studyEventAttrs.values()));
     }
 }

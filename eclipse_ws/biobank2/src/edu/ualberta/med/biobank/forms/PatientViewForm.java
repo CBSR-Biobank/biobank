@@ -12,12 +12,16 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewCollectionEventInfoTable;
 
 public class PatientViewForm extends BiobankViewForm {
-    public static final String ID = "edu.ualberta.med.biobank.forms.PatientViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.PatientViewForm"; //$NON-NLS-1$
 
     private BgcBaseText studyLabel;
 
@@ -33,6 +37,10 @@ public class PatientViewForm extends BiobankViewForm {
 
     private PatientInfo patientInfo;
 
+    private BgcBaseText commentLabel;
+
+    private CommentCollectionInfoTable commentEntryTable;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof PatientAdapter,
@@ -47,8 +55,9 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     private void updatePatientInfo() throws Exception {
-        patientInfo = SessionManager.getAppService().doAction(
-            new PatientGetInfoAction(adapter.getId()));
+        patientInfo =
+            SessionManager.getAppService().doAction(
+                new PatientGetInfoAction(adapter.getId()));
     }
 
     @Override
@@ -59,8 +68,28 @@ public class PatientViewForm extends BiobankViewForm {
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createPatientSection();
+        createCommentSection();
         createCollectionEventSection();
         setValues();
+    }
+
+    private void createCommentSection() {
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable =
+            new CommentCollectionInfoTable(client,
+                ModelWrapper.wrapModelCollection(
+                    SessionManager.getAppService(),
+                    patientInfo.patient.getCommentCollection(),
+                    CommentWrapper.class));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+
     }
 
     private void createPatientSection() {
@@ -71,23 +100,28 @@ public class PatientViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.patient_field_label_study);
-        createdAtLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.PatientViewForm_label_createdAt);
-        visitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.PatientViewForm_label_totalVisits);
-        sourceSpecimenCountLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, Messages.PatientViewForm_label_totalSourceSpecimens);
-        aliquotedSpecimenCountLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, Messages.PatientViewForm_label_totalAliquotedSpecimens);
+        studyLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.patient_field_label_study);
+        createdAtLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.PatientViewForm_label_createdAt);
+        visitCountLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.PatientViewForm_label_totalVisits);
+        sourceSpecimenCountLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.PatientViewForm_label_totalSourceSpecimens);
+        aliquotedSpecimenCountLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.PatientViewForm_label_totalAliquotedSpecimens);
     }
 
     private void createCollectionEventSection() {
         Section section = createSection(Messages.PatientViewForm_visits_title);
 
-        collectionEventTable = new NewCollectionEventInfoTable(section,
-            patientInfo.cevents);
+        collectionEventTable =
+            new NewCollectionEventInfoTable(section, patientInfo.cevents);
         section.setClient(collectionEventTable);
         collectionEventTable.adaptToToolkit(toolkit, true);
         collectionEventTable.addClickListener(collectionDoubleClickListener);
@@ -102,6 +136,7 @@ public class PatientViewForm extends BiobankViewForm {
         setTextValue(sourceSpecimenCountLabel, patientInfo.sourceSpecimenCount);
         setTextValue(aliquotedSpecimenCountLabel,
             patientInfo.aliquotedSpecimenCount);
+        setTextValue(commentLabel, patientInfo.patient.getCommentCollection());
     }
 
     @Override
@@ -112,7 +147,7 @@ public class PatientViewForm extends BiobankViewForm {
             patientInfo.patient.getPnumber()));
         form.setText(NLS.bind(Messages.PatientViewForm_title,
             patientInfo.patient.getPnumber()));
-        collectionEventTable.setCollection(patientInfo.cevents);
+        collectionEventTable.setList(patientInfo.cevents);
     }
 
 }

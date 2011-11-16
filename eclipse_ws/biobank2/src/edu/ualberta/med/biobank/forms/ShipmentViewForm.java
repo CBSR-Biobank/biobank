@@ -15,10 +15,12 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 
 public class ShipmentViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ShipmentViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ShipmentViewForm"; //$NON-NLS-1$
 
     private OriginInfoWrapper originInfo;
 
@@ -36,9 +38,10 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private BgcBaseText boxNumberLabel;
 
-    private BgcBaseText commentLabel;
 
     private SpecimenEntryWidget specimenWidget;
+
+    private CommentCollectionInfoTable commentEntryTable;
 
     @Override
     protected void init() throws Exception {
@@ -60,13 +63,15 @@ public class ShipmentViewForm extends BiobankViewForm {
     }
 
     private void createSpecimensSection() {
-        Composite client = createSectionWithClient(Messages.ShipmentViewForm_specimens_title);
+        Composite client =
+            createSectionWithClient(Messages.ShipmentViewForm_specimens_title);
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-        specimenWidget = new SpecimenEntryWidget(client, SWT.NONE, toolkit,
-            SessionManager.getAppService(), false);
+        specimenWidget =
+            new SpecimenEntryWidget(client, SWT.NONE, toolkit,
+                SessionManager.getAppService(), false);
         specimenWidget.setSpecimens(originInfo.getSpecimenCollection());
         specimenWidget.addDoubleClickListener(collectionDoubleClickListener);
     }
@@ -79,28 +84,51 @@ public class ShipmentViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ShipmentViewForm_sender_label);
-        receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ShipmentViewForm_receiver_label);
-        waybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ShipmentViewForm_waybill_label);
-        shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ShipmentViewForm_shipmethod_label);
+        senderLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ShipmentViewForm_sender_label);
+        receiverLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ShipmentViewForm_receiver_label);
+        waybillLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ShipmentViewForm_waybill_label);
+        shippingMethodLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ShipmentViewForm_shipmethod_label);
         if (originInfo.getShipmentInfo().getShippingMethod().needDate()) {
-            departedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.ShipmentViewForm_packed_label);
+            departedLabel =
+                createReadOnlyLabelledField(client, SWT.NONE,
+                    Messages.ShipmentViewForm_packed_label);
         }
-        boxNumberLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ShipmentViewForm_boxNber_label);
-        dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ShipmentViewForm_received_label);
-        commentLabel = createReadOnlyLabelledField(client,
-            SWT.WRAP | SWT.MULTI, Messages.ShipmentViewForm_comment_label);
+        boxNumberLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ShipmentViewForm_boxNber_label);
+        dateReceivedLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ShipmentViewForm_received_label);
 
+        createCommentSection();
+        
         setShipmentValues();
     }
 
+    private void createCommentSection() {
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable =
+            new CommentCollectionInfoTable(client,
+                    originInfo.getShipmentInfo().getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+
+    }
+    
     private void setShipmentValues() {
         ShipmentInfoWrapper shipInfo = originInfo.getShipmentInfo();
         ShippingMethodWrapper shipMethod = shipInfo.getShippingMethod();
@@ -119,7 +147,6 @@ public class ShipmentViewForm extends BiobankViewForm {
 
         setTextValue(boxNumberLabel, shipInfo.getBoxNumber());
         setTextValue(dateReceivedLabel, shipInfo.getFormattedDateReceived());
-        setTextValue(commentLabel, shipInfo.getCommentCollection(false));
     }
 
     @Override
@@ -128,7 +155,8 @@ public class ShipmentViewForm extends BiobankViewForm {
         setPartName();
         setFormText();
         setShipmentValues();
-
+        
+        commentEntryTable.setList(originInfo.getShipmentInfo().getCommentCollection(false));
         specimenWidget.setSpecimens(originInfo.getSpecimenCollection());
     }
 

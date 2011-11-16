@@ -7,7 +7,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
@@ -38,7 +37,9 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
         + " LEFT JOIN patient."
         + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
         + " AS cevents"
-        + " LEFT JOIN cevents."
+        + " LEFT JOIN FETCH patient."
+        + PatientPeer.COMMENT_COLLECTION.getName()
+        + " AS comments LEFT JOIN cevents."
         + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
         + " AS sourceSpecs"
         + " LEFT JOIN cevents."
@@ -66,7 +67,7 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        return new PatientReadPermission(patientId).isAllowed(user, session); 
+        return new PatientReadPermission(patientId).isAllowed(user, session);
     }
 
     @Override
@@ -84,8 +85,9 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
             pInfo.patient = (Patient) row[0];
             pInfo.sourceSpecimenCount = (Long) row[1];
             pInfo.aliquotedSpecimenCount = (Long) row[2];
-            pInfo.cevents = new PatientGetCollectionEventInfosAction(patientId)
-                .run(user, session);
+            pInfo.cevents =
+                new PatientGetCollectionEventInfosAction(patientId).run(user,
+                    session);
 
         } else {
             throw new ActionException("No patient found with id:" + patientId); //$NON-NLS-1$

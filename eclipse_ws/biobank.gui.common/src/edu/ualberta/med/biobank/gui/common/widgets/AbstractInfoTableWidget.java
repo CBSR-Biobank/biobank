@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.gui.common.widgets;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.SafeRunnable;
@@ -24,6 +26,9 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.common.util.DelegatingList;
+import edu.ualberta.med.biobank.common.util.ListChangeHandler;
+import edu.ualberta.med.biobank.common.util.ListChangeSource;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -46,16 +51,16 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * <li>pagination widget</li>
  * </ul>
  */
-public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
-    IInfoTalePagination, IDoubleClickListener {
+public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
+    implements IInfoTablePagination, IDoubleClickListener, ListChangeSource<T> {
 
     public static class RowItem {
         int itemNumber;
     }
 
-    protected TableViewer tableViewer;
+    protected final DelegatingList<T> list = new DelegatingList<T>();
 
-    protected Thread backgroundThread;
+    protected TableViewer tableViewer;
 
     protected Menu menu;
 
@@ -75,12 +80,10 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
 
     protected PaginationWidget paginationWidget;
 
+    // TODO: all listeners can be managed by an external class
     protected ListenerList addItemListeners = new ListenerList();
-
     protected ListenerList editItemListeners = new ListenerList();
-
     protected ListenerList deleteItemListeners = new ListenerList();
-
     protected ListenerList doubleClickListeners = new ListenerList();
 
     public AbstractInfoTableWidget(Composite parent, String[] headings,
@@ -304,7 +307,7 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
         doubleClickListeners.add(listener);
     }
 
-    public void addAddItemListener(IInfoTableAddItemListener listener) {
+    public void addAddItemListener(IInfoTableAddItemListener<T> listener) {
         addItemListeners.add(listener);
 
         Assert.isNotNull(menu);
@@ -318,7 +321,7 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
         });
     }
 
-    public void addEditItemListener(IInfoTableEditItemListener listener) {
+    public void addEditItemListener(IInfoTableEditItemListener<T> listener) {
         editItemListeners.add(listener);
 
         Assert.isNotNull(menu);
@@ -332,7 +335,7 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
         });
     }
 
-    public void addDeleteItemListener(IInfoTableDeleteItemListener listener) {
+    public void addDeleteItemListener(IInfoTableDeleteItemListener<T> listener) {
         deleteItemListeners.add(listener);
 
         Assert.isNotNull(menu);
@@ -381,10 +384,11 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
             return;
 
         InfoTableSelection selection = new InfoTableSelection(objSelected);
-        final InfoTableEvent event = new InfoTableEvent(this, selection);
+        final InfoTableEvent<T> event = new InfoTableEvent<T>(this, selection);
         Object[] listeners = addItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTableAddItemListener l = (IInfoTableAddItemListener) listeners[i];
+            @SuppressWarnings("unchecked")
+            final IInfoTableAddItemListener<T> l = (IInfoTableAddItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -401,10 +405,11 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
             return;
 
         InfoTableSelection selection = new InfoTableSelection(objSelected);
-        final InfoTableEvent event = new InfoTableEvent(this, selection);
+        final InfoTableEvent<T> event = new InfoTableEvent<T>(this, selection);
         Object[] listeners = editItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTableEditItemListener l = (IInfoTableEditItemListener) listeners[i];
+            @SuppressWarnings("unchecked")
+            final IInfoTableEditItemListener<T> l = (IInfoTableEditItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -421,10 +426,11 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
             return;
 
         InfoTableSelection selection = new InfoTableSelection(objSelected);
-        final InfoTableEvent event = new InfoTableEvent(this, selection);
+        final InfoTableEvent<T> event = new InfoTableEvent<T>(this, selection);
         Object[] listeners = deleteItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTableDeleteItemListener l = (IInfoTableDeleteItemListener) listeners[i];
+            @SuppressWarnings("unchecked")
+            final IInfoTableDeleteItemListener<T> l = (IInfoTableDeleteItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -434,4 +440,21 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
         }
     }
 
+    public void setList(final List<T> list) {
+        this.list.setDelegate(list);
+    }
+
+    public List<T> getList() {
+        return list;
+    }
+
+    @Override
+    public void addListChangeHandler(ListChangeHandler<T> handler) {
+        list.addListChangeHandler(handler);
+    }
+
+    @Override
+    public void removeListChangeHandler(ListChangeHandler<T> handler) {
+        list.removeListChangeHandler(handler);
+    }
 }

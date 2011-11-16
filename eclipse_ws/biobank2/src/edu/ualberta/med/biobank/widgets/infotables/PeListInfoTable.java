@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class PeListInfoTable extends InfoTableWidget {
+public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 24;
 

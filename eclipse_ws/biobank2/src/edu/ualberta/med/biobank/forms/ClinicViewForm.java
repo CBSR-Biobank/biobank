@@ -16,7 +16,8 @@ import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 
 public class ClinicViewForm extends AddressViewFormCommon {
-    public static final String ID = "edu.ualberta.med.biobank.forms.ClinicViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ClinicViewForm"; //$NON-NLS-1$
 
     private ClinicWrapper clinic;
 
@@ -69,18 +70,23 @@ public class ClinicViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_name);
-        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_nameShort);
-        hasShipmentsButton = (Button) createLabelledWidget(client,
-            Button.class, SWT.NONE, Messages.clinic_field_label_sendsShipments);
-        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_activity);
-        patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ClinicViewForm_field_label_totalPatients);
-        ceventTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ClinicViewForm_field_label_totalCollectionEvents);
+        nameLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, Messages.label_name);
+        nameShortLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.label_nameShort);
+        hasShipmentsButton =
+            (Button) createLabelledWidget(client, Button.class, SWT.NONE,
+                Messages.clinic_field_label_sendsShipments);
+        activityStatusLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.label_activity);
+        patientTotal =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ClinicViewForm_field_label_totalPatients);
+        ceventTotal =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.ClinicViewForm_field_label_totalCollectionEvents);
 
         setClinicValues();
     }
@@ -95,24 +101,27 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     private void createContactsSection() {
-        Composite client = createSectionWithClient(Messages.clinic_contact_title);
+        Composite client =
+            createSectionWithClient(Messages.clinic_contact_title);
 
-        contactsTable = new ContactInfoTable(client,
-            clinic.getContactCollection(false));
+        contactsTable =
+            new ContactInfoTable(client, clinic.getContactCollection(false));
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
     }
 
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
-        commentTable = new CommentCollectionInfoTable(client,
-            clinic.getCommentCollection(false));
+        commentTable =
+            new CommentCollectionInfoTable(client,
+                clinic.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
     }
 
     protected void createStudiesSection() {
-        Composite client = createSectionWithClient(Messages.ClinicViewForm_studies_title);
+        Composite client =
+            createSectionWithClient(Messages.ClinicViewForm_studies_title);
 
         studiesTable = new ClinicStudyInfoTable(client, clinic);
         studiesTable.adaptToToolkit(toolkit, true);
@@ -129,9 +138,9 @@ public class ClinicViewForm extends AddressViewFormCommon {
         form.setText(NLS.bind(Messages.ClinicViewForm_title, clinic.getName()));
         setClinicValues();
         setAddressValues(clinic);
-        contactsTable.setCollection(clinic.getContactCollection(true));
-        studiesTable.setCollection(clinic.getStudyCollection());
-        commentTable.setCollection(clinic.getCommentCollection(false));
+        contactsTable.setList(clinic.getContactCollection(true));
+        studiesTable.setList(clinic.getStudyCollection());
+        commentTable.setList(clinic.getCommentCollection(false));
     }
 
 }

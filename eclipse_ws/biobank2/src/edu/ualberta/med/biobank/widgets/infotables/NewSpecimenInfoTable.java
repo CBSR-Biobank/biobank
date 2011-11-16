@@ -6,16 +6,20 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
+import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
-public class NewSpecimenInfoTable extends InfoTableWidget {
+public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
 
     public static enum ColumnsShown {
         // ALL(new String[] { Messages.SpecimenInfoTable_inventoryid_label,
@@ -264,7 +268,8 @@ public class NewSpecimenInfoTable extends InfoTableWidget {
         return new BgcLabelProvider() {
             @Override
             public Image getColumnImage(Object element, int columnIndex) {
-                SpecimenInfo info = (SpecimenInfo) ((BiobankCollectionModel) element).o;
+                SpecimenInfo info =
+                    (SpecimenInfo) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     return null;
                 }
@@ -273,7 +278,8 @@ public class NewSpecimenInfoTable extends InfoTableWidget {
 
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                SpecimenInfo info = (SpecimenInfo) ((BiobankCollectionModel) element).o;
+                SpecimenInfo info =
+                    (SpecimenInfo) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -287,8 +293,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget {
 
     @Override
     protected String getCollectionModelObjectToString(Object o) {
-        if (o == null)
-            return null;
+        if (o == null) return null;
         SpecimenInfo r = (SpecimenInfo) o;
         return r.toString();
     }
@@ -309,11 +314,34 @@ public class NewSpecimenInfoTable extends InfoTableWidget {
     @Override
     public SpecimenInfo getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
-        if (item == null)
-            return null;
+        if (item == null) return null;
         SpecimenInfo row = (SpecimenInfo) item.o;
         Assert.isNotNull(row);
         return row;
+    }
+
+    @Override
+    public void editItem() {
+        if (useDefaultEditItem) {
+            // default edit item which opens the entry form for the selected
+            // model object
+            SpecimenInfo specimenInfo = getSelection();
+            if (specimenInfo != null) {
+                SpecimenWrapper specimen =
+                    new SpecimenWrapper(SessionManager.getAppService(),
+                        specimenInfo.specimen);
+                try {
+                    specimen.reload();
+                } catch (Exception e) {
+                }
+                AbstractAdapterBase adapter =
+                    AdapterFactory.getAdapter(specimen);
+                adapter.openEntryForm();
+            }
+            return;
+        }
+
+        super.editItem();
     }
 
     @Override

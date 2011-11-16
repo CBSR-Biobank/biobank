@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class CommentCollectionInfoTable extends InfoTableWidget {
+public class CommentCollectionInfoTable extends InfoTableWidget<CommentWrapper> {
 
     protected static class TableRowData {
         public CommentWrapper comment;
@@ -41,7 +41,8 @@ public class CommentCollectionInfoTable extends InfoTableWidget {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -75,8 +76,7 @@ public class CommentCollectionInfoTable extends InfoTableWidget {
 
     @Override
     protected String getCollectionModelObjectToString(Object o) {
-        if (o == null)
-            return null;
+        if (o == null) return null;
         return ((TableRowData) o).toString();
     }
 
@@ -87,6 +87,8 @@ public class CommentCollectionInfoTable extends InfoTableWidget {
 
             @Override
             public int compare(Object o, Object o2) {
+                if (o == null || o2 == null)
+                    return 0;
                 CommentWrapper comment1 = (CommentWrapper) o;
                 CommentWrapper comment2 = (CommentWrapper) o2;
                 return comment1.getCreatedAt().compareTo(

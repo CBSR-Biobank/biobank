@@ -14,14 +14,14 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
-import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.DiffUtils;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
+import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
+import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
@@ -147,7 +147,8 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
     private void check(User user, Session session) {
         // Check that the visit number is unique for the patient
-        List<ValueProperty<CollectionEvent>> propUple = new ArrayList<ValueProperty<CollectionEvent>>();
+        List<ValueProperty<CollectionEvent>> propUple =
+            new ArrayList<ValueProperty<CollectionEvent>>();
         propUple.add(new ValueProperty<CollectionEvent>(
             CollectionEventPeer.PATIENT.to(PatientPeer.ID), patientId));
         propUple.add(new ValueProperty<CollectionEvent>(
@@ -210,11 +211,13 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
     public void setEventAttrs(Session session, User user, Study study,
         CollectionEvent cevent) throws ActionException {
-        Map<Integer, StudyEventAttrInfo> studyEventList = new StudyGetEventAttrInfoAction(
-            study.getId()).run(user, session);
+        Map<Integer, StudyEventAttrInfo> studyEventList =
+            new StudyGetEventAttrInfoAction(
+                study.getId()).run(user, session);
 
-        Map<Integer, EventAttrInfo> ceventAttrList = new CollectionEventGetEventAttrInfoAction(
-            ceventId).run(user, session);
+        Map<Integer, EventAttrInfo> ceventAttrList =
+            new CollectionEventGetEventAttrInfoAction(
+                ceventId).run(user, session);
         if (ceAttrList != null)
             for (CEventAttrSaveInfo attrInfo : ceAttrList) {
                 EventAttrInfo ceventAttrInfo = ceventAttrList

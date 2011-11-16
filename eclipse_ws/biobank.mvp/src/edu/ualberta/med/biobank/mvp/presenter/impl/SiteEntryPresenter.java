@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import com.google.gwt.user.client.ui.HasValue;
@@ -16,30 +15,33 @@ import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidato
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
+import edu.ualberta.med.biobank.common.action.info.SiteInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
-import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction.SiteInfo;
-import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.mvp.event.AlertEvent;
+import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.site.SiteViewPresenterShowEvent;
-import edu.ualberta.med.biobank.mvp.model.BaseModel;
+import edu.ualberta.med.biobank.mvp.model.AbstractModel;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
-import edu.ualberta.med.biobank.mvp.util.ObjectCloner;
-import edu.ualberta.med.biobank.mvp.view.IFormView;
+import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
-public class SiteEntryPresenter extends BaseEntryPresenter<View> {
+/**
+ * 
+ * @author jferland
+ * 
+ */
+public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
     private final Dispatcher dispatcher;
     private final AddressEntryPresenter addressEntryPresenter;
     private final ActivityStatusComboPresenter activityStatusComboPresenter;
     private final Model model;
+    private Integer siteId;
 
-    public interface View extends IFormView, ValidationDisplay {
+    public interface View extends IEntryFormView, ValidationDisplay {
         void setActivityStatusComboView(IView view);
 
         void setAddressEditView(IView view);
@@ -48,15 +50,12 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
         HasValue<String> getNameShort();
 
-        HasValue<List<Comment>> getCommentCollection();
-
         HasValue<Collection<StudyInfo>> getStudies();
     }
 
     @Inject
     public SiteEntryPresenter(View view, EventBus eventBus,
-        Dispatcher dispatcher,
-        AddressEntryPresenter addressEntryPresenter,
+        Dispatcher dispatcher, AddressEntryPresenter addressEntryPresenter,
         ActivityStatusComboPresenter activityStatusComboPresenter) {
         super(view, eventBus);
         this.dispatcher = dispatcher;
@@ -77,15 +76,14 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         addressEntryPresenter.bind(); // still necessary to bind view to model
         activityStatusComboPresenter.bind();
 
+        binder.bind(model.siteId).to(view.getIdentifier());
         binder.bind(model.name).to(view.getName());
         binder.bind(model.nameShort).to(view.getNameShort());
+        binder.bind(model.studies).to(view.getStudies());
+        binder.bind(model.activityStatus).to(
+            activityStatusComboPresenter.getActivityStatus());
 
-        // TODO: fix comment colletion section
-        // binder.bind(model.comment).to(view.getCommentCollection());
-
-        // binder.bind(model.studies).to(view.getStudies());
-        binder.bind(model.activityStatus)
-            .to(activityStatusComboPresenter.getActivityStatus());
+        binder.bind(model.dirty()).to(view.getDirty());
 
         model.bind();
 
@@ -99,18 +97,22 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         model.unbind();
 
         activityStatusComboPresenter.unbind();
+        addressEntryPresenter.unbind();
     }
 
     @Override
     public void doReload() {
-        // TODO: this resets the form. To reload it from the database, something
-        // different must be done (e.g. setting a Command that is re-run on
-        // reload).
-        model.revert();
+        if (siteId != null) {
+            editSite(siteId);
+        } else {
+            createSite();
+        }
     }
 
     @Override
     public void doSave() {
+        if (!model.validAndDirty().getValue()) return;
+
         SiteSaveAction saveSite = new SiteSaveAction();
         saveSite.setId(model.siteId.getValue());
         saveSite.setName(model.name.getValue());
@@ -123,12 +125,14 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         dispatcher.exec(saveSite, new ActionCallback<Integer>() {
             @Override
             public void onFailure(Throwable caught) {
-                // TODO: better error message and show or log exception?
-                eventBus.fireEvent(new AlertEvent(caught.getLocalizedMessage()));
+                eventBus.fireEvent(new ExceptionEvent(caught));
             }
 
             @Override
             public void onSuccess(Integer siteId) {
+                // clear dirty state (so form can close without prompt to save)
+                model.checkpoint();
+
                 eventBus.fireEvent(new SiteChangedEvent(siteId));
                 eventBus.fireEvent(new SiteViewPresenterShowEvent(siteId));
                 close();
@@ -136,55 +140,63 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         });
     }
 
-    public View createSite() {
-        SiteInfo siteInfo = new SiteInfo();
-        siteInfo.setSite(new Site());
-        siteInfo.getSite().setAddress(new Address());
-        return editSite(siteInfo);
+    public void createSite() {
+        SiteInfo siteInfo = new SiteInfo.Builder().build();
+        editSite(siteInfo);
     }
 
-    public View editSite(Integer siteId) {
-        SiteGetInfoAction getSiteInfo = new SiteGetInfoAction(siteId);
-        dispatcher.exec(getSiteInfo, new ActionCallback<SiteInfo>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                // TODO: better error message and show or log exception?
-                eventBus.fireEvent(new AlertEvent(caught.getLocalizedMessage()));
-                close();
-            }
+    public boolean editSite(Integer siteId) {
+        this.siteId = siteId;
 
-            @Override
-            public void onSuccess(SiteInfo siteInfo) {
-                editSite(siteInfo);
-            }
-        });
+        SiteGetInfoAction siteGetInfoAction = new SiteGetInfoAction(siteId);
 
-        return view;
+        boolean success = dispatcher.exec(siteGetInfoAction,
+            new ActionCallback<SiteInfo>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    eventBus.fireEvent(new ExceptionEvent(caught));
+                    close();
+                }
+
+                @Override
+                public void onSuccess(SiteInfo siteInfo) {
+                    editSite(siteInfo);
+                }
+            });
+
+        return success;
     }
 
-    public View editSite(SiteInfo siteInfo) {
-        // as long as this method is public, get our own (deep) copy of the data
-        SiteInfo clone = ObjectCloner.deepCopy(siteInfo);
-        model.setValue(clone);
-        return view;
+    private void editSite(SiteInfo siteInfo) {
+        model.setValue(siteInfo);
     }
 
-    public static class Model extends BaseModel<SiteInfo> {
-        private final BaseModel<Address> addressModel;
+    /**
+     * The {@link Model} holds the data that the {@link View} needs and supplies
+     * validation.
+     * 
+     * @author jferland
+     * 
+     */
+    public static class Model extends AbstractModel<SiteInfo> {
+        private final AbstractModel<Address> addressModel;
 
         final FieldModel<Integer> siteId;
         final FieldModel<String> name;
         final FieldModel<String> nameShort;
-        final FieldModel<String> comment;
         final FieldModel<ActivityStatus> activityStatus;
         final FieldModel<Address> address;
         final ListFieldModel<StudyInfo> studies;
 
         @SuppressWarnings("unchecked")
-        private Model(BaseModel<Address> addressModel) {
+        private Model(AbstractModel<Address> addressModel) {
             super(SiteInfo.class);
 
             this.addressModel = addressModel;
+
+            // TODO: have a provider(x.class) method that creates and returns a
+            // provider? (while adding the dirty listener, etc.) Keep a refernce
+            // to the provider to allow getters and setters to be called on it.
 
             siteId = fieldOfType(Integer.class)
                 .boundTo(provider, "site.id");
@@ -192,14 +204,12 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
                 .boundTo(provider, "site.name");
             nameShort = fieldOfType(String.class)
                 .boundTo(provider, "site.nameShort");
-            comment = fieldOfType(String.class)
-                .boundTo(provider, "site.comment");
             activityStatus = fieldOfType(ActivityStatus.class)
                 .boundTo(provider, "site.activityStatus");
             address = fieldOfType(Address.class)
                 .boundTo(provider, "site.address");
             studies = listOfType(StudyInfo.class)
-                .boundTo(provider, "studies");
+                .boundTo(provider, "studyCollection");
 
             ValidationPlugin.validateField(name)
                 .using(new NotEmptyValidator("Name is required"));

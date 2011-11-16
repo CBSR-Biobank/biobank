@@ -1,25 +1,31 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
+import edu.ualberta.med.biobank.common.util.ListChangeEvent;
+import edu.ualberta.med.biobank.common.util.ListChangeHandler;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 import edu.ualberta.med.biobank.gui.common.widgets.Messages;
 
-public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
+public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
+    private final Queue<ListUpdater> updateListQueue =
+        new LinkedList<ListUpdater>();
+    private final InfoTableListChangeHandler infoTableListChangeHandler =
+        new InfoTableListChangeHandler();
+    private Thread previousThread;
 
-    private int size;
-
-    private List<?> collection;
-
-    public InfoTableBgrLoader(Composite parent, List<?> collection,
+    public InfoTableBgrLoader(Composite parent, List<T> list,
         String[] headings, int[] columnWidths, int rowsPerPage) {
         super(parent, headings, columnWidths, rowsPerPage);
-        setCollection(collection);
+        addListChangeHandler(infoTableListChangeHandler);
+        setList(list);
     }
 
     /**
@@ -31,65 +37,92 @@ public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
      * 
      * @throws Exception
      */
-    protected abstract void tableLoader(final List<?> collection,
-        final Object Selection);
+    protected abstract void tableLoader(final List<T> list, final T Selection);
 
-    public void setCollection(List<?> collection) {
-        setCollection(collection, null);
-        if (collection != null) {
-            size = collection.size();
-        }
+    @Override
+    public synchronized void setList(List<T> collection) {
+        setList(collection, null);
     }
 
-    public void setCollection(final List<?> collection, final Object selection) {
-        try {
-            if ((collection == null)
-                || ((backgroundThread != null) && backgroundThread.isAlive())) {
-                return;
-            } else if ((this.collection != collection)
-                || (size != collection.size())) {
-                this.collection = collection;
-                init(collection);
-                setPaginationParams(collection);
-            }
-            if (paginationRequired) {
-                showPaginationWidget();
-                paginationWidget.setPageLabelText();
-                enablePaginationWidget(false);
-            } else if (paginationWidget != null) {
-                paginationWidget.setVisible(false);
-            }
-            final Display display = getTableViewer().getTable().getDisplay();
+    public synchronized void setList(final List<T> list, final T selection) {
+        if (list == null) return;
 
-            resizeTable();
-            backgroundThread = new Thread() {
-                @Override
-                public void run() {
-                    tableLoader(collection, selection);
-                    if (autoSizeColumns) {
-                        display.syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                autoSizeColumns();
-                            }
-                        });
+        final ListUpdater updater = new ListUpdater(list, selection);
+        final Thread previousThread = this.previousThread;
+
+        // set the list here, which sets the delegate, so events fired by the
+        // delegate can be properly paid attention to or ignored.
+        super.setList(list);
+
+        resizeTable();
+
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                boolean ran = false;
+                while (!ran) {
+                    try {
+                        if (previousThread != null) {
+                            // if there is a previous thread, wait until it
+                            // finishes
+                            previousThread.join();
+                        }
+
+                        ran = true;
+                        updater.run();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
-            };
-            backgroundThread.start();
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError(
-                Messages.AbstractInfoTableWidget_load_error_title, e);
+            }
+        };
+
+        thread.start();
+        this.previousThread = thread;
+    }
+
+    private class ListUpdater implements Runnable {
+        private final List<T> list;
+        private final T selection;
+
+        private ListUpdater(List<T> list, T selection) {
+            this.list = list;
+            this.selection = selection;
+        }
+
+        @Override
+        public void run() {
+            try {
+                final Display display = getTableViewer()
+                    .getTable().getDisplay();
+                display.syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (paginationRequired) {
+                            showPaginationWidget();
+                            paginationWidget.setPageLabelText();
+                            enablePaginationWidget(false);
+                        } else if (paginationWidget != null) {
+                            paginationWidget.setVisible(false);
+                        }
+
+                        tableLoader(list, selection);
+
+                        if (autoSizeColumns) {
+                            autoSizeColumns();
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                BgcPlugin.openAsyncError(
+                    Messages.AbstractInfoTableWidget_load_error_title, e);
+            }
         }
     }
 
-    protected abstract void init(List<?> collection);
+    protected abstract void init(List<T> list);
 
-    protected abstract void setPaginationParams(List<?> collection);
-
-    public List<?> getCollection() {
-        return collection;
-    }
+    protected abstract void setPaginationParams(List<T> list);
 
     @Override
     protected BgcTableSorter getTableSorter() {
@@ -100,27 +133,46 @@ public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
 
     @Override
     public void firstPage() {
-        setCollection(collection);
+        setList(getList());
     }
 
     @Override
     public void lastPage() {
-        setCollection(collection);
+        setList(getList());
     }
 
     @Override
     public void prevPage() {
-        setCollection(collection);
+        setList(getList());
     }
 
     @Override
     public void nextPage() {
-        setCollection(collection);
+        setList(getList());
     }
 
     @Override
     public void reload() {
-        setCollection(collection);
+        setList(getList());
     }
 
+    private class InfoTableListChangeHandler implements ListChangeHandler<T> {
+        private boolean ignoreEvents = false;
+
+        @Override
+        public void onListChange(ListChangeEvent<T> event) {
+            // init() may cause ListChangeEvent-s to be fired, so don't listen
+            // for them when init() is called.
+            if (!ignoreEvents) {
+                try {
+                    ignoreEvents = true;
+                    List<T> list = getList();
+                    init(list);
+                    setPaginationParams(list);
+                } finally {
+                    ignoreEvents = false;
+                }
+            }
+        }
+    }
 }

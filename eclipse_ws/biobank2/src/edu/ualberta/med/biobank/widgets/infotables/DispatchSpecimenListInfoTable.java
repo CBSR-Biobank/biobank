@@ -19,7 +19,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 
-public abstract class DispatchSpecimenListInfoTable extends InfoTableWidget {
+public abstract class DispatchSpecimenListInfoTable extends
+    InfoTableWidget<DispatchSpecimenWrapper> {
 
     protected static class TableRowData {
         DispatchSpecimenWrapper dsa;
@@ -48,13 +49,14 @@ public abstract class DispatchSpecimenListInfoTable extends InfoTableWidget {
     public DispatchSpecimenListInfoTable(Composite parent,
         final DispatchWrapper shipment, boolean editMode) {
         super(parent, null, HEADINGS, 15, DispatchSpecimenWrapper.class);
-        setCollection(getInternalDispatchSpecimens());
+        setList(getInternalDispatchSpecimens());
         this.editMode = editMode;
         if (editMode) {
             if (shipment.isInCreationState()) {
-                addDeleteItemListener(new IInfoTableDeleteItemListener() {
+                addDeleteItemListener(new IInfoTableDeleteItemListener<DispatchSpecimenWrapper>() {
                     @Override
-                    public void deleteItem(InfoTableEvent event) {
+                    public void deleteItem(
+                        InfoTableEvent<DispatchSpecimenWrapper> event) {
                         List<DispatchSpecimenWrapper> dsaList = getSelectedItems();
                         if (dsaList.size() > 0) {
                             if (dsaList.size() == 1

@@ -115,7 +115,7 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
     }
 
     @Override
-    public List<LogWrapper> getCollection() {
+    public List<LogWrapper> getList() {
         return null;
     }
 

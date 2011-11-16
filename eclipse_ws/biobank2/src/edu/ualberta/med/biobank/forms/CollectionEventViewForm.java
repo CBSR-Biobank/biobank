@@ -16,8 +16,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
-import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
+import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -30,7 +30,8 @@ import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsS
 
 public class CollectionEventViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.CollectionEventViewForm"; //$NON-NLS-1$
 
     private BgcBaseText studyLabel;
 
@@ -70,8 +71,9 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void updateCEventInfo() throws Exception {
-        ceventInfo = SessionManager.getAppService().doAction(
-            new CollectionEventGetInfoAction(adapter.getId()));
+        ceventInfo =
+            SessionManager.getAppService().doAction(
+                new CollectionEventGetInfoAction(adapter.getId()));
     }
 
     @Override
@@ -93,14 +95,18 @@ public class CollectionEventViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.CollectionEventViewForm_study_label);
-        patientLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.CollectionEventViewForm_patient_label);
-        visitNumberLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.CollectionEventViewForm_visitNber_label);
-        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_activity);
+        studyLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.CollectionEventViewForm_study_label);
+        patientLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.CollectionEventViewForm_patient_label);
+        visitNumberLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.CollectionEventViewForm_visitNber_label);
+        activityStatusLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.label_activity);
 
         createPvDataSection(client);
         createCommentsSection();
@@ -110,17 +116,19 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
-        commentTable = new CommentCollectionInfoTable(client,
-            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
-                ceventInfo.cevent.getCommentCollection(),
-                CommentWrapper.class));
+        commentTable =
+            new CommentCollectionInfoTable(client,
+                ModelWrapper.wrapModelCollection(
+                    SessionManager.getAppService(),
+                    ceventInfo.cevent.getCommentCollection(),
+                    CommentWrapper.class));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
     }
 
     private void createPvDataSection(Composite client) throws Exception {
-        Map<Integer, StudyEventAttrInfo> studyAttrInfos = SessionManager
-            .getAppService().doAction(
+        Map<Integer, StudyEventAttrInfo> studyAttrInfos =
+            SessionManager.getAppService().doAction(
                 new StudyGetEventAttrInfoAction(ceventInfo.cevent.getPatient()
                     .getStudy().getId()));
 
@@ -146,8 +154,9 @@ public class CollectionEventViewForm extends BiobankViewForm {
                 combinedPvInfo.setValue(value);
             }
 
-            combinedPvInfo.widget = createReadOnlyLabelledField(client, style,
-                entry.getValue().attr.getLabel(), combinedPvInfo.getValue());
+            combinedPvInfo.widget =
+                createReadOnlyLabelledField(client, style,
+                    entry.getValue().attr.getLabel(), combinedPvInfo.getValue());
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
             combinedPvInfo.widget.setLayoutData(gd);
 
@@ -169,10 +178,11 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void createSourceSpecimensSection() {
-        Composite client = createSectionWithClient(Messages.CollectionEventViewForm_sourcespecimens_title);
-        sourceSpecimenTable = new NewSpecimenInfoTable(client,
-            ceventInfo.sourceSpecimenInfos,
-            ColumnsShown.CEVENT_SOURCE_SPECIMENS, 10);
+        Composite client =
+            createSectionWithClient(Messages.CollectionEventViewForm_sourcespecimens_title);
+        sourceSpecimenTable =
+            new NewSpecimenInfoTable(client, ceventInfo.sourceSpecimenInfos,
+                ColumnsShown.CEVENT_SOURCE_SPECIMENS, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
         sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
         sourceSpecimenTable.createDefaultEditItem();
@@ -180,10 +190,11 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private void createAliquotedSpecimensSection() {
         // FIXME should we show that to clinics ?
-        Composite client = createSectionWithClient(Messages.CollectionEventViewForm_aliquotedspecimens_title);
-        aliquotedSpcTable = new NewSpecimenInfoTable(client,
-            ceventInfo.aliquotedSpecimenInfos,
-            ColumnsShown.CEVENT_ALIQUOTED_SPECIMENS, 10);
+        Composite client =
+            createSectionWithClient(Messages.CollectionEventViewForm_aliquotedspecimens_title);
+        aliquotedSpcTable =
+            new NewSpecimenInfoTable(client, ceventInfo.aliquotedSpecimenInfos,
+                ColumnsShown.CEVENT_ALIQUOTED_SPECIMENS, 10);
         aliquotedSpcTable.adaptToToolkit(toolkit, true);
         aliquotedSpcTable.addClickListener(collectionDoubleClickListener);
         aliquotedSpcTable.createDefaultEditItem();
@@ -197,10 +208,11 @@ public class CollectionEventViewForm extends BiobankViewForm {
         form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
             +ceventInfo.cevent.getVisitNumber()));
         setCollectionEventValues();
-        sourceSpecimenTable.setCollection(ceventInfo.sourceSpecimenInfos);
-        aliquotedSpcTable.setCollection(ceventInfo.aliquotedSpecimenInfos);
-        commentTable.setCollection((List<?>) ceventInfo.cevent
-            .getCommentCollection());
+        sourceSpecimenTable.setList(ceventInfo.sourceSpecimenInfos);
+        aliquotedSpcTable.setList(ceventInfo.aliquotedSpecimenInfos);
+        // TODO: fix this
+        // commentTable.setList((List<?>) ceventInfo.cevent
+        // .getCommentCollection());
     }
 
 }

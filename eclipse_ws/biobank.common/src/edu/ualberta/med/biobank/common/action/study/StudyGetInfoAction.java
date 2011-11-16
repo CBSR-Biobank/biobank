@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.study;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -8,9 +7,9 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfo.ClinicInfo;
+import edu.ualberta.med.biobank.common.action.info.Info;
+import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
@@ -31,7 +30,7 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     // @formatter:on
 
     private final Integer studyId;
-    private final StudyGetClinicInfo getClinicInfo;
+    private final StudyGetClinicInfoAction getClinicInfo;
     private final StudyGetSourceSpecimensAction getSourceSpecimens;
     private final StudyGetAliquotedSpecimensAction getAliquotedSpecimens;
     private final StudyGetStudyEventAttrsAction getStudyEventAttrs;
@@ -39,7 +38,7 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     public StudyGetInfoAction(Integer studyId) {
         this.studyId = studyId;
 
-        getClinicInfo = new StudyGetClinicInfo(studyId);
+        getClinicInfo = new StudyGetClinicInfoAction(studyId);
         getSourceSpecimens = new StudyGetSourceSpecimensAction(studyId);
         getAliquotedSpecimens = new StudyGetAliquotedSpecimensAction(studyId);
         getStudyEventAttrs = new StudyGetStudyEventAttrsAction(studyId);
@@ -81,7 +80,7 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
         return info;
     }
 
-    public static class StudyInfo implements Serializable, NotAProxy {
+    public static class StudyInfo implements Info {
         private static final long serialVersionUID = 1L;
 
         public Study study;
@@ -100,7 +99,7 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
             this.studyEventAttrs = studyEventAttrs;
         }
 
-        public void setContactIds(List<ClinicInfo> clinicInfo) {
+        public void setClinicInfos(List<ClinicInfo> clinicInfo) {
             this.clinicInfos = clinicInfo;
         }
 

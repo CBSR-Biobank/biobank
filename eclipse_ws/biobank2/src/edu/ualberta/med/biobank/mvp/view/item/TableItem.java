@@ -1,50 +1,65 @@
 package edu.ualberta.med.biobank.mvp.view.item;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasValue;
 
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableBgrLoader;
+import edu.ualberta.med.biobank.common.util.ListChangeEvent;
+import edu.ualberta.med.biobank.common.util.ListChangeHandler;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
+import edu.ualberta.med.biobank.mvp.event.SimpleValueChangeEvent;
 
+/**
+ * 
+ * @author jferland
+ * 
+ * @param <T>
+ */
 // TODO: ideally, tables would use MVP too, but for now, do this
-public class TableItem<T extends List<?>> implements HasValue<T> {
-    private final HandlerManager handlerManager = new HandlerManager(this);
-    private InfoTableBgrLoader table;
+public class TableItem<T> extends ValidationItem<Collection<T>> implements
+    HasValue<Collection<T>> {
+    private final ListChangeHandler<T> listChangeHandler = new ListChangeHandler<T>() {
+        @Override
+        public void onListChange(ListChangeEvent<T> event) {
+            if (fireEvents) {
+                Collection<T> value = getValue();
+                fireEvent(new SimpleValueChangeEvent<Collection<T>>(value));
+            }
+        }
+    };
+    private AbstractInfoTableWidget<T> table;
+    private List<T> list = new ArrayList<T>();
+    private boolean fireEvents = true;
 
-    public synchronized void setTable(InfoTableBgrLoader table) {
+    public synchronized void setTable(AbstractInfoTableWidget<T> table) {
+        unbindOldTable();
+
         this.table = table;
-        // TODO: for now, this table doesn't really fire any ValueChangeEvent-s
-        // because AbstractInfoTableWidget's listener system doesn't make any
-        // sense. The addXXXItemTableListener methods need to be rewritten.
+        setValue(list);
+        table.addListChangeHandler(listChangeHandler);
     }
 
     @Override
-    public HandlerRegistration addValueChangeHandler(
-        ValueChangeHandler<T> handler) {
-        return handlerManager.addHandler(ValueChangeEvent.getType(), handler);
+    public Collection<T> getValue() {
+        return table != null ? table.getList() : list;
     }
 
     @Override
-    public void fireEvent(GwtEvent<?> event) {
-        handlerManager.fireEvent(event);
+    public void setValue(Collection<T> value, boolean fireEvents) {
+        list = new ArrayList<T>(value);
+
+        if (table != null) {
+            this.fireEvents = fireEvents;
+            table.setList(list);
+            this.fireEvents = true;
+        }
     }
 
-    @Override
-    public T getValue() {
-        return null;
-    }
-
-    @Override
-    public void setValue(T value) {
-    }
-
-    @Override
-    public void setValue(T value, boolean fireEvents) {
-
+    private void unbindOldTable() {
+        if (table != null) {
+            table.removeListChangeHandler(listChangeHandler);
+        }
     }
 }

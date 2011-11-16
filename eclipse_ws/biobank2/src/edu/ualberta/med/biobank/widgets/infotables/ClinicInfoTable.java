@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class ClinicInfoTable extends InfoTableWidget {
+public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
     private static class TableRowData {
         public ClinicWrapper clinic;
