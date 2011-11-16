@@ -92,7 +92,6 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
     @Override
     protected void doSave() {
         // TODO Auto-generated method stub
-
     }
 
     public void createStudy() {
@@ -159,7 +158,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
                 .boundTo(provider, "study.activityStatus");
 
             clinics = listOfType(ClinicInfo.class)
-                .boundTo(provider, "contactCollection");
+                .boundTo(provider, "clinicInfos");
 
             ValidationPlugin.validateField(name)
                 .using(new NotEmptyValidator("Name is required"));
