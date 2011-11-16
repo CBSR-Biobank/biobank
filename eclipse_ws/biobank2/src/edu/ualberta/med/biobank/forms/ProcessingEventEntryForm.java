@@ -45,11 +45,14 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingEventEntryForm extends BiobankEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ProcessingEventEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ProcessingEventEntryForm"; //$NON-NLS-1$
 
-    private static final String MSG_NEW_PEVENT_OK = Messages.ProcessingEventEntryForm_creation_msg;
+    private static final String MSG_NEW_PEVENT_OK =
+        Messages.ProcessingEventEntryForm_creation_msg;
 
-    private static final String MSG_PEVENT_OK = Messages.ProcessingEventEntryForm_edition_msg;
+    private static final String MSG_PEVENT_OK =
+        Messages.ProcessingEventEntryForm_edition_msg;
 
     private ProcessingEventAdapter pEventAdapter;
 
@@ -69,12 +72,13 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     private CommentCollectionInfoTable commentEntryTable;
 
-    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BgcEntryFormWidgetListener listener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     @Override
     protected void init() throws Exception {
@@ -182,7 +186,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     }
 
     private void createSpecimensSection() {
-        Composite client = createSectionWithClient(Messages.ProcessingEventEntryForm_specimens_title);
+        Composite client =
+            createSectionWithClient(Messages.ProcessingEventEntryForm_specimens_title);
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
@@ -202,92 +207,97 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         specimenEntryWidget
             .addDoubleClickListener(collectionDoubleClickListener);
 
-        VetoListener<ItemAction, SpecimenWrapper> vetoListener = new VetoListener<ItemAction, SpecimenWrapper>() {
+        VetoListener<ItemAction, SpecimenWrapper> vetoListener =
+            new VetoListener<ItemAction, SpecimenWrapper>() {
 
-            @Override
-            public void handleEvent(Event<ItemAction, SpecimenWrapper> event)
-                throws VetoException {
-                SpecimenWrapper specimen = event.getObject();
-                switch (event.getType()) {
-                case PRE_ADD:
-                    if (specimen == null)
-                        throw new VetoException(
-                            Messages.ProcessingEventEntryForm_notfound_spec_error_msg);
-                    else if (!SessionManager.getUser()
-                        .getCurrentWorkingCenter()
-                        .equals(specimen.getCurrentCenter())) {
-                        String centerName = Messages.ProcessingEventEntryForm_none_text;
-                        if (specimen.getCurrentCenter() != null)
-                            centerName = specimen.getCurrentCenter()
-                                .getNameShort();
-                        throw new VetoException(
-                            NLS.bind(
-                                Messages.ProcessingEventEntryForm_center_spec_error_msg,
-                                centerName));
-                    } else if (specimen.getProcessingEvent() != null) {
-                        throw new VetoException(
-                            NLS.bind(
-                                Messages.ProcessingEventEntryForm_other_pEvent_error_msg,
-                                specimen.getProcessingEvent().getWorksheet(),
-                                specimen.getProcessingEvent()
-                                    .getFormattedCreatedAt()));
-                    } else if (!specimen.isActive())
-                        throw new VetoException(
-                            NLS.bind(
-                                Messages.ProcessingEventEntryForm_spec_active_only_error_msg,
-                                specimen.getActivityStatus().getName()));
-                    else if (specimen.isUsedInDispatch())
-                        throw new VetoException(
-                            Messages.ProcessingEventEntryForm_spec_dispatch_error_msg);
-                    else if (specimen.getParentContainer() != null)
-                        throw new VetoException(
-                            Messages.ProcessingEventEntryForm_stored_spec_error_msg);
-                    else if (!SessionManager
-                        .getUser()
-                        .getCurrentWorkingCenter()
-                        .getStudyCollection()
-                        .contains(
-                            specimen.getCollectionEvent().getPatient()
-                                .getStudy()))
-                        throw new VetoException(
-                            NLS.bind(
-                                Messages.ProcessingEventEntryForm_spec_study_allowed_only_error_msg,
-                                specimen.getCollectionEvent().getPatient()
-                                    .getStudy().getNameShort()));
-                    else if (pEvent.getSpecimenCollection(false).size() > 0
-                        && !pEvent
-                            .getSpecimenCollection(false)
-                            .get(0)
-                            .getCollectionEvent()
-                            .getPatient()
-                            .getStudy()
-                            .equals(
+                @Override
+                public void handleEvent(Event<ItemAction, SpecimenWrapper> event)
+                    throws VetoException {
+                    SpecimenWrapper specimen = event.getObject();
+                    switch (event.getType()) {
+                    case PRE_ADD:
+                        if (specimen == null)
+                            throw new VetoException(
+                                Messages.ProcessingEventEntryForm_notfound_spec_error_msg);
+                        else if (!SessionManager.getUser()
+                            .getCurrentWorkingCenter()
+                            .equals(specimen.getCurrentCenter())) {
+                            String centerName =
+                                Messages.ProcessingEventEntryForm_none_text;
+                            if (specimen.getCurrentCenter() != null)
+                                centerName = specimen.getCurrentCenter()
+                                    .getNameShort();
+                            throw new VetoException(
+                                NLS.bind(
+                                    Messages.ProcessingEventEntryForm_center_spec_error_msg,
+                                    centerName));
+                        } else if (specimen.getProcessingEvent() != null) {
+                            throw new VetoException(
+                                NLS.bind(
+                                    Messages.ProcessingEventEntryForm_other_pEvent_error_msg,
+                                    specimen.getProcessingEvent()
+                                        .getWorksheet(),
+                                    specimen.getProcessingEvent()
+                                        .getFormattedCreatedAt()));
+                        } else if (!specimen.isActive())
+                            throw new VetoException(
+                                NLS.bind(
+                                    Messages.ProcessingEventEntryForm_spec_active_only_error_msg,
+                                    specimen.getActivityStatus().getName()));
+                        else if (specimen.isUsedInDispatch())
+                            throw new VetoException(
+                                Messages.ProcessingEventEntryForm_spec_dispatch_error_msg);
+                        else if (specimen.getParentContainer() != null)
+                            throw new VetoException(
+                                Messages.ProcessingEventEntryForm_stored_spec_error_msg);
+                        else if (!SessionManager
+                            .getUser()
+                            .getCurrentWorkingCenter()
+                            .getStudyCollection()
+                            .contains(
                                 specimen.getCollectionEvent().getPatient()
                                     .getStudy()))
-                        throw new VetoException(
-                            Messages.ProcessingEventEntryForm_study_spec_error_msg);
-                    break;
-                case POST_ADD:
-                    specimen.setProcessingEvent(pEvent);
-                    specimen.setActivityStatus(closedActivityStatus);
-                    pEvent.addToSpecimenCollection(Arrays.asList(specimen));
-                    break;
-                case PRE_DELETE:
-                    if (specimen.getChildSpecimenCollection(false).size() > 0) {
-                        boolean ok = BgcPlugin
-                            .openConfirm(
-                                Messages.ProcessingEventEntryForm_confirm_remove_title,
-                                Messages.ProcessingEventEntryForm_confirm_remove_msg);
-                        event.doit = ok;
+                            throw new VetoException(
+                                NLS.bind(
+                                    Messages.ProcessingEventEntryForm_spec_study_allowed_only_error_msg,
+                                    specimen.getCollectionEvent().getPatient()
+                                        .getStudy().getNameShort()));
+                        else if (pEvent.getSpecimenCollection(false).size() > 0
+                            && !pEvent
+                                .getSpecimenCollection(false)
+                                .get(0)
+                                .getCollectionEvent()
+                                .getPatient()
+                                .getStudy()
+                                .equals(
+                                    specimen.getCollectionEvent().getPatient()
+                                        .getStudy()))
+                            throw new VetoException(
+                                Messages.ProcessingEventEntryForm_study_spec_error_msg);
+                        break;
+                    case POST_ADD:
+                        specimen.setProcessingEvent(pEvent);
+                        specimen.setActivityStatus(closedActivityStatus);
+                        pEvent.addToSpecimenCollection(Arrays.asList(specimen));
+                        break;
+                    case PRE_DELETE:
+                        if (specimen.getChildSpecimenCollection(false).size() > 0) {
+                            boolean ok =
+                                BgcPlugin
+                                    .openConfirm(
+                                        Messages.ProcessingEventEntryForm_confirm_remove_title,
+                                        Messages.ProcessingEventEntryForm_confirm_remove_msg);
+                            event.doit = ok;
+                        }
+                        break;
+                    case POST_DELETE:
+                        pEvent
+                            .removeFromSpecimenCollection(Arrays
+                                .asList(specimen));
+                        break;
                     }
-                    break;
-                case POST_DELETE:
-                    pEvent
-                        .removeFromSpecimenCollection(Arrays.asList(specimen));
-                    break;
                 }
-            }
-        };
+            };
 
         specimenEntryWidget.addBinding(widgetCreator,
             Messages.ProcessingEventEntryForm_specimens_validation_msg);
@@ -312,7 +322,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         Integer peventId = SessionManager.getAppService().doAction(
             new ProcessingEventSaveAction(pEvent.getId(), pEvent.getCenter()
                 .getId(), pEvent.getCreatedAt(), pEvent.getWorksheet(), pEvent
-                .getActivityStatus().getId(), null, specimens));
+                .getActivityStatus().getId(), null, specimens)).getId();
         adapter.setId(peventId);
         // FIXME figure out if still need this. But should probably be on the
         // action side now

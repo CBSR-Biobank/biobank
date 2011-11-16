@@ -78,7 +78,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         this.inventoryIdExcludeList = inventoryIdExcludeList;
         try {
             allActivityStatuses = SessionManager.getAppService().doAction(
-                new ActivityStatusGetAllAction());
+                new ActivityStatusGetAllAction()).getMap();
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
                 Messages.CEventSourceSpecimenDialog_activity_error_msg, e);
@@ -136,18 +136,19 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         contents.setLayout(new GridLayout(3, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        inventoryIdWidget = (BgcBaseText) createBoundWidgetWithLabel(
-            contents,
-            BgcBaseText.class,
-            SWT.NONE,
-            Messages.CEventSourceSpecimenDialog_field_inventoryId_label,
-            null,
-            internalSpecimen,
-            SpecimenPeer.INVENTORY_ID.getName(),
-            new InventoryIdValidator(
-                inventoryIdExcludeList,
-                Messages.CEventSourceSpecimenDialog_field_inventoryID_validator_msg,
-                internalSpecimen));
+        inventoryIdWidget =
+            (BgcBaseText) createBoundWidgetWithLabel(
+                contents,
+                BgcBaseText.class,
+                SWT.NONE,
+                Messages.CEventSourceSpecimenDialog_field_inventoryId_label,
+                null,
+                internalSpecimen,
+                SpecimenPeer.INVENTORY_ID.getName(),
+                new InventoryIdValidator(
+                    inventoryIdExcludeList,
+                    Messages.CEventSourceSpecimenDialog_field_inventoryID_validator_msg,
+                    internalSpecimen));
         GridData gd = (GridData) inventoryIdWidget.getLayoutData();
         gd.horizontalSpan = 2;
 

@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.test.action;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -64,7 +63,7 @@ public class TestPatient extends TestAction {
         final String pnumber = "testSaveNew" + r.nextInt();
         final Date date = Utils.getRandomDate();
         final Integer id = appService.doAction(new PatientSaveAction(null,
-            study.getId(), pnumber, date));
+            study.getId(), pnumber, date)).getId();
 
         openHibernateSession();
         // Check patient is in database with correct values
@@ -81,7 +80,7 @@ public class TestPatient extends TestAction {
         final Date date = Utils.getRandomDate();
         // create a new patient
         final Integer id = appService.doAction(new PatientSaveAction(null,
-            study.getId(), pnumber, date));
+            study.getId(), pnumber, date)).getId();
 
         final String newPNumber = "testSaveExisting-2" + r.nextInt();
         final Date newDate = Utils.getRandomDate();
@@ -102,7 +101,7 @@ public class TestPatient extends TestAction {
         final String pnumber = "testSaveSamePnumber" + r.nextInt();
         final Date date = Utils.getRandomDate();
         final Integer id = appService.doAction(new PatientSaveAction(null,
-            study.getId(), pnumber, date));
+            study.getId(), pnumber, date)).getId();
 
         openHibernateSession();
         // Check patient is in database with correct values
@@ -126,7 +125,7 @@ public class TestPatient extends TestAction {
         final Date date = Utils.getRandomDate();
         // create a new patient
         final Integer id = appService.doAction(new PatientSaveAction(null,
-            study.getId(), pnumber, date));
+            study.getId(), pnumber, date)).getId();
 
         // delete the patient
         appService.doAction(new PatientDeleteAction(id));
@@ -143,7 +142,7 @@ public class TestPatient extends TestAction {
         final Date date = Utils.getRandomDate();
         // create a new patient
         final Integer patientId = appService.doAction(new PatientSaveAction(
-            null, study.getId(), pnumber, date));
+            null, study.getId(), pnumber, date)).getId();
         // add a cevent to the patient:
         appService.doAction(new CollectionEventSaveAction(null, patientId, r
             .nextInt(20), 1, null, siteId, null,
@@ -169,19 +168,20 @@ public class TestPatient extends TestAction {
         final String string = "testMerge" + r.nextInt();
 
         // add specimen type
-        final Integer typeId = edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-            .addSpecimenType(string).getId();
+        final Integer typeId =
+            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
+                .addSpecimenType(string).getId();
 
         // create a new patient 1
         final Integer patientId1 = appService.doAction(new PatientSaveAction(
-            null, study.getId(), string + "1", Utils.getRandomDate()));
+            null, study.getId(), string + "1", Utils.getRandomDate())).getId();
         // create cevents in patient1
         createCEventWithSpecimens(patientId1, 1, typeId, 4);
         createCEventWithSpecimens(patientId1, 2, typeId, 2);
 
         // create a new patient 2
         final Integer patientId2 = appService.doAction(new PatientSaveAction(
-            null, study.getId(), string + "2", Utils.getRandomDate()));
+            null, study.getId(), string + "2", Utils.getRandomDate())).getId();
         // create cevents in patient2
         createCEventWithSpecimens(patientId2, 1, typeId, 5);
         createCEventWithSpecimens(patientId2, 3, typeId, 7);
@@ -223,12 +223,13 @@ public class TestPatient extends TestAction {
         final String string = "testMergeDifferentStudies" + r.nextInt();
 
         // add specimen type
-        final Integer typeId = edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-            .addSpecimenType(string).getId();
+        final Integer typeId =
+            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
+                .addSpecimenType(string).getId();
 
         // create a new patient 1
         final Integer patientId1 = appService.doAction(new PatientSaveAction(
-            null, study.getId(), string + "1", Utils.getRandomDate()));
+            null, study.getId(), string + "1", Utils.getRandomDate())).getId();
         // create cevents in patient1
         createCEventWithSpecimens(patientId1, 1, typeId, 4);
         createCEventWithSpecimens(patientId1, 2, typeId, 2);
@@ -237,7 +238,7 @@ public class TestPatient extends TestAction {
         StudyWrapper study2 = StudyHelper.addStudy(string
             + Utils.getRandomString(10));
         final Integer patientId2 = appService.doAction(new PatientSaveAction(
-            null, study2.getId(), string + "2", Utils.getRandomDate()));
+            null, study2.getId(), string + "2", Utils.getRandomDate())).getId();
         // create cevents in patient2
         createCEventWithSpecimens(patientId2, 1, typeId, 5);
         createCEventWithSpecimens(patientId2, 3, typeId, 7);
@@ -270,20 +271,26 @@ public class TestPatient extends TestAction {
             "testPatientGetSimpleCEventInfoAction", study.getId());
 
         // add specimen type
-        final Integer typeId = edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-            .addSpecimenType("testSaveWithSpecs" + r.nextInt()).getId();
+        final Integer typeId =
+            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
+                .addSpecimenType("testSaveWithSpecs" + r.nextInt()).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
             .createSaveCEventSpecimenInfoRandomList(5, typeId);
 
         // Save a new cevent with specimens
-        final Integer ceventId = appService
-            .doAction(new CollectionEventSaveAction(null, patientId, r
-                .nextInt(20), 1, null, siteId,
-                new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
+        final Integer ceventId =
+            appService
+                .doAction(
+                    new CollectionEventSaveAction(null, patientId, r
+                        .nextInt(20), 1, null, siteId,
+                        new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
+                        null)).getId();
 
-        HashMap<Integer, SimpleCEventInfo> ceventInfos = appService
-            .doAction(new PatientGetSimpleCollectionEventInfosAction(patientId));
+        Map<Integer, SimpleCEventInfo> ceventInfos =
+            appService
+                .doAction(new PatientGetSimpleCollectionEventInfosAction(
+                    patientId)).getMap();
         Assert.assertEquals(1, ceventInfos.size());
         SimpleCEventInfo info = ceventInfos.get(ceventId);
         Assert.assertNotNull(info);
@@ -306,8 +313,9 @@ public class TestPatient extends TestAction {
                 study.getId());
 
         // add specimen type
-        final Integer typeId = edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-            .addSpecimenType("testSaveWithSpecs" + r.nextInt()).getId();
+        final Integer typeId =
+            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
+                .addSpecimenType("testSaveWithSpecs" + r.nextInt()).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
             .createSaveCEventSpecimenInfoRandomList(5, typeId);
@@ -317,8 +325,10 @@ public class TestPatient extends TestAction {
             .nextInt(20), 1, null, siteId,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
-        ArrayList<PatientCEventInfo> infos = appService
-            .doAction(new PatientGetCollectionEventInfosAction(patientId));
+        ArrayList<PatientCEventInfo> infos =
+            appService
+                .doAction(new PatientGetCollectionEventInfosAction(patientId))
+                .getList();
         Assert.assertEquals(1, infos.size());
         PatientCEventInfo info = infos.get(0);
         // no aliquoted specimens added:
@@ -342,11 +352,12 @@ public class TestPatient extends TestAction {
         String name = "testGetInfoAction" + r.nextInt();
         Date date = Utils.getRandomDate();
         Integer patientId = appService.doAction(new PatientSaveAction(null,
-            study.getId(), name, date));
+            study.getId(), name, date)).getId();
 
         // add specimen type
-        final Integer typeId = edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-            .addSpecimenType(name).getId();
+        final Integer typeId =
+            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
+                .addSpecimenType(name).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
             .createSaveCEventSpecimenInfoRandomList(5, typeId);
@@ -386,7 +397,7 @@ public class TestPatient extends TestAction {
             null));
 
         Integer next = appService.doAction(new PatientNextVisitNumberAction(
-            patientId));
+            patientId)).getNextVisitNumber();
         Assert.assertEquals(visitNumber + 1, next.intValue());
     }
 
@@ -395,7 +406,7 @@ public class TestPatient extends TestAction {
         final String pnumber = "testSearch" + r.nextInt();
         final Date date = Utils.getRandomDate();
         final Integer patientId = appService.doAction(new PatientSaveAction(
-            null, study.getId(), pnumber, date));
+            null, study.getId(), pnumber, date)).getId();
 
         // add 2 cevents to this patient:
         int vnber = r.nextInt(20);

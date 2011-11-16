@@ -7,13 +7,14 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
 public class StudyGetStudyEventAttrsAction implements
-    Action<ArrayList<StudyEventAttr>> {
+    Action<ListResult<StudyEventAttr>> {
     private static final long serialVersionUID = 1L;
 
     // @formatter:off
@@ -40,7 +41,7 @@ public class StudyGetStudyEventAttrsAction implements
     }
 
     @Override
-    public ArrayList<StudyEventAttr> run(User user, Session session)
+    public ListResult<StudyEventAttr> run(User user, Session session)
         throws ActionException {
         ArrayList<StudyEventAttr> result = new ArrayList<StudyEventAttr>();
 
@@ -53,7 +54,7 @@ public class StudyGetStudyEventAttrsAction implements
             result.addAll(attrs);
         }
 
-        return result;
+        return new ListResult<StudyEventAttr>(result);
     }
 
 }

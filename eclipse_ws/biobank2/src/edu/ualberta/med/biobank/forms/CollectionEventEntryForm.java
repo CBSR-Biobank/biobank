@@ -141,7 +141,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         if (adapter.getId() == null) {
             ceventCopy.setVisitNumber(SessionManager.getAppService().doAction(
                 new PatientNextVisitNumberAction(ceventInfo.cevent.getPatient()
-                    .getId())));
+                    .getId())).getNextVisitNumber());
             ceventCopy.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(SessionManager.getAppService())
                 .getWrappedObject());
@@ -267,12 +267,14 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);
         try {
-            final List<SpecimenTypeInfo> allSpecimenTypes = SessionManager
-                .getAppService().doAction(new SpecimenTypeGetInfosAction());
+            final List<SpecimenTypeInfo> allSpecimenTypes =
+                SessionManager
+                    .getAppService().doAction(new SpecimenTypeGetInfosAction())
+                    .getList();
             final List<SourceSpecimen> studySourceSpecimens = SessionManager
                 .getAppService().doAction(
                     new StudyGetSourceSpecimensAction(ceventInfo.cevent
-                        .getPatient().getStudy().getId()));
+                        .getPatient().getStudy().getId())).getList();
 
             specimensTable.addEditSupport(studySourceSpecimens,
                 allSpecimenTypes);
@@ -298,7 +300,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         Map<Integer, StudyEventAttrInfo> studyAttrInfos =
             SessionManager.getAppService().doAction(
                 new StudyGetEventAttrInfoAction(ceventInfo.cevent.getPatient()
-                    .getStudy().getId()));
+                    .getStudy().getId())).getMap();
 
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 
@@ -430,7 +432,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                     .getPatient().getId(), ceventCopy.getVisitNumber(),
                     ceventCopy.getActivityStatus().getId(), commentList,
                     SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                    cevents, ceventAttrList));
+                    cevents, ceventAttrList)).getId();
         ((CollectionEventAdapter) adapter).setId(savedCeventId);
     }
 

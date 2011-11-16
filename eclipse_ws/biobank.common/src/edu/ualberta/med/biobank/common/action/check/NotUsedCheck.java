@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
@@ -23,7 +24,8 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsed
  */
 public class NotUsedCheck<E extends IBiobankModel> extends ActionCheck<E> {
     private static final long serialVersionUID = 1L;
-    private static final String EXCEPTION_MESSAGE = "{0} {1} is still in use by {2}."; //$NON-NLS-1$
+    private static final String EXCEPTION_MESSAGE =
+        "{0} {1} is still in use by {2}."; //$NON-NLS-1$
 
     private final CountUsesAction<E> countAction;
     private final String modelString;
@@ -49,15 +51,16 @@ public class NotUsedCheck<E extends IBiobankModel> extends ActionCheck<E> {
     }
 
     @Override
-    public E run(User user, Session session) throws ActionException {
+    public EmptyResult run(User user, Session session) throws ActionException {
         // TODO Auto-generated method stub
-        Long count = countAction.run(user, session);
+        Long count = countAction.run(user, session).getCount();
 
         if (count > 0) {
             String message = getExceptionMessage();
             throw new ModelIsUsedException(message);
         }
-        return null;
+
+        return new EmptyResult();
     }
 
     private String getExceptionMessage() {

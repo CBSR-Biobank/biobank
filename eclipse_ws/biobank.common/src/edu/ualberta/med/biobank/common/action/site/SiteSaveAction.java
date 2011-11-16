@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.center.CenterSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
@@ -38,7 +39,7 @@ public class SiteSaveAction extends CenterSaveAction {
     }
 
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
         SessionUtil sessionUtil = new SessionUtil(session);
         Site site = sessionUtil.get(Site.class, centerId, new Site());
 

@@ -15,6 +15,7 @@ import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidato
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
@@ -122,14 +123,16 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         saveSite.setActivityStatusId(model.getActivityStatusId());
         saveSite.setStudyIds(model.getStudyIds());
 
-        dispatcher.exec(saveSite, new ActionCallback<Integer>() {
+        dispatcher.exec(saveSite, new ActionCallback<IdResult>() {
             @Override
             public void onFailure(Throwable caught) {
                 eventBus.fireEvent(new ExceptionEvent(caught));
             }
 
             @Override
-            public void onSuccess(Integer siteId) {
+            public void onSuccess(IdResult result) {
+                Integer siteId = result.getId();
+
                 // clear dirty state (so form can close without prompt to save)
                 model.checkpoint();
 

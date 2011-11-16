@@ -14,7 +14,7 @@ public class PatientHelper extends Helper {
         String pnumber = s + r.nextInt();
         Date date = Utils.getRandomDate();
         Integer patientId = appService.doAction(new PatientSaveAction(null,
-            studyId, pnumber, date));
+            studyId, pnumber, date)).getId();
         return patientId;
     }
 }

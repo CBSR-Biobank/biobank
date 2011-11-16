@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.patient;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -8,10 +7,10 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
@@ -39,7 +38,7 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
     private String pnumber;
     private Integer patientId;
 
-    public static class SearchedPatientInfo implements Serializable, NotAProxy {
+    public static class SearchedPatientInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
         public Patient patient;
         public Study study;

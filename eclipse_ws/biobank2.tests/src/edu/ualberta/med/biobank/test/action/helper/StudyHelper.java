@@ -37,7 +37,7 @@ public class StudyHelper extends Helper {
         saveStudy
             .setStudyEventAttrSaveInfo(new ArrayList<StudyEventAttrSaveInfo>());
 
-        return appService.doAction(saveStudy);
+        return appService.doAction(saveStudy).getId();
     }
 
     public static Integer createStudy(BiobankApplicationService appService,
@@ -52,7 +52,7 @@ public class StudyHelper extends Helper {
         saveStudy.setAliquotSpcIds(new HashSet<Integer>());
         saveStudy.setStudyEventAttrSaveInfo(attrInfos);
 
-        return appService.doAction(saveStudy);
+        return appService.doAction(saveStudy).getId();
     }
 
     public static StudySaveAction getSaveAction(
@@ -88,7 +88,7 @@ public class StudyHelper extends Helper {
         saveStudy.setAliquotSpcIds(ids);
 
         Map<Integer, GlobalEventAttrInfo> globalEventAttrInfoList =
-            appService.doAction(new GlobalEventAttrInfoGetAction());
+            appService.doAction(new GlobalEventAttrInfoGetAction()).getMap();
         HashMap<String, GlobalEventAttrInfo> globalEventAttrByLabel =
             new HashMap<String, GlobalEventAttrInfo>();
 

@@ -8,10 +8,11 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.User;
 
-public class CheckNoDuplicateAction implements Action<Boolean> {
+public class CheckNoDuplicateAction implements Action<BooleanResult> {
 
     private static final long serialVersionUID = 1L;
     private Class<?> objectClass;
@@ -19,8 +20,9 @@ public class CheckNoDuplicateAction implements Action<Boolean> {
     private String value;
     private Integer objectId;
 
-    private static final String CHECK_NO_DUPLICATES = "select count(o) from {0} " //$NON-NLS-1$
-        + "as o where {1}=? {2}"; //$NON-NLS-1$
+    private static final String CHECK_NO_DUPLICATES =
+        "select count(o) from {0} " //$NON-NLS-1$
+            + "as o where {1}=? {2}"; //$NON-NLS-1$
 
     public CheckNoDuplicateAction(Class<?> objectClass, Integer objectId,
         String propertyName, String value) {
@@ -37,7 +39,7 @@ public class CheckNoDuplicateAction implements Action<Boolean> {
     }
 
     @Override
-    public Boolean run(User user, Session session) throws ActionException {
+    public BooleanResult run(User user, Session session) throws ActionException {
         final List<Object> params = new ArrayList<Object>();
         params.add(value);
         String equalsTest = ""; //$NON-NLS-1$
@@ -56,7 +58,7 @@ public class CheckNoDuplicateAction implements Action<Boolean> {
         if (res.size() != 1) {
             throw new ActionException("Problem in query result size"); //$NON-NLS-1$
         }
-        return res.get(0) == 0;
+        return new BooleanResult(res.get(0) == 0);
     }
 
 }

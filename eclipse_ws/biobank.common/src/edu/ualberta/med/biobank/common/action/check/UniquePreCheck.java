@@ -8,6 +8,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.util.StringUtil;
@@ -24,15 +25,18 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
  * 
  * @author delphine
  */
-public class UniquePreCheck<T extends IBiobankModel> extends ActionCheck<T> {
+public class UniquePreCheck<T extends IBiobankModel> extends
+    ActionCheck<T> {
     private static final long serialVersionUID = 1L;
 
-    private static final String HQL = "SELECT COUNT(*) FROM {0} o WHERE ({1}) = ({2}) {3}"; //$NON-NLS-1$
+    private static final String HQL =
+        "SELECT COUNT(*) FROM {0} o WHERE ({1}) = ({2}) {3}"; //$NON-NLS-1$
 
     // FIXME what about translation if this message is generated on the server?
     // Can we generated an exception that contain the information to display
     // that can create the appropriate message on the client?
-    private static final String EXCEPTION_STRING = "There already exists a {0} with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique."; //$NON-NLS-1$
+    private static final String EXCEPTION_STRING =
+        "There already exists a {0} with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique."; //$NON-NLS-1$
 
     protected final Collection<ValueProperty<T>> valueProperties;
 
@@ -48,14 +52,15 @@ public class UniquePreCheck<T extends IBiobankModel> extends ActionCheck<T> {
     }
 
     @Override
-    public T run(User user, Session session) throws ActionException {
+    public EmptyResult run(User user, Session session) throws ActionException {
         Query query = getQuery(session);
         Long count = HibernateUtil.getCountFromQuery(query);
 
         if (count > 0) {
             throwException();
         }
-        return null;
+
+        return new EmptyResult();
     }
 
     private void throwException() throws DuplicatePropertySetException {

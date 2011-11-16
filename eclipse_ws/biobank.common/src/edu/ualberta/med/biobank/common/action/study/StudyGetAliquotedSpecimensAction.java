@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
 public class StudyGetAliquotedSpecimensAction implements
-    Action<ArrayList<AliquotedSpecimen>> {
+    Action<StudyGetAliquotedSpecimensResult> {
     private static final long serialVersionUID = 1L;
 
     // @formatter:off
@@ -41,7 +41,7 @@ public class StudyGetAliquotedSpecimensAction implements
     }
 
     @Override
-    public ArrayList<AliquotedSpecimen> run(User user, Session session)
+    public StudyGetAliquotedSpecimensResult run(User user, Session session)
         throws ActionException {
         ArrayList<AliquotedSpecimen> result =
             new ArrayList<AliquotedSpecimen>();
@@ -50,12 +50,12 @@ public class StudyGetAliquotedSpecimensAction implements
         query.setParameter(0, studyId);
 
         @SuppressWarnings("unchecked")
-        List<AliquotedSpecimen> aqspcs = query.list();
-        if (aqspcs != null) {
-            result.addAll(aqspcs);
+        List<AliquotedSpecimen> aliquotedSpecimens = query.list();
+        if (aliquotedSpecimens != null) {
+            result.addAll(aliquotedSpecimens);
         }
 
-        return result;
+        return new StudyGetAliquotedSpecimensResult(result);
     }
 
 }

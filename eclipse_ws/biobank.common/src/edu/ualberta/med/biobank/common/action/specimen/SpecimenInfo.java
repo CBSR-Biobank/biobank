@@ -1,12 +1,10 @@
 package edu.ualberta.med.biobank.common.action.specimen;
 
-import java.io.Serializable;
-
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.util.InfoUtil;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Specimen;
 
-public class SpecimenInfo implements Serializable, NotAProxy {
+public class SpecimenInfo implements ActionResult {
 
     private static final long serialVersionUID = 1L;
 

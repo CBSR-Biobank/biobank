@@ -1,16 +1,15 @@
 package edu.ualberta.med.biobank.common.action.study;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfo.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
@@ -72,16 +71,19 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
             info.study = (Study) row[0];
             info.patientCount = (Long) row[1];
             info.ceventCount = (Long) row[2];
-            info.clinicInfos = getClinicInfo.run(user, session);
-            info.sourceSpcs = getSourceSpecimens.run(user, session);
-            info.aliquotedSpcs = getAliquotedSpecimens.run(user, session);
-            info.studyEventAttrs = getStudyEventAttrs.run(user, session);
+            info.clinicInfos = getClinicInfo.run(user, session).getList();
+            info.sourceSpcs = getSourceSpecimens.run(user, session).getList();
+            info.aliquotedSpcs =
+                getAliquotedSpecimens.run(user, session)
+                    .getAliquotedSpecimens();
+            info.studyEventAttrs =
+                getStudyEventAttrs.run(user, session).getList();
         }
 
         return info;
     }
 
-    public static class StudyInfo implements Serializable, NotAProxy {
+    public static class StudyInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
 
         public Study study;

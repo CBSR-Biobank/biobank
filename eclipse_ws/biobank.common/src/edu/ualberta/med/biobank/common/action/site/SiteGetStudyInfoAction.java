@@ -7,13 +7,14 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class SiteGetStudyInfoAction implements Action<ArrayList<StudyInfo>> {
+public class SiteGetStudyInfoAction implements Action<ListResult<StudyInfo>> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -44,7 +45,7 @@ public class SiteGetStudyInfoAction implements Action<ArrayList<StudyInfo>> {
     }
 
     @Override
-    public ArrayList<StudyInfo> run(User user, Session session)
+    public ListResult<StudyInfo> run(User user, Session session)
         throws ActionException {
         ArrayList<StudyInfo> studies = new ArrayList<StudyInfo>();
 
@@ -60,6 +61,6 @@ public class SiteGetStudyInfoAction implements Action<ArrayList<StudyInfo>> {
             studies.add(studyInfo);
         }
 
-        return studies;
+        return new ListResult<StudyInfo>(studies);
     }
 }

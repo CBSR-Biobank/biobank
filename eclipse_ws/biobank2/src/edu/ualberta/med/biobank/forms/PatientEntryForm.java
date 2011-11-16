@@ -39,13 +39,17 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class PatientEntryForm extends BiobankEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.PatientEntryForm"; //$NON-NLS-1$
 
-    private static final String CREATED_AT_BINDING = "patient-created-at-binding"; //$NON-NLS-1$
+    private static final String CREATED_AT_BINDING =
+        "patient-created-at-binding"; //$NON-NLS-1$
 
-    public static final String MSG_NEW_PATIENT_OK = Messages.PatientEntryForm_creation_msg;
+    public static final String MSG_NEW_PATIENT_OK =
+        Messages.PatientEntryForm_creation_msg;
 
-    public static final String MSG_PATIENT_OK = Messages.PatientEntryForm_edition_msg;
+    public static final String MSG_PATIENT_OK =
+        Messages.PatientEntryForm_edition_msg;
 
     private ComboViewer studiesViewer;
 
@@ -53,19 +57,21 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private NotNullValidator createdAtValidator;
 
-    private NonEmptyStringValidator pnumberNonEmptyValidator = new NonEmptyStringValidator(
-        Messages.PatientEntryForm_patientNumber_validation_msg);
+    private NonEmptyStringValidator pnumberNonEmptyValidator =
+        new NonEmptyStringValidator(
+            Messages.PatientEntryForm_patientNumber_validation_msg);
 
     private PatientInfo pInfo;
 
     private Patient patientCopy;
 
-    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BgcEntryFormWidgetListener listener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     private CommentCollectionInfoTable commentEntryTable;
 
@@ -130,7 +136,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         List<Study> studies = SessionManager.getAppService().doAction(
             new StudyGetListForSiteAction(SessionManager.getUser()
-                .getCurrentWorkingSite().getId()));
+                .getCurrentWorkingSite().getId())).getList();
         Study selectedStudy = null;
         if (pInfo == null) {
             if (studies.size() == 1) {
@@ -211,7 +217,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             .doAction(
                 new PatientSaveAction(patientCopy.getId(), patientCopy
                     .getStudy().getId(), patientCopy.getPnumber(), patientCopy
-                    .getCreatedAt()));
+                    .getCreatedAt())).getId();
         adapter.setId(patientId);
 
         // FIXME the tree needs to get the new value from the patien in case it

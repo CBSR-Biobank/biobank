@@ -27,33 +27,36 @@ public class ClinicHelper extends Helper {
         address.setCity(Utils.getRandomString(5, 10));
         clinicSave.setAddress(address);
 
-        return appService.doAction(clinicSave);
+        return appService.doAction(clinicSave).getId();
     }
 
     public static Integer createContact(BiobankApplicationService appService,
         String name, Integer clinicId) throws ApplicationException {
         ContactSaveAction contactSave = new ContactSaveAction();
-        
+
         contactSave.setName(name);
         contactSave.setClinicId(clinicId);
 
-        return appService.doAction(contactSave);
+        return appService.doAction(contactSave).getId();
     }
-    
-    public static Set<Integer> createClinicsWithContacts(BiobankApplicationService appService,
-        String name, int numClinics, int numContactsPerClinic) throws ApplicationException { 
+
+    public static Set<Integer> createClinicsWithContacts(
+        BiobankApplicationService appService,
+        String name, int numClinics, int numContactsPerClinic)
+        throws ApplicationException {
         Set<Integer> result = new HashSet<Integer>();
-        
+
         Integer clinicId;
         for (int i = 0; i < numClinics; ++i) {
-            clinicId = createClinic(appService, name + i, ActivityStatusEnum.ACTIVE);
-            
+            clinicId =
+                createClinic(appService, name + i, ActivityStatusEnum.ACTIVE);
+
             for (int j = 0; j < numContactsPerClinic; ++j) {
                 createContact(appService, name + "_contact" + j, clinicId);
             }
             result.add(clinicId);
         }
-        
+
         return result;
     }
 }

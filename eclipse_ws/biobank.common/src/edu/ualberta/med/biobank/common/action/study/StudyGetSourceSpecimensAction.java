@@ -7,6 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
@@ -15,7 +16,7 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.User;
 
 public class StudyGetSourceSpecimensAction implements
-    Action<ArrayList<SourceSpecimen>> {
+    Action<ListResult<SourceSpecimen>> {
 
     private static final long serialVersionUID = 1L;
     private Integer studyId;
@@ -41,7 +42,7 @@ public class StudyGetSourceSpecimensAction implements
     }
 
     @Override
-    public ArrayList<SourceSpecimen> run(User user, Session session)
+    public ListResult<SourceSpecimen> run(User user, Session session)
         throws ActionException {
         ArrayList<SourceSpecimen> result = new ArrayList<SourceSpecimen>();
 
@@ -54,6 +55,6 @@ public class StudyGetSourceSpecimensAction implements
             result.addAll(srcspcs);
         }
 
-        return result;
+        return new ListResult<SourceSpecimen>(result);
     }
 }

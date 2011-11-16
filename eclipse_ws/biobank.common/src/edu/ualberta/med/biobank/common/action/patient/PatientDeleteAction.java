@@ -3,16 +3,16 @@ package edu.ualberta.med.biobank.common.action.patient;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.CollectionIsEmptyCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
-import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.patient.PatientDeletePermission;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.User;
 
-public class PatientDeleteAction implements Action<Integer> {
+public class PatientDeleteAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
 
@@ -27,11 +27,11 @@ public class PatientDeleteAction implements Action<Integer> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-       return new PatientDeletePermission(patientId).isAllowed(user, session);
+        return new PatientDeletePermission(patientId).isAllowed(user, session);
     }
 
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
         Patient patient = (Patient) session.load(Patient.class, patientId);
 
         new CollectionIsEmptyCheck<Patient>(new ValueProperty<Patient>(
@@ -41,6 +41,6 @@ public class PatientDeleteAction implements Action<Integer> {
 
         session.delete(patient);
 
-        return patientId;
+        return new IdResult(patientId);
     }
 }

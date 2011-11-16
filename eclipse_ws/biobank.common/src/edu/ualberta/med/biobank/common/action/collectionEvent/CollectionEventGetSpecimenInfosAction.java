@@ -7,6 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -21,7 +22,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
 public class CollectionEventGetSpecimenInfosAction implements
-    Action<ArrayList<SpecimenInfo>> {
+    Action<ListResult<SpecimenInfo>> {
     private static final long serialVersionUID = 1L;
 
     // @formatter:off
@@ -82,7 +83,7 @@ public class CollectionEventGetSpecimenInfosAction implements
     }
 
     @Override
-    public ArrayList<SpecimenInfo> run(User user, Session session)
+    public ListResult<SpecimenInfo> run(User user, Session session)
         throws ActionException {
         ArrayList<SpecimenInfo> specs = new ArrayList<SpecimenInfo>();
 
@@ -102,6 +103,6 @@ public class CollectionEventGetSpecimenInfosAction implements
             specs.add(specInfo);
         }
 
-        return specs;
+        return new ListResult<SpecimenInfo>(specs);
     }
 }

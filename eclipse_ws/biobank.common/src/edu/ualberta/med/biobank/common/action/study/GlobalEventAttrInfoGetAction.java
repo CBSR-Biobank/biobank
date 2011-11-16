@@ -7,6 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.EventAttrTypePeer;
 import edu.ualberta.med.biobank.common.peer.GlobalEventAttrPeer;
@@ -15,7 +16,7 @@ import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
 public class GlobalEventAttrInfoGetAction implements
-    Action<HashMap<Integer, GlobalEventAttrInfo>> {
+    Action<MapResult<Integer, GlobalEventAttrInfo>> {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,9 +37,11 @@ public class GlobalEventAttrInfoGetAction implements
     }
 
     @Override
-    public HashMap<Integer, GlobalEventAttrInfo> run(User user, Session session)
+    public MapResult<Integer, GlobalEventAttrInfo> run(User user,
+        Session session)
         throws ActionException {
-        HashMap<Integer, GlobalEventAttrInfo> attrInfos = new HashMap<Integer, GlobalEventAttrInfo>();
+        HashMap<Integer, GlobalEventAttrInfo> attrInfos =
+            new HashMap<Integer, GlobalEventAttrInfo>();
 
         Query query = session.createQuery(GLOBAL_EVENT_ATTR_QRY);
 
@@ -50,7 +53,7 @@ public class GlobalEventAttrInfoGetAction implements
             attrInfo.type = EventAttrTypeEnum.getEventAttrType((String) row[1]);
             attrInfos.put(attrInfo.attr.getId(), attrInfo);
         }
-        return attrInfos;
+        return new MapResult<Integer, GlobalEventAttrInfo>(attrInfos);
     }
 
 }

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.server.orm;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
@@ -21,7 +22,6 @@ import gov.nih.nci.system.dao.Response;
 import gov.nih.nci.system.dao.orm.WritableORMDAOImpl;
 import gov.nih.nci.system.query.SDKQueryResult;
 
-import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +66,7 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         return super.query(request);
     }
 
-    private <T extends Serializable> Response query(Action<T> action) {
+    private <T extends ActionResult> Response query(Action<T> action) {
         Session session = getSession();
 
         User user = getCurrentUser(session);

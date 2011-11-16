@@ -1,12 +1,12 @@
 package edu.ualberta.med.biobank.common.action.check;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Collection;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -20,11 +20,13 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionN
  * 
  * @author delphine
  */
-public class CollectionIsEmptyCheck<T extends Serializable> extends
+public class CollectionIsEmptyCheck<T> extends
     ActionCheck<T> {
     private static final long serialVersionUID = 1L;
-    private static final String EXCEPTION_MESSAGE = "{0} {1} has one or more {2}."; //$NON-NLS-1$
-    private static final String COUNT_HQL = "SELECT m.{0}.size FROM {1} m WHERE m.{2} = ?"; //$NON-NLS-1$
+    private static final String EXCEPTION_MESSAGE =
+        "{0} {1} has one or more {2}."; //$NON-NLS-1$
+    private static final String COUNT_HQL =
+        "SELECT m.{0}.size FROM {1} m WHERE m.{2} = ?"; //$NON-NLS-1$
 
     private final Property<? extends Collection<?>, ? super T> collectionProperty;
     private final String exceptionMessage;
@@ -53,7 +55,7 @@ public class CollectionIsEmptyCheck<T extends Serializable> extends
     }
 
     @Override
-    public T run(User user, Session session) throws ActionException {
+    public EmptyResult run(User user, Session session) throws ActionException {
         String hql = MessageFormat.format(COUNT_HQL,
             collectionProperty.getName(), getModelClass().getName(),
             getIdProperty().getName());
@@ -67,7 +69,7 @@ public class CollectionIsEmptyCheck<T extends Serializable> extends
             throw new CollectionNotEmptyException(message);
         }
 
-        return null;
+        return new EmptyResult();
     }
 
     private String getExceptionMessage() {

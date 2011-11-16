@@ -130,7 +130,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
         Map<Integer, StudyEventAttrInfo> studyAttrInfos =
             SessionManager.getAppService().doAction(
                 new StudyGetEventAttrInfoAction(ceventInfo.cevent.getPatient()
-                    .getStudy().getId()));
+                    .getStudy().getId())).getMap();
 
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 

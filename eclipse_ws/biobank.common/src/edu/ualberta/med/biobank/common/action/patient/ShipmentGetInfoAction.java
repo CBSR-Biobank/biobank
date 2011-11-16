@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.patient;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -8,13 +7,13 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.ShipmentGetInfoAction.ShipInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.patient.OriginInfoReadPermission;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.User;
@@ -51,7 +50,7 @@ public class ShipmentGetInfoAction implements Action<ShipInfo> {
 
     private final Integer oiId;
 
-    public static class ShipInfo implements Serializable, NotAProxy {
+    public static class ShipInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
 
         public OriginInfo oi;
@@ -85,9 +84,10 @@ public class ShipmentGetInfoAction implements Action<ShipInfo> {
             sInfo.oi = (OriginInfo) row[0];
             sInfo.sourceCenter = (String) row[1];
             sInfo.receiverSite = (String) row[2];
-            sInfo.specimens = (Collection<SpecimenInfo>) new ShipmentGetSpecimenInfosAction(
-                oiId)
-                .run(user, session);
+            sInfo.specimens =
+                (Collection<SpecimenInfo>) new ShipmentGetSpecimenInfosAction(
+                    oiId)
+                    .run(user, session);
 
         } else {
             throw new ActionException("No patient found with id:" + oiId); //$NON-NLS-1$

@@ -6,6 +6,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -15,7 +16,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 
-public class ContainerSaveAction implements Action<Integer> {
+public class ContainerSaveAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
 
@@ -44,7 +45,7 @@ public class ContainerSaveAction implements Action<Integer> {
     }
 
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
         // FIXME permissions
         // FIXME loggings
         // FIXME checks
@@ -68,7 +69,7 @@ public class ContainerSaveAction implements Action<Integer> {
 
         session.saveOrUpdate(container);
 
-        return container.getId();
+        return new IdResult(container.getId());
     }
 
 }

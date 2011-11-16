@@ -1,21 +1,20 @@
 package edu.ualberta.med.biobank.common.action.clinic;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.User;
 
-public class ClinicGetInfoAction  implements Action<ClinicInfo> {
+public class ClinicGetInfoAction implements Action<ClinicInfo> {
     private static final long serialVersionUID = 1L;
-    
+
     // @formatter:off
     @SuppressWarnings("nls")
     private static final String CLINIC_INFO_HQL = 
@@ -31,7 +30,7 @@ public class ClinicGetInfoAction  implements Action<ClinicInfo> {
 
     private final Integer clinicId;
     private final ClinicGetStudyInfoAction getStudyInfo;
-    
+
     public ClinicGetInfoAction(Integer clinicId) {
         this.clinicId = clinicId;
         this.getStudyInfo = new ClinicGetStudyInfoAction(clinicId);
@@ -48,30 +47,31 @@ public class ClinicGetInfoAction  implements Action<ClinicInfo> {
         // TODO Auto-generated method stub
         return null;
     }
-   
-    
-    public static class ClinicInfo implements Serializable, NotAProxy {
+
+    public static class ClinicInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
 
-        public Clinic clinic;        
+        public Clinic clinic;
         public Long patientCount;
         public Long ceventCount;
         public List<StudyInfo> studyInfos;
-    
+
         public Clinic getClinic() {
             return clinic;
         }
+
         public Long getPatientCount() {
             return patientCount;
         }
+
         public Long getCeventCount() {
             return ceventCount;
         }
+
         public List<StudyInfo> getStudyInfos() {
             return studyInfos;
         }
-        
-}
-    
+
+    }
 
 }

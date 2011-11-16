@@ -6,6 +6,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.CountResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.Property;
@@ -20,9 +21,11 @@ import edu.ualberta.med.biobank.model.User;
  * 
  * @param <E>
  */
-public class CountUsesAction<E extends IBiobankModel> implements Action<Long> {
+public class CountUsesAction<E extends IBiobankModel> implements
+    Action<CountResult> {
     private static final long serialVersionUID = 1L;
-    private static final String COUNT_HQL = "SELECT count(m) FROM {0} m WHERE m.{1} = ?"; //$NON-NLS-1$
+    private static final String COUNT_HQL =
+        "SELECT count(m) FROM {0} m WHERE m.{1} = ?"; //$NON-NLS-1$
 
     private final Property<? super E, ?> linkProperty;
     private final Class<?> linkPropertyClass;
@@ -42,14 +45,14 @@ public class CountUsesAction<E extends IBiobankModel> implements Action<Long> {
     }
 
     @Override
-    public Long run(User user, Session session) throws ActionException {
+    public CountResult run(User user, Session session) throws ActionException {
         String hql = MessageFormat.format(COUNT_HQL,
             linkPropertyClass.getName(), linkProperty.getName());
         Query query = session.createQuery(hql);
         query.setParameter(0, model);
 
         Long count = HibernateUtil.getCountFromQuery(query);
-        return count;
+        return new CountResult(count);
     }
 
     @Override

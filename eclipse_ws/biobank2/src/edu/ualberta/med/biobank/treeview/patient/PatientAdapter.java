@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -80,8 +80,9 @@ public class PatientAdapter extends AbstractNewAdapterBase {
                     SimpleCEventInfo cevent = new SimpleCEventInfo();
                     cevent.cevent = new CollectionEvent();
                     cevent.cevent.setPatient(patient);
-                    CollectionEventAdapter ceventAdapter = new CollectionEventAdapter(
-                        null, cevent);
+                    CollectionEventAdapter ceventAdapter =
+                        new CollectionEventAdapter(
+                            null, cevent);
                     ceventAdapter.openEntryForm();
                 }
             });
@@ -109,7 +110,8 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     @Override
     protected Map<Integer, ?> getChildrenObjects() throws Exception {
         return SessionManager.getAppService().doAction(
-            new PatientGetSimpleCollectionEventInfosAction(patient.getId()));
+            new PatientGetSimpleCollectionEventInfosAction(patient.getId()))
+            .getMap();
     }
 
     @Override

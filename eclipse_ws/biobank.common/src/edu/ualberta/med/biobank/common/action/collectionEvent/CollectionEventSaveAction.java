@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.collectionEvent;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,10 +11,12 @@ import java.util.Map;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.DiffUtils;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
@@ -29,7 +30,6 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventCreatePermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
@@ -44,7 +44,7 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
-public class CollectionEventSaveAction implements Action<Integer> {
+public class CollectionEventSaveAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
 
@@ -54,8 +54,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
     private Integer statusId;
     private Collection<CommentInfo> comments;
 
-    public static class SaveCEventSpecimenInfo implements Serializable,
-        NotAProxy {
+    public static class SaveCEventSpecimenInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
 
         public Integer id;
@@ -67,7 +66,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
         public Double quantity;
     }
 
-    public static class CEventAttrSaveInfo implements Serializable, NotAProxy {
+    public static class CEventAttrSaveInfo implements ActionResult {
 
         private static final long serialVersionUID = 1L;
         public Integer studyEventAttrId;
@@ -109,7 +108,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
     }
 
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
 
         check(user, session);
 
@@ -142,7 +141,7 @@ public class CollectionEventSaveAction implements Action<Integer> {
 
         session.saveOrUpdate(ceventToSave);
 
-        return ceventToSave.getId();
+        return new IdResult(ceventToSave.getId());
     }
 
     private void check(User user, Session session) {
@@ -214,11 +213,11 @@ public class CollectionEventSaveAction implements Action<Integer> {
         CollectionEvent cevent) throws ActionException {
         Map<Integer, StudyEventAttrInfo> studyEventList =
             new StudyGetEventAttrInfoAction(
-                study.getId()).run(user, session);
+                study.getId()).run(user, session).getMap();
 
         Map<Integer, EventAttrInfo> ceventAttrList =
             new CollectionEventGetEventAttrInfoAction(
-                ceventId).run(user, session);
+                ceventId).run(user, session).getMap();
         if (ceAttrList != null)
             for (CEventAttrSaveInfo attrInfo : ceAttrList) {
                 EventAttrInfo ceventAttrInfo = ceventAttrList

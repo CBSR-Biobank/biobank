@@ -57,7 +57,8 @@ public class AssignProcess extends ServerProcess {
         boolean rescanMode) throws ActionException {
         AssignProcessData assignData = data;
         CellStatus currentScanState = CellStatus.EMPTY;
-        Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet = new HashMap<RowColPos, Boolean>();
+        Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet =
+            new HashMap<RowColPos, Boolean>();
         for (int row = 0; row < assignData.getPalletRowCapacity(session); row++) {
             for (int col = 0; col < assignData.getPalletColCapacity(session); col++) {
                 RowColPos rcp = new RowColPos(row, col);
@@ -153,7 +154,8 @@ public class AssignProcess extends ServerProcess {
                                 movedAndMissingSpecimensFromPallet);
                         } else { // new in pallet
                             if (new SpecimenIsUsedInDispatchAction(
-                                foundSpecimen.getId()).run(null, session)) {
+                                foundSpecimen.getId()).run(null, session)
+                                .isTrue()) {
                                 updateCellAsDispatchedError(
                                     positionString,
                                     scanCell, foundSpecimen);

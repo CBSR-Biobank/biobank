@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.action.center;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -10,7 +11,7 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.User;
 
-public abstract class CenterSaveAction implements Action<Integer> {
+public abstract class CenterSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
     protected Integer centerId = null;
@@ -51,7 +52,7 @@ public abstract class CenterSaveAction implements Action<Integer> {
         return false;
     }
 
-    protected Integer run(@SuppressWarnings("unused") User user,
+    protected IdResult run(@SuppressWarnings("unused") User user,
         Session session,
         SessionUtil sessionUtil, Center center) throws ActionException {
 
@@ -79,6 +80,6 @@ public abstract class CenterSaveAction implements Action<Integer> {
         // if this was an insert, try using a callback that sets the response
         // value instead?
 
-        return center.getId();
+        return new IdResult(center.getId());
     }
 }

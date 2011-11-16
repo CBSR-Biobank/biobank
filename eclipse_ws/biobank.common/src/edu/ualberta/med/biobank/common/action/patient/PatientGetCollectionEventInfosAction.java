@@ -9,6 +9,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -20,7 +21,7 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.User;
 
 public class PatientGetCollectionEventInfosAction implements
-    Action<ArrayList<PatientCEventInfo>> {
+    Action<ListResult<PatientCEventInfo>> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -55,9 +56,10 @@ public class PatientGetCollectionEventInfosAction implements
     }
 
     @Override
-    public ArrayList<PatientCEventInfo> run(User user, Session session)
+    public ListResult<PatientCEventInfo> run(User user, Session session)
         throws ActionException {
-        ArrayList<PatientCEventInfo> ceventInfos = new ArrayList<PatientCEventInfo>();
+        ArrayList<PatientCEventInfo> ceventInfos =
+            new ArrayList<PatientCEventInfo>();
 
         Query query = session.createQuery(CEVENT_INFO_QRY);
         query.setParameter(0, patientId);
@@ -72,6 +74,6 @@ public class PatientGetCollectionEventInfosAction implements
             ceventInfo.minSourceSpecimenDate = (Date) row[3];
             ceventInfos.add(ceventInfo);
         }
-        return ceventInfos;
+        return new ListResult<PatientCEventInfo>(ceventInfos);
     }
 }

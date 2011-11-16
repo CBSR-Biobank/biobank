@@ -9,6 +9,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermission;
@@ -22,7 +23,7 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.User;
 
 public class SpecimenLinkSaveAction implements
-    Action<ArrayList<AliquotedSpecimenResInfo>> {
+    Action<ListResult<AliquotedSpecimenResInfo>> {
 
     private static final long serialVersionUID = 1L;
 
@@ -74,7 +75,7 @@ public class SpecimenLinkSaveAction implements
      * Return the number of saved specimen
      */
     @Override
-    public ArrayList<AliquotedSpecimenResInfo> run(User user, Session session)
+    public ListResult<AliquotedSpecimenResInfo> run(User user, Session session)
         throws ActionException {
         Center currentCenter = ActionUtil.sessionGet(session, Center.class,
             centerId);
@@ -88,7 +89,8 @@ public class SpecimenLinkSaveAction implements
         originInfo.setCenter(currentCenter);
         session.saveOrUpdate(originInfo);
 
-        ArrayList<AliquotedSpecimenResInfo> resList = new ArrayList<SpecimenLinkSaveAction.AliquotedSpecimenResInfo>();
+        ArrayList<AliquotedSpecimenResInfo> resList =
+            new ArrayList<SpecimenLinkSaveAction.AliquotedSpecimenResInfo>();
         for (AliquotedSpecimenInfo asi : aliquotedSpecInfoList) {
             // in specimen link, this is always a new specimen
             Specimen specimen = new Specimen();
@@ -127,6 +129,6 @@ public class SpecimenLinkSaveAction implements
             resList.add(res);
         }
 
-        return resList;
+        return new ListResult<AliquotedSpecimenResInfo>(resList);
     }
 }

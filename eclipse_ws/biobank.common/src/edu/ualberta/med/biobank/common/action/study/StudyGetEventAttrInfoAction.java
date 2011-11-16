@@ -7,6 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.EventAttrTypePeer;
 import edu.ualberta.med.biobank.common.peer.StudyEventAttrPeer;
@@ -17,7 +18,7 @@ import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
 public class StudyGetEventAttrInfoAction implements
-    Action<HashMap<Integer, StudyEventAttrInfo>> {
+    Action<MapResult<Integer, StudyEventAttrInfo>> {
 
     private static final long serialVersionUID = 1L;
     private Integer studyId;
@@ -50,9 +51,10 @@ public class StudyGetEventAttrInfoAction implements
      * Action that return a map of [label=StudyEventAttrInfo]
      */
     @Override
-    public HashMap<Integer, StudyEventAttrInfo> run(User user, Session session)
+    public MapResult<Integer, StudyEventAttrInfo> run(User user, Session session)
         throws ActionException {
-        HashMap<Integer, StudyEventAttrInfo> attrInfos = new HashMap<Integer, StudyEventAttrInfo>();
+        HashMap<Integer, StudyEventAttrInfo> attrInfos =
+            new HashMap<Integer, StudyEventAttrInfo>();
 
         Query query = session.createQuery(STUDY_EVENT_ATTR_QRY);
         query.setParameter(0, studyId);
@@ -66,6 +68,6 @@ public class StudyGetEventAttrInfoAction implements
             attrInfo.type = EventAttrTypeEnum.getEventAttrType((String) row[1]);
             attrInfos.put(attrInfo.attr.getId(), attrInfo);
         }
-        return attrInfos;
+        return new MapResult<Integer, StudyEventAttrInfo>(attrInfos);
     }
 }

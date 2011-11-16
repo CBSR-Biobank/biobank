@@ -7,6 +7,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -18,7 +19,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class PatientSaveAction implements Action<Integer> {
+public class PatientSaveAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
 
@@ -48,7 +49,7 @@ public class PatientSaveAction implements Action<Integer> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
         // checks pnumber unique to send a proper message:
         new UniquePreCheck<Patient>(new ValueProperty<Patient>(
             PatientPeer.ID, patientId), Patient.class,
@@ -69,6 +70,6 @@ public class PatientSaveAction implements Action<Integer> {
 
         session.saveOrUpdate(patientToSave);
 
-        return patientToSave.getId();
+        return new IdResult(patientToSave.getId());
     }
 }

@@ -3,16 +3,16 @@ package edu.ualberta.med.biobank.common.action.collectionEvent;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.CollectionIsEmptyCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
-import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventDeletePermission;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.User;
 
-public class CollectionEventDeleteAction implements Action<Integer> {
+public class CollectionEventDeleteAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,7 +32,7 @@ public class CollectionEventDeleteAction implements Action<Integer> {
     }
 
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
         CollectionEvent cevent = (CollectionEvent) session.load(
             CollectionEvent.class, ceventId);
 
@@ -44,7 +44,7 @@ public class CollectionEventDeleteAction implements Action<Integer> {
 
         session.delete(cevent);
 
-        return ceventId;
+        return new IdResult(ceventId);
     }
 
 }
