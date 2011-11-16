@@ -162,9 +162,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 case 8:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 9:
-                    return (row.specimen.getCommentCollection() == null || row.specimen
-                        .getCommentCollection().equals("")) ? Messages.SpecimenInfoTable_no_first_letter //$NON-NLS-1$
-                        : Messages.SpecimenInfoTable_yes_first_letter;
+                    return getCommentLetter(row);
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -218,9 +216,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 case 8:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 9:
-                    return (row.specimen.getCommentCollection() == null || row.specimen
-                        .getCommentCollection().equals("")) ? Messages.SpecimenInfoTable_no_first_letter //$NON-NLS-1$
-                        : Messages.SpecimenInfoTable_yes_first_letter;
+                    return getCommentLetter(row);
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -360,5 +356,11 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 return super.compare(01, o2);
             }
         };
+    }
+
+    private static String getCommentLetter(SpecimenInfo si) {
+        return (si.specimen.getCommentCollection() == null || si.specimen
+            .getCommentCollection().size() == 0) ? Messages.SpecimenInfoTable_no_first_letter
+            : Messages.SpecimenInfoTable_yes_first_letter;
     }
 }
