@@ -77,8 +77,9 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         this.defaultTimeDrawn = defaultTimeDrawn;
         this.inventoryIdExcludeList = inventoryIdExcludeList;
         try {
-            allActivityStatuses = SessionManager.getAppService().doAction(
-                new ActivityStatusGetAllAction());
+            allActivityStatuses =
+                SessionManager.getAppService().doAction(
+                    new ActivityStatusGetAllAction());
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
                 Messages.CEventSourceSpecimenDialog_activity_error_msg, e);
@@ -136,72 +137,85 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         contents.setLayout(new GridLayout(3, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        inventoryIdWidget = (BgcBaseText) createBoundWidgetWithLabel(
-            contents,
-            BgcBaseText.class,
-            SWT.NONE,
-            Messages.CEventSourceSpecimenDialog_field_inventoryId_label,
-            null,
-            internalSpecimen,
-            SpecimenPeer.INVENTORY_ID.getName(),
-            new InventoryIdValidator(
-                inventoryIdExcludeList,
-                Messages.CEventSourceSpecimenDialog_field_inventoryID_validator_msg,
-                internalSpecimen));
+        inventoryIdWidget =
+            (BgcBaseText) createBoundWidgetWithLabel(
+                contents,
+                BgcBaseText.class,
+                SWT.NONE,
+                Messages.CEventSourceSpecimenDialog_field_inventoryId_label,
+                null,
+                internalSpecimen,
+                SpecimenPeer.INVENTORY_ID.getName(),
+                new InventoryIdValidator(
+                    inventoryIdExcludeList,
+                    Messages.CEventSourceSpecimenDialog_field_inventoryID_validator_msg,
+                    internalSpecimen));
         GridData gd = (GridData) inventoryIdWidget.getLayoutData();
         gd.horizontalSpan = 2;
 
         addSpecimenTypeWidgets(contents);
 
-        timeDrawnLabel = widgetCreator.createLabel(contents,
-            Messages.CEventSourceSpecimenDialog_field_time_label);
+        timeDrawnLabel =
+            widgetCreator.createLabel(contents,
+                Messages.CEventSourceSpecimenDialog_field_time_label);
         timeDrawnLabel
             .setToolTipText(Messages.CEventSourceSpecimenDialog_field_time_tooltip);
-        timeDrawnWidget = createDateTimeWidget(contents, timeDrawnLabel,
-            internalSpecimen.getCreatedAt(), internalSpecimen,
-            SpecimenPeer.CREATED_AT.getName(), new NotNullValidator(
-                Messages.CEventSourceSpecimenDialog_field_time_validation_msg),
-            SWT.DATE | SWT.TIME, null);
+        timeDrawnWidget =
+            createDateTimeWidget(
+                contents,
+                timeDrawnLabel,
+                internalSpecimen.getCreatedAt(),
+                internalSpecimen,
+                SpecimenPeer.CREATED_AT.getName(),
+                new NotNullValidator(
+                    Messages.CEventSourceSpecimenDialog_field_time_validation_msg),
+                SWT.DATE | SWT.TIME, null);
         gd = (GridData) timeDrawnWidget.getLayoutData();
         gd.horizontalSpan = 2;
 
-        activityStatusComboViewer = widgetCreator.createComboViewer(contents,
-            Messages.CEventSourceSpecimenDialog_label_activity,
-            allActivityStatuses.values(), internalSpecimen.getActivityStatus(),
-            Messages.CEventSourceSpecimenDialog_validation_activity,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    internalSpecimen
-                        .setActivityStatus((ActivityStatus) selectedObject);
-                }
-            }, new BiobankLabelProvider() {
-                @Override
-                public String getText(Object element) {
-                    return ((ActivityStatus) element).getName();
-                }
-            });
+        activityStatusComboViewer =
+            widgetCreator.createComboViewer(contents,
+                Messages.CEventSourceSpecimenDialog_label_activity,
+                allActivityStatuses.values(),
+                internalSpecimen.getActivityStatus(),
+                Messages.CEventSourceSpecimenDialog_validation_activity,
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        internalSpecimen
+                            .setActivityStatus((ActivityStatus) selectedObject);
+                    }
+                }, new BiobankLabelProvider() {
+                    @Override
+                    public String getText(Object element) {
+                        return ((ActivityStatus) element).getName();
+                    }
+                });
         gd = (GridData) activityStatusComboViewer.getControl().getLayoutData();
         gd.horizontalSpan = 2;
 
-        BgcBaseText commentWidget = (BgcBaseText) createBoundWidgetWithLabel(
-            contents, BgcBaseText.class, SWT.MULTI,
-            Messages.CEventSourceSpecimenDialog_label_comments, null,
-            internalSpecimen, SpecimenPeer.COMMENT_COLLECTION.getName(), null);
+        BgcBaseText commentWidget =
+            (BgcBaseText) createBoundWidgetWithLabel(contents,
+                BgcBaseText.class, SWT.MULTI,
+                Messages.CEventSourceSpecimenDialog_label_comments, null,
+                internalSpecimen, SpecimenPeer.COMMENT_COLLECTION.getName(),
+                null);
         gd = (GridData) commentWidget.getLayoutData();
         gd.horizontalSpan = 2;
         gd.widthHint = 400;
 
-        quantityLabel = widgetCreator.createLabel(contents,
-            Messages.CEventSourceSpecimenDialog_field_quantity_label);
+        quantityLabel =
+            widgetCreator.createLabel(contents,
+                Messages.CEventSourceSpecimenDialog_field_quantity_label);
         quantityLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        quantityTextValidator = new DoubleNumberValidator(
-            Messages.CEventSourceSpecimenDialog_field_quantity_validation_msg);
-        quantityText = (BgcBaseText) createBoundWidget(contents,
-            BgcBaseText.class, SWT.BORDER, quantityLabel, new String[0],
-            internalSpecimen, SpecimenPeer.QUANTITY.getName(),
-            quantityTextValidator);
+        quantityTextValidator =
+            new DoubleNumberValidator(
+                Messages.CEventSourceSpecimenDialog_field_quantity_validation_msg);
+        quantityText =
+            (BgcBaseText) createBoundWidget(contents, BgcBaseText.class,
+                SWT.BORDER, quantityLabel, new String[0], internalSpecimen,
+                SpecimenPeer.QUANTITY.getName(), quantityTextValidator);
         gd = (GridData) quantityText.getLayoutData();
         gd.horizontalSpan = 2;
 
@@ -221,33 +235,34 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             && allSpecimenTypes.contains(typeInfo)) {
             useStudyOnlySourceSpecimens = false;
         }
-        specimenTypeComboViewer = getWidgetCreator().createComboViewer(
-            contents, Messages.CEventSourceSpecimenDialog_field_type_label,
-            mapStudySourceSpecimen.values(), ss,
-            Messages.CEventSourceSpecimenDialog_field_type_validation_msg,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    if (selectedObject instanceof SourceSpecimen) {
-                        internalSpecimen
-                            .setSpecimenType(((SourceSpecimen) selectedObject)
-                                .getSpecimenType());
-                    } else {
-                        internalSpecimen
-                            .setSpecimenType(((SpecimenTypeInfo) selectedObject).type);
+        specimenTypeComboViewer =
+            getWidgetCreator().createComboViewer(contents,
+                Messages.CEventSourceSpecimenDialog_field_type_label,
+                mapStudySourceSpecimen.values(), ss,
+                Messages.CEventSourceSpecimenDialog_field_type_validation_msg,
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        if (selectedObject instanceof SourceSpecimen) {
+                            internalSpecimen
+                                .setSpecimenType(((SourceSpecimen) selectedObject)
+                                    .getSpecimenType());
+                        } else {
+                            internalSpecimen
+                                .setSpecimenType(((SpecimenTypeInfo) selectedObject).type);
+                        }
+                        updateWidgetVisibilityAndValues();
                     }
-                    updateWidgetVisibilityAndValues();
-                }
-            }, new BiobankLabelProvider() {
-                @Override
-                public String getText(Object element) {
-                    if (element instanceof SourceSpecimen) {
-                        return ((SourceSpecimen) element).getSpecimenType()
-                            .getNameShort();
+                }, new BiobankLabelProvider() {
+                    @Override
+                    public String getText(Object element) {
+                        if (element instanceof SourceSpecimen) {
+                            return ((SourceSpecimen) element).getSpecimenType()
+                                .getNameShort();
+                        }
+                        return ((SpecimenTypeInfo) element).type.getNameShort();
                     }
-                    return ((SpecimenTypeInfo) element).type.getNameShort();
-                }
-            });
+                });
         if (!useStudyOnlySourceSpecimens) {
             specimenTypeComboViewer.setInput(allSpecimenTypes);
             specimenTypeComboViewer.setSelection(new StructuredSelection(
@@ -272,18 +287,19 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
     }
 
     public void updateWidgetVisibilityAndValues() {
-        if (!dialogCreated)
-            return;
+        if (!dialogCreated) return;
 
         SourceSpecimen ss = null;
         SpecimenType type = internalSpecimen.getSpecimenType();
         if (type != null) {
             ss = mapStudySourceSpecimen.get(type.getName());
         }
-        boolean enableVolume = (type != null)
-            && (ss == null || Boolean.TRUE.equals(ss.getNeedOriginalVolume()));
-        boolean isVolumeRequired = ss != null
-            && Boolean.TRUE.equals(ss.getNeedOriginalVolume());
+        boolean enableVolume =
+            (type != null)
+                && (ss == null || Boolean.TRUE.equals(ss
+                    .getNeedOriginalVolume()));
+        boolean isVolumeRequired =
+            ss != null && Boolean.TRUE.equals(ss.getNeedOriginalVolume());
 
         if (defaultTimeDrawn != null) {
             timeDrawnWidget.setDate(defaultTimeDrawn);
@@ -315,23 +331,13 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
     @Override
     protected void resetFields() {
-        // then reset fields
-        // FIXME reset ? see presenter ?
-        // try {
-        // internalSpecimen.reset();
-        // } catch (Exception e) {
-        // BgcPlugin.openAsyncError(
-        // Messages.CEventSourceSpecimenDialog_reset_error_title, e);
-        // }
         inventoryIdWidget.setText(""); //$NON-NLS-1$
         inventoryIdWidget.setFocus();
         quantityText.setText(""); //$NON-NLS-1$
         timeDrawnWidget.setDate(null);
-        quantityText.setText(""); //$NON-NLS-1$
         specimenTypeComboViewer.getCombo().deselectAll();
-        activityStatusComboViewer.getCombo().deselectAll();
         activityStatusComboViewer.setSelection(new StructuredSelection(
-            allSpecimenTypes.get(ActivityStatusEnum.ACTIVE.getId())));
+            allActivityStatuses.get(ActivityStatusEnum.ACTIVE.getId())));
         updateWidgetVisibilityAndValues();
     }
 
