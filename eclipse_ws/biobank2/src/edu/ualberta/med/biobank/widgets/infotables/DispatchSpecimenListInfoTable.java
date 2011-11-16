@@ -11,6 +11,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -141,7 +142,7 @@ public abstract class DispatchSpecimenListInfoTable extends
         Assert.isNotNull(type, Messages.DispatchSpecimenListInfoTable_16);
         info.type = type.getName();
         info.status = info.dsa.getSpecimen().getActivityStatus().toString();
-        info.comment = info.dsa.getCommentCollection(false).toString();
+        info.comment = CommentWrapper.commentListToString(info.dsa.getCommentCollection(false));
         return info;
     }
 

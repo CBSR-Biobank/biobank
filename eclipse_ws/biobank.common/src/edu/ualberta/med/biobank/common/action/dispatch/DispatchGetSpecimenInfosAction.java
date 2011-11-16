@@ -9,12 +9,15 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.DispatchSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
@@ -25,15 +28,16 @@ public class DispatchGetSpecimenInfosAction implements
     @SuppressWarnings("nls")
     public static final String DISPATCH_SPECIMEN_INFO_HQL = "select dspec from "
         + DispatchSpecimen.class.getName() + " as dspec inner join fetch dspec."
-        + DispatchSpecimenPeer.SPECIMEN + " as spec inner join fetch spec."
-        + SpecimenPeer.SPECIMEN_TYPE.getName() + " left join fetch spec."
-        + SpecimenPeer.COMMENT_COLLECTION.getName() + " inner join fetch spec."
+        + DispatchSpecimenPeer.SPECIMEN.getName() + " as spec inner join fetch spec."
+        + SpecimenPeer.SPECIMEN_TYPE.getName()  + " inner join fetch spec."
         + SpecimenPeer.ACTIVITY_STATUS.getName() + " inner join fetch spec."
         + SpecimenPeer.COLLECTION_EVENT.getName() + " cevent inner join fetch spec."
         + SpecimenPeer.CURRENT_CENTER.getName() + " as center"
         + " inner join fetch cevent." + CollectionEventPeer.PATIENT.getName()
         + " as patient inner join fetch patient." + PatientPeer.STUDY.getName()
-        + " study where dspec.dispatch.id=?";
+        + " study left join fetch spec."
+        + SpecimenPeer.COMMENT_COLLECTION.getName()
+        + " where dspec." + Property.concatNames(DispatchSpecimenPeer.DISPATCH, DispatchPeer.ID) +"=?";
 
     private static final long serialVersionUID = 1L;
     private Integer oiId;

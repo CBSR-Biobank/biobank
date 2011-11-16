@@ -14,17 +14,17 @@ public class ShipmentInfoSaveInfo implements Serializable {
     public Date packedAt;
     public Date receivedAt;
     public String waybill;
-    public CommentInfo commentInfo;
+    public String comment;
     public ShippingMethodInfo method;
 
     public ShipmentInfoSaveInfo(Integer siId, String boxNumber, Date packedAt,
-        Date receivedAt, String waybill, CommentInfo commentInfo, ShippingMethodInfo method) {
+        Date receivedAt, String waybill, String comment, ShippingMethodInfo method) {
         this.siId = siId;
         this.boxNumber = boxNumber;
         this.packedAt = packedAt;
         this.receivedAt = receivedAt;
         this.waybill = waybill;
-        this.commentInfo = commentInfo;
+        this.comment = comment;
         this.method = method;
     }
 

@@ -30,7 +30,7 @@ public class ShipmentProcessInfo extends AbstractProcessPalletInfo {
 
     public ShipmentProcessInfo(Container pallet,
         DispatchWrapper dispatch, boolean errorIfAlreadyAdded) {
-        super(pallet.getId());
+        super(pallet == null ? null : pallet.getId());
         init(dispatch.getDispatchSpecimenCollection(false),
             errorIfAlreadyAdded, dispatch.getSenderCenter());
     }

@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -111,7 +110,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 9:
                     return row.center;
                 case 10:
-                    return row.comment;
+                    return (row.comment == null || row.comment.equals("")) ? Messages.SpecimenInfoTable_no_first_letter //$NON-NLS-1$
+                        : Messages.SpecimenInfoTable_yes_first_letter;
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -183,8 +183,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         return new BgcLabelProvider() {
             @Override
             public Image getColumnImage(Object element, int columnIndex) {
-                TableRowData info =
-                    (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     return null;
                 }
@@ -193,8 +192,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
 
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info =
-                    (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -236,8 +234,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         }
 
         info.createdAt = info.specimen.getFormattedCreatedAt();
-        info.worksheet =
-            info.specimen.getParentSpecimen() == null ? "" : info.specimen //$NON-NLS-1$
+        info.worksheet = info.specimen.getParentSpecimen() == null ? "" : info.specimen //$NON-NLS-1$
                 .getParentSpecimen().getProcessingEvent().getWorksheet();
         Double quantity = info.specimen.getQuantity();
         info.quantity = quantity;
@@ -250,7 +247,6 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             (comments == null || comments.size() == 0) ? Messages.SpecimenInfoTable_no_first_letter
                 : Messages.SpecimenInfoTable_yes_first_letter;
 
-        info.specimen.getCommentCollection(false).toString();
         info.center = info.specimen.getCurrentCenter().getNameShort();
 
         info.originCenter = ""; //$NON-NLS-1$
@@ -266,13 +262,15 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
 
     @Override
     protected String getCollectionModelObjectToString(Object o) {
-        if (o == null) return null;
+        if (o == null)
+            return null;
         TableRowData r = (TableRowData) o;
         return r.toString();
     }
 
     public void setSelection(SpecimenWrapper selectedSample) {
-        if (selectedSample == null) return;
+        if (selectedSample == null)
+            return;
         for (BiobankCollectionModel item : model) {
             TableRowData info = (TableRowData) item.o;
             if (info.specimen == selectedSample) {
@@ -285,7 +283,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
     @Override
     public SpecimenWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
-        if (item == null) return null;
+        if (item == null)
+            return null;
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
         return row.specimen;
@@ -295,5 +294,4 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
     protected BiobankTableSorter getComparator() {
         return null;
     }
-
 }

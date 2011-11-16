@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -16,14 +17,9 @@ import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
-import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
-import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchFormReadInfo;
-import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
-import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
-import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
-import edu.ualberta.med.biobank.common.action.info.ShippingMethodInfo;
-import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
+import edu.ualberta.med.biobank.common.util.ModelUtil;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -33,7 +29,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModificationConcurrencyException;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
@@ -58,10 +53,10 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     protected DispatchFormReadInfo dispatchInfo;
 
-    private Dispatch dispatchModel;
-    
-    protected Comment comment;
+    protected CommentWrapper comment;
 
+    protected Set<Integer> oldSpecIds;
+    
     @Override
     protected void init() throws Exception {
         Assert.isNotNull(adapter, "Adapter should be no null"); //$NON-NLS-1$
@@ -69,26 +64,21 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        dispatchModel = new Dispatch();
+        comment = new CommentWrapper(SessionManager.getAppService());
         if (adapter.getId()!=null) {
-        dispatchInfo = SessionManager.getAppService().doAction(
-            new DispatchGetInfoAction(adapter.getId()));
-            copyInfo();
-        }
-        dispatch= new DispatchWrapper(SessionManager.getAppService(), dispatchModel);
+            dispatchInfo = SessionManager.getAppService().doAction(
+                new DispatchGetInfoAction(adapter.getId()));
+            dispatch= new DispatchWrapper(SessionManager.getAppService(), dispatchInfo.dispatch);
+        } else
+            dispatch = new DispatchWrapper(SessionManager.getAppService());
+
+        oldSpecIds = ModelUtil.getCollectionIds(dispatchInfo.specimens);
+
         SessionManager.logEdit(dispatch);
 
         setPartName(getTextForPartName());
     }
     
-    public void copyInfo() {
-        dispatchModel.setReceiverCenter(dispatchInfo.dispatch.getReceiverCenter());
-        dispatchModel.setSenderCenter(dispatchInfo.dispatch.getSenderCenter());
-        dispatchModel.setShipmentInfo(dispatchInfo.dispatch.getShipmentInfo());
-        dispatchModel.setState(dispatchInfo.dispatch.getState());
-        dispatchModel.setDispatchSpecimenCollection(dispatchInfo.specimens);
-    }
-
     protected abstract String getTextForPartName();
 
     /**

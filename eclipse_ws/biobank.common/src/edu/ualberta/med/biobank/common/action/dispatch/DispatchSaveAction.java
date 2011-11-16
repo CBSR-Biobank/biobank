@@ -3,21 +3,25 @@ package edu.ualberta.med.biobank.common.action.dispatch;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchSavePermission;
+import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
 public class DispatchSaveAction implements Action<Integer> {
@@ -27,10 +31,12 @@ public class DispatchSaveAction implements Action<Integer> {
      */
     private static final long serialVersionUID = 1L;
     private DispatchSaveInfo dInfo;
+    private Set<DispatchSpecimenInfo> dsInfos;
     private ShipmentInfoSaveInfo siInfo;
 
-    public DispatchSaveAction(DispatchSaveInfo dInfo, ShipmentInfoSaveInfo siInfo) {
+    public DispatchSaveAction(DispatchSaveInfo dInfo, Set<DispatchSpecimenInfo> dsInfos, ShipmentInfoSaveInfo siInfo) {
         this.dInfo = dInfo;
+        this.dsInfos = dsInfos;
         this.siInfo = siInfo;
     }
 
@@ -43,43 +49,70 @@ public class DispatchSaveAction implements Action<Integer> {
     @Override
     public Integer run(User user, Session session) throws ActionException {
         SessionUtil sessionUtil = new SessionUtil(session);
-        Dispatch oi =
+        Dispatch disp =
             sessionUtil.get(Dispatch.class, dInfo.id, new Dispatch());
 
-        oi.setReceiverCenter(sessionUtil.get(Site.class, dInfo.receiverId));
-        oi.setSenderCenter(sessionUtil.get(Center.class, dInfo.senderId));
+        disp.setReceiverCenter(sessionUtil.get(Center.class, dInfo.receiverId));
+        disp.setSenderCenter(sessionUtil.get(Center.class, dInfo.senderId));
 
-        ShipmentInfo si =
-            sessionUtil
-                .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
-        si.boxNumber = siInfo.boxNumber;
-        si.packedAt = siInfo.packedAt;
-        si.receivedAt = siInfo.receivedAt;
-        si.waybill = siInfo.waybill;
+        if (dInfo.state==null)
+            dInfo.state=DispatchState.CREATION.getId();
+
+        disp.setState(dInfo.state);
+
+        disp.setDispatchSpecimenCollection(reassemble(sessionUtil, disp, dsInfos));
         
-        ShippingMethod sm = sessionUtil
-            .get(ShippingMethod.class, siInfo.method.id, new ShippingMethod());
+        if (siInfo!=null) {
+            ShipmentInfo si =
+                sessionUtil
+                    .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
+            si.boxNumber = siInfo.boxNumber;
+            si.packedAt = siInfo.packedAt;
+            si.receivedAt = siInfo.receivedAt;
+            si.waybill = siInfo.waybill;
+
+            ShippingMethod sm = sessionUtil
+                .get(ShippingMethod.class, siInfo.method.id, new ShippingMethod());
+
+            si.setShippingMethod(sm);
+            disp.setShipmentInfo(si);
+        }
         
-        si.setShippingMethod(sm);
 
         // This stuff could be extracted to a util method. need to think about
         // how
-        Collection<Comment> comments = si.getCommentCollection();
-        if (comments == null) comments = new HashSet<Comment>();
-        Comment newComment = new Comment();
-        newComment.setCreatedAt(new Date());
-        newComment.setMessage(siInfo.commentInfo.message);
-        newComment.setUser(user);
-        session.saveOrUpdate(newComment);
-        
-        comments.add(newComment);
-        si.setCommentCollection(comments);
+        if (!dInfo.comment.trim().equals("")) {
+            Collection<Comment> comments = disp.getCommentCollection();
+            if (comments == null) comments = new HashSet<Comment>();
+            Comment newComment = new Comment();
+            newComment.setCreatedAt(new Date());
+            newComment.setMessage(dInfo.comment);
+            newComment.setUser(user);
+            session.saveOrUpdate(newComment);
 
-        oi.setShipmentInfo(si);
+            comments.add(newComment);
+            disp.setCommentCollection(comments);
+        }
 
-        session.saveOrUpdate(oi);
+
+        session.saveOrUpdate(disp);
         session.flush();
 
-        return oi.getId();
+        return disp.getId();
+    }
+
+    private Collection<DispatchSpecimen> reassemble(SessionUtil sessionUtil, Dispatch dispatch,
+        Set<DispatchSpecimenInfo> dsInfos) {
+        Collection<DispatchSpecimen> dispSpecimens = new HashSet<DispatchSpecimen>();
+        for (DispatchSpecimenInfo dsInfo : dsInfos) {
+            DispatchSpecimen dspec =
+                sessionUtil.get(DispatchSpecimen.class, dsInfo.id, new DispatchSpecimen());
+            dspec.setSpecimen(sessionUtil.load(Specimen.class, dsInfo.specimenId));
+            dspec.setState(dsInfo.state);
+            dspec.setDispatch(dispatch);
+            dispSpecimens.add(dspec);
+        }
+        return dispSpecimens;
+
     }
 }

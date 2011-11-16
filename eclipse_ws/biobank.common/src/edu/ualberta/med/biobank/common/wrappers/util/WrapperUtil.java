@@ -5,8 +5,10 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.cglib.proxy.Enhancer;
 
@@ -160,8 +162,8 @@ public class WrapperUtil {
         return unwrapped;
     }
     
-    public static List<Integer> getCollectionIds(Collection<? extends ModelWrapper<?>> wrapperCollection) {
-        List<Integer> ids = new ArrayList<Integer>();
+    public static Set<Integer> getCollectionIds(Collection<? extends ModelWrapper<?>> wrapperCollection) {
+        Set<Integer> ids = new HashSet<Integer>();
 
         for (ModelWrapper<?> wrapper : wrapperCollection) {
             ids.add(wrapper.getId());
