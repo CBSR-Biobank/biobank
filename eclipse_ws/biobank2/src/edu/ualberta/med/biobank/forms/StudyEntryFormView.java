@@ -12,9 +12,11 @@ import com.google.gwt.user.client.ui.HasValue;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter;
@@ -26,7 +28,9 @@ import edu.ualberta.med.biobank.mvp.view.item.TextItem;
 import edu.ualberta.med.biobank.mvp.view.item.TranslatedItem;
 import edu.ualberta.med.biobank.mvp.view.item.TranslatedItem.Translator;
 import edu.ualberta.med.biobank.mvp.view.util.InputTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.AliquotedSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ClinicAddInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.SourceSpecimenEntryInfoTable;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class StudyEntryFormView extends AbstractEntryFormView implements
@@ -39,8 +43,10 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
         new TableItem<ContactWrapper>();
     private final TableItem<SourceSpecimenWrapper> srcSpcWrappers =
         new TableItem<SourceSpecimenWrapper>();
+    private final TableItem<AliquotedSpecimenWrapper> aqSpcWrappers =
+        new TableItem<AliquotedSpecimenWrapper>();
 
-    private final TranslatedItem<Collection<ClinicInfo>, Collection<ContactWrapper>> clinics =
+    private final TranslatedItem<Collection<ClinicInfo>, Collection<ContactWrapper>> clinicsTranslator =
         TranslatedItem.from(contactWrappers, CONTACT_TRANSLATOR);
 
     private static final ContactTranslator CONTACT_TRANSLATOR =
@@ -78,7 +84,7 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
         }
     }
 
-    private final TranslatedItem<Collection<SourceSpecimen>, Collection<SourceSpecimenWrapper>> srcSpcs =
+    private final TranslatedItem<Collection<SourceSpecimen>, Collection<SourceSpecimenWrapper>> srcSpcsTranslator =
         TranslatedItem.from(srcSpcWrappers, SOURCE_SPC_TRANSLATOR);
 
     private static final SrcSpcTranslator SOURCE_SPC_TRANSLATOR =
@@ -114,6 +120,47 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
         }
     }
 
+    private final TranslatedItem<Collection<AliquotedSpecimen>, Collection<AliquotedSpecimenWrapper>> aqSpcsTranslator =
+        TranslatedItem.from(aqSpcWrappers, ALIQUOTED_SPC_TRANSLATOR);
+
+    private static final AqSpcTranslator ALIQUOTED_SPC_TRANSLATOR =
+        new AqSpcTranslator();
+
+    private static class AqSpcTranslator
+        implements
+        Translator<Collection<AliquotedSpecimen>, Collection<AliquotedSpecimenWrapper>> {
+        @Override
+        public Collection<AliquotedSpecimen> fromDelegate(
+            Collection<AliquotedSpecimenWrapper> delegate) {
+            Collection<AliquotedSpecimen> aqSpcs =
+                new ArrayList<AliquotedSpecimen>();
+            for (AliquotedSpecimenWrapper ssWrapper : delegate) {
+                aqSpcs.add(ssWrapper.getWrappedObject());
+            }
+            return aqSpcs;
+        }
+
+        @Override
+        public Collection<AliquotedSpecimenWrapper> toDelegate(
+            Collection<AliquotedSpecimen> foreign) {
+            Collection<AliquotedSpecimenWrapper> asWrappers =
+                new ArrayList<AliquotedSpecimenWrapper>();
+            WritableApplicationService appService =
+                SessionManager.getAppService();
+            for (AliquotedSpecimen ss : foreign) {
+                AliquotedSpecimenWrapper wrapper =
+                    new AliquotedSpecimenWrapper(appService, ss);
+                asWrappers.add(wrapper);
+            }
+            return asWrappers;
+        }
+    }
+
+    private BaseForm baseForm;
+    private WritableApplicationService appService;
+    private StudyWrapper studyWrapper;
+    private boolean isSuperAdmin;
+
     @Override
     public void setActivityStatusComboView(IView view) {
         this.activityStatusComboView = view;
@@ -131,12 +178,23 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
 
     @Override
     public HasValue<Collection<ClinicInfo>> getClinics() {
-        return clinics;
+        return clinicsTranslator;
+    }
+
+    @Override
+    public HasValue<Collection<SourceSpecimen>> getSourceSpecimens() {
+        return srcSpcsTranslator;
+    }
+
+    @Override
+    public HasValue<Collection<AliquotedSpecimen>> getAliquotedSpecimens() {
+        return aqSpcsTranslator;
     }
 
     @Override
     public void onCreate(BaseForm baseForm) {
         super.onCreate(baseForm);
+        this.baseForm = baseForm;
 
         baseForm.setTitle(Messages.StudyEntryForm_main_title);
 
@@ -152,16 +210,30 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
         table.addLabel("activityStatus");
         activityStatusComboView.create(table);
 
-        Section clinicSection = baseForm.createSection("Clinics");
-        WritableApplicationService appService =
-            SessionManager.getAppService();
-        StudyWrapper studyWrapper = new StudyWrapper(appService);
-        boolean superAdmin = SessionManager.getUser().isSuperAdmin();
+        appService = SessionManager.getAppService();
+        studyWrapper = new StudyWrapper(appService);
+        isSuperAdmin = SessionManager.getUser().isSuperAdmin();
+
+        createCommentsSection();
+        createClinicSection();
+        createSourceSpecimensSection();
+        createAliquotedSpecimensSection();
+        createStudyEventAttrSection();
+    }
+
+    private void createCommentsSection() {
+        // TODO: fix comment section
+        // comment.setText(widget.comment);
+    }
+
+    private void createClinicSection() {
+        Section section =
+            baseForm.createSection(Messages.StudyEntryForm_contacts_title);
         final ClinicAddInfoTable clinicsTable =
-            new ClinicAddInfoTable(clinicSection, studyWrapper);
-        clinicSection.setClient(clinicsTable);
-        if (superAdmin) {
-            BaseForm.addSectionToolbar(clinicSection,
+            new ClinicAddInfoTable(section, studyWrapper);
+        section.setClient(clinicsTable);
+        if (isSuperAdmin) {
+            BaseForm.addSectionToolbar(section,
                 Messages.SiteEntryForm_studies_add, new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
@@ -170,9 +242,50 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
                 }, ContactWrapper.class, null);
         }
         contactWrappers.setTable(clinicsTable);
+    }
 
-        // TODO: fix comment section
-        // comment.setText(widget.comment);
+    private void createSourceSpecimensSection() {
+        Section section =
+            baseForm
+                .createSection(Messages.StudyEntryForm_source_specimens_title);
+        final SourceSpecimenEntryInfoTable sourceSpecimenTable =
+            new SourceSpecimenEntryInfoTable(section, studyWrapper);
+        section.setClient(sourceSpecimenTable);
+        if (isSuperAdmin) {
+            BaseForm.addSectionToolbar(section,
+                Messages.SiteEntryForm_studies_add, new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        sourceSpecimenTable.addSourceSpecimen();
+                    }
+                }, SourceSpecimenWrapper.class, null);
+        }
+        srcSpcWrappers.setTable(sourceSpecimenTable);
+    }
+
+    private void createAliquotedSpecimensSection() {
+        Section section =
+            baseForm
+                .createSection(Messages.StudyEntryForm_aliquoted_specimens_title);
+        final AliquotedSpecimenEntryInfoTable aliquotedSpecimenTable =
+            new AliquotedSpecimenEntryInfoTable(section, studyWrapper);
+        section.setClient(aliquotedSpecimenTable);
+        if (isSuperAdmin) {
+            BaseForm.addSectionToolbar(section,
+                Messages.SiteEntryForm_studies_add, new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        aliquotedSpecimenTable.addAliquotedSpecimen();
+                    }
+                }, SourceSpecimenWrapper.class, null);
+        }
+        aqSpcWrappers.setTable(aliquotedSpecimenTable);
+    }
+
+    private void createStudyEventAttrSection() {
+        Section section =
+            baseForm.createSection(Messages.StudyEntryForm_visit_info_title);
+        // TODO this needs implementation
     }
 
     @Override

@@ -165,6 +165,8 @@ public class BaseForm {
             // colour in forms
             Composite client =
                 (Composite) ((Section) container).getClient();
+            if (client == null) return;
+
             toolkit.adapt(client, true, true);
             children = client.getChildren();
         } else {

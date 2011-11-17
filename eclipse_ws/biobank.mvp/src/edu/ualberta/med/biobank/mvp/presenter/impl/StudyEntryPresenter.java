@@ -19,7 +19,10 @@ import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.Cli
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.model.AbstractModel;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter.View;
@@ -40,6 +43,10 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         HasValue<String> getNameShort();
 
         HasValue<Collection<ClinicInfo>> getClinics();
+
+        HasValue<Collection<SourceSpecimen>> getSourceSpecimens();
+
+        HasValue<Collection<AliquotedSpecimen>> getAliquotedSpecimens();
     }
 
     @Inject
@@ -64,9 +71,11 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         binder.bind(model.studyId).to(view.getIdentifier());
         binder.bind(model.name).to(view.getName());
         binder.bind(model.nameShort).to(view.getNameShort());
-        binder.bind(model.clinics).to(view.getClinics());
         binder.bind(model.activityStatus).to(
             activityStatusComboPresenter.getActivityStatus());
+        binder.bind(model.clinics).to(view.getClinics());
+        binder.bind(model.sourceSpcs).to(view.getSourceSpecimens());
+        binder.bind(model.aliquotedSpcs).to(view.getAliquotedSpecimens());
         binder.bind(model.dirty()).to(view.getDirty());
 
         model.bind();
@@ -139,6 +148,9 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         final FieldModel<String> nameShort;
         final FieldModel<ActivityStatus> activityStatus;
         final ListFieldModel<ClinicInfo> clinics;
+        final ListFieldModel<SourceSpecimen> sourceSpcs;
+        final ListFieldModel<AliquotedSpecimen> aliquotedSpcs;
+        final ListFieldModel<StudyEventAttr> studyEventAttrs;
 
         @SuppressWarnings("unchecked")
         private Model() {
@@ -157,8 +169,14 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
             activityStatus = fieldOfType(ActivityStatus.class)
                 .boundTo(provider, "study.activityStatus");
 
-            clinics = listOfType(ClinicInfo.class)
-                .boundTo(provider, "clinicInfos");
+            clinics =
+                listOfType(ClinicInfo.class).boundTo(provider, "clinicInfos");
+            sourceSpcs = listOfType(SourceSpecimen.class)
+                .boundTo(provider, "sourceSpcs");
+            aliquotedSpcs = listOfType(AliquotedSpecimen.class)
+                .boundTo(provider, "aliquotedSpcs");
+            studyEventAttrs = listOfType(StudyEventAttr.class)
+                .boundTo(provider, "studyEventAttrs");
 
             ValidationPlugin.validateField(name)
                 .using(new NotEmptyValidator("Name is required"));

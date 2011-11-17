@@ -119,23 +119,19 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
             return study;
         }
 
-        public List<StudyEventAttr> getStudyEventAttrs() {
-            return studyEventAttrs;
-        }
-
         public List<ClinicInfo> getClinicInfos() {
             return clinicInfos;
         }
 
-        public List<SourceSpecimen> getSourceSpc() {
+        public List<SourceSpecimen> getSourceSpcs() {
             return sourceSpcs;
         }
 
-        public List<AliquotedSpecimen> getAliquotedSpcTypeIds() {
+        public List<AliquotedSpecimen> getAliquotedSpcs() {
             return aliquotedSpcs;
         }
 
-        public List<StudyEventAttr> getStudyEventattrs() {
+        public List<StudyEventAttr> getStudyEventAttrs() {
             return studyEventAttrs;
         }
     }
