@@ -66,10 +66,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     private ActivityStatusWrapper closedActivityStatus;
 
-    protected boolean tryAgain = false;
-
-    private boolean isTryingAgain;
-
     private CommentCollectionInfoTable commentEntryTable;
 
     private BgcEntryFormWidgetListener listener =
@@ -96,17 +92,20 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                 .getActiveActivityStatus(SessionManager.getAppService()));
         } else {
             if (pEvent.getWorksheet() == null)
-                tabName = NLS.bind(
-                    Messages.ProcessingEventEntryForm_title_edit_worksheet,
-                    pEvent.getWorksheet(), pEvent.getFormattedCreatedAt());
+                tabName =
+                    NLS.bind(
+                        Messages.ProcessingEventEntryForm_title_edit_worksheet,
+                        pEvent.getWorksheet(), pEvent.getFormattedCreatedAt());
             else
-                tabName = NLS.bind(
-                    Messages.ProcessingEventEntryForm_title_edit_noworksheet,
-                    pEvent.getFormattedCreatedAt());
+                tabName =
+                    NLS.bind(
+                        Messages.ProcessingEventEntryForm_title_edit_noworksheet,
+                        pEvent.getFormattedCreatedAt());
         }
-        closedActivityStatus = ActivityStatusWrapper.getActivityStatus(
-            SessionManager.getAppService(),
-            ActivityStatusWrapper.CLOSED_STATUS_STRING);
+        closedActivityStatus =
+            ActivityStatusWrapper.getActivityStatus(
+                SessionManager.getAppService(),
+                ActivityStatusWrapper.CLOSED_STATUS_STRING);
         setPartName(tabName);
     }
 
@@ -131,11 +130,15 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             Messages.ProcessingEvent_field_center_label, pEvent.getCenter()
                 .getName());
 
-        dateWidget = createDateTimeWidget(client,
-            Messages.ProcessingEvent_field_date_label, pEvent.getCreatedAt(),
-            pEvent, ProcessingEventPeer.CREATED_AT.getName(),
-            new NotNullValidator(
-                Messages.ProcessingEventEntryForm_field_date_validation_msg));
+        dateWidget =
+            createDateTimeWidget(
+                client,
+                Messages.ProcessingEvent_field_date_label,
+                pEvent.getCreatedAt(),
+                pEvent,
+                ProcessingEventPeer.CREATED_AT.getName(),
+                new NotNullValidator(
+                    Messages.ProcessingEventEntryForm_field_date_validation_msg));
         setFirstControl(dateWidget);
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
@@ -145,19 +148,22 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                 : new NonEmptyStringValidator(
                     Messages.ProcessingEventEntryForm_worksheet_validation_msg));
 
-        activityStatusComboViewer = createComboViewer(client,
-            Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
-                .getAppService()), pEvent.getActivityStatus(),
-            Messages.ProcessingEventEntryForm_field_activity_validation_msg,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    setDirty(true);
-                    pEvent
-                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
-                }
-            });
+        activityStatusComboViewer =
+            createComboViewer(
+                client,
+                Messages.label_activity,
+                ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                    .getAppService()),
+                pEvent.getActivityStatus(),
+                Messages.ProcessingEventEntryForm_field_activity_validation_msg,
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        setDirty(true);
+                        pEvent
+                            .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                    }
+                });
         if (pEvent.getActivityStatus() != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
                 pEvent.getActivityStatus()));
@@ -173,8 +179,9 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentCollectionInfoTable(client,
-            pEvent.getCommentCollection(false));
+        commentEntryTable =
+            new CommentCollectionInfoTable(client,
+                pEvent.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
@@ -195,8 +202,9 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
         List<SpecimenWrapper> specimens = pEvent.getSpecimenCollection(true);
 
-        specimenEntryWidget = new SpecimenEntryWidget(client, SWT.NONE,
-            toolkit, SessionManager.getAppService(), true);
+        specimenEntryWidget =
+            new SpecimenEntryWidget(client, SWT.NONE, toolkit,
+                SessionManager.getAppService(), true);
         specimenEntryWidget
             .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
                 @Override
@@ -225,8 +233,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                             String centerName =
                                 Messages.ProcessingEventEntryForm_none_text;
                             if (specimen.getCurrentCenter() != null)
-                                centerName = specimen.getCurrentCenter()
-                                    .getNameShort();
+                                centerName =
+                                    specimen.getCurrentCenter().getNameShort();
                             throw new VetoException(
                                 NLS.bind(
                                     Messages.ProcessingEventEntryForm_center_spec_error_msg,
@@ -236,8 +244,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                 NLS.bind(
                                     Messages.ProcessingEventEntryForm_other_pEvent_error_msg,
                                     specimen.getProcessingEvent()
-                                        .getWorksheet(),
-                                    specimen.getProcessingEvent()
+                                        .getWorksheet(), specimen
+                                        .getProcessingEvent()
                                         .getFormattedCreatedAt()));
                         } else if (!specimen.isActive())
                             throw new VetoException(
@@ -291,9 +299,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                         }
                         break;
                     case POST_DELETE:
-                        pEvent
-                            .removeFromSpecimenCollection(Arrays
-                                .asList(specimen));
+                        pEvent.removeFromSpecimenCollection(Arrays
+                            .asList(specimen));
                         break;
                     }
                 }
@@ -319,47 +326,19 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             specimens.add(spc.getId());
         }
 
-        Integer peventId = SessionManager.getAppService().doAction(
-            new ProcessingEventSaveAction(pEvent.getId(), pEvent.getCenter()
-                .getId(), pEvent.getCreatedAt(), pEvent.getWorksheet(), pEvent
-                .getActivityStatus().getId(), null, specimens)).getId();
-        adapter.setId(peventId);
-        // FIXME figure out if still need this. But should probably be on the
-        // action side now
-        // try {
-        // pEvent.persist();
-        // } catch (ModificationConcurrencyException mc) {
-        // if (isTryingAgain) {
-        // // already tried once
-        // throw mc;
-        // }
-        // Display.getDefault().syncExec(new Runnable() {
-        // @Override
-        // public void run() {
-        // tryAgain = BgcPlugin
-        // .openConfirm(
-        // Messages.ProcessingEventEntryForm_save_error_title,
-        // Messages.ProcessingEventEntryForm_concurrency_error_msg);
-        // setDirty(true);
-        // try {
-        // doTrySettingAgain();
-        // tryAgain = true;
-        // } catch (Exception e) {
-        // saveErrorCatch(e, null, true);
-        // }
-        // }
-        // });
-        // }
+        Integer peventId =
+            SessionManager.getAppService().doAction(
+                new ProcessingEventSaveAction(pEvent.getId(), pEvent
+                    .getCenter().getId(), pEvent.getCreatedAt(), pEvent
+                    .getWorksheet(), pEvent.getActivityStatus().getId(), null,
+                    specimens)).getId();
+        ((ProcessingEventWrapper) pEventAdapter.getModelObject())
+            .getWrappedObject().setId(peventId);
     }
 
     @Override
     protected void doAfterSave() throws Exception {
-        if (tryAgain) {
-            isTryingAgain = true;
-            tryAgain = false;
-            confirm();
-        } else
-            SessionManager.updateAllSimilarNodes(pEventAdapter, true);
+        SessionManager.updateAllSimilarNodes(pEventAdapter, true);
     }
 
     protected void doTrySettingAgain() throws Exception {
@@ -367,11 +346,11 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         // add/remove them again (after reloading them) through the
         // SpecimenEntryWidget to check again if can perform the action
 
-        List<SpecimenWrapper> addedSpecimens = specimenEntryWidget
-            .getAddedSpecimens();
+        List<SpecimenWrapper> addedSpecimens =
+            specimenEntryWidget.getAddedSpecimens();
 
-        List<SpecimenWrapper> removedSpecimens = specimenEntryWidget
-            .getRemovedSpecimens();
+        List<SpecimenWrapper> removedSpecimens =
+            specimenEntryWidget.getRemovedSpecimens();
         List<SpecimenWrapper> pEventSpecs = pEvent.getSpecimenCollection(false);
         pEventSpecs.removeAll(addedSpecimens);
         pEventSpecs.addAll(removedSpecimens);
@@ -409,8 +388,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         if (problems.size() != 0) {
             StringBuffer msg = new StringBuffer();
             for (Entry<String, String> entry : problems.entrySet()) {
-                if (msg.length() > 0)
-                    msg.append("\n"); //$NON-NLS-1$
+                if (msg.length() > 0) msg.append("\n"); //$NON-NLS-1$
                 msg.append(entry.getKey()).append(": ") //$NON-NLS-1$
                     .append(entry.getValue());
             }

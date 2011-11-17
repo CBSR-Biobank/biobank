@@ -15,7 +15,7 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.common.action.scanprocess.CellStatus;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -137,7 +137,7 @@ public class PalletScanManagement {
                             .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
                                 .getInformation() : "") //$NON-NLS-1$
                                 + " " + Messages.PalletScanManagement_rescan_differnt_msg); //$NON-NLS-1$
-                        oldScannedCell.setStatus(CellStatus.ERROR);
+                        oldScannedCell.setStatus(CellInfoStatus.ERROR);
                         rescanDifferent = true;
 
                     } else if (!PalletCell.hasValue(newScannedCell)) {

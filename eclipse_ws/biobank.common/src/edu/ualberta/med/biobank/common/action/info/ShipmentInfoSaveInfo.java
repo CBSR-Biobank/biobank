@@ -4,11 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class ShipmentInfoSaveInfo implements Serializable {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
+
     public Integer siId;
     public String boxNumber;
     public Date packedAt;
@@ -18,7 +15,8 @@ public class ShipmentInfoSaveInfo implements Serializable {
     public ShippingMethodInfo method;
 
     public ShipmentInfoSaveInfo(Integer siId, String boxNumber, Date packedAt,
-        Date receivedAt, String waybill, String comment, ShippingMethodInfo method) {
+        Date receivedAt, String waybill, String comment,
+        ShippingMethodInfo method) {
         this.siId = siId;
         this.boxNumber = boxNumber;
         this.packedAt = packedAt;

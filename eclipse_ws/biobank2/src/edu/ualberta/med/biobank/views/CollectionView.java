@@ -18,7 +18,8 @@ import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
 
 public class CollectionView extends AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.CollectionView"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.CollectionView"; //$NON-NLS-1$
 
     private static CollectionView currentInstance;
 
@@ -53,13 +54,14 @@ public class CollectionView extends AbstractAdministrationView {
     }
 
     protected void notFound(String text) {
-        boolean create = BgcPlugin.openConfirm(
-            Messages.CollectionView_patient_error_title,
-            Messages.CollectionView_patient_error_msg);
+        boolean create =
+            BgcPlugin.openConfirm(Messages.CollectionView_patient_error_title,
+                Messages.CollectionView_patient_error_msg);
         if (create) {
-            Patient patient = new Patient();
-            patient.setPnumber(text);
-            AbstractAdapterBase adapter = new PatientAdapter(null, null);
+            SearchedPatientInfo spi = new SearchedPatientInfo();
+            spi.patient = new Patient();
+            spi.patient.setPnumber(text);
+            AbstractAdapterBase adapter = new PatientAdapter(null, spi);
             adapter.openEntryForm();
         }
     }
@@ -84,8 +86,7 @@ public class CollectionView extends AbstractAdministrationView {
     }
 
     public static void reloadCurrent() {
-        if (currentInstance != null)
-            currentInstance.reload();
+        if (currentInstance != null) currentInstance.reload();
     }
 
     @Override
@@ -100,8 +101,8 @@ public class CollectionView extends AbstractAdministrationView {
 
     public void showSearchedObjectsInTree(Integer patientId, String pnumber,
         boolean searchIfNotFound, boolean doubleClick) {
-        List<AbstractAdapterBase> nodeRes = rootNode.search(Patient.class,
-            patientId);
+        List<AbstractAdapterBase> nodeRes =
+            rootNode.search(Patient.class, patientId);
         if (nodeRes.size() == 0 && searchIfNotFound) {
             // this is happening when a new patient is created.
             internalSearch(pnumber);
@@ -128,8 +129,9 @@ public class CollectionView extends AbstractAdministrationView {
 
     protected void internalSearch(String text) {
         try {
-            SearchedPatientInfo pinfo = SessionManager.getAppService()
-                .doAction(new PatientSearchAction(text.trim()));
+            SearchedPatientInfo pinfo =
+                SessionManager.getAppService().doAction(
+                    new PatientSearchAction(text.trim()));
             if (pinfo == null) {
                 notFound(text);
             } else {

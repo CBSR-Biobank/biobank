@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
 
-public abstract class ProcessWithPallet implements Serializable, NotAProxy {
+public abstract class AbstractProcessPalletInfo implements Serializable, NotAProxy {
 
     private static final long serialVersionUID = 1L;
 
@@ -26,7 +26,7 @@ public abstract class ProcessWithPallet implements Serializable, NotAProxy {
     // FIXME initialized to a new container if new container?
     private Container pallet;
 
-    public ProcessWithPallet(Integer palletId) {
+    public AbstractProcessPalletInfo(Integer palletId) {
         this.palletId = palletId;
     }
 
@@ -44,10 +44,10 @@ public abstract class ProcessWithPallet implements Serializable, NotAProxy {
         + Specimen.class.getName() + " as spec"
         + " left join spec." + SpecimenPeer.SPECIMEN_POSITION.getName()
         + " as pos " + " where pos." + SpecimenPositionPeer.ROW.getName()
-        + "={row}" + " and pos." + SpecimenPositionPeer.COL.getName()
-        + "={col}" + " and pos." + Property
+        + "= :row" + " and pos." + SpecimenPositionPeer.COL.getName()
+        + "= :col" + " and pos." + Property
             .concatNames(SpecimenPositionPeer.CONTAINER, ContainerPeer.ID)
-        + "={contId}";
+        + "= :contId";
 
     public Specimen getSpecimen(Session session,
         Integer row, Integer col) {

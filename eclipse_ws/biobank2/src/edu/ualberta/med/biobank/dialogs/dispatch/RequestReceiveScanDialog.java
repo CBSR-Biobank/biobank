@@ -10,9 +10,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcess;
-import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcessAction;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -92,21 +92,21 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
 
     @Override
     protected Action<ProcessResult> getCellProcessAction(Integer centerId,
-        Cell cell, Locale locale) {
-        return new ShipmentReceiveProcess(getProcessData(), centerId, cell,
+        CellInfo cell, Locale locale) {
+        return new ShipmentReceiveProcessAction(getProcessData(), centerId, cell,
             locale);
     }
 
     @Override
     protected Action<ProcessResult> getPalletProcessAction(
-        Integer centerId, Map<RowColPos, Cell> cells, boolean isRescanMode,
+        Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
         Locale locale) {
-        return new ShipmentReceiveProcess(getProcessData(), centerId, cells,
+        return new ShipmentReceiveProcessAction(getProcessData(), centerId, cells,
             isRescanMode, locale);
     }
 
-    private ShipmentProcessData getProcessData() {
-        return new ShipmentProcessData(null, currentShipment, false);
+    private ShipmentProcessInfo getProcessData() {
+        return new ShipmentProcessInfo(null, currentShipment, false);
     }
 
 }

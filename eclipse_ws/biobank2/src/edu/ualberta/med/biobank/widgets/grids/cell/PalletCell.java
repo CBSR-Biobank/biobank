@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.action.scanprocess.CellStatus;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -240,7 +240,7 @@ public class PalletCell extends AbstractUICell {
     }
 
     public void merge(WritableApplicationService appService,
-        edu.ualberta.med.biobank.common.action.scanprocess.Cell cell) throws Exception {
+        edu.ualberta.med.biobank.common.action.scanprocess.CellInfo cell) throws Exception {
         setStatus(cell.getStatus());
         setInformation(cell.getInformation());
         setValue(cell.getValue());
@@ -262,18 +262,18 @@ public class PalletCell extends AbstractUICell {
         setSpecimen(specimen);
     }
 
-    public void setStatus(CellStatus status) {
+    public void setStatus(CellInfoStatus status) {
         if (status != null)
             setStatus(UICellStatus.valueOf(status.name()));
     }
 
-    public Cell transformIntoServerCell() {
-        Cell serverCell = new Cell(getRow(), getCol(), getValue(),
-            getStatus() == null ? null : CellStatus.valueOf(getStatus().name()));
+    public CellInfo transformIntoServerCell() {
+        CellInfo serverCell = new CellInfo(getRow(), getCol(), getValue(),
+            getStatus() == null ? null : CellInfoStatus.valueOf(getStatus().name()));
         serverCell.setExpectedSpecimenId(getExpectedSpecimen() == null ? null
             : getExpectedSpecimen().getId());
         if (getStatus() != null)
-            serverCell.setStatus(CellStatus.valueOf(getStatus().name()));
+            serverCell.setStatus(CellInfoStatus.valueOf(getStatus().name()));
         serverCell.setInformation(getInformation());
         serverCell.setSpecimenId(getSpecimen() == null ? null : getSpecimen()
             .getId());

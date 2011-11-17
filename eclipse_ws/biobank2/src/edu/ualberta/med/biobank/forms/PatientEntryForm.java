@@ -88,6 +88,8 @@ public class PatientEntryForm extends BiobankEntryForm {
                 SessionManager.getAppService().doAction(
                     new PatientGetInfoAction(adapter.getId()));
             copyPatient();
+        } else {
+            patientCopy = ((PatientAdapter) adapter).getPatient();
         }
 
         // FIXME log edit action?

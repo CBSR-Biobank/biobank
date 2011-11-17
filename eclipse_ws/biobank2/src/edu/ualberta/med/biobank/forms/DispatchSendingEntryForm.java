@@ -25,14 +25,12 @@ import edu.ualberta.med.biobank.SessionSecurityHelper;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
-import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcess;
-import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcessAction;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
@@ -54,11 +52,14 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm"; //$NON-NLS-1$
 
-    public static final String MSG_NEW_DISPATCH_OK = Messages.DispatchSendingEntryForm_new_ok_msg;
+    public static final String MSG_NEW_DISPATCH_OK =
+        Messages.DispatchSendingEntryForm_new_ok_msg;
 
-    public static final String MSG_DISPATCH_OK = Messages.DispatchSendingEntryForm_edit_ok_msg;
+    public static final String MSG_DISPATCH_OK =
+        Messages.DispatchSendingEntryForm_edit_ok_msg;
 
     private ComboViewer destSiteComboViewer;
 
@@ -70,12 +71,13 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     private ShipmentInfoWrapper shipmentInfo = null;
 
-    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BgcEntryFormWidgetListener listener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     private CommentCollectionInfoTable commentEntryTable;
 
@@ -158,8 +160,10 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        commentWidget = (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add, null, comment, "message", null);
+        commentWidget =
+            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
+                SWT.MULTI,
+                Messages.Comments_add, null, comment, "message", null);
 
     }
 
@@ -171,7 +175,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 .getNameShort());
         } else {
             try {
-                destSiteComboViewer = createComboViewer(client,
+                destSiteComboViewer = createComboViewer(
+                    client,
                     Messages.DispatchSendingEntryForm_receiver_label,
                     CenterWrapper.getOtherCenters(SessionManager
                         .getAppService(), SessionManager.getUser()
@@ -197,12 +202,14 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     private void createSpecimensSelectionSection() {
         if (dispatch.isInCreationState()) {
-            Section section = createSection(Messages.DispatchSendingEntryForm_specimens_title);
+            Section section =
+                createSection(Messages.DispatchSendingEntryForm_specimens_title);
             Composite composite = toolkit.createComposite(section);
             composite.setLayout(new GridLayout(1, false));
             section.setClient(composite);
             if (dispatch.isInCreationState()) {
-                addSectionToolbar(section,
+                addSectionToolbar(
+                    section,
                     Messages.DispatchSendingEntryForm_specimens_description,
                     new SelectionAdapter() {
                         @Override
@@ -216,7 +223,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             }
         } else {
             specimensTreeTable = new DispatchSpecimensTreeTable(page, dispatch,
-                !dispatch.isInClosedState() && !dispatch.isInLostState(), true);
+                !dispatch.isInClosedState() && !dispatch.isInLostState(),
+                true);
             specimensTreeTable.addSelectionChangedListener(biobankListener);
             specimensTreeTable.addClickListener();
         }
@@ -241,9 +249,11 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             public void doubleClick(DoubleClickEvent event) {
                 Object selection = event.getSelection();
                 if (selection instanceof InfoTableSelection) {
-                    InfoTableSelection tableSelection = (InfoTableSelection) selection;
-                    DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) tableSelection
-                        .getObject();
+                    InfoTableSelection tableSelection =
+                        (InfoTableSelection) selection;
+                    DispatchSpecimenWrapper dsa =
+                        (DispatchSpecimenWrapper) tableSelection
+                            .getObject();
                     if (dsa != null) {
                         SessionManager.openViewForm(dsa.getSpecimen());
                     }
@@ -270,10 +280,11 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         try {
             CellProcessResult res = (CellProcessResult) SessionManager
                 .getAppService().doAction(
-                    new DispatchCreateProcess(new ShipmentProcessData(null,
-                        dispatch, true), SessionManager.getUser()
-                        .getCurrentWorkingCenter().getId(),
-                        new Cell(-1, -1, inventoryId, null),
+                    new DispatchCreateProcessAction(
+                        new ShipmentProcessInfo(null, dispatch,
+                            true), SessionManager.getUser()
+                            .getCurrentWorkingCenter().getId(),
+                        new CellInfo(-1, -1, inventoryId, null),
                         Locale.getDefault()));
             switch (res.getProcessStatus()) {
             case FILLED:
@@ -289,9 +300,10 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 setDirty(true);
                 break;
             case ERROR:
-                BgcPlugin.openAsyncError(
-                    Messages.DispatchSendingEntryForm_invalid_spec_error_title,
-                    res.getCell().getInformation());
+                BgcPlugin
+                    .openAsyncError(
+                        Messages.DispatchSendingEntryForm_invalid_spec_error_title,
+                        res.getCell().getInformation());
                 break;
             }
         } catch (Exception e) {
@@ -367,46 +379,36 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 Messages.BiobankEntryForm_access_denied_error_msg);
         }
     }
-    
+
     @Override
     protected void saveForm() throws Exception {
 
         Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
-        for (DispatchSpecimenWrapper ds : dispatch.getDispatchSpecimenCollection(false))
-            dsInfos.add(new DispatchSpecimenInfo(ds.getId(), ds.getSpecimen().getId(), ds.getState()));
-        
-        DispatchSaveInfo dInfo = new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter().getId(), dispatch.getSenderCenter().getId(), dispatch.getState(), comment.getMessage() == null ? "" : comment.getMessage());
+        for (DispatchSpecimenWrapper ds : dispatch
+            .getDispatchSpecimenCollection(false))
+            dsInfos.add(new DispatchSpecimenInfo(ds.getId(), ds.getSpecimen()
+                .getId(), ds.getState()));
+
+        DispatchSaveInfo dInfo =
+            new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter()
+                .getId(), dispatch.getSenderCenter().getId(),
+                dispatch.getState(), comment.getMessage() == null ? ""
+                    : comment.getMessage());
         DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
         SessionManager.getAppService().doAction(save);
-        
-        /*
-        try {
-            dispatch.persist();
-            if (needToTryAgainIfConcurrency()) {
-                if (isTryingAgain) {
-                    // already tried once
-                    throw mc;
-                }
-                Display.getDefault().syncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        tryAgain = BgcPlugin
-                            .openConfirm(
-                                Messages.ProcessingEventEntryForm_save_error_title,
-                                Messages.ProcessingEventEntryForm_concurrency_error_msg);
-                        setDirty(true);
-                        try {
-                            doTrySettingAgain();
-                            tryAgain = true;
-                        } catch (Exception e) {
-                            saveErrorCatch(e, null, true);
-                        }
-                    }
-                });
-            } else
-                throw mc;
-        }
-        */
-    }
 
+        /*
+         * try { dispatch.persist(); } catch (ModificationConcurrencyException
+         * mc) { if (needToTryAgainIfConcurrency()) { if (isTryingAgain) { //
+         * already tried once throw mc; } Display.getDefault().syncExec(new
+         * Runnable() {
+         * 
+         * @Override public void run() { tryAgain = BgcPlugin .openConfirm(
+         * Messages.ProcessingEventEntryForm_save_error_title,
+         * Messages.ProcessingEventEntryForm_concurrency_error_msg);
+         * setDirty(true); try { doTrySettingAgain(); tryAgain = true; } catch
+         * (Exception e) { saveErrorCatch(e, null, true); } } }); } else throw
+         * mc; }
+         */
+    }
 }

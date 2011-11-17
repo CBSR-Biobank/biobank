@@ -83,8 +83,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
         Integer visitNumber, Integer statusId,
-        Collection<CommentInfo> comments,
-        Integer centerId, Collection<SaveCEventSpecimenInfo> sourceSpecs,
+        Collection<CommentInfo> comments, Integer centerId,
+        Collection<SaveCEventSpecimenInfo> sourceSpecs,
         List<CEventAttrSaveInfo> ceAttrList) {
         this.ceventId = ceventId;
         this.patientId = patientId;
@@ -130,8 +130,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
             ActivityStatus.class, statusId));
 
         Collection<Comment> commentsToSave = CollectionUtils.getCollection(
-            ceventToSave,
-            CollectionEventPeer.COMMENT_COLLECTION);
+            ceventToSave, CollectionEventPeer.COMMENT_COLLECTION);
         CommentInfo
             .setCommentModelCollection(session, commentsToSave, comments);
 
@@ -153,8 +152,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         propUple.add(new ValueProperty<CollectionEvent>(
             CollectionEventPeer.VISIT_NUMBER, visitNumber));
         new UniquePreCheck<CollectionEvent>(new ValueProperty<CollectionEvent>(
-            CollectionEventPeer.ID, ceventId), CollectionEvent.class, propUple)
-            .run(user, session);
+            CollectionEventPeer.ID, ceventId), CollectionEvent.class,
+            propUple).run(user, session);
     }
 
     private void setSourceSpecimens(Session session,
@@ -175,11 +174,11 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     specimen = new Specimen();
                     specimen.setCurrentCenter(oi.getCenter());
                     specimen.setOriginInfo(oi);
+                    specimen.setTopSpecimen(specimen);
                 } else {
                     specimen = ActionUtil.sessionGet(session, Specimen.class,
                         specInfo.id);
                 }
-                specimen.setTopSpecimen(specimen);
                 specimen.setActivityStatus(ActionUtil.sessionGet(session,
                     ActivityStatus.class, specInfo.statusId));
                 specimen.setCollectionEvent(ceventToSave);
@@ -188,8 +187,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 specimen.setOriginalCollectionEvent(ceventToSave);
                 originalSpec.add(specimen);
                 Collection<Comment> commentsToSave = CollectionUtils
-                    .getCollection(
-                        specimen,
+                    .getCollection(specimen,
                         SpecimenPeer.COMMENT_COLLECTION);
                 CommentInfo.setCommentModelCollection(session, commentsToSave,
                     specInfo.comments);

@@ -17,9 +17,9 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.SessionSecurityHelper;
-import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcess;
-import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcessAction;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
@@ -150,11 +150,11 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         try {
             CellProcessResult res = (CellProcessResult) SessionManager
                 .getAppService().doAction(
-                    new ShipmentReceiveProcess(
-                        new ShipmentProcessData(null, dispatch, false),
+                    new ShipmentReceiveProcessAction(
+                        new ShipmentProcessInfo(null, dispatch, false),
                         SessionManager.getUser().getCurrentWorkingCenter()
                             .getId(),
-                        new Cell(-1, -1, inventoryId, null),
+                        new CellInfo(-1, -1, inventoryId, null),
                         Locale.getDefault()));
             SpecimenWrapper specimen = null;
             if (res.getCell().getSpecimenId() != null) {

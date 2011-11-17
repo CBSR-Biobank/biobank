@@ -8,9 +8,9 @@ import java.util.TreeMap;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcess;
-import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcessAction;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -33,21 +33,21 @@ public class DispatchReceiveScanDialog extends
 
     @Override
     protected Action<ProcessResult> getCellProcessAction(Integer centerId,
-        Cell cell, Locale locale) {
-        return new ShipmentReceiveProcess(getProcessData(), centerId, cell,
+        CellInfo cell, Locale locale) {
+        return new ShipmentReceiveProcessAction(getProcessData(), centerId, cell,
             locale);
     }
 
     @Override
     protected Action<ProcessResult> getPalletProcessAction(
-        Integer centerId, Map<RowColPos, Cell> cells, boolean isRescanMode,
+        Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
         Locale locale) {
-        return new ShipmentReceiveProcess(getProcessData(), centerId, cells,
+        return new ShipmentReceiveProcessAction(getProcessData(), centerId, cells,
             isRescanMode, locale);
     }
 
-    protected ShipmentProcessData getProcessData() {
-        return new ShipmentProcessData(null, currentShipment, false);
+    protected ShipmentProcessInfo getProcessData() {
+        return new ShipmentProcessInfo(null, currentShipment, false);
     }
 
     @Override
