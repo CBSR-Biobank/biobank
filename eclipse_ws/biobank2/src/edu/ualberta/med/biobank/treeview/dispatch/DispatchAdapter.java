@@ -15,7 +15,11 @@ import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
+import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.ShippingMethodInfo;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -25,9 +29,11 @@ import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchAdapter extends AdapterBase {
 
@@ -181,37 +187,31 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     private void setDispatchAsReceived() {
-        try {
-            // to be sure has last database data.
-            getDispatchWrapper().reload();
-        } catch (Exception ex) {
-            BgcPlugin.openAsyncError(Messages.DispatchAdapter_reload_error, ex);
-        }
         getDispatchWrapper().getShipmentInfo().setReceivedAt(new Date());
         getDispatchWrapper().setState(DispatchState.RECEIVED);
         persistDispatch();
     }
 
+    private void persistDispatch() {
+        DispatchChangeStateAction action= new DispatchChangeStateAction(getDispatchWrapper().getId(), DispatchState.CREATION, prepareShipInfo(getDispatchWrapper().getShipmentInfo()));
+        try {
+            SessionManager.getAppService().doAction(action);
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Unable to save changes", e);
+        }
+        SpecimenTransitView.getCurrent().reload();
+    }
+
     private void setDispatchAsCreation() {
-        getDispatchWrapper().setState(DispatchState.CREATION);
         getDispatchWrapper().getShipmentInfo().setPackedAt(null);
         persistDispatch();
     }
 
-    private void persistDispatch() {
-        try {
-            getDispatchWrapper().persist();
-        } catch (final RemoteConnectFailureException exp) {
-            BgcPlugin.openRemoteConnectErrorMessage(exp);
-        } catch (final RemoteAccessException exp) {
-            BgcPlugin.openRemoteAccessErrorMessage(exp);
-        } catch (final AccessDeniedException ade) {
-            BgcPlugin.openAccessDeniedErrorMessage(ade);
-        } catch (Exception ex) {
-            BgcPlugin.openAsyncError(Messages.DispatchAdapter_save_error_title,
-                ex);
-        }
-        SpecimenTransitView.getCurrent().reload();
+    private ShipmentInfoSaveInfo prepareShipInfo(
+        ShipmentInfoWrapper shipmentInfo) {
+        ShippingMethodInfo methodInfo = new ShippingMethodInfo(shipmentInfo.getShippingMethod().getId());
+        ShipmentInfoSaveInfo si = new ShipmentInfoSaveInfo(shipmentInfo.getId(), shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(), shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(), methodInfo);
+        return si;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.shipment;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -50,24 +49,24 @@ public class OriginInfoSaveAction implements Action<Integer> {
 
         oi.setReceiverSite(sessionUtil.get(Site.class, oiInfo.siteId));
         oi.setCenter(sessionUtil.get(Center.class, oiInfo.centerId));
-
+        
         Collection<Specimen> oiSpecimens = oi.getSpecimenCollection();
-        if(oiSpecimens == null) oiSpecimens = new ArrayList<Specimen>();
-
+        if(oiSpecimens == null) oiSpecimens = new HashSet<Specimen>();
+        
         for (Integer specId : oiInfo.removedSpecIds) {
             Specimen spec =
                 sessionUtil.load(Specimen.class, specId);
             oiSpecimens.remove(spec);
         }
-
+        
         for (Integer specId : oiInfo.addedSpecIds) {
             Specimen spec =
                 sessionUtil.load(Specimen.class, specId);
             oiSpecimens.add(spec);
         }
-
+        
         oi.setSpecimenCollection(oiSpecimens);
-
+        
         ShipmentInfo si =
             sessionUtil
                 .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
@@ -83,17 +82,17 @@ public class OriginInfoSaveAction implements Action<Integer> {
 
         // This stuff could be extracted to a util method. need to think about
         // how
-        if (!siInfo.comment.trim().equals("")) {
-            Collection<Comment> comments = si.getCommentCollection();
+        if (!oiInfo.comment.trim().equals("")) {
+            Collection<Comment> comments = oi.getCommentCollection();
             if (comments == null) comments = new HashSet<Comment>();
             Comment newComment = new Comment();
             newComment.setCreatedAt(new Date());
-            newComment.setMessage(siInfo.comment);
+            newComment.setMessage(oiInfo.comment);
             newComment.setUser(user);
             session.saveOrUpdate(newComment);
-
+            
             comments.add(newComment);
-            si.setCommentCollection(comments);
+            oi.setCommentCollection(comments);
         }
 
         oi.setShipmentInfo(si);

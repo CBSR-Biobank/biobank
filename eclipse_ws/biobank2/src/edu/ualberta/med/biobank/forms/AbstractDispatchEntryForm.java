@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,9 +19,13 @@ import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchFormReadInfo;
+import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.util.ModelUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -29,6 +35,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
@@ -54,7 +61,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
     protected DispatchFormReadInfo dispatchInfo;
 
     protected CommentWrapper comment;
-
+    
     protected Set<Integer> oldSpecIds;
     
     @Override
@@ -71,9 +78,9 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             dispatch= new DispatchWrapper(SessionManager.getAppService(), dispatchInfo.dispatch);
         } else
             dispatch = new DispatchWrapper(SessionManager.getAppService());
-
+        
         oldSpecIds = ModelUtil.getCollectionIds(dispatchInfo.specimens);
-
+        
         SessionManager.logEdit(dispatch);
 
         setPartName(getTextForPartName());
@@ -167,5 +174,16 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
     protected void onReset() throws Exception {
         dispatch.reset();
         reloadSpecimens();
+    }
+    @Override
+    protected void saveForm() throws Exception {
+
+        Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
+        for (DispatchSpecimenWrapper ds : dispatch.getDispatchSpecimenCollection(false))
+            dsInfos.add(new DispatchSpecimenInfo(ds.getId(), ds.getSpecimen().getId(), ds.getState()));
+
+        DispatchSaveInfo dInfo = new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter().getId(), dispatch.getSenderCenter().getId(), dispatch.getState(), comment.getMessage() == null ? "" : comment.getMessage());
+        DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
+        SessionManager.getAppService().doAction(save);
     }
 }

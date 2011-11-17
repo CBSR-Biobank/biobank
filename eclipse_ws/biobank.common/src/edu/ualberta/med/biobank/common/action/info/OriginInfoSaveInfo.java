@@ -15,12 +15,14 @@ public class OriginInfoSaveInfo implements Serializable {
     public Integer centerId;
     public Set<Integer> addedSpecIds;
     public Set<Integer> removedSpecIds;
+    public String comment;
 
-    public OriginInfoSaveInfo(Integer oiId, Integer siteId, Integer centerId, 
+    public OriginInfoSaveInfo(Integer oiId, Integer siteId, Integer centerId, String comment,
         Set<Integer> addedSpecimenIds, Set<Integer> removedSpecimenIds) {
         this.oiId = oiId;
         this.siteId = siteId;
         this.centerId = centerId;
+        this.comment = comment;
         this.addedSpecIds = addedSpecimenIds;
         this.removedSpecIds = removedSpecimenIds;
     }

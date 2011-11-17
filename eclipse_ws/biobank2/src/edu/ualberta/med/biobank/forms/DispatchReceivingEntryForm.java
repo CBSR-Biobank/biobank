@@ -290,9 +290,5 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         }
     }
     
-    @Override
-    public void saveForm() {
-        //???
-    }
     
 }
