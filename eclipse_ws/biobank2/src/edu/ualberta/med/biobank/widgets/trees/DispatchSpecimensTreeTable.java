@@ -224,9 +224,8 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         DispatchSpecimenState newState) {
         String previousComment = null;
         if (iStructuredSelection.size() == 1) {
-            previousComment = ((DispatchSpecimenWrapper) ((TreeItemAdapter) iStructuredSelection
-                .getFirstElement()).getSpecimen()).getCommentCollection(false)
-                .toString();
+            previousComment = CommentWrapper.commentListToString(((DispatchSpecimenWrapper) ((TreeItemAdapter) iStructuredSelection
+                .getFirstElement()).getSpecimen()).getCommentCollection(false));
         }
         ModifyStateDispatchDialog dialog = new ModifyStateDispatchDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),

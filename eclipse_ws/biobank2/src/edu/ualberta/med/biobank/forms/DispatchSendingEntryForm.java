@@ -368,45 +368,5 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         }
     }
     
-    @Override
-    protected void saveForm() throws Exception {
-
-        Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
-        for (DispatchSpecimenWrapper ds : dispatch.getDispatchSpecimenCollection(false))
-            dsInfos.add(new DispatchSpecimenInfo(ds.getId(), ds.getSpecimen().getId(), ds.getState()));
-        
-        DispatchSaveInfo dInfo = new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter().getId(), dispatch.getSenderCenter().getId(), dispatch.getState(), comment.getMessage() == null ? "" : comment.getMessage());
-        DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
-        SessionManager.getAppService().doAction(save);
-        
-        /*
-        try {
-            dispatch.persist();
-            if (needToTryAgainIfConcurrency()) {
-                if (isTryingAgain) {
-                    // already tried once
-                    throw mc;
-                }
-                Display.getDefault().syncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        tryAgain = BgcPlugin
-                            .openConfirm(
-                                Messages.ProcessingEventEntryForm_save_error_title,
-                                Messages.ProcessingEventEntryForm_concurrency_error_msg);
-                        setDirty(true);
-                        try {
-                            doTrySettingAgain();
-                            tryAgain = true;
-                        } catch (Exception e) {
-                            saveErrorCatch(e, null, true);
-                        }
-                    }
-                });
-            } else
-                throw mc;
-        }
-        */
-    }
-
+   
 }
