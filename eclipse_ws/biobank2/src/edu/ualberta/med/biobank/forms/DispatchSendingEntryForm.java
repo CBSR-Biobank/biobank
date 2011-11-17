@@ -1,8 +1,10 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -20,12 +22,17 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.SessionSecurityHelper;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
+import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcess;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
+import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
@@ -71,6 +78,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     };
 
     private CommentCollectionInfoTable commentEntryTable;
+
+    private BgcBaseText commentWidget;
 
     @Override
     protected void init() throws Exception {
@@ -149,8 +158,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_button_add);
+        commentWidget = (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_add, null, comment, "message", null);
 
     }
 
@@ -358,4 +367,46 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 Messages.BiobankEntryForm_access_denied_error_msg);
         }
     }
+    
+    @Override
+    protected void saveForm() throws Exception {
+
+        Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
+        for (DispatchSpecimenWrapper ds : dispatch.getDispatchSpecimenCollection(false))
+            dsInfos.add(new DispatchSpecimenInfo(ds.getId(), ds.getSpecimen().getId(), ds.getState()));
+        
+        DispatchSaveInfo dInfo = new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter().getId(), dispatch.getSenderCenter().getId(), dispatch.getState(), comment.getMessage() == null ? "" : comment.getMessage());
+        DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
+        SessionManager.getAppService().doAction(save);
+        
+        /*
+        try {
+            dispatch.persist();
+            if (needToTryAgainIfConcurrency()) {
+                if (isTryingAgain) {
+                    // already tried once
+                    throw mc;
+                }
+                Display.getDefault().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        tryAgain = BgcPlugin
+                            .openConfirm(
+                                Messages.ProcessingEventEntryForm_save_error_title,
+                                Messages.ProcessingEventEntryForm_concurrency_error_msg);
+                        setDirty(true);
+                        try {
+                            doTrySettingAgain();
+                            tryAgain = true;
+                        } catch (Exception e) {
+                            saveErrorCatch(e, null, true);
+                        }
+                    }
+                });
+            } else
+                throw mc;
+        }
+        */
+    }
+
 }

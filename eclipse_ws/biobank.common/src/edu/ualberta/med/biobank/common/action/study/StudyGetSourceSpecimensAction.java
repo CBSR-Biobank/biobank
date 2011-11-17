@@ -9,9 +9,6 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
-import edu.ualberta.med.biobank.common.peer.StudyPeer;
-import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.User;
 
@@ -19,18 +16,16 @@ public class StudyGetSourceSpecimensAction implements
     Action<ListResult<SourceSpecimen>> {
 
     private static final long serialVersionUID = 1L;
-    private Integer studyId;
 
     // @formatter:off
     @SuppressWarnings("nls")
     private static final String SELECT_SOURCE_SPCS_HQL =
         " FROM " + SourceSpecimen.class.getName() + " AS srce"
-        + " INNER JOIN FETCH srce."
-        + SourceSpecimenPeer.SPECIMEN_TYPE.getName()
-        + " WHERE srce."
-        + Property.concatNames(SourceSpecimenPeer.STUDY, StudyPeer.ID)
-        + " =?";
+        + " INNER JOIN FETCH srce.specimenType"
+        + " WHERE srce.study.id=?";
     // @formatter:on
+
+    private final Integer studyId;
 
     public StudyGetSourceSpecimensAction(Integer studyId) {
         this.studyId = studyId;

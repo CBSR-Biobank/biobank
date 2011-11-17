@@ -18,7 +18,7 @@ public class InputTable extends Composite {
         super(parent, SWT.NONE);
 
         setLayout(new GridLayout(2, false));
-        setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
+        setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
     }
 
     public Label addLabel(String text) {

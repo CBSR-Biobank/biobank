@@ -98,8 +98,8 @@ public class TestSiteEntryPresenter {
 
         Mockito.when(siteEntryView.getName()).thenReturn(nameHs);
         Mockito.when(siteEntryView.getNameShort()).thenReturn(nameShortHs);
-        Mockito.when(siteEntryView.getCommentCollection()).thenReturn(
-            commentsHs);
+        // Mockito.when(siteEntryView.getCommentCollection()).thenReturn(
+        // commentsHs);
         Mockito.when(siteEntryView.getStudies()).thenReturn(studiesHs);
 
         Mockito.when(addressView.getStreet1()).thenReturn(nullString);

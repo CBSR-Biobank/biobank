@@ -36,7 +36,9 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
         + " LEFT JOIN patient."
         + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
         + " AS cevents"
-        + " LEFT JOIN cevents."
+        + " LEFT JOIN FETCH patient."
+        + PatientPeer.COMMENT_COLLECTION.getName()
+        + " AS comments LEFT JOIN cevents."
         + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
         + " AS sourceSpecs"
         + " LEFT JOIN cevents."

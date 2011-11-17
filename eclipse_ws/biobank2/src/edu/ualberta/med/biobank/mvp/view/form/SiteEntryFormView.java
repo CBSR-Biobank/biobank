@@ -63,9 +63,9 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
         @Override
         public Collection<StudyWrapper> toDelegate(Collection<StudyInfo> foreign) {
             Collection<StudyWrapper> studies = new ArrayList<StudyWrapper>();
+            WritableApplicationService appService =
+                SessionManager.getAppService();
             for (StudyInfo study : foreign) {
-                WritableApplicationService appService =
-                    SessionManager.getAppService();
                 StudyWrapper wrapper =
                     new StudyWrapper(appService, study.getStudy());
                 studies.add(wrapper);
@@ -103,7 +103,7 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
     public void onCreate(BaseForm baseForm) {
         super.onCreate(baseForm);
 
-        baseForm.setTitle(Messages.StudyEntryForm_main_title);
+        baseForm.setTitle(Messages.SiteEntryForm_main_title);
 
         InputTable table = new InputTable(baseForm.getPage());
 

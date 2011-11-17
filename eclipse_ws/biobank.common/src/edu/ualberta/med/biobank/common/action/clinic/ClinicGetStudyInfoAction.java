@@ -59,10 +59,8 @@ public class ClinicGetStudyInfoAction implements
         @SuppressWarnings("unchecked")
         List<Object[]> results = query.list();
         for (Object[] row : results) {
-
             StudyInfo info = new StudyInfo((Study) row[1], (Long) row[2],
                 (Long) row[3]);
-
             infos.add(info);
         }
 

@@ -92,12 +92,12 @@ public class DispatchViewForm extends BiobankViewForm {
             logger.error(Messages.DispatchViewForm_retrieve_ship_error_msg
                 + dispatch.getShipmentInfo().getWaybill(), ex);
         }
-        commentTable.setList(dispatch.getCommentCollection(false));
     }
 
     @Override
     public void reload() throws Exception {
         retrieveDispatch();
+        commentTable.setList(dispatch.getCommentCollection(false));
         setPartName(Messages.DispatchViewForm_fulltitle
             + dispatch.getShipmentInfo().getPackedAt());
         setDispatchValues();
@@ -154,6 +154,8 @@ public class DispatchViewForm extends BiobankViewForm {
                 && dispatch.getNonProcessedDispatchSpecimenCollection().size() == 0)
                 createCloseButton();
         }
+        
+        commentTable.setList(dispatch.getCommentCollection(false));
     }
 
     @Override

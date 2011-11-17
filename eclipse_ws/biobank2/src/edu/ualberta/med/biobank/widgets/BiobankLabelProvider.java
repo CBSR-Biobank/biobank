@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
@@ -85,7 +86,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return specimen.getQuantity() == null ? "" : specimen //$NON-NLS-1$
                     .getQuantity().toString();
             case 6:
-                return specimen.getCommentCollection(false) == null ? "" : specimen.getCommentCollection(false).toString(); //$NON-NLS-1$
+                return specimen.getCommentCollection(false) == null ? "" : CommentWrapper.commentListToString(specimen.getCommentCollection(false)); //$NON-NLS-1$
             }
         } else if (element instanceof SpecimenTypeWrapper) {
             final SpecimenTypeWrapper st = (SpecimenTypeWrapper) element;
@@ -124,7 +125,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             if (columnIndex == 3)
                 return dsa.getSpecimen().getActivityStatus().toString();
             if (columnIndex == 4)
-                return dsa.getCommentCollection(false).toString();
+                return CommentWrapper.commentListToString(dsa.getCommentCollection(false));
         } else if (element instanceof RequestSpecimenWrapper) {
             RequestSpecimenWrapper dsa = (RequestSpecimenWrapper) element;
             if (columnIndex == 0)

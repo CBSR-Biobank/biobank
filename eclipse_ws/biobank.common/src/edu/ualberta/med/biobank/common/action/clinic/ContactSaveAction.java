@@ -6,6 +6,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.User;
 
@@ -79,6 +80,13 @@ public class ContactSaveAction implements Action<IdResult> {
         contact.setOfficeNumber(officeNumber);
         contact.setPagerNumber(pagerNumber);
         contact.setFaxNumber(faxNumber);
+        contact.setEmailAddress(emailAddress);
+
+        Clinic clinic = sessionUtil.get(Clinic.class, clinicId);
+        contact.setClinic(clinic);
+
+        session.saveOrUpdate(contact);
+        session.flush();
 
         return new IdResult(contact.getId());
     }

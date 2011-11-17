@@ -48,7 +48,15 @@ public enum PermissionEnum {
     PROCESSING_EVENT_UPDATE(23),
     PROCESSING_EVENT_DELETE(24),
 
-    ORIGIN_INFO_READ(25);
+    ORIGIN_INFO_CREATE(25),
+    ORIGIN_INFO_READ(26),
+    ORIGIN_INFO_UPDATE(27),
+    ORIGIN_INFO_DELETE(28),
+    
+    DISPATCH_CREATE(29),
+    DISPATCH_READ(30),
+    DISPATCH_UPDATE(31),
+    DISPATCH_DELETE(32);
 
     private final Integer permissionId;
 
@@ -103,18 +111,20 @@ public enum PermissionEnum {
         return false;
     }
 
-    private boolean isMembershipAllowed(Membership membership,
-        Center center, Study study) {
+    private boolean isMembershipAllowed(Membership membership, Center center,
+        Study study) {
 
-        boolean hasCenter = center == null || membership.getCenter() == null
-            || membership.getCenter().equals(center);
-        boolean hasStudy = study == null || membership.getStudy() == null
-            || membership.getStudy().equals(study);
+        boolean hasCenter =
+            center == null || membership.getCenter() == null
+                || membership.getCenter().equals(center);
+        boolean hasStudy =
+            study == null || membership.getStudy() == null
+                || membership.getStudy().equals(study);
 
-        Collection<Permission> permissions = membership
-            .getPermissionCollection();
-        boolean hasPermission = permissions != null
-            && isPermissionAllowed(permissions);
+        Collection<Permission> permissions =
+            membership.getPermissionCollection();
+        boolean hasPermission =
+            permissions != null && isPermissionAllowed(permissions);
 
         return hasCenter && hasStudy && hasPermission;
     }

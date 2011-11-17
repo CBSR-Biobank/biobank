@@ -22,6 +22,7 @@ public class ClinicHelper extends Helper {
         clinicSave.setNameShort(name);
         clinicSave.setSendsShipments(true);
         clinicSave.setContactIds(new HashSet<Integer>());
+        clinicSave.setActivityStatusId(activityStatus.getId());
 
         Address address = new Address();
         address.setCity(Utils.getRandomString(5, 10));

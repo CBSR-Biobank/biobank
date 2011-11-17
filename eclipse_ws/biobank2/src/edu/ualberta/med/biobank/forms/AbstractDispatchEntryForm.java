@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.List;
+import java.util.Set;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -13,13 +16,19 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
+import edu.ualberta.med.biobank.common.action.info.DispatchFormReadInfo;
+import edu.ualberta.med.biobank.common.util.ModelUtil;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModificationConcurrencyException;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
@@ -42,6 +51,12 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     protected boolean tryAgain;
 
+    protected DispatchFormReadInfo dispatchInfo;
+
+    protected CommentWrapper comment;
+    
+    protected Set<Integer> oldSpecIds;
+    
     @Override
     protected void init() throws Exception {
         Assert.isNotNull(adapter, "Adapter should be no null"); //$NON-NLS-1$
@@ -49,22 +64,21 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        dispatch = (DispatchWrapper) getModelObject();
+        comment = new CommentWrapper(SessionManager.getAppService());
+        if (adapter.getId()!=null) {
+            dispatchInfo = SessionManager.getAppService().doAction(
+                new DispatchGetInfoAction(adapter.getId()));
+            dispatch= new DispatchWrapper(SessionManager.getAppService(), dispatchInfo.dispatch);
+        } else
+            dispatch = new DispatchWrapper(SessionManager.getAppService());
+        
+        oldSpecIds = ModelUtil.getCollectionIds(dispatchInfo.specimens);
+        
         SessionManager.logEdit(dispatch);
-        retrieveShipment();
 
         setPartName(getTextForPartName());
     }
-
-    private void retrieveShipment() {
-        try {
-            dispatch.reload();
-        } catch (Exception ex) {
-            logger.error("Error while retrieving shipment " //$NON-NLS-1$
-                + dispatch.getShipmentInfo().getWaybill(), ex);
-        }
-    }
-
+    
     protected abstract String getTextForPartName();
 
     /**
@@ -127,37 +141,6 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
      * add specimen represented by the inventoryid entered in the text field
      */
     protected abstract void doSpecimenTextAction(String text);
-
-    @Override
-    protected void saveForm() throws Exception {
-        try {
-            dispatch.persist();
-        } catch (ModificationConcurrencyException mc) {
-            if (needToTryAgainIfConcurrency()) {
-                if (isTryingAgain) {
-                    // already tried once
-                    throw mc;
-                }
-                Display.getDefault().syncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        tryAgain = BgcPlugin
-                            .openConfirm(
-                                Messages.ProcessingEventEntryForm_save_error_title,
-                                Messages.ProcessingEventEntryForm_concurrency_error_msg);
-                        setDirty(true);
-                        try {
-                            doTrySettingAgain();
-                            tryAgain = true;
-                        } catch (Exception e) {
-                            saveErrorCatch(e, null, true);
-                        }
-                    }
-                });
-            } else
-                throw mc;
-        }
-    }
 
     protected boolean needToTryAgainIfConcurrency() {
         return false;

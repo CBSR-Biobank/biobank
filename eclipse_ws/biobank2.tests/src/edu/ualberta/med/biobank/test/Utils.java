@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import edu.ualberta.med.biobank.common.action.CommentInfo;
+import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 
 public class Utils {
 
@@ -47,10 +47,8 @@ public class Utils {
         final List<CommentInfo> comments = new ArrayList<CommentInfo>();
 
         for (int i = 0, n = r.nextInt(5); i < n; ++i) {
-            CommentInfo c = new CommentInfo();
-            c.createAt = getRandomDate();
-            c.message = "comment " + r.nextInt();
-            c.userId = userId;
+            CommentInfo c = new CommentInfo("comment " + r.nextInt(),
+                getRandomDate(), userId);
             comments.add(c);
         }
         return comments;

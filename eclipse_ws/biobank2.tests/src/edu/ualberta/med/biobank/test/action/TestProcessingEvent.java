@@ -12,9 +12,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.ActionUtil;
-import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSpecimenInfosAction;
+import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;

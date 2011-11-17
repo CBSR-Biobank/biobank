@@ -7,13 +7,14 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
 public class StudyGetAliquotedSpecimensAction implements
-    Action<StudyGetAliquotedSpecimensResult> {
+    Action<ListResult<AliquotedSpecimen>> {
     private static final long serialVersionUID = 1L;
 
     // @formatter:off
@@ -41,7 +42,7 @@ public class StudyGetAliquotedSpecimensAction implements
     }
 
     @Override
-    public StudyGetAliquotedSpecimensResult run(User user, Session session)
+    public ListResult<AliquotedSpecimen> run(User user, Session session)
         throws ActionException {
         ArrayList<AliquotedSpecimen> result =
             new ArrayList<AliquotedSpecimen>();
@@ -55,7 +56,7 @@ public class StudyGetAliquotedSpecimensAction implements
             result.addAll(aliquotedSpecimens);
         }
 
-        return new StudyGetAliquotedSpecimensResult(result);
+        return new ListResult<AliquotedSpecimen>(result);
     }
 
 }

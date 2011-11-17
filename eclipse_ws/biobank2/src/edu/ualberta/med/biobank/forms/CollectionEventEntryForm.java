@@ -22,13 +22,13 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.CommentInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
+import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientNextVisitNumberAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetInfosAction;
@@ -175,25 +175,19 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         Composite client = createSectionWithClient(Messages.Comments_title);
         GridLayout gl = new GridLayout(2, false);
 
-        ArrayList<Comment> comments = new ArrayList<Comment>();
-        if (ceventInfo.cevent != null &&
-            ceventInfo.cevent.getCommentCollection() != null) {
-            comments.addAll(ceventInfo.cevent.getCommentCollection());
-        }
-
         client.setLayout(gl);
         commentEntryTable =
             new CommentCollectionInfoTable(client,
                 ModelWrapper.wrapModelCollection(
-                    SessionManager.getAppService(), comments,
-                    CommentWrapper.class));
+                    SessionManager.getAppService(),
+                    ceventCopy.getCommentCollection(), CommentWrapper.class));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_button_add);
+            Messages.Comments_add);
 
     }
 

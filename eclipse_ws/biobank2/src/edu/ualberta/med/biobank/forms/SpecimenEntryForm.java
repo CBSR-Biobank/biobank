@@ -317,9 +317,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        commentText =
-            (BgcBaseText) createLabelledWidget(client, BgcBaseText.class,
-                SWT.MULTI, Messages.Comments_button_add);
+        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_add);
 
     }
 
