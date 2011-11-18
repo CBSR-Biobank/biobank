@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -242,7 +243,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         ActivityStatusWrapper status = info.specimen.getActivityStatus();
         info.activityStatus = (status == null) ? "" : status.getName(); //$NON-NLS-1$
         List<CommentWrapper> comments =
-            info.specimen.getCommentCollection(false);
+            info.specimen.getCommentCollection(false);      
         info.comment =
             (comments == null || comments.size() == 0) ? Messages.SpecimenInfoTable_no_first_letter
                 : Messages.SpecimenInfoTable_yes_first_letter;
