@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import com.google.gwt.user.client.ui.HasValue;
@@ -195,8 +197,9 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
     public void onCreate(BaseForm baseForm) {
         super.onCreate(baseForm);
         this.baseForm = baseForm;
-
         baseForm.setTitle(Messages.StudyEntryForm_main_title);
+        editor.setPartName(NLS.bind(Messages.StudyEntryForm_title_edit,
+            nameShort.getValue()));
 
         InputTable table = new InputTable(baseForm.getPage());
 
@@ -264,9 +267,8 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
     }
 
     private void createAliquotedSpecimensSection() {
-        Section section =
-            baseForm
-                .createSection(Messages.StudyEntryForm_aliquoted_specimens_title);
+        Section section = baseForm.createSection(
+            Messages.StudyEntryForm_aliquoted_specimens_title);
         final AliquotedSpecimenEntryInfoTable aliquotedSpecimenTable =
             new AliquotedSpecimenEntryInfoTable(section, studyWrapper);
         section.setClient(aliquotedSpecimenTable);
@@ -283,8 +285,12 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
     }
 
     private void createStudyEventAttrSection() {
-        Section section =
-            baseForm.createSection(Messages.StudyEntryForm_visit_info_title);
+        Composite client = baseForm.createSectionWithClient(
+            Messages.StudyEntryForm_visit_info_title);
+        baseForm.getToolkit().createLabel(client,
+            "Select the information that is collected from a patient during a "
+                + "collection event.");
+
         // TODO this needs implementation
     }
 

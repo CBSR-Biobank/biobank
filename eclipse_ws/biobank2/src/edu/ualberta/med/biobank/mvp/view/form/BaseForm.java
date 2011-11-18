@@ -75,6 +75,10 @@ public class BaseForm {
         scrolledForm.setMessage(message, newType);
     }
 
+    public FormToolkit getToolkit() {
+        return toolkit;
+    }
+
     public Composite getPage() {
         return page;
     }

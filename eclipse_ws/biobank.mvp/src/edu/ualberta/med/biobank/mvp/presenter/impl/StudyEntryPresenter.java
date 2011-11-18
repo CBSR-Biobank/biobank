@@ -15,15 +15,19 @@ import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidato
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
+import edu.ualberta.med.biobank.mvp.event.model.study.StudyChangedEvent;
+import edu.ualberta.med.biobank.mvp.event.presenter.study.StudyViewPresenterShowEvent;
 import edu.ualberta.med.biobank.mvp.model.AbstractModel;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
@@ -47,6 +51,8 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         HasValue<Collection<SourceSpecimen>> getSourceSpecimens();
 
         HasValue<Collection<AliquotedSpecimen>> getAliquotedSpecimens();
+
+        // TODO: add study event attributes
     }
 
     @Inject
@@ -76,6 +82,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         binder.bind(model.clinics).to(view.getClinics());
         binder.bind(model.sourceSpcs).to(view.getSourceSpecimens());
         binder.bind(model.aliquotedSpcs).to(view.getAliquotedSpecimens());
+        // TODO: add bind to study event attibutes
         binder.bind(model.dirty()).to(view.getDirty());
 
         model.bind();
@@ -100,7 +107,36 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
 
     @Override
     protected void doSave() {
-        // TODO Auto-generated method stub
+        if (!model.validAndDirty().getValue()) return;
+
+        StudySaveAction saveStudy = new StudySaveAction();
+        saveStudy.setId(model.studyId.getValue());
+        saveStudy.setName(model.name.getValue());
+        saveStudy.setNameShort(model.nameShort.getValue());
+        saveStudy.setActivityStatusId(model.getActivityStatusId());
+        saveStudy.setContactIds(model.getContactIds());
+        saveStudy.setSourceSpcIds(model.getSourceSepcimenIds());
+        saveStudy.setAliquotSpcIds(model.getAliquotedSepcimenIds());
+        saveStudy.setStudyEventAttrIds(model.getStudyEventAttrIds());
+
+        dispatcher.exec(saveStudy, new ActionCallback<IdResult>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                eventBus.fireEvent(new ExceptionEvent(caught));
+            }
+
+            @Override
+            public void onSuccess(IdResult result) {
+                Integer studyId = result.getId();
+
+                // clear dirty state (so form can close without prompt to save)
+                model.checkpoint();
+
+                eventBus.fireEvent(new StudyChangedEvent(studyId));
+                eventBus.fireEvent(new StudyViewPresenterShowEvent(studyId));
+                close();
+            }
+        });
     }
 
     public void createStudy() {
@@ -137,8 +173,6 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
     /**
      * The {@link Model} holds the data that the {@link View} needs and supplies
      * validation.
-     * 
-     * @author jferland
      * 
      */
     public static class Model extends AbstractModel<StudyInfo> {
@@ -190,13 +224,37 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         }
 
         Set<Integer> getContactIds() {
-            Set<Integer> contactIds = new HashSet<Integer>();
+            Set<Integer> ids = new HashSet<Integer>();
             for (ClinicInfo clinicInfo : clinics) {
                 for (Contact c : clinicInfo.getContacts()) {
-                    contactIds.add(c.getId());
+                    ids.add(c.getId());
                 }
             }
-            return contactIds;
+            return ids;
+        }
+
+        Set<Integer> getSourceSepcimenIds() {
+            Set<Integer> ids = new HashSet<Integer>();
+            for (SourceSpecimen ss : sourceSpcs) {
+                ids.add(ss.getId());
+            }
+            return ids;
+        }
+
+        Set<Integer> getAliquotedSepcimenIds() {
+            Set<Integer> ids = new HashSet<Integer>();
+            for (AliquotedSpecimen as : aliquotedSpcs) {
+                ids.add(as.getId());
+            }
+            return ids;
+        }
+
+        Set<Integer> getStudyEventAttrIds() {
+            Set<Integer> ids = new HashSet<Integer>();
+            for (StudyEventAttr attr : studyEventAttrs) {
+                ids.add(attr.getId());
+            }
+            return ids;
         }
 
         @Override
