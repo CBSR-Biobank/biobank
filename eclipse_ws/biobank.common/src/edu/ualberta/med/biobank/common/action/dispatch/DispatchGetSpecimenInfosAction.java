@@ -23,29 +23,18 @@ public class DispatchGetSpecimenInfosAction implements
     Action<ListResult<DispatchSpecimen>> {
 
     @SuppressWarnings("nls")
-    public static final String DISPATCH_SPECIMEN_INFO_HQL =
-        "select dspec from "
-            + DispatchSpecimen.class.getName()
-            + " as dspec inner join fetch dspec."
-            + DispatchSpecimenPeer.SPECIMEN.getName()
-            + " as spec inner join fetch spec."
-            + SpecimenPeer.SPECIMEN_TYPE.getName()
-            + " inner join fetch spec."
-            + SpecimenPeer.ACTIVITY_STATUS.getName()
-            + " inner join fetch spec."
-            + SpecimenPeer.COLLECTION_EVENT.getName()
-            + " cevent inner join fetch spec."
-            + SpecimenPeer.CURRENT_CENTER.getName()
-            + " as center"
-            + " inner join fetch cevent."
-            + CollectionEventPeer.PATIENT.getName()
-            + " as patient inner join fetch patient."
-            + PatientPeer.STUDY.getName()
-            + " study left join fetch spec."
-            + SpecimenPeer.COMMENT_COLLECTION.getName()
-            + " where dspec."
-            + Property.concatNames(DispatchSpecimenPeer.DISPATCH,
-                DispatchPeer.ID) + "=?";
+    public static final String DISPATCH_SPECIMEN_INFO_HQL = "select dspec from "
+        + DispatchSpecimen.class.getName() + " as dspec inner join fetch dspec."
+        + DispatchSpecimenPeer.SPECIMEN.getName() + " as spec inner join fetch spec."
+        + SpecimenPeer.SPECIMEN_TYPE.getName()  + " inner join fetch spec."
+        + SpecimenPeer.ACTIVITY_STATUS.getName() + " inner join fetch spec."
+        + SpecimenPeer.COLLECTION_EVENT.getName() + " cevent inner join fetch spec."
+        + SpecimenPeer.CURRENT_CENTER.getName() + " as center"
+        + " inner join fetch cevent." + CollectionEventPeer.PATIENT.getName()
+        + " as patient inner join fetch patient." + PatientPeer.STUDY.getName()
+        + " study left join fetch spec."
+        + SpecimenPeer.COMMENT_COLLECTION.getName()
+        + " where dspec." + Property.concatNames(DispatchSpecimenPeer.DISPATCH, DispatchPeer.ID) +"=?";
 
     private static final long serialVersionUID = 1L;
     private Integer oiId;

@@ -459,7 +459,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayout(gl);
         commentEntryTable =
             new CommentCollectionInfoTable(client,
-                shipmentInfo.getCommentCollection(false));
+                originInfo.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
@@ -487,8 +487,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         Set<Integer> removedSpecimenIds = WrapperUtil.getCollectionIds(specimenEntryWidget.getRemovedSpecimens());
         
         ShippingMethodInfo methodInfo = new ShippingMethodInfo(shipmentInfo.getShippingMethod().getId());
-        OriginInfoSaveInfo oiInfo = new OriginInfoSaveInfo(originInfo.getId(), originInfo.getReceiverSite().getId(), originInfo.getCenter().getId(), addedSpecimenIds, removedSpecimenIds);
-        ShipmentInfoSaveInfo siInfo = new ShipmentInfoSaveInfo(shipmentInfo.getId(), shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(), shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(), comment.getMessage(), methodInfo);
+        OriginInfoSaveInfo oiInfo = new OriginInfoSaveInfo(originInfo.getId(), originInfo.getReceiverSite().getId(), originInfo.getCenter().getId(), comment.getMessage(), addedSpecimenIds, removedSpecimenIds);
+        ShipmentInfoSaveInfo siInfo = new ShipmentInfoSaveInfo(shipmentInfo.getId(), shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(), shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),  methodInfo);
         OriginInfoSaveAction save = new OriginInfoSaveAction(oiInfo, siInfo);
         SessionManager.getAppService().doAction(save);
 
