@@ -50,7 +50,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.PvAttrCustom;
+import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -76,7 +76,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private CollectionEvent ceventCopy;
 
-    private static class FormPvCustomInfo extends PvAttrCustom {
+    private static class FormPvCustomInfo extends EventAttrCustom {
         private Control control;
     }
 
