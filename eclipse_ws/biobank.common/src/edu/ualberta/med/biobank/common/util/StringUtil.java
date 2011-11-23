@@ -26,4 +26,22 @@ public class StringUtil {
         }
         return builder.toString();
     }
+
+    /**
+     * @param unit to repeat
+     * @param n number of times to repeat
+     * @param delimiter to separate unit-s
+     * @return a string of {@code unit} repeated {@code n} times, with a
+     *         {@code delimiter} in between each {@code unit}.
+     */
+    public static String repeat(String unit, int n, String delimiter) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i <= n; i++) {
+            sb.append(unit);
+            if (i < n) {
+                sb.append(delimiter);
+            }
+        }
+        return sb.toString();
+    }
 }
