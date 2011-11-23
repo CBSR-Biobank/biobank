@@ -207,7 +207,6 @@ public class RequestEntryForm extends BiobankViewForm {
         return dispatchTable.getSelection();
     }
 
-    @SuppressWarnings("unused")
     protected void createSpecimensSelectionActions(Composite composite,
         boolean setAsFirstControl) {
         Composite addComposite = toolkit.createComposite(composite);

@@ -11,8 +11,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.info.AddressSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
+import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
+import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
 import edu.ualberta.med.biobank.common.peer.ResearchGroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -20,7 +25,9 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
+import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -40,6 +47,9 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     private ResearchGroupAdapter researchGroupAdapter;
 
     private ResearchGroupWrapper researchGroup;
+    
+    private BgcBaseText commentWidget;
+    private CommentWrapper comment;
 
     private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
         @Override
@@ -60,9 +70,12 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
         researchGroupAdapter = (ResearchGroupAdapter) adapter;
-        researchGroup = (ResearchGroupWrapper) researchGroupAdapter
-            .getModelObject();
-
+        comment = new CommentWrapper(SessionManager.getAppService());
+        
+        if (adapter.getId()!=null)
+            researchGroup = new ResearchGroupWrapper(SessionManager.getAppService(), SessionManager.getAppService().doAction(new ResearchGroupGetInfoAction(adapter.getId())).rg);
+        else 
+            researchGroup= new ResearchGroupWrapper(SessionManager.getAppService());
         String tabName;
         if (researchGroup.isNew()) {
             tabName = Messages.ResearchGroupEntryForm_title_new;
@@ -161,8 +174,8 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add);
+        commentWidget = (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_add, null, comment, "message", null);
 
     }
 
@@ -177,11 +190,18 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
     @Override
     public void saveForm() throws Exception {
-        researchGroup.persist();
-        SessionManager.updateAllSimilarNodes(researchGroupAdapter, true);
-        SessionManager.getUser().updateCurrentCenter(researchGroup);
+        AddressSaveInfo addressInfo = new AddressSaveInfo(researchGroup.getAddress().getId(), researchGroup.getAddress().getStreet1(), researchGroup.getAddress().getStreet2(), researchGroup.getAddress().getCity(), researchGroup.getAddress().getProvince(), researchGroup.getAddress().getPostalCode(), researchGroup.getAddress().getEmailAddress(),
+            researchGroup.getAddress().getPhoneNumber(), researchGroup.getAddress().getFaxNumber(), researchGroup.getAddress().getCountry(), researchGroup.getAddress().getName());
+        ResearchGroupSaveInfo info = new ResearchGroupSaveInfo(researchGroup.getId(), researchGroup.getName(), researchGroup.getNameShort(), researchGroup.getStudy().getId(), comment.getMessage(), addressInfo, researchGroup.getActivityStatus().getId());
+        ResearchGroupSaveAction save = new ResearchGroupSaveAction(info); 
+        adapter.setId(SessionManager.getAppService().doAction(save));
     }
 
+    @Override
+    protected void doAfterSave() throws Exception {
+        SessionManager.getUser().updateCurrentCenter(researchGroup);
+    }
+    
     @Override
     public String getNextOpenedFormID() {
         return ResearchGroupViewForm.ID;

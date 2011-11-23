@@ -56,7 +56,12 @@ public enum PermissionEnum {
     DISPATCH_READ(29),
     DISPATCH_CHANGE_STATE(30),
     DISPATCH_UPDATE(31),
-    DISPATCH_DELETE(32);
+    DISPATCH_DELETE(32),
+    
+    RESEARCH_GROUP_CREATE(33),
+    RESEARCH_GROUP_READ(34),
+    RESEARCH_GROUP_UPDATE(35),
+    RESEARCH_GROUP_DELETE(36);
 
     private final Integer permissionId;
 

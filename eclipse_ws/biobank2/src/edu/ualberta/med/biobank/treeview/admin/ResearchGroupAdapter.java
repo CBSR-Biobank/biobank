@@ -1,31 +1,36 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.List;
+import java.util.Map;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
+import edu.ualberta.med.biobank.common.action.info.ResearchGroupAdapterInfo;
 import edu.ualberta.med.biobank.forms.ResearchGroupEntryForm;
 import edu.ualberta.med.biobank.forms.ResearchGroupViewForm;
+import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class ResearchGroupAdapter extends AdapterBase {
+public class ResearchGroupAdapter extends AbstractNewAdapterBase {
 
-    public ResearchGroupAdapter(AdapterBase parent,
-        ResearchGroupWrapper researchGroupWrapper) {
-        super(parent, researchGroupWrapper);
+    ResearchGroupAdapterInfo rg;
+    
+    public ResearchGroupAdapter(AbstractNewAdapterBase parent,
+        ResearchGroupAdapterInfo rg) {
+        super(parent, rg.id, rg.nameShort, null, false);
+        this.rg=rg;
+    }
+    
+    public void setValue(Object value) {
+        
     }
 
     @Override
     protected String getLabelInternal() {
-        ResearchGroupWrapper wrapper = (ResearchGroupWrapper) getModelObject();
-        Assert.isNotNull(wrapper, "client is null"); //$NON-NLS-1$
-        return wrapper.getNameShort();
+        return rg.nameShort;
     }
 
     @Override
@@ -56,19 +61,8 @@ public class ResearchGroupAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(Object child) {
+    protected AbstractNewAdapterBase createChildNode(Object child) {
         return null;
-    }
-
-    @Override
-    protected List<? extends ModelWrapper<?>> getWrapperChildren()
-        throws Exception {
-        return null;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return 0;
     }
 
     @Override
@@ -84,7 +78,23 @@ public class ResearchGroupAdapter extends AdapterBase {
     @Override
     public int compareTo(AbstractAdapterBase o) {
         if (o instanceof ResearchGroupAdapter)
-            return internalCompareTo(o);
+            return rg.id.compareTo(
+                ((ResearchGroupAdapter) o).rg.id);
+        return 0;
+    }
+
+    @Override
+    protected void runDelete() throws Exception {
+        //TODO: implement delete
+    }
+
+    @Override
+    protected Map<Integer, ?> getChildrenObjects() throws Exception {
+        return null;
+    }
+
+    @Override
+    protected int getChildrenCount() throws Exception {
         return 0;
     }
 }

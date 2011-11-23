@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -27,14 +28,14 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
     private static final String ALL_RG_QRY = "from " //$NON-NLS-1$
         + ResearchGroup.class.getName();
 
-    public static List<ResearchGroupWrapper> getAllResearchGroups(
+    public static HashMap<Integer, ResearchGroup> getAllResearchGroups(
         WritableApplicationService appService) throws ApplicationException {
-        List<ResearchGroupWrapper> wrappers = new ArrayList<ResearchGroupWrapper>();
+        HashMap<Integer, ResearchGroup> rgs = new HashMap<Integer, ResearchGroup>();
         HQLCriteria c = new HQLCriteria(ALL_RG_QRY);
         List<ResearchGroup> ResearchGroups = appService.query(c);
         for (ResearchGroup researchGroup : ResearchGroups)
-            wrappers.add(new ResearchGroupWrapper(appService, researchGroup));
-        return wrappers;
+            rgs.put(researchGroup.getId(), researchGroup);
+        return rgs;
     }
 
     private static final String RG_COUNT_QRY = "select count (*) from " //$NON-NLS-1$

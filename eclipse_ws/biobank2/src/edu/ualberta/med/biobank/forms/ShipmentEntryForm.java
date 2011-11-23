@@ -17,11 +17,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentFormReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ShippingMethodInfo;
@@ -107,8 +105,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     @SuppressWarnings("unused")
     private NonEmptyStringValidator boxValidator;
-
-    private boolean isTryingAgain;
 
     protected boolean tryAgain;
 
@@ -557,7 +553,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     @Override
     protected void doAfterSave() throws Exception {
         if (tryAgain) {
-            isTryingAgain = true;
             tryAgain = false;
             confirm();
         } else {

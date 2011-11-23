@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
@@ -282,10 +281,8 @@ public class DispatchViewForm extends BiobankViewForm {
                                 try {
                                     ShipmentInfoWrapper si =
                                         dispatch.getShipmentInfo();
-                                    dispatch.reload();
                                     dispatch.setShipmentInfo(si);
-                                    dispatch.setState(DispatchState.IN_TRANSIT);
-                                    dispatch.persist();
+                                    dispatchAdapter.doSend();
                                 } catch (Exception ex) {
                                     saveErrorCatch(ex, monitor, false);
                                     return;
