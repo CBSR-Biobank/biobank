@@ -19,20 +19,20 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
-public abstract class ServerProcess implements Action<ProcessResult> {
+public abstract class ServerProcessAction implements Action<ProcessResult> {
     private static final long serialVersionUID = 1L;
 
     protected Integer currentWorkingCenterId;
     private List<String> logs;
     protected Locale locale;
-    private Map<RowColPos, Cell> cells;
+    private Map<RowColPos, CellInfo> cells;
     private boolean isRescanMode = false;
     private boolean processOneCell;
-    private Cell cell;
+    private CellInfo cell;
 
-    public ServerProcess(
+    public ServerProcessAction(
         Integer currentWorkingCenterId,
-        Map<RowColPos, Cell> cells,
+        Map<RowColPos, CellInfo> cells,
         boolean isRescanMode, Locale locale) {
         this.currentWorkingCenterId = currentWorkingCenterId;
         this.cells = cells;
@@ -42,9 +42,9 @@ public abstract class ServerProcess implements Action<ProcessResult> {
         logs = new ArrayList<String>();
     }
 
-    public ServerProcess(
+    public ServerProcessAction(
         Integer currentWorkingCenterId,
-        Cell cell,
+        CellInfo cell,
         Locale locale) {
         this.currentWorkingCenterId = currentWorkingCenterId;
         this.cell = cell;
@@ -66,11 +66,11 @@ public abstract class ServerProcess implements Action<ProcessResult> {
     }
 
     protected abstract ScanProcessResult getScanProcessResult(Session session,
-        Map<RowColPos, Cell> cells, boolean isRescanMode)
+        Map<RowColPos, CellInfo> cells, boolean isRescanMode)
         throws ActionException;
 
     protected abstract CellProcessResult getCellProcessResult(Session session,
-        Cell cell)
+        CellInfo cell)
         throws ActionException;
 
     public void appendNewLog(String log) {

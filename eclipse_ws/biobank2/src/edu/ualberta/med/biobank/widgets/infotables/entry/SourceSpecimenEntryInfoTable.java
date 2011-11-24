@@ -48,12 +48,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
      * 
      * @param parent a composite control which will be the parent of the new
      *            instance (cannot be null)
-     * @param style the style of control to construct
-     * @param sampleStorageCollection the sample storage already selected and to
-     *            be displayed in the table viewer (can be null).
-     * @param toolkit The toolkit is responsible for creating SWT controls
-     *            adapted to work in Eclipse forms. If widget is not used in a
-     *            form this parameter should be null.
+     * @param study the study the source specimens belong to.
      */
     public SourceSpecimenEntryInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null);

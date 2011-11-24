@@ -79,14 +79,17 @@ public class FormViewEditorPart extends EditorPart {
         // not sure who to set focus on
     }
 
+    @Override
     public void setPartName(String partName) {
         super.setPartName(partName);
     }
 
+    @Override
     public void setTitleImage(Image titleImage) {
         super.setTitleImage(titleImage);
     }
 
+    @Override
     public void setTitleToolTip(String titleToolTip) {
         super.setTitleToolTip(titleToolTip);
     }

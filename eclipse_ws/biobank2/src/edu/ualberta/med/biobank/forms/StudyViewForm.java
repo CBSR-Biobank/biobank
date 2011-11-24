@@ -15,7 +15,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.model.PvAttrCustom;
+import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
@@ -42,7 +42,7 @@ public class StudyViewForm extends BiobankViewForm {
     private AliquotedSpecimenInfoTable aliquotedSpecimenTable;
     private SourceSpecimenInfoTable sourceSpecimenTable;
 
-    private static class StudyPvCustomInfo extends PvAttrCustom {
+    private static class StudyPvCustomInfo extends EventAttrCustom {
         public BgcBaseText widget;
     }
 

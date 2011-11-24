@@ -29,9 +29,9 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
-import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.action.scanprocess.LinkProcess;
-import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenHierarchy;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenLinkProcessAction;
+import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenHierarchyInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
@@ -93,7 +93,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     // List of specimen types that a pallet can have.
     private List<SpecimenTypeWrapper> palletSpecimenTypes;
     // source/type hierarchy selected (use rows order)
-    private List<SpecimenHierarchy> preSelections;
+    private List<SpecimenHierarchyInfo> preSelections;
 
     @Override
     protected void init() throws Exception {
@@ -231,7 +231,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                     @Override
                     public void selectionChanged(SelectionChangedEvent event) {
                         if (typeWidget.needToSave()) {
-                            SpecimenHierarchy selection = typeWidget
+                            SpecimenHierarchyInfo selection = typeWidget
                                 .getSelection();
                             if (selection != null) {
                                 @SuppressWarnings("unchecked")
@@ -460,11 +460,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets
                     .get(row);
                 // if rescan, want to keep previous selection
-            SpecimenHierarchy previousSelection = widget.getSelection();
-            widget.setSourceSpecimens(availableSourceSpecimens);
-            widget.setResultTypes(studiesAliquotedTypes);
-            widget.setSelection(previousSelection);
-        }
+                SpecimenHierarchyInfo previousSelection = widget.getSelection();
+                widget.setSourceSpecimens(availableSourceSpecimens);
+                widget.setResultTypes(studiesAliquotedTypes);
+                widget.setSelection(previousSelection);
+            }
     }
 
     @Override
@@ -477,7 +477,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     protected void doBeforeSave() throws Exception {
         // can't access the combos in another thread, so do it now
         if (mode.isSingleMode()) {
-            SpecimenHierarchy selection = singleTypesWidget.getSelection();
+            SpecimenHierarchyInfo selection = singleTypesWidget.getSelection();
             singleSpecimen.setParentSpecimen(selection.getParentSpecimen());
             singleSpecimen
                 .setSpecimenType(selection.getAliquotedSpecimenType());
@@ -636,7 +636,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple linking: do this before any scan is really launched
      */
     private void beforeScans(boolean resetTypeRows) {
-        preSelections = new ArrayList<SpecimenHierarchy>();
+        preSelections = new ArrayList<SpecimenHierarchyInfo>();
         for (AliquotedSpecimenSelectionWidget stw : specimenTypesWidgets) {
             preSelections.add(stw.getSelection());
         }
@@ -664,16 +664,16 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected Action<ProcessResult> getCellProcessAction(Integer centerId,
-        Cell cell, Locale locale) {
-        return new LinkProcess(centerId, linkFormPatientManagement
+        CellInfo cell, Locale locale) {
+        return new SpecimenLinkProcessAction(centerId, linkFormPatientManagement
             .getCurrentPatient().getStudy().getId(), cell, locale);
     }
 
     @Override
     protected Action<ProcessResult> getPalletProcessAction(
-        Integer centerId, Map<RowColPos, Cell> cells, boolean isRescanMode,
+        Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
         Locale locale) {
-        return new LinkProcess(centerId, linkFormPatientManagement
+        return new SpecimenLinkProcessAction(centerId, linkFormPatientManagement
             .getCurrentPatient().getStudy().getId(), cells, isRescanMode,
             locale);
     }
@@ -731,7 +731,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             specimenTypesWidgets.get(rcp.getRow()).resetValues(!isRescanMode(),
                 true, true);
         }
-        SpecimenHierarchy selection = preSelections.get(cell.getRow());
+        SpecimenHierarchyInfo selection = preSelections.get(cell.getRow());
         if (selection != null)
             setHierarchyToCell(cell, selection);
         if (PalletCell.hasValue(cell)) {
@@ -760,7 +760,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     /**
      * Multiple linking: apply a source and type to a specific cell.
      */
-    private void setHierarchyToCell(PalletCell cell, SpecimenHierarchy selection) {
+    private void setHierarchyToCell(PalletCell cell, SpecimenHierarchyInfo selection) {
         cell.setSourceSpecimen(selection.getParentSpecimen());
         cell.setSpecimenType(selection.getAliquotedSpecimenType());
         if (cell.getStatus() != UICellStatus.ERROR)

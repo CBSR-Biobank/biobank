@@ -120,7 +120,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         client.setLayout(gl);
         commentEntryTable =
             new CommentCollectionInfoTable(client,
-                    originInfo.getShipmentInfo().getCommentCollection(false));
+                    originInfo.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
@@ -156,7 +156,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         setFormText();
         setShipmentValues();
         
-        commentEntryTable.setList(originInfo.getShipmentInfo().getCommentCollection(false));
+        commentEntryTable.setList(originInfo.getCommentCollection(false));
         specimenWidget.setSpecimens(originInfo.getSpecimenCollection());
     }
 

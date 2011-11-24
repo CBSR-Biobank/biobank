@@ -3,26 +3,26 @@ package edu.ualberta.med.biobank.common.action.scanprocess.result;
 import java.io.Serializable;
 import java.util.Map;
 
-import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.action.scanprocess.CellStatus;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 
 public class ScanProcessResult extends ProcessResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Map<RowColPos, Cell> cells;
+    private Map<RowColPos, CellInfo> cells;
 
     public ScanProcessResult() {
         super();
     }
 
-    public void setResult(Map<RowColPos, Cell> cells, CellStatus status) {
+    public void setResult(Map<RowColPos, CellInfo> cells, CellInfoStatus status) {
         setProcessStatus(status);
         this.cells = cells;
     }
 
-    public Map<RowColPos, Cell> getCells() {
+    public Map<RowColPos, CellInfo> getCells() {
         return cells;
     }
 

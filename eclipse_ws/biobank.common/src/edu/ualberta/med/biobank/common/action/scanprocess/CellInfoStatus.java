@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.action.scanprocess;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 
-public enum CellStatus implements NotAProxy {
+public enum CellInfoStatus implements NotAProxy {
     NOT_INITIALIZED,
     INITIALIZED,
     FULL,
@@ -21,10 +21,10 @@ public enum CellStatus implements NotAProxy {
     IN_SHIPMENT_RECEIVED,
     EXTRA;
 
-    private CellStatus() {
+    private CellInfoStatus() {
     }
 
-    public CellStatus mergeWith(CellStatus newStatus) {
+    public CellInfoStatus mergeWith(CellInfoStatus newStatus) {
         switch (this) {
         case EMPTY:
             return newStatus;

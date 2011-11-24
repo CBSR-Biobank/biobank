@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.action.scanprocess;
 
 import java.io.Serializable;
 
-public class Cell implements Serializable {
+public class CellInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -12,7 +12,7 @@ public class Cell implements Serializable {
 
     private String value;
 
-    private CellStatus status;
+    private CellInfoStatus status;
 
     private String information;
 
@@ -22,10 +22,10 @@ public class Cell implements Serializable {
 
     private Integer specimenId;
 
-    public Cell() {
+    public CellInfo() {
     }
 
-    public Cell(int row, int col, String value, CellStatus status) {
+    public CellInfo(int row, int col, String value, CellInfoStatus status) {
         this();
         this.row = row;
         this.col = col;
@@ -33,11 +33,11 @@ public class Cell implements Serializable {
         this.status = status;
     }
 
-    public CellStatus getStatus() {
+    public CellInfoStatus getStatus() {
         return status;
     }
 
-    public void setStatus(CellStatus status) {
+    public void setStatus(CellInfoStatus status) {
         this.status = status;
     }
 
@@ -73,7 +73,7 @@ public class Cell implements Serializable {
         this.value = value;
     }
 
-    public static boolean hasValue(Cell cell) {
+    public static boolean hasValue(CellInfo cell) {
         return cell != null && cell.getValue() != null;
     }
 

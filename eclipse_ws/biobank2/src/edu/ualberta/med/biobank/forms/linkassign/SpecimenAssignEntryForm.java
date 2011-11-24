@@ -37,9 +37,9 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction.ContainerInfo;
-import edu.ualberta.med.biobank.common.action.scanprocess.AssignProcess;
-import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.action.scanprocess.data.AssignProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenAssignProcessAction;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.AssignProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenAssignResInfo;
@@ -1332,19 +1332,19 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected Action<ProcessResult> getCellProcessAction(Integer centerId,
-        Cell cell, Locale locale) {
-        return new AssignProcess(getProcessData(), centerId, cell, locale);
+        CellInfo cell, Locale locale) {
+        return new SpecimenAssignProcessAction(getProcessData(), centerId, cell, locale);
     }
 
     @Override
     protected Action<ProcessResult> getPalletProcessAction(Integer centerId,
-        Map<RowColPos, Cell> cells, boolean isRescanMode, Locale locale) {
-        return new AssignProcess(getProcessData(), centerId, cells,
+        Map<RowColPos, CellInfo> cells, boolean isRescanMode, Locale locale) {
+        return new SpecimenAssignProcessAction(getProcessData(), centerId, cells,
             isRescanMode, locale);
     }
 
-    protected AssignProcessData getProcessData() {
-        return new AssignProcessData(
+    protected AssignProcessInfo getProcessData() {
+        return new AssignProcessInfo(
             currentMultipleContainer.getWrappedObject());
     }
 }

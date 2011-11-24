@@ -22,7 +22,8 @@ public class StudyGetAliquotedSpecimensAction implements
     private static final String SELECT_ALIQUOTED_SPCS_HQL = 
     "SELECT srcspc"
     + " FROM " + AliquotedSpecimen.class.getName() + " srcspc"
-    + " INNER JOIN FETCH srcspc.specimenType specimenType"
+    + " INNER JOIN FETCH srcspc.specimenType"
+    + " INNER JOIN FETCH srcspc.activityStatus"
     + " WHERE srcspc.study.id = ?";
     // @formatter:on
 

@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenHierarchy;
+import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenHierarchyInfo;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
@@ -380,14 +380,14 @@ public class AliquotedSpecimenSelectionWidget {
     /**
      * @return an array of [SpecimenLink (source), SpecimenType (result)]
      */
-    public SpecimenHierarchy getSelection() {
+    public SpecimenHierarchyInfo getSelection() {
         if (getSourceSelection() != null && getResultTypeSelection() != null)
-            return new SpecimenHierarchy(getSourceSelection(),
+            return new SpecimenHierarchyInfo(getSourceSelection(),
                 getResultTypeSelection());
         return null;
     }
 
-    public void setSelection(SpecimenHierarchy previousSelection) {
+    public void setSelection(SpecimenHierarchyInfo previousSelection) {
         if (previousSelection != null) {
             cvSource.setSelection(new StructuredSelection(previousSelection
                 .getParentSpecimen()));

@@ -25,14 +25,14 @@ import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.dialogs.ListAddDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
-import edu.ualberta.med.biobank.model.PvAttrCustom;
+import edu.ualberta.med.biobank.model.EventAttrCustom;
 
-public class PvInfoWidget extends BgcBaseWidget {
+public class StudyEventAttrWidget extends BgcBaseWidget {
     private Button checkButton;
     private Button addButton;
     private Button removeButton;
     private List itemList;
-    boolean hasListValues;
+    private boolean hasListValues;
     private LabelDialogInfo labelDlgInfo;
 
     private static class LabelDialogInfo {
@@ -47,40 +47,43 @@ public class PvInfoWidget extends BgcBaseWidget {
         }
     };
 
-    private static Map<String, LabelDialogInfo> LABEL_DLG_INFO = new HashMap<String, LabelDialogInfo>() {
-        private static final long serialVersionUID = 1L;
-        {
-            put(Messages.PvInfoWidget_patient_type_label, new LabelDialogInfo(
-                Messages.PvInfoWidget_patient_type_title,
-                Messages.PvInfoWidget_patient_type_prompt,
-                Messages.PvInfoWidget_patient_type_help));
-            put(Messages.PvInfoWidget_visit_type_label, new LabelDialogInfo(
-                Messages.PvInfoWidget_visit_type_title,
-                Messages.PvInfoWidget_visit_type_prompt,
-                Messages.PvInfoWidget_visit_type_help));
-            put(Messages.PvInfoWidget_consent_label, new LabelDialogInfo(
-                Messages.PvInfoWidget_consent_title,
-                Messages.PvInfoWidget_consent_prompt,
-                Messages.PvInfoWidget_consent_help));
-        }
-    };
+    private static Map<String, LabelDialogInfo> LABEL_DLG_INFO =
+        new HashMap<String, LabelDialogInfo>() {
+            private static final long serialVersionUID = 1L;
+            {
+                put(Messages.PvInfoWidget_patient_type_label,
+                    new LabelDialogInfo(
+                        Messages.PvInfoWidget_patient_type_title,
+                        Messages.PvInfoWidget_patient_type_prompt,
+                        Messages.PvInfoWidget_patient_type_help));
+                put(Messages.PvInfoWidget_visit_type_label,
+                    new LabelDialogInfo(
+                        Messages.PvInfoWidget_visit_type_title,
+                        Messages.PvInfoWidget_visit_type_prompt,
+                        Messages.PvInfoWidget_visit_type_help));
+                put(Messages.PvInfoWidget_consent_label, new LabelDialogInfo(
+                    Messages.PvInfoWidget_consent_title,
+                    Messages.PvInfoWidget_consent_prompt,
+                    Messages.PvInfoWidget_consent_help));
+            }
+        };
 
-    public PvInfoWidget(Composite parent, int style,
-        final PvAttrCustom pvCustomInfo, boolean selected) {
+    public StudyEventAttrWidget(Composite parent, int style,
+        final EventAttrCustom customInfo, boolean selected) {
         super(parent, style);
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        hasListValues = pvCustomInfo.getType() == EventAttrTypeEnum.SELECT_SINGLE
-            || pvCustomInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE;
-        selected |= (pvCustomInfo.getAllowedValues() != null);
+        hasListValues = customInfo.getType() == EventAttrTypeEnum.SELECT_SINGLE
+            || customInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE;
+        selected |= (customInfo.getAllowedValues() != null);
 
         if (hasListValues) {
-            labelDlgInfo = LABEL_DLG_INFO.get(pvCustomInfo.getLabel());
+            labelDlgInfo = LABEL_DLG_INFO.get(customInfo.getLabel());
             Assert.isNotNull(labelDlgInfo, "no dialog info for label " //$NON-NLS-1$
-                + pvCustomInfo.getLabel());
+                + customInfo.getLabel());
 
-            createCheckButton(pvCustomInfo, selected);
+            createCheckButton(customInfo, selected);
 
             // this composite holds the list and the "Add" and "Remove" buttons
             Composite comp = new Composite(this, SWT.NONE);
@@ -103,15 +106,16 @@ public class PvInfoWidget extends BgcBaseWidget {
                 public void widgetSelected(SelectionEvent e) {
                     notifyListeners();
                     Assert.isNotNull(labelDlgInfo, "no dialog info for label " //$NON-NLS-1$
-                        + pvCustomInfo.getLabel());
+                        + customInfo.getLabel());
 
                     ListAddDialog dlg = new ListAddDialog(PlatformUI
                         .getWorkbench().getActiveWorkbenchWindow().getShell(),
                         labelDlgInfo.title, labelDlgInfo.prompt,
                         labelDlgInfo.helpText);
                     if (dlg.open() == Dialog.OK) {
-                        java.util.List<String> currentItems = new ArrayList<String>(
-                            Arrays.asList(itemList.getItems()));
+                        java.util.List<String> currentItems =
+                            new ArrayList<String>(
+                                Arrays.asList(itemList.getItems()));
                         java.util.List<String> newItems = Arrays.asList(dlg
                             .getResult());
 
@@ -155,8 +159,8 @@ public class PvInfoWidget extends BgcBaseWidget {
 
             itemList = new List(comp, SWT.BORDER | SWT.V_SCROLL);
             itemList.setLayoutData(new GridData(GridData.FILL_BOTH));
-            if (pvCustomInfo.getAllowedValues() != null) {
-                for (String item : pvCustomInfo.getAllowedValues()) {
+            if (customInfo.getAllowedValues() != null) {
+                for (String item : customInfo.getAllowedValues()) {
                     itemList.add(item);
                 }
             }
@@ -255,11 +259,11 @@ public class PvInfoWidget extends BgcBaseWidget {
 
             itemList.setMenu(m);
         } else {
-            createCheckButton(pvCustomInfo, selected);
+            createCheckButton(customInfo, selected);
         }
     }
 
-    private void createCheckButton(final PvAttrCustom pvCustomInfo,
+    private void createCheckButton(final EventAttrCustom pvCustomInfo,
         boolean selected) {
         checkButton = new Button(this, SWT.CHECK);
         checkButton.setText(pvCustomInfo.getLabel());
@@ -285,7 +289,7 @@ public class PvInfoWidget extends BgcBaseWidget {
     public String getValues() {
         if (hasListValues) {
             return StringUtils.join(itemList.getItems(),
-                PvAttrCustom.VALUE_MULTIPLE_SEPARATOR);
+                EventAttrCustom.VALUE_MULTIPLE_SEPARATOR);
         }
         return null;
     }
@@ -294,7 +298,7 @@ public class PvInfoWidget extends BgcBaseWidget {
         checkButton.setSelection(selected);
     }
 
-    public void reloadAllowedValues(PvAttrCustom pvCustomInfo) {
+    public void reloadAllowedValues(EventAttrCustom pvCustomInfo) {
         if (itemList != null) {
             itemList.removeAll();
             if (pvCustomInfo.getAllowedValues() != null) {
