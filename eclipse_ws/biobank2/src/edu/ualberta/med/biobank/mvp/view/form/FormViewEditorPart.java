@@ -10,7 +10,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.mvp.event.EmptyClickEvent;
-import edu.ualberta.med.biobank.mvp.user.ui.IButton;
+import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 import edu.ualberta.med.biobank.mvp.view.IFormView;
 import edu.ualberta.med.biobank.mvp.view.ISaveableView;
 
@@ -32,7 +32,7 @@ public class FormViewEditorPart extends EditorPart {
         monitor.setCanceled(true);
 
         if (formView instanceof ISaveableView) {
-            IButton save = ((ISaveableView) formView).getSave();
+            HasButton save = ((ISaveableView) formView).getSave();
             save.fireEvent(new EmptyClickEvent());
         }
     }

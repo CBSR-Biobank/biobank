@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.mvp.view.form;
 
 import java.util.Collection;
 
-import com.google.gwt.user.client.ui.HasValue;
 
 import edu.ualberta.med.biobank.common.action.info.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
@@ -12,6 +11,7 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteViewPresenter;
+import edu.ualberta.med.biobank.mvp.user.ui.HasField;
 import edu.ualberta.med.biobank.mvp.view.item.LongTextItem;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
 import edu.ualberta.med.biobank.mvp.view.item.TranslatedItem.Translator;
@@ -81,76 +81,76 @@ public class SiteViewFormView extends AbstractViewFormView
     }
 
     @Override
-    public HasValue<String> getName() {
+    public HasField<String> getName() {
         return name;
     }
 
     @Override
-    public HasValue<String> getNameShort() {
+    public HasField<String> getNameShort() {
         return nameShort;
     }
 
     @Override
-    public HasValue<Long> getStudyCount() {
+    public HasField<Long> getStudyCount() {
         return studyCount;
     }
 
     @Override
-    public HasValue<Long> getContainerTypeCount() {
+    public HasField<Long> getContainerTypeCount() {
         return containerTypeCount;
     }
 
     @Override
-    public HasValue<Long> getTopContainerCount() {
+    public HasField<Long> getTopContainerCount() {
         return topContainerCount;
     }
 
     @Override
-    public HasValue<Long> getPatientCount() {
+    public HasField<Long> getPatientCount() {
         return patientCount;
     }
 
     @Override
-    public HasValue<Long> getCollectionEventCount() {
+    public HasField<Long> getCollectionEventCount() {
         return collectionEventCount;
     }
 
     @Override
-    public HasValue<Long> getAliquotedSpecimenCount() {
+    public HasField<Long> getAliquotedSpecimenCount() {
         return aliquotedSpecimenCount;
     }
 
     @Override
-    public HasValue<ActivityStatus> getActivityStatus() {
+    public HasField<ActivityStatus> getActivityStatus() {
         return activityStatus;
     }
 
     @Override
-    public HasValue<Address> getAddress() {
+    public HasField<Address> getAddress() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public HasValue<Collection<Comment>> getCommentCollection() {
+    public HasField<Collection<Comment>> getCommentCollection() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public HasValue<Collection<StudyInfo>> getStudyCollection() {
+    public HasField<Collection<StudyInfo>> getStudyCollection() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public HasValue<Collection<ContainerTypeInfo>> getContainerTypeCollection() {
+    public HasField<Collection<ContainerTypeInfo>> getContainerTypeCollection() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public HasValue<Collection<Container>> getTopContainerCollection() {
+    public HasField<Collection<Container>> getTopContainerCollection() {
         // TODO Auto-generated method stub
         return null;
     }

@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.pietschy.gwt.pectin.client.form.FieldModel;
@@ -30,6 +29,7 @@ import edu.ualberta.med.biobank.mvp.event.model.study.StudyChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.study.StudyViewPresenterShowEvent;
 import edu.ualberta.med.biobank.mvp.model.AbstractModel;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter.View;
+import edu.ualberta.med.biobank.mvp.user.ui.HasField;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
@@ -42,15 +42,15 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
     public interface View extends IEntryFormView, ValidationDisplay {
         void setActivityStatusComboView(IView view);
 
-        HasValue<String> getName();
+        HasField<String> getName();
 
-        HasValue<String> getNameShort();
+        HasField<String> getNameShort();
 
-        HasValue<Collection<ClinicInfo>> getClinics();
+        HasField<Collection<ClinicInfo>> getClinics();
 
-        HasValue<Collection<SourceSpecimen>> getSourceSpecimens();
+        HasField<Collection<SourceSpecimen>> getSourceSpecimens();
 
-        HasValue<Collection<AliquotedSpecimen>> getAliquotedSpecimens();
+        HasField<Collection<AliquotedSpecimen>> getAliquotedSpecimens();
 
         // TODO: add study event attributes
     }

@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -27,7 +26,8 @@ import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
-import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValue;
+import edu.ualberta.med.biobank.mvp.user.ui.HasField;
+import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedField;
 import edu.ualberta.med.biobank.test.TestingDispatcher;
 
 public class TestSiteEntryPresenter {
@@ -78,15 +78,15 @@ public class TestSiteEntryPresenter {
         SiteEntryPresenter presenter = injector
             .getInstance(SiteEntryPresenter.class);
 
-        HasValue<String> nameHs = Mockito.mock(HasValue.class);
-        HasValue<String> nameShortHs = Mockito.mock(HasValue.class);
-        HasValue<List<Comment>> commentsHs = Mockito.mock(HasValue.class);
-        HasValue<Collection<StudyInfo>> studiesHs = Mockito
-            .mock(HasValue.class);
+        HasField<String> nameHs = Mockito.mock(HasField.class);
+        HasField<String> nameShortHs = Mockito.mock(HasField.class);
+        HasField<List<Comment>> commentsHs = Mockito.mock(HasField.class);
+        HasField<Collection<StudyInfo>> studiesHs = Mockito
+            .mock(HasField.class);
 
-        HasValue<String> nullString = Mockito.mock(HasValue.class);
-        HasSelectedValue<ActivityStatus> astatus = Mockito
-            .mock(HasSelectedValue.class);
+        HasField<String> nullString = Mockito.mock(HasField.class);
+        HasSelectedField<ActivityStatus> astatus = Mockito
+            .mock(HasSelectedField.class);
 
         List<Comment> comments = new ArrayList<Comment>();
 

@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import java.util.Collection;
 
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -19,6 +18,7 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteViewPresenter.View;
+import edu.ualberta.med.biobank.mvp.user.ui.HasField;
 import edu.ualberta.med.biobank.mvp.view.IViewFormView;
 
 public class SiteViewPresenter extends AbstractViewFormPresenter<View> {
@@ -26,33 +26,33 @@ public class SiteViewPresenter extends AbstractViewFormPresenter<View> {
     private Integer siteId;
 
     public interface View extends IViewFormView {
-        HasValue<String> getName();
+        HasField<String> getName();
 
-        HasValue<String> getNameShort();
+        HasField<String> getNameShort();
 
-        HasValue<Long> getStudyCount();
+        HasField<Long> getStudyCount();
 
-        HasValue<Long> getContainerTypeCount();
+        HasField<Long> getContainerTypeCount();
 
-        HasValue<Long> getTopContainerCount();
+        HasField<Long> getTopContainerCount();
 
-        HasValue<Long> getPatientCount();
+        HasField<Long> getPatientCount();
 
-        HasValue<Long> getCollectionEventCount();
+        HasField<Long> getCollectionEventCount();
 
-        HasValue<Long> getAliquotedSpecimenCount();
+        HasField<Long> getAliquotedSpecimenCount();
 
-        HasValue<ActivityStatus> getActivityStatus();
+        HasField<ActivityStatus> getActivityStatus();
 
-        HasValue<Address> getAddress();
+        HasField<Address> getAddress();
 
-        HasValue<Collection<Comment>> getCommentCollection();
+        HasField<Collection<Comment>> getCommentCollection();
 
-        HasValue<Collection<StudyInfo>> getStudyCollection();
+        HasField<Collection<StudyInfo>> getStudyCollection();
 
-        HasValue<Collection<ContainerTypeInfo>> getContainerTypeCollection();
+        HasField<Collection<ContainerTypeInfo>> getContainerTypeCollection();
 
-        HasValue<Collection<Container>> getTopContainerCollection();
+        HasField<Collection<Container>> getTopContainerCollection();
     }
 
     @Inject

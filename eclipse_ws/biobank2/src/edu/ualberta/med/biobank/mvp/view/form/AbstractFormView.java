@@ -4,11 +4,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.pietschy.gwt.pectin.client.value.ValueHolder;
 import com.pietschy.gwt.pectin.client.value.ValueTarget;
 
-import edu.ualberta.med.biobank.mvp.user.ui.IButton;
+import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 import edu.ualberta.med.biobank.mvp.view.AbstractView;
 import edu.ualberta.med.biobank.mvp.view.IFormView;
 import edu.ualberta.med.biobank.mvp.view.form.ToolBarButtonManager.ButtonType;
@@ -38,12 +37,12 @@ public abstract class AbstractFormView extends AbstractView implements
     }
 
     @Override
-    public HasClickHandlers getClose() {
+    public HasButton getClose() {
         return close;
     }
 
     @Override
-    public HasClickHandlers getReload() {
+    public HasButton getReload() {
         return reload;
     }
 
@@ -71,8 +70,8 @@ public abstract class AbstractFormView extends AbstractView implements
     protected abstract void onCreate(BaseForm baseForm);
 
     private void initActions() {
-        IButton closeButton = form.getToolbar().get(ButtonType.CLOSE);
-        IButton reloadButton = form.getToolbar().get(ButtonType.RELOAD);
+        HasButton closeButton = form.getToolbar().get(ButtonType.CLOSE);
+        HasButton reloadButton = form.getToolbar().get(ButtonType.RELOAD);
 
         close.setDelegate(closeButton);
         reload.setDelegate(reloadButton);

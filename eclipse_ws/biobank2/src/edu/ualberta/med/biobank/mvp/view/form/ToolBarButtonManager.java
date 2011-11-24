@@ -18,7 +18,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.mvp.event.EmptyClickEvent;
-import edu.ualberta.med.biobank.mvp.user.ui.IButton;
+import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 
 public class ToolBarButtonManager {
     private final Map<ButtonType, ButtonImpl> actions =
@@ -53,13 +53,13 @@ public class ToolBarButtonManager {
     }
 
     /**
-     * Returns an {@link IButton} based on the given {@link ButtonType},
+     * Returns an {@link HasButton} based on the given {@link ButtonType},
      * creating it if necessary.
      * 
      * @param buttonType
      * @return
      */
-    public IButton get(ButtonType buttonType) {
+    public HasButton get(ButtonType buttonType) {
         ButtonImpl button = actions.get(buttonType);
         if (button == null) {
             button = new ButtonImpl(buttonType);
@@ -70,7 +70,7 @@ public class ToolBarButtonManager {
         return button;
     }
 
-    private class ButtonImpl implements IButton {
+    private class ButtonImpl implements HasButton {
         private final HandlerManager handlerManager = new HandlerManager(this);
         private final ActionContributionItem contributionItem;
 
