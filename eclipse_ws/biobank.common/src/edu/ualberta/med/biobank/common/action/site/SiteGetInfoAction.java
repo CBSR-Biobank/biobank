@@ -65,11 +65,14 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
             builder.setAliquotedSpecimenCount((Long) row[3]);
 
             builder.setTopContainers(
-                new SiteGetTopContainersAction(siteId).run(user, session));
+                new SiteGetTopContainersAction(siteId).run(user, session)
+                    .getTopContainers());
             builder.setContainerTypes(
-                new SiteGetContainerTypeInfoAction(siteId).run(user, session));
-            builder.setStudies(
-                new SiteGetStudyInfoAction(siteId).run(user, session));
+                new SiteGetContainerTypeInfoAction(siteId).run(user, session)
+                    .getContainerTypeInfoCollection());
+            builder
+                .setStudies(
+                new SiteGetStudyInfoAction(siteId).run(user, session).getList());
         } else {
             // TODO: throw exception?
         }

@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 
 public class SiteGetContainerTypeInfoAction implements
-    Action<ArrayList<ContainerTypeInfo>> {
+    Action<SiteGetContainerTypeInfoResult> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -47,7 +47,7 @@ public class SiteGetContainerTypeInfoAction implements
     }
 
     @Override
-    public ArrayList<ContainerTypeInfo> run(User user, Session session)
+    public SiteGetContainerTypeInfoResult run(User user, Session session)
         throws ActionException {
 
         ArrayList<ContainerTypeInfo> containerTypes =
@@ -64,6 +64,6 @@ public class SiteGetContainerTypeInfoAction implements
             containerTypes.add(containerTypeInfo);
         }
 
-        return containerTypes;
+        return new SiteGetContainerTypeInfoResult(containerTypes);
     }
 }

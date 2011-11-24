@@ -75,6 +75,10 @@ public class BaseForm {
         scrolledForm.setMessage(message, newType);
     }
 
+    public FormToolkit getToolkit() {
+        return toolkit;
+    }
+
     public Composite getPage() {
         return page;
     }
@@ -165,6 +169,8 @@ public class BaseForm {
             // colour in forms
             Composite client =
                 (Composite) ((Section) container).getClient();
+            if (client == null) return;
+
             toolkit.adapt(client, true, true);
             children = client.getChildren();
         } else {

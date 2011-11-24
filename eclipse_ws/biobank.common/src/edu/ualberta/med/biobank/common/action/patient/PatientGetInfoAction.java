@@ -1,19 +1,18 @@
 package edu.ualberta.med.biobank.common.action.patient;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.User;
 
@@ -51,7 +50,7 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
 
     private final Integer patientId;
 
-    public static class PatientInfo implements Serializable, NotAProxy {
+    public static class PatientInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
 
         public Patient patient;
@@ -85,9 +84,8 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
             pInfo.patient = (Patient) row[0];
             pInfo.sourceSpecimenCount = (Long) row[1];
             pInfo.aliquotedSpecimenCount = (Long) row[2];
-            pInfo.cevents =
-                new PatientGetCollectionEventInfosAction(patientId).run(user,
-                    session);
+            pInfo.cevents = new PatientGetCollectionEventInfosAction(patientId)
+                .run(user, session).getList();
 
         } else {
             throw new ActionException("No patient found with id:" + patientId); //$NON-NLS-1$

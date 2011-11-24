@@ -10,6 +10,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
@@ -18,7 +19,7 @@ import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class StudyGetClinicInfoAction implements Action<ArrayList<ClinicInfo>> {
+public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> {
     private static final long serialVersionUID = 1L;
 
     // @formatter:off
@@ -64,7 +65,7 @@ public class StudyGetClinicInfoAction implements Action<ArrayList<ClinicInfo>> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public ArrayList<ClinicInfo> run(User user, Session session)
+    public ListResult<ClinicInfo> run(User user, Session session)
         throws ActionException {
 
         // first get contacts by clinic
@@ -104,7 +105,7 @@ public class StudyGetClinicInfoAction implements Action<ArrayList<ClinicInfo>> {
             infos.add(info);
         }
 
-        return infos;
+        return new ListResult<ClinicInfo>(infos);
     }
 
     public static class ClinicInfo implements Serializable, NotAProxy {

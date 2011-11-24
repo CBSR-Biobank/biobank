@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.action;
 
-public interface ActionCallback<T> {
+public interface ActionCallback<T extends ActionResult> {
     /**
      * Called when an command call fails to complete normally.
      * 

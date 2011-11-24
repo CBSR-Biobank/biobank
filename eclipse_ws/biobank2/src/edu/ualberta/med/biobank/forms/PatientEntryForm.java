@@ -88,6 +88,8 @@ public class PatientEntryForm extends BiobankEntryForm {
                 SessionManager.getAppService().doAction(
                     new PatientGetInfoAction(adapter.getId()));
             copyPatient();
+        } else {
+            patientCopy = ((PatientAdapter) adapter).getPatient();
         }
 
         // FIXME log edit action?
@@ -139,10 +141,9 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        List<Study> studies =
-            SessionManager.getAppService().doAction(
-                new StudyGetListForSiteAction(SessionManager.getUser()
-                    .getCurrentWorkingSite().getId()));
+        List<Study> studies = SessionManager.getAppService().doAction(
+            new StudyGetListForSiteAction(SessionManager.getUser()
+                .getCurrentWorkingSite().getId())).getList();
         Study selectedStudy = null;
         if (pInfo == null) {
             if (studies.size() == 1) {
@@ -227,7 +228,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             SessionManager.getAppService().doAction(
                 new PatientSaveAction(patientCopy.getId(), patientCopy
                     .getStudy().getId(), patientCopy.getPnumber(), patientCopy
-                    .getCreatedAt()));
+                    .getCreatedAt())).getId();
         adapter.setId(patientId);
 
         // FIXME the tree needs to get the new value from the patien in case it

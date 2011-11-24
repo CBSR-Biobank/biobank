@@ -7,6 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -14,7 +15,7 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
 public class ClinicGetStudyInfoAction implements
-    Action<ArrayList<StudyInfo>> {
+    Action<ListResult<StudyInfo>> {
     private static final long serialVersionUID = 1L;
 
     // @formatter:off
@@ -48,7 +49,7 @@ public class ClinicGetStudyInfoAction implements
     }
 
     @Override
-    public ArrayList<StudyInfo> run(User user, Session session)
+    public ListResult<StudyInfo> run(User user, Session session)
         throws ActionException {
         ArrayList<StudyInfo> infos = new ArrayList<StudyInfo>();
 
@@ -58,12 +59,11 @@ public class ClinicGetStudyInfoAction implements
         @SuppressWarnings("unchecked")
         List<Object[]> results = query.list();
         for (Object[] row : results) {
-
             StudyInfo info = new StudyInfo((Study) row[1], (Long) row[2],
                 (Long) row[3]);
-
             infos.add(info);
         }
-        return infos;
+
+        return new ListResult<StudyInfo>(infos);
     }
 }

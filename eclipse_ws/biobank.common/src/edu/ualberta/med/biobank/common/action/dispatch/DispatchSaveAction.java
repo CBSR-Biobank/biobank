@@ -8,6 +8,7 @@ import java.util.Set;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
@@ -24,7 +25,7 @@ import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class DispatchSaveAction implements Action<Integer> {
+public class DispatchSaveAction implements Action<IdResult> {
 
     /**
      * 
@@ -34,7 +35,8 @@ public class DispatchSaveAction implements Action<Integer> {
     private Set<DispatchSpecimenInfo> dsInfos;
     private ShipmentInfoSaveInfo siInfo;
 
-    public DispatchSaveAction(DispatchSaveInfo dInfo, Set<DispatchSpecimenInfo> dsInfos, ShipmentInfoSaveInfo siInfo) {
+    public DispatchSaveAction(DispatchSaveInfo dInfo,
+        Set<DispatchSpecimenInfo> dsInfos, ShipmentInfoSaveInfo siInfo) {
         this.dInfo = dInfo;
         this.dsInfos = dsInfos;
         this.siInfo = siInfo;
@@ -47,22 +49,23 @@ public class DispatchSaveAction implements Action<Integer> {
     }
 
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
         SessionUtil sessionUtil = new SessionUtil(session);
         Dispatch disp =
             sessionUtil.get(Dispatch.class, dInfo.id, new Dispatch());
 
         disp.setReceiverCenter(sessionUtil.get(Center.class, dInfo.receiverId));
         disp.setSenderCenter(sessionUtil.get(Center.class, dInfo.senderId));
-        
-        if (dInfo.state==null)
-            dInfo.state=DispatchState.CREATION.getId();
+
+        if (dInfo.state == null)
+            dInfo.state = DispatchState.CREATION.getId();
 
         disp.setState(dInfo.state);
-        
-        disp.setDispatchSpecimenCollection(reassemble(sessionUtil, disp, dsInfos));
-        
-        if (siInfo!=null) {
+
+        disp.setDispatchSpecimenCollection(reassemble(sessionUtil, disp,
+            dsInfos));
+
+        if (siInfo != null) {
             ShipmentInfo si =
                 sessionUtil
                     .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
@@ -70,14 +73,15 @@ public class DispatchSaveAction implements Action<Integer> {
             si.packedAt = siInfo.packedAt;
             si.receivedAt = siInfo.receivedAt;
             si.waybill = siInfo.waybill;
-            
-            ShippingMethod sm = sessionUtil
-                .get(ShippingMethod.class, siInfo.method.id, new ShippingMethod());
-            
+
+            ShippingMethod sm =
+                sessionUtil
+                    .get(ShippingMethod.class, siInfo.method.id,
+                        new ShippingMethod());
+
             si.setShippingMethod(sm);
             disp.setShipmentInfo(si);
         }
-        
 
         // This stuff could be extracted to a util method. need to think about
         // how
@@ -89,30 +93,33 @@ public class DispatchSaveAction implements Action<Integer> {
             newComment.setMessage(dInfo.comment);
             newComment.setUser(user);
             session.saveOrUpdate(newComment);
-            
+
             comments.add(newComment);
             disp.setCommentCollection(comments);
         }
 
-
         session.saveOrUpdate(disp);
         session.flush();
 
-        return disp.getId();
+        return new IdResult(disp.getId());
     }
 
-    private Collection<DispatchSpecimen> reassemble(SessionUtil sessionUtil, Dispatch dispatch, 
+    private Collection<DispatchSpecimen> reassemble(SessionUtil sessionUtil,
+        Dispatch dispatch,
         Set<DispatchSpecimenInfo> dsInfos) {
-        Collection<DispatchSpecimen> dispSpecimens = new HashSet<DispatchSpecimen>();
+        Collection<DispatchSpecimen> dispSpecimens =
+            new HashSet<DispatchSpecimen>();
         for (DispatchSpecimenInfo dsInfo : dsInfos) {
             DispatchSpecimen dspec =
-                sessionUtil.get(DispatchSpecimen.class, dsInfo.id, new DispatchSpecimen());
-            dspec.setSpecimen(sessionUtil.load(Specimen.class, dsInfo.specimenId));
+                sessionUtil.get(DispatchSpecimen.class, dsInfo.id,
+                    new DispatchSpecimen());
+            dspec.setSpecimen(sessionUtil.load(Specimen.class,
+                dsInfo.specimenId));
             dspec.setState(dsInfo.state);
             dspec.setDispatch(dispatch);
             dispSpecimens.add(dspec);
         }
         return dispSpecimens;
-        
+
     }
 }

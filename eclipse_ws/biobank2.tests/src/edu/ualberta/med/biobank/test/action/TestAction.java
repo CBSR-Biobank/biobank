@@ -33,7 +33,7 @@ public class TestAction extends TestDatabase {
         sessionFactory = new Configuration().configure().buildSessionFactory();
         super.setUp();
         currentUser = appService
-            .doAction(new UserGetAction(AllTests.userLogin));
+            .doAction(new UserGetAction(AllTests.userLogin)).getUser();
     }
 
     /**

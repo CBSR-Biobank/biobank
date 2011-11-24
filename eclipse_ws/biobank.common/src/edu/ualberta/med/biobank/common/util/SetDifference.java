@@ -16,16 +16,39 @@ public class SetDifference<T> {
 
     private Set<T> oldSet;
     private Set<T> newSet;
-    private Set<T> intersection;
+    private Set<Pair<T>> intersection;
     private Set<T> removeSet;
     private Set<T> addSet;
+
+    public static class Pair<T> {
+        T oldObject;
+        T newObject;
+
+        public Pair(T oldObj, T newObj) {
+            this.oldObject = oldObj;
+            this.newObject = newObj;
+        }
+    }
 
     public SetDifference(Set<T> oldSet, Set<T> newSet) {
         this.oldSet = oldSet;
         this.newSet = newSet;
 
-        intersection = new HashSet<T>(oldSet);
-        intersection.retainAll(newSet);
+        intersection = new HashSet<Pair<T>>();
+
+        Set<T> oldObjIntersection = new HashSet<T>(oldSet);
+        oldObjIntersection.retainAll(newSet);
+
+        Set<T> newObjIntersection = new HashSet<T>(newSet);
+        newObjIntersection.retainAll(oldSet);
+
+        for (T oldObj : oldObjIntersection) {
+            for (T newOjb : newObjIntersection) {
+                if (oldObj.equals(newOjb)) {
+                    intersection.add(new Pair<T>(oldObj, newOjb));
+                }
+            }
+        }
 
         removeSet = new HashSet<T>(oldSet);
         removeSet.removeAll(intersection);
@@ -51,7 +74,7 @@ public class SetDifference<T> {
         return newSet;
     }
 
-    public Set<T> getIntersection() {
+    public Set<Pair<T>> getIntersection() {
         return intersection;
     }
 

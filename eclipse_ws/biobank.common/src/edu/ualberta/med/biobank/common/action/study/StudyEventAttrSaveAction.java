@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.action.study;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -12,7 +13,7 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
-public class StudyEventAttrSaveAction implements Action<Integer> {
+public class StudyEventAttrSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
     private Integer id = null;
@@ -53,7 +54,7 @@ public class StudyEventAttrSaveAction implements Action<Integer> {
     }
 
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
         if (globalEventAttrId == null) {
             throw new NullPointerException("globalEventAttrId cannot be null");
         }
@@ -83,7 +84,7 @@ public class StudyEventAttrSaveAction implements Action<Integer> {
         session.saveOrUpdate(attr);
         session.flush();
 
-        return attr.getId();
+        return new IdResult(attr.getId());
     }
 
 }

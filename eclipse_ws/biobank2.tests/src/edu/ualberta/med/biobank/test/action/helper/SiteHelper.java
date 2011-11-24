@@ -28,7 +28,7 @@ public class SiteHelper extends Helper {
         saveSite.setActivityStatusId(activityStatus.getId());
         saveSite.setStudyIds(studyIds);
 
-        return appService.doAction(saveSite);
+        return appService.doAction(saveSite).getId();
     }
 
     public static List<Integer> createSites(

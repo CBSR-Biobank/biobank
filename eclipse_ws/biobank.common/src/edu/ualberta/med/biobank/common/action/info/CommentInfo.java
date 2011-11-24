@@ -1,17 +1,16 @@
 package edu.ualberta.med.biobank.common.action.info;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.User;
 
-public class CommentInfo implements NotAProxy, Serializable {
+public class CommentInfo implements ActionResult {
 
     private static final long serialVersionUID = -7537167935539051938L;
 

@@ -28,7 +28,7 @@ public class ClinicHelper extends Helper {
         address.setCity(Utils.getRandomString(5, 10));
         clinicSave.setAddress(address);
 
-        return appService.doAction(clinicSave);
+        return appService.doAction(clinicSave).getId();
     }
 
     public static Integer createContact(BiobankApplicationService appService,
@@ -38,7 +38,7 @@ public class ClinicHelper extends Helper {
         contactSave.setName(name);
         contactSave.setClinicId(clinicId);
 
-        return appService.doAction(contactSave);
+        return appService.doAction(contactSave).getId();
     }
 
     public static Set<Integer> createClinicsWithContacts(

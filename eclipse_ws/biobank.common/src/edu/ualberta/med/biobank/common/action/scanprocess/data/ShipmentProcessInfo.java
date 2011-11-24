@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.model.Container;
 
-public class ShipmentProcessData extends ProcessWithPallet {
+public class ShipmentProcessInfo extends AbstractProcessPalletInfo {
 
     private static final long serialVersionUID = 1L;
 
@@ -21,14 +21,14 @@ public class ShipmentProcessData extends ProcessWithPallet {
     private Map<Integer, ItemState> currentDispatchSpecimenIds;
     private boolean errorIfAlreadyAdded;
 
-    public ShipmentProcessData(Container pallet, RequestWrapper request,
+    public ShipmentProcessInfo(Container pallet, RequestWrapper request,
         boolean errorIfAlreadyAdded) {
         super(pallet.getId());
         init(request.getRequestSpecimenCollection(false),
             errorIfAlreadyAdded, null);
     }
 
-    public ShipmentProcessData(Container pallet,
+    public ShipmentProcessInfo(Container pallet,
         DispatchWrapper dispatch, boolean errorIfAlreadyAdded) {
         super(pallet == null ? null : pallet.getId());
         init(dispatch.getDispatchSpecimenCollection(false),

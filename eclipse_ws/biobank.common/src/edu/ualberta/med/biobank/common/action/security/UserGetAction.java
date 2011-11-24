@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.model.User;
 
-public class UserGetAction implements Action<User> {
+public class UserGetAction implements Action<UserGetResult> {
 
     private static final long serialVersionUID = 1L;
     private String login;
@@ -26,7 +26,7 @@ public class UserGetAction implements Action<User> {
     }
 
     @Override
-    public User run(User user, Session session) throws ActionException {
+    public UserGetResult run(User user, Session session) throws ActionException {
         Criteria c = session.createCriteria(User.class.getName()).add(
             Restrictions.eq(UserPeer.LOGIN.getName(), login));
         // FIXME need to fetch all the user graph of object?
@@ -36,6 +36,6 @@ public class UserGetAction implements Action<User> {
         if (list.size() == 0)
             throw new ActionException("Problem getting user with login=" //$NON-NLS-1$
                 + login);
-        return list.get(0);
+        return new UserGetResult(list.get(0));
     }
 }

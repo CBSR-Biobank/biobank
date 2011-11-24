@@ -7,8 +7,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.info.Info;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -70,17 +70,17 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
 
             StudyInfo info = new StudyInfo(
                 (Study) row[0], (Long) row[1], (Long) row[2],
-                getClinicInfo.run(user, session),
-                getSourceSpecimens.run(user, session),
-                getAliquotedSpecimens.run(user, session),
-                getStudyEventAttrs.run(user, session));
+                getClinicInfo.run(user, session).getList(),
+                getSourceSpecimens.run(user, session).getList(),
+                getAliquotedSpecimens.run(user, session).getList(),
+                getStudyEventAttrs.run(user, session).getList());
 
             return info;
         }
         return null;
     }
 
-    public static class StudyInfo implements Info {
+    public static class StudyInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
 
         public final Study study;
@@ -102,7 +102,8 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
         }
 
         public StudyInfo(Study study, Long patientCount, Long ceventCount,
-            List<ClinicInfo> clinicInfos, List<SourceSpecimen> sourceSpcs,
+            List<ClinicInfo> clinicInfos,
+            List<SourceSpecimen> sourceSpcs,
             List<AliquotedSpecimen> aliquotedSpcs,
             List<StudyEventAttr> studyEventAttrs) {
             this.study = study;
@@ -118,23 +119,19 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
             return study;
         }
 
-        public List<StudyEventAttr> getStudyEventAttrs() {
-            return studyEventAttrs;
-        }
-
         public List<ClinicInfo> getClinicInfos() {
             return clinicInfos;
         }
 
-        public List<SourceSpecimen> getSourceSpc() {
+        public List<SourceSpecimen> getSourceSpcs() {
             return sourceSpcs;
         }
 
-        public List<AliquotedSpecimen> getAliquotedSpcTypeIds() {
+        public List<AliquotedSpecimen> getAliquotedSpcs() {
             return aliquotedSpcs;
         }
 
-        public List<StudyEventAttr> getStudyEventattrs() {
+        public List<StudyEventAttr> getStudyEventAttrs() {
             return studyEventAttrs;
         }
     }

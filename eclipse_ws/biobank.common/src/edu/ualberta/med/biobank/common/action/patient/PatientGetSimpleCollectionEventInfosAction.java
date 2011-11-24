@@ -9,6 +9,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -20,7 +21,7 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.User;
 
 public class PatientGetSimpleCollectionEventInfosAction implements
-    Action<HashMap<Integer, SimpleCEventInfo>> {
+    Action<MapResult<Integer, SimpleCEventInfo>> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -52,13 +53,14 @@ public class PatientGetSimpleCollectionEventInfosAction implements
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        return true; 
+        return true;
     }
 
     @Override
-    public HashMap<Integer, SimpleCEventInfo> run(User user, Session session)
+    public MapResult<Integer, SimpleCEventInfo> run(User user, Session session)
         throws ActionException {
-        HashMap<Integer, SimpleCEventInfo> ceventInfos = new HashMap<Integer, SimpleCEventInfo>();
+        HashMap<Integer, SimpleCEventInfo> ceventInfos =
+            new HashMap<Integer, SimpleCEventInfo>();
 
         Query query = session.createQuery(CEVENT_INFO_QRY);
         query.setParameter(0, patientId);
@@ -72,6 +74,7 @@ public class PatientGetSimpleCollectionEventInfosAction implements
             ceventInfo.minSourceSpecimenDate = (Date) row[2];
             ceventInfos.put(ceventInfo.cevent.id, ceventInfo);
         }
-        return ceventInfos;
+
+        return new MapResult<Integer, SimpleCEventInfo>(ceventInfos);
     }
 }

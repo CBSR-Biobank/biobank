@@ -2,10 +2,10 @@ package edu.ualberta.med.biobank.mvp.view;
 
 import org.eclipse.swt.widgets.Composite;
 
-import com.google.gwt.user.client.ui.HasValue;
 
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter;
+import edu.ualberta.med.biobank.mvp.user.ui.HasField;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
 import edu.ualberta.med.biobank.mvp.view.util.InputTable;
 
@@ -22,42 +22,42 @@ public class AddressEntryView extends AbstractView implements
     private InputTable table;
 
     @Override
-    public HasValue<String> getStreet1() {
+    public HasField<String> getStreet1() {
         return street1;
     }
 
     @Override
-    public HasValue<String> getStreet2() {
+    public HasField<String> getStreet2() {
         return street2;
     }
 
     @Override
-    public HasValue<String> getCity() {
+    public HasField<String> getCity() {
         return city;
     }
 
     @Override
-    public HasValue<String> getProvince() {
+    public HasField<String> getProvince() {
         return province;
     }
 
     @Override
-    public HasValue<String> getPostalCode() {
+    public HasField<String> getPostalCode() {
         return postalCode;
     }
 
     @Override
-    public HasValue<String> getPhoneNumber() {
+    public HasField<String> getPhoneNumber() {
         return phoneNumber;
     }
 
     @Override
-    public HasValue<String> getFaxNumber() {
+    public HasField<String> getFaxNumber() {
         return faxNumber;
     }
 
     @Override
-    public HasValue<String> getCountry() {
+    public HasField<String> getCountry() {
         return country;
     }
 

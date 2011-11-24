@@ -50,7 +50,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.PvAttrCustom;
+import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -76,7 +76,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private CollectionEvent ceventCopy;
 
-    private static class FormPvCustomInfo extends PvAttrCustom {
+    private static class FormPvCustomInfo extends EventAttrCustom {
         private Control control;
     }
 
@@ -141,7 +141,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         if (adapter.getId() == null) {
             ceventCopy.setVisitNumber(SessionManager.getAppService().doAction(
                 new PatientNextVisitNumberAction(ceventInfo.cevent.getPatient()
-                    .getId())));
+                    .getId())).getNextVisitNumber());
             ceventCopy.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(SessionManager.getAppService())
                 .getWrappedObject());
@@ -261,12 +261,14 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);
         try {
-            final List<SpecimenTypeInfo> allSpecimenTypes = SessionManager
-                .getAppService().doAction(new SpecimenTypeGetInfosAction());
+            final List<SpecimenTypeInfo> allSpecimenTypes =
+                SessionManager
+                    .getAppService().doAction(new SpecimenTypeGetInfosAction())
+                    .getList();
             final List<SourceSpecimen> studySourceSpecimens = SessionManager
                 .getAppService().doAction(
                     new StudyGetSourceSpecimensAction(ceventInfo.cevent
-                        .getPatient().getStudy().getId()));
+                        .getPatient().getStudy().getId())).getList();
 
             specimensTable.addEditSupport(studySourceSpecimens,
                 allSpecimenTypes);
@@ -292,7 +294,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         Map<Integer, StudyEventAttrInfo> studyAttrInfos =
             SessionManager.getAppService().doAction(
                 new StudyGetEventAttrInfoAction(ceventInfo.cevent.getPatient()
-                    .getStudy().getId()));
+                    .getStudy().getId())).getMap();
 
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 
@@ -388,7 +390,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         for (Object o : specimensTable.getList()) {
             SpecimenInfo specInfo = (SpecimenInfo) o;
             SaveCEventSpecimenInfo ceSpecInfo = new SaveCEventSpecimenInfo();
-            ceSpecInfo.comments = specInfo.specimen.getCommentCollection();
+            // TODO: why is this even being sent to the server, unless comments
+            // were modified here and need to be saved?
+            // ceSpecInfo.comments = specInfo.specimen.getCommentCollection();
             ceSpecInfo.id = specInfo.specimen.getId();
             ceSpecInfo.inventoryId = specInfo.specimen.getInventoryId();
             ceSpecInfo.quantity = specInfo.specimen.getQuantity();
@@ -422,7 +426,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                     .getPatient().getId(), ceventCopy.getVisitNumber(),
                     ceventCopy.getActivityStatus().getId(), commentList,
                     SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                    cevents, ceventAttrList));
+                    cevents, ceventAttrList)).getId();
         ((CollectionEventAdapter) adapter).setId(savedCeventId);
     }
 

@@ -1,27 +1,25 @@
 package edu.ualberta.med.biobank.common.action.scanprocess.result;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.action.scanprocess.CellStatus;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
+import edu.ualberta.med.biobank.common.action.ActionResult;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 
-public abstract class ProcessResult implements Serializable, NotAProxy {
-
+public abstract class ProcessResult implements ActionResult {
     private static final long serialVersionUID = 1L;
     private List<String> logs = new ArrayList<String>();
-    private CellStatus processStatus;
+    private CellInfoStatus processStatus;
 
     public List<String> getLogs() {
         return logs;
     }
 
-    public CellStatus getProcessStatus() {
+    public CellInfoStatus getProcessStatus() {
         return processStatus;
     }
 
-    protected void setProcessStatus(CellStatus processStatus) {
+    protected void setProcessStatus(CellInfoStatus processStatus) {
         this.processStatus = processStatus;
     }
 

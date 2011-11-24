@@ -5,7 +5,7 @@ import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 import com.pietschy.gwt.pectin.client.form.validation.message.ValidationMessage;
 import com.pietschy.gwt.pectin.client.value.ValueTarget;
 
-import edu.ualberta.med.biobank.mvp.user.ui.IButton;
+import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
 import edu.ualberta.med.biobank.mvp.view.form.ToolBarButtonManager.ButtonType;
 import edu.ualberta.med.biobank.mvp.view.widget.DelegatingButton;
@@ -18,7 +18,7 @@ public abstract class AbstractEntryFormView extends AbstractFormView implements
     private boolean dirty = false;
 
     @Override
-    public IButton getSave() {
+    public HasButton getSave() {
         return save;
     }
 
@@ -51,7 +51,7 @@ public abstract class AbstractEntryFormView extends AbstractFormView implements
     public abstract String getOkMessage();
 
     private void initActions(BaseForm form) {
-        IButton saveButton = form.getToolbar().get(ButtonType.SAVE);
+        HasButton saveButton = form.getToolbar().get(ButtonType.SAVE);
         save.setDelegate(saveButton);
     }
 

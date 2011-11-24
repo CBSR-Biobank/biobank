@@ -20,9 +20,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenUpdateAction;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.util.Holder;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -45,7 +47,8 @@ import edu.ualberta.med.biobank.wizards.SelectCollectionEventWizard;
 
 public class SpecimenEntryForm extends BiobankEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.SpecimenEntryForm"; //$NON-NLS-1$
 
     public static final String OK_MESSAGE = Messages.SpecimenEntryForm_ok_msg;
 
@@ -74,12 +77,13 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private CommentCollectionInfoTable commentEntryTable;
 
-    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BgcEntryFormWidgetListener listener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     @Override
     protected void init() throws Exception {
@@ -120,7 +124,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             containerSpecimenTypeList = ct.getSpecimenTypeCollection();
         }
 
-        List<SpecimenTypeWrapper> specimenTypes = new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> specimenTypes =
+            new ArrayList<SpecimenTypeWrapper>();
         for (AliquotedSpecimenWrapper ss : allowedAliquotedSpecimen) {
             SpecimenTypeWrapper sst = ss.getSpecimenType();
             if (containerSpecimenTypeList == null) {
@@ -201,8 +206,9 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         editPatientButton.addListener(SWT.MouseUp, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                SelectCollectionEventWizard wizard = new SelectCollectionEventWizard(
-                    SessionManager.getAppService());
+                SelectCollectionEventWizard wizard =
+                    new SelectCollectionEventWizard(
+                        SessionManager.getAppService());
                 WizardDialog dialog = new BiobankWizardDialog(page.getShell(),
                     wizard);
                 int res = dialog.open();
@@ -339,13 +345,24 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        if (newCollectionEvent == null)
-            specimen.persist();
-        else {
-            newCollectionEvent.addToAllSpecimenCollection(allchildren);
-            newCollectionEvent.addToOriginalSpecimenCollection(origchildren);
-            newCollectionEvent.persist();
-        }
+        SpecimenUpdateAction updateAction = new SpecimenUpdateAction();
+        updateAction.setSpecimenId(specimen.getId());
+        updateAction.setSpecimenTypeId(specimen.getSpecimenType().getId());
+        updateAction
+            .setCollectionEventId(specimen.getCollectionEvent().getId());
+
+        final Holder<String> commentMessage = new Holder<String>(null);
+        commentText.getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                commentMessage.setValue(commentText.getText());
+            }
+        });
+
+        updateAction.setCommentMessage(commentMessage.getValue());
+        updateAction.setActivityStatusId(specimen.getActivityStatus().getId());
+
+        SessionManager.getAppService().doAction(updateAction);
     }
 
     @Override

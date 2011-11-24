@@ -7,6 +7,7 @@ import java.util.HashSet;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
@@ -27,7 +28,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class ResearchGroupSaveAction implements Action<Integer> {
+public class ResearchGroupSaveAction implements Action<IdResult> {
 
     /**
      * 
@@ -46,7 +47,7 @@ public class ResearchGroupSaveAction implements Action<Integer> {
     }
 
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
         SessionUtil sessionUtil = new SessionUtil(session);
         ResearchGroup rg =
             sessionUtil.get(ResearchGroup.class, rgInfo.id, new ResearchGroup());
@@ -91,6 +92,6 @@ public class ResearchGroupSaveAction implements Action<Integer> {
         session.saveOrUpdate(rg);
         session.flush();
 
-        return rg.getId();
+        return new IdResult(rg.getId());
     }
 }

@@ -34,7 +34,7 @@ public class StudyHelper extends Helper {
         String name, ActivityStatusEnum activityStatus)
         throws ApplicationException {
         StudySaveAction saveStudy = getSaveAction(name, name, activityStatus);
-        return appService.doAction(saveStudy);
+        return appService.doAction(saveStudy).getId();
     }
 
     public static StudySaveAction getSaveAction(

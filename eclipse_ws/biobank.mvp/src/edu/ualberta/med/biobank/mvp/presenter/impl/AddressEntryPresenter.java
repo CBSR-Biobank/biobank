@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.mvp.presenter.impl;
 
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.pietschy.gwt.pectin.client.form.FieldModel;
@@ -10,27 +9,28 @@ import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidato
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.mvp.model.AbstractModel;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter.View;
+import edu.ualberta.med.biobank.mvp.user.ui.HasField;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
 public class AddressEntryPresenter extends AbstractPresenter<View> {
     private final Model model;
 
     public interface View extends IView {
-        HasValue<String> getStreet1();
+        HasField<String> getStreet1();
 
-        HasValue<String> getStreet2();
+        HasField<String> getStreet2();
 
-        HasValue<String> getCity();
+        HasField<String> getCity();
 
-        HasValue<String> getProvince();
+        HasField<String> getProvince();
 
-        HasValue<String> getPostalCode();
+        HasField<String> getPostalCode();
 
-        HasValue<String> getPhoneNumber();
+        HasField<String> getPhoneNumber();
 
-        HasValue<String> getFaxNumber();
+        HasField<String> getFaxNumber();
 
-        HasValue<String> getCountry();
+        HasField<String> getCountry();
     }
 
     @Inject

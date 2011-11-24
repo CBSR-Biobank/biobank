@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.model.PvAttrCustom;
+import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
@@ -51,7 +51,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private CommentCollectionInfoTable commentTable;
 
-    private static class FormPvCustomInfo extends PvAttrCustom {
+    private static class FormPvCustomInfo extends EventAttrCustom {
         BgcBaseText widget;
     }
 
@@ -130,7 +130,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
         Map<Integer, StudyEventAttrInfo> studyAttrInfos =
             SessionManager.getAppService().doAction(
                 new StudyGetEventAttrInfoAction(ceventInfo.cevent.getPatient()
-                    .getStudy().getId()));
+                    .getStudy().getId())).getMap();
 
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 

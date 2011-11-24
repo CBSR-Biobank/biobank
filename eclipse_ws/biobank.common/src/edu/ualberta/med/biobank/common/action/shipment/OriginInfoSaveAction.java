@@ -7,6 +7,7 @@ import java.util.HashSet;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
@@ -21,7 +22,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class OriginInfoSaveAction implements Action<Integer> {
+public class OriginInfoSaveAction implements Action<IdResult> {
 
     /**
      * 
@@ -30,7 +31,8 @@ public class OriginInfoSaveAction implements Action<Integer> {
     private OriginInfoSaveInfo oiInfo;
     private ShipmentInfoSaveInfo siInfo;
 
-    public OriginInfoSaveAction(OriginInfoSaveInfo oiInfo, ShipmentInfoSaveInfo siInfo) {
+    public OriginInfoSaveAction(OriginInfoSaveInfo oiInfo,
+        ShipmentInfoSaveInfo siInfo) {
         this.oiInfo = oiInfo;
         this.siInfo = siInfo;
     }
@@ -42,7 +44,7 @@ public class OriginInfoSaveAction implements Action<Integer> {
     }
 
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
         SessionUtil sessionUtil = new SessionUtil(session);
         OriginInfo oi =
             sessionUtil.get(OriginInfo.class, oiInfo.oiId, new OriginInfo());
@@ -74,10 +76,10 @@ public class OriginInfoSaveAction implements Action<Integer> {
         si.packedAt = siInfo.packedAt;
         si.receivedAt = siInfo.receivedAt;
         si.waybill = siInfo.waybill;
-        
+
         ShippingMethod sm = sessionUtil
             .get(ShippingMethod.class, siInfo.method.id, new ShippingMethod());
-        
+
         si.setShippingMethod(sm);
 
         // This stuff could be extracted to a util method. need to think about
@@ -100,6 +102,6 @@ public class OriginInfoSaveAction implements Action<Integer> {
         session.saveOrUpdate(oi);
         session.flush();
 
-        return oi.getId();
+        return new IdResult(oi.getId());
     }
 }

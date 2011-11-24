@@ -7,7 +7,7 @@ import java.util.Map;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
@@ -19,23 +19,23 @@ import edu.ualberta.med.biobank.model.User;
 /**
  * Used by dispatch and request
  */
-public class ShipmentReceiveProcess extends ServerProcess {
+public class ShipmentReceiveProcessAction extends ServerProcessAction {
 
     private static final long serialVersionUID = 1L;
 
-    private ShipmentProcessData data;
+    private ShipmentProcessInfo data;
 
-    public ShipmentReceiveProcess(ShipmentProcessData data,
+    public ShipmentReceiveProcessAction(ShipmentProcessInfo data,
         Integer currentWorkingCenterId,
-        Map<RowColPos, Cell> cells,
+        Map<RowColPos, CellInfo> cells,
         boolean isRescanMode, Locale locale) {
         super(currentWorkingCenterId, cells, isRescanMode, locale);
         this.data = data;
     }
 
-    public ShipmentReceiveProcess(ShipmentProcessData data,
+    public ShipmentReceiveProcessAction(ShipmentProcessInfo data,
         Integer currentWorkingCenterId,
-        Cell cell,
+        CellInfo cell,
         Locale locale) {
         super(currentWorkingCenterId, cell, locale);
         this.data = data;
@@ -46,7 +46,7 @@ public class ShipmentReceiveProcess extends ServerProcess {
      */
     @Override
     protected ScanProcessResult getScanProcessResult(Session session,
-        Map<RowColPos, Cell> cells, boolean isRescanMode)
+        Map<RowColPos, CellInfo> cells, boolean isRescanMode)
         throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
         res.setResult(cells, receiveProcess(session, cells));
@@ -57,7 +57,7 @@ public class ShipmentReceiveProcess extends ServerProcess {
      * Process of only one cell
      */
     @Override
-    protected CellProcessResult getCellProcessResult(Session session, Cell cell)
+    protected CellProcessResult getCellProcessResult(Session session, CellInfo cell)
         throws ActionException {
         CellProcessResult res = new CellProcessResult();
         processCellDipatchReceiveStatus(session, cell);
@@ -72,11 +72,11 @@ public class ShipmentReceiveProcess extends ServerProcess {
      * @return
      * @throws Exception
      */
-    private CellStatus receiveProcess(Session session,
-        Map<RowColPos, Cell> cells) {
-        CellStatus currentScanState = CellStatus.EMPTY;
+    private CellInfoStatus receiveProcess(Session session,
+        Map<RowColPos, CellInfo> cells) {
+        CellInfoStatus currentScanState = CellInfoStatus.EMPTY;
         if (cells != null) {
-            for (Cell cell : cells.values()) {
+            for (CellInfo cell : cells.values()) {
                 processCellDipatchReceiveStatus(session, cell);
                 currentScanState = currentScanState.mergeWith(cell.getStatus());
             }
@@ -90,7 +90,7 @@ public class ShipmentReceiveProcess extends ServerProcess {
      * @param cell
      * @param specimen
      */
-    private void updateCellWithSpecimen(Cell cell, Specimen specimen) {
+    private void updateCellWithSpecimen(CellInfo cell, Specimen specimen) {
         cell.setSpecimenId(specimen.getId());
         cell.setTitle(specimen.getCollectionEvent().getPatient().getPnumber());
     }
@@ -101,11 +101,11 @@ public class ShipmentReceiveProcess extends ServerProcess {
      * @param cell
      * @throws Exception
      */
-    private void processCellDipatchReceiveStatus(Session session, Cell cell) {
+    private void processCellDipatchReceiveStatus(Session session, CellInfo cell) {
         Specimen foundSpecimen = searchSpecimen(session, cell.getValue());
         if (foundSpecimen == null) {
             // not in db
-            cell.setStatus(CellStatus.ERROR);
+            cell.setStatus(CellInfoStatus.ERROR);
             cell.setInformation(MessageFormat.format(Messages.getString(
                 "DispatchReceiveScanDialog.cell.notInDb.msg", locale), cell //$NON-NLS-1$
                 .getValue()));
@@ -116,19 +116,19 @@ public class ShipmentReceiveProcess extends ServerProcess {
             if (state == null) {
                 // not in the shipment
                 updateCellWithSpecimen(cell, foundSpecimen);
-                cell.setStatus(CellStatus.EXTRA);
+                cell.setStatus(CellInfoStatus.EXTRA);
                 cell.setInformation(Messages.getString(
                     "DispatchReceiveScanDialog.cell.notInShipment.msg", locale)); //$NON-NLS-1$
             } else {
                 if (DispatchSpecimenState.RECEIVED == state) {
                     updateCellWithSpecimen(cell, foundSpecimen);
-                    cell.setStatus(CellStatus.IN_SHIPMENT_RECEIVED);
+                    cell.setStatus(CellInfoStatus.IN_SHIPMENT_RECEIVED);
                 } else if (DispatchSpecimenState.EXTRA == state) {
                     updateCellWithSpecimen(cell, foundSpecimen);
-                    cell.setStatus(CellStatus.EXTRA);
+                    cell.setStatus(CellInfoStatus.EXTRA);
                 } else {
                     updateCellWithSpecimen(cell, foundSpecimen);
-                    cell.setStatus(CellStatus.IN_SHIPMENT_EXPECTED);
+                    cell.setStatus(CellInfoStatus.IN_SHIPMENT_EXPECTED);
                 }
             }
         }

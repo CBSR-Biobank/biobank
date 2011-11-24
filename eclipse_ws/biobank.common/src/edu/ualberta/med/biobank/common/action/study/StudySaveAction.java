@@ -10,6 +10,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
@@ -24,7 +25,7 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
-public class StudySaveAction implements Action<Integer> {
+public class StudySaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
     private Integer id = null;
@@ -83,7 +84,7 @@ public class StudySaveAction implements Action<Integer> {
     }
 
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
         if (name == null) {
             throw new NullPointerException("name not specified");
         }
@@ -123,7 +124,7 @@ public class StudySaveAction implements Action<Integer> {
         session.saveOrUpdate(study);
         session.flush();
 
-        return study.getId();
+        return new IdResult(study.getId());
     }
 
     private static final String STUDY_UNIQUE_ATTR_HQL =

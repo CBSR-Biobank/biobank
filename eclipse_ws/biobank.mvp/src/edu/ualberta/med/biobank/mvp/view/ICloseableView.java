@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.mvp.view;
 
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 
 public interface ICloseableView extends IView {
     /**
@@ -9,5 +9,5 @@ public interface ICloseableView extends IView {
      */
     void close();
 
-    HasClickHandlers getClose();
+    HasButton getClose();
 }

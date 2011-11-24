@@ -7,6 +7,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -22,7 +23,7 @@ import edu.ualberta.med.biobank.model.User;
  * Merge patient2 into patient1.
  * 
  */
-public class PatientMergeAction implements Action<Boolean> {
+public class PatientMergeAction implements Action<BooleanResult> {
 
     private static final long serialVersionUID = 1L;
 
@@ -42,7 +43,7 @@ public class PatientMergeAction implements Action<Boolean> {
     }
 
     @Override
-    public Boolean run(User user, Session session) throws ActionException {
+    public BooleanResult run(User user, Session session) throws ActionException {
         // FIXME add checks
         // FIXME logging?
 
@@ -101,7 +102,7 @@ public class PatientMergeAction implements Action<Boolean> {
             throw new PatientMergeException(
                 PatientMergeException.ExceptionTypeEnum.STUDY);
         }
-        return true;
+        return new BooleanResult(true);
     }
 
     /**

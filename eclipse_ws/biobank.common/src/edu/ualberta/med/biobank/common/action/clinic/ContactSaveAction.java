@@ -3,13 +3,14 @@ package edu.ualberta.med.biobank.common.action.clinic;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.User;
 
-public class ContactSaveAction implements Action<Integer> {
+public class ContactSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
     private Integer id = null;
@@ -65,7 +66,7 @@ public class ContactSaveAction implements Action<Integer> {
     }
 
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
         if (clinicId == null) {
             throw new NullPointerException("clinic id cannot be null");
         }
@@ -87,7 +88,7 @@ public class ContactSaveAction implements Action<Integer> {
         session.saveOrUpdate(contact);
         session.flush();
 
-        return contact.getId();
+        return new IdResult(contact.getId());
     }
 
 }

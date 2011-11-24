@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
@@ -26,7 +27,6 @@ import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 import gov.nih.nci.system.util.ClassCache;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -216,7 +216,8 @@ public class BiobankApplicationServiceImpl extends
     private static final int SS_INV_ID_LENGTH = 12;
 
     @SuppressWarnings("nls")
-    private static final String SS_INV_ID_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String SS_INV_ID_ALPHABET =
+        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     private static final int SS_INV_ID_ALPHABET_LENGTH = SS_INV_ID_ALPHABET
         .length();
@@ -289,7 +290,7 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public <T extends Serializable> T doAction(Action<T> action)
+    public <T extends ActionResult> T doAction(Action<T> action)
         throws ApplicationException {
         Request request = new Request(action);
         request.setDomainObjectName(Site.class.getName());

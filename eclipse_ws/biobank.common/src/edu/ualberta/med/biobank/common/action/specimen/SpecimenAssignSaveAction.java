@@ -1,19 +1,18 @@
 package edu.ualberta.med.biobank.common.action.specimen;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenAssignResInfo;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenAssignPermission;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -23,14 +22,13 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
 
     private static final long serialVersionUID = 1L;
 
-    public static class SpecimenInfo implements Serializable, NotAProxy {
+    public static class SpecimenInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
         public Integer specimenId;
         public RowColPos position;
     }
 
-    public static class SpecimenAssignResInfo implements Serializable,
-        NotAProxy {
+    public static class SpecimenAssignResInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
 
         public Integer parentContainerId;
@@ -42,7 +40,7 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
         public List<SpecimenResInfo> specimens;
     }
 
-    public static class SpecimenResInfo implements Serializable, NotAProxy {
+    public static class SpecimenResInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
         public Integer specimenId;
         public String position;
@@ -92,7 +90,7 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
             throw new ActionException("problem in data sent"); //$NON-NLS-1$
         if (containerId == null) {
             containerId = new ContainerSaveAction(containerInfo).run(user,
-                session);
+                session).getId();
         }
         res.parentContainerId = containerId;
         Container container = ActionUtil.sessionGet(session, Container.class,
@@ -102,7 +100,8 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
         res.parentLabel = container.getLabel();
         res.siteName = container.getSite().getNameShort();
 
-        res.specimens = new ArrayList<SpecimenAssignSaveAction.SpecimenResInfo>();
+        res.specimens =
+            new ArrayList<SpecimenAssignSaveAction.SpecimenResInfo>();
         for (SpecimenInfo si : specInfos) {
             Specimen specimen = ActionUtil.sessionGet(session, Specimen.class,
                 si.specimenId);

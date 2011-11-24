@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.server.orm;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
@@ -21,7 +22,6 @@ import gov.nih.nci.system.dao.Response;
 import gov.nih.nci.system.dao.orm.WritableORMDAOImpl;
 import gov.nih.nci.system.query.SDKQueryResult;
 
-import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +46,8 @@ import org.springframework.orm.hibernate3.HibernateCallback;
  */
 public class BiobankORMDAOImpl extends WritableORMDAOImpl {
     private static AtomicInteger nextHandleId = new AtomicInteger(0);
-    private static final HashMap<QueryHandle, QueryProcess> queryMap = new HashMap<QueryHandle, QueryProcess>();
+    private static final HashMap<QueryHandle, QueryProcess> queryMap =
+        new HashMap<QueryHandle, QueryProcess>();
 
     @Override
     public Response query(Request request) throws DAOException {
@@ -65,7 +66,7 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         return super.query(request);
     }
 
-    private <T extends Serializable> Response query(Action<T> action) {
+    private <T extends ActionResult> Response query(Action<T> action) {
         Session session = getSession();
 
         User user = getCurrentUser(session);
@@ -132,7 +133,8 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         CommandType command = qhr.getCommandType();
 
         if (command.equals(CommandType.CREATE)) {
-            QueryHandle handle = new QueryHandle(nextHandleId.incrementAndGet());
+            QueryHandle handle =
+                new QueryHandle(nextHandleId.incrementAndGet());
             try {
                 queryMap.put(handle, new QueryProcess(qhr.getQueryCommand(),
                     qhr.getAppService()));

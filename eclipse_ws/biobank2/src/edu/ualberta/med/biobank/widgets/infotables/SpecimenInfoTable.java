@@ -242,7 +242,12 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         info.position = info.specimen.getPositionString();
         ActivityStatusWrapper status = info.specimen.getActivityStatus();
         info.activityStatus = (status == null) ? "" : status.getName(); //$NON-NLS-1$
-        info.comment = CommentWrapper.commentListToString(info.specimen.getCommentCollection(false));
+        List<CommentWrapper> comments =
+            info.specimen.getCommentCollection(false);      
+        info.comment =
+            (comments == null || comments.size() == 0) ? Messages.SpecimenInfoTable_no_first_letter
+                : Messages.SpecimenInfoTable_yes_first_letter;
+
         info.center = info.specimen.getCurrentCenter().getNameShort();
 
         info.originCenter = ""; //$NON-NLS-1$

@@ -1,16 +1,15 @@
 package edu.ualberta.med.biobank.test;
 
-import java.io.Serializable;
-
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionCallback;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
 public class TestingDispatcher implements Dispatcher {
     @Override
-    public <T extends Serializable> T exec(Action<T> action) {
+    public <T extends ActionResult> T exec(Action<T> action) {
         T result = null;
         try {
             BiobankApplicationService service = ServiceConnection
@@ -26,7 +25,7 @@ public class TestingDispatcher implements Dispatcher {
     }
 
     @Override
-    public <T extends Serializable> boolean exec(Action<T> action,
+    public <T extends ActionResult> boolean exec(Action<T> action,
         ActionCallback<T> callback) {
         boolean success = false;
         try {

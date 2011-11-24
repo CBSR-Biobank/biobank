@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.action.sourcespecimen;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
@@ -10,7 +11,7 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class SourceSpecimenSaveAction implements Action<Integer> {
+public class SourceSpecimenSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
     private Integer id = null;
@@ -41,7 +42,7 @@ public class SourceSpecimenSaveAction implements Action<Integer> {
     }
 
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
         if (needOriginalVolume == null) {
             throw new NullPointerException("needOriginalVolume cannot be null");
         }
@@ -68,6 +69,6 @@ public class SourceSpecimenSaveAction implements Action<Integer> {
         session.saveOrUpdate(srcSpc);
         session.flush();
 
-        return srcSpc.getId();
+        return new IdResult(srcSpc.getId());
     }
 }

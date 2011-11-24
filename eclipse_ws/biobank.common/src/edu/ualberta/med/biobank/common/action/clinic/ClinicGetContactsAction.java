@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.clinic;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,13 +7,12 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction.Response;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.User;
 
-public class ClinicGetContactsAction implements Action<Response> {
+public class ClinicGetContactsAction implements Action<ListResult<Contact>> {
 
     private static final long serialVersionUID = 1L;
 
@@ -39,9 +37,9 @@ public class ClinicGetContactsAction implements Action<Response> {
     }
 
     @Override
-    public Response run(User user, Session session)
+    public ListResult<Contact> run(User user, Session session)
         throws ActionException {
-        Response response = new Response();
+        ArrayList<Contact> result = new ArrayList<Contact>();
 
         Query query = session.createQuery(HQL);
         query.setParameter(0, clinicId);
@@ -49,22 +47,8 @@ public class ClinicGetContactsAction implements Action<Response> {
         @SuppressWarnings("unchecked")
         List<Contact> rs = query.list();
         if (rs != null) {
-            response.contacts.addAll(rs);
+            result.addAll(rs);
         }
-        return response;
-    }
-
-    public static class Response implements Serializable, NotAProxy {
-        private static final long serialVersionUID = 1L;
-
-        private ArrayList<Contact> contacts;
-
-        public Response() {
-            contacts = new ArrayList<Contact>();
-        }
-
-        public ArrayList<Contact> getContacts() {
-            return contacts;
-        }
+        return new ListResult<Contact>(result);
     }
 }

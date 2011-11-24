@@ -34,9 +34,11 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientMergeForm extends BiobankEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.PatientMergeForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.PatientMergeForm"; //$NON-NLS-1$
 
-    public static final String MSG_PATIENT_NOT_VALID = Messages.PatientMergeForm_notValid_msg;
+    public static final String MSG_PATIENT_NOT_VALID =
+        Messages.PatientMergeForm_notValid_msg;
 
     private PatientWrapper patient1;
 
@@ -181,7 +183,8 @@ public class PatientMergeForm extends BiobankEntryForm {
     }
 
     protected void populateFields(String pnumber) {
-        List<CollectionEventWrapper> newContents = new ArrayList<CollectionEventWrapper>();
+        List<CollectionEventWrapper> newContents =
+            new ArrayList<CollectionEventWrapper>();
         try {
             patient2 = PatientWrapper.getPatient(
                 SessionManager.getAppService(), pnumber);
@@ -241,8 +244,12 @@ public class PatientMergeForm extends BiobankEntryForm {
         if (canMerge) {
             boolean success = false;
             try {
-                success = SessionManager.getAppService().doAction(
-                    new PatientMergeAction(patient1.getId(), patient2.getId()));
+                success =
+                    SessionManager
+                        .getAppService()
+                        .doAction(
+                            new PatientMergeAction(patient1.getId(), patient2
+                                .getId())).isTrue();
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
                     Messages.PatientMergeForm_merge_error_title, e);

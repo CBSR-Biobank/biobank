@@ -1,16 +1,15 @@
 package edu.ualberta.med.biobank.common.action.clinic;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.User;
@@ -61,14 +60,14 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
             info.clinic = (Clinic) row[0];
             info.patientCount = (Long) row[1];
             info.ceventCount = (Long) row[2];
-            info.contacts = getContacts.run(user, session).getContacts();
-            info.studyInfos = getStudyInfo.run(user, session);
+            info.contacts = getContacts.run(user, session).getList();
+            info.studyInfos = getStudyInfo.run(user, session).getList();
         }
 
         return info;
     }
 
-    public static class ClinicInfo implements Serializable, NotAProxy {
+    public static class ClinicInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
 
         public Clinic clinic;

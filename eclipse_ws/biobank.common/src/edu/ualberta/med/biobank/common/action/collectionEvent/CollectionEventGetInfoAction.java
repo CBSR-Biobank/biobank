@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.collectionEvent;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -8,15 +7,16 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.peer.CommentPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.User;
 
 public class CollectionEventGetInfoAction implements Action<CEventInfo> {
@@ -32,6 +32,8 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
             + CollectionEventPeer.ACTIVITY_STATUS.getName() + " status"
             + " left join fetch cevent."
             + CollectionEventPeer.COMMENT_COLLECTION.getName() + " comments"
+            + " left join fetch comments."
+            + CommentPeer.USER.getName() + " commentsUser"
             + " inner join fetch patient." + PatientPeer.STUDY.getName()
             + " study"
             + " where cevent." + CollectionEventPeer.ID.getName() + "=?"
@@ -40,7 +42,7 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
 
     private final Integer ceventId;
 
-    public static class CEventInfo implements Serializable, NotAProxy {
+    public static class CEventInfo implements ActionResult {
 
         private static final long serialVersionUID = 1L;
         public CollectionEvent cevent;
@@ -74,13 +76,15 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
         List<CollectionEvent> rows = query.list();
         if (rows.size() == 1) {
             ceventInfo.cevent = rows.get(0);
-            ceventInfo.sourceSpecimenInfos = new CollectionEventGetSpecimenInfosAction(
-                ceventId, false).run(user, session);
-            ceventInfo.aliquotedSpecimenInfos = new CollectionEventGetSpecimenInfosAction(
-                ceventId, true).run(user, session);
+            ceventInfo.sourceSpecimenInfos =
+                new CollectionEventGetSpecimenInfosAction(
+                    ceventId, false).run(user, session).getList();
+            ceventInfo.aliquotedSpecimenInfos =
+                new CollectionEventGetSpecimenInfosAction(
+                    ceventId, true).run(user, session).getList();
             ceventInfo.eventAttrs = new CollectionEventGetEventAttrInfoAction(
                 ceventId).run(
-                user, session);
+                user, session).getMap();
         } else {
             throw new ActionException("Cannot find a collection event with id=" //$NON-NLS-1$
                 + ceventId);

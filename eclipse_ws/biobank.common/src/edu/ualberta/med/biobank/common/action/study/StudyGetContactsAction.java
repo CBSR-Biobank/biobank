@@ -7,12 +7,13 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class StudyGetContactsAction implements Action<ArrayList<Contact>> {
+public class StudyGetContactsAction implements Action<ListResult<Contact>> {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,7 +37,7 @@ public class StudyGetContactsAction implements Action<ArrayList<Contact>> {
     }
 
     @Override
-    public ArrayList<Contact> run(User user, Session session)
+    public ListResult<Contact> run(User user, Session session)
         throws ActionException {
         ArrayList<Contact> result = new ArrayList<Contact>();
 
@@ -49,6 +50,6 @@ public class StudyGetContactsAction implements Action<ArrayList<Contact>> {
             result.addAll(rs);
         }
 
-        return result;
+        return new ListResult<Contact>(result);
     }
 }

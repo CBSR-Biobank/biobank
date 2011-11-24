@@ -55,7 +55,7 @@ public class InventoryIdValidator extends AbstractValidator {
                         new CheckNoDuplicateAction(Specimen.class,
                             editedSpecimen == null ? null : editedSpecimen
                                 .getId(), SpecimenPeer.INVENTORY_ID.getName(),
-                            testedInventoryId));
+                            testedInventoryId)).isTrue();
                     duplicate = !unique;
                     if (unique)
                         if (inventoryIdExcludeList.contains(testedInventoryId)) {

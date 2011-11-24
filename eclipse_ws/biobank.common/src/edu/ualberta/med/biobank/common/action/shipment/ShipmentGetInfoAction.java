@@ -45,7 +45,8 @@ public class ShipmentGetInfoAction implements Action<ShipmentFormReadInfo> {
     }
 
     @Override
-    public ShipmentFormReadInfo run(User user, Session session) throws ActionException {
+    public ShipmentFormReadInfo run(User user, Session session)
+        throws ActionException {
         ShipmentFormReadInfo sInfo = new ShipmentFormReadInfo();
 
         Query query = session.createQuery(ORIGIN_INFO_HQL);
@@ -58,7 +59,8 @@ public class ShipmentGetInfoAction implements Action<ShipmentFormReadInfo> {
 
             sInfo.oi = (OriginInfo) row;
             sInfo.specimens =
-                new ShipmentGetSpecimenInfosAction(oiId).run(user, session);
+                new ShipmentGetSpecimenInfosAction(oiId).run(user, session)
+                    .getList();
 
         } else {
             throw new ActionException("No patient found with id:" + oiId); //$NON-NLS-1$

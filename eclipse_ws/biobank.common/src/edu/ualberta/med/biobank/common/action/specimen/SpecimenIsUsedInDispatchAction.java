@@ -7,6 +7,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -15,7 +16,7 @@ import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class SpecimenIsUsedInDispatchAction implements Action<Boolean> {
+public class SpecimenIsUsedInDispatchAction implements Action<BooleanResult> {
 
     private static final long serialVersionUID = 1L;
     private Integer specimenId;
@@ -37,7 +38,7 @@ public class SpecimenIsUsedInDispatchAction implements Action<Boolean> {
     }
 
     @Override
-    public Boolean run(User user, Session session) throws ActionException {
+    public BooleanResult run(User user, Session session) throws ActionException {
         Specimen specimen = ActionUtil.sessionGet(session, Specimen.class,
             specimenId);
         // FIXME reused code from wrapper. Might be more efficient to use a hql
@@ -54,12 +55,12 @@ public class SpecimenIsUsedInDispatchAction implements Action<Boolean> {
                             .getState())))) {
                     if (DispatchSpecimenState.MISSING
                         .equals(DispatchSpecimenState.getState(dsa.getState()))) {
-                        return false;
+                        return new BooleanResult(false);
                     }
-                    return true;
+                    return new BooleanResult(true);
                 }
             }
-        return false;
+        return new BooleanResult(false);
     }
 
 }

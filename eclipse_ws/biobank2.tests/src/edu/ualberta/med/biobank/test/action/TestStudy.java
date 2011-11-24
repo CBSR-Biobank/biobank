@@ -16,7 +16,6 @@ import org.junit.rules.TestName;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.aliquotedspecimen.AliquotedSpecimenSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
-import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction.Response;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.sourcespecimen.SourceSpecimenSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrSaveAction;
@@ -113,9 +112,9 @@ public class TestStudy extends TestAction {
 
         // get a contact id from each clinic
         for (Integer clinicId : clinicIds) {
-            Response response =
-                appService.doAction(new ClinicGetContactsAction(clinicId));
-            List<Contact> contacts = response.getContacts();
+            List<Contact> contacts =
+                appService.doAction(new ClinicGetContactsAction(clinicId))
+                    .getList();
             Assert.assertNotNull(contacts);
             Assert.assertNotNull(contacts.get(0));
             Assert.assertNotNull(contacts.get(1));
@@ -219,7 +218,7 @@ public class TestStudy extends TestAction {
             srcSpcSaveAction.setStudyId(studyId);
             SpecimenType spcType = spcTypes.get(r.nextInt(spcTypes.size()));
             srcSpcSaveAction.setSpecimenTypeId(spcType.getId());
-            Integer id = appService.doAction(srcSpcSaveAction);
+            Integer id = appService.doAction(srcSpcSaveAction).getId();
 
             idsAll.add(id);
             if (i < 5) {
@@ -292,7 +291,7 @@ public class TestStudy extends TestAction {
             aqSpcSaveAction.setSpecimenTypeId(spcTypes.get(
                 r.nextInt(spcTypes.size()))
                 .getId());
-            Integer id = appService.doAction(aqSpcSaveAction);
+            Integer id = appService.doAction(aqSpcSaveAction).getId();
 
             idsAll.add(id);
             if (i < 5) {
@@ -367,7 +366,7 @@ public class TestStudy extends TestAction {
             stEvAttrSave.setStudyId(studyId);
             stEvAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE
                 .getId());
-            Integer id = appService.doAction(stEvAttrSave);
+            Integer id = appService.doAction(stEvAttrSave).getId();
             idsAll.add(id);
         }
 

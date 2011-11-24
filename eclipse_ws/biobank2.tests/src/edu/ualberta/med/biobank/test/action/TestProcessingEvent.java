@@ -65,7 +65,7 @@ public class TestProcessingEvent extends TestAction {
             .getId());
         Date date = Utils.getRandomDate();
         Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
-            null, siteId, date, worksheet, 1, comments, null));
+            null, siteId, date, worksheet, 1, comments, null)).getId();
 
         openHibernateSession();
         // Check ProcessingEvent is in database with correct values
@@ -91,13 +91,13 @@ public class TestProcessingEvent extends TestAction {
                 patientId, siteId);
         ArrayList<SpecimenInfo> sourceSpecs = appService
             .doAction(new CollectionEventGetSpecimenInfosAction(ceventId,
-                false));
+                false)).getList();
 
         // create a processing event with one of the collection event source
         // specimen
         Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
             null, siteId, date, worksheet, 1, comments, Arrays
-                .asList(sourceSpecs.get(0).specimen.getId())));
+                .asList(sourceSpecs.get(0).specimen.getId()))).getId();
 
         // FIXME should test to add specimens that can't add ???
 
@@ -135,7 +135,7 @@ public class TestProcessingEvent extends TestAction {
     public void testDelete() throws Exception {
         Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
             null, siteId, Utils.getRandomDate(), Utils
-                .getRandomString(50), 1, null, null));
+                .getRandomString(50), 1, null, null)).getId();
 
         appService.doAction(new ProcessingEventDeleteAction(pEventId));
 
@@ -154,7 +154,7 @@ public class TestProcessingEvent extends TestAction {
                 patientId, siteId);
         ArrayList<SpecimenInfo> sourceSpecs = appService
             .doAction(new CollectionEventGetSpecimenInfosAction(ceventId,
-                false));
+                false)).getList();
         Integer spcId = sourceSpecs.get(0).specimen.getId();
 
         // create a processing event with one of the collection event source
@@ -163,7 +163,7 @@ public class TestProcessingEvent extends TestAction {
             null, siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), 1, null,
             Arrays
-                .asList(spcId)));
+                .asList(spcId))).getId();
 
         openHibernateSession();
         Specimen spc = ActionUtil.sessionGet(session, Specimen.class, spcId);
@@ -195,7 +195,7 @@ public class TestProcessingEvent extends TestAction {
                 patientId, siteId);
         ArrayList<SpecimenInfo> sourceSpecs = appService
             .doAction(new CollectionEventGetSpecimenInfosAction(ceventId,
-                false));
+                false)).getList();
         Integer spcId = sourceSpecs.get(0).specimen.getId();
 
         // FIXME need to add a child to the source specimen
@@ -206,7 +206,7 @@ public class TestProcessingEvent extends TestAction {
             null, siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), 1, null,
             Arrays
-                .asList(spcId)));
+                .asList(spcId))).getId();
 
         openHibernateSession();
         Specimen spc = ActionUtil.sessionGet(session, Specimen.class, spcId);

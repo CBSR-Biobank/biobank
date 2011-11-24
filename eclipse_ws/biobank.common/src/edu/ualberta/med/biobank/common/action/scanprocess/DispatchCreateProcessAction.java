@@ -9,7 +9,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenIsUsedInDispatchAction;
@@ -19,22 +19,22 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class DispatchCreateProcess extends ServerProcess {
+public class DispatchCreateProcessAction extends ServerProcessAction {
     private static final long serialVersionUID = 1L;
 
-    private ShipmentProcessData data;
+    private ShipmentProcessInfo data;
 
-    public DispatchCreateProcess(ShipmentProcessData data,
+    public DispatchCreateProcessAction(ShipmentProcessInfo data,
         Integer currentWorkingCenterId,
-        Map<RowColPos, Cell> cells,
+        Map<RowColPos, CellInfo> cells,
         boolean isRescanMode, Locale locale) {
         super(currentWorkingCenterId, cells, isRescanMode, locale);
         this.data = data;
     }
 
-    public DispatchCreateProcess(ShipmentProcessData data,
+    public DispatchCreateProcessAction(ShipmentProcessInfo data,
         Integer currentWorkingCenterId,
-        Cell cell,
+        CellInfo cell,
         Locale locale) {
         super(currentWorkingCenterId, cell, locale);
         this.data = data;
@@ -45,7 +45,7 @@ public class DispatchCreateProcess extends ServerProcess {
      */
     @Override
     protected ScanProcessResult getScanProcessResult(Session session,
-        Map<RowColPos, Cell> cells, boolean isRescanMode)
+        Map<RowColPos, CellInfo> cells, boolean isRescanMode)
         throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
         res.setResult(cells, createProcess(session, cells));
@@ -56,10 +56,10 @@ public class DispatchCreateProcess extends ServerProcess {
      * Process of only one cell
      */
     @Override
-    protected CellProcessResult getCellProcessResult(Session session, Cell cell)
+    protected CellProcessResult getCellProcessResult(Session session, CellInfo cell)
         throws ActionException {
         CellProcessResult res = new CellProcessResult();
-        ShipmentProcessData dispatchData = data;
+        ShipmentProcessInfo dispatchData = data;
         Center sender = null;
         if (dispatchData.getSenderId() != null) {
             sender = ActionUtil.sessionGet(session, Center.class,
@@ -78,16 +78,16 @@ public class DispatchCreateProcess extends ServerProcess {
      * @return
      * @throws Exception
      */
-    private CellStatus createProcess(Session session, Map<RowColPos, Cell> cells) {
-        CellStatus currentScanState = CellStatus.EMPTY;
-        ShipmentProcessData dispatchData = data;
+    private CellInfoStatus createProcess(Session session, Map<RowColPos, CellInfo> cells) {
+        CellInfoStatus currentScanState = CellInfoStatus.EMPTY;
+        ShipmentProcessInfo dispatchData = data;
         Center sender = null;
         if (dispatchData.getSenderId() != null) {
             sender = ActionUtil.sessionGet(session, Center.class,
                 dispatchData.getSenderId());
         }
         if (dispatchData.getPallet(session) == null) {
-            for (Cell cell : cells.values()) {
+            for (CellInfo cell : cells.values()) {
                 processCellDipatchCreateStatus(session, cell, sender, false);
                 currentScanState = currentScanState.mergeWith(cell.getStatus());
             }
@@ -97,12 +97,12 @@ public class DispatchCreateProcess extends ServerProcess {
                 for (int col = 0; col < dispatchData
                     .getPalletColCapacity(session); col++) {
                     RowColPos rcp = new RowColPos(row, col);
-                    Cell cell = cells.get(rcp);
+                    CellInfo cell = cells.get(rcp);
                     Specimen expectedSpecimen = dispatchData
                         .getSpecimen(session, row, col);
                     if (expectedSpecimen != null) {
                         if (cell == null) {
-                            cell = new Cell(row, col, null, null);
+                            cell = new CellInfo(row, col, null, null);
                             cells.put(rcp, cell);
                         }
                         cell.setExpectedSpecimenId(expectedSpecimen.getId());
@@ -125,8 +125,8 @@ public class DispatchCreateProcess extends ServerProcess {
      * only be 'already added' (this status is used while scanning: the color
      * will be different)
      */
-    private CellStatus processCellDipatchCreateStatus(Session session,
-        Cell scanCell,
+    private CellInfoStatus processCellDipatchCreateStatus(Session session,
+        CellInfo scanCell,
         Center sender, boolean checkAlreadyAdded) {
         Specimen expectedSpecimen = null;
         if (scanCell.getExpectedSpecimenId() != null) {
@@ -135,7 +135,7 @@ public class DispatchCreateProcess extends ServerProcess {
         }
         String value = scanCell.getValue();
         if (value == null) { // no specimen scanned
-            scanCell.setStatus(CellStatus.MISSING);
+            scanCell.setStatus(CellInfoStatus.MISSING);
             scanCell.setInformation(MessageFormat.format(Messages.getString(
                 "ScanAssign.scanStatus.specimen.missing", locale), //$NON-NLS-1$
                 expectedSpecimen.getInventoryId()));
@@ -144,14 +144,14 @@ public class DispatchCreateProcess extends ServerProcess {
             Specimen foundSpecimen = searchSpecimen(session, value);
             if (foundSpecimen == null) {
                 // not in database
-                scanCell.setStatus(CellStatus.ERROR);
+                scanCell.setStatus(CellInfoStatus.ERROR);
                 scanCell.setInformation(Messages.getString(
                     "DispatchProcess.scanStatus.specimen.notfound", locale)); //$NON-NLS-1$
             } else {
                 if (expectedSpecimen != null
                     && !foundSpecimen.equals(expectedSpecimen)) {
                     // Position taken
-                    scanCell.setStatus(CellStatus.ERROR);
+                    scanCell.setStatus(CellInfoStatus.ERROR);
                     scanCell
                         .setInformation(Messages
                             .getString(
@@ -165,7 +165,7 @@ public class DispatchCreateProcess extends ServerProcess {
                             sender, checkAlreadyAdded);
                     } else {
                         // should not be there
-                        scanCell.setStatus(CellStatus.ERROR);
+                        scanCell.setStatus(CellInfoStatus.ERROR);
                         scanCell.setTitle(foundSpecimen.getCollectionEvent()
                             .getPatient().getPnumber());
                         scanCell
@@ -188,20 +188,20 @@ public class DispatchCreateProcess extends ServerProcess {
      * @param checkAlreadyAdded
      * @throws Exception
      */
-    private void checkCanAddSpecimen(Session session, Cell cell,
+    private void checkCanAddSpecimen(Session session, CellInfo cell,
         Specimen specimen,
         Center sender, boolean checkAlreadyAdded) {
         if (specimen.getId() == null) {
-            cell.setStatus(CellStatus.ERROR);
+            cell.setStatus(CellInfoStatus.ERROR);
             cell.setInformation(""); //$NON-NLS-1$
         } else if (!specimen.getActivityStatus().getId()
             .equals(ActivityStatusEnum.ACTIVE.getId())) {
-            cell.setStatus(CellStatus.ERROR);
+            cell.setStatus(CellInfoStatus.ERROR);
             cell.setInformation(MessageFormat.format(Messages.getString(
                 "DispatchProcess.create.specimen.status", locale), //$NON-NLS-1$
                 specimen.getInventoryId()));
         } else if (!specimen.getCurrentCenter().equals(sender)) {
-            cell.setStatus(CellStatus.ERROR);
+            cell.setStatus(CellInfoStatus.ERROR);
             cell.setInformation(MessageFormat.format(Messages.getString(
                 "DispatchProcess.create.specimen.currentCenter", locale), //$NON-NLS-1$
                 specimen.getInventoryId(), specimen.getCurrentCenter()
@@ -212,13 +212,13 @@ public class DispatchCreateProcess extends ServerProcess {
             boolean alreadyInShipment = currentSpecimenIds != null
                 && currentSpecimenIds.get(specimen.getId()) != null;
             if (checkAlreadyAdded && alreadyInShipment) {
-                cell.setStatus(CellStatus.ERROR);
+                cell.setStatus(CellInfoStatus.ERROR);
                 cell.setInformation(MessageFormat.format(Messages.getString(
                     "DispatchProcess.create.specimen.alreadyAdded", locale), //$NON-NLS-1$
                     specimen.getInventoryId()));
             } else if (new SpecimenIsUsedInDispatchAction(specimen.getId())
-                .run(null, session)) {
-                cell.setStatus(CellStatus.ERROR);
+                .run(null, session).isTrue()) {
+                cell.setStatus(CellInfoStatus.ERROR);
                 cell.setInformation(MessageFormat.format(
                     Messages
                         .getString(
@@ -226,9 +226,9 @@ public class DispatchCreateProcess extends ServerProcess {
                     specimen.getInventoryId()));
             } else {
                 if (alreadyInShipment)
-                    cell.setStatus(CellStatus.IN_SHIPMENT_ADDED);
+                    cell.setStatus(CellInfoStatus.IN_SHIPMENT_ADDED);
                 else
-                    cell.setStatus(CellStatus.FILLED);
+                    cell.setStatus(CellInfoStatus.FILLED);
                 cell.setTitle(specimen.getCollectionEvent().getPatient()
                     .getPnumber());
                 cell.setSpecimenId(specimen.getId());

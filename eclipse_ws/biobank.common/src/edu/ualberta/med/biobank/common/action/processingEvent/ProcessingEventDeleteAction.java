@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.NotUsedCheck;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -14,11 +15,12 @@ import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class ProcessingEventDeleteAction implements Action<Integer> {
+public class ProcessingEventDeleteAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String HAS_DERIVED_SPECIMENS_MSG = "Unable to delete processing event '{0}' ({1}) since some of its specimens have already been derived into others specimens.";
+    private static final String HAS_DERIVED_SPECIMENS_MSG =
+        "Unable to delete processing event '{0}' ({1}) since some of its specimens have already been derived into others specimens.";
 
     private Integer peventId;
 
@@ -33,7 +35,7 @@ public class ProcessingEventDeleteAction implements Action<Integer> {
     }
 
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
         ProcessingEvent pevent = (ProcessingEvent) session.load(
             ProcessingEvent.class, peventId);
 
@@ -55,6 +57,6 @@ public class ProcessingEventDeleteAction implements Action<Integer> {
 
         session.delete(pevent);
 
-        return peventId;
+        return new IdResult(peventId);
     }
 }

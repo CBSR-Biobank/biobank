@@ -23,10 +23,10 @@ public class DispatchChangeStatePermission implements Permission {
     @Override
     public boolean isAllowed(User user, Session session) {
         Dispatch dispatch = ActionUtil.sessionGet(session, Dispatch.class, dispatchId);
-        return (!DispatchState.getState(dispatch.getState()).equals(DispatchState.CREATION) 
+        return (!DispatchState.getState(dispatch.getState()).equals(DispatchState.CREATION)
             && PermissionEnum.DISPATCH_CHANGE_STATE.isAllowed(user,
             dispatch.getReceiverCenter()))
-            || (DispatchState.getState(dispatch.getState()).equals(DispatchState.CREATION) 
+            || (DispatchState.getState(dispatch.getState()).equals(DispatchState.CREATION)
                 && PermissionEnum.DISPATCH_CHANGE_STATE.isAllowed(user, dispatch.getSenderCenter()));
     }
 

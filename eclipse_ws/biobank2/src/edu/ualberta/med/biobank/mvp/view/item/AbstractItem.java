@@ -1,4 +1,4 @@
 package edu.ualberta.med.biobank.mvp.view.item;
 
-public abstract class BaseItem {
+public abstract class AbstractItem {
 }

@@ -175,18 +175,14 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         dispatch.reset();
         reloadSpecimens();
     }
-    
     @Override
     protected void saveForm() throws Exception {
 
         Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
         for (DispatchSpecimenWrapper ds : dispatch.getDispatchSpecimenCollection(false))
             dsInfos.add(new DispatchSpecimenInfo(ds.getId(), ds.getSpecimen().getId(), ds.getState()));
-        
         DispatchSaveInfo dInfo = new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter().getId(), dispatch.getSenderCenter().getId(), dispatch.getState(), comment.getMessage() == null ? "" : comment.getMessage());
         DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
         SessionManager.getAppService().doAction(save);
     }
-
-    
 }

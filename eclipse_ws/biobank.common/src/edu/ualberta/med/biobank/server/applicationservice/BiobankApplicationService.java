@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
@@ -10,7 +11,6 @@ import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -61,7 +61,7 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public boolean isUserLockedOut(Long csmUserId) throws ApplicationException;
 
-    public <T extends Serializable> T doAction(Action<T> action)
+    public <T extends ActionResult> T doAction(Action<T> action)
         throws ApplicationException;
 
     public boolean isAllowed(Permission permission) throws ApplicationException;

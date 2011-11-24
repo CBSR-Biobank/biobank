@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
@@ -13,7 +14,7 @@ import edu.ualberta.med.biobank.model.Site;
  * @author jferland
  * 
  */
-public class SiteInfo implements Info {
+public class SiteInfo implements ActionResult {
     private static final long serialVersionUID = 1L;
     public final Site site;
     public final List<ContainerTypeInfo> containerTypes;

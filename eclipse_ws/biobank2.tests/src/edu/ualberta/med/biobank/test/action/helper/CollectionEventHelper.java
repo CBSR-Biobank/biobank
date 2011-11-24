@@ -40,7 +40,8 @@ public class CollectionEventHelper extends Helper {
      */
     public static Map<String, SaveCEventSpecimenInfo> createSaveCEventSpecimenInfoRandomList(
         int nber, Integer typeId, Integer userId) {
-        Map<String, SaveCEventSpecimenInfo> specs = new HashMap<String, CollectionEventSaveAction.SaveCEventSpecimenInfo>();
+        Map<String, SaveCEventSpecimenInfo> specs =
+            new HashMap<String, CollectionEventSaveAction.SaveCEventSpecimenInfo>();
         for (int i = 0; i < nber; i++) {
             SaveCEventSpecimenInfo info = createSaveCEventSpecimenInfoRandom(
                 typeId, userId);
@@ -73,7 +74,8 @@ public class CollectionEventHelper extends Helper {
         return appService.doAction(new CollectionEventSaveAction(
             null, patientId, r
                 .nextInt(20), 1, null, siteId,
-            new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
+            new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
+            .getId();
 
     }
 }

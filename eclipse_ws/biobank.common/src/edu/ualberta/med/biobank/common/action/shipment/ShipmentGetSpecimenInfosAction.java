@@ -7,6 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
@@ -17,7 +18,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
 public class ShipmentGetSpecimenInfosAction implements
-    Action<ArrayList<Specimen>> {
+    Action<ListResult<Specimen>> {
 
     @SuppressWarnings("nls")
     public static final String SPECIMEN_INFO_HQL = "select spec from "
@@ -47,7 +48,7 @@ public class ShipmentGetSpecimenInfosAction implements
     }
 
     @Override
-    public ArrayList<Specimen> run(User user, Session session)
+    public ListResult<Specimen> run(User user, Session session)
         throws ActionException {
         ArrayList<Specimen> specInfos = new ArrayList<Specimen>();
 
@@ -59,6 +60,6 @@ public class ShipmentGetSpecimenInfosAction implements
         for (Object row : rows) {
             specInfos.add((Specimen) row);
         }
-        return specInfos;
+        return new ListResult<Specimen>(specInfos);
     }
 }

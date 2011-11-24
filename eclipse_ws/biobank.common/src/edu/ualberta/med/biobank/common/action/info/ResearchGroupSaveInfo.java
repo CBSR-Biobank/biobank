@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.common.action.info;
 
-import java.io.Serializable;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 
 
-public class ResearchGroupSaveInfo implements Serializable{
+public class ResearchGroupSaveInfo implements ActionResult{
 
     /**
      * 

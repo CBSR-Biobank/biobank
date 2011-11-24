@@ -194,7 +194,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             researchGroup.getAddress().getPhoneNumber(), researchGroup.getAddress().getFaxNumber(), researchGroup.getAddress().getCountry(), researchGroup.getAddress().getName());
         ResearchGroupSaveInfo info = new ResearchGroupSaveInfo(researchGroup.getId(), researchGroup.getName(), researchGroup.getNameShort(), researchGroup.getStudy().getId(), comment.getMessage(), addressInfo, researchGroup.getActivityStatus().getId());
         ResearchGroupSaveAction save = new ResearchGroupSaveAction(info); 
-        adapter.setId(SessionManager.getAppService().doAction(save));
+        adapter.setId(SessionManager.getAppService().doAction(save).getId());
     }
 
     @Override

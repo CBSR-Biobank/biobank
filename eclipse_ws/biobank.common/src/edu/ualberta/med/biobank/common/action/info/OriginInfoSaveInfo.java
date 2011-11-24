@@ -1,10 +1,10 @@
 package edu.ualberta.med.biobank.common.action.info;
 
-import java.io.Serializable;
-import java.util.List;
 import java.util.Set;
 
-public class OriginInfoSaveInfo implements Serializable {
+import edu.ualberta.med.biobank.common.action.ActionResult;
+
+public class OriginInfoSaveInfo implements ActionResult {
     /**
      * 
      */

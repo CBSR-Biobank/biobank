@@ -153,7 +153,7 @@ public class DispatchViewForm extends BiobankViewForm {
                 && dispatch.getNonProcessedDispatchSpecimenCollection().size() == 0)
                 createCloseButton();
         }
-        
+
         commentTable.setList(dispatch.getCommentCollection(false));
     }
 

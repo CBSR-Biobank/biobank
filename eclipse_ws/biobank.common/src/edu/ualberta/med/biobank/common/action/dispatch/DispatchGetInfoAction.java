@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.dispatch;
 
-
 import java.util.List;
 
 import org.hibernate.Query;
@@ -26,17 +25,17 @@ public class DispatchGetInfoAction implements Action<DispatchFormReadInfo> {
     @SuppressWarnings("nls")
     private static final String DISPATCH_HQL = "select dispatch from "
     + Dispatch.class.getName() 
-    + " dispatch left join fetch dispatch."+ DispatchPeer.SHIPMENT_INFO.getName() 
-    + " si left join fetch si." + ShipmentInfoPeer.SHIPPING_METHOD.getName() 
-    + " join fetch dispatch." + DispatchPeer.RECEIVER_CENTER.getName() 
+    + " dispatch left join fetch dispatch."+ DispatchPeer.SHIPMENT_INFO.getName()
+    + " si left join fetch si." + ShipmentInfoPeer.SHIPPING_METHOD.getName()
+    + " join fetch dispatch." + DispatchPeer.RECEIVER_CENTER.getName()
     + " join fetch dispatch." + DispatchPeer.SENDER_CENTER.getName()
-    + " left join fetch dispatch." + DispatchPeer.COMMENT_COLLECTION.getName() 
+    + " left join fetch dispatch." + DispatchPeer.COMMENT_COLLECTION.getName()
     + " commentCollection where dispatch." + DispatchPeer.ID.getName()
     +"=? group by dispatch";
     // @formatter:on
 
     public DispatchGetInfoAction(Integer id) {
-        this.id=id;
+        this.id = id;
     }
 
     @Override
@@ -45,7 +44,8 @@ public class DispatchGetInfoAction implements Action<DispatchFormReadInfo> {
     }
 
     @Override
-    public DispatchFormReadInfo run(User user, Session session) throws ActionException {
+    public DispatchFormReadInfo run(User user, Session session)
+        throws ActionException {
         DispatchFormReadInfo sInfo = new DispatchFormReadInfo();
 
         Query query = session.createQuery(DISPATCH_HQL);
@@ -58,7 +58,8 @@ public class DispatchGetInfoAction implements Action<DispatchFormReadInfo> {
 
             sInfo.dispatch = (Dispatch) row;
             sInfo.specimens =
-                new DispatchGetSpecimenInfosAction(id).run(user, session);
+                new DispatchGetSpecimenInfosAction(id).run(user, session)
+                    .getList();
 
         } else {
             throw new ActionException("No dispatch specimens found for id:" + id); //$NON-NLS-1$

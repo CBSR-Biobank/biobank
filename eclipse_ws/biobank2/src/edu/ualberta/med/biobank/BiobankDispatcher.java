@@ -1,15 +1,14 @@
 package edu.ualberta.med.biobank;
 
-import java.io.Serializable;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionCallback;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
 public class BiobankDispatcher implements Dispatcher {
     @Override
-    public <T extends Serializable> T exec(Action<T> action) {
+    public <T extends ActionResult> T exec(Action<T> action) {
         BiobankApplicationService service = SessionManager.getAppService();
         T result = null;
         try {
@@ -22,7 +21,7 @@ public class BiobankDispatcher implements Dispatcher {
     }
 
     @Override
-    public <T extends Serializable> boolean exec(Action<T> action,
+    public <T extends ActionResult> boolean exec(Action<T> action,
         ActionCallback<T> callback) {
         boolean success = false;
 

@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
@@ -9,10 +8,11 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
+import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusGetAllAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter.View;
-import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValue;
+import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedField;
 import edu.ualberta.med.biobank.mvp.util.Converter;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
@@ -21,7 +21,7 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
     private final Dispatcher dispatcher;
 
     public interface View extends IView {
-        HasSelectedValue<ActivityStatus> getActivityStatus();
+        HasSelectedField<ActivityStatus> getActivityStatus();
     }
 
     @Inject
@@ -38,7 +38,7 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
     @Override
     protected void onBind() {
         dispatcher.exec(new ActivityStatusGetAllAction(),
-            new ActionCallback<HashMap<Integer, ActivityStatus>>() {
+            new ActionCallback<MapResult<Integer, ActivityStatus>>() {
                 @Override
                 public void onFailure(Throwable caught) {
                     // TODO: need to do something if cannot get information,
@@ -49,9 +49,11 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
                 }
 
                 @Override
-                public void onSuccess(HashMap<Integer, ActivityStatus> result) {
-                    view.getActivityStatus().setOptions(
-                        new ArrayList<ActivityStatus>(result.values()));
+                public void onSuccess(MapResult<Integer, ActivityStatus> result) {
+                    view.getActivityStatus()
+                        .setOptions(
+                            new ArrayList<ActivityStatus>(result.getMap()
+                                .values()));
                     view.getActivityStatus().setOptionLabeller(labeller);
                 }
             });

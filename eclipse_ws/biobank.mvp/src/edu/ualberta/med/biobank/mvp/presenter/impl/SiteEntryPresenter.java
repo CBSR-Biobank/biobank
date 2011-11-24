@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.pietschy.gwt.pectin.client.form.FieldModel;
@@ -15,6 +14,7 @@ import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidato
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.site.SiteViewPresenterShowEvent;
 import edu.ualberta.med.biobank.mvp.model.AbstractModel;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
+import edu.ualberta.med.biobank.mvp.user.ui.HasField;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
@@ -46,11 +47,11 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         void setAddressEditView(IView view);
 
-        HasValue<String> getName();
+        HasField<String> getName();
 
-        HasValue<String> getNameShort();
+        HasField<String> getNameShort();
 
-        HasValue<Collection<StudyInfo>> getStudies();
+        HasField<Collection<StudyInfo>> getStudies();
     }
 
     @Inject
@@ -122,14 +123,16 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         saveSite.setActivityStatusId(model.getActivityStatusId());
         saveSite.setStudyIds(model.getStudyIds());
 
-        dispatcher.exec(saveSite, new ActionCallback<Integer>() {
+        dispatcher.exec(saveSite, new ActionCallback<IdResult>() {
             @Override
             public void onFailure(Throwable caught) {
                 eventBus.fireEvent(new ExceptionEvent(caught));
             }
 
             @Override
-            public void onSuccess(Integer siteId) {
+            public void onSuccess(IdResult result) {
+                Integer siteId = result.getId();
+
                 // clear dirty state (so form can close without prompt to save)
                 model.checkpoint();
 

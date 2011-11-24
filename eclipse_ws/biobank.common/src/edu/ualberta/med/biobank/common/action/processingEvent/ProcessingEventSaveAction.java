@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.DiffUtils;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -26,7 +27,7 @@ import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class ProcessingEventSaveAction implements Action<Integer> {
+public class ProcessingEventSaveAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
 
@@ -69,7 +70,7 @@ public class ProcessingEventSaveAction implements Action<Integer> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public IdResult run(User user, Session session) throws ActionException {
         ProcessingEvent peventToSave;
         if (peventId == null) {
             peventToSave = new ProcessingEvent();
@@ -111,7 +112,7 @@ public class ProcessingEventSaveAction implements Action<Integer> {
 
         session.saveOrUpdate(peventToSave);
 
-        return peventToSave.getId();
+        return new IdResult(peventToSave.getId());
     }
 
     protected void setComments(Session session, ProcessingEvent peventToSave) {

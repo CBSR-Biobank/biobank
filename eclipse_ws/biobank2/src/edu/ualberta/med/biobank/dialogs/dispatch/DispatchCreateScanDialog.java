@@ -19,9 +19,9 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcess;
-import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcessAction;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -150,21 +150,21 @@ public class DispatchCreateScanDialog extends
 
     @Override
     protected Action<ProcessResult> getCellProcessAction(Integer centerId,
-        Cell cell, Locale locale) {
-        return new DispatchCreateProcess(getProcessData(), centerId, cell,
+        CellInfo cell, Locale locale) {
+        return new DispatchCreateProcessAction(getProcessData(), centerId, cell,
             locale);
     }
 
     @Override
     protected Action<ProcessResult> getPalletProcessAction(
-        Integer centerId, Map<RowColPos, Cell> cells, boolean isRescanMode,
+        Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
         Locale locale) {
-        return new DispatchCreateProcess(getProcessData(), centerId, cells,
+        return new DispatchCreateProcessAction(getProcessData(), centerId, cells,
             isRescanMode, locale);
     }
 
-    protected ShipmentProcessData getProcessData() {
-        return new ShipmentProcessData(currentPallet.getWrappedObject(),
+    protected ShipmentProcessInfo getProcessData() {
+        return new ShipmentProcessInfo(currentPallet.getWrappedObject(),
             currentShipment, false);
     }
 

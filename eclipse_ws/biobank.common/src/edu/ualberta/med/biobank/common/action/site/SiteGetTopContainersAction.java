@@ -12,7 +12,8 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 
-public class SiteGetTopContainersAction implements Action<ArrayList<Container>> {
+public class SiteGetTopContainersAction implements
+    Action<SiteGetTopContainersResult> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -41,7 +42,7 @@ public class SiteGetTopContainersAction implements Action<ArrayList<Container>> 
     }
 
     @Override
-    public ArrayList<Container> run(User user, Session session)
+    public SiteGetTopContainersResult run(User user, Session session)
         throws ActionException {
         ArrayList<Container> topContainers = new ArrayList<Container>();
 
@@ -54,6 +55,6 @@ public class SiteGetTopContainersAction implements Action<ArrayList<Container>> 
             topContainers.addAll(results);
         }
 
-        return topContainers;
+        return new SiteGetTopContainersResult(topContainers);
     }
 }

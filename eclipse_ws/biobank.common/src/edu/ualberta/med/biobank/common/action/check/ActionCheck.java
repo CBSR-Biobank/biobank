@@ -1,11 +1,10 @@
 package edu.ualberta.med.biobank.common.action.check;
 
-import java.io.Serializable;
-
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 
-public abstract class ActionCheck<T extends Serializable> implements Action<T> {
+public abstract class ActionCheck<T> implements Action<EmptyResult> {
 
     private static final long serialVersionUID = 1L;
 

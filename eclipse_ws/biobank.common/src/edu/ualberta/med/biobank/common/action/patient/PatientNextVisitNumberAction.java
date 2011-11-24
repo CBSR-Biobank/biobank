@@ -10,13 +10,15 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.User;
 
-public class PatientNextVisitNumberAction implements Action<Integer> {
+public class PatientNextVisitNumberAction implements
+    Action<PatientNextVisitNumberResult> {
 
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
-    private static final String NEXT_NUMBER_QRY = "select coalesce(max(ce.visitNumber),0) from "
-        + CollectionEvent.class.getName() + " ce where ce.patient.id=?";
+    private static final String NEXT_NUMBER_QRY =
+        "select coalesce(max(ce.visitNumber),0) from "
+            + CollectionEvent.class.getName() + " ce where ce.patient.id=?";
 
     private Integer patientId;
 
@@ -30,16 +32,22 @@ public class PatientNextVisitNumberAction implements Action<Integer> {
     }
 
     @Override
-    public Integer run(User user, Session session) throws ActionException {
+    public PatientNextVisitNumberResult run(User user, Session session)
+        throws ActionException {
         Query query = session.createQuery(NEXT_NUMBER_QRY);
         query.setParameter(0, patientId);
 
         @SuppressWarnings("unchecked")
         List<Integer> rows = query.list();
-        if (rows.size() == 0)
-            return 1;
 
-        return rows.get(0) + 1;
+        Integer nextVisitNumber = null;
+        if (rows.size() == 0) {
+            nextVisitNumber = 1;
+        } else {
+            nextVisitNumber = rows.get(0) + 1;
+        }
+
+        return new PatientNextVisitNumberResult(nextVisitNumber);
     }
 
 }

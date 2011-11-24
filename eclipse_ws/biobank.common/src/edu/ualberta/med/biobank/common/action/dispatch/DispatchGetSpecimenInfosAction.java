@@ -7,23 +7,20 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.DispatchSpecimenPeer;
-import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
-import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
 public class DispatchGetSpecimenInfosAction implements
-    Action<ArrayList<DispatchSpecimen>> {
+    Action<ListResult<DispatchSpecimen>> {
 
     @SuppressWarnings("nls")
     public static final String DISPATCH_SPECIMEN_INFO_HQL = "select dspec from "
@@ -52,9 +49,10 @@ public class DispatchGetSpecimenInfosAction implements
     }
 
     @Override
-    public ArrayList<DispatchSpecimen> run(User user, Session session)
+    public ListResult<DispatchSpecimen> run(User user, Session session)
         throws ActionException {
-        ArrayList<DispatchSpecimen> specInfos = new ArrayList<DispatchSpecimen>();
+        ArrayList<DispatchSpecimen> specInfos =
+            new ArrayList<DispatchSpecimen>();
 
         Query query = session.createQuery(DISPATCH_SPECIMEN_INFO_HQL);
         query.setParameter(0, oiId);
@@ -64,6 +62,6 @@ public class DispatchGetSpecimenInfosAction implements
         for (Object row : rows) {
             specInfos.add((DispatchSpecimen) row);
         }
-        return specInfos;
+        return new ListResult<DispatchSpecimen>(specInfos);
     }
 }
