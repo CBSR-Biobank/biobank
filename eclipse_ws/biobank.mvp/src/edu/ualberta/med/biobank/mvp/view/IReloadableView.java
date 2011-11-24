@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.mvp.view;
 
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 
 public interface IReloadableView extends IView {
-    HasClickHandlers getReload();
+    HasButton getReload();
 }

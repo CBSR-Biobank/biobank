@@ -22,10 +22,11 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
 
 import edu.ualberta.med.biobank.mvp.event.SimpleValueChangeEvent;
-import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValue;
+import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedField;
 import edu.ualberta.med.biobank.mvp.util.Converter;
 
-public class ComboItem<T> implements HasSelectedValue<T> {
+public class ComboItem<T> extends ValidationItem<T> implements
+    HasSelectedField<T> {
     private static final Listener KILL_MOUSE_WHEEL_LISTENER = new Listener() {
         @Override
         public void handleEvent(Event event) {
@@ -91,22 +92,17 @@ public class ComboItem<T> implements HasSelectedValue<T> {
     }
 
     @Override
-    public void setValue(T value) {
+    public void setValue(T value, boolean fireEvents) {
         this.value = value;
 
         if (comboViewer != null) {
+            this.fireEvents = fireEvents;
             IStructuredSelection selection =
                 value != null ? new StructuredSelection(
                     value) : new StructuredSelection();
             comboViewer.setSelection(selection, true);
+            this.fireEvents = true;
         }
-    }
-
-    @Override
-    public void setValue(T value, boolean fireEvents) {
-        this.fireEvents = fireEvents;
-        setValue(value);
-        this.fireEvents = true;
     }
 
     @Override

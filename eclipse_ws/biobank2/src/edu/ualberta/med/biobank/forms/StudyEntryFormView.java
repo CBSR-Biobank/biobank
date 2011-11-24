@@ -10,7 +10,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import com.google.gwt.user.client.ui.HasValue;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
@@ -22,6 +21,7 @@ import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter;
+import edu.ualberta.med.biobank.mvp.user.ui.HasField;
 import edu.ualberta.med.biobank.mvp.view.IView;
 import edu.ualberta.med.biobank.mvp.view.form.AbstractEntryFormView;
 import edu.ualberta.med.biobank.mvp.view.form.BaseForm;
@@ -169,27 +169,27 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
     }
 
     @Override
-    public HasValue<String> getName() {
+    public HasField<String> getName() {
         return name;
     }
 
     @Override
-    public HasValue<String> getNameShort() {
+    public HasField<String> getNameShort() {
         return nameShort;
     }
 
     @Override
-    public HasValue<Collection<ClinicInfo>> getClinics() {
+    public HasField<Collection<ClinicInfo>> getClinics() {
         return clinicsTranslator;
     }
 
     @Override
-    public HasValue<Collection<SourceSpecimen>> getSourceSpecimens() {
+    public HasField<Collection<SourceSpecimen>> getSourceSpecimens() {
         return srcSpcsTranslator;
     }
 
     @Override
-    public HasValue<Collection<AliquotedSpecimen>> getAliquotedSpecimens() {
+    public HasField<Collection<AliquotedSpecimen>> getAliquotedSpecimens() {
         return aqSpcsTranslator;
     }
 

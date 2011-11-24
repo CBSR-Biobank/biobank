@@ -6,16 +6,16 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
 
-import edu.ualberta.med.biobank.mvp.user.ui.IButton;
+import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 
-public class DelegatingButton implements IButton {
+public class DelegatingButton implements HasButton {
     private final HandlerManager handlerManager = new HandlerManager(this);
     private final ClickMonitor clickMonitor = new ClickMonitor();
     private HandlerRegistration handlerRegistration;
-    private IButton button;
+    private HasButton button;
     private boolean enabled = true;
 
-    public synchronized void setDelegate(IButton button) {
+    public synchronized void setDelegate(HasButton button) {
         removeOldHandler();
         this.button = button;
         button.setEnabled(enabled);

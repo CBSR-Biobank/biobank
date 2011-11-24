@@ -8,8 +8,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import com.google.gwt.user.client.ui.HasValue;
-
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -17,6 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
+import edu.ualberta.med.biobank.mvp.user.ui.HasField;
 import edu.ualberta.med.biobank.mvp.view.IView;
 import edu.ualberta.med.biobank.mvp.view.item.TableItem;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
@@ -85,17 +84,17 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
     }
 
     @Override
-    public HasValue<String> getName() {
+    public HasField<String> getName() {
         return name;
     }
 
     @Override
-    public HasValue<String> getNameShort() {
+    public HasField<String> getNameShort() {
         return nameShort;
     }
 
     @Override
-    public HasValue<Collection<StudyInfo>> getStudies() {
+    public HasField<Collection<StudyInfo>> getStudies() {
         return studies;
     }
 

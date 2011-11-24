@@ -11,7 +11,7 @@ import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 import com.pietschy.gwt.pectin.client.form.validation.component.ValidationDisplay;
 import com.pietschy.gwt.pectin.client.form.validation.message.ValidationMessage;
 
-public abstract class ValidationItem<T> extends BaseHasValueItem<T> implements
+public abstract class ValidationItem<T> extends AbstractHasFieldItem<T> implements
     ValidationDisplay {
     private static final FieldDecoration ERROR_FIELD_DECORATION = FieldDecorationRegistry
         .getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
