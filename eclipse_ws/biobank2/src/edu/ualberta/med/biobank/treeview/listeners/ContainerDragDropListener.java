@@ -136,13 +136,11 @@ public class ContainerDragDropListener implements DropTargetListener,
                             + dstContainer);
                         srcContainerAdapter.moveContainer(dstContainer);
                         return;
-                    } else {
-                        BgcPlugin
-                            .openError(
-                                Messages.ContainerDragDropListener_state_error_title,
-                                Messages.ContainerDragDropListener_state_error_msg);
-
                     }
+                    BgcPlugin
+                        .openError(
+                            Messages.ContainerDragDropListener_state_error_title,
+                            Messages.ContainerDragDropListener_state_error_msg);
                 } catch (Exception ex) {
                     BgcPlugin
                         .openAsyncError(

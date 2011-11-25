@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.common.peer.CommentPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.User;
 
 public class CollectionEventGetInfoAction implements Action<CEventInfo> {

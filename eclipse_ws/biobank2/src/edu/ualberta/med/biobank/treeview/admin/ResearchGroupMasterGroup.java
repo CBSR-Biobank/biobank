@@ -27,10 +27,10 @@ public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
         super(sessionAdapter, id,
             Messages.ResearchGroupMasterGroup_all_rgroups_label, null, false);
         try {
-            rgs =ResearchGroupWrapper.getAllResearchGroups(SessionManager
+            rgs = ResearchGroupWrapper.getAllResearchGroups(SessionManager
                 .getAppService());
         } catch (ApplicationException e) {
-           BgcPlugin.openAsyncError("Unable to retrieve research groups", e);
+            BgcPlugin.openAsyncError("Unable to retrieve research groups", e);
         }
     }
 
@@ -49,7 +49,7 @@ public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
     }
 
     public void addResearchGroup() {
-        ResearchGroupAdapter adapter = new ResearchGroupAdapter((AbstractNewAdapterBase)this,
+        ResearchGroupAdapter adapter = new ResearchGroupAdapter(this,
             new ResearchGroupAdapterInfo(null, null));
         adapter.openEntryForm();
     }
@@ -100,7 +100,7 @@ public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
 
     @Override
     public void setValue(Object value) {
-        this.rgs = (Map<Integer, ResearchGroup>)value;
+        this.rgs = (Map<Integer, ResearchGroup>) value;
     }
 
     @Override

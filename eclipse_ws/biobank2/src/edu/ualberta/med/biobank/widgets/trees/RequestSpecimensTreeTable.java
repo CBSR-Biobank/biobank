@@ -92,8 +92,9 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
-                groups = RequestTableGroup
-                    .getGroupsForRequest(RequestSpecimensTreeTable.this.request);
+                groups =
+                    RequestTableGroup
+                        .getGroupsForRequest(RequestSpecimensTreeTable.this.request);
             }
 
             @Override
@@ -252,10 +253,12 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
     }
 
     public List<RequestSpecimenWrapper> getWrappers(Node parent) {
-        List<RequestSpecimenWrapper> list = new ArrayList<RequestSpecimenWrapper>();
+        List<RequestSpecimenWrapper> list =
+            new ArrayList<RequestSpecimenWrapper>();
         if (parent instanceof TreeItemAdapter) {
-            RequestSpecimenWrapper spec = (RequestSpecimenWrapper) ((TreeItemAdapter) parent)
-                .getSpecimen();
+            RequestSpecimenWrapper spec =
+                (RequestSpecimenWrapper) ((TreeItemAdapter) parent)
+                    .getSpecimen();
             list.add(spec);
         } else {
             for (Node child : parent.getChildren()) {
@@ -288,16 +291,14 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
             && ((RequestSpecimenWrapper) ((TreeItemAdapter) startNode)
                 .getSpecimen()).getSpecimen().getInventoryId().equals(text))
             return startNode;
-        else {
-            Node found = null;
-            List<Node> children = startNode.getChildren();
-            for (Node child : children) {
-                found = search(child, text);
-                if (found != null)
-                    return found;
-            }
-            return null;
+        Node found = null;
+        List<Node> children = startNode.getChildren();
+        for (Node child : children) {
+            found = search(child, text);
+            if (found != null)
+                return found;
         }
+        return null;
     }
 
     public void pull(Node updateNode) {

@@ -130,8 +130,7 @@ public class LogQuery {
     public void setSearchQueryItem(String field, String value) throws Exception {
         if (searchQuery.get(field) == null || value == null)
             throw new NullPointerException();
-        else
-            searchQuery.put(field, value);
+        searchQuery.put(field, value);
 
     }
 }

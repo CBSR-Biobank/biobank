@@ -33,12 +33,14 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 @SuppressWarnings("unused")
 public class CollectionEventWrapper extends CollectionEventBaseWrapper {
-    private static final CollectionEventLogProvider LOG_PROVIDER = new CollectionEventLogProvider();
+    private static final CollectionEventLogProvider LOG_PROVIDER =
+        new CollectionEventLogProvider();
     private static final String HAS_SPECIMENS_MSG = Messages
         .getString("CollectionEventWrapper.has_specimen_delete_msg"); //$NON-NLS-1$
     private static final Collection<Property<?, ? super CollectionEvent>> UNIQUE_VISIT_NUMBER_PROPS;
     static {
-        Collection<Property<?, ? super CollectionEvent>> tmp = new ArrayList<Property<?, ? super CollectionEvent>>();
+        Collection<Property<?, ? super CollectionEvent>> tmp =
+            new ArrayList<Property<?, ? super CollectionEvent>>();
         tmp.add(CollectionEventPeer.PATIENT.to(PatientPeer.ID));
         tmp.add(CollectionEventPeer.VISIT_NUMBER);
 
@@ -140,15 +142,16 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             CollectionEventWrapper.class);
     }
 
-    private static final String COLLECTION_EVENTS_BY_DATE_RECEIVED_QRY = "from " //$NON-NLS-1$
-        + CollectionEvent.class.getName()
-        + " ce join ce." //$NON-NLS-1$
-        + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION
-        + " as spcs join spcs." //$NON-NLS-1$
-        + SpecimenPeer.ORIGIN_INFO.getName()
-        + " as oi join oi." //$NON-NLS-1$
-        + OriginInfoPeer.SHIPMENT_INFO.getName()
-        + " as shipinfo where shipinfo." + ShipmentInfoPeer.RECEIVED_AT + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
+    private static final String COLLECTION_EVENTS_BY_DATE_RECEIVED_QRY =
+        "from " //$NON-NLS-1$
+            + CollectionEvent.class.getName()
+            + " ce join ce." //$NON-NLS-1$
+            + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION
+            + " as spcs join spcs." //$NON-NLS-1$
+            + SpecimenPeer.ORIGIN_INFO.getName()
+            + " as oi join oi." //$NON-NLS-1$
+            + OriginInfoPeer.SHIPMENT_INFO.getName()
+            + " as shipinfo where shipinfo." + ShipmentInfoPeer.RECEIVED_AT + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
     public static List<CollectionEventWrapper> getCollectionEvents(
         WritableApplicationService appService, Date dateReceived)
@@ -175,12 +178,13 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             fast);
     }
 
-    private static final String ALIQUOTED_SPECIMEN_COUNT_QRY = "select count(spc) from " //$NON-NLS-1$
-        + Specimen.class.getName()
-        + " as spc where spc." //$NON-NLS-1$
-        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.ID) + "=? and spc." //$NON-NLS-1$
-        + SpecimenPeer.PARENT_SPECIMEN.getName() + " is not null"; //$NON-NLS-1$
+    private static final String ALIQUOTED_SPECIMEN_COUNT_QRY =
+        "select count(spc) from " //$NON-NLS-1$
+            + Specimen.class.getName()
+            + " as spc where spc." //$NON-NLS-1$
+            + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
+                CollectionEventPeer.ID) + "=? and spc." //$NON-NLS-1$
+            + SpecimenPeer.PARENT_SPECIMEN.getName() + " is not null"; //$NON-NLS-1$
 
     public long getAliquotedSpecimensCount(boolean fast)
         throws BiobankException, ApplicationException {
@@ -201,23 +205,25 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     public List<SpecimenWrapper> getAliquotedSpecimenCollection(boolean sort) {
-        List<SpecimenWrapper> aliquotedSpecimens = new ArrayList<SpecimenWrapper>(
-            getAllSpecimenCollection(true));
+        List<SpecimenWrapper> aliquotedSpecimens =
+            new ArrayList<SpecimenWrapper>(
+                getAllSpecimenCollection(true));
         aliquotedSpecimens.removeAll(getOriginalSpecimenCollection(false));
         return aliquotedSpecimens;
     }
 
-    private static String SOURCE_SPEC_IN_PROCESS_NOT_FLAGGED_QRY = "select spec from " //$NON-NLS-1$
-        + Specimen.class.getName()
-        + " as spec where spec." //$NON-NLS-1$
-        + Property.concatNames(SpecimenPeer.ORIGINAL_COLLECTION_EVENT,
-            CollectionEventPeer.ID)
-        + " = ? and spec." //$NON-NLS-1$
-        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
-            ProcessingEventPeer.ID)
-        + " = ? and spec." //$NON-NLS-1$
-        + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
-            ActivityStatusPeer.NAME) + " != 'Flagged'"; //$NON-NLS-1$
+    private static String SOURCE_SPEC_IN_PROCESS_NOT_FLAGGED_QRY =
+        "select spec from " //$NON-NLS-1$
+            + Specimen.class.getName()
+            + " as spec where spec." //$NON-NLS-1$
+            + Property.concatNames(SpecimenPeer.ORIGINAL_COLLECTION_EVENT,
+                CollectionEventPeer.ID)
+            + " = ? and spec." //$NON-NLS-1$
+            + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
+                ProcessingEventPeer.ID)
+            + " = ? and spec." //$NON-NLS-1$
+            + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
+                ActivityStatusPeer.NAME) + " != 'Flagged'"; //$NON-NLS-1$
 
     /**
      * source specimen that are in a process event
@@ -248,8 +254,9 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
         studyEventAttrMap = new HashMap<String, StudyEventAttrWrapper>();
         if (patient != null && patient.getStudy() != null) {
-            Collection<StudyEventAttrWrapper> studyEventAttrCollection = patient
-                .getStudy().getStudyEventAttrCollection();
+            Collection<StudyEventAttrWrapper> studyEventAttrCollection =
+                patient
+                    .getStudy().getStudyEventAttrCollection();
             if (studyEventAttrCollection != null) {
                 for (StudyEventAttrWrapper studyEventAttr : studyEventAttrCollection) {
                     studyEventAttrMap.put(studyEventAttr.getLabel(),
@@ -454,8 +461,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         List<Object> result = appService.query(c);
         if (result == null || result.size() == 0 || result.get(0) == null)
             return 1;
-        else
-            return (Integer) result.get(0) + 1;
+        return (Integer) result.get(0) + 1;
     }
 
     @Override

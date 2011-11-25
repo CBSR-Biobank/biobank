@@ -1,11 +1,8 @@
 package edu.ualberta.med.biobank.common.action.scanprocess.data;
 
-import java.util.Map;
-
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.ActionUtil;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -17,13 +14,12 @@ public class AssignProcessInfo extends AbstractProcessPalletInfo {
     private String palletLabel;
     private Integer containerTypeId;
 
-
     // existing pallet
     public AssignProcessInfo(Container pallet) {
         super(pallet.getId());
         this.containerTypeId = pallet.getContainerType().getId();
         if (palletId == null) {
-        	palletLabel = pallet.getLabel();
+            palletLabel = pallet.getLabel();
         }
     }
 
@@ -62,8 +58,8 @@ public class AssignProcessInfo extends AbstractProcessPalletInfo {
 
     public Specimen getExpectedSpecimen(
         Session session, Integer row, Integer col) {
-        if (palletId == null) 
-        	return null;
+        if (palletId == null)
+            return null;
         return getSpecimen(session, row, col);
     }
 }

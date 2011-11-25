@@ -91,17 +91,16 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
                 }
                 reloadCollection(selectedActivityStatus);
                 return true;
-            } else {
-                try {
-                    activityStatus.reload();
-                } catch (Exception e) {
-                    BgcPlugin
-                        .openAsyncError(
-                            Messages.ActivityStatusEntryInfoTable_refresh_error_title,
-                            e);
-                }
-                reloadCollection(selectedActivityStatus);
             }
+            try {
+                activityStatus.reload();
+            } catch (Exception e) {
+                BgcPlugin
+                    .openAsyncError(
+                        Messages.ActivityStatusEntryInfoTable_refresh_error_title,
+                        e);
+            }
+            reloadCollection(selectedActivityStatus);
         }
         return false;
     }

@@ -52,7 +52,6 @@ public class TreeViewerDropListener<T> extends ViewerDropAdapter {
         TransferData transferType) {
         if (target != null && target == this.getSelectedObject())
             return false;
-        else
-            return multiSelect.getDndTransfer().isSupportedType(transferType);
+        return multiSelect.getDndTransfer().isSupportedType(transferType);
     }
 }

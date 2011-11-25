@@ -317,9 +317,8 @@ public abstract class AbstractAdapterBase implements
                 + getClass().getName());
         }
         boolean doDelete = true;
-        if (msg != null)
-            doDelete = BgcPlugin.openConfirm(
-                Messages.AdapterBase_confirm_delete_title, msg);
+        doDelete = BgcPlugin.openConfirm(
+            Messages.AdapterBase_confirm_delete_title, msg);
         if (doDelete) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
@@ -418,9 +417,8 @@ public abstract class AbstractAdapterBase implements
         while (node != null) {
             if (node.getClass().equals(parentClass)) {
                 return (E) node;
-            } else {
-                node = node.getParent();
             }
+            node = node.getParent();
         }
         return null;
     }

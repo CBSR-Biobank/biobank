@@ -91,17 +91,16 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                 }
                 reloadCollection(selectedShippingMethod);
                 return true;
-            } else {
-                try {
-                    shippingMethod.reload();
-                } catch (Exception e) {
-                    BgcPlugin
-                        .openAsyncError(
-                            Messages.ShippingMethodEntryInfoTable_refresh_error_title,
-                            e);
-                }
-                reloadCollection(selectedShippingMethod);
             }
+            try {
+                shippingMethod.reload();
+            } catch (Exception e) {
+                BgcPlugin
+                    .openAsyncError(
+                        Messages.ShippingMethodEntryInfoTable_refresh_error_title,
+                        e);
+            }
+            reloadCollection(selectedShippingMethod);
         }
         return false;
     }

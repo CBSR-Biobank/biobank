@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
@@ -26,7 +25,6 @@ import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
@@ -91,8 +89,7 @@ public class DispatchAdapter extends AdapterBase {
                 .equals(getDispatchWrapper().getSenderCenter())
                 && SessionManager.canDelete(getDispatchWrapper())
                 && getDispatchWrapper().isInCreationState();
-        else
-            return false;
+        return false;
     }
 
     @Override
@@ -164,7 +161,7 @@ public class DispatchAdapter extends AdapterBase {
         setDispatchAsSent();
         openViewForm();
     }
-    
+
     private void setDispatchAsSent() {
         getDispatchWrapper().setState(DispatchState.IN_TRANSIT);
         persistDispatch();
@@ -200,7 +197,10 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     private void persistDispatch() {
-        DispatchChangeStateAction action= new DispatchChangeStateAction(getDispatchWrapper().getId(), DispatchState.CREATION, prepareShipInfo(getDispatchWrapper().getShipmentInfo()));
+        DispatchChangeStateAction action =
+            new DispatchChangeStateAction(getDispatchWrapper().getId(),
+                DispatchState.CREATION, prepareShipInfo(getDispatchWrapper()
+                    .getShipmentInfo()));
         try {
             SessionManager.getAppService().doAction(action);
         } catch (ApplicationException e) {
@@ -208,6 +208,7 @@ public class DispatchAdapter extends AdapterBase {
         }
         SpecimenTransitView.getCurrent().reload();
     }
+
     private void setDispatchAsCreation() {
         getDispatchWrapper().setState(DispatchState.CREATION);
         getDispatchWrapper().getShipmentInfo().setPackedAt(null);
@@ -216,8 +217,13 @@ public class DispatchAdapter extends AdapterBase {
 
     private ShipmentInfoSaveInfo prepareShipInfo(
         ShipmentInfoWrapper shipmentInfo) {
-        ShippingMethodInfo methodInfo = new ShippingMethodInfo(shipmentInfo.getShippingMethod().getId());
-        ShipmentInfoSaveInfo si = new ShipmentInfoSaveInfo(shipmentInfo.getId(), shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(), shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(), methodInfo);
+        ShippingMethodInfo methodInfo =
+            new ShippingMethodInfo(shipmentInfo.getShippingMethod().getId());
+        ShipmentInfoSaveInfo si =
+            new ShipmentInfoSaveInfo(shipmentInfo.getId(),
+                shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(),
+                shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),
+                methodInfo);
         return si;
     }
 
@@ -264,5 +270,4 @@ public class DispatchAdapter extends AdapterBase {
         return 0;
     }
 
-    
 }

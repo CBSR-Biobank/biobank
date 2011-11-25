@@ -88,16 +88,14 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
     protected String getTitleAreaMessage() {
         if (availableSpecimenTypes.size() > 0)
             return Messages.StudyAliquotedSpecimenDialog_msg;
-        else
-            return Messages.StudyAliquotedSpecimenDialog_available_nomore_msg;
+        return Messages.StudyAliquotedSpecimenDialog_available_nomore_msg;
     }
 
     @Override
     protected int getTitleAreaMessageType() {
         if (availableSpecimenTypes.size() > 0)
             return IMessageProvider.NONE;
-        else
-            return IMessageProvider.INFORMATION;
+        return IMessageProvider.INFORMATION;
     }
 
     @Override

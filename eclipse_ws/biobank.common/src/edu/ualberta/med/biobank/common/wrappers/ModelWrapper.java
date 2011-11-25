@@ -38,16 +38,20 @@ import java.util.Set;
 import org.hibernate.Hibernate;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
-    final Map<Property<?, ?>, Object> propertyCache = new HashMap<Property<?, ?>, Object>();
+    final Map<Property<?, ?>, Object> propertyCache =
+        new HashMap<Property<?, ?>, Object>();
 
     protected WritableApplicationService appService;
     protected E wrappedObject;
-    protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-        this);
+    protected PropertyChangeSupport propertyChangeSupport =
+        new PropertyChangeSupport(
+            this);
     protected HashMap<String, Object> cache = new HashMap<String, Object>();
 
-    private final List<WrapperListener> listeners = new ArrayList<WrapperListener>();
-    private final ElementTracker<E> elementTracker = new ElementTracker<E>(this);
+    private final List<WrapperListener> listeners =
+        new ArrayList<WrapperListener>();
+    private final ElementTracker<E> elementTracker =
+        new ElementTracker<E>(this);
     private final ElementQueue<E> elementQueue = new ElementQueue<E>(this);
     private final WrapperCascader<E> cascader = new WrapperCascader<E>(this);
     private final WrapperChecker<E> preChecker = new WrapperChecker<E>(this);
@@ -70,10 +74,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 throw new RuntimeException(
                     "was not able to create new object of type " //$NON-NLS-1$
                         + classType.getName(), e);
-            } else {
-                throw new RuntimeException("was not able to create new object", //$NON-NLS-1$
-                    e);
             }
+            throw new RuntimeException("was not able to create new object", //$NON-NLS-1$
+                e);
         }
 
         this.session = new WrapperSession(this);
@@ -332,7 +335,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         firePropertyChanges(oldWrappedObject, wrappedObject);
     }
 
-    private static final String PROPERTY_COUNT_HQL = "SELECT m.{0}.size FROM {1} m WHERE m.id = ?"; //$NON-NLS-1$
+    private static final String PROPERTY_COUNT_HQL =
+        "SELECT m.{0}.size FROM {1} m WHERE m.id = ?"; //$NON-NLS-1$
 
     protected final <T> Long getPropertyCount(
         Property<Collection<T>, ? super E> property, boolean fast)
@@ -369,8 +373,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return constructor.newInstance();
     }
 
-    private static final String CHECK_NO_DUPLICATES = "select count(o) from {0} " //$NON-NLS-1$
-        + "as o where {1}=? {2}"; //$NON-NLS-1$
+    private static final String CHECK_NO_DUPLICATES =
+        "select count(o) from {0} " //$NON-NLS-1$
+            + "as o where {1}=? {2}"; //$NON-NLS-1$
 
     protected void checkNoDuplicates(Class<?> objectClass, String propertyName,
         String value, String errorName) throws ApplicationException,
@@ -562,7 +567,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
     }
 
-    @SuppressWarnings("unused")
     protected final Log getLogMessage(String action, String site, String details)
         throws Exception {
         Log log = null;

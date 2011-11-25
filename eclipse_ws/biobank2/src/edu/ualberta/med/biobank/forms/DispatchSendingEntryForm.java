@@ -1,10 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -49,11 +47,14 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm"; //$NON-NLS-1$
 
-    public static final String MSG_NEW_DISPATCH_OK = Messages.DispatchSendingEntryForm_new_ok_msg;
+    public static final String MSG_NEW_DISPATCH_OK =
+        Messages.DispatchSendingEntryForm_new_ok_msg;
 
-    public static final String MSG_DISPATCH_OK = Messages.DispatchSendingEntryForm_edit_ok_msg;
+    public static final String MSG_DISPATCH_OK =
+        Messages.DispatchSendingEntryForm_edit_ok_msg;
 
     private ComboViewer destSiteComboViewer;
 
@@ -65,12 +66,13 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     private ShipmentInfoWrapper shipmentInfo = null;
 
-    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BgcEntryFormWidgetListener listener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     private CommentCollectionInfoTable commentEntryTable;
 
@@ -153,8 +155,10 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        commentWidget = (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add, null, comment, "message", null);
+        commentWidget =
+            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
+                SWT.MULTI,
+                Messages.Comments_add, null, comment, "message", null);
 
     }
 
@@ -192,7 +196,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     private void createSpecimensSelectionSection() {
         if (dispatch.isInCreationState()) {
-            Section section = createSection(Messages.DispatchSendingEntryForm_specimens_title);
+            Section section =
+                createSection(Messages.DispatchSendingEntryForm_specimens_title);
             Composite composite = toolkit.createComposite(section);
             composite.setLayout(new GridLayout(1, false));
             section.setClient(composite);
@@ -236,9 +241,11 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             public void doubleClick(DoubleClickEvent event) {
                 Object selection = event.getSelection();
                 if (selection instanceof InfoTableSelection) {
-                    InfoTableSelection tableSelection = (InfoTableSelection) selection;
-                    DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) tableSelection
-                        .getObject();
+                    InfoTableSelection tableSelection =
+                        (InfoTableSelection) selection;
+                    DispatchSpecimenWrapper dsa =
+                        (DispatchSpecimenWrapper) tableSelection
+                            .getObject();
                     if (dsa != null) {
                         SessionManager.openViewForm(dsa.getSpecimen());
                     }
@@ -263,13 +270,15 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     @Override
     protected void doSpecimenTextAction(String inventoryId) {
         try {
-            CellProcessResult res = (CellProcessResult) SessionManager
-                .getAppService().doAction(
-                    new DispatchCreateProcessAction(new ShipmentProcessInfo(null,
-                        dispatch, true), SessionManager.getUser()
-                        .getCurrentWorkingCenter().getId(),
-                        new CellInfo(-1, -1, inventoryId, null),
-                        Locale.getDefault()));
+            CellProcessResult res =
+                (CellProcessResult) SessionManager
+                    .getAppService().doAction(
+                        new DispatchCreateProcessAction(
+                            new ShipmentProcessInfo(null,
+                                dispatch, true), SessionManager.getUser()
+                                .getCurrentWorkingCenter().getId(),
+                            new CellInfo(-1, -1, inventoryId, null),
+                            Locale.getDefault()));
             switch (res.getProcessStatus()) {
             case FILLED:
                 // ok
@@ -327,16 +336,15 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     protected String getTextForPartName() {
         if (dispatch.isNew()) {
             return Messages.DispatchSendingEntryForm_new_title;
-        } else {
-            Assert.isNotNull(dispatch, "Dispatch is null"); //$NON-NLS-1$
-            String label = dispatch.getSenderCenter().getNameShort() + " -> " //$NON-NLS-1$
-                + dispatch.getReceiverCenter().getNameShort();
-
-            String packedAt = dispatch.getFormattedPackedAt();
-            if (packedAt != null)
-                label += " [" + packedAt + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-            return label;
         }
+        Assert.isNotNull(dispatch, "Dispatch is null"); //$NON-NLS-1$
+        String label = dispatch.getSenderCenter().getNameShort() + " -> " //$NON-NLS-1$
+            + dispatch.getReceiverCenter().getNameShort();
+
+        String packedAt = dispatch.getFormattedPackedAt();
+        if (packedAt != null)
+            label += " [" + packedAt + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+        return label;
     }
 
     @Override
@@ -362,5 +370,5 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 Messages.BiobankEntryForm_access_denied_error_msg);
         }
     }
-    
+
 }

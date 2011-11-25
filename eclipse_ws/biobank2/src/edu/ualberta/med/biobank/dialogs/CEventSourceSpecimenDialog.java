@@ -120,9 +120,8 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
     protected String getTitleAreaMessage() {
         if (addMode) {
             return Messages.CEventSourceSpecimenDialog_msg_add;
-        } else {
-            return Messages.CEventSourceSpecimenDialog_msg_edit;
         }
+        return Messages.CEventSourceSpecimenDialog_msg_edit;
     }
 
     @Override
@@ -230,7 +229,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         if (typeInfo.type != null) {
             ss = mapStudySourceSpecimen.get(typeInfo.type.getName());
         }
-        if (ss == null && typeInfo != null
+        if (ss == null && typeInfo.type != null
             && allSpecimenTypes.contains(typeInfo)) {
             useStudyOnlySourceSpecimens = false;
         }

@@ -31,7 +31,8 @@ public class AdapterFactory {
             objectClass = objectClass.getSuperclass();
         }
         String objectClassName = objectClass.getSimpleName();
-        String adapterClassName = objectClassName.replace("Wrapper", "") + "Adapter"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        String adapterClassName =
+            objectClassName.replace("Wrapper", "") + "Adapter"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         try {
             for (String packageName : adaptersPackages) {
                 Class<?> klass;
@@ -53,10 +54,9 @@ public class AdapterFactory {
         } catch (Exception e) {
             if (object instanceof ModelWrapper)
                 return getAdapter(((ModelWrapper<?>) object).getWrappedObject());
-            else
-                throw new RuntimeException(
-                    "error in invoking adapter for object: " + objectClassName //$NON-NLS-1$
-                        + " (adapter name is " + adapterClassName + "). ", e); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new RuntimeException(
+                "error in invoking adapter for object: " + objectClassName //$NON-NLS-1$
+                    + " (adapter name is " + adapterClassName + "). ", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 }
