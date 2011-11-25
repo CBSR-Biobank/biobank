@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -54,8 +53,6 @@ public class TestProcessingEvent extends TestDatabase {
 
     private ClinicWrapper clinic;
 
-    private PatientWrapper patient;
-
     @Override
     @Before
     public void setUp() throws Exception {
@@ -72,7 +69,7 @@ public class TestProcessingEvent extends TestDatabase {
             "Contact - Processing Event Test");
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
-        patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
+        PatientHelper.addPatient(Utils.getRandomNumericString(20),
             study);
     }
 
@@ -258,7 +255,8 @@ public class TestProcessingEvent extends TestDatabase {
         ContainerWrapper container = containerMap.get("ChildL1");
 
         // fill container with random samples
-        Map<Integer, SpecimenWrapper> spcMap = new HashMap<Integer, SpecimenWrapper>();
+        Map<Integer, SpecimenWrapper> spcMap =
+            new HashMap<Integer, SpecimenWrapper>();
         int rows = container.getRowCapacity().intValue();
         int cols = container.getColCapacity().intValue();
         for (int row = 0; row < rows; ++row) {
@@ -326,7 +324,8 @@ public class TestProcessingEvent extends TestDatabase {
 
         try {
             // fill container with random samples
-            Map<Integer, SpecimenWrapper> spcMap = new HashMap<Integer, SpecimenWrapper>();
+            Map<Integer, SpecimenWrapper> spcMap =
+                new HashMap<Integer, SpecimenWrapper>();
             int rows = container.getRowCapacity().intValue();
             int cols = container.getColCapacity().intValue();
             for (int row = 0; row < rows; ++row) {
@@ -362,7 +361,8 @@ public class TestProcessingEvent extends TestDatabase {
     @Test
     public void testSpecimenCounts() throws Exception {
         List<SpecimenWrapper> parentSpcs = new ArrayList<SpecimenWrapper>();
-        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        List<ProcessingEventWrapper> pevents =
+            new ArrayList<ProcessingEventWrapper>();
         List<SpecimenTypeWrapper> allSpcTypes = SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, true);
 

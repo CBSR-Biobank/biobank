@@ -34,43 +34,55 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractReportTest {
     public static enum CompareResult {
-        ORDER, SIZE
+        ORDER,
+        SIZE
     };
 
     public static final String[] DATE_FIELDS = { "Week", "Month", "Quarter",
         "Year" };
 
-    public static final Predicate<ContainerWrapper> CONTAINER_IS_TOP_LEVEL = new Predicate<ContainerWrapper>() {
-        public boolean evaluate(ContainerWrapper container) {
-            return container.getParentContainer() == null;
-        }
-    };
-    public static final Predicate<ContainerWrapper> CONTAINER_CAN_STORE_SAMPLES_PREDICATE = new Predicate<ContainerWrapper>() {
-        public boolean evaluate(ContainerWrapper container) {
-            return (container.getContainerType().getSpecimenTypeCollection(
-                false) != null)
-                && (container.getContainerType()
-                    .getSpecimenTypeCollection(false).size() > 0);
-        }
-    };
-    public static final Predicate<SpecimenWrapper> ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER = new Predicate<SpecimenWrapper>() {
-        public boolean evaluate(SpecimenWrapper aliquot) {
-            return (aliquot.getParentContainer() == null)
-                || !aliquot.getParentContainer().getLabel().startsWith("SS");
-        }
-    };
-    public static final Predicate<SpecimenWrapper> ALIQUOT_HAS_POSITION = new Predicate<SpecimenWrapper>() {
-        public boolean evaluate(SpecimenWrapper aliquot) {
-            return aliquot.getParentContainer() != null;
-        }
-    };
-    public static final Comparator<SpecimenWrapper> ORDER_ALIQUOT_BY_PNUMBER = new Comparator<SpecimenWrapper>() {
-        public int compare(SpecimenWrapper lhs, SpecimenWrapper rhs) {
-            return compareStrings(lhs.getCollectionEvent().getPatient()
-                .getPnumber(), rhs.getCollectionEvent().getPatient()
-                .getPnumber());
-        }
-    };
+    public static final Predicate<ContainerWrapper> CONTAINER_IS_TOP_LEVEL =
+        new Predicate<ContainerWrapper>() {
+            @Override
+            public boolean evaluate(ContainerWrapper container) {
+                return container.getParentContainer() == null;
+            }
+        };
+    public static final Predicate<ContainerWrapper> CONTAINER_CAN_STORE_SAMPLES_PREDICATE =
+        new Predicate<ContainerWrapper>() {
+            @Override
+            public boolean evaluate(ContainerWrapper container) {
+                return (container.getContainerType().getSpecimenTypeCollection(
+                    false) != null)
+                    && (container.getContainerType()
+                        .getSpecimenTypeCollection(false).size() > 0);
+            }
+        };
+    public static final Predicate<SpecimenWrapper> ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER =
+        new Predicate<SpecimenWrapper>() {
+            @Override
+            public boolean evaluate(SpecimenWrapper aliquot) {
+                return (aliquot.getParentContainer() == null)
+                    || !aliquot.getParentContainer().getLabel()
+                        .startsWith("SS");
+            }
+        };
+    public static final Predicate<SpecimenWrapper> ALIQUOT_HAS_POSITION =
+        new Predicate<SpecimenWrapper>() {
+            @Override
+            public boolean evaluate(SpecimenWrapper aliquot) {
+                return aliquot.getParentContainer() != null;
+            }
+        };
+    public static final Comparator<SpecimenWrapper> ORDER_ALIQUOT_BY_PNUMBER =
+        new Comparator<SpecimenWrapper>() {
+            @Override
+            public int compare(SpecimenWrapper lhs, SpecimenWrapper rhs) {
+                return compareStrings(lhs.getCollectionEvent().getPatient()
+                    .getPnumber(), rhs.getCollectionEvent().getPatient()
+                    .getPnumber());
+            }
+        };
 
     private BiobankReport report;
     private static ReportDataSource dataSource;
@@ -82,6 +94,7 @@ public abstract class AbstractReportTest {
     public static Predicate<SpecimenWrapper> aliquotSite(final boolean isIn,
         final Integer siteId) {
         return new Predicate<SpecimenWrapper>() {
+            @Override
             public boolean evaluate(SpecimenWrapper aliquot) {
                 return isIn == aliquot.getProcessingEvent().getCenter().getId()
                     .equals(siteId);
@@ -92,6 +105,7 @@ public abstract class AbstractReportTest {
     public static Predicate<ContainerWrapper> containerSite(final boolean isIn,
         final Integer siteId) {
         return new Predicate<ContainerWrapper>() {
+            @Override
             public boolean evaluate(ContainerWrapper container) {
                 return isIn == container.getSite().getId().equals(siteId);
             }
@@ -101,6 +115,7 @@ public abstract class AbstractReportTest {
     public static Predicate<ProcessingEventWrapper> patientVisitSite(
         final boolean isIn, final Integer siteId) {
         return new Predicate<ProcessingEventWrapper>() {
+            @Override
             public boolean evaluate(ProcessingEventWrapper patientVisit) {
                 return !isIn || patientVisit.getCenter().getId().equals(siteId);
             }
@@ -114,6 +129,7 @@ public abstract class AbstractReportTest {
         return new Predicate<SpecimenWrapper>() {
             private Calendar drawn = Calendar.getInstance();
 
+            @Override
             public boolean evaluate(SpecimenWrapper aliquot) {
                 drawn.setTime(aliquot.getParentSpecimen().getCreatedAt());
                 int drawnDayOfYear = drawn.get(Calendar.DAY_OF_YEAR);
@@ -129,6 +145,7 @@ public abstract class AbstractReportTest {
     public static Predicate<SpecimenWrapper> aliquotLinkedBetween(
         final Date after, final Date before) {
         return new Predicate<SpecimenWrapper>() {
+            @Override
             public boolean evaluate(SpecimenWrapper aliquot) {
                 Date linked = aliquot.getCreatedAt();
                 return (DateCompare.compare(linked, after) <= 0)
@@ -140,6 +157,7 @@ public abstract class AbstractReportTest {
     public static Predicate<SpecimenWrapper> aliquotPvProcessedBetween(
         final Date after, final Date before) {
         return new Predicate<SpecimenWrapper>() {
+            @Override
             public boolean evaluate(SpecimenWrapper aliquot) {
                 Date processed = aliquot.getProcessingEvent().getCreatedAt();
                 return (DateCompare.compare(processed, after) <= 0)
@@ -151,6 +169,7 @@ public abstract class AbstractReportTest {
     public static Predicate<ProcessingEventWrapper> patientVisitProcessedBetween(
         final Date after, final Date before) {
         return new Predicate<ProcessingEventWrapper>() {
+            @Override
             public boolean evaluate(ProcessingEventWrapper pevent) {
                 Date processed = pevent.getCreatedAt();
                 return (DateCompare.compare(processed, after) <= 0)
@@ -182,6 +201,7 @@ public abstract class AbstractReportTest {
     public static Predicate<SpecimenWrapper> aliquotTopContainerIdIn(String list) {
         if ((list == null) || list.isEmpty()) {
             return new Predicate<SpecimenWrapper>() {
+                @Override
                 public boolean evaluate(SpecimenWrapper aliquot) {
                     return false;
                 }
@@ -192,6 +212,7 @@ public abstract class AbstractReportTest {
             topContainerIds.add(Integer.valueOf(id));
         }
         return new Predicate<SpecimenWrapper>() {
+            @Override
             public boolean evaluate(SpecimenWrapper aliquot) {
                 ContainerWrapper top = aliquot.getTop();
                 return (top != null) && topContainerIds.contains(top.getId());
@@ -372,7 +393,8 @@ public abstract class AbstractReportTest {
 
         List<Object> actualResults = ReportFactory.createReport(getReport())
             .generate(getAppService());
-        List<Object> postProcessedExpectedResults = postProcessExpectedResults(expectedResults);
+        List<Object> postProcessedExpectedResults =
+            postProcessExpectedResults(expectedResults);
 
         testPostProcess(cmpOptions, expectedResults,
             postProcessedExpectedResults);
