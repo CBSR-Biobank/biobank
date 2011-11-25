@@ -54,7 +54,13 @@ import edu.ualberta.med.biobank.gui.common.widgets.nebula.IControlPainter;
 public abstract class VControl {
 
     public enum Type {
-        Button, Custom, Label, Native, Panel, Text, Spacer
+        Button,
+        Custom,
+        Label,
+        Native,
+        Panel,
+        Text,
+        Spacer
     }
 
     /**
@@ -142,7 +148,8 @@ public abstract class VControl {
 
     IControlPainter painter;
     Map<String, Object> dataMap;
-    Map<Integer, List<Listener>> listeners = new HashMap<Integer, List<Listener>>();
+    Map<Integer, List<Listener>> listeners =
+        new HashMap<Integer, List<Listener>>();
     private Set<Integer> eventTypes = new HashSet<Integer>();
 
     private Listener listener = new Listener() {
@@ -273,6 +280,7 @@ public abstract class VControl {
         return computeSize(wHint, hHint, true);
     }
 
+    @SuppressWarnings("unused")
     public Point computeSize(int wHint, int hHint, boolean changed) {
         if (wHint != SWT.DEFAULT && wHint < 0) {
             wHint = 0;
@@ -431,7 +439,7 @@ public abstract class VControl {
         return null;
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({ "unchecked", "unused" })
     public <T> T getData(String name, Class<T> clazz) {
         if (dataMap != null) {
             return (T) dataMap.get(name);
@@ -521,6 +529,7 @@ public abstract class VControl {
         return getParent().getWidget();
     }
 
+    @SuppressWarnings("unused")
     protected void filterEvent(Event event) {
         // subclasses to implement if necessary
     }
@@ -581,10 +590,12 @@ public abstract class VControl {
         return getVisible() && composite.isVisible();
     }
 
+    @SuppressWarnings("unused")
     public void moveAbove(VControl control) {
         parent.move(this, null);
     }
 
+    @SuppressWarnings("unused")
     public void moveBelow(VControl control) {
         parent.move(null, this);
     }
@@ -812,6 +823,7 @@ public abstract class VControl {
         return false;
     }
 
+    @SuppressWarnings("unused")
     public void setFont(Font font) {
         // TODO setFont
     }
