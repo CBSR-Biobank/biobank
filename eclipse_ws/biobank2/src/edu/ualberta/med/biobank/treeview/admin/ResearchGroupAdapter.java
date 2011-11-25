@@ -9,7 +9,6 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupAdapterInfo;
 import edu.ualberta.med.biobank.forms.ResearchGroupEntryForm;
 import edu.ualberta.med.biobank.forms.ResearchGroupViewForm;
-import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -17,15 +16,15 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public class ResearchGroupAdapter extends AbstractNewAdapterBase {
 
     ResearchGroupAdapterInfo rg;
-    
+
     public ResearchGroupAdapter(AbstractNewAdapterBase parent,
         ResearchGroupAdapterInfo rg) {
         super(parent, rg.id, rg.nameShort, null, false);
-        this.rg=rg;
+        this.rg = rg;
     }
-    
+
     public void setValue(Object value) {
-        
+
     }
 
     @Override
@@ -85,7 +84,7 @@ public class ResearchGroupAdapter extends AbstractNewAdapterBase {
 
     @Override
     protected void runDelete() throws Exception {
-        //TODO: implement delete
+        // TODO: implement delete
     }
 
     @Override

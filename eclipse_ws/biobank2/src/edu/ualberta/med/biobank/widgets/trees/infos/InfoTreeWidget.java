@@ -248,8 +248,9 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
             for (int i = start; i < end; ++i) {
                 if (tree.isDisposed())
                     return;
-                final BiobankCollectionModel item = (BiobankCollectionModel) model
-                    .get(i);
+                final BiobankCollectionModel item =
+                    (BiobankCollectionModel) model
+                        .get(i);
                 Assert.isNotNull(item != null);
                 if (reloadData || (item.o == null)) {
                     item.o = getCollectionModelObject(collection
@@ -291,7 +292,6 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         }
     }
 
-    @SuppressWarnings("unused")
     public Object getCollectionModelObject(Object item) throws Exception {
         return item;
     }
@@ -312,8 +312,9 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         editItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                ModelWrapper<?> selection = (ModelWrapper<?>) InfoTreeWidget.this
-                    .getSelection();
+                ModelWrapper<?> selection =
+                    (ModelWrapper<?>) InfoTreeWidget.this
+                        .getSelection();
                 if (selection != null) {
                     AbstractAdapterBase adapter = AdapterFactory
                         .getAdapter(selection);
@@ -389,7 +390,8 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         Object[] listeners = addItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
             @SuppressWarnings("unchecked")
-            final IInfoTreeAddItemListener<T> l = (IInfoTreeAddItemListener<T>) listeners[i];
+            final IInfoTreeAddItemListener<T> l =
+                (IInfoTreeAddItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -405,7 +407,8 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         Object[] listeners = editItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
             @SuppressWarnings("unchecked")
-            final IInfoTreeEditItemListener<T> l = (IInfoTreeEditItemListener<T>) listeners[i];
+            final IInfoTreeEditItemListener<T> l =
+                (IInfoTreeEditItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -421,7 +424,8 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         Object[] listeners = deleteItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
             @SuppressWarnings("unchecked")
-            final IInfoTreeDeleteItemListener<T> l = (IInfoTreeDeleteItemListener<T>) listeners[i];
+            final IInfoTreeDeleteItemListener<T> l =
+                (IInfoTreeDeleteItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -529,7 +533,8 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         throws Exception {
         List<Node> nodes = new ArrayList<Node>();
         for (int i = 0, n = objects.size(); i < n; ++i) {
-            BiobankCollectionModel model = new BiobankCollectionModel(parent, i);
+            BiobankCollectionModel model =
+                new BiobankCollectionModel(parent, i);
             model.o = getCollectionModelObject(objects.get(i));
             nodes.add(model);
         }

@@ -115,9 +115,11 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             @Override
             protected void beforeScan() {
                 setScanHasBeenLaunched(false, true);
-                String msg = Messages.AbstractPalletSpecimenAdminForm_activitylog_scanning;
+                String msg =
+                    Messages.AbstractPalletSpecimenAdminForm_activitylog_scanning;
                 if (isRescanMode()) {
-                    msg = Messages.AbstractPalletSpecimenAdminForm_activitylog_rescanning;
+                    msg =
+                        Messages.AbstractPalletSpecimenAdminForm_activitylog_rescanning;
                 }
                 appendLog(NLS.bind(msg, currentPlateToScan));
 
@@ -235,7 +237,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected abstract void enableFields(boolean enable);
 
     protected void createScanButton(Composite parent) {
-        scanButtonTitle = Messages.AbstractPalletSpecimenAdminForm_scanButton_text;
+        scanButtonTitle =
+            Messages.AbstractPalletSpecimenAdminForm_scanButton_text;
         if (!BiobankPlugin.isRealScanEnabled()) {
             createFakeOptions(parent);
             scanButtonTitle = "Fake scan"; //$NON-NLS-1$
@@ -285,13 +288,14 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected void createProfileComboBox(Composite fieldsComposite) {
         Label lbl = widgetCreator.createLabel(fieldsComposite,
             Messages.AbstractPalletSpecimenAdminForm_profile_label);
-        profilesCombo = widgetCreator
-            .createComboViewer(
-                fieldsComposite,
-                lbl,
-                null,
-                null,
-                "Invalid profile selected", false, null, null, new BiobankLabelProvider()); //$NON-NLS-1$
+        profilesCombo =
+            widgetCreator
+                .createComboViewer(
+                    fieldsComposite,
+                    lbl,
+                    null,
+                    null,
+                    "Invalid profile selected", false, null, null, new BiobankLabelProvider()); //$NON-NLS-1$
 
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
@@ -319,17 +323,18 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected void createPlateToScanField(Composite fieldsComposite) {
         plateToScanLabel = widgetCreator.createLabel(fieldsComposite,
             Messages.AbstractPalletSpecimenAdminForm_plateToScan_label);
-        plateToScanText = (BgcBaseText) widgetCreator
-            .createBoundWidget(
-                fieldsComposite,
-                BgcBaseText.class,
-                SWT.NONE,
-                plateToScanLabel,
-                new String[0],
-                plateToScanValue,
-                new ScannerBarcodeValidator(
-                    Messages.AbstractPalletSpecimenAdminForm_plateToScan_validationMsg),
-                PLATE_VALIDATOR);
+        plateToScanText =
+            (BgcBaseText) widgetCreator
+                .createBoundWidget(
+                    fieldsComposite,
+                    BgcBaseText.class,
+                    SWT.NONE,
+                    plateToScanLabel,
+                    new String[0],
+                    plateToScanValue,
+                    new ScannerBarcodeValidator(
+                        Messages.AbstractPalletSpecimenAdminForm_plateToScan_validationMsg),
+                    PLATE_VALIDATOR);
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
@@ -346,16 +351,19 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                         .getValue() && fieldsValid());
             }
         });
-        String tooltip = Messages.AbstractPalletSpecimenAdminForm_nobarcodes_msg;
+        String tooltip =
+            Messages.AbstractPalletSpecimenAdminForm_nobarcodes_msg;
         List<String> barcodes = BiobankPlugin.getDefault()
             .getPossibleBarcodes();
         if (barcodes.size() > 0)
-            tooltip = Messages.AbstractPalletSpecimenAdminForm_barcodes_tooltip_msg
-                + StringUtil.join(barcodes, ", ");//$NON-NLS-1$
+            tooltip =
+                Messages.AbstractPalletSpecimenAdminForm_barcodes_tooltip_msg
+                    + StringUtil.join(barcodes, ", ");//$NON-NLS-1$
         plateToScanText.setToolTipText(tooltip);
         GridData gd = (GridData) plateToScanText.getLayoutData();
         gd.horizontalAlignment = SWT.FILL;
-        int parentNumColumns = ((GridLayout) fieldsComposite.getLayout()).numColumns;
+        int parentNumColumns =
+            ((GridLayout) fieldsComposite.getLayout()).numColumns;
         if (parentNumColumns > 2)
             gd.horizontalSpan = parentNumColumns - 1;
         plateToScanText.setLayoutData(gd);
@@ -376,7 +384,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         cancelConfirmWidget = new CancelConfirmWidget(parent, this, true);
     }
 
-    @SuppressWarnings("unused")
     protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
         return null;
     }
@@ -577,9 +584,11 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
         // conversion for server side call
-        Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> serverCells = null;
+        Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> serverCells =
+            null;
         if (cells != null) {
-            serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo>();
+            serverCells =
+                new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo>();
             for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
                 serverCells.put(entry.getKey(), entry.getValue()
                     .transformIntoServerCell());

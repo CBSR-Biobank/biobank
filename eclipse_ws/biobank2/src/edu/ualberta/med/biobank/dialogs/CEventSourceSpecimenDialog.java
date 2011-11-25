@@ -67,7 +67,6 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
     private List<String> inventoryIdExcludeList;
 
-    @SuppressWarnings("unchecked")
     public CEventSourceSpecimenDialog(Shell parent, Specimen spec,
         List<SourceSpecimen> studySourceSpecimen,
         List<SpecimenTypeInfo> allSpecimenTypes,
@@ -340,7 +339,6 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         updateWidgetVisibilityAndValues();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void copy(Object newModelObject) {
         Specimen spec = (Specimen) newModelObject;
