@@ -19,8 +19,9 @@ import edu.ualberta.med.biobank.mvp.util.HandlerRegManager;
  * Listens for {@link ValueChangeEvent}-s from the condition and will re-
  * {@link HasValidation#validate()} whenever the condition value changes.
  * <p>
- * Listens for {@link ValidationEvent}-s from the validator and will re-fire
- * them as coming from this class.
+ * Listens for {@link ValidationEvent}-s from the validator and will re-
+ * {@link HasValidation#validate()} to determine whether to fire our own
+ * {@link ValidationEvent}.
  * 
  * @author jferland
  * 
