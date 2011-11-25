@@ -36,6 +36,7 @@ import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
 public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
+    @SuppressWarnings("unused")
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractDispatchEntryForm.class.getName());
 
@@ -49,8 +50,6 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
                 setDirty(true);
             }
         };
-
-    private boolean isTryingAgain;
 
     protected boolean tryAgain;
 
@@ -161,7 +160,6 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
     @Override
     protected void doAfterSave() throws Exception {
         if (tryAgain) {
-            isTryingAgain = true;
             tryAgain = false;
             confirm();
         } else
