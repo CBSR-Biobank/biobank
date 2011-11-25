@@ -97,21 +97,20 @@ public class PalletScanManagement {
                             Messages.PalletScanManagement_scan_error_msg_notenabled,
                             plateToScan));
                 return;
-            } else {
-                List<ScanCell> scanCells = null;
-                try {
-                    scanCells = ScannerConfigPlugin.decodePlate(plateNum,
-                        profile);
-                    cells = PalletCell.convertArray(scanCells);
-                } catch (Exception ex) {
-                    BgcPlugin.openAsyncError(
-                        Messages.PalletScanManagement_scan_error_title, ex,
-                        Messages.PalletScanManagement_scan_error_msg_2dScanner);
-                    return;
-                } finally {
-                    scansCount++;
-                    afterScanBeforeMerge();
-                }
+            }
+            List<ScanCell> scanCells = null;
+            try {
+                scanCells = ScannerConfigPlugin.decodePlate(plateNum,
+                    profile);
+                cells = PalletCell.convertArray(scanCells);
+            } catch (Exception ex) {
+                BgcPlugin.openAsyncError(
+                    Messages.PalletScanManagement_scan_error_title, ex,
+                    Messages.PalletScanManagement_scan_error_msg_2dScanner);
+                return;
+            } finally {
+                scansCount++;
+                afterScanBeforeMerge();
             }
         } else {
             cells = getFakeScanCells();

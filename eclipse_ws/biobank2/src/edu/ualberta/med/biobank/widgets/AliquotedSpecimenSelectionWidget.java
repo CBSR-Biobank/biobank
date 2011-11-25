@@ -73,7 +73,8 @@ public class AliquotedSpecimenSelectionWidget {
     private Label sourceLabel;
     private Label resultLabel;
 
-    private List<SpecimenTypeWrapper> sourceChildTypes = new ArrayList<SpecimenTypeWrapper>();
+    private List<SpecimenTypeWrapper> sourceChildTypes =
+        new ArrayList<SpecimenTypeWrapper>();
 
     public AliquotedSpecimenSelectionWidget(Composite parent, Character letter,
         BgcWidgetCreator widgetCreator, boolean oneRow) {
@@ -84,11 +85,16 @@ public class AliquotedSpecimenSelectionWidget {
                 SWT.LEFT);
         }
         if (!oneRow) {
-            sourceLabel = widgetCreator.createLabel(parent, Messages.AliquotedSpecimenSelectionWidget_sources_spec_title);
-            sourceControlDecoration = BgcBaseWidget
-                .createDecorator(
-                    sourceLabel,
-                    Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
+            sourceLabel =
+                widgetCreator
+                    .createLabel(
+                        parent,
+                        Messages.AliquotedSpecimenSelectionWidget_sources_spec_title);
+            sourceControlDecoration =
+                BgcBaseWidget
+                    .createDecorator(
+                        sourceLabel,
+                        Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
         }
         cvSource = widgetCreator.createComboViewerWithoutLabel(parent, null,
             null, new BiobankLabelProvider());
@@ -105,8 +111,9 @@ public class AliquotedSpecimenSelectionWidget {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
                 if (!event.getSelection().isEmpty()) {
-                    SpecimenWrapper spc = (SpecimenWrapper) ((IStructuredSelection) event
-                        .getSelection()).getFirstElement();
+                    SpecimenWrapper spc =
+                        (SpecimenWrapper) ((IStructuredSelection) event
+                            .getSelection()).getFirstElement();
                     sourceChildTypes = spc.getSpecimenType()
                         .getChildSpecimenTypeCollection(false);
                 }
@@ -118,10 +125,11 @@ public class AliquotedSpecimenSelectionWidget {
         if (!oneRow) {
             resultLabel = widgetCreator.createLabel(parent,
                 Messages.AliquotedSpecimenSelectionWidget_aliquoted_spec_title);
-            resultControlDecoration = BgcBaseWidget
-                .createDecorator(
-                    resultLabel,
-                    Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
+            resultControlDecoration =
+                BgcBaseWidget
+                    .createDecorator(
+                        resultLabel,
+                        Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
         }
         cvResult = widgetCreator.createComboViewerWithoutLabel(parent, null,
             null, new BiobankLabelProvider());
@@ -148,10 +156,11 @@ public class AliquotedSpecimenSelectionWidget {
             gd.widthHint = 20;
             gd.horizontalAlignment = SWT.LEFT;
             textNumber.setLayoutData(gd);
-            rowControlDecoration = BgcBaseWidget
-                .createDecorator(
-                    textNumber,
-                    Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
+            rowControlDecoration =
+                BgcBaseWidget
+                    .createDecorator(
+                        textNumber,
+                        Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
         }
     }
 
@@ -263,9 +272,8 @@ public class AliquotedSpecimenSelectionWidget {
     public boolean needToSave() {
         if (number == null) {
             return false;
-        } else {
-            return number > 0;
         }
+        return number > 0;
     }
 
     private SpecimenTypeWrapper getResultTypeSelection() {
@@ -281,7 +289,8 @@ public class AliquotedSpecimenSelectionWidget {
     public void addBindings() {
         if (oneRow) {
             if (oneRowBinding == null) {
-                UpdateValueStrategy rowUpdateValue = createOneRowUpdateValueStrategy(rowControlDecoration);
+                UpdateValueStrategy rowUpdateValue =
+                    createOneRowUpdateValueStrategy(rowControlDecoration);
                 oneRowBinding = widgetCreator.bindValue(new WritableValue(
                     Boolean.FALSE, Boolean.class), bothSelected,
                     rowUpdateValue, rowUpdateValue);
@@ -290,11 +299,13 @@ public class AliquotedSpecimenSelectionWidget {
             }
         } else {
             if (sourceBinding == null || resultBinding == null) {
-                UpdateValueStrategy sourceUpdateValue = createOneRowUpdateValueStrategy(sourceControlDecoration);
+                UpdateValueStrategy sourceUpdateValue =
+                    createOneRowUpdateValueStrategy(sourceControlDecoration);
                 sourceBinding = widgetCreator.bindValue(new WritableValue(
                     Boolean.FALSE, Boolean.class), sourceSelected,
                     sourceUpdateValue, sourceUpdateValue);
-                UpdateValueStrategy resultUpdateValue = createOneRowUpdateValueStrategy(resultControlDecoration);
+                UpdateValueStrategy resultUpdateValue =
+                    createOneRowUpdateValueStrategy(resultControlDecoration);
                 resultBinding = widgetCreator.bindValue(new WritableValue(
                     Boolean.FALSE, Boolean.class), resultSelected,
                     resultUpdateValue, resultUpdateValue);
@@ -315,10 +326,9 @@ public class AliquotedSpecimenSelectionWidget {
                     decoration.show();
                     return ValidationStatus
                         .error(Messages.AliquotedSpecimenSelectionWidget_selections_status_msg);
-                } else {
-                    decoration.hide();
-                    return Status.OK_STATUS;
                 }
+                decoration.hide();
+                return Status.OK_STATUS;
             }
         });
         return uvs;

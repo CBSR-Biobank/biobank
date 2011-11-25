@@ -24,8 +24,7 @@ public class OriginInfoSearchedNode extends AbstractSearchedNode {
             || child instanceof OriginInfoWrapper);
         if (child instanceof OriginInfoWrapper)
             return new ShipmentAdapter(this, (OriginInfoWrapper) child);
-        else
-            return new DispatchAdapter(this, (DispatchWrapper) child);
+        return new DispatchAdapter(this, (DispatchWrapper) child);
     }
 
     @Override
@@ -46,8 +45,7 @@ public class OriginInfoSearchedNode extends AbstractSearchedNode {
         Integer objectId) {
         if (Integer.class.isAssignableFrom(searchedClass))
             return findChildFromClass(searchedClass, objectId, Integer.class);
-        else
-            return searchChildren(searchedClass, objectId);
+        return searchChildren(searchedClass, objectId);
     }
 
     @Override

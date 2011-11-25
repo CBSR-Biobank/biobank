@@ -47,8 +47,10 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class SpecimenEntryWidget extends BgcBaseWidget {
     private WritableApplicationService appService;
     private List<SpecimenWrapper> specimens;
-    private List<SpecimenWrapper> addedSpecimens = new ArrayList<SpecimenWrapper>();
-    private List<SpecimenWrapper> removedSpecimens = new ArrayList<SpecimenWrapper>();
+    private List<SpecimenWrapper> addedSpecimens =
+        new ArrayList<SpecimenWrapper>();
+    private List<SpecimenWrapper> removedSpecimens =
+        new ArrayList<SpecimenWrapper>();
     private SpecimenInfoTable specTable;
     private BgcBaseText newSpecimenInventoryId;
     private boolean editable;
@@ -58,10 +60,14 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
 
     // TODO: not sure these should all be interruptable
     public static enum ItemAction {
-        PRE_ADD, POST_ADD, PRE_DELETE, POST_DELETE;
+        PRE_ADD,
+        POST_ADD,
+        PRE_DELETE,
+        POST_DELETE;
     }
 
-    private VetoListenerSupport<ItemAction, SpecimenWrapper> vetoListenerSupport = new VetoListenerSupport<ItemAction, SpecimenWrapper>();
+    private VetoListenerSupport<ItemAction, SpecimenWrapper> vetoListenerSupport =
+        new VetoListenerSupport<ItemAction, SpecimenWrapper>();
 
     public void addVetoListener(ItemAction action,
         VetoListener<ItemAction, SpecimenWrapper> listener) {
@@ -166,11 +172,13 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
             return;
         }
 
-        VetoListenerSupport.Event<ItemAction, SpecimenWrapper> preAdd = VetoListenerSupport.Event
-            .newEvent(ItemAction.PRE_ADD, specimen);
+        VetoListenerSupport.Event<ItemAction, SpecimenWrapper> preAdd =
+            VetoListenerSupport.Event
+                .newEvent(ItemAction.PRE_ADD, specimen);
 
-        VetoListenerSupport.Event<ItemAction, SpecimenWrapper> postAdd = VetoListenerSupport.Event
-            .newEvent(ItemAction.POST_ADD, specimen);
+        VetoListenerSupport.Event<ItemAction, SpecimenWrapper> postAdd =
+            VetoListenerSupport.Event
+                .newEvent(ItemAction.POST_ADD, specimen);
 
         vetoListenerSupport.notifyListeners(preAdd);
 
@@ -220,11 +228,13 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
     }
 
     public void removeSpecimen(SpecimenWrapper specimen) throws VetoException {
-        VetoListenerSupport.Event<ItemAction, SpecimenWrapper> preDelete = VetoListenerSupport.Event
-            .newEvent(ItemAction.PRE_DELETE, specimen);
+        VetoListenerSupport.Event<ItemAction, SpecimenWrapper> preDelete =
+            VetoListenerSupport.Event
+                .newEvent(ItemAction.PRE_DELETE, specimen);
 
-        VetoListenerSupport.Event<ItemAction, SpecimenWrapper> postDelete = VetoListenerSupport.Event
-            .newEvent(ItemAction.POST_DELETE, specimen);
+        VetoListenerSupport.Event<ItemAction, SpecimenWrapper> postDelete =
+            VetoListenerSupport.Event
+                .newEvent(ItemAction.POST_DELETE, specimen);
 
         vetoListenerSupport.notifyListeners(preDelete);
         if (preDelete.doit) {
@@ -272,10 +282,9 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                 if (value instanceof Boolean && !(Boolean) value) {
                     controlDecoration.show();
                     return ValidationStatus.error(message);
-                } else {
-                    controlDecoration.hide();
-                    return Status.OK_STATUS;
                 }
+                controlDecoration.hide();
+                return Status.OK_STATUS;
             }
         });
         dbc.bindValue(wv, hasSpecimens, uvs, uvs);

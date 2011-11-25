@@ -89,8 +89,7 @@ public class DispatchAdapter extends AdapterBase {
                 .equals(getDispatchWrapper().getSenderCenter())
                 && SessionManager.canDelete(getDispatchWrapper())
                 && getDispatchWrapper().isInCreationState();
-        else
-            return false;
+        return false;
     }
 
     @Override

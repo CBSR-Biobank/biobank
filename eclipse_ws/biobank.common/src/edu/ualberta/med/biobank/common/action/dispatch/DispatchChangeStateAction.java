@@ -1,9 +1,5 @@
 package edu.ualberta.med.biobank.common.action.dispatch;
 
-
-import org.hibernate.Session;
-
-import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -48,8 +44,7 @@ public class DispatchChangeStateAction implements Action<IdResult> {
             sessionUtil.load(Dispatch.class, id);
 
         disp.setState(newState.getId());
-        
-        
+
         if (shipInfo != null) {
 
             ShipmentInfo si =

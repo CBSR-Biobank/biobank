@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.util.Collection;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.base.CommentBaseWrapper;
@@ -24,8 +23,8 @@ public class CommentWrapper extends CommentBaseWrapper {
             sb.append(comment.getMessage());
             sb.append("; ");
         }
-        if (sb.length()>0) sb.delete(sb.length()-2, sb.length() -1);
+        if (sb.length() > 0) sb.delete(sb.length() - 2, sb.length() - 1);
         return sb.toString();
     }
-    
+
 }

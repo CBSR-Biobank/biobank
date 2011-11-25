@@ -173,8 +173,10 @@ public class VGridLayout extends VLayout {
 
         int numRows = getNumRows(children);
 
-        size.x += (marginLeft + (2 * marginWidth) + marginRight + (horizontalSpacing * (numColumns - 1)));
-        size.y += (marginTop + (2 * marginHeight) + marginBottom + (verticalSpacing * (numRows - 1)));
+        size.x +=
+            (marginLeft + (2 * marginWidth) + marginRight + (horizontalSpacing * (numColumns - 1)));
+        size.y +=
+            (marginTop + (2 * marginHeight) + marginBottom + (verticalSpacing * (numRows - 1)));
 
         return size;
     }
@@ -310,10 +312,12 @@ public class VGridLayout extends VLayout {
                     taken[((row + i) * numColumns) + col] = cellWidth;
                 }
             }
-            int w1 = (SWT.FILL == data.horizontalAlignment) ? (cellWidth - data.horizontalIndent)
-                : p.x;
-            int h1 = (SWT.FILL == data.verticalAlignment) ? (cellHeight - data.verticalIndent)
-                : p.y;
+            int w1 =
+                (SWT.FILL == data.horizontalAlignment) ? (cellWidth - data.horizontalIndent)
+                    : p.x;
+            int h1 =
+                (SWT.FILL == data.verticalAlignment) ? (cellHeight - data.verticalIndent)
+                    : p.y;
             child.setBounds(xoffset + getX(data, cellX, cellWidth, w1), yoffset
                 + getY(data, cellY, cellHeight, h1), w1, h1);
             col += data.horizontalSpan;
@@ -340,9 +344,8 @@ public class VGridLayout extends VLayout {
                 }
             }
             return children.toArray(new VControl[children.size()]);
-        } else {
-            return new VControl[0];
         }
+        return new VControl[0];
     }
 
     private int getNumRows(VControl[] children) {

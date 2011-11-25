@@ -30,9 +30,12 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
-    private static final ProcessingEventLogProvider LOG_PROVIDER = new ProcessingEventLogProvider();
-    private static final String HAS_DERIVED_SPECIMENS_MSG = Messages.getString("ProcessingEventWrapper.has.derived.specimens.msg"); //$NON-NLS-1$
-    private Set<SpecimenWrapper> removedSpecimens = new HashSet<SpecimenWrapper>();
+    private static final ProcessingEventLogProvider LOG_PROVIDER =
+        new ProcessingEventLogProvider();
+    private static final String HAS_DERIVED_SPECIMENS_MSG = Messages
+        .getString("ProcessingEventWrapper.has.derived.specimens.msg"); //$NON-NLS-1$
+    private Set<SpecimenWrapper> removedSpecimens =
+        new HashSet<SpecimenWrapper>();
 
     public ProcessingEventWrapper(WritableApplicationService appService,
         ProcessingEvent wrappedObject) {
@@ -49,7 +52,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     public List<SpecimenWrapper> getDerivedSpecimenCollection(boolean sort) {
-        List<SpecimenWrapper> derivedSpecimens = new ArrayList<SpecimenWrapper>();
+        List<SpecimenWrapper> derivedSpecimens =
+            new ArrayList<SpecimenWrapper>();
         for (SpecimenWrapper spec : getSpecimenCollection(false)) {
             derivedSpecimens.addAll(spec.getChildSpecimenCollection(false));
         }
@@ -91,15 +95,16 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return LOG_PROVIDER;
     }
 
-    private static final String PROCESSING_EVENT_BY_DATE_QRY = "select pEvent from " //$NON-NLS-1$
-        + ProcessingEvent.class.getName()
-        + " pEvent where pEvent." //$NON-NLS-1$
-        + ProcessingEventPeer.CREATED_AT.getName()
-        + ">=? and pEvent." //$NON-NLS-1$
-        + ProcessingEventPeer.CREATED_AT.getName()
-        + "<? and pEvent." //$NON-NLS-1$
-        + Property.concatNames(ProcessingEventPeer.CENTER, CenterPeer.ID)
-        + "= ?"; //$NON-NLS-1$
+    private static final String PROCESSING_EVENT_BY_DATE_QRY =
+        "select pEvent from " //$NON-NLS-1$
+            + ProcessingEvent.class.getName()
+            + " pEvent where pEvent." //$NON-NLS-1$
+            + ProcessingEventPeer.CREATED_AT.getName()
+            + ">=? and pEvent." //$NON-NLS-1$
+            + ProcessingEventPeer.CREATED_AT.getName()
+            + "<? and pEvent." //$NON-NLS-1$
+            + Property.concatNames(ProcessingEventPeer.CENTER, CenterPeer.ID)
+            + "= ?"; //$NON-NLS-1$
 
     public static List<ProcessingEventWrapper> getProcessingEventsWithDateForCenter(
         WritableApplicationService appService, Date date,
@@ -108,7 +113,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
             Arrays.asList(new Object[] { startOfDay(date), endOfDay(date),
                 center.getId() }));
         List<ProcessingEvent> pvs = appService.query(c);
-        List<ProcessingEventWrapper> pvws = new ArrayList<ProcessingEventWrapper>();
+        List<ProcessingEventWrapper> pvws =
+            new ArrayList<ProcessingEventWrapper>();
         for (ProcessingEvent pv : pvs)
             pvws.add(new ProcessingEventWrapper(appService, pv));
         if (pvws.size() == 0)
@@ -116,10 +122,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return pvws;
     }
 
-    private static final String PROCESSING_EVENT_BY_WORKSHEET_QRY = "select pEvent from " //$NON-NLS-1$
-        + ProcessingEvent.class.getName()
-        + " pEvent where pEvent." //$NON-NLS-1$
-        + ProcessingEventPeer.WORKSHEET.getName() + "=?"; //$NON-NLS-1$
+    private static final String PROCESSING_EVENT_BY_WORKSHEET_QRY =
+        "select pEvent from " //$NON-NLS-1$
+            + ProcessingEvent.class.getName()
+            + " pEvent where pEvent." //$NON-NLS-1$
+            + ProcessingEventPeer.WORKSHEET.getName() + "=?"; //$NON-NLS-1$
 
     public static List<ProcessingEventWrapper> getProcessingEventsWithWorksheet(
         WritableApplicationService appService, String worksheetNumber)
@@ -127,7 +134,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_BY_WORKSHEET_QRY,
             Arrays.asList(new Object[] { worksheetNumber }));
         List<ProcessingEvent> pvs = appService.query(c);
-        List<ProcessingEventWrapper> pvws = new ArrayList<ProcessingEventWrapper>();
+        List<ProcessingEventWrapper> pvws =
+            new ArrayList<ProcessingEventWrapper>();
         for (ProcessingEvent pv : pvs)
             pvws.add(new ProcessingEventWrapper(appService, pv));
         if (pvws.size() == 0)
@@ -135,10 +143,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return pvws;
     }
 
-    private static final String PROCESSING_EVENT_BY_WORKSHEET_COUNT_QRY = "select count(pEvent) from " //$NON-NLS-1$
-        + ProcessingEvent.class.getName()
-        + " pEvent where pEvent." //$NON-NLS-1$
-        + ProcessingEventPeer.WORKSHEET.getName() + "=?"; //$NON-NLS-1$
+    private static final String PROCESSING_EVENT_BY_WORKSHEET_COUNT_QRY =
+        "select count(pEvent) from " //$NON-NLS-1$
+            + ProcessingEvent.class.getName()
+            + " pEvent where pEvent." //$NON-NLS-1$
+            + ProcessingEventPeer.WORKSHEET.getName() + "=?"; //$NON-NLS-1$
 
     public static long getProcessingEventsWithWorksheetCount(
         WritableApplicationService appService, String worksheetNumber)
@@ -172,15 +181,16 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return count;
     }
 
-    private static String CEVENT_FROM_SPECIMEN_AND_PATIENT_QRY = "select distinct(cEvent) from " //$NON-NLS-1$
-        + CollectionEvent.class.getName()
-        + " as cEvent join cEvent." //$NON-NLS-1$
-        + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
-        + " as specs where cEvent." //$NON-NLS-1$
-        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
-        + "=? and specs." //$NON-NLS-1$
-        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
-            ProcessingEventPeer.ID) + "=?"; //$NON-NLS-1$
+    private static String CEVENT_FROM_SPECIMEN_AND_PATIENT_QRY =
+        "select distinct(cEvent) from " //$NON-NLS-1$
+            + CollectionEvent.class.getName()
+            + " as cEvent join cEvent." //$NON-NLS-1$
+            + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
+            + " as specs where cEvent." //$NON-NLS-1$
+            + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+            + "=? and specs." //$NON-NLS-1$
+            + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
+                ProcessingEventPeer.ID) + "=?"; //$NON-NLS-1$
 
     public List<CollectionEventWrapper> getCollectionEventFromSpecimensAndPatient(
         PatientWrapper patient) throws ApplicationException {

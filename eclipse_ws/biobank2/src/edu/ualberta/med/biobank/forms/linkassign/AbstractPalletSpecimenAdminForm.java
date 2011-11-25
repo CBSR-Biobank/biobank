@@ -280,9 +280,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             || profilesCombo.getCombo().getItemCount() <= 0
             || profilesCombo.getCombo().getSelectionIndex() < 0)
             return ProfileManager.ALL_PROFILE_NAME;
-        else
-            return profilesCombo.getCombo().getItem(
-                profilesCombo.getCombo().getSelectionIndex());
+        return profilesCombo.getCombo().getItem(
+            profilesCombo.getCombo().getSelectionIndex());
     }
 
     protected void createProfileComboBox(Composite fieldsComposite) {

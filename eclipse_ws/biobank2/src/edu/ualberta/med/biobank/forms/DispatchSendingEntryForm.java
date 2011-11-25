@@ -336,16 +336,15 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     protected String getTextForPartName() {
         if (dispatch.isNew()) {
             return Messages.DispatchSendingEntryForm_new_title;
-        } else {
-            Assert.isNotNull(dispatch, "Dispatch is null"); //$NON-NLS-1$
-            String label = dispatch.getSenderCenter().getNameShort() + " -> " //$NON-NLS-1$
-                + dispatch.getReceiverCenter().getNameShort();
-
-            String packedAt = dispatch.getFormattedPackedAt();
-            if (packedAt != null)
-                label += " [" + packedAt + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-            return label;
         }
+        Assert.isNotNull(dispatch, "Dispatch is null"); //$NON-NLS-1$
+        String label = dispatch.getSenderCenter().getNameShort() + " -> " //$NON-NLS-1$
+            + dispatch.getReceiverCenter().getNameShort();
+
+        String packedAt = dispatch.getFormattedPackedAt();
+        if (packedAt != null)
+            label += " [" + packedAt + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+        return label;
     }
 
     @Override

@@ -57,10 +57,9 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                 unwrapedProxyObjects.add(unwrapedProxyObject);
             }
             return unwrapedProxyObjects;
-        } else {
-            Object unwrapedProxyObject = convertToObject(map, proxyObject);
-            return unwrapedProxyObject;
         }
+        Object unwrapedProxyObject = convertToObject(map, proxyObject);
+        return unwrapedProxyObject;
     }
 
     @SuppressWarnings({ "unchecked", "nls" })
@@ -118,9 +117,12 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                         + method.getName().substring(3);
                     if (childObject instanceof List
                         && !(childObject instanceof Set)) {
-                        Object plainObjectCollection = convertProxyToObject(childObject);
-                        Collection<Object> objects = (Collection<Object>) plainObjectCollection;
-                        Collection<Object> tempObjects = new ArrayList<Object>();
+                        Object plainObjectCollection =
+                            convertProxyToObject(childObject);
+                        Collection<Object> objects =
+                            (Collection<Object>) plainObjectCollection;
+                        Collection<Object> tempObjects =
+                            new ArrayList<Object>();
                         for (Object object : objects) {
                             Object child = convertToObject(map, object);
                             tempObjects.add(child);
@@ -130,8 +132,10 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                             new Class[] { method.getReturnType() });
                         setterMethod.invoke(plainObject, tempObjects);
                     } else if (childObject instanceof Collection) {
-                        Object plainObjectCollection = convertProxyToObject(childObject);
-                        Collection<Object> objects = (Collection<Object>) plainObjectCollection;
+                        Object plainObjectCollection =
+                            convertProxyToObject(childObject);
+                        Collection<Object> objects =
+                            (Collection<Object>) plainObjectCollection;
                         Collection<Object> tempObjects = new HashSet<Object>();
                         for (Object object : objects) {
                             Object child = convertToObject(map, object);
@@ -165,8 +169,8 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
             || obj instanceof Byte || obj instanceof Short
             || obj instanceof String || obj instanceof Date) {
             return true;
-        } else
-            return false;
+        }
+        return false;
     }
 
     private Object convertProxyToObject(Object obj) {

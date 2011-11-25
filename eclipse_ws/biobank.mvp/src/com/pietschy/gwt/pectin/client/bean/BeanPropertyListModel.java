@@ -119,7 +119,6 @@ public class BeanPropertyListModel<T> extends ArrayListModel<T> implements BeanP
       }
    }
 
-   @SuppressWarnings("unchecked")
    public void readFromSource()
    {
       getUpdateStrategy().readFromSource();
@@ -337,10 +336,7 @@ public class BeanPropertyListModel<T> extends ArrayListModel<T> implements BeanP
          {
             return (List<T>) collection;
          }
-         else
-         {
-            return collection != null ? new ArrayList<T>(collection) : EMPTY_LIST;
-         }
+        return collection != null ? new ArrayList<T>(collection) : EMPTY_LIST;
       }
 
       void updateDirtyState()

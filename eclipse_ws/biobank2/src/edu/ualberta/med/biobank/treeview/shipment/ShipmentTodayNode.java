@@ -49,8 +49,7 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
             return OriginInfoWrapper.getTodayShipments(SessionManager
                 .getAppService(), SessionManager.getUser()
                 .getCurrentWorkingCenter());
-        else
-            return null;
+        return null;
     }
 
     @Override

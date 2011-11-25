@@ -23,14 +23,16 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
     private Integer studyId;
 
     // multiple cells link process
-    public SpecimenLinkProcessAction(Integer currentWorkingCenterId, Integer studyId,
+    public SpecimenLinkProcessAction(Integer currentWorkingCenterId,
+        Integer studyId,
         Map<RowColPos, CellInfo> cells, boolean isRescanMode, Locale locale) {
         super(currentWorkingCenterId, cells, isRescanMode, locale);
         this.studyId = studyId;
     }
 
     // single cell link process
-    public SpecimenLinkProcessAction(Integer currentWorkingCenterId, Integer studyId,
+    public SpecimenLinkProcessAction(Integer currentWorkingCenterId,
+        Integer studyId,
         CellInfo cell, Locale locale) {
         super(currentWorkingCenterId, cell, locale);
         this.studyId = studyId;
@@ -92,7 +94,8 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
     }
 
     @Override
-    protected CellProcessResult getCellProcessResult(Session session, CellInfo cell)
+    protected CellProcessResult getCellProcessResult(Session session,
+        CellInfo cell)
         throws ActionException {
         CellProcessResult res = new CellProcessResult();
         processCellLinkStatus(session, cell);
@@ -111,51 +114,49 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
             return CellInfoStatus.EMPTY;
         if (cell.getStatus() == CellInfoStatus.ERROR)
             return CellInfoStatus.ERROR;
-        else {
-            String value = cell.getValue();
-            if (value != null) {
-                Specimen foundSpecimen = searchSpecimen(session, value);
-                if (foundSpecimen != null) {
-                    cell.setStatus(CellInfoStatus.ERROR);
-                    cell.setInformation(Messages.getString(
-                        "ScanLink.scanStatus.specimen.alreadyExists", locale)); //$NON-NLS-1$
-                    String palletPosition = ContainerLabelingSchemeWrapper
-                        .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
-                    if (foundSpecimen.getParentSpecimen() == null)
-                        appendNewLog(MessageFormat
-                            .format(
-                                Messages
-                                    .getString(
-                                        "ScanLink.activitylog.specimen.existsError.noParent", //$NON-NLS-1$
-                                        locale), palletPosition, value,
-                                foundSpecimen.getCollectionEvent()
-                                    .getVisitNumber(), foundSpecimen
-                                    .getCollectionEvent().getPatient()
-                                    .getPnumber(), foundSpecimen
-                                    .getCurrentCenter().getNameShort()));
-                    else
-                        appendNewLog(MessageFormat
-                            .format(
-                                Messages
-                                    .getString(
-                                        "ScanLink.activitylog.specimen.existsError.withParent", //$NON-NLS-1$
-                                        locale), palletPosition, value,
-                                foundSpecimen.getParentSpecimen()
-                                    .getInventoryId(), foundSpecimen
-                                    .getParentSpecimen().getSpecimenType()
-                                    .getNameShort(), foundSpecimen
-                                    .getCollectionEvent().getVisitNumber(),
-                                foundSpecimen.getCollectionEvent().getPatient()
-                                    .getPnumber(), foundSpecimen
-                                    .getCurrentCenter().getNameShort()));
-                } else {
-                    cell.setStatus(CellInfoStatus.NO_TYPE);
-                }
+        String value = cell.getValue();
+        if (value != null) {
+            Specimen foundSpecimen = searchSpecimen(session, value);
+            if (foundSpecimen != null) {
+                cell.setStatus(CellInfoStatus.ERROR);
+                cell.setInformation(Messages.getString(
+                    "ScanLink.scanStatus.specimen.alreadyExists", locale)); //$NON-NLS-1$
+                String palletPosition = ContainerLabelingSchemeWrapper
+                    .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
+                if (foundSpecimen.getParentSpecimen() == null)
+                    appendNewLog(MessageFormat
+                        .format(
+                            Messages
+                                .getString(
+                                    "ScanLink.activitylog.specimen.existsError.noParent", //$NON-NLS-1$
+                                    locale), palletPosition, value,
+                            foundSpecimen.getCollectionEvent()
+                                .getVisitNumber(), foundSpecimen
+                                .getCollectionEvent().getPatient()
+                                .getPnumber(), foundSpecimen
+                                .getCurrentCenter().getNameShort()));
+                else
+                    appendNewLog(MessageFormat
+                        .format(
+                            Messages
+                                .getString(
+                                    "ScanLink.activitylog.specimen.existsError.withParent", //$NON-NLS-1$
+                                    locale), palletPosition, value,
+                            foundSpecimen.getParentSpecimen()
+                                .getInventoryId(), foundSpecimen
+                                .getParentSpecimen().getSpecimenType()
+                                .getNameShort(), foundSpecimen
+                                .getCollectionEvent().getVisitNumber(),
+                            foundSpecimen.getCollectionEvent().getPatient()
+                                .getPnumber(), foundSpecimen
+                                .getCurrentCenter().getNameShort()));
             } else {
-                cell.setStatus(CellInfoStatus.EMPTY);
+                cell.setStatus(CellInfoStatus.NO_TYPE);
             }
-            return cell.getStatus();
+        } else {
+            cell.setStatus(CellInfoStatus.EMPTY);
         }
+        return cell.getStatus();
     }
 
     @Override

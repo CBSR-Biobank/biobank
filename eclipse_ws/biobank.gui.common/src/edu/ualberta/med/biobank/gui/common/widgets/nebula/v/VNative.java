@@ -84,9 +84,8 @@ public class VNative<T extends Control> extends VControl {
     public Rectangle getClientArea() {
         if (control instanceof Composite) {
             return ((Composite) control).getClientArea();
-        } else {
-            return super.getClientArea();
         }
+        return super.getClientArea();
     }
 
     @Override

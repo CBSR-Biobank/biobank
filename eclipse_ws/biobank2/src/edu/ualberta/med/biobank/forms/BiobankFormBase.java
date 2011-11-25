@@ -239,9 +239,8 @@ public abstract class BiobankFormBase extends BgcFormBase {
             cancelSave(monitor);
             if (lastThrowException)
                 throw new RuntimeException(ex);
-            else
-                BgcPlugin.openAsyncError(
-                    Messages.BiobankFormBase_save_error_title, ex);
+            BgcPlugin.openAsyncError(
+                Messages.BiobankFormBase_save_error_title, ex);
         }
     }
 
