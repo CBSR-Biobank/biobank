@@ -10,7 +10,7 @@ import com.pietschy.gwt.pectin.client.form.validation.ValidationHandler;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationResultImpl;
 
-public abstract class AbstractValidator implements HasValidation {
+public abstract class AbstractValidation implements HasValidation {
     private final HandlerManager handlerManager = new HandlerManager(this);
     private ValidationResult validationResult = EmptyValidationResult.INSTANCE;
 

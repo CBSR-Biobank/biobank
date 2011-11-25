@@ -73,7 +73,7 @@ public class ValidationTree extends AbstractValidation {
     }
 
     public void dispose() {
-        hrManager.clear();
+        hrManager.dispose();
     }
 
     private boolean runValidators() {

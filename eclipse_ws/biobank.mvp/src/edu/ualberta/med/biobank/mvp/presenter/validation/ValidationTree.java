@@ -14,12 +14,20 @@ import com.pietschy.gwt.pectin.client.form.validation.Validator;
 
 import edu.ualberta.med.biobank.mvp.util.HandlerRegManager;
 
-public class ValidationTree extends AbstractValidator {
+/**
+ * Created so presenters can use the validation of other presenters, possibly
+ * based on a condition.
+ * 
+ * @author jferland
+ * 
+ */
+public class ValidationTree extends AbstractValidation {
     private static final Condition TRUE = new DelegatingCondition(true);
     private final ValidatorMonitor validatorMonitor = new ValidatorMonitor();
     private final HandlerRegManager hrManager = new HandlerRegManager();
-    private final List<ConditionalValidator> validators =
-        new ArrayList<ConditionalValidator>();
+    // use a LinkedHashSet, only allow one of any HasValidation that are equal?
+    private final List<HasValidation> validators =
+        new ArrayList<HasValidation>();
 
     public <T> void validate(HasValue<T> hasValue,
         Validator<T> validator,
@@ -37,9 +45,11 @@ public class ValidationTree extends AbstractValidator {
     }
 
     public void add(HasValidation validator, Condition condition) {
-        ConditionalValidator entry =
-            new ConditionalValidator(validator, condition);
-        validators.add(entry);
+        add(new DelegatingConditionalValidation(validator, condition));
+    }
+
+    private void add(DelegatingConditionalValidation validator) {
+        validators.add(validator);
         hrManager.add(validator.addValidationHandler(validatorMonitor));
     }
 
@@ -65,7 +75,7 @@ public class ValidationTree extends AbstractValidator {
             // our validators
             validatorMonitor.setIgnoreEvents(true);
 
-            for (ConditionalValidator validator : validators) {
+            for (HasValidation validator : validators) {
                 validator.clear();
             }
 
@@ -82,7 +92,7 @@ public class ValidationTree extends AbstractValidator {
     private boolean runValidators() {
         boolean valid = true;
 
-        for (ConditionalValidator validator : validators) {
+        for (HasValidation validator : validators) {
             valid = valid && validator.validate();
         }
 
@@ -92,7 +102,7 @@ public class ValidationTree extends AbstractValidator {
     private void updateValidationResult() {
         ValidationResultImpl result = new ValidationResultImpl();
 
-        for (ConditionalValidator validator : validators) {
+        for (HasValidation validator : validators) {
             result.addAll(validator.getValidationResult().getMessages());
         }
 
