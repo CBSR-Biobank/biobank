@@ -18,7 +18,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.SimpleEventBus;
 
 import edu.ualberta.med.biobank.common.action.Dispatcher;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.mvp.PresenterModule;
@@ -81,7 +81,7 @@ public class TestSiteEntryPresenter {
         HasField<String> nameHs = Mockito.mock(HasField.class);
         HasField<String> nameShortHs = Mockito.mock(HasField.class);
         HasField<List<Comment>> commentsHs = Mockito.mock(HasField.class);
-        HasField<Collection<StudyInfo>> studiesHs = Mockito
+        HasField<Collection<StudyCountInfo>> studiesHs = Mockito
             .mock(HasField.class);
 
         HasField<String> nullString = Mockito.mock(HasField.class);

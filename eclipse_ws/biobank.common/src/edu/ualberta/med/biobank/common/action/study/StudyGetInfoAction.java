@@ -1,20 +1,14 @@
 package edu.ualberta.med.biobank.common.action.study;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
-import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
-import edu.ualberta.med.biobank.model.AliquotedSpecimen;
-import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
 public class StudyGetInfoAction implements Action<StudyInfo> {
@@ -78,62 +72,6 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
             return info;
         }
         return null;
-    }
-
-    public static class StudyInfo implements ActionResult {
-        private static final long serialVersionUID = 1L;
-
-        public final Study study;
-        public final Long patientCount;
-        public final Long ceventCount;
-        public final List<ClinicInfo> clinicInfos;
-        public final List<SourceSpecimen> sourceSpcs;
-        public final List<AliquotedSpecimen> aliquotedSpcs;
-        public final List<StudyEventAttr> studyEventAttrs;
-
-        public StudyInfo() {
-            this.study = null;
-            this.patientCount = 0L;
-            this.ceventCount = 0L;
-            this.clinicInfos = new ArrayList<ClinicInfo>();
-            this.sourceSpcs = new ArrayList<SourceSpecimen>();
-            this.aliquotedSpcs = new ArrayList<AliquotedSpecimen>();
-            this.studyEventAttrs = new ArrayList<StudyEventAttr>();
-        }
-
-        public StudyInfo(Study study, Long patientCount, Long ceventCount,
-            List<ClinicInfo> clinicInfos,
-            List<SourceSpecimen> sourceSpcs,
-            List<AliquotedSpecimen> aliquotedSpcs,
-            List<StudyEventAttr> studyEventAttrs) {
-            this.study = study;
-            this.patientCount = patientCount;
-            this.ceventCount = ceventCount;
-            this.clinicInfos = clinicInfos;
-            this.sourceSpcs = sourceSpcs;
-            this.aliquotedSpcs = aliquotedSpcs;
-            this.studyEventAttrs = studyEventAttrs;
-        }
-
-        public Study getStudy() {
-            return study;
-        }
-
-        public List<ClinicInfo> getClinicInfos() {
-            return clinicInfos;
-        }
-
-        public List<SourceSpecimen> getSourceSpcs() {
-            return sourceSpcs;
-        }
-
-        public List<AliquotedSpecimen> getAliquotedSpcs() {
-            return aliquotedSpcs;
-        }
-
-        public List<StudyEventAttr> getStudyEventAttrs() {
-            return studyEventAttrs;
-        }
     }
 
 }

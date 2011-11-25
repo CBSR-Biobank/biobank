@@ -9,12 +9,12 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class SiteGetStudyInfoAction implements Action<ListResult<StudyInfo>> {
+public class SiteGetStudyInfoAction implements Action<ListResult<StudyCountInfo>> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -45,9 +45,9 @@ public class SiteGetStudyInfoAction implements Action<ListResult<StudyInfo>> {
     }
 
     @Override
-    public ListResult<StudyInfo> run(User user, Session session)
+    public ListResult<StudyCountInfo> run(User user, Session session)
         throws ActionException {
-        ArrayList<StudyInfo> studies = new ArrayList<StudyInfo>();
+        ArrayList<StudyCountInfo> studies = new ArrayList<StudyCountInfo>();
 
         Query query = session.createQuery(STUDY_INFO_HQL);
         query.setParameter(0, siteId);
@@ -55,12 +55,12 @@ public class SiteGetStudyInfoAction implements Action<ListResult<StudyInfo>> {
         @SuppressWarnings("unchecked")
         List<Object[]> results = query.list();
         for (Object[] row : results) {
-            StudyInfo studyInfo = new StudyInfo((Study) row[0], (Long) row[1],
+            StudyCountInfo studyInfo = new StudyCountInfo((Study) row[0], (Long) row[1],
                 (Long) row[2]);
 
             studies.add(studyInfo);
         }
 
-        return new ListResult<StudyInfo>(studies);
+        return new ListResult<StudyCountInfo>(studies);
     }
 }

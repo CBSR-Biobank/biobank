@@ -5,14 +5,14 @@ import java.util.List;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class NewStudyInfoTable extends AbstractInfoTableWidget<StudyInfo> {
+public class NewStudyInfoTable extends AbstractInfoTableWidget<StudyCountInfo> {
     private static final String[] HEADINGS = new String[] {
         Messages.StudyInfoTable_name_label,
         Messages.StudyInfoTable_nameshort_label,
@@ -20,7 +20,7 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget<StudyInfo> {
         Messages.StudyInfoTable_patients_label,
         Messages.StudyInfoTable_visits_label };
 
-    public NewStudyInfoTable(Composite parent, List<StudyInfo> studies) {
+    public NewStudyInfoTable(Composite parent, List<StudyCountInfo> studies) {
         super(parent, HEADINGS, new int[] { 100, 100, 100, 100, 100 }, 10);
         getTableViewer().setInput(studies);
     }
@@ -30,7 +30,7 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget<StudyInfo> {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                StudyInfo info = (StudyInfo) element;
+                StudyCountInfo info = (StudyCountInfo) element;
 
                 switch (columnIndex) {
                 case 0:
@@ -59,8 +59,8 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget<StudyInfo> {
             @Override
             public int compare(Viewer viewer, Object e1, Object e2) {
                 int rc = 0;
-                StudyInfo row1 = (StudyInfo) e1;
-                StudyInfo row2 = (StudyInfo) e2;
+                StudyCountInfo row1 = (StudyCountInfo) e1;
+                StudyCountInfo row2 = (StudyCountInfo) e2;
 
                 switch (propertyIndex) {
                 case 0:

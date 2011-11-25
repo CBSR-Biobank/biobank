@@ -18,7 +18,7 @@ public class SiteInfo implements ActionResult {
     private static final long serialVersionUID = 1L;
     public final Site site;
     public final List<ContainerTypeInfo> containerTypes;
-    public final List<StudyInfo> studies;
+    public final List<StudyCountInfo> studies;
     public final List<Container> topContainers;
     public final Long patientCount;
     public final Long collectionEventCount;
@@ -32,7 +32,7 @@ public class SiteInfo implements ActionResult {
         return Collections.unmodifiableList(containerTypes);
     }
 
-    public List<StudyInfo> getStudyCollection() {
+    public List<StudyCountInfo> getStudyCollection() {
         return Collections.unmodifiableList(studies);
     }
 
@@ -85,7 +85,7 @@ public class SiteInfo implements ActionResult {
     }
 
     private SiteInfo(Site site, List<ContainerTypeInfo> containerTypes,
-        List<StudyInfo> studies, List<Container> topContainers,
+        List<StudyCountInfo> studies, List<Container> topContainers,
         Long patientCount, Long collectionEventCount,
         Long aliquotedSpecimenCount) {
         this.site = site;
@@ -101,7 +101,7 @@ public class SiteInfo implements ActionResult {
         private Site site = new Site();
         private List<ContainerTypeInfo> containerTypes =
             new ArrayList<ContainerTypeInfo>();
-        private List<StudyInfo> studies = new ArrayList<StudyInfo>();
+        private List<StudyCountInfo> studies = new ArrayList<StudyCountInfo>();
         private List<Container> topContainers = new ArrayList<Container>();
         private Long patientCount;
         private Long collectionEventCount;
@@ -121,7 +121,7 @@ public class SiteInfo implements ActionResult {
             return this;
         }
 
-        public Builder setStudies(List<StudyInfo> studies) {
+        public Builder setStudies(List<StudyCountInfo> studies) {
             this.studies = studies;
             return this;
         }

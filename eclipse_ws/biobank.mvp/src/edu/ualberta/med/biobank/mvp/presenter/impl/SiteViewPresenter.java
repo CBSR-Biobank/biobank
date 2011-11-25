@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.common.action.info.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
@@ -48,7 +48,7 @@ public class SiteViewPresenter extends AbstractViewFormPresenter<View> {
 
         HasField<Collection<Comment>> getCommentCollection();
 
-        HasField<Collection<StudyInfo>> getStudyCollection();
+        HasField<Collection<StudyCountInfo>> getStudyCollection();
 
         HasField<Collection<ContainerTypeInfo>> getContainerTypeCollection();
 

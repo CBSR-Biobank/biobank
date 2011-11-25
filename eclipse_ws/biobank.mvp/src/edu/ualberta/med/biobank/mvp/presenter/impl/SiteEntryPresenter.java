@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -51,7 +51,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         HasField<String> getNameShort();
 
-        HasField<Collection<StudyInfo>> getStudies();
+        HasField<Collection<StudyCountInfo>> getStudies();
     }
 
     @Inject
@@ -189,7 +189,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         final FieldModel<String> nameShort;
         final FieldModel<ActivityStatus> activityStatus;
         final FieldModel<Address> address;
-        final ListFieldModel<StudyInfo> studies;
+        final ListFieldModel<StudyCountInfo> studies;
 
         @SuppressWarnings("unchecked")
         private Model(AbstractModel<Address> addressModel) {
@@ -211,7 +211,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
                 .boundTo(provider, "site.activityStatus");
             address = fieldOfType(Address.class)
                 .boundTo(provider, "site.address");
-            studies = listOfType(StudyInfo.class)
+            studies = listOfType(StudyCountInfo.class)
                 .boundTo(provider, "studyCollection");
 
             ValidationPlugin.validateField(name)
@@ -227,7 +227,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         Set<Integer> getStudyIds() {
             Set<Integer> studyIds = new HashSet<Integer>();
-            for (StudyInfo studyInfo : studies) {
+            for (StudyCountInfo studyInfo : studies) {
                 studyIds.add(studyInfo.getStudy().getId());
             }
             return studyIds;

@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -36,7 +36,7 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
     private final TextItem nameShort = new TextItem();
     private final TableItem<StudyWrapper> studyWrappers =
         new TableItem<StudyWrapper>();
-    private final TranslatedItem<Collection<StudyInfo>, Collection<StudyWrapper>> studies =
+    private final TranslatedItem<Collection<StudyCountInfo>, Collection<StudyWrapper>> studies =
         TranslatedItem.from(studyWrappers, STUDY_TRANSLATOR);
 
     private IView addressEntryView;
@@ -46,25 +46,25 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
         new StudyTranslator();
 
     private static class StudyTranslator implements
-        Translator<Collection<StudyInfo>, Collection<StudyWrapper>> {
+        Translator<Collection<StudyCountInfo>, Collection<StudyWrapper>> {
         @Override
-        public Collection<StudyInfo> fromDelegate(
+        public Collection<StudyCountInfo> fromDelegate(
             Collection<StudyWrapper> delegate) {
-            Collection<StudyInfo> studies = new ArrayList<StudyInfo>();
+            Collection<StudyCountInfo> studies = new ArrayList<StudyCountInfo>();
             for (StudyWrapper study : delegate) {
-                StudyInfo studyInfo =
-                    new StudyInfo(study.getWrappedObject(), -1l, -1l);
+                StudyCountInfo studyInfo =
+                    new StudyCountInfo(study.getWrappedObject(), -1l, -1l);
                 studies.add(studyInfo);
             }
             return studies;
         }
 
         @Override
-        public Collection<StudyWrapper> toDelegate(Collection<StudyInfo> foreign) {
+        public Collection<StudyWrapper> toDelegate(Collection<StudyCountInfo> foreign) {
             Collection<StudyWrapper> studies = new ArrayList<StudyWrapper>();
             WritableApplicationService appService =
                 SessionManager.getAppService();
-            for (StudyInfo study : foreign) {
+            for (StudyCountInfo study : foreign) {
                 StudyWrapper wrapper =
                     new StudyWrapper(appService, study.getStudy());
                 studies.add(wrapper);
@@ -94,7 +94,7 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
     }
 
     @Override
-    public HasField<Collection<StudyInfo>> getStudies() {
+    public HasField<Collection<StudyCountInfo>> getStudies() {
         return studies;
     }
 

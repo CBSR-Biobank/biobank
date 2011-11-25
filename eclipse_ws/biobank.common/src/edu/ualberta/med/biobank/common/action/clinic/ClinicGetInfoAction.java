@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.User;
@@ -74,7 +74,7 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
         public Long patientCount;
         public Long ceventCount;
         public List<Contact> contacts;
-        public List<StudyInfo> studyInfos;
+        public List<StudyCountInfo> studyInfos;
 
         public Clinic getClinic() {
             return clinic;
@@ -88,7 +88,7 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
             return ceventCount;
         }
 
-        public List<StudyInfo> getStudyInfos() {
+        public List<StudyCountInfo> getStudyInfos() {
             return studyInfos;
         }
 
