@@ -77,8 +77,8 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     private IObservableValue statusObservable;
 
     QueryHandle query;
-    ProgressMonitorDialogBusyListener listener = new ProgressMonitorDialogBusyListener(
-        "Generating report..."); //$NON-NLS-1$
+    ProgressMonitorDialogBusyListener listener =
+        new ProgressMonitorDialogBusyListener("Generating report..."); //$NON-NLS-1$
 
     @Override
     protected void init() throws Exception {
@@ -234,17 +234,17 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                 @Override
                 public void run(final IProgressMonitor monitor) {
                     Thread t = new Thread("Querying") { //$NON-NLS-1$
-                        @Override
-                        public void run() {
-                            try {
-                                reportData = SessionManager.getAppService()
-                                    .startQuery(query);
-                            } catch (Exception e) {
-                                reportData = new ArrayList<Object>();
-                                BgcPlugin.openAsyncError("Query Error", e); //$NON-NLS-1$
+                            @Override
+                            public void run() {
+                                try {
+                                    reportData = SessionManager.getAppService()
+                                        .startQuery(query);
+                                } catch (Exception e) {
+                                    reportData = new ArrayList<Object>();
+                                    BgcPlugin.openAsyncError("Query Error", e); //$NON-NLS-1$
+                                }
                             }
-                        }
-                    };
+                        };
                     monitor.beginTask("Generating Report...", //$NON-NLS-1$
                         IProgressMonitor.UNKNOWN);
                     t.start();
@@ -420,7 +420,8 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                 public void run(final IProgressMonitor monitor) {
                     monitor.beginTask("Preparing Report...", //$NON-NLS-1$
                         IProgressMonitor.UNKNOWN);
-                    final List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
+                    final List<Map<String, String>> listData =
+                        new ArrayList<Map<String, String>>();
                     try {
                         if (exportCSV) {
                             exportCSV(columnInfo, printParams, path);
@@ -428,7 +429,8 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                                 "report"); //$NON-NLS-1$
                         } else {
                             for (Object object : reportData) {
-                                Map<String, String> map = new HashMap<String, String>();
+                                Map<String, String> map =
+                                    new HashMap<String, String>();
                                 for (int j = 0; j < columnInfo.size(); j++) {
                                     map.put(columnInfo.get(j), (reportTable
                                         .getLabelProvider().getColumnText(
@@ -543,8 +545,8 @@ public abstract class ReportsEditor extends BiobankEntryForm {
             c.add(Calendar.DAY_OF_YEAR, 1);
             c.add(Calendar.MINUTE, -1);
             return (c.getTime());
-        } else
-            return processedDate;
+        }
+        return processedDate;
     }
 
     @Override

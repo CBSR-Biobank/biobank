@@ -42,7 +42,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     private static final String BAD_SAMPLE_TYPE_MSG = Messages
         .getString("SpecimenWrapper.bad.specimen.type.msg"); //$NON-NLS-1$
     private static final String DISPATCHS_CACHE_KEY = "dispatchs"; //$NON-NLS-1$
-    private static final SpecimenLogProvider LOG_PROVIDER = new SpecimenLogProvider();
+    private static final SpecimenLogProvider LOG_PROVIDER =
+        new SpecimenLogProvider();
 
     private boolean topSpecimenChanged = false;
 
@@ -187,8 +188,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             return;
         CollectionEventWrapper cevent = getCollectionEvent();
         StudyWrapper study = cevent.getPatient().getStudy();
-        Collection<AliquotedSpecimenWrapper> aliquotedSpecimenCollection = study
-            .getAliquotedSpecimenCollection(false);
+        Collection<AliquotedSpecimenWrapper> aliquotedSpecimenCollection =
+            study
+                .getAliquotedSpecimenCollection(false);
         for (AliquotedSpecimenWrapper as : aliquotedSpecimenCollection) {
             if (getSpecimenType().equals(as.getSpecimenType())) {
                 setQuantity(as.getVolume());
@@ -278,8 +280,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             if (s1 == null || s2 == null)
                 return getInventoryId().compareTo(
                     ((SpecimenWrapper) o).getInventoryId());
-            else
-                return s1.compareTo(s2);
+            return s1.compareTo(s2);
         }
         return 0;
     }
@@ -294,7 +295,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         List<DispatchWrapper> dispatchs = (List<DispatchWrapper>) cache
             .get(DISPATCHS_CACHE_KEY);
         if (dispatchs == null) {
-            List<DispatchSpecimenWrapper> dsaList = getDispatchSpecimenCollection();
+            List<DispatchSpecimenWrapper> dsaList =
+                getDispatchSpecimenCollection();
             if (dsaList != null) {
                 dispatchs = new ArrayList<DispatchWrapper>();
                 for (DispatchSpecimenWrapper dsa : dsaList) {
@@ -405,9 +407,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         if (isPropertyCached(SpecimenPeer.PARENT_SPECIMEN)
             && getParentSpecimen() != null) {
             return getParentSpecimen().getTopSpecimen();
-        } else {
-            return super.getTopSpecimen();
         }
+        return super.getTopSpecimen();
     }
 
     private void addTasksToPostCheckLegalSampleType(TaskList tasks) {
@@ -421,9 +422,11 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         LazyMessage badSampleTypeMsg = new LazyMessage(BAD_SAMPLE_TYPE_MSG,
             containerLabel, specimenType);
 
-        Property<Collection<SpecimenType>, Specimen> pathToLegalSpecimenTypeOptions = SpecimenPeer.SPECIMEN_POSITION
-            .to(SpecimenPositionPeer.CONTAINER.to(ContainerPeer.CONTAINER_TYPE
-                .to(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION)));
+        Property<Collection<SpecimenType>, Specimen> pathToLegalSpecimenTypeOptions =
+            SpecimenPeer.SPECIMEN_POSITION
+                .to(SpecimenPositionPeer.CONTAINER
+                    .to(ContainerPeer.CONTAINER_TYPE
+                        .to(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION)));
 
         BiobankSessionAction checkLegalSampleType = check().legalOption(
             pathToLegalSpecimenTypeOptions, SpecimenPeer.SPECIMEN_TYPE,
@@ -441,7 +444,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                 // if the children have already been loaded, then update their
                 // top specimen so that they update their children, etc. so that
                 // the entire subtree is consistent.
-                List<SpecimenWrapper> children = getChildSpecimenCollection(false);
+                List<SpecimenWrapper> children =
+                    getChildSpecimenCollection(false);
                 for (SpecimenWrapper child : children) {
                     child.setTopSpecimenInternal(topSpecimen, false);
 

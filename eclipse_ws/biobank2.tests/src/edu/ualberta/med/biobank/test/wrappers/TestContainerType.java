@@ -136,8 +136,9 @@ public class TestContainerType extends TestDatabase {
         Integer maxCols = null;
         Integer maxCapacity = null;
 
-        Collection<ContainerLabelingSchemeWrapper> schemeWrappers = ContainerLabelingSchemeWrapper
-            .getAllLabelingSchemesMap(appService).values();
+        Collection<ContainerLabelingSchemeWrapper> schemeWrappers =
+            ContainerLabelingSchemeWrapper
+                .getAllLabelingSchemesMap(appService).values();
 
         ContainerTypeWrapper cTWrapper = ContainerTypeHelper.newContainerType(
             site, "Bogus Top Container Type", "BTCT", 2, 1, 1, true);
@@ -206,41 +207,6 @@ public class TestContainerType extends TestDatabase {
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
-    }
-
-    private void checkLegalCapacities(ContainerTypeWrapper wrapper,
-        Integer maxCapacity, Integer maxRows, Integer maxCols) throws Exception {
-
-        int numRows, numCols;
-
-        for (numRows = 1; numRows <= maxRows; numRows++) {
-            numCols = maxCapacity / numRows;
-            if (numCols <= maxCols) {
-                checkCapacity(wrapper, numRows, numCols);
-            }
-        }
-
-        for (numCols = 1; numCols <= maxCols; numCols++) {
-            numRows = maxCapacity / numCols;
-            if (numRows <= maxRows) {
-                checkCapacity(wrapper, numRows, numCols);
-            }
-        }
-    }
-
-    private void checkCapacity(ContainerTypeWrapper wrapper, Integer numRows,
-        Integer numCols) throws Exception {
-        wrapper.setRowCapacity(numRows);
-        wrapper.setColCapacity(numCols);
-
-        wrapper.persist();
-        wrapper.reload();
-
-        Assert.assertEquals("[gs]etRowCapacity() failed.", numRows,
-            wrapper.getRowCapacity());
-
-        Assert.assertEquals("[gs]etColCapacity() failed.", numCols,
-            wrapper.getColCapacity());
     }
 
     @Test
@@ -410,8 +376,9 @@ public class TestContainerType extends TestDatabase {
 
     @Test
     public void testDelete() throws Exception {
-        ContainerTypeWrapper topType = addContainerTypeHierarchy(containerTypeMap
-            .get("TopCT"));
+        ContainerTypeWrapper topType =
+            addContainerTypeHierarchy(containerTypeMap
+                .get("TopCT"));
         ContainerHelper.addContainer(String.valueOf(r.nextInt()),
             TestCommon.getNewBarcode(r), site, topType);
         try {
@@ -585,7 +552,8 @@ public class TestContainerType extends TestDatabase {
         List<SpecimenTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
         // get list of unselected sample types
-        List<SpecimenTypeWrapper> unselectedSampleTypes = new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> unselectedSampleTypes =
+            new ArrayList<SpecimenTypeWrapper>();
         for (SpecimenTypeWrapper sampleType : allSampleTypes) {
             if (!selectedSampleTypes.contains(sampleType)) {
                 unselectedSampleTypes.add(sampleType);
@@ -1059,16 +1027,18 @@ public class TestContainerType extends TestDatabase {
 
     @Test
     public void testGetAllLabelingSchemes() throws ApplicationException {
-        Map<Integer, ContainerLabelingSchemeWrapper> map = ContainerLabelingSchemeWrapper
-            .getAllLabelingSchemesMap(appService);
+        Map<Integer, ContainerLabelingSchemeWrapper> map =
+            ContainerLabelingSchemeWrapper
+                .getAllLabelingSchemesMap(appService);
 
         Assert.assertEquals(6, map.size());
     }
 
     @Test
     public void testGetContainersCount() throws Exception {
-        ContainerTypeWrapper topType = addContainerTypeHierarchy(containerTypeMap
-            .get("TopCT"));
+        ContainerTypeWrapper topType =
+            addContainerTypeHierarchy(containerTypeMap
+                .get("TopCT"));
         ContainerTypeWrapper childTypeL1 = containerTypeMap.get("ChildCtL1");
 
         ContainerWrapper top = ContainerHelper.addContainer("01", "01", site,

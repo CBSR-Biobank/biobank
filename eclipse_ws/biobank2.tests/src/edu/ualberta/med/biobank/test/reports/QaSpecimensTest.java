@@ -104,6 +104,7 @@ public class QaSpecimensTest extends AbstractReportTest {
     private static Predicate<SpecimenWrapper> aliquotSampleTypeNameShortLike(
         final String sampleTypeNameShort) {
         return new Predicate<SpecimenWrapper>() {
+            @Override
             public boolean evaluate(SpecimenWrapper aliquot) {
                 return aliquot.getSpecimenType().getNameShort()
                     .equals(sampleTypeNameShort);

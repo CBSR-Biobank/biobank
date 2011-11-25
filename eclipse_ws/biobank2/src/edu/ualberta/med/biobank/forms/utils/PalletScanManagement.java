@@ -30,7 +30,8 @@ import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManage
 
 public class PalletScanManagement {
 
-    protected Map<RowColPos, PalletCell> cells = new HashMap<RowColPos, PalletCell>();
+    protected Map<RowColPos, PalletCell> cells =
+        new HashMap<RowColPos, PalletCell>();
     private int scansCount = 0;
     private boolean useScanner = true;
 
@@ -96,21 +97,20 @@ public class PalletScanManagement {
                             Messages.PalletScanManagement_scan_error_msg_notenabled,
                             plateToScan));
                 return;
-            } else {
-                List<ScanCell> scanCells = null;
-                try {
-                    scanCells = ScannerConfigPlugin.decodePlate(plateNum,
-                        profile);
-                    cells = PalletCell.convertArray(scanCells);
-                } catch (Exception ex) {
-                    BgcPlugin.openAsyncError(
-                        Messages.PalletScanManagement_scan_error_title, ex,
-                        Messages.PalletScanManagement_scan_error_msg_2dScanner);
-                    return;
-                } finally {
-                    scansCount++;
-                    afterScanBeforeMerge();
-                }
+            }
+            List<ScanCell> scanCells = null;
+            try {
+                scanCells = ScannerConfigPlugin.decodePlate(plateNum,
+                    profile);
+                cells = PalletCell.convertArray(scanCells);
+            } catch (Exception ex) {
+                BgcPlugin.openAsyncError(
+                    Messages.PalletScanManagement_scan_error_title, ex,
+                    Messages.PalletScanManagement_scan_error_msg_2dScanner);
+                return;
+            } finally {
+                scansCount++;
+                afterScanBeforeMerge();
             }
         } else {
             cells = getFakeScanCells();
@@ -135,7 +135,8 @@ public class PalletScanManagement {
                         // Different values at same position
                         oldScannedCell
                             .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
-                                .getInformation() : "") //$NON-NLS-1$
+                                .getInformation()
+                                : "") //$NON-NLS-1$
                                 + " " + Messages.PalletScanManagement_rescan_differnt_msg); //$NON-NLS-1$
                         oldScannedCell.setStatus(CellInfoStatus.ERROR);
                         rescanDifferent = true;
@@ -223,7 +224,6 @@ public class PalletScanManagement {
         // default does nothing
     }
 
-    @SuppressWarnings("unused")
     protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
         return null;
     }
@@ -295,8 +295,9 @@ public class PalletScanManagement {
             for (Entry<RowColPos, SpecimenWrapper> entry : container
                 .getSpecimens().entrySet()) {
                 RowColPos rcp = entry.getKey();
-                PalletCell cell = new PalletCell(new ScanCell(rcp.getRow(), rcp.getCol(),
-                    entry.getValue().getInventoryId()));
+                PalletCell cell =
+                    new PalletCell(new ScanCell(rcp.getRow(), rcp.getCol(),
+                        entry.getValue().getInventoryId()));
                 cell.setSpecimen(entry.getValue());
                 cell.setStatus(UICellStatus.FILLED);
                 cells.put(rcp, cell);

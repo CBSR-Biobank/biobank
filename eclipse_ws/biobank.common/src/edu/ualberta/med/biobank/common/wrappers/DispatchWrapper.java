@@ -39,17 +39,21 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchWrapper extends DispatchBaseWrapper {
-    private static final DispatchLogProvider LOG_PROVIDER = new DispatchLogProvider();
-    private static final Property<String, Dispatch> WAYBILL_PROPERTY = DispatchPeer.SHIPMENT_INFO
-        .to(ShipmentInfoPeer.WAYBILL);
-    private static final Collection<Property<?, ? super Dispatch>> UNIQUE_WAYBILL_PER_SENDER_PROPERTIES = new ArrayList<Property<?, ? super Dispatch>>();
+    private static final DispatchLogProvider LOG_PROVIDER =
+        new DispatchLogProvider();
+    private static final Property<String, Dispatch> WAYBILL_PROPERTY =
+        DispatchPeer.SHIPMENT_INFO
+            .to(ShipmentInfoPeer.WAYBILL);
+    private static final Collection<Property<?, ? super Dispatch>> UNIQUE_WAYBILL_PER_SENDER_PROPERTIES =
+        new ArrayList<Property<?, ? super Dispatch>>();
 
     static {
         UNIQUE_WAYBILL_PER_SENDER_PROPERTIES.add(WAYBILL_PROPERTY);
         UNIQUE_WAYBILL_PER_SENDER_PROPERTIES.add(DispatchPeer.SENDER_CENTER);
     }
 
-    private final Map<DispatchSpecimenState, List<DispatchSpecimenWrapper>> dispatchSpecimenMap = new HashMap<DispatchSpecimenState, List<DispatchSpecimenWrapper>>();
+    private final Map<DispatchSpecimenState, List<DispatchSpecimenWrapper>> dispatchSpecimenMap =
+        new HashMap<DispatchSpecimenState, List<DispatchSpecimenWrapper>>();
 
     private boolean hasNewSpecimens = false;
 
@@ -57,7 +61,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     // TODO: Not sure if it's a good idea to maintain a list like this
     // internally. It can result in unwanted changes being persisted.
-    private List<DispatchSpecimenWrapper> dispatchSpecimensToPersist = new ArrayList<DispatchSpecimenWrapper>();
+    private List<DispatchSpecimenWrapper> dispatchSpecimensToPersist =
+        new ArrayList<DispatchSpecimenWrapper>();
 
     public DispatchWrapper(WritableApplicationService appService) {
         super(appService);
@@ -132,13 +137,13 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
         if (states.length == 1) {
             return map.get(states[0]);
-        } else {
-            List<DispatchSpecimenWrapper> tmp = new ArrayList<DispatchSpecimenWrapper>();
-            for (DispatchSpecimenState state : states) {
-                tmp.addAll(map.get(state));
-            }
-            return tmp;
         }
+        List<DispatchSpecimenWrapper> tmp =
+            new ArrayList<DispatchSpecimenWrapper>();
+        for (DispatchSpecimenState state : states) {
+            tmp.addAll(map.get(state));
+        }
+        return tmp;
     }
 
     public List<SpecimenWrapper> getSpecimenCollection(boolean sort) {
@@ -158,9 +163,12 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             return;
 
         // already added dsa
-        List<DispatchSpecimenWrapper> currentDaList = getDispatchSpecimenCollection(false);
-        List<DispatchSpecimenWrapper> newDispatchSpecimens = new ArrayList<DispatchSpecimenWrapper>();
-        List<SpecimenWrapper> currentSpecimenList = new ArrayList<SpecimenWrapper>();
+        List<DispatchSpecimenWrapper> currentDaList =
+            getDispatchSpecimenCollection(false);
+        List<DispatchSpecimenWrapper> newDispatchSpecimens =
+            new ArrayList<DispatchSpecimenWrapper>();
+        List<SpecimenWrapper> currentSpecimenList =
+            new ArrayList<SpecimenWrapper>();
 
         for (DispatchSpecimenWrapper dsa : currentDaList) {
             currentSpecimenList.add(dsa.getSpecimen());
@@ -214,7 +222,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         if (spcs.isEmpty())
             return;
 
-        List<DispatchSpecimenWrapper> removeDispatchSpecimens = new ArrayList<DispatchSpecimenWrapper>();
+        List<DispatchSpecimenWrapper> removeDispatchSpecimens =
+            new ArrayList<DispatchSpecimenWrapper>();
 
         for (DispatchSpecimenWrapper dsa : getDispatchSpecimenCollection(false)) {
             if (spcs.contains(dsa.getSpecimen())) {
@@ -232,8 +241,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         if (dsaList.isEmpty())
             return;
 
-        List<DispatchSpecimenWrapper> currentDaList = getDispatchSpecimenCollection(false);
-        List<DispatchSpecimenWrapper> removeDispatchSpecimens = new ArrayList<DispatchSpecimenWrapper>();
+        List<DispatchSpecimenWrapper> currentDaList =
+            getDispatchSpecimenCollection(false);
+        List<DispatchSpecimenWrapper> removeDispatchSpecimens =
+            new ArrayList<DispatchSpecimenWrapper>();
 
         for (DispatchSpecimenWrapper dsa : currentDaList) {
             if (dsaList.contains(dsa)) {
@@ -249,7 +260,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     // tracking done in the wrapper just creates potential problems if several
     // methods that do tracking are called without persisting after - JMF
     public void receiveSpecimens(List<SpecimenWrapper> specimensToReceive) {
-        List<DispatchSpecimenWrapper> nonProcessedSpecimens = getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
+        List<DispatchSpecimenWrapper> nonProcessedSpecimens =
+            getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
         for (DispatchSpecimenWrapper ds : nonProcessedSpecimens) {
             if (specimensToReceive.contains(ds.getSpecimen())) {
                 hasSpecimenStatesChanged = true;
@@ -421,16 +433,17 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return shipments;
     }
 
-    private static final String DISPATCHES_BY_DATE_RECEIVED_QRY = DISPATCH_HQL_STRING
-        + " where s." //$NON-NLS-1$
-        + ShipmentInfoPeer.RECEIVED_AT.getName()
-        + " >=? and s." //$NON-NLS-1$
-        + ShipmentInfoPeer.RECEIVED_AT.getName()
-        + " <? and (d." //$NON-NLS-1$
-        + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
-        + "= ? or d." //$NON-NLS-1$
-        + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-        + " = ?)"; //$NON-NLS-1$
+    private static final String DISPATCHES_BY_DATE_RECEIVED_QRY =
+        DISPATCH_HQL_STRING
+            + " where s." //$NON-NLS-1$
+            + ShipmentInfoPeer.RECEIVED_AT.getName()
+            + " >=? and s." //$NON-NLS-1$
+            + ShipmentInfoPeer.RECEIVED_AT.getName()
+            + " <? and (d." //$NON-NLS-1$
+            + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
+            + "= ? or d." //$NON-NLS-1$
+            + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
+            + " = ?)"; //$NON-NLS-1$
 
     /**
      * Search for shipments in the site with the given date received. Don't use
@@ -453,16 +466,17 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return shipments;
     }
 
-    private static final String DISPATCHED_BY_DATE_SENT_QRY = DISPATCH_HQL_STRING
-        + " where s." //$NON-NLS-1$
-        + ShipmentInfoPeer.PACKED_AT.getName()
-        + " >= ? and s." //$NON-NLS-1$
-        + ShipmentInfoPeer.PACKED_AT.getName()
-        + " < ? and (d." //$NON-NLS-1$
-        + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
-        + "= ? or d." //$NON-NLS-1$
-        + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-        + " = ?)"; //$NON-NLS-1$
+    private static final String DISPATCHED_BY_DATE_SENT_QRY =
+        DISPATCH_HQL_STRING
+            + " where s." //$NON-NLS-1$
+            + ShipmentInfoPeer.PACKED_AT.getName()
+            + " >= ? and s." //$NON-NLS-1$
+            + ShipmentInfoPeer.PACKED_AT.getName()
+            + " < ? and (d." //$NON-NLS-1$
+            + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
+            + "= ? or d." //$NON-NLS-1$
+            + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
+            + " = ?)"; //$NON-NLS-1$
 
     public static List<DispatchWrapper> getDispatchesByDateSent(
         WritableApplicationService appService, Date dateSent,
@@ -528,7 +542,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private void removeSpecimensFromParents(TaskList tasks) {
         if (DispatchState.IN_TRANSIT.equals(getDispatchState())) {
-            Collection<DispatchSpecimenWrapper> dispatchSpecimens = getDispatchSpecimenCollection(false);
+            Collection<DispatchSpecimenWrapper> dispatchSpecimens =
+                getDispatchSpecimenCollection(false);
             for (DispatchSpecimenWrapper dispatchSpecimen : dispatchSpecimens) {
                 SpecimenWrapper specimen = dispatchSpecimen.getSpecimen();
                 specimen.setSpecimenPosition(null);

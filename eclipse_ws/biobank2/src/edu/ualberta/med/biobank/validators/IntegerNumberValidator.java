@@ -35,10 +35,9 @@ public class IntegerNumberValidator extends AbstractValidator {
             if (allowEmpty) {
                 hideDecoration();
                 return Status.OK_STATUS;
-            } else {
-                showDecoration();
-                return ValidationStatus.error(errorMessage);
             }
+            showDecoration();
+            return ValidationStatus.error(errorMessage);
         }
 
         Matcher m = pattern.matcher((String) value);

@@ -116,7 +116,8 @@ public abstract class UserInfoTable extends InfoTableWidget<UserWrapper> {
         return new BgcLabelProvider() {
             @Override
             public Image getColumnImage(Object element, int columnIndex) {
-                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info != null && info.lockedOut && columnIndex == 0) {
                     return BiobankPlugin.getDefault().getImage(
                         BgcPlugin.IMG_LOCK);
@@ -126,7 +127,8 @@ public abstract class UserInfoTable extends InfoTableWidget<UserWrapper> {
 
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -171,11 +173,10 @@ public abstract class UserInfoTable extends InfoTableWidget<UserWrapper> {
                     Messages.UserInfoTable_delete_error_msg,
                     Messages.UserInfoTable_confirm_delete_suicide_msg);
                 return false;
-            } else {
-                message = MessageFormat.format(
-                    Messages.UserInfoTable_confirm_delete_msg,
-                    new Object[] { loginName });
             }
+            message = MessageFormat.format(
+                Messages.UserInfoTable_confirm_delete_msg,
+                new Object[] { loginName });
 
             if (BgcPlugin.openConfirm(
                 Messages.UserInfoTable_confirm_delete_title, message)) {

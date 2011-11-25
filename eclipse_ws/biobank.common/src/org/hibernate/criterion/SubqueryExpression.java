@@ -50,8 +50,9 @@ public abstract class SubqueryExpression implements Criterion {
     public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery)
         throws HibernateException {
 
-        final SessionFactoryImplementor factory = extractSessionFactoryImplementor(
-            criteria, criteriaQuery);
+        final SessionFactoryImplementor factory =
+            extractSessionFactoryImplementor(
+                criteria, criteriaQuery);
 
         final OuterJoinLoadable persister = (OuterJoinLoadable) factory
             .getEntityPersister(criteriaImpl.getEntityOrClassName());
@@ -165,7 +166,7 @@ public abstract class SubqueryExpression implements Criterion {
      * @return
      */
     private SessionFactoryImplementor extractSessionFactoryImplementor(
-        @SuppressWarnings("unused") Criteria criteria,
+        Criteria criteria,
         CriteriaQuery criteriaQuery) {
         return criteriaQuery.getFactory();
 

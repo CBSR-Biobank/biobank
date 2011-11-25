@@ -100,8 +100,9 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
                     @Override
                     public void widgetSelected(SelectionEvent e) {
                         if (commandListControl.getSelectionCount() == 1) {
-                            String modified = getModifiedEntry(commandListControl
-                                .getSelection()[0]);
+                            String modified =
+                                getModifiedEntry(commandListControl
+                                    .getSelection()[0]);
                             if (modified != null) {
                                 int selectedIndex = commandListControl
                                     .getSelectionIndex();
@@ -138,8 +139,8 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
                 .getShell());
             if (dlg.open() == Dialog.OK) {
                 return dlg.getServerAddress();
-            } else
-                return null;
+            }
+            return null;
         }
 
         @Override

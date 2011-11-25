@@ -67,7 +67,6 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
     private List<String> inventoryIdExcludeList;
 
-    @SuppressWarnings("unchecked")
     public CEventSourceSpecimenDialog(Shell parent, Specimen spec,
         List<SourceSpecimen> studySourceSpecimen,
         List<SpecimenTypeInfo> allSpecimenTypes,
@@ -120,9 +119,8 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
     protected String getTitleAreaMessage() {
         if (addMode) {
             return Messages.CEventSourceSpecimenDialog_msg_add;
-        } else {
-            return Messages.CEventSourceSpecimenDialog_msg_edit;
         }
+        return Messages.CEventSourceSpecimenDialog_msg_edit;
     }
 
     @Override
@@ -230,7 +228,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         if (typeInfo.type != null) {
             ss = mapStudySourceSpecimen.get(typeInfo.type.getName());
         }
-        if (ss == null && typeInfo != null
+        if (ss == null && typeInfo.type != null
             && allSpecimenTypes.contains(typeInfo)) {
             useStudyOnlySourceSpecimens = false;
         }
@@ -340,7 +338,6 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         updateWidgetVisibilityAndValues();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void copy(Object newModelObject) {
         Specimen spec = (Specimen) newModelObject;

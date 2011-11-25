@@ -259,8 +259,7 @@ public class TestStudy extends TestAction {
         closeHibernateSession();
     }
 
-    private Set<Integer> getSourceSpecimenIds(StudyInfo studyInfo)
-        throws ApplicationException {
+    private Set<Integer> getSourceSpecimenIds(StudyInfo studyInfo) {
         Set<Integer> actualIds = new HashSet<Integer>();
         for (SourceSpecimen srcSpc : studyInfo.sourceSpcs) {
             actualIds.add(srcSpc.getId());
@@ -332,8 +331,7 @@ public class TestStudy extends TestAction {
         closeHibernateSession();
     }
 
-    private Set<Integer> getAliquotedSpecimenIds(StudyInfo studyInfo)
-        throws ApplicationException {
+    private Set<Integer> getAliquotedSpecimenIds(StudyInfo studyInfo) {
         Set<Integer> actualIds = new HashSet<Integer>();
         for (AliquotedSpecimen aqSpc : studyInfo.aliquotedSpcs) {
             actualIds.add(aqSpc.getId());
@@ -421,8 +419,7 @@ public class TestStudy extends TestAction {
         closeHibernateSession();
     }
 
-    private Set<Integer> getStudyEventAttrIds(StudyInfo studyInfo)
-        throws ApplicationException {
+    private Set<Integer> getStudyEventAttrIds(StudyInfo studyInfo) {
         Set<Integer> actualIds = new HashSet<Integer>();
         for (StudyEventAttr aqSpc : studyInfo.studyEventAttrs) {
             actualIds.add(aqSpc.getId());

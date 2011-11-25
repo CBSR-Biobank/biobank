@@ -28,9 +28,8 @@ public class VLabel extends VControl {
     public Point computeSize(int wHint, int hHint, boolean changed) {
         if (hasStyle(SWT.SEPARATOR)) {
             return new Point(2, 2);
-        } else {
-            return super.computeSize(wHint, hHint, changed);
         }
+        return super.computeSize(wHint, hHint, changed);
     }
 
     @Override
