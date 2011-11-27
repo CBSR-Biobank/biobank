@@ -199,7 +199,7 @@ public abstract class AbstractModel<T> extends FormModel {
             onUnbind();
 
             dirty.setDelegate(provider.dirty());
-            hrManager.clear();
+            hrManager.dispose();
             binder.dispose();
             validationBinder.dispose();
             validationTree.dispose();

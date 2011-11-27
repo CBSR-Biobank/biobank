@@ -168,13 +168,15 @@ public class ValueValidation<T> extends AbstractValidation implements
         public void validate(T value) {
             ValidationResultImpl result = new ValidationResultImpl();
 
-            validator.validate(value, result);
+            if (ConditionUtil.isTrue(condition)) {
+                validator.validate(value, result);
+            }
 
             setValidationResult(result);
         }
 
         public ValidationResult getValidationResult() {
-            return ConditionUtil.isTrue(condition) ? result : EMPTY_RESULT;
+            return result;
         }
 
         private void setValidationResult(ValidationResultImpl result) {

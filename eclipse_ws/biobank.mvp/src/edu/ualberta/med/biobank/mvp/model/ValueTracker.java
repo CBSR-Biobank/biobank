@@ -39,7 +39,7 @@ public class ValueTracker<T> implements HasDirtyModel, Disposable {
 
     @Override
     public void dispose() {
-        hrManager.clear();
+        hrManager.dispose();
     }
 
     private class ChangeMonitor implements ValueChangeHandler<T> {

@@ -48,22 +48,24 @@ public class LazyDelegatingConditionalValidation extends AbstractValidation
 
     @Override
     public boolean validate() {
+        boolean valid = true;
+
         // TODO: decide whether waiting to validate makes sense or not.
         if (ConditionUtil.isTrue(condition)) {
             // will result in updateValidationResult() being called since this
             // listens for events from the delegate
-            delegate.validate();
+            valid = delegate.validate();
 
             conditionMonitor.setValidateOnChange(false);
         } else {
+            clear(); // make sure our ValidationResult is up-to-date
+
             // we were told to validate, but the condition was not true, so,
             // delay validation until the condition becomes true
             conditionMonitor.setValidateOnChange(true);
         }
 
-        // even though the delegate may have an error, we might not if the
-        // condition is not true
-        return getValidationResult().contains(Severity.ERROR);
+        return valid;
     }
 
     @Override
