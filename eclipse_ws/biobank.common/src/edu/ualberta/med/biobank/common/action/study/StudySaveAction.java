@@ -14,6 +14,9 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.common.permission.Permission;
+import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -79,8 +82,12 @@ public class StudySaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        // FIXME: needs implementation
-        return true;
+        Permission permission;
+        if (id == null)
+            permission = new StudyCreatePermission();
+        else
+            permission = new StudyUpdatePermission(id);
+        return permission.isAllowed(user, session);
     }
 
     @Override
