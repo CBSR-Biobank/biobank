@@ -33,8 +33,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/server/csmapi-4.1.jar" sourcepath="/home/delphine/projects/sources/CaCore/CSM/CSM_API_4_1_Source/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-writable-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/commons-io-1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/SuperCSV-1.52.jar"/>
 	<classpathentry kind="lib" path="lib/client/mysql-connector-java-5.1.15-bin.jar"/>
-	<classpathentry kind="lib" path="lib/client/commons-io-1.4.jar"/>
-	<classpathentry kind="lib" path="/home/delson/proj/cbsr/biobank2/eclipse_ws/biobank.common/lib/client/SuperCSV-1.52.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
