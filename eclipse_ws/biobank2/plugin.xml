@@ -299,6 +299,11 @@
              id="edu.ualberta.med.biobank.commands.processing.link"
              name="Specimen Link">
        </command>
+       <command
+             categoryId="org.eclipse.ui.category.window"
+             id="edu.ualberta.med.biobank.commands.processing.tecan"
+             name="TECAN Scan Link">
+       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -854,6 +859,25 @@
             </reference>
          </enabledWhen>
       </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.TecanEventAddHandler2"
+            commandId="edu.ualberta.med.biobank.commands.processing.tecan">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank.processingPerspectiveSelected">
+               </reference>
+               <reference
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+               </reference>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="biobank.processingPerspectiveSelected">
+            </reference>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -1060,6 +1084,12 @@
                   commandId="edu.ualberta.med.biobank.commands.processing.assign"
                   icon="icons/scanAssign.png"
                   label="Specimen Assign"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.processing.tecan"
+                  icon="icons/linkTecan.png"
+                  label="TECAN Scan Link"
                   style="push">
             </command>
             <separator
@@ -1337,6 +1367,18 @@
                   commandId="edu.ualberta.med.biobank.commands.processing.assign"
                   icon="icons/scanAssign.png"
                   label="Specimen Assign"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank.processingPerspectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.processing.tecan"
+                  icon="icons/linkTecan.png"
+                  label="TECAN Scan Link"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -1969,6 +2011,12 @@
       id="edu.ualberta.med.biobank.forms.SpecimenAssignEntryForm"
       name="Specimen Assign">
 </editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.TecanScanLinkEntryForm"
+      default="false"
+      id="edu.ualberta.med.biobank.forms.TecanScanLinkEntryForm"
+      name="Tecan Scan Link">
+</editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -2047,6 +2095,12 @@
             contextId="edu.ualberta.med.biobank.perspective.processing"
             schemeId="biobank.scheme"
             sequence="M2+M3+A">
+      </key>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.processing.tecan"
+            contextId="edu.ualberta.med.biobank.perspective.processing"
+            schemeId="biobank.scheme"
+            sequence="M2+M3+T">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.reset"

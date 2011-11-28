@@ -29,11 +29,13 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -41,8 +43,15 @@ import java.util.Random;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
-//import org.apache.commons.io.*;
+import org.supercsv.cellprocessor.Optional;
+import org.supercsv.cellprocessor.ParseDate;
+import org.supercsv.cellprocessor.ParseInt;
+import org.supercsv.cellprocessor.constraint.StrMinMax;
+import org.supercsv.cellprocessor.constraint.Unique;
+import org.supercsv.cellprocessor.ift.CellProcessor;
+import org.supercsv.io.CsvBeanReader;
+import org.supercsv.io.ICsvBeanReader;
+import org.supercsv.prefs.CsvPreference;
 
 /**
  * Implementation of the BiobankApplicationService interface. This class will be
@@ -341,4 +350,111 @@ public class BiobankApplicationServiceImpl extends
         }
         return newFile;
     }
+
+    @Override
+    public String tecanloadFile(byte[] bytes, String deviceID)
+        throws ApplicationException {
+
+        System.out.printf("Came From Client: %s", deviceID);
+        String uploadDir = System.getProperty("upload.dir");
+
+        Calendar currentDate = Calendar.getInstance();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MMM_dd-HH_mm");
+        String dateNow = formatter.format(currentDate.getTime());
+
+        String newFile = uploadDir + "/" + dateNow + "_ID_" + deviceID + ".pdf";
+        File fl = new File(newFile);
+
+        try {
+            boolean success = fl.createNewFile();
+            if (success) {
+                // File did not exist and was created
+            } else {
+                // File already exists
+            }
+        } catch (IOException e) {
+        }
+        try {
+            FileUtils.writeByteArrayToFile(fl, bytes);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        try {
+            MyCVS(newFile);
+        } catch (Exception e) {
+            // TODO
+        }
+
+        return newFile;
+    }
+
+    // DFE May go to a helper class
+    static final CellProcessor[] userProcessors = new CellProcessor[] {
+        new Unique(new StrMinMax(5, 20)), new StrMinMax(8, 35),
+        new ParseDate("dd/MM/yyyy"), new Optional(new ParseInt()), null };
+
+    public static void MyCVS(String myfile) throws Exception {
+        ICsvBeanReader inFile = new CsvBeanReader(new FileReader(myfile),
+            CsvPreference.EXCEL_PREFERENCE);
+        try {
+            final String[] header = inFile.getCSVHeader(true);
+            UserBean user;
+            while ((user = inFile.read(UserBean.class, header, userProcessors)) != null) {
+                System.out.println(user.getZip());
+            }
+        } finally {
+            inFile.close();
+        }
+    }
+
+    public class UserBean {
+        String username, password, town;
+        Date date;
+        int zip;
+
+        public Date getDate() {
+            return date;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public String getTown() {
+            return town;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public int getZip() {
+            return zip;
+        }
+
+        public void setDate(final Date date) {
+            this.date = date;
+        }
+
+        public void setPassword(final String password) {
+            this.password = password;
+        }
+
+        public void setTown(final String town) {
+            this.town = town;
+        }
+
+        public void setUsername(final String username) {
+            this.username = username;
+        }
+
+        public void setZip(final int zip) {
+            this.zip = zip;
+        }
+    }
+
+    // DFE
+
 }

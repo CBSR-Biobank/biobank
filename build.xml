@@ -53,7 +53,7 @@
   <property name="biobank.jar.files"
             value="gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
   <property name="biobank.common.jar.files"
-            value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar" />
+            value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar,SuperCSV-1.52.jar" />
   <property name="biobank.tools.jar.files"
             value="commons-io-1.4.jar, jargs.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar,mysql-connector-java-5.1.15-bin.jar" />
   <property name="cacore.system.jar.files"
@@ -374,11 +374,13 @@
       <fileset file="${req.jars.dir}/mysql-connector-java-5.1.15-bin.jar" />
       <fileset file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
       <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-client-framework.jar" />
+      <fileset file="${req.jars.dir}/SuperCSV-1.52.jar" />
     </copy>
     <copy todir="${eclipse.proj.dir.common}/lib/server" overwrite="true">
       <fileset file="${cacore.sdk.dir}/system/dist/sdk-core.jar" />
       <fileset file="${cacore.sdk.dir}/system/lib/csmapi-4.1.jar" />
       <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-core.jar" />
+      <fileset file="${req.jars.dir}/SuperCSV-1.52.jar" />
     </copy>
     <copy todir="${eclipse.proj.dir.common}/conf" overwrite="true">
       <filelist dir="${cacore.sdk.dir}/output/biobank/package/remote-client/conf"
