@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
@@ -52,9 +53,7 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        // TODO: implement StudyReadPermission
-        // return new StudyReadPermission(studyId).isAllowed(user, session);
-        return true;
+        return new StudyReadPermission(studyId).isAllowed(user, session);
     }
 
     @Override
