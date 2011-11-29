@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.test.presenters;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Before;
@@ -26,8 +25,9 @@ import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
-import edu.ualberta.med.biobank.mvp.user.ui.HasField;
-import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedField;
+import edu.ualberta.med.biobank.mvp.user.ui.HasListField;
+import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValueField;
+import edu.ualberta.med.biobank.mvp.user.ui.HasValueField;
 import edu.ualberta.med.biobank.test.TestingDispatcher;
 
 public class TestSiteEntryPresenter {
@@ -78,15 +78,16 @@ public class TestSiteEntryPresenter {
         SiteEntryPresenter presenter = injector
             .getInstance(SiteEntryPresenter.class);
 
-        HasField<String> nameHs = Mockito.mock(HasField.class);
-        HasField<String> nameShortHs = Mockito.mock(HasField.class);
-        HasField<List<Comment>> commentsHs = Mockito.mock(HasField.class);
-        HasField<Collection<StudyInfo>> studiesHs = Mockito
-            .mock(HasField.class);
+        HasValueField<String> nameHs = Mockito.mock(HasValueField.class);
+        HasValueField<String> nameShortHs = Mockito.mock(HasValueField.class);
+        HasValueField<List<Comment>> commentsHs =
+            Mockito.mock(HasValueField.class);
+        HasListField<StudyInfo> studiesHs = Mockito
+            .mock(HasListField.class);
 
-        HasField<String> nullString = Mockito.mock(HasField.class);
-        HasSelectedField<ActivityStatus> astatus = Mockito
-            .mock(HasSelectedField.class);
+        HasValueField<String> nullString = Mockito.mock(HasValueField.class);
+        HasSelectedValueField<ActivityStatus> astatus = Mockito
+            .mock(HasSelectedValueField.class);
 
         List<Comment> comments = new ArrayList<Comment>();
 

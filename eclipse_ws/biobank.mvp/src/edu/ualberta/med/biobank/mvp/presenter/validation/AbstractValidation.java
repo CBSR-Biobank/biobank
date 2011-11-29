@@ -8,7 +8,6 @@ import com.pietschy.gwt.pectin.client.form.validation.HasValidation;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationEvent;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationHandler;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
-import com.pietschy.gwt.pectin.client.form.validation.ValidationResultImpl;
 
 public abstract class AbstractValidation implements HasValidation {
     private final HandlerManager handlerManager = new HandlerManager(this);
@@ -31,10 +30,10 @@ public abstract class AbstractValidation implements HasValidation {
 
     @Override
     public void clear() {
-        setValidationResult(new ValidationResultImpl());
+        setValidationResult(EmptyValidationResult.INSTANCE);
     }
 
-    protected void setValidationResult(ValidationResultImpl result) {
+    protected void setValidationResult(ValidationResult result) {
         if (result == null) {
             throw new NullPointerException("validationResult is null");
         }

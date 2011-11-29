@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.pietschy.gwt.pectin.client.binding.Disposable;
 
-public class HandlerRegManager implements Disposable {
+public class HandlerRegistry implements Disposable {
     private final List<HandlerRegistration> handlerRegistrations =
         new ArrayList<HandlerRegistration>();
 
@@ -14,6 +14,7 @@ public class HandlerRegManager implements Disposable {
         handlerRegistrations.add(handlerRegistration);
     }
 
+    @Override
     public void dispose() {
         for (HandlerRegistration handlerRegistration : handlerRegistrations) {
             handlerRegistration.removeHandler();

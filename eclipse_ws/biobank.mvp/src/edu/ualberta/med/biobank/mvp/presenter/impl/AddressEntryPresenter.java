@@ -2,108 +2,96 @@ package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.pietschy.gwt.pectin.client.form.FieldModel;
-import com.pietschy.gwt.pectin.client.form.validation.ValidationPlugin;
+import com.pietschy.gwt.pectin.client.form.validation.HasValidation;
 import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidator;
 
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.mvp.model.AbstractModel;
+import edu.ualberta.med.biobank.mvp.presenter.HasState;
+import edu.ualberta.med.biobank.mvp.presenter.IValidatablePresenter;
+import edu.ualberta.med.biobank.mvp.presenter.IViewStatePresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter.View;
-import edu.ualberta.med.biobank.mvp.user.ui.HasField;
+import edu.ualberta.med.biobank.mvp.presenter.model.SimpleViewState;
+import edu.ualberta.med.biobank.mvp.presenter.validation.ValidationTree;
+import edu.ualberta.med.biobank.mvp.user.ui.HasValueField;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
-public class AddressEntryPresenter extends AbstractPresenter<View> {
-    private final Model model;
+public class AddressEntryPresenter extends AbstractPresenter<View>
+    implements IViewStatePresenter, IValidatablePresenter {
+    private final ValidationTree validation = new ValidationTree();
+    private final SimpleViewState viewState = new SimpleViewState();
+    private Integer addressId;
 
     public interface View extends IView {
-        HasField<String> getStreet1();
+        HasValueField<String> getStreet1();
 
-        HasField<String> getStreet2();
+        HasValueField<String> getStreet2();
 
-        HasField<String> getCity();
+        HasValueField<String> getCity();
 
-        HasField<String> getProvince();
+        HasValueField<String> getProvince();
 
-        HasField<String> getPostalCode();
+        HasValueField<String> getPostalCode();
 
-        HasField<String> getPhoneNumber();
+        HasValueField<String> getPhoneNumber();
 
-        HasField<String> getFaxNumber();
+        HasValueField<String> getFaxNumber();
 
-        HasField<String> getCountry();
+        HasValueField<String> getCountry();
     }
 
     @Inject
     public AddressEntryPresenter(View view, EventBus eventBus) {
         super(view, eventBus);
-
-        this.model = new Model();
-    }
-
-    public Model getModel() {
-        return model;
     }
 
     @Override
     protected void onBind() {
-        binder.bind(model.street1).to(view.getStreet1());
-        binder.bind(model.street2).to(view.getStreet2());
-        binder.bind(model.city).to(view.getCity());
-        binder.bind(model.province).to(view.getProvince());
-        binder.bind(model.postalCode).to(view.getPostalCode());
-        binder.bind(model.phoneNumber).to(view.getPhoneNumber());
-        binder.bind(model.faxNumber).to(view.getFaxNumber());
-        binder.bind(model.country).to(view.getCountry());
-
-        model.bind();
+        validation.validate(view.getCity())
+            .using(new NotEmptyValidator("city"))
+            .when(getViewState().dirty());
     }
 
     @Override
     protected void onUnbind() {
-        model.unbind();
+        validation.dispose();
     }
 
-    public static class Model extends AbstractModel<Address> {
-        final FieldModel<String> street1;
-        final FieldModel<String> street2;
-        final FieldModel<String> city;
-        final FieldModel<String> province;
-        final FieldModel<String> postalCode;
-        final FieldModel<String> phoneNumber;
-        final FieldModel<String> faxNumber;
-        final FieldModel<String> country;
+    public void setAddress(Address address) {
+        this.addressId = address.getId();
 
-        @SuppressWarnings("unchecked")
-        private Model() {
-            super(Address.class);
+        view.getStreet1().setValue(address.getStreet1());
+        view.getStreet2().setValue(address.getStreet2());
+        view.getCity().setValue(address.getCity());
+        view.getProvince().setValue(address.getProvince());
+        view.getPostalCode().setValue(address.getPostalCode());
+        view.getPhoneNumber().setValue(address.getPhoneNumber());
+        view.getFaxNumber().setValue(address.getFaxNumber());
+        view.getCountry().setValue(address.getCountry());
+    }
 
-            street1 = fieldOfType(String.class)
-                .boundTo(provider, "street1");
-            street2 = fieldOfType(String.class)
-                .boundTo(provider, "street2");
-            city = fieldOfType(String.class)
-                .boundTo(provider, "city");
-            province = fieldOfType(String.class)
-                .boundTo(provider, "province");
-            postalCode = fieldOfType(String.class)
-                .boundTo(provider, "postalCode");
-            phoneNumber = fieldOfType(String.class)
-                .boundTo(provider, "phoneNumber");
-            faxNumber = fieldOfType(String.class)
-                .boundTo(provider, "faxNumber");
-            country = fieldOfType(String.class)
-                .boundTo(provider, "country");
+    public Address getAddress() {
+        Address address = new Address();
+        address.setId(addressId);
 
-            ValidationPlugin.validateField(city)
-                .using(new NotEmptyValidator("City is required"));
-        }
+        address.setStreet1(view.getStreet1().getValue());
+        address.setStreet2(view.getStreet2().getValue());
+        address.setCity(view.getCity().getValue());
+        address.setProvince(view.getProvince().getValue());
+        address.setPostalCode(view.getPostalCode().getValue());
+        address.setPhoneNumber(view.getPhoneNumber().getValue());
+        address.setFaxNumber(view.getFaxNumber().getValue());
+        address.setCountry(view.getCountry().getValue());
 
-        @Override
-        public void onBind() {
-        }
+        return address;
+    }
 
-        @Override
-        public void onUnbind() {
-        }
+    @Override
+    public HasValidation getValidation() {
+        return validation;
+    }
+
+    @Override
+    public HasState getViewState() {
+        return viewState;
     }
 }

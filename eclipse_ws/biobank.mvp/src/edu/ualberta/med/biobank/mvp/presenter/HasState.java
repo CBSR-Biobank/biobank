@@ -1,8 +1,10 @@
 package edu.ualberta.med.biobank.mvp.presenter;
 
-import com.pietschy.gwt.pectin.client.bean.HasDirtyModel;
+import com.pietschy.gwt.pectin.client.value.ValueModel;
 
-public interface IDirtiablePresenter extends HasDirtyModel {
+public interface HasState {
+    ValueModel<Boolean> dirty();
+
     /**
      * Takes a snapshot of the current data, which should clear the dirty state.
      */

@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import java.util.ArrayList;
 
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -12,7 +11,7 @@ import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusGetAllAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter.View;
-import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedField;
+import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValueField;
 import edu.ualberta.med.biobank.mvp.util.Converter;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
@@ -21,7 +20,7 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
     private final Dispatcher dispatcher;
 
     public interface View extends IView {
-        HasSelectedField<ActivityStatus> getActivityStatus();
+        HasSelectedValueField<ActivityStatus> getActivityStatus();
     }
 
     @Inject
@@ -31,12 +30,28 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
         this.dispatcher = dispatcher;
     }
 
-    public HasValue<ActivityStatus> getActivityStatus() {
-        return view.getActivityStatus();
+    @Override
+    protected void onBind() {
     }
 
     @Override
-    protected void onBind() {
+    protected void onUnbind() {
+    }
+
+    public ActivityStatus getActivityStatus() {
+        return view.getActivityStatus().getValue();
+    }
+
+    public Integer getActivityStatusId() {
+        return getActivityStatus() != null ? getActivityStatus().getId() : null;
+    }
+
+    public void setActivityStatus(ActivityStatus activityStatus) {
+        loadOptions();
+        view.getActivityStatus().setValue(activityStatus);
+    }
+
+    private void loadOptions() {
         dispatcher.exec(new ActivityStatusGetAllAction(),
             new ActionCallback<MapResult<Integer, ActivityStatus>>() {
                 @Override
@@ -57,10 +72,6 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
                     view.getActivityStatus().setOptionLabeller(labeller);
                 }
             });
-    }
-
-    @Override
-    protected void onUnbind() {
     }
 
     private static class OptionLabeller implements
