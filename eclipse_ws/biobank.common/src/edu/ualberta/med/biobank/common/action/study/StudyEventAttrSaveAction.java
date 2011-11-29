@@ -6,6 +6,9 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.common.permission.Permission;
+import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.EventAttrType;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
@@ -49,8 +52,12 @@ public class StudyEventAttrSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        // should only be called by other actions
-        return false;
+        Permission permission;
+        if (studyId == null)
+            permission = new StudyCreatePermission();
+        else
+            permission = new StudyUpdatePermission(studyId);
+        return permission.isAllowed(user, session);
     }
 
     @Override
