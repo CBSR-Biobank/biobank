@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,7 +31,8 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
 
     public static HashMap<Integer, ResearchGroup> getAllResearchGroups(
         WritableApplicationService appService) throws ApplicationException {
-        HashMap<Integer, ResearchGroup> rgs = new HashMap<Integer, ResearchGroup>();
+        HashMap<Integer, ResearchGroup> rgs =
+            new HashMap<Integer, ResearchGroup>();
         HQLCriteria c = new HQLCriteria(ALL_RG_QRY);
         List<ResearchGroup> ResearchGroups = appService.query(c);
         for (ResearchGroup researchGroup : ResearchGroups)
@@ -86,5 +88,17 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
             return myName.compareTo(wrapperName);
         }
         return 0;
+    }
+
+    private static final String RG_GET = "from "
+        + ResearchGroup.class.getName() + " rg where rg.id=?";
+
+    public static ResearchGroupWrapper getResearchGroupById(
+        WritableApplicationService appService, Integer id)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(RG_GET);
+        criteria.setParameters(Arrays.asList(id));
+        List<ResearchGroup> rgs = appService.query(criteria);
+        return new ResearchGroupWrapper(appService, rgs.get(0));
     }
 }
