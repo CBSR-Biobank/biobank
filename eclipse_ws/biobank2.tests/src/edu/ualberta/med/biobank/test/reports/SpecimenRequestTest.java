@@ -76,28 +76,35 @@ public class SpecimenRequestTest extends AbstractReportTest {
             Date dateDrawn = request.getDateDrawn();
             Integer maxResults = (int) request.getMaxAliquots();
 
-            Predicate<SpecimenWrapper> aliquotPnumber = new Predicate<SpecimenWrapper>() {
-                public boolean evaluate(SpecimenWrapper aliquot) {
-                    return aliquot.getCollectionEvent().getPatient()
-                        .getPnumber().equals(pnumber);
-                }
-            };
+            Predicate<SpecimenWrapper> aliquotPnumber =
+                new Predicate<SpecimenWrapper>() {
+                    @Override
+                    public boolean evaluate(SpecimenWrapper aliquot) {
+                        return aliquot.getCollectionEvent().getPatient()
+                            .getPnumber().equals(pnumber);
+                    }
+                };
 
-            Predicate<SpecimenWrapper> aliquotSampleType = new Predicate<SpecimenWrapper>() {
-                public boolean evaluate(SpecimenWrapper aliquot) {
-                    return aliquot.getSpecimenType().getNameShort()
-                        .equals(typeName);
-                }
-            };
+            Predicate<SpecimenWrapper> aliquotSampleType =
+                new Predicate<SpecimenWrapper>() {
+                    @Override
+                    public boolean evaluate(SpecimenWrapper aliquot) {
+                        return aliquot.getSpecimenType().getNameShort()
+                            .equals(typeName);
+                    }
+                };
 
             Collection<SpecimenWrapper> allAliquots = getSpecimens();
             @SuppressWarnings("unchecked")
-            List<SpecimenWrapper> filteredAliquots = new ArrayList<SpecimenWrapper>(
-                PredicateUtil.filter(allAliquots, PredicateUtil.andPredicate(
-                    AbstractReportTest.aliquotDrawnSameDay(dateDrawn),
-                    ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER, ALIQUOT_HAS_POSITION,
-                    aliquotPnumber, aliquotSampleType,
-                    aliquotSite(isInSite(), getSiteId()))));
+            List<SpecimenWrapper> filteredAliquots =
+                new ArrayList<SpecimenWrapper>(
+                    PredicateUtil.filter(allAliquots, PredicateUtil
+                        .andPredicate(
+                            AbstractReportTest.aliquotDrawnSameDay(dateDrawn),
+                            ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER,
+                            ALIQUOT_HAS_POSITION,
+                            aliquotPnumber, aliquotSampleType,
+                            aliquotSite(isInSite(), getSiteId()))));
 
             for (SpecimenWrapper aliquot : filteredAliquots) {
                 expectedResults.add(aliquot.getWrappedObject());

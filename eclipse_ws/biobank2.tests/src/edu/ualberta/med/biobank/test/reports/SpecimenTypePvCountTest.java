@@ -22,36 +22,41 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class SpecimenTypePvCountTest extends AbstractReportTest {
-    private static final Mapper<SpecimenWrapper, List<Object>, Long> GROUP_BY_PV_AND_SAMPLE_TYPE = new Mapper<SpecimenWrapper, List<Object>, Long>() {
-        public List<Object> getKey(SpecimenWrapper aliquot) {
-            ProcessingEventWrapper pevent = aliquot.getProcessingEvent();
-            SpecimenWrapper parentSpc = aliquot.getParentSpecimen();
-            return Arrays.asList(new Object[] { pevent.getId(),
-                parentSpc.getCollectionEvent().getPatient().getPnumber(),
-                pevent.getCreatedAt(), parentSpc.getCreatedAt(),
-                aliquot.getSpecimenType().getName() });
-        }
-
-        public Long getValue(SpecimenWrapper aliquot, Long count) {
-            return count == null ? new Long(1) : new Long(count + 1);
-        }
-    };
-    private static final Comparator<List<Object>> ORDER_BY_PNUMBER_DATE_PROCESSED = new Comparator<List<Object>>() {
-        public int compare(List<Object> lhs, List<Object> rhs) {
-            String lhsPnumber = (String) lhs.get(1);
-            String rhsPnumber = (String) rhs.get(1);
-
-            int cmp = compareStrings(lhsPnumber, rhsPnumber);
-            if (cmp != 0) {
-                return cmp;
+    private static final Mapper<SpecimenWrapper, List<Object>, Long> GROUP_BY_PV_AND_SAMPLE_TYPE =
+        new Mapper<SpecimenWrapper, List<Object>, Long>() {
+            @Override
+            public List<Object> getKey(SpecimenWrapper aliquot) {
+                ProcessingEventWrapper pevent = aliquot.getProcessingEvent();
+                SpecimenWrapper parentSpc = aliquot.getParentSpecimen();
+                return Arrays.asList(new Object[] { pevent.getId(),
+                    parentSpc.getCollectionEvent().getPatient().getPnumber(),
+                    pevent.getCreatedAt(), parentSpc.getCreatedAt(),
+                    aliquot.getSpecimenType().getName() });
             }
 
-            Date lhsDateProcessed = (Date) lhs.get(2);
-            Date rhsDateProcessed = (Date) rhs.get(2);
+            @Override
+            public Long getValue(SpecimenWrapper aliquot, Long count) {
+                return count == null ? new Long(1) : new Long(count + 1);
+            }
+        };
+    private static final Comparator<List<Object>> ORDER_BY_PNUMBER_DATE_PROCESSED =
+        new Comparator<List<Object>>() {
+            @Override
+            public int compare(List<Object> lhs, List<Object> rhs) {
+                String lhsPnumber = (String) lhs.get(1);
+                String rhsPnumber = (String) rhs.get(1);
 
-            return DateCompare.compare(rhsDateProcessed, lhsDateProcessed);
-        }
-    };
+                int cmp = compareStrings(lhsPnumber, rhsPnumber);
+                if (cmp != 0) {
+                    return cmp;
+                }
+
+                Date lhsDateProcessed = (Date) lhs.get(2);
+                Date rhsDateProcessed = (Date) rhs.get(2);
+
+                return DateCompare.compare(rhsDateProcessed, lhsDateProcessed);
+            }
+        };
 
     @Test
     public void testResults() throws Exception {
@@ -110,6 +115,7 @@ public class SpecimenTypePvCountTest extends AbstractReportTest {
     private static Predicate<SpecimenWrapper> aliquotStudyNameShortLike(
         final String studyNameShort) {
         return new Predicate<SpecimenWrapper>() {
+            @Override
             public boolean evaluate(SpecimenWrapper aliquot) {
                 return aliquot.getCollectionEvent().getPatient().getStudy()
                     .getNameShort().equals(studyNameShort);

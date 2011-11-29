@@ -32,20 +32,25 @@ public class ContainerEmptyLocationsTest extends AbstractReportTest {
         final String containerLabel = (String) getReport().getParams().get(0);
         final String topContainerList = getReport().getContainerList();
 
-        Predicate<ContainerWrapper> specificContainerLabel = new Predicate<ContainerWrapper>() {
-            public boolean evaluate(ContainerWrapper container) {
-                return container.getLabel().startsWith(containerLabel);
-            }
-        };
-        Predicate<ContainerWrapper> specificTopContainer = new Predicate<ContainerWrapper>() {
-            public boolean evaluate(ContainerWrapper container) {
-                final List<Integer> topContainerIds = new ArrayList<Integer>();
-                for (String id : topContainerList.split(",")) {
-                    topContainerIds.add(Integer.valueOf(id));
+        Predicate<ContainerWrapper> specificContainerLabel =
+            new Predicate<ContainerWrapper>() {
+                @Override
+                public boolean evaluate(ContainerWrapper container) {
+                    return container.getLabel().startsWith(containerLabel);
                 }
-                return topContainerIds.contains(container.getId());
-            }
-        };
+            };
+        Predicate<ContainerWrapper> specificTopContainer =
+            new Predicate<ContainerWrapper>() {
+                @Override
+                public boolean evaluate(ContainerWrapper container) {
+                    final List<Integer> topContainerIds =
+                        new ArrayList<Integer>();
+                    for (String id : topContainerList.split(",")) {
+                        topContainerIds.add(Integer.valueOf(id));
+                    }
+                    return topContainerIds.contains(container.getId());
+                }
+            };
 
         List<ContainerWrapper> allContainers = getContainers();
         Collection<ContainerWrapper> topContainers = PredicateUtil.filter(
