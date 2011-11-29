@@ -206,8 +206,14 @@ public class UserEditDialog extends BgcBaseDialog {
             WrapperTransaction tx = new WrapperTransaction(
                 SessionManager.getAppService());
             tx.persist(originalUser);
+
             for (BbGroupWrapper g : groupsWidget.getAddedToSelection()) {
                 g.addToUserCollection(Arrays.asList(originalUser));
+                tx.persist(g);
+            }
+
+            for (BbGroupWrapper g : groupsWidget.getRemovedFromSelection()) {
+                g.removeFromUserCollection(Arrays.asList(originalUser));
                 tx.persist(g);
             }
             // add into group after persisting because user needs to be created

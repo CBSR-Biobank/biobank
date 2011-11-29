@@ -49,8 +49,8 @@ public class StudyEventAttrSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        // FIXME: needs implementation
-        return true;
+        // should only be called by other actions
+        return false;
     }
 
     @Override

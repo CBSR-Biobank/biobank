@@ -113,7 +113,8 @@ public enum PermissionEnum {
         Collection<Membership> membs = principal.getMembershipCollection();
         if (membs != null) {
             for (Membership memb : membs) {
-                if (isMembershipAllowed(memb, center, study)) {
+                boolean x = isMembershipAllowed(memb, center, study);
+                if (x) {
                     return true;
                 }
             }
@@ -134,9 +135,11 @@ public enum PermissionEnum {
         Collection<Permission> permissions =
             membership.getPermissionCollection();
         boolean hasPermission =
-            permissions != null && isPermissionAllowed(permissions);
+            ((permissions != null) && isPermissionAllowed(permissions));
 
-        return hasCenter && hasStudy && hasPermission;
+        boolean result = hasCenter && hasStudy && hasPermission;
+
+        return result;
     }
 
     private boolean isPermissionAllowed(Collection<Permission> permissions) {
