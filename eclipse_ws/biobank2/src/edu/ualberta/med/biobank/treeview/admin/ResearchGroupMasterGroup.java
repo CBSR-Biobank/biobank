@@ -29,6 +29,10 @@ public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
         try {
             rgs = ResearchGroupWrapper.getAllResearchGroups(SessionManager
                 .getAppService());
+            for (Integer rgId : rgs.keySet())
+                this.addChild(new ResearchGroupAdapter(this,
+                    new ResearchGroupAdapterInfo(rgId, rgs.get(rgId)
+                        .getNameShort())));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Unable to retrieve research groups", e);
         }
@@ -69,7 +73,7 @@ public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
     }
 
     @Override
-    protected AbstractAdapterBase createChildNode() {
+    protected AbstractNewAdapterBase createChildNode() {
         return null;
     }
 

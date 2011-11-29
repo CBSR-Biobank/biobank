@@ -62,7 +62,9 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        researchGroup = (ResearchGroupWrapper) getModelObject();
+        researchGroup =
+            ResearchGroupWrapper.getResearchGroupById(
+                SessionManager.getAppService(), adapter.getId());
         setPartName(NLS.bind(Messages.ResearchGroupViewForm_title,
             researchGroup.getNameShort()));
     }
@@ -154,21 +156,18 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             reader.close();
         }
 
-        List<RequestSpecimenWrapper> specs =
-            new ArrayList<RequestSpecimenWrapper>();
         for (RequestInput ob : requests) {
+            SpecimenWrapper spec =
+                SpecimenWrapper.getSpecimen(SessionManager.getAppService(),
+                    ob.getInventoryID());
+            if (spec == null)
+                continue;
             RequestSpecimenWrapper r =
                 new RequestSpecimenWrapper(SessionManager.getAppService());
             r.setRequest(request);
             r.setState(RequestSpecimenState.AVAILABLE_STATE);
-            SpecimenWrapper spec =
-                SpecimenWrapper.getSpecimen(SessionManager.getAppService(),
-                    ob.getInventoryID());
-            if (spec == null) continue;
             r.setSpecimen(spec);
-            specs.add(r);
         }
-        request.addToRequestSpecimenCollection(specs);
 
         request.setStudy(researchGroup.getStudy());
         request.setCreated(new Date());
