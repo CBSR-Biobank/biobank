@@ -10,13 +10,18 @@ import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusGetAllAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
+import edu.ualberta.med.biobank.mvp.presenter.HasState;
+import edu.ualberta.med.biobank.mvp.presenter.IStatefulPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter.View;
+import edu.ualberta.med.biobank.mvp.presenter.state.SimpleState;
 import edu.ualberta.med.biobank.mvp.user.ui.SelectedValueField;
 import edu.ualberta.med.biobank.mvp.util.Converter;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
-public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
+public class ActivityStatusComboPresenter extends AbstractPresenter<View>
+    implements IStatefulPresenter {
     private final static OptionLabeller LABELLER = new OptionLabeller();
+    private final SimpleState state = new SimpleState();
     private final Dispatcher dispatcher;
 
     public interface View extends IView {
@@ -34,10 +39,17 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
 
     @Override
     protected void onBind() {
+        state.add(view.getActivityStatus());
     }
 
     @Override
     protected void onUnbind() {
+        state.dispose();
+    }
+
+    @Override
+    public HasState getState() {
+        return state;
     }
 
     public ActivityStatus getActivityStatus() {

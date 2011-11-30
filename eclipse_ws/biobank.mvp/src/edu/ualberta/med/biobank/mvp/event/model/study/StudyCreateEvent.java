@@ -9,8 +9,6 @@ import edu.ualberta.med.biobank.model.Study;
  * 
  */
 public class StudyCreateEvent extends GwtEvent<StudyCreateHandler> {
-    private final Integer studyId;
-
     /**
      * Handler type.
      */
@@ -28,12 +26,7 @@ public class StudyCreateEvent extends GwtEvent<StudyCreateHandler> {
         return TYPE;
     }
 
-    public StudyCreateEvent(Integer studyId) {
-        this.studyId = studyId;
-    }
-
-    public Integer getStudyId() {
-        return studyId;
+    public StudyCreateEvent() {
     }
 
     @Override

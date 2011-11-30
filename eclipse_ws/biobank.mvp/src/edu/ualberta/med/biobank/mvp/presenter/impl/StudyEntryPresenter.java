@@ -9,6 +9,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.pietschy.gwt.pectin.client.form.validation.component.ValidationDisplay;
 import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidator;
+import com.pietschy.gwt.pectin.client.form.validation.validator.NotNullValidator;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
@@ -71,10 +72,22 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         activityStatusComboPresenter.bind();
 
+        state.add(view.getName());
+        state.add(view.getNameShort());
+        state.add(view.getContacts());
+        state.add(view.getAliquotedSpecimens());
+        state.add(view.getSourceSpecimens());
+
+        state.add(activityStatusComboPresenter);
+
         validation.validate(view.getName())
             .using(new NotEmptyValidator("asdf"));
         validation.validate(view.getNameShort())
             .using(new NotEmptyValidator("asdf"));
+
+        validation.validate(
+            activityStatusComboPresenter.getView().getActivityStatus())
+            .using(new NotNullValidator("asdfa sdfad"));
     }
 
     @Override
@@ -88,6 +101,10 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
     protected void doSave() {
         StudySaveAction saveStudy = new StudySaveAction();
         saveStudy.setId(studyId);
+
+        // TODO: set site ids?
+        saveStudy.setSiteIds(new HashSet<Integer>());
+
         saveStudy.setName(view.getName().getValue());
         saveStudy.setNameShort(view.getNameShort().getValue());
         saveStudy.setActivityStatusId(getActivityStatusId());
