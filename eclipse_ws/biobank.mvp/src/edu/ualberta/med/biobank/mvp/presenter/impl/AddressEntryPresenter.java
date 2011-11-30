@@ -7,18 +7,18 @@ import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidato
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.mvp.presenter.HasState;
+import edu.ualberta.med.biobank.mvp.presenter.IStatefulPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.IValidatablePresenter;
-import edu.ualberta.med.biobank.mvp.presenter.IViewStatePresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter.View;
-import edu.ualberta.med.biobank.mvp.presenter.model.SimpleViewState;
+import edu.ualberta.med.biobank.mvp.presenter.state.SimpleState;
 import edu.ualberta.med.biobank.mvp.presenter.validation.ValidationTree;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
 public class AddressEntryPresenter extends AbstractPresenter<View>
-    implements IViewStatePresenter, IValidatablePresenter {
+    implements IStatefulPresenter, IValidatablePresenter {
     private final ValidationTree validation = new ValidationTree();
-    private final SimpleViewState viewState = new SimpleViewState();
+    private final SimpleState state = new SimpleState();
     private Integer addressId;
 
     public interface View extends IView {
@@ -46,6 +46,16 @@ public class AddressEntryPresenter extends AbstractPresenter<View>
 
     @Override
     protected void onBind() {
+        // TODO: replace with reflection?
+        state.add(view.getStreet1());
+        state.add(view.getStreet2());
+        state.add(view.getCity());
+        state.add(view.getProvince());
+        state.add(view.getPostalCode());
+        state.add(view.getPhoneNumber());
+        state.add(view.getFaxNumber());
+        state.add(view.getCountry());
+
         validation.validate(view.getCity())
             .using(new NotEmptyValidator("city"));
     }
@@ -90,7 +100,7 @@ public class AddressEntryPresenter extends AbstractPresenter<View>
     }
 
     @Override
-    public HasState getViewState() {
-        return viewState;
+    public HasState getState() {
+        return state;
     }
 }

@@ -73,7 +73,14 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         addressEntryPresenter.bind();
 
-        validation.add(addressEntryPresenter.getValidation());
+        // TODO: replace with reflection?
+        state.add(view.getName());
+        state.add(view.getNameShort());
+        state.add(view.getStudies());
+
+        state.add(addressEntryPresenter);
+
+        validation.add(addressEntryPresenter);
 
         validation.validate(view.getName())
             .using(new NotEmptyValidator("asdf"));
@@ -82,7 +89,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         validation.validate(
             activityStatusComboPresenter.getView().getActivityStatus())
-            .using(new NotNullValidator(""));
+            .using(new NotNullValidator("asdfa sdfad"));
     }
 
     @Override
@@ -124,7 +131,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
                 Integer siteId = result.getId();
 
                 // clear dirty state (so form can close without prompt to save)
-                getViewState().checkpoint();
+                getState().checkpoint();
 
                 eventBus.fireEvent(new SiteChangedEvent(siteId));
                 eventBus.fireEvent(new SiteViewPresenterShowEvent(siteId));
@@ -173,6 +180,8 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         Address address = site.getAddress();
         addressEntryPresenter.setAddress(address);
+
+        state.checkpoint();
     }
 
     private Integer getActivityStatusId() {

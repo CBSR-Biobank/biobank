@@ -9,7 +9,7 @@ import com.pietschy.gwt.pectin.client.form.validation.HasValidation;
 
 import edu.ualberta.med.biobank.mvp.presenter.HasState;
 import edu.ualberta.med.biobank.mvp.presenter.IEntryFormPresenter;
-import edu.ualberta.med.biobank.mvp.presenter.model.SimpleViewState;
+import edu.ualberta.med.biobank.mvp.presenter.state.SimpleState;
 import edu.ualberta.med.biobank.mvp.presenter.validation.ValidationTree;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
 
@@ -17,11 +17,11 @@ public abstract class AbstractEntryFormPresenter<V extends IEntryFormView>
     extends AbstractFormPresenter<V>
     implements IEntryFormPresenter<V> {
     protected final ValidationTree validation = new ValidationTree();
-    protected final SimpleViewState viewState = new SimpleViewState();
+    protected final SimpleState state = new SimpleState();
     private final SaveClickHandler saveClickHandler = new SaveClickHandler();
 
     @SuppressWarnings("unchecked")
-    private final Condition validAndDirty = Conditions.and(viewState.dirty(),
+    private final Condition validAndDirty = Conditions.and(state.dirty(),
         validation.valid());
 
     public AbstractEntryFormPresenter(V view, EventBus eventBus) {
@@ -29,8 +29,8 @@ public abstract class AbstractEntryFormPresenter<V extends IEntryFormView>
     }
 
     @Override
-    public HasState getViewState() {
-        return viewState;
+    public HasState getState() {
+        return state;
     }
 
     @Override
@@ -56,6 +56,7 @@ public abstract class AbstractEntryFormPresenter<V extends IEntryFormView>
     @Override
     protected void onUnbind() {
         validation.dispose();
+        state.dispose();
     }
 
     protected abstract void doSave();

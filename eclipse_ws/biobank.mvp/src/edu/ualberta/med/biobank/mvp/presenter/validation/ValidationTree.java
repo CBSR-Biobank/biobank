@@ -15,6 +15,7 @@ import com.pietschy.gwt.pectin.client.form.validation.ValidationResultImpl;
 import com.pietschy.gwt.pectin.client.value.ValueHolder;
 import com.pietschy.gwt.pectin.client.value.ValueModel;
 
+import edu.ualberta.med.biobank.mvp.presenter.IValidatablePresenter;
 import edu.ualberta.med.biobank.mvp.util.HandlerRegistry;
 
 /**
@@ -37,7 +38,9 @@ public class ValidationTree extends AbstractValidation {
         return new ValueValidationBuilder<T>(this, source);
     }
 
-    public DelegatingConditionBuilder add(HasValidation validation) {
+    public DelegatingConditionBuilder add(IValidatablePresenter presenter) {
+        HasValidation validation = presenter.getValidation();
+
         DelegatingCondition condition = new DelegatingCondition(true);
 
         add(new ConditionalValidation(validation, condition));

@@ -66,9 +66,8 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
                 @Override
                 public void onSuccess(MapResult<Integer, ActivityStatus> result) {
                     view.getActivityStatus()
-                        .setOptions(
-                            new ArrayList<ActivityStatus>(result.getMap()
-                                .values()));
+                        .setOptions(new ArrayList<ActivityStatus>(
+                            result.getMap().values()));
                     view.getActivityStatus().setOptionLabeller(labeller);
                 }
             });

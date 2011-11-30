@@ -115,7 +115,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
                 Integer studyId = result.getId();
 
                 // clear dirty state (so form can close without prompt to save)
-                getViewState().checkpoint();
+                getState().checkpoint();
 
                 eventBus.fireEvent(new StudyChangedEvent(studyId));
                 eventBus.fireEvent(new StudyViewPresenterShowEvent(studyId));

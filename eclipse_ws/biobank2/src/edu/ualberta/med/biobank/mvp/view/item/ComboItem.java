@@ -64,7 +64,7 @@ public class ComboItem<T> extends AbstractValueField<T>
 
     @Override
     public void setOptions(List<T> options) {
-        this.options = options;
+        this.options = new ArrayList<T>(options);
 
         if (comboViewer != null) {
             comboViewer.setInput(options);
