@@ -7,6 +7,7 @@ import com.pietschy.gwt.pectin.client.condition.Condition;
 import com.pietschy.gwt.pectin.client.condition.Conditions;
 import com.pietschy.gwt.pectin.client.form.validation.HasValidation;
 
+import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
 import edu.ualberta.med.biobank.mvp.presenter.HasState;
 import edu.ualberta.med.biobank.mvp.presenter.IEntryFormPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.state.SimpleState;
@@ -57,6 +58,15 @@ public abstract class AbstractEntryFormPresenter<V extends IEntryFormView>
     protected void onUnbind() {
         validation.dispose();
         state.dispose();
+    }
+
+    @Override
+    protected V load(Loadable loadable) throws InitPresenterException {
+        super.load(loadable);
+
+        state.checkpoint();
+
+        return view;
     }
 
     protected abstract void doSave();

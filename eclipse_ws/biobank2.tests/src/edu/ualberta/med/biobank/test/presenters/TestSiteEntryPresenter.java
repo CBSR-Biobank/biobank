@@ -116,7 +116,13 @@ public class TestSiteEntryPresenter {
             .thenReturn(astatus);
 
         presenter.bind();
-        presenter.createSite();
+
+        try {
+            // TODO: deal with this better
+            presenter.createSite();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         siteEntryView.getSave();
     }

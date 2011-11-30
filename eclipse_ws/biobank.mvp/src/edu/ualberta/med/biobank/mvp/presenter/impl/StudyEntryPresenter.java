@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.event.model.study.StudyChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.study.StudyViewPresenterShowEvent;
+import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.user.ui.ListField;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
@@ -84,15 +85,6 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
     }
 
     @Override
-    public void doReload() {
-        if (studyId != null) {
-            editStudy(studyId);
-        } else {
-            createStudy();
-        }
-    }
-
-    @Override
     protected void doSave() {
         StudySaveAction saveStudy = new StudySaveAction();
         saveStudy.setId(studyId);
@@ -100,7 +92,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         saveStudy.setNameShort(view.getNameShort().getValue());
         saveStudy.setActivityStatusId(getActivityStatusId());
         saveStudy.setContactIds(getContactIds());
-        saveStudy.setSourceSpcIds(getSourceSepcimenIds());
+        saveStudy.setSourceSpcIds(getSourceSpecimenIds());
         saveStudy.setAliquotSpcIds(getAliquotedSepcimenIds());
         saveStudy.setStudyEventAttrIds(getStudyEventAttrIds());
 
@@ -124,38 +116,15 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         });
     }
 
-    public void createStudy() {
-        StudyInfo studyInfo =
-            new StudyInfo(new Study(), 0l, 0l, new ArrayList<ClinicInfo>(),
-                new ArrayList<SourceSpecimen>(),
-                new ArrayList<AliquotedSpecimen>(),
-                new ArrayList<StudyEventAttr>());
-        editStudy(studyInfo);
+    public View createStudy() throws InitPresenterException {
+        return load(new StudyCreate());
     }
 
-    public boolean editStudy(Integer studyId) {
-        this.studyId = studyId;
-
-        StudyGetInfoAction studyGetInfoAction = new StudyGetInfoAction(studyId);
-
-        boolean success = dispatcher.exec(studyGetInfoAction,
-            new ActionCallback<StudyInfo>() {
-                @Override
-                public void onFailure(Throwable caught) {
-                    eventBus.fireEvent(new ExceptionEvent(caught));
-                    close();
-                }
-
-                @Override
-                public void onSuccess(StudyInfo studyInfo) {
-                    editStudy(studyInfo);
-                }
-            });
-
-        return success;
+    public View editStudy(Integer studyId) throws InitPresenterException {
+        return load(new StudyEdit(studyId));
     }
 
-    private void editStudy(StudyInfo studyInfo) {
+    private void editStudy(StudyInfo studyInfo) throws InitPresenterException {
         Study study = studyInfo.getStudy();
         view.getName().setValue(study.getName());
         view.getNameShort().setValue(study.getNameShort());
@@ -190,7 +159,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         return ids;
     }
 
-    private Set<Integer> getSourceSepcimenIds() {
+    private Set<Integer> getSourceSpecimenIds() {
         Set<Integer> ids = new HashSet<Integer>();
         for (SourceSpecimen ss : view.getSourceSpecimens().asUnmodifiableList()) {
             ids.add(ss.getId());
@@ -211,5 +180,38 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         Set<Integer> ids = new HashSet<Integer>();
         // TODO: this
         return ids;
+    }
+
+    private class StudyEdit implements Loadable {
+        private final Integer newStudyId;
+
+        public StudyEdit(Integer newStudyId) {
+            this.newStudyId = newStudyId;
+        }
+
+        @Override
+        public void run() throws Exception {
+            studyId = newStudyId;
+
+            StudyInfo studyInfo =
+                dispatcher.exec(new StudyGetInfoAction(studyId));
+
+            editStudy(studyInfo);
+        }
+    }
+
+    private class StudyCreate implements Loadable {
+        @Override
+        public void run() throws Exception {
+            studyId = null;
+
+            StudyInfo studyInfo =
+                new StudyInfo(new Study(), 0l, 0l, new ArrayList<ClinicInfo>(),
+                    new ArrayList<SourceSpecimen>(),
+                    new ArrayList<AliquotedSpecimen>(),
+                    new ArrayList<StudyEventAttr>());
+
+            editStudy(studyInfo);
+        }
     }
 }

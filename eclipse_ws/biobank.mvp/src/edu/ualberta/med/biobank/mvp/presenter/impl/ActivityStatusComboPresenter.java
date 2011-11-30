@@ -5,18 +5,18 @@ import java.util.ArrayList;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusGetAllAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
 import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter.View;
 import edu.ualberta.med.biobank.mvp.user.ui.SelectedValueField;
 import edu.ualberta.med.biobank.mvp.util.Converter;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
 public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
-    private final static OptionLabeller labeller = new OptionLabeller();
+    private final static OptionLabeller LABELLER = new OptionLabeller();
     private final Dispatcher dispatcher;
 
     public interface View extends IView {
@@ -28,6 +28,8 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
         Dispatcher dispatcher) {
         super(view, eventBus);
         this.dispatcher = dispatcher;
+
+        view.getActivityStatus().setOptionLabeller(LABELLER);
     }
 
     @Override
@@ -46,31 +48,27 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
         return getActivityStatus() != null ? getActivityStatus().getId() : null;
     }
 
-    public void setActivityStatus(ActivityStatus activityStatus) {
+    public void setActivityStatus(ActivityStatus activityStatus)
+        throws InitPresenterException {
         loadOptions();
+
         view.getActivityStatus().setValue(activityStatus);
     }
 
-    private void loadOptions() {
-        dispatcher.exec(new ActivityStatusGetAllAction(),
-            new ActionCallback<MapResult<Integer, ActivityStatus>>() {
-                @Override
-                public void onFailure(Throwable caught) {
-                    // TODO: need to do something if cannot get information,
-                    // like throwing an ExceptionEvent. Parent Presenter may
-                    // need to tear down/ fail if this fails.
-                    System.out.println("FAIL!");
-                    caught.printStackTrace();
-                }
+    private void loadOptions() throws InitPresenterException {
+        try {
+            ActivityStatusGetAllAction action =
+                new ActivityStatusGetAllAction();
 
-                @Override
-                public void onSuccess(MapResult<Integer, ActivityStatus> result) {
-                    view.getActivityStatus()
-                        .setOptions(new ArrayList<ActivityStatus>(
-                            result.getMap().values()));
-                    view.getActivityStatus().setOptionLabeller(labeller);
-                }
-            });
+            MapResult<Integer, ActivityStatus> result = dispatcher.exec(action);
+
+            view.getActivityStatus()
+                .setOptions(new ArrayList<ActivityStatus>(
+                    result.getMap().values()));
+
+        } catch (Exception caught) {
+            throw new InitPresenterException(caught);
+        }
     }
 
     private static class OptionLabeller implements

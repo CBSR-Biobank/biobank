@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.site.SiteViewPresenterShowEvent;
+import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.presenter.validation.ValidationTree;
 import edu.ualberta.med.biobank.mvp.user.ui.ListField;
@@ -101,15 +102,6 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
     }
 
     @Override
-    public void doReload() {
-        if (siteId != null) {
-            editSite(siteId);
-        } else {
-            createSite();
-        }
-    }
-
-    @Override
     public void doSave() {
         SiteSaveAction saveSite = new SiteSaveAction();
         saveSite.setId(siteId);
@@ -140,34 +132,15 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         });
     }
 
-    public void createSite() {
-        SiteInfo siteInfo = new SiteInfo.Builder().build();
-        editSite(siteInfo);
+    public View createSite() throws InitPresenterException {
+        return load(new SiteCreate());
     }
 
-    public boolean editSite(Integer siteId) {
-        this.siteId = siteId;
-
-        SiteGetInfoAction siteGetInfoAction = new SiteGetInfoAction(siteId);
-
-        boolean success = dispatcher.exec(siteGetInfoAction,
-            new ActionCallback<SiteInfo>() {
-                @Override
-                public void onFailure(Throwable caught) {
-                    eventBus.fireEvent(new ExceptionEvent(caught));
-                    close();
-                }
-
-                @Override
-                public void onSuccess(SiteInfo siteInfo) {
-                    editSite(siteInfo);
-                }
-            });
-
-        return success;
+    public View editSite(Integer siteId) throws InitPresenterException {
+        return load(new SiteEdit(siteId));
     }
 
-    private void editSite(SiteInfo siteInfo) {
+    private void editSite(SiteInfo siteInfo) throws InitPresenterException {
         view.getIdentifier().setValue(siteId);
         view.getStudies().setElements(siteInfo.getStudyCollection());
 
@@ -180,8 +153,6 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         Address address = site.getAddress();
         addressEntryPresenter.setAddress(address);
-
-        state.checkpoint();
     }
 
     private Integer getActivityStatusId() {
@@ -194,5 +165,35 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
             studyIds.add(studyInfo.getStudy().getId());
         }
         return studyIds;
+    }
+
+    private class SiteEdit implements Loadable {
+        private final Integer newSiteId;
+
+        public SiteEdit(Integer newSiteId) {
+            this.newSiteId = newSiteId;
+        }
+
+        @Override
+        public void run() throws Exception {
+            siteId = newSiteId;
+
+            SiteGetInfoAction siteGetInfoAction = new SiteGetInfoAction(siteId);
+
+            SiteInfo siteInfo = dispatcher.exec(siteGetInfoAction);
+
+            editSite(siteInfo);
+        }
+    }
+
+    private class SiteCreate implements Loadable {
+        @Override
+        public void run() throws Exception {
+            siteId = null;
+
+            SiteInfo siteInfo = new SiteInfo.Builder().build();
+
+            editSite(siteInfo);
+        }
     }
 }
