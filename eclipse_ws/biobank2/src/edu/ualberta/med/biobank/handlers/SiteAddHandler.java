@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.mvp.event.model.site.SiteCreateEvent;
 
 public class SiteAddHandler extends AbstractHandler {
+    @SuppressWarnings("unused")
     private static BgcLogger LOGGER = BgcLogger.getLogger(SiteAddHandler.class
         .getName());
     private EventBus eventBus;

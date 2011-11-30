@@ -440,7 +440,8 @@ public class BgcWidgetCreator {
                 fieldLabel, errorMessage));
             UpdateValueStrategy uvs = new UpdateValueStrategy();
             uvs.setAfterGetValidator(validator);
-            IObservableValue selectedValue = new WritableValue("", String.class); //$NON-NLS-1$
+            IObservableValue selectedValue =
+                new WritableValue("", String.class); //$NON-NLS-1$
             Binding binding = dbc.bindValue(
                 SWTObservables.observeSelection(combo), selectedValue, uvs,
                 null);
@@ -458,8 +459,9 @@ public class BgcWidgetCreator {
                 .addSelectionChangedListener(new ISelectionChangedListener() {
                     @Override
                     public void selectionChanged(SelectionChangedEvent event) {
-                        IStructuredSelection selection = (IStructuredSelection) comboViewer
-                            .getSelection();
+                        IStructuredSelection selection =
+                            (IStructuredSelection) comboViewer
+                                .getSelection();
                         if ((selection != null) && (selection.size() > 0)) {
                             csu.doSelection(selection.getFirstElement());
                         } else {
@@ -595,9 +597,8 @@ public class BgcWidgetCreator {
                             return ValidationStatus.warning(errorMsg);
                         }
                         return ValidationStatus.error(errorMsg);
-                    } else {
-                        return Status.OK_STATUS;
                     }
+                    return Status.OK_STATUS;
                 }
 
             });
@@ -751,8 +752,10 @@ public class BgcWidgetCreator {
     public BgcBaseText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value,
         boolean useBackgroundColor) {
-        BgcBaseText widget = (BgcBaseText) createLabelledWidget(parent,
-            BgcBaseText.class, SWT.READ_ONLY | widgetOptions, fieldLabel, value);
+        BgcBaseText widget =
+            (BgcBaseText) createLabelledWidget(parent,
+                BgcBaseText.class, SWT.READ_ONLY | widgetOptions, fieldLabel,
+                value);
         if (useBackgroundColor)
             widget.setBackground(READ_ONLY_TEXT_BGR);
         return widget;

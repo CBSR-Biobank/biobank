@@ -62,16 +62,14 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
                     Object[] castedVals = (Object[]) element;
                     if (castedVals[columnIndex] == null)
                         return ""; //$NON-NLS-1$
-                    else {
-                        if (castedVals[columnIndex] instanceof Date)
-                            return DateFormatter
-                                .formatAsDate((Date) castedVals[columnIndex]);
-                        if (formatNumbers
-                            && castedVals[columnIndex] instanceof Number)
-                            return NumberFormatter
-                                .format((Number) castedVals[columnIndex]);
-                        return castedVals[columnIndex].toString();
-                    }
+                    if (castedVals[columnIndex] instanceof Date)
+                        return DateFormatter
+                            .formatAsDate((Date) castedVals[columnIndex]);
+                    if (formatNumbers
+                        && castedVals[columnIndex] instanceof Number)
+                        return NumberFormatter
+                            .format((Number) castedVals[columnIndex]);
+                    return castedVals[columnIndex].toString();
                 }
                 return "no label provider"; //$NON-NLS-1$
             }

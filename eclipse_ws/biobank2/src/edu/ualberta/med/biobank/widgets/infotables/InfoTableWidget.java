@@ -260,7 +260,6 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
         }
     }
 
-    @SuppressWarnings("unused")
     public Object getCollectionModelObject(Object item) throws Exception {
         return item;
     }

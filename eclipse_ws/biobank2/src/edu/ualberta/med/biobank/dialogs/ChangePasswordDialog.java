@@ -104,7 +104,8 @@ public class ChangePasswordDialog extends BgcBaseDialog {
         if (forceChange) {
             // will ask about bulk email on the same time
             checkBulk = new Button(contents, SWT.CHECK);
-            checkBulk.setText(Messages.ChangePasswordDialog_receive_email_check);
+            checkBulk
+                .setText(Messages.ChangePasswordDialog_receive_email_check);
             checkBulk.setSelection(SessionManager.getUser().getBulkEmails());
         }
     }
@@ -130,8 +131,7 @@ public class ChangePasswordDialog extends BgcBaseDialog {
     public boolean close() {
         if (!forceChange || getReturnCode() == OK)
             return super.close();
-        else
-            return false;
+        return false;
     }
 
     @Override

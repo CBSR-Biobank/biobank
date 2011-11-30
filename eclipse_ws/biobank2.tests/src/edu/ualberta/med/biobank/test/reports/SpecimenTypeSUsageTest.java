@@ -15,25 +15,31 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 
 public class SpecimenTypeSUsageTest extends AbstractReportTest {
-    private static final Comparator<AliquotedSpecimenWrapper> ORDER_SS_BY_SAMPLE_TYPE_NAME_SHORT = new Comparator<AliquotedSpecimenWrapper>() {
-        public int compare(AliquotedSpecimenWrapper lhs,
-            AliquotedSpecimenWrapper rhs) {
-            int cmp = compareStrings(lhs.getSpecimenType().getNameShort(), rhs
-                .getSpecimenType().getNameShort());
+    private static final Comparator<AliquotedSpecimenWrapper> ORDER_SS_BY_SAMPLE_TYPE_NAME_SHORT =
+        new Comparator<AliquotedSpecimenWrapper>() {
+            @Override
+            public int compare(AliquotedSpecimenWrapper lhs,
+                AliquotedSpecimenWrapper rhs) {
+                int cmp =
+                    compareStrings(lhs.getSpecimenType().getNameShort(), rhs
+                        .getSpecimenType().getNameShort());
 
-            if (cmp != 0) {
-                return cmp;
+                if (cmp != 0) {
+                    return cmp;
+                }
+
+                return compareStrings(lhs.getStudy().getNameShort(), rhs
+                    .getStudy()
+                    .getNameShort());
             }
-
-            return compareStrings(lhs.getStudy().getNameShort(), rhs.getStudy()
-                .getNameShort());
-        }
-    };
-    private static final Comparator<SpecimenTypeWrapper> ORDER_ST_BY_SAMPLE_TYPE_NAME_SHORT = new Comparator<SpecimenTypeWrapper>() {
-        public int compare(SpecimenTypeWrapper lhs, SpecimenTypeWrapper rhs) {
-            return compareStrings(lhs.getNameShort(), rhs.getNameShort());
-        }
-    };
+        };
+    private static final Comparator<SpecimenTypeWrapper> ORDER_ST_BY_SAMPLE_TYPE_NAME_SHORT =
+        new Comparator<SpecimenTypeWrapper>() {
+            @Override
+            public int compare(SpecimenTypeWrapper lhs, SpecimenTypeWrapper rhs) {
+                return compareStrings(lhs.getNameShort(), rhs.getNameShort());
+            }
+        };
 
     @Test
     public void testResults() throws Exception {
@@ -42,8 +48,9 @@ public class SpecimenTypeSUsageTest extends AbstractReportTest {
 
     @Override
     protected Collection<Object> getExpectedResults() throws Exception {
-        List<AliquotedSpecimenWrapper> allSampleStorages = new ArrayList<AliquotedSpecimenWrapper>(
-            getAliquotedSpecimens());
+        List<AliquotedSpecimenWrapper> allSampleStorages =
+            new ArrayList<AliquotedSpecimenWrapper>(
+                getAliquotedSpecimens());
         Collections.sort(allSampleStorages, ORDER_SS_BY_SAMPLE_TYPE_NAME_SHORT);
 
         List<Object> expectedResults = new ArrayList<Object>();
@@ -60,12 +67,14 @@ public class SpecimenTypeSUsageTest extends AbstractReportTest {
         // add sample types not in any study
         Collection<SpecimenTypeWrapper> sampleTypesNotInSs = PredicateUtil
             .filter(getSpecimenTypes(), new Predicate<SpecimenTypeWrapper>() {
+                @Override
                 public boolean evaluate(SpecimenTypeWrapper type) {
                     return !sampleTypeIdsInSs.contains(type.getId());
                 }
             });
-        List<SpecimenTypeWrapper> sampleTypesNotInSsOrdered = new ArrayList<SpecimenTypeWrapper>(
-            sampleTypesNotInSs);
+        List<SpecimenTypeWrapper> sampleTypesNotInSsOrdered =
+            new ArrayList<SpecimenTypeWrapper>(
+                sampleTypesNotInSs);
         Collections.sort(sampleTypesNotInSsOrdered,
             ORDER_ST_BY_SAMPLE_TYPE_NAME_SHORT);
 

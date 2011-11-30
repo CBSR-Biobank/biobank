@@ -48,9 +48,8 @@ public class TreeItemAdapter implements Node {
     public boolean equals(Object item) {
         if (!(item instanceof TreeItemAdapter))
             return false;
-        else
-            return getSpecimen().getSpecimen().equals(
-                ((TreeItemAdapter) item).getSpecimen().getSpecimen());
+        return getSpecimen().getSpecimen().equals(
+            ((TreeItemAdapter) item).getSpecimen().getSpecimen());
     }
 
     @Override

@@ -39,7 +39,8 @@ import edu.ualberta.med.biobank.treeview.shipment.ShipmentTodayNode;
 
 public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.SpecimenTransitView"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.SpecimenTransitView"; //$NON-NLS-1$
 
     private static BgcLogger logger = BgcLogger
         .getLogger(SpecimenTransitView.class.getName());
@@ -188,10 +189,11 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             if (searchedObject == null || searchedObject.size() == 0) {
                 String msg;
                 if (radioWaybill.getSelection()) {
-                    msg = NLS
-                        .bind(
-                            Messages.SpecimenTransitView_notfound_waybill_error_msg,
-                            treeText.getText());
+                    msg =
+                        NLS
+                            .bind(
+                                Messages.SpecimenTransitView_notfound_waybill_error_msg,
+                                treeText.getText());
                 } else {
                     msg = NLS.bind(
                         Messages.SpecimenTransitView_notfound_date_error_msg,
@@ -278,7 +280,8 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 && !currentInstance.radioWaybill.getSelection()) {
                 Date date;
                 if (currentInstance.radioDateReceived.getSelection()) {
-                    text = Messages.SpecimenTransitView_date_received_node_label;
+                    text =
+                        Messages.SpecimenTransitView_date_received_node_label;
                     date = originInfo.getShipmentInfo().getReceivedAt();
                 } else {
                     text = Messages.SpecimenTransitView_date_packed_node_label;
@@ -370,8 +373,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     protected AbstractSearchedNode createSearchedNode() {
         if (searchedNode == null)
             return new OriginInfoSearchedNode((RootNode) rootNode, 2);
-        else
-            return searchedNode;
+        return searchedNode;
     }
 
     @Override

@@ -537,8 +537,10 @@ public class TestSpecimen extends TestDatabase {
             }
         }
 
-        List<SpecimenWrapper> activeSpecimens = new ArrayList<SpecimenWrapper>();
-        List<SpecimenWrapper> nonActiveSpecimens = new ArrayList<SpecimenWrapper>();
+        List<SpecimenWrapper> activeSpecimens =
+            new ArrayList<SpecimenWrapper>();
+        List<SpecimenWrapper> nonActiveSpecimens =
+            new ArrayList<SpecimenWrapper>();
 
         activeSpecimens.add(childSpc);
         for (int i = 1, n = container.getColCapacity(); i < n; ++i) {
@@ -616,7 +618,7 @@ public class TestSpecimen extends TestDatabase {
     }
 
     @Test
-    public void testCheckPosition() throws BiobankCheckException, Exception {
+    public void testCheckPosition() throws Exception {
         ContainerWrapper container = childSpc.getParentContainer();
 
         Assert.assertFalse(container.isPositionFree(childSpc.getPosition()));
@@ -667,9 +669,10 @@ public class TestSpecimen extends TestDatabase {
                 appService, site.getId()).size() > 0);
             Assert.assertTrue(DebugUtil.getRandomAssignedSpecimens(appService,
                 site.getId()).size() > 0);
-            List<SpecimenWrapper> randomNonAssociatedNonDispatchedSpecimens = DebugUtil
-                .getRandomNonAssignedNonDispatchedSpecimens(appService,
-                    site.getId(), 10);
+            List<SpecimenWrapper> randomNonAssociatedNonDispatchedSpecimens =
+                DebugUtil
+                    .getRandomNonAssignedNonDispatchedSpecimens(appService,
+                        site.getId(), 10);
             Assert
                 .assertTrue(randomNonAssociatedNonDispatchedSpecimens.size() > 0);
         } catch (Exception e) {
@@ -836,7 +839,7 @@ public class TestSpecimen extends TestDatabase {
     }
 
     @Test
-    public void testGetTop() throws BiobankCheckException, Exception {
+    public void testGetTop() throws Exception {
         Assert.assertFalse(childSpc.getParentContainer().equals(
             childSpc.getTop()));
         Assert.assertEquals(topContainer, childSpc.getTop());

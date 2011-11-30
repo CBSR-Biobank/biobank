@@ -125,8 +125,7 @@ public class TestContainerLabelingScheme extends TestDatabase {
     }
 
     @Test
-    public void TestGetAllLabelingSchemes() throws BiobankCheckException,
-        Exception {
+    public void TestGetAllLabelingSchemes() throws Exception {
         ContainerLabelingSchemeWrapper.getAllLabelingSchemesMap(appService)
             .values();
     }
@@ -353,8 +352,9 @@ public class TestContainerLabelingScheme extends TestDatabase {
                 "tct", ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA, 1,
                 1, true));
 
-        ContainerLabelingSchemeWrapper newCLSW = new ContainerLabelingSchemeWrapper(
-            appService);
+        ContainerLabelingSchemeWrapper newCLSW =
+            new ContainerLabelingSchemeWrapper(
+                appService);
         newCLSW.persist();
         newCLSW.delete();
 
@@ -490,8 +490,9 @@ public class TestContainerLabelingScheme extends TestDatabase {
         String original;
         ContainerLabelingSchemeWrapper scheme;
         for (int i = 1; i < 7; i++) {
-            Map<Integer, ContainerLabelingSchemeWrapper> map = ContainerLabelingSchemeWrapper
-                .getAllLabelingSchemesMap(appService);
+            Map<Integer, ContainerLabelingSchemeWrapper> map =
+                ContainerLabelingSchemeWrapper
+                    .getAllLabelingSchemesMap(appService);
             scheme = map.get(i);
             original = scheme.getName();
             try {

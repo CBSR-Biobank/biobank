@@ -1,8 +1,9 @@
 package edu.ualberta.med.biobank.common.action.info;
 
-import java.io.Serializable;
+
+import edu.ualberta.med.biobank.common.action.ActionResult;
 // @author: aaron
-public class ShippingMethodInfo implements Serializable {
+public class ShippingMethodInfo implements ActionResult {
 
     /**
      * 

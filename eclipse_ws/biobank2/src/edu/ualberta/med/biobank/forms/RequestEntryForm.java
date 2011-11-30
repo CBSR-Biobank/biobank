@@ -21,10 +21,13 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.info.RequestFormReadInfo;
+import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
@@ -42,13 +45,39 @@ import edu.ualberta.med.biobank.widgets.trees.RequestSpecimensTreeTable;
 
 public class RequestEntryForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.RequestEntryFormBase"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.RequestEntryFormBase"; //$NON-NLS-1$
     private RequestWrapper request;
     private RequestSpecimensTreeTable specimensTree;
     private RequestDispatchInfoTable dispatchTable;
     private BgcBaseText newSpecimenText;
     private Button addButton;
     private Button openScanButton;
+    private CommentWrapper comment;
+    private RequestFormReadInfo requestInfo;
+
+    @Override
+    protected void init() throws Exception {
+        Assert.isNotNull(adapter, "Adapter should be no null"); //$NON-NLS-1$
+        Assert.isTrue((adapter instanceof RequestAdapter),
+            "Invalid editor input: object of type " //$NON-NLS-1$
+                + adapter.getClass().getName());
+
+        comment = new CommentWrapper(SessionManager.getAppService());
+        if (adapter.getId() != null) {
+            requestInfo = SessionManager.getAppService().doAction(
+                new RequestGetInfoAction(adapter.getId()));
+            request =
+                new RequestWrapper(SessionManager.getAppService(),
+                    requestInfo.request);
+        } else
+            request = new RequestWrapper(SessionManager.getAppService());
+
+        SessionManager.logEdit(request);
+
+        setPartName(Messages.RequestEntryForm_title
+            + request.getId().toString());
+    }
 
     @Override
     protected void createFormContent() throws Exception {
@@ -105,7 +134,8 @@ public class RequestEntryForm extends BiobankViewForm {
             }
         });
 
-        Section s2 = createSection(Messages.RequestEntryForm_dispatches_section);
+        Section s2 =
+            createSection(Messages.RequestEntryForm_dispatches_section);
         Composite dispatchCreation = toolkit.createComposite(s2);
         s2.setClient(dispatchCreation);
         addSectionToolbar(s2, Messages.RequestEntryForm_dispatch_add_title,
@@ -207,7 +237,6 @@ public class RequestEntryForm extends BiobankViewForm {
         return dispatchTable.getSelection();
     }
 
-    @SuppressWarnings("unused")
     protected void createSpecimensSelectionActions(Composite composite,
         boolean setAsFirstControl) {
         Composite addComposite = toolkit.createComposite(composite);
@@ -232,8 +261,9 @@ public class RequestEntryForm extends BiobankViewForm {
                     else if (((TreeItemAdapter) updateNode).getSpecimen()
                         .getSpecimenState()
                         .equals(RequestSpecimenState.AVAILABLE_STATE)) {
-                        RequestSpecimenWrapper spec = (RequestSpecimenWrapper) ((TreeItemAdapter) updateNode)
-                            .getSpecimen();
+                        RequestSpecimenWrapper spec =
+                            (RequestSpecimenWrapper) ((TreeItemAdapter) updateNode)
+                                .getSpecimen();
                         if (spec.getSpecimen().getInventoryId()
                             .equals(newSpecimenText.getText())) {
                             if (spec.getClaimedBy() == null
@@ -265,7 +295,8 @@ public class RequestEntryForm extends BiobankViewForm {
         dialog.open();
         if (dialog.hasReceivedSpecimens()) {
             try {
-                List<RequestSpecimenWrapper> rspecs = new ArrayList<RequestSpecimenWrapper>();
+                List<RequestSpecimenWrapper> rspecs =
+                    new ArrayList<RequestSpecimenWrapper>();
                 for (SpecimenWrapper spec : dialog.getSpecimens()) {
                     for (RequestSpecimenWrapper rs : specimensTree
                         .getWrappers())
@@ -278,18 +309,6 @@ public class RequestEntryForm extends BiobankViewForm {
             }
         }
         specimensTree.rebuild();
-    }
-
-    @Override
-    protected void init() throws Exception {
-        Assert.isNotNull(adapter, "Adapter should be no null"); //$NON-NLS-1$
-        Assert.isTrue((adapter instanceof RequestAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
-                + adapter.getClass().getName());
-        this.request = (RequestWrapper) ((RequestAdapter) adapter)
-            .getModelObject();
-        setPartName(Messages.RequestEntryForm_title
-            + request.getId().toString());
     }
 
     protected void buildNewDispatch() {
@@ -320,7 +339,8 @@ public class RequestEntryForm extends BiobankViewForm {
     protected void addToDispatch(DispatchWrapper dispatch,
         List<RequestSpecimenWrapper> specs) throws Exception {
         // FIXME: SHOULD BE IN ONE TRANSACTION
-        List<SpecimenWrapper> dispatchSpecimens = new ArrayList<SpecimenWrapper>();
+        List<SpecimenWrapper> dispatchSpecimens =
+            new ArrayList<SpecimenWrapper>();
         for (ItemWrapper rspec : specs) {
             if (rspec.getSpecimenState().equals(
                 RequestSpecimenState.PULLED_STATE)) {

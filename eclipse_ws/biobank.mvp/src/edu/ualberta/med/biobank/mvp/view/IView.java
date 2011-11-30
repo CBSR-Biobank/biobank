@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.mvp.view;
 
-import com.google.gwt.canvas.dom.client.Context2d.Composite;
 
 // TODO: make an ICreatableView, IView, and IShowHideableView?
 public interface IView {

@@ -69,8 +69,7 @@ public class CollectionView extends AbstractAdministrationView {
     protected PatientSearchedNode createSearchedNode() {
         if (searchedNode == null)
             return new PatientSearchedNode(rootNode, 0);
-        else
-            return searchedNode;
+        return searchedNode;
     }
 
     public static CollectionView getCurrent() {

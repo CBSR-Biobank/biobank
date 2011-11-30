@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,13 +19,15 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class WrapperUtil {
-    private static final Map<Class<?>, Class<?>> modelClassMap = new HashMap<Class<?>, Class<?>>();
+    private static final Map<Class<?>, Class<?>> modelClassMap =
+        new HashMap<Class<?>, Class<?>>();
 
     public static <E> Class<? extends ModelWrapper<E>> getWrapperClass(
         Class<E> modelClass) {
         @SuppressWarnings("unchecked")
-        Class<? extends ModelWrapper<E>> wrapperClass = (Class<? extends ModelWrapper<E>>) modelClassMap
-            .get(modelClass);
+        Class<? extends ModelWrapper<E>> wrapperClass =
+            (Class<? extends ModelWrapper<E>>) modelClassMap
+                .get(modelClass);
 
         if (wrapperClass == null && !modelClassMap.containsKey(modelClass)) {
             wrapperClass = findWrapperClass(modelClass);
@@ -47,14 +48,16 @@ public class WrapperUtil {
 
         try {
             @SuppressWarnings("unchecked")
-            Class<? extends ModelWrapper<E>> tmp = (Class<? extends ModelWrapper<E>>) Class
-                .forName(packageName + "." + classSimpleName); //$NON-NLS-1$
+            Class<? extends ModelWrapper<E>> tmp =
+                (Class<? extends ModelWrapper<E>>) Class
+                    .forName(packageName + "." + classSimpleName); //$NON-NLS-1$
             wrapperClass = tmp;
         } catch (ClassNotFoundException e) {
             try {
                 @SuppressWarnings("unchecked")
-                Class<? extends ModelWrapper<E>> tmp = (Class<? extends ModelWrapper<E>>) Class
-                    .forName(internalPackageName + "." + classSimpleName); //$NON-NLS-1$
+                Class<? extends ModelWrapper<E>> tmp =
+                    (Class<? extends ModelWrapper<E>>) Class
+                        .forName(internalPackageName + "." + classSimpleName); //$NON-NLS-1$
                 wrapperClass = tmp;
             } catch (ClassNotFoundException e1) {
             }
@@ -161,8 +164,9 @@ public class WrapperUtil {
 
         return unwrapped;
     }
-    
-    public static Set<Integer> getCollectionIds(Collection<? extends ModelWrapper<?>> wrapperCollection) {
+
+    public static Set<Integer> getCollectionIds(
+        Collection<? extends ModelWrapper<?>> wrapperCollection) {
         Set<Integer> ids = new HashSet<Integer>();
 
         for (ModelWrapper<?> wrapper : wrapperCollection) {
@@ -170,5 +174,5 @@ public class WrapperUtil {
         }
         return ids;
     }
-    
+
 }

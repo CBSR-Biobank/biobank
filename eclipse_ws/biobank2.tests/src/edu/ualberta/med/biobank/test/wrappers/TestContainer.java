@@ -210,7 +210,8 @@ public class TestContainer extends TestDatabase {
         containerTypeMap.put("frezer3x10", freezerType);
         hotelType = ContainerTypeHelper.addContainerType(site, "Hotel13",
             "H-13", 2, 1, 13, false);
-        List<ContainerTypeWrapper> childContainerTypes = new ArrayList<ContainerTypeWrapper>();
+        List<ContainerTypeWrapper> childContainerTypes =
+            new ArrayList<ContainerTypeWrapper>();
         childContainerTypes.add(hotelType);
         freezerType.addToChildContainerTypeCollection(childContainerTypes);
         freezerType.persist();
@@ -446,6 +447,7 @@ public class TestContainer extends TestDatabase {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testGetPath() throws Exception {
         ContainerWrapper top, child;
@@ -874,7 +876,8 @@ public class TestContainer extends TestDatabase {
             .getAllSpecimenTypes(appService, true);
         List<SpecimenTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
-        List<SpecimenTypeWrapper> unselectedSampleTypes = new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> unselectedSampleTypes =
+            new ArrayList<SpecimenTypeWrapper>();
 
         for (SpecimenTypeWrapper sampleType : allSampleTypes) {
             if (!selectedSampleTypes.contains(sampleType)) {
@@ -893,14 +896,16 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper top = containerMap.get("Top");
         addContainerHierarchy(top);
 
-        Map<RowColPos, SpecimenTypeWrapper> samplesTypesMap = new TreeMap<RowColPos, SpecimenTypeWrapper>();
+        Map<RowColPos, SpecimenTypeWrapper> samplesTypesMap =
+            new TreeMap<RowColPos, SpecimenTypeWrapper>();
         SpecimenTypeWrapper sampleType;
 
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
             site, patient, 1);
         ContainerWrapper childL3 = containerMap.get("ChildL3");
-        for (int row = 0, maxRow = childL3.getRowCapacity(), n = selectedSampleTypes
-            .size(); row < maxRow; ++row) {
+        for (int row = 0, maxRow = childL3.getRowCapacity(), n =
+            selectedSampleTypes
+                .size(); row < maxRow; ++row) {
             for (int col = 0, maxCol = childL3.getColCapacity(); col < maxCol; ++col) {
                 if ((row == 1) && (col == 1)) {
                     // attempt to add invalid sample type

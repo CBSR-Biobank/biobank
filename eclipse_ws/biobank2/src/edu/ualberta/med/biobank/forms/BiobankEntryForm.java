@@ -71,7 +71,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public abstract class BiobankEntryForm extends BiobankFormBase implements
     IBgcEntryForm {
 
-    private static final String CONTEXT_ENTRY_FORM = "biobank.context.entryForm"; //$NON-NLS-1$
+    private static final String CONTEXT_ENTRY_FORM =
+        "biobank.context.entryForm"; //$NON-NLS-1$
 
     private static BgcLogger logger = BgcLogger
         .getLogger(BiobankEntryForm.class.getName());
@@ -192,7 +193,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
      * Called before the monitor start. Can be used to get values on the GUI
      * objects.
      */
-    @SuppressWarnings("unused")
     protected void doBeforeSave() throws Exception {
         // do nothing by default
     }
@@ -201,7 +201,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
      * Called after the monitor start. Can be used to get values on the GUI
      * objects.
      */
-    @SuppressWarnings("unused")
     protected void doAfterSave() throws Exception {
         // default does nothing
     }

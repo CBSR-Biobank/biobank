@@ -798,9 +798,8 @@ public class CDateTime extends BaseCombo {
     public Calendar getCalendarInstance(Date date) {
         if (date == null) {
             return getCalendarInstance(System.currentTimeMillis());
-        } else {
-            return getCalendarInstance(date.getTime());
         }
+        return getCalendarInstance(date.getTime());
     }
 
     /**
@@ -856,9 +855,8 @@ public class CDateTime extends BaseCombo {
         if (nullText == null) {
             if (isDate) {
                 return Resources.getString("null_text.date", locale); //$NON-NLS-1$
-            } else {
-                return Resources.getString("null_text.time", locale); //$NON-NLS-1$
             }
+            return Resources.getString("null_text.time", locale); //$NON-NLS-1$
         }
         return nullText;
     }
@@ -1580,10 +1578,9 @@ public class CDateTime extends BaseCombo {
                             System.arraycopy(bak, 0, field, 0, bak.length);
                         }
                         return false;
-                    } else {
-                        field[i] = (Field) oa[0];
-                        last = oa[0];
                     }
+                    field[i] = (Field) oa[0];
+                    last = oa[0];
                     i++;
                 }
             } else {

@@ -35,8 +35,7 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
         if (object instanceof ShippingMethodWrapper)
             return ((ShippingMethodWrapper) object).getName().equals(
                 this.getName());
-        else
-            return false;
+        return false;
     }
 
     @Override
@@ -51,7 +50,8 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
         WritableApplicationService appService) throws ApplicationException {
         List<ShippingMethod> objects = appService.search(ShippingMethod.class,
             new ShippingMethod());
-        List<ShippingMethodWrapper> wrappers = new ArrayList<ShippingMethodWrapper>();
+        List<ShippingMethodWrapper> wrappers =
+            new ArrayList<ShippingMethodWrapper>();
         for (ShippingMethod sm : objects) {
             wrappers.add(new ShippingMethodWrapper(appService, sm));
         }

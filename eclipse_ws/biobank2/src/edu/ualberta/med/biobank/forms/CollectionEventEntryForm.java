@@ -382,7 +382,6 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void saveForm() throws Exception {
         List<SaveCEventSpecimenInfo> cevents =

@@ -46,6 +46,7 @@ public class DispatchChangeStateAction implements Action<IdResult> {
         disp.setState(newState.getId());
 
         if (shipInfo != null) {
+
             ShipmentInfo si =
                 sessionUtil
                     .get(ShipmentInfo.class, shipInfo.siId, new ShipmentInfo());

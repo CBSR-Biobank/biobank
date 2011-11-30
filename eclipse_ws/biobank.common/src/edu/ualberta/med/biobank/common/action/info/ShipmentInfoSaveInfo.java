@@ -1,9 +1,10 @@
 package edu.ualberta.med.biobank.common.action.info;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class ShipmentInfoSaveInfo implements Serializable {
+import edu.ualberta.med.biobank.common.action.ActionResult;
+
+public class ShipmentInfoSaveInfo implements ActionResult {
     private static final long serialVersionUID = 1L;
 
     public Integer siId;

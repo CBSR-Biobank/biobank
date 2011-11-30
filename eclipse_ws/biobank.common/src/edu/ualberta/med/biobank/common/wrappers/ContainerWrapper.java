@@ -290,14 +290,17 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 throw new Exception(
                     MessageFormat
                         .format(
-                            Messages.getString("ContainerWrapper.position.error.msg"), //$NON-NLS-1$
+                            Messages
+                                .getString("ContainerWrapper.position.error.msg"), //$NON-NLS-1$
                             position, getFullInfoLabel(),
                             type.getRowCapacity(), type.getColCapacity()));
             }
             if (rcp.getRow() < 0 || rcp.getCol() < 0) {
-                throw new Exception(MessageFormat.format(
-                    Messages.getString("ContainerWrapper.invalid.position.error.msg"), //$NON-NLS-1$
-                    position, getFullInfoLabel()));
+                throw new Exception(
+                    MessageFormat.format(
+                        Messages
+                            .getString("ContainerWrapper.invalid.position.error.msg"), //$NON-NLS-1$
+                        position, getFullInfoLabel()));
             }
         }
         return rcp;
@@ -305,9 +308,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     public Map<RowColPos, SpecimenWrapper> getSpecimens() {
         if (specimens == null) {
-            Map<RowColPos, SpecimenWrapper> specimens = new TreeMap<RowColPos, SpecimenWrapper>();
+            Map<RowColPos, SpecimenWrapper> specimens =
+                new TreeMap<RowColPos, SpecimenWrapper>();
 
-            List<SpecimenPositionWrapper> positions = getSpecimenPositionCollection(false);
+            List<SpecimenPositionWrapper> positions =
+                getSpecimenPositionCollection(false);
             for (SpecimenPositionWrapper position : positions) {
                 SpecimenWrapper specimen = position.getSpecimen();
                 RowColPos rowColPos = new RowColPos(position);
@@ -378,9 +383,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     public Map<RowColPos, ContainerWrapper> getChildren() {
         if (children == null) {
-            Map<RowColPos, ContainerWrapper> children = new TreeMap<RowColPos, ContainerWrapper>();
+            Map<RowColPos, ContainerWrapper> children =
+                new TreeMap<RowColPos, ContainerWrapper>();
 
-            List<ContainerPositionWrapper> positions = getChildPositionCollection(false);
+            List<ContainerPositionWrapper> positions =
+                getChildPositionCollection(false);
             for (ContainerPositionWrapper position : positions) {
                 // explicitly set the parent container because (1) skip
                 // lazy-loading later and (2) will put the parentContainer
@@ -513,14 +520,15 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             getContainerType());
     }
 
-    private static final String POSSIBLE_PARENTS_BASE_QRY = "select distinct(c) from " //$NON-NLS-1$
-        + Container.class.getName()
-        + " as c left join c." //$NON-NLS-1$
-        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
-            ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION)
-        + " as ct where c." //$NON-NLS-1$
-        + ContainerPeer.SITE.getName() + "=? and c." //$NON-NLS-1$
-        + ContainerPeer.LABEL.getName() + " in ("; //$NON-NLS-1$
+    private static final String POSSIBLE_PARENTS_BASE_QRY =
+        "select distinct(c) from " //$NON-NLS-1$
+            + Container.class.getName()
+            + " as c left join c." //$NON-NLS-1$
+            + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+                ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION)
+            + " as ct where c." //$NON-NLS-1$
+            + ContainerPeer.SITE.getName() + "=? and c." //$NON-NLS-1$
+            + ContainerPeer.LABEL.getName() + " in ("; //$NON-NLS-1$
 
     /**
      * Get containers with a given label that can have a child (container or
@@ -547,7 +555,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                             childLabel.substring(0, childLabel.length() - crop))
                         .append("'").toString()); //$NON-NLS-1$
 
-        List<ContainerWrapper> filteredWrappers = new ArrayList<ContainerWrapper>();
+        List<ContainerWrapper> filteredWrappers =
+            new ArrayList<ContainerWrapper>();
         if (validParents.size() > 0) {
             List<Object> params = new ArrayList<Object>();
             params.add(site.getWrappedObject());
@@ -579,29 +588,30 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return filteredWrappers;
     }
 
-    private static final String EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY = "from " //$NON-NLS-1$
-        + Container.class.getName()
-        + " where " //$NON-NLS-1$
-        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
-        + "=? and " //$NON-NLS-1$
-        + ContainerPeer.SPECIMEN_POSITION_COLLECTION.getName()
-        + ".size = 0 and " //$NON-NLS-1$
-        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
-            ContainerTypePeer.CAPACITY, CapacityPeer.ROW_CAPACITY)
-        + " >= ? and " //$NON-NLS-1$
-        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
-            ContainerTypePeer.CAPACITY, CapacityPeer.COL_CAPACITY)
-        + " >= ? and " //$NON-NLS-1$
-        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
-            ContainerTypePeer.ID)
-        + " in (select ct." //$NON-NLS-1$
-        + ContainerTypePeer.ID.getName()
-        + " from " //$NON-NLS-1$
-        + ContainerType.class.getName()
-        + " as ct left join ct." //$NON-NLS-1$
-        + ContainerTypePeer.SPECIMEN_TYPE_COLLECTION.getName()
-        + " as sampleType where sampleType." //$NON-NLS-1$
-        + SpecimenTypePeer.ID.getName() + " in ("; //$NON-NLS-1$
+    private static final String EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY =
+        "from " //$NON-NLS-1$
+            + Container.class.getName()
+            + " where " //$NON-NLS-1$
+            + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
+            + "=? and " //$NON-NLS-1$
+            + ContainerPeer.SPECIMEN_POSITION_COLLECTION.getName()
+            + ".size = 0 and " //$NON-NLS-1$
+            + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+                ContainerTypePeer.CAPACITY, CapacityPeer.ROW_CAPACITY)
+            + " >= ? and " //$NON-NLS-1$
+            + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+                ContainerTypePeer.CAPACITY, CapacityPeer.COL_CAPACITY)
+            + " >= ? and " //$NON-NLS-1$
+            + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+                ContainerTypePeer.ID)
+            + " in (select ct." //$NON-NLS-1$
+            + ContainerTypePeer.ID.getName()
+            + " from " //$NON-NLS-1$
+            + ContainerType.class.getName()
+            + " as ct left join ct." //$NON-NLS-1$
+            + ContainerTypePeer.SPECIMEN_TYPE_COLLECTION.getName()
+            + " as sampleType where sampleType." //$NON-NLS-1$
+            + SpecimenTypePeer.ID.getName() + " in ("; //$NON-NLS-1$
 
     /**
      * Retrieve a list of empty containers in a specific site. These containers
@@ -670,10 +680,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper.class);
     }
 
-    private static final String CONTAINER_WITH_PRODUCT_BARCODE_IN_SITE_QRY = "from " //$NON-NLS-1$
-        + Container.class.getName() + " where " //$NON-NLS-1$
-        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and " //$NON-NLS-1$
-        + ContainerPeer.PRODUCT_BARCODE.getName() + "=?"; //$NON-NLS-1$
+    private static final String CONTAINER_WITH_PRODUCT_BARCODE_IN_SITE_QRY =
+        "from " //$NON-NLS-1$
+            + Container.class.getName() + " where " //$NON-NLS-1$
+            + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and " //$NON-NLS-1$
+            + ContainerPeer.PRODUCT_BARCODE.getName() + "=?"; //$NON-NLS-1$
 
     /**
      * Get the container with the given productBarcode in a site
@@ -681,16 +692,20 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public static ContainerWrapper getContainerWithProductBarcodeInSite(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String productBarcode) throws Exception {
-        HQLCriteria criteria = new HQLCriteria(
-            CONTAINER_WITH_PRODUCT_BARCODE_IN_SITE_QRY,
-            Arrays.asList(new Object[] { siteWrapper.getId(), productBarcode }));
+        HQLCriteria criteria =
+            new HQLCriteria(
+                CONTAINER_WITH_PRODUCT_BARCODE_IN_SITE_QRY,
+                Arrays.asList(new Object[] { siteWrapper.getId(),
+                    productBarcode }));
         List<Container> containers = appService.query(criteria);
         if (containers.size() == 0) {
             return null;
         } else if (containers.size() > 1) {
-            throw new Exception(MessageFormat.format(
-                Messages.getString("ContainerWrapper.multiple.containers.product.barcode.error.msg"), //$NON-NLS-1$
-                productBarcode));
+            throw new Exception(
+                MessageFormat.format(
+                    Messages
+                        .getString("ContainerWrapper.multiple.containers.product.barcode.error.msg"), //$NON-NLS-1$
+                    productBarcode));
         }
         return new ContainerWrapper(appService, containers.get(0));
     }
@@ -861,23 +876,26 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             String errorMsg;
             if (contType == null)
                 if (isContainerPosition)
-                    errorMsg = MessageFormat
-                        .format(
-                            Messages
-                                .getString("ContainerWrapper.getPossibleContainersFromPosition.error.notfound.msg"), //$NON-NLS-1$
-                            res.toString());
+                    errorMsg =
+                        MessageFormat
+                            .format(
+                                Messages
+                                    .getString("ContainerWrapper.getPossibleContainersFromPosition.error.notfound.msg"), //$NON-NLS-1$
+                                res.toString());
                 else
-                    errorMsg = MessageFormat
+                    errorMsg =
+                        MessageFormat
+                            .format(
+                                Messages
+                                    .getString("ContainerWrapper.getPossibleContainersFromPosition.error.notfoundSpecimenHolder.msg"), //$NON-NLS-1$
+                                res.toString());
+            else
+                errorMsg =
+                    MessageFormat
                         .format(
                             Messages
-                                .getString("ContainerWrapper.getPossibleContainersFromPosition.error.notfoundSpecimenHolder.msg"), //$NON-NLS-1$
-                            res.toString());
-            else
-                errorMsg = MessageFormat
-                    .format(
-                        Messages
-                            .getString("ContainerWrapper.getPossibleContainersFromPosition.error.notfoundWithType.msg"),//$NON-NLS-1$
-                        contType.getNameShort(), res.toString());
+                                .getString("ContainerWrapper.getPossibleContainersFromPosition.error.notfoundWithType.msg"),//$NON-NLS-1$
+                            contType.getNameShort(), res.toString());
 
             throw new BiobankException(errorMsg);
         }
@@ -914,9 +932,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 // TODO: select a count instead?
                 List<Specimen> samples = appService.query(criteria);
                 return samples.isEmpty();
-            } else {
-                return !getChildren().containsKey(position);
             }
+            return !getChildren().containsKey(position);
         }
         return true;
     }
@@ -993,7 +1010,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 // if the children have already been loaded, then update their
                 // top Container so that they update their children, etc. so
                 // that the entire subtree is consistent.
-                List<ContainerPositionWrapper> positions = getChildPositionCollection(false);
+                List<ContainerPositionWrapper> positions =
+                    getChildPositionCollection(false);
                 for (ContainerPositionWrapper position : positions) {
                     ContainerWrapper child = position.getContainer();
 

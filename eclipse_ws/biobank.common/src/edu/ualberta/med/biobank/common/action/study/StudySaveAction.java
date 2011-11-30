@@ -14,6 +14,9 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.common.permission.Permission;
+import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -79,8 +82,12 @@ public class StudySaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        // FIXME: needs implementation
-        return true;
+        Permission permission;
+        if (id == null)
+            permission = new StudyCreatePermission();
+        else
+            permission = new StudyUpdatePermission(id);
+        return permission.isAllowed(user, session);
     }
 
     @Override
@@ -223,12 +230,10 @@ public class StudySaveAction implements Action<IdResult> {
             new SetDifference<SourceSpecimen>(
                 study.getSourceSpecimenCollection(),
                 sourceSpcs.values());
-
+        study.setSourceSpecimenCollection(srcSpcsDiff.getAddSet());
         for (SourceSpecimen srcSpc : srcSpcsDiff.getRemoveSet()) {
             session.delete(srcSpc);
         }
-        study.setSourceSpecimenCollection(new HashSet<SourceSpecimen>(
-            sourceSpcs.values()));
     }
 
     private void saveAliquotedSpecimens() {
@@ -240,11 +245,10 @@ public class StudySaveAction implements Action<IdResult> {
                 aliquotedSpcs.values());
 
         // delete aliquoted specimens no longer in use
+        study.setAliquotedSpecimenCollection(aqSpcsDiff.getAddSet());
         for (AliquotedSpecimen aqSpc : aqSpcsDiff.getRemoveSet()) {
             session.delete(aqSpc);
         }
-        study.setAliquotedSpecimenCollection(new HashSet<AliquotedSpecimen>(
-            aliquotedSpcs.values()));
     }
 
     private void saveEventAttributes() {
@@ -255,11 +259,9 @@ public class StudySaveAction implements Action<IdResult> {
                 study.getStudyEventAttrCollection(),
                 studyEventAttrs.values());
 
-        // delete study event attrs no longer in use
+        study.setStudyEventAttrCollection(attrsDiff.getAddSet());
         for (StudyEventAttr attr : attrsDiff.getRemoveSet()) {
             session.delete(attr);
         }
-        study.setStudyEventAttrCollection(new HashSet<StudyEventAttr>(
-            studyEventAttrs.values()));
     }
 }

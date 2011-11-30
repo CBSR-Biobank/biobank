@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.action.info;
 
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.model.Study;
 
 /**
@@ -7,7 +8,7 @@ import edu.ualberta.med.biobank.model.Study;
  * @author jferland
  * 
  */
-public class StudyInfo implements Info {
+public class StudyInfo implements ActionResult {
     private static final long serialVersionUID = 1L;
 
     private final Study study;

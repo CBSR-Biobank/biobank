@@ -17,15 +17,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentFormReadInfo;
-import edu.ualberta.med.biobank.common.action.info.ShippingMethodInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.ShippingMethodInfo;
 import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
@@ -108,8 +106,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     @SuppressWarnings("unused")
     private NonEmptyStringValidator boxValidator;
 
-    private boolean isTryingAgain;
-
     protected boolean tryAgain;
 
     private CommentCollectionInfoTable commentEntryTable;
@@ -139,7 +135,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         comment = new CommentWrapper(SessionManager.getAppService());
-        
+
         oiCopy = new OriginInfo();
         if (adapter.getId() != null) {
             oiInfo =
@@ -465,8 +461,10 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        commentWidget = (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-           Messages.Comments_add, null, comment, "message", null);
+        commentWidget =
+            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
+                SWT.MULTI,
+                Messages.Comments_add, null, comment, "message", null);
 
     }
 
@@ -482,13 +480,27 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        
-        Set<Integer> addedSpecimenIds = WrapperUtil.getCollectionIds(specimenEntryWidget.getAddedSpecimens());
-        Set<Integer> removedSpecimenIds = WrapperUtil.getCollectionIds(specimenEntryWidget.getRemovedSpecimens());
-        
-        ShippingMethodInfo methodInfo = new ShippingMethodInfo(shipmentInfo.getShippingMethod().getId());
-        OriginInfoSaveInfo oiInfo = new OriginInfoSaveInfo(originInfo.getId(), originInfo.getReceiverSite().getId(), originInfo.getCenter().getId(), comment.getMessage(), addedSpecimenIds, removedSpecimenIds);
-        ShipmentInfoSaveInfo siInfo = new ShipmentInfoSaveInfo(shipmentInfo.getId(), shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(), shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),  methodInfo);
+
+        Set<Integer> addedSpecimenIds =
+            WrapperUtil.getCollectionIds(specimenEntryWidget
+                .getAddedSpecimens());
+        Set<Integer> removedSpecimenIds =
+            WrapperUtil.getCollectionIds(specimenEntryWidget
+                .getRemovedSpecimens());
+
+        ShippingMethodInfo methodInfo =
+            new ShippingMethodInfo(shipmentInfo.getShippingMethod().getId());
+        OriginInfoSaveInfo oiInfo =
+            new OriginInfoSaveInfo(originInfo.getId(), originInfo
+                .getReceiverSite().getId(), originInfo.getCenter().getId(),
+                comment.getMessage() == null ? ""
+                    : comment.getMessage(), addedSpecimenIds,
+                removedSpecimenIds);
+        ShipmentInfoSaveInfo siInfo =
+            new ShipmentInfoSaveInfo(shipmentInfo.getId(),
+                shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(),
+                shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),
+                methodInfo);
         OriginInfoSaveAction save = new OriginInfoSaveAction(oiInfo, siInfo);
         SessionManager.getAppService().doAction(save);
 
@@ -557,7 +569,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     @Override
     protected void doAfterSave() throws Exception {
         if (tryAgain) {
-            isTryingAgain = true;
             tryAgain = false;
             confirm();
         } else {

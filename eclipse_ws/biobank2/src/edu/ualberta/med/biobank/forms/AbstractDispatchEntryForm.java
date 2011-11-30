@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -13,7 +12,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
@@ -27,43 +25,40 @@ import edu.ualberta.med.biobank.common.util.ModelUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
-import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
 public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
+    @SuppressWarnings("unused")
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractDispatchEntryForm.class.getName());
 
     protected DispatchWrapper dispatch;
 
-    protected BgcEntryFormWidgetListener biobankListener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            reloadSpecimens();
-            setDirty(true);
-        }
-    };
-
-    private boolean isTryingAgain;
+    protected BgcEntryFormWidgetListener biobankListener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                reloadSpecimens();
+                setDirty(true);
+            }
+        };
 
     protected boolean tryAgain;
 
     protected DispatchFormReadInfo dispatchInfo;
 
     protected CommentWrapper comment;
-    
+
     protected Set<Integer> oldSpecIds;
-    
+
     @Override
     protected void init() throws Exception {
         Assert.isNotNull(adapter, "Adapter should be no null"); //$NON-NLS-1$
@@ -72,20 +67,25 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         comment = new CommentWrapper(SessionManager.getAppService());
-        if (adapter.getId()!=null) {
+        if (adapter.getId() != null) {
             dispatchInfo = SessionManager.getAppService().doAction(
                 new DispatchGetInfoAction(adapter.getId()));
-            dispatch= new DispatchWrapper(SessionManager.getAppService(), dispatchInfo.dispatch);
+            dispatch =
+                new DispatchWrapper(SessionManager.getAppService(),
+                    dispatchInfo.dispatch);
         } else
             dispatch = new DispatchWrapper(SessionManager.getAppService());
-        
-        oldSpecIds = ModelUtil.getCollectionIds(dispatchInfo.specimens);
-        
+
+        oldSpecIds =
+            ModelUtil
+                .getCollectionIds(dispatchInfo == null ? new ArrayList<DispatchSpecimen>()
+                    : dispatchInfo.specimens);
+
         SessionManager.logEdit(dispatch);
 
         setPartName(getTextForPartName());
     }
-    
+
     protected abstract String getTextForPartName();
 
     /**
@@ -153,7 +153,6 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         return false;
     }
 
-    @SuppressWarnings("unused")
     protected void doTrySettingAgain() throws Exception {
         // default does nothing
     }
@@ -161,7 +160,6 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
     @Override
     protected void doAfterSave() throws Exception {
         if (tryAgain) {
-            isTryingAgain = true;
             tryAgain = false;
             confirm();
         } else
@@ -175,14 +173,20 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         dispatch.reset();
         reloadSpecimens();
     }
+
     @Override
     protected void saveForm() throws Exception {
 
         Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
-        for (DispatchSpecimenWrapper ds : dispatch.getDispatchSpecimenCollection(false))
-            dsInfos.add(new DispatchSpecimenInfo(ds.getId(), ds.getSpecimen().getId(), ds.getState()));
-
-        DispatchSaveInfo dInfo = new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter().getId(), dispatch.getSenderCenter().getId(), dispatch.getState(), comment.getMessage() == null ? "" : comment.getMessage());
+        for (DispatchSpecimenWrapper ds : dispatch
+            .getDispatchSpecimenCollection(false))
+            dsInfos.add(new DispatchSpecimenInfo(ds.getId(), ds.getSpecimen()
+                .getId(), ds.getState()));
+        DispatchSaveInfo dInfo =
+            new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter()
+                .getId(), dispatch.getSenderCenter().getId(),
+                dispatch.getState(), comment.getMessage() == null ? ""
+                    : comment.getMessage());
         DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
         SessionManager.getAppService().doAction(save);
     }

@@ -132,9 +132,8 @@ public class VPanel extends VControl {
     public int getBorderWidth() {
         if (isTopLevel) {
             return composite.getBorderWidth();
-        } else {
-            return 1;
         }
+        return 1;
     }
 
     public VControl[] getChildren() {
@@ -153,9 +152,8 @@ public class VPanel extends VControl {
                 if (child.getVisible() && child.getBounds().contains(x, y)) {
                     if (includePanels && child instanceof VPanel) {
                         return ((VPanel) child).getControl(x, y, true);
-                    } else {
-                        return child;
                     }
+                    return child;
                 }
             }
             return this;
@@ -167,7 +165,7 @@ public class VPanel extends VControl {
         return layout;
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({ "unchecked", "unused" })
     public <T extends VLayout> T getLayout(Class<T> clazz) {
         return (T) layout;
     }
@@ -260,12 +258,11 @@ public class VPanel extends VControl {
                 }
             }
             return false;
-        } else {
-            for (VControl child : children) {
-                child.setFocus(false);
-            }
-            return true;
         }
+        for (VControl child : children) {
+            child.setFocus(false);
+        }
+        return true;
     }
 
     public void setLayout(VLayout layout) {

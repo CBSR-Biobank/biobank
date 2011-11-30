@@ -155,11 +155,9 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     public void setValue(Object value) {
         if (value instanceof SearchedPatientInfo) {
             SearchedPatientInfo pinfo = (SearchedPatientInfo) value;
-            if (pinfo != null) {
-                this.patient = pinfo.patient;
-                this.study = pinfo.study;
-                this.ceventsCount = pinfo.ceventsCount;
-            }
+            this.patient = pinfo.patient;
+            this.study = pinfo.study;
+            this.ceventsCount = pinfo.ceventsCount;
         }
     }
 

@@ -71,18 +71,16 @@ public class UserEditDialog extends BgcBaseDialog {
     protected String getDialogShellTitle() {
         if (originalUser.isNew()) {
             return Messages.UserEditDialog_title_add;
-        } else {
-            return Messages.UserEditDialog_title_edit;
         }
+        return Messages.UserEditDialog_title_edit;
     }
 
     @Override
     protected String getTitleAreaMessage() {
         if (originalUser.isNew()) {
             return Messages.UserEditDialog_description_add;
-        } else {
-            return Messages.UserEditDialog_description_edit;
         }
+        return Messages.UserEditDialog_description_edit;
     }
 
     @Override
@@ -208,8 +206,14 @@ public class UserEditDialog extends BgcBaseDialog {
             WrapperTransaction tx = new WrapperTransaction(
                 SessionManager.getAppService());
             tx.persist(originalUser);
+
             for (BbGroupWrapper g : groupsWidget.getAddedToSelection()) {
                 g.addToUserCollection(Arrays.asList(originalUser));
+                tx.persist(g);
+            }
+
+            for (BbGroupWrapper g : groupsWidget.getRemovedFromSelection()) {
+                g.removeFromUserCollection(Arrays.asList(originalUser));
                 tx.persist(g);
             }
             // add into group after persisting because user needs to be created
@@ -271,14 +275,17 @@ public class UserEditDialog extends BgcBaseDialog {
             }
         });
 
-        BgcBaseText passwordRetyped = (BgcBaseText) createBoundWidgetWithLabel(
-            parent,
-            BgcBaseText.class,
-            SWT.BORDER | SWT.PASSWORD,
-            (originalUser.isNew() ? Messages.UserEditDialog_password_retype_new_label
-                : Messages.UserEditDialog_password_retype_label),
-            new String[0], originalUser, "password", new MatchingTextValidator( //$NON-NLS-1$
-                Messages.UserEditDialog_passwords_match_error_msg, password));
+        BgcBaseText passwordRetyped =
+            (BgcBaseText) createBoundWidgetWithLabel(
+                parent,
+                BgcBaseText.class,
+                SWT.BORDER | SWT.PASSWORD,
+                (originalUser.isNew() ? Messages.UserEditDialog_password_retype_new_label
+                    : Messages.UserEditDialog_password_retype_label),
+                new String[0],
+                originalUser,
+                "password", new MatchingTextValidator( //$NON-NLS-1$
+                    Messages.UserEditDialog_passwords_match_error_msg, password));
 
         MatchingTextValidator.addListener(password, passwordRetyped);
     }
