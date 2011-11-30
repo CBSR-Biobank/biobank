@@ -37,6 +37,9 @@ public class ClinicSaveAction extends CenterSaveAction {
 
     @Override
     public IdResult run(User user, Session session) throws ActionException {
+        if (contactIds == null) {
+            throw new NullPointerException("contact ids cannot be null");
+        }
         SessionUtil sessionUtil = new SessionUtil(session);
         Clinic clinic = sessionUtil.get(Clinic.class, centerId, new Clinic());
         clinic.setSendsShipments(sendsShipments);

@@ -1,11 +1,16 @@
 package edu.ualberta.med.biobank.common.action.center;
 
+import java.text.MessageFormat;
+
+import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.IdResult;
+import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Center;
@@ -25,6 +30,7 @@ public abstract class CenterSaveAction implements Action<IdResult> {
     private String nameShort;
     private Address address;
     private Integer aStatusId;
+    private Session session = null;
 
     public void setId(Integer id) {
         this.centerId = id;
@@ -55,6 +61,16 @@ public abstract class CenterSaveAction implements Action<IdResult> {
     protected IdResult run(@SuppressWarnings("unused") User user,
         Session session,
         SessionUtil sessionUtil, Center center) throws ActionException {
+        if (name == null) {
+            throw new NullPointerException("name not specified");
+        }
+        if (nameShort == null) {
+            throw new NullPointerException("name short not specified");
+        }
+
+        this.session = session;
+
+        performChecks(session);
 
         // TODO: check permission? (can edit site?)
 
@@ -81,5 +97,40 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         // value instead?
 
         return new IdResult(center.getId());
+    }
+
+    private static final String CENTER_UNIQUE_ATTR_HQL =
+        "SELECT COUNT(*) FROM " + Center.class.getName()
+            + " s WHERE {0}=? {1}"; //$NON-NLS-1$
+
+    private void performChecks(Session session) throws ActionException {
+        if (session == null) {
+            throw new NullPointerException("session not initialized");
+        }
+
+        if (!peformUniqueQuery("name", name).equals(0L)) {
+            throw new ActionCheckException("duplicate name");
+        }
+
+        if (!peformUniqueQuery("nameShort", nameShort).equals(0L)) {
+            throw new ActionCheckException("duplicate name short");
+        }
+    }
+
+    private Long peformUniqueQuery(String attribute, String value) {
+        String msg;
+
+        if (centerId == null) {
+            msg =
+                MessageFormat
+                    .format(CENTER_UNIQUE_ATTR_HQL, attribute, "");
+        } else {
+            msg = MessageFormat.format(CENTER_UNIQUE_ATTR_HQL, attribute,
+                "AND id<>" + centerId);
+        }
+
+        Query query = session.createQuery(msg);
+        query.setParameter(0, value);
+        return HibernateUtil.getCountFromQuery(query);
     }
 }

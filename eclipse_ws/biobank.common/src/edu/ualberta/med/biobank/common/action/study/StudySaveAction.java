@@ -136,7 +136,7 @@ public class StudySaveAction implements Action<IdResult> {
 
     private static final String STUDY_UNIQUE_ATTR_HQL =
         "SELECT COUNT(*) FROM " + Study.class.getName()
-            + " s WHERE {0}=? {2}"; //$NON-NLS-1$
+            + " s WHERE {0}=? {1}"; //$NON-NLS-1$
 
     private void performChecks(Session session) throws ActionException {
         if (session == null) {
@@ -157,9 +157,9 @@ public class StudySaveAction implements Action<IdResult> {
 
         if (id == null) {
             msg =
-                MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, attribute, "?", "");
+                MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, attribute, "");
         } else {
-            msg = MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, attribute, "?",
+            msg = MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, attribute,
                 "AND id<>" + id);
         }
 
