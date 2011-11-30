@@ -8,10 +8,10 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasValue;
 
 import edu.ualberta.med.biobank.mvp.event.SimpleValueChangeEvent;
-import edu.ualberta.med.biobank.mvp.user.ui.HasValueField;
+import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 
 public abstract class AbstractValueField<T> extends AbstractValidationField
-    implements HasValueField<T> {
+    implements ValueField<T> {
     private final HandlerManager handlerManager = new HandlerManager(this);
     private T value;
 

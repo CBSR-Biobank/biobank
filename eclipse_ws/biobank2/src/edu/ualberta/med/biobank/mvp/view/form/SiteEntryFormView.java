@@ -12,8 +12,8 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
-import edu.ualberta.med.biobank.mvp.user.ui.HasListField;
-import edu.ualberta.med.biobank.mvp.user.ui.HasValueField;
+import edu.ualberta.med.biobank.mvp.user.ui.ListField;
+import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IView;
 import edu.ualberta.med.biobank.mvp.view.item.AdaptedListField;
 import edu.ualberta.med.biobank.mvp.view.item.Adapter;
@@ -68,17 +68,17 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
     }
 
     @Override
-    public HasValueField<String> getName() {
+    public ValueField<String> getName() {
         return name;
     }
 
     @Override
-    public HasValueField<String> getNameShort() {
+    public ValueField<String> getNameShort() {
         return nameShort;
     }
 
     @Override
-    public HasListField<StudyInfo> getStudies() {
+    public ListField<StudyInfo> getStudies() {
         return studies;
     }
 

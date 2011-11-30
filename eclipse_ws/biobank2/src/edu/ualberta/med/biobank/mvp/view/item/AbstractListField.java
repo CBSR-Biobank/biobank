@@ -11,10 +11,10 @@ import com.google.gwt.event.shared.HandlerRegistration;
 
 import edu.ualberta.med.biobank.mvp.event.ui.ListChangeEvent;
 import edu.ualberta.med.biobank.mvp.event.ui.ListChangeHandler;
-import edu.ualberta.med.biobank.mvp.user.ui.HasListField;
+import edu.ualberta.med.biobank.mvp.user.ui.ListField;
 
 public abstract class AbstractListField<E> extends AbstractValidationField
-    implements HasListField<E> {
+    implements ListField<E> {
     private final HandlerManager handlerManager = new HandlerManager(this);
     private final List<E> list = new ArrayList<E>();
     private final List<E> unmodifiableList = Collections.unmodifiableList(list);

@@ -15,11 +15,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValueField;
+import edu.ualberta.med.biobank.mvp.user.ui.SelectedValueField;
 import edu.ualberta.med.biobank.mvp.util.Converter;
 
 public class ComboItem<T> extends AbstractValueField<T>
-    implements HasSelectedValueField<T> {
+    implements SelectedValueField<T> {
     private static final Listener KILL_MOUSE_WHEEL_LISTENER = new Listener() {
         @Override
         public void handleEvent(Event event) {

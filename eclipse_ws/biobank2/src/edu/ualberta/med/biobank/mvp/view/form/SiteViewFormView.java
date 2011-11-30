@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteViewPresenter;
-import edu.ualberta.med.biobank.mvp.user.ui.HasValueField;
+import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.item.Adapter;
 import edu.ualberta.med.biobank.mvp.view.item.LongBox;
 import edu.ualberta.med.biobank.mvp.view.item.TextBox;
@@ -80,76 +80,76 @@ public class SiteViewFormView extends AbstractViewFormView
     }
 
     @Override
-    public HasValueField<String> getName() {
+    public ValueField<String> getName() {
         return name;
     }
 
     @Override
-    public HasValueField<String> getNameShort() {
+    public ValueField<String> getNameShort() {
         return nameShort;
     }
 
     @Override
-    public HasValueField<Long> getStudyCount() {
+    public ValueField<Long> getStudyCount() {
         return studyCount;
     }
 
     @Override
-    public HasValueField<Long> getContainerTypeCount() {
+    public ValueField<Long> getContainerTypeCount() {
         return containerTypeCount;
     }
 
     @Override
-    public HasValueField<Long> getTopContainerCount() {
+    public ValueField<Long> getTopContainerCount() {
         return topContainerCount;
     }
 
     @Override
-    public HasValueField<Long> getPatientCount() {
+    public ValueField<Long> getPatientCount() {
         return patientCount;
     }
 
     @Override
-    public HasValueField<Long> getCollectionEventCount() {
+    public ValueField<Long> getCollectionEventCount() {
         return collectionEventCount;
     }
 
     @Override
-    public HasValueField<Long> getAliquotedSpecimenCount() {
+    public ValueField<Long> getAliquotedSpecimenCount() {
         return aliquotedSpecimenCount;
     }
 
     @Override
-    public HasValueField<ActivityStatus> getActivityStatus() {
+    public ValueField<ActivityStatus> getActivityStatus() {
         return activityStatus;
     }
 
     @Override
-    public HasValueField<Address> getAddress() {
+    public ValueField<Address> getAddress() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public HasValueField<Collection<Comment>> getCommentCollection() {
+    public ValueField<Collection<Comment>> getCommentCollection() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public HasValueField<Collection<StudyInfo>> getStudyCollection() {
+    public ValueField<Collection<StudyInfo>> getStudyCollection() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public HasValueField<Collection<ContainerTypeInfo>> getContainerTypeCollection() {
+    public ValueField<Collection<ContainerTypeInfo>> getContainerTypeCollection() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public HasValueField<Collection<Container>> getTopContainerCollection() {
+    public ValueField<Collection<Container>> getTopContainerCollection() {
         // TODO Auto-generated method stub
         return null;
     }

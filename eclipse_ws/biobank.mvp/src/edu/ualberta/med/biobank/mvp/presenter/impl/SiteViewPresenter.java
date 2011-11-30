@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteViewPresenter.View;
-import edu.ualberta.med.biobank.mvp.user.ui.HasValueField;
+import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IViewFormView;
 
 public class SiteViewPresenter extends AbstractViewFormPresenter<View> {
@@ -26,33 +26,33 @@ public class SiteViewPresenter extends AbstractViewFormPresenter<View> {
     private Integer siteId;
 
     public interface View extends IViewFormView {
-        HasValueField<String> getName();
+        ValueField<String> getName();
 
-        HasValueField<String> getNameShort();
+        ValueField<String> getNameShort();
 
-        HasValueField<Long> getStudyCount();
+        ValueField<Long> getStudyCount();
 
-        HasValueField<Long> getContainerTypeCount();
+        ValueField<Long> getContainerTypeCount();
 
-        HasValueField<Long> getTopContainerCount();
+        ValueField<Long> getTopContainerCount();
 
-        HasValueField<Long> getPatientCount();
+        ValueField<Long> getPatientCount();
 
-        HasValueField<Long> getCollectionEventCount();
+        ValueField<Long> getCollectionEventCount();
 
-        HasValueField<Long> getAliquotedSpecimenCount();
+        ValueField<Long> getAliquotedSpecimenCount();
 
-        HasValueField<ActivityStatus> getActivityStatus();
+        ValueField<ActivityStatus> getActivityStatus();
 
-        HasValueField<Address> getAddress();
+        ValueField<Address> getAddress();
 
-        HasValueField<Collection<Comment>> getCommentCollection();
+        ValueField<Collection<Comment>> getCommentCollection();
 
-        HasValueField<Collection<StudyInfo>> getStudyCollection();
+        ValueField<Collection<StudyInfo>> getStudyCollection();
 
-        HasValueField<Collection<ContainerTypeInfo>> getContainerTypeCollection();
+        ValueField<Collection<ContainerTypeInfo>> getContainerTypeCollection();
 
-        HasValueField<Collection<Container>> getTopContainerCollection();
+        ValueField<Collection<Container>> getTopContainerCollection();
     }
 
     @Inject

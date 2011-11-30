@@ -26,8 +26,8 @@ import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.event.model.study.StudyChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.study.StudyViewPresenterShowEvent;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter.View;
-import edu.ualberta.med.biobank.mvp.user.ui.HasListField;
-import edu.ualberta.med.biobank.mvp.user.ui.HasValueField;
+import edu.ualberta.med.biobank.mvp.user.ui.ListField;
+import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
@@ -39,15 +39,15 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
     public interface View extends IEntryFormView, ValidationDisplay {
         void setActivityStatusComboView(IView view);
 
-        HasValueField<String> getName();
+        ValueField<String> getName();
 
-        HasValueField<String> getNameShort();
+        ValueField<String> getNameShort();
 
-        HasListField<Contact> getContacts();
+        ListField<Contact> getContacts();
 
-        HasListField<SourceSpecimen> getSourceSpecimens();
+        ListField<SourceSpecimen> getSourceSpecimens();
 
-        HasListField<AliquotedSpecimen> getAliquotedSpecimens();
+        ListField<AliquotedSpecimen> getAliquotedSpecimens();
 
         // TODO: add study event attributes
     }

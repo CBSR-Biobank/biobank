@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusGetAllAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter.View;
-import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValueField;
+import edu.ualberta.med.biobank.mvp.user.ui.SelectedValueField;
 import edu.ualberta.med.biobank.mvp.util.Converter;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
@@ -20,7 +20,7 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
     private final Dispatcher dispatcher;
 
     public interface View extends IView {
-        HasSelectedValueField<ActivityStatus> getActivityStatus();
+        SelectedValueField<ActivityStatus> getActivityStatus();
     }
 
     @Inject

@@ -24,8 +24,8 @@ import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.site.SiteViewPresenterShowEvent;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.presenter.validation.ValidationTree;
-import edu.ualberta.med.biobank.mvp.user.ui.HasListField;
-import edu.ualberta.med.biobank.mvp.user.ui.HasValueField;
+import edu.ualberta.med.biobank.mvp.user.ui.ListField;
+import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
@@ -46,11 +46,11 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         void setAddressEditView(IView view);
 
-        HasValueField<String> getName();
+        ValueField<String> getName();
 
-        HasValueField<String> getNameShort();
+        ValueField<String> getNameShort();
 
-        HasListField<StudyInfo> getStudies();
+        ListField<StudyInfo> getStudies();
     }
 
     @Inject

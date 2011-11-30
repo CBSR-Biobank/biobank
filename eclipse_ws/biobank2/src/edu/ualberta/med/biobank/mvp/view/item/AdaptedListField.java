@@ -5,14 +5,14 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.mvp.event.ui.ListChangeEvent;
 import edu.ualberta.med.biobank.mvp.event.ui.ListChangeHandler;
-import edu.ualberta.med.biobank.mvp.user.ui.HasListField;
+import edu.ualberta.med.biobank.mvp.user.ui.ListField;
 
 public class AdaptedListField<T, U> extends AbstractListField<T> {
     private final AdapteeMonitor adapteeMonitor = new AdapteeMonitor();
-    private final HasListField<U> adaptee;
+    private final ListField<U> adaptee;
     private final Adapter<T, U> adapter;
 
-    public AdaptedListField(HasListField<U> adaptee, Adapter<T, U> adapter) {
+    public AdaptedListField(ListField<U> adaptee, Adapter<T, U> adapter) {
         this.adaptee = adaptee;
         this.adapter = adapter;
 

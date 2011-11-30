@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.mvp.presenter.IViewStatePresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.presenter.model.SimpleViewState;
 import edu.ualberta.med.biobank.mvp.presenter.validation.ValidationTree;
-import edu.ualberta.med.biobank.mvp.user.ui.HasValueField;
+import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
 public class AddressEntryPresenter extends AbstractPresenter<View>
@@ -22,21 +22,21 @@ public class AddressEntryPresenter extends AbstractPresenter<View>
     private Integer addressId;
 
     public interface View extends IView {
-        HasValueField<String> getStreet1();
+        ValueField<String> getStreet1();
 
-        HasValueField<String> getStreet2();
+        ValueField<String> getStreet2();
 
-        HasValueField<String> getCity();
+        ValueField<String> getCity();
 
-        HasValueField<String> getProvince();
+        ValueField<String> getProvince();
 
-        HasValueField<String> getPostalCode();
+        ValueField<String> getPostalCode();
 
-        HasValueField<String> getPhoneNumber();
+        ValueField<String> getPhoneNumber();
 
-        HasValueField<String> getFaxNumber();
+        ValueField<String> getFaxNumber();
 
-        HasValueField<String> getCountry();
+        ValueField<String> getCountry();
     }
 
     @Inject
@@ -47,8 +47,7 @@ public class AddressEntryPresenter extends AbstractPresenter<View>
     @Override
     protected void onBind() {
         validation.validate(view.getCity())
-            .using(new NotEmptyValidator("city"))
-            .when(getViewState().dirty());
+            .using(new NotEmptyValidator("city"));
     }
 
     @Override

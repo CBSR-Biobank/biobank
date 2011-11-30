@@ -25,9 +25,9 @@ import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
-import edu.ualberta.med.biobank.mvp.user.ui.HasListField;
-import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValueField;
-import edu.ualberta.med.biobank.mvp.user.ui.HasValueField;
+import edu.ualberta.med.biobank.mvp.user.ui.ListField;
+import edu.ualberta.med.biobank.mvp.user.ui.SelectedValueField;
+import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.test.TestingDispatcher;
 
 public class TestSiteEntryPresenter {
@@ -78,16 +78,16 @@ public class TestSiteEntryPresenter {
         SiteEntryPresenter presenter = injector
             .getInstance(SiteEntryPresenter.class);
 
-        HasValueField<String> nameHs = Mockito.mock(HasValueField.class);
-        HasValueField<String> nameShortHs = Mockito.mock(HasValueField.class);
-        HasValueField<List<Comment>> commentsHs =
-            Mockito.mock(HasValueField.class);
-        HasListField<StudyInfo> studiesHs = Mockito
-            .mock(HasListField.class);
+        ValueField<String> nameHs = Mockito.mock(ValueField.class);
+        ValueField<String> nameShortHs = Mockito.mock(ValueField.class);
+        ValueField<List<Comment>> commentsHs =
+            Mockito.mock(ValueField.class);
+        ListField<StudyInfo> studiesHs = Mockito
+            .mock(ListField.class);
 
-        HasValueField<String> nullString = Mockito.mock(HasValueField.class);
-        HasSelectedValueField<ActivityStatus> astatus = Mockito
-            .mock(HasSelectedValueField.class);
+        ValueField<String> nullString = Mockito.mock(ValueField.class);
+        SelectedValueField<ActivityStatus> astatus = Mockito
+            .mock(SelectedValueField.class);
 
         List<Comment> comments = new ArrayList<Comment>();
 

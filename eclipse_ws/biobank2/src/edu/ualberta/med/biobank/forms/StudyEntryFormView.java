@@ -15,8 +15,8 @@ import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter;
-import edu.ualberta.med.biobank.mvp.user.ui.HasListField;
-import edu.ualberta.med.biobank.mvp.user.ui.HasValueField;
+import edu.ualberta.med.biobank.mvp.user.ui.ListField;
+import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IView;
 import edu.ualberta.med.biobank.mvp.view.form.AbstractEntryFormView;
 import edu.ualberta.med.biobank.mvp.view.form.BaseForm;
@@ -115,27 +115,27 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
     }
 
     @Override
-    public HasValueField<String> getName() {
+    public ValueField<String> getName() {
         return name;
     }
 
     @Override
-    public HasValueField<String> getNameShort() {
+    public ValueField<String> getNameShort() {
         return nameShort;
     }
 
     @Override
-    public HasListField<Contact> getContacts() {
+    public ListField<Contact> getContacts() {
         return contactsAdapter;
     }
 
     @Override
-    public HasListField<SourceSpecimen> getSourceSpecimens() {
+    public ListField<SourceSpecimen> getSourceSpecimens() {
         return srcSpcsAdapter;
     }
 
     @Override
-    public HasListField<AliquotedSpecimen> getAliquotedSpecimens() {
+    public ListField<AliquotedSpecimen> getAliquotedSpecimens() {
         return aqSpcsTranslator;
     }
 
