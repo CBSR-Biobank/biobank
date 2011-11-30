@@ -59,6 +59,18 @@ public class ClinicHelper extends Helper {
         return appService.doAction(contactSave).getId();
     }
 
+    public static Set<Integer> createContacts(
+        BiobankApplicationService appService,
+        Integer clinicId, String basename, int numContacts)
+        throws ApplicationException {
+        Set<Integer> result = new HashSet<Integer>();
+        for (int j = 0; j < numContacts; ++j) {
+            result.add(createContact(appService, basename + "_contact" + j,
+                clinicId));
+        }
+        return result;
+    }
+
     public static Set<Integer> createClinicsWithContacts(
         BiobankApplicationService appService,
         String name, int numClinics, int numContactsPerClinic)
@@ -69,10 +81,7 @@ public class ClinicHelper extends Helper {
         for (int i = 0; i < numClinics; ++i) {
             clinicId =
                 createClinic(appService, name + i, ActivityStatusEnum.ACTIVE);
-
-            for (int j = 0; j < numContactsPerClinic; ++j) {
-                createContact(appService, name + "_contact" + j, clinicId);
-            }
+            createContacts(appService, clinicId, name, numContactsPerClinic);
             result.add(clinicId);
         }
 

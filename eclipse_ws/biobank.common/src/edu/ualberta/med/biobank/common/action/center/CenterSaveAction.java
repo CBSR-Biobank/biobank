@@ -58,8 +58,7 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         return false;
     }
 
-    protected IdResult run(@SuppressWarnings("unused") User user,
-        Session session,
+    protected IdResult run(User user, Session session,
         SessionUtil sessionUtil, Center center) throws ActionException {
         if (name == null) {
             throw new NullPointerException("name not specified");

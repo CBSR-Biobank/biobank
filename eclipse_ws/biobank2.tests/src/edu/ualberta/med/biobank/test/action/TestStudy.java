@@ -98,7 +98,7 @@ public class TestStudy extends TestAction {
     @Test
     public void testGetContactCollection() throws Exception {
         // check for empty contact list after creation of study
-        Assert.assertTrue(getStudyContacts().isEmpty());
+        Assert.assertTrue(getStudyContacts(studyId).isEmpty());
 
         int numClinics = r.nextInt(5) + 2;
         int numContacts = 2;
@@ -126,26 +126,28 @@ public class TestStudy extends TestAction {
         for (Contact c : studyContactsSet1) {
             expectedStudyContacts.add(c);
             studyAddContacts(Arrays.asList(c));
-            Assert.assertEquals(expectedStudyContacts, getStudyContacts());
+            Assert.assertEquals(expectedStudyContacts,
+                getStudyContacts(studyId));
         }
 
         // add contact set 2
         studyAddContacts(studyContactsSet2);
         expectedStudyContacts.addAll(studyContactsSet2);
-        Assert.assertEquals(expectedStudyContacts, getStudyContacts());
+        Assert.assertEquals(expectedStudyContacts, getStudyContacts(studyId));
 
         // remove all contacts from set 1 individually
         for (Contact c : studyContactsSet1) {
             expectedStudyContacts.remove(c);
             studyRemoveContacts(Arrays.asList(c));
-            Assert.assertEquals(expectedStudyContacts, getStudyContacts());
+            Assert.assertEquals(expectedStudyContacts,
+                getStudyContacts(studyId));
         }
 
         // remove contact set 2
         studyRemoveContacts(studyContactsSet2);
         expectedStudyContacts.removeAll(studyContactsSet2);
-        Assert.assertEquals(expectedStudyContacts, getStudyContacts());
-        Assert.assertTrue(getStudyContacts().isEmpty());
+        Assert.assertEquals(expectedStudyContacts, getStudyContacts(studyId));
+        Assert.assertTrue(getStudyContacts(studyId).isEmpty());
     }
 
     private void studyAddContacts(List<Contact> contacts)
@@ -187,7 +189,8 @@ public class TestStudy extends TestAction {
         appService.doAction(studySave);
     }
 
-    private Set<Contact> getStudyContacts() throws ApplicationException {
+    private Set<Contact> getStudyContacts(Integer studyId)
+        throws ApplicationException {
         StudyInfo studyInfo = appService.doAction(new
             StudyGetInfoAction(studyId));
         Set<Contact> contacts = new HashSet<Contact>();
@@ -247,7 +250,7 @@ public class TestStudy extends TestAction {
         appService.doAction(studySave);
 
         studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
-        Assert.assertTrue(getSourceSpecimenIds(studyInfo).isEmpty());
+        Assert.assertTrue(studyInfo.sourceSpcs.isEmpty());
 
         // check that this study no longer has any source specimens
         openHibernateSession();
@@ -319,7 +322,7 @@ public class TestStudy extends TestAction {
         appService.doAction(studySave);
 
         studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
-        Assert.assertTrue(getAliquotedSpecimenIds(studyInfo).isEmpty());
+        Assert.assertTrue(studyInfo.aliquotedSpcs.isEmpty());
 
         // check that this study no longer has any aliquoted specimens
         openHibernateSession();
