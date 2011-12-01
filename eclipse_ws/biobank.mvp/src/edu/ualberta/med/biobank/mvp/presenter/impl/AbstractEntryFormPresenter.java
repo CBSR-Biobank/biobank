@@ -52,6 +52,7 @@ public abstract class AbstractEntryFormPresenter<V extends IEntryFormView>
 
         registerHandler(view.getSave().addClickHandler(saveClickHandler));
         binder.enable(view.getSave()).when(validAndDirty);
+        binder.bind(state.dirty()).to(view.getDirty());
 
         state.add(view);
 
