@@ -6,8 +6,6 @@ import java.util.Set;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.pietschy.gwt.pectin.client.form.validation.component.ValidationDisplay;
-import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidator;
-import com.pietschy.gwt.pectin.client.form.validation.validator.NotNullValidator;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
@@ -24,7 +22,8 @@ import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.site.SiteViewPresenterShowEvent;
 import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
-import edu.ualberta.med.biobank.mvp.presenter.validation.ValidationTree;
+import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotEmpty;
+import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotNull;
 import edu.ualberta.med.biobank.mvp.user.ui.ListField;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
@@ -39,7 +38,6 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
     private final Dispatcher dispatcher;
     private final AddressEntryPresenter addressEntryPresenter;
     private final ActivityStatusComboPresenter activityStatusComboPresenter;
-    private final ValidationTree validation = new ValidationTree();
     private Integer siteId;
 
     public interface View extends IEntryFormView, ValidationDisplay {
@@ -80,13 +78,13 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         validation.add(addressEntryPresenter);
 
         validation.validate(view.getName())
-            .using(new NotEmptyValidator("asdf"));
+            .using(new NotEmpty("name"));
         validation.validate(view.getNameShort())
-            .using(new NotEmptyValidator("asdf"));
+            .using(new NotEmpty("nameShort"));
 
         validation.validate(
             activityStatusComboPresenter.getView().getActivityStatus())
-            .using(new NotNullValidator("asdfa sdfad"));
+            .using(new NotNull("activityStatus"));
     }
 
     @Override

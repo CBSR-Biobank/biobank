@@ -8,8 +8,6 @@ import java.util.Set;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.pietschy.gwt.pectin.client.form.validation.component.ValidationDisplay;
-import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidator;
-import com.pietschy.gwt.pectin.client.form.validation.validator.NotNullValidator;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
@@ -28,6 +26,8 @@ import edu.ualberta.med.biobank.mvp.event.model.study.StudyChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.study.StudyViewPresenterShowEvent;
 import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter.View;
+import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotEmpty;
+import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotNull;
 import edu.ualberta.med.biobank.mvp.user.ui.ListField;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
@@ -75,13 +75,13 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         state.add(activityStatusComboPresenter);
 
         validation.validate(view.getName())
-            .using(new NotEmptyValidator("asdf"));
+            .using(new NotEmpty("name"));
         validation.validate(view.getNameShort())
-            .using(new NotEmptyValidator("asdf"));
+            .using(new NotEmpty("nameShort"));
 
         validation.validate(
             activityStatusComboPresenter.getView().getActivityStatus())
-            .using(new NotNullValidator("asdfa sdfad"));
+            .using(new NotNull("activityStatus"));
     }
 
     @Override
