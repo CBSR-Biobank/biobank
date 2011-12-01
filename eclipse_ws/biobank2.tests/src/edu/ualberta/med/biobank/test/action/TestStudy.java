@@ -17,7 +17,10 @@ import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.aliquotedspecimen.AliquotedSpecimenSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
+import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.sourcespecimen.SourceSpecimenSaveAction;
+import edu.ualberta.med.biobank.common.action.study.StudyDeleteAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
@@ -48,9 +51,8 @@ public class TestStudy extends TestAction {
     public void setUp() throws Exception {
         super.setUp();
         name = testname.getMethodName() + r.nextInt();
-        studyId =
-            StudyHelper
-                .createStudy(appService, name, ActivityStatusEnum.ACTIVE);
+        studyId = StudyHelper.createStudy(appService, name,
+            ActivityStatusEnum.ACTIVE);
     }
 
     @Test
@@ -96,7 +98,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void testGetContactCollection() throws Exception {
+    public void testContactCollection() throws Exception {
         // check for empty contact list after creation of study
         Assert.assertTrue(getStudyContacts(studyId).isEmpty());
 
@@ -428,5 +430,43 @@ public class TestStudy extends TestAction {
             actualIds.add(aqSpc.getId());
         }
         return actualIds;
+    }
+
+    @Test
+    public void testDelete() throws ApplicationException {
+        // delete a study with no patients and no other associations
+        appService.doAction(new StudyDeleteAction(studyId));
+
+        // add patients to study
+        studyId = StudyHelper.createStudy(appService, name,
+            ActivityStatusEnum.ACTIVE);
+        PatientSaveAction patientSaveAction =
+            new PatientSaveAction(null, studyId, Utils.getRandomString(5, 10),
+                Utils.getRandomDate());
+        Integer patientId = appService.doAction(patientSaveAction).getId();
+
+        try {
+            appService.doAction(new StudyDeleteAction(studyId));
+            Assert.fail(
+                "should not be allowed to delete a study with patients");
+        } catch (ActionCheckException e) {
+            Assert.assertTrue(true);
+        }
+        appService.doAction(new PatientDeleteAction(patientId));
+        appService.doAction(new StudyDeleteAction(studyId));
+
+        // add contacts to study
+        Integer clinicId =
+            ClinicHelper.createClinic(appService, name + "_clinic",
+                ActivityStatusEnum.ACTIVE);
+
+        // add source specimens to study
+        studyId = StudyHelper.createStudy(appService, name,
+            ActivityStatusEnum.ACTIVE);
+    }
+
+    @Test
+    public void testComments() {
+
     }
 }

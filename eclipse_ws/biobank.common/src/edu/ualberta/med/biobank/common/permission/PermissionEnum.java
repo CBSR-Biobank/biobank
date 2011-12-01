@@ -63,14 +63,19 @@ public enum PermissionEnum {
     RESEARCH_GROUP_UPDATE(35),
     RESEARCH_GROUP_DELETE(36),
 
-	STUDY_CREATE(37),
+    STUDY_CREATE(37),
     STUDY_READ(38),
     STUDY_UPDATE(39),
     STUDY_DELETE(40),
 
     REQUEST_READ(41),
     REQUEST_UPDATE(42),
-    REQUEST_SAVE(43);
+    REQUEST_SAVE(43),
+
+    CLINIC_CREATE(44),
+    CLINIC_READ(45),
+    CLINIC_UPDATE(46),
+    CLINIC_DELETE(47);
 
     private final Integer permissionId;
 

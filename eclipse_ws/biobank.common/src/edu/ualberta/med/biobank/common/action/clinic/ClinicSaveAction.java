@@ -9,6 +9,9 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.center.CenterSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.common.permission.Permission;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicCreatePermission;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
@@ -31,8 +34,12 @@ public class ClinicSaveAction extends CenterSaveAction {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        // TODO Auto-generated method stub
-        return true;
+        Permission permission;
+        if (centerId == null)
+            permission = new ClinicCreatePermission();
+        else
+            permission = new ClinicUpdatePermission(centerId);
+        return permission.isAllowed(user, session);
     }
 
     @Override
@@ -44,7 +51,6 @@ public class ClinicSaveAction extends CenterSaveAction {
         Clinic clinic = sessionUtil.get(Clinic.class, centerId, new Clinic());
         clinic.setSendsShipments(sendsShipments);
 
-        //
         Map<Integer, Contact> contacts =
             sessionUtil.get(Contact.class, contactIds);
         SetDifference<Contact> contactsDiff = new SetDifference<Contact>(
