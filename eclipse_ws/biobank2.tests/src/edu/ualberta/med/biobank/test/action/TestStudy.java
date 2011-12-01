@@ -15,6 +15,7 @@ import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.aliquotedspecimen.AliquotedSpecimenSaveAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicDeleteAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
@@ -155,6 +156,19 @@ public class TestStudy extends TestAction {
         studyRemoveContacts(studyContactsSet2);
         expectedStudyContacts.removeAll(studyContactsSet2);
         Assert.assertEquals(expectedStudyContacts, getStudyContacts(studyId));
+        Assert.assertTrue(getStudyContacts(studyId).isEmpty());
+
+        // test removing clinics - contacts should be deleted
+        studyAddContacts(studyContactsSet2);
+        expectedStudyContacts.addAll(studyContactsSet2);
+        Assert.assertEquals(expectedStudyContacts, getStudyContacts(studyId));
+
+        for (Contact c : studyContactsSet2) {
+            expectedStudyContacts.remove(c);
+            appService.doAction(new ClinicDeleteAction(c.getClinic()));
+            Assert.assertEquals(expectedStudyContacts,
+                getStudyContacts(studyId));
+        }
         Assert.assertTrue(getStudyContacts(studyId).isEmpty());
     }
 
