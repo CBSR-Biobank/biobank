@@ -5,12 +5,9 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Control;
 
-import com.pietschy.gwt.pectin.client.form.validation.component.ValidationDisplay;
-
 import edu.ualberta.med.biobank.mvp.user.ui.HasControl;
 
-public abstract class AbstractControlField
-    implements HasControl, ValidationDisplay {
+public abstract class AbstractControlField implements HasControl {
     private final EnabledForwarder enabledForwarder = new EnabledForwarder();
     private final VisibleForwarder visibleForwarder = new VisibleForwarder();
 
