@@ -7,7 +7,6 @@ import java.util.Set;
 
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.pietschy.gwt.pectin.client.form.validation.component.ValidationDisplay;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
@@ -38,7 +37,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
     private final ActivityStatusComboPresenter activityStatusComboPresenter;
     private Integer studyId;
 
-    public interface View extends IEntryFormView, ValidationDisplay {
+    public interface View extends IEntryFormView {
         void setActivityStatusComboView(IView view);
 
         ValueField<String> getName();
