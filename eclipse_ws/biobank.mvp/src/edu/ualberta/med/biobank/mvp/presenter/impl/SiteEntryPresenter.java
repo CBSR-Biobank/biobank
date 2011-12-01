@@ -92,8 +92,6 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         validation.validate(
             activityStatusComboPresenter.getView().getActivityStatus())
             .using(new NotNullValidator("asdfa sdfad"));
-
-        validation.bindValidationTo(view);
     }
 
     @Override

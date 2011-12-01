@@ -52,6 +52,8 @@ public abstract class AbstractEntryFormPresenter<V extends IEntryFormView>
 
         registerHandler(view.getSave().addClickHandler(saveClickHandler));
         binder.enable(view.getSave()).when(validAndDirty);
+
+        validation.bindValidationTo(view);
     }
 
     @Override
