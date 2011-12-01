@@ -20,6 +20,10 @@ public class TextBox extends AbstractValueField<String> {
 
         this.text = text;
         update();
+
+        forwardEnabled(text);
+        forwardVisible(text);
+
         text.addModifyListener(modifyListener);
         // TODO: listen for disposal?
     }
@@ -39,6 +43,9 @@ public class TextBox extends AbstractValueField<String> {
     private void unbindOldText() {
         if (text != null) {
             text.removeModifyListener(modifyListener);
+
+            unforwardEnabled(text);
+            unforwardVisible(text);
         }
     }
 }
