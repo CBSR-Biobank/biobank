@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.action.clinic;
 
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.center.CenterDeleteAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -12,11 +13,8 @@ import edu.ualberta.med.biobank.model.User;
 public class ClinicDeleteAction extends CenterDeleteAction {
     private static final long serialVersionUID = 1L;
 
-    private final Clinic clinic;
-
-    public ClinicDeleteAction(Clinic clinic) {
-        super(clinic.getId());
-        this.clinic = clinic;
+    public ClinicDeleteAction(Integer id) {
+        super(id);
     }
 
     @Override
@@ -26,6 +24,9 @@ public class ClinicDeleteAction extends CenterDeleteAction {
 
     @Override
     public EmptyResult run(User user, Session session) throws ActionException {
+        Clinic clinic = ActionUtil.sessionGet(session, Clinic.class, centerId);
+        ClinicPreDeleteChecks preCheck = new ClinicPreDeleteChecks(clinic);
+        preCheck.performChecks(session);
         return super.run(user, session, clinic);
     }
 }

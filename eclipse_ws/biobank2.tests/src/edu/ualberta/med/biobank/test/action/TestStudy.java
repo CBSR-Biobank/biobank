@@ -158,18 +158,22 @@ public class TestStudy extends TestAction {
         Assert.assertEquals(expectedStudyContacts, getStudyContacts(studyId));
         Assert.assertTrue(getStudyContacts(studyId).isEmpty());
 
-        // test removing clinics - contacts should be deleted
+        // test removing clinics - should fail
         studyAddContacts(studyContactsSet2);
         expectedStudyContacts.addAll(studyContactsSet2);
         Assert.assertEquals(expectedStudyContacts, getStudyContacts(studyId));
 
         for (Contact c : studyContactsSet2) {
-            expectedStudyContacts.remove(c);
-            appService.doAction(new ClinicDeleteAction(c.getClinic()));
-            Assert.assertEquals(expectedStudyContacts,
-                getStudyContacts(studyId));
+            try {
+                appService.doAction(new ClinicDeleteAction(c.getClinic()
+                    .getId()));
+                Assert
+                    .fail(
+                    "should not be allowed to delete a clinic with contact linked to study");
+            } catch (ActionCheckException e) {
+                Assert.assertTrue(true);
+            }
         }
-        Assert.assertTrue(getStudyContacts(studyId).isEmpty());
     }
 
     private void studyAddContacts(List<Contact> contacts)
