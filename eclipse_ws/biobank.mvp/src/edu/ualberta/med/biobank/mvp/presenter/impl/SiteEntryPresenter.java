@@ -74,8 +74,8 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         addressEntryPresenter.bind();
 
-        state.addPresenter(addressEntryPresenter);
-        state.addPresenter(activityStatusComboPresenter);
+        state.add(addressEntryPresenter);
+        state.add(activityStatusComboPresenter);
 
         validation.add(addressEntryPresenter);
 

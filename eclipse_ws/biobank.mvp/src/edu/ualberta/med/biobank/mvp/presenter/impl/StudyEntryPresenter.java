@@ -72,7 +72,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         activityStatusComboPresenter.bind();
 
-        state.addPresenter(activityStatusComboPresenter);
+        state.add(activityStatusComboPresenter);
 
         validation.validate(view.getName())
             .using(new NotEmptyValidator("asdf"));

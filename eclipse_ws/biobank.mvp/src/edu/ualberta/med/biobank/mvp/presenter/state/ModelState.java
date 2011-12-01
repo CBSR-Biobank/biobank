@@ -23,7 +23,7 @@ public class ModelState implements HasState, Disposable {
     private final Set<HasState> states = new HashSet<HasState>();
     private final List<Disposable> disposables = new ArrayList<Disposable>();
 
-    public void addView(IView view) {
+    public void add(IView view) {
         Class<?>[] interfaces = view.getClass().getInterfaces();
         for (Class<?> klazz : interfaces) {
             if (IView.class.isAssignableFrom(klazz)) {
@@ -34,17 +34,17 @@ public class ModelState implements HasState, Disposable {
         }
     }
 
-    public void addPresenter(IStatefulPresenter presenter) {
+    public void add(IStatefulPresenter presenter) {
         HasState state = presenter.getState();
         addState(state);
     }
 
-    public <T> void addValue(HasValue<T> source) {
+    public <T> void add(HasValue<T> source) {
         ValueState<T> valueState = new ValueState<T>(source);
         addAbstractState(valueState);
     }
 
-    public <E> void addList(HasList<E> source) {
+    public <E> void add(HasList<E> source) {
         ListState<E> listState = new ListState<E>(source);
         addAbstractState(listState);
     }
@@ -78,10 +78,10 @@ public class ModelState implements HasState, Disposable {
             try {
                 if (HasValue.class.isAssignableFrom(returnType)) {
                     HasValue<?> hasValue = (HasValue<?>) method.invoke(view);
-                    addValue(hasValue);
+                    add(hasValue);
                 } else if (HasList.class.isAssignableFrom(returnType)) {
                     HasList<?> hasList = (HasList<?>) method.invoke(view);
-                    addList(hasList);
+                    add(hasList);
                 }
             } catch (Exception caught) {
                 // TODO: need a logger (for non-user errors).

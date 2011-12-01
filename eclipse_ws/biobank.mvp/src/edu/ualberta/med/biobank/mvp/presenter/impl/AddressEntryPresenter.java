@@ -46,7 +46,7 @@ public class AddressEntryPresenter extends AbstractPresenter<View>
 
     @Override
     protected void onBind() {
-        state.addView(view);
+        state.add(view);
 
         validation.validate(view.getCity())
             .using(new NotEmptyValidator("city"));
