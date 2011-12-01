@@ -2,26 +2,30 @@ package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import java.util.ArrayList;
 
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusGetAllAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
+import edu.ualberta.med.biobank.mvp.presenter.HasState;
+import edu.ualberta.med.biobank.mvp.presenter.IStatefulPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter.View;
-import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedField;
+import edu.ualberta.med.biobank.mvp.presenter.state.ModelState;
+import edu.ualberta.med.biobank.mvp.user.ui.SelectedValueField;
 import edu.ualberta.med.biobank.mvp.util.Converter;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
-public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
-    private final static OptionLabeller labeller = new OptionLabeller();
+public class ActivityStatusComboPresenter extends AbstractPresenter<View>
+    implements IStatefulPresenter {
+    private final static OptionLabeller LABELLER = new OptionLabeller();
+    private final ModelState state = new ModelState();
     private final Dispatcher dispatcher;
 
     public interface View extends IView {
-        HasSelectedField<ActivityStatus> getActivityStatus();
+        SelectedValueField<ActivityStatus> getActivityStatus();
     }
 
     @Inject
@@ -29,38 +33,54 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View> {
         Dispatcher dispatcher) {
         super(view, eventBus);
         this.dispatcher = dispatcher;
-    }
 
-    public HasValue<ActivityStatus> getActivityStatus() {
-        return view.getActivityStatus();
+        view.getActivityStatus().setOptionLabeller(LABELLER);
     }
 
     @Override
     protected void onBind() {
-        dispatcher.exec(new ActivityStatusGetAllAction(),
-            new ActionCallback<MapResult<Integer, ActivityStatus>>() {
-                @Override
-                public void onFailure(Throwable caught) {
-                    // TODO: need to do something if cannot get information,
-                    // like throwing an ExceptionEvent. Parent Presenter may
-                    // need to tear down/ fail if this fails.
-                    System.out.println("FAIL!");
-                    caught.printStackTrace();
-                }
-
-                @Override
-                public void onSuccess(MapResult<Integer, ActivityStatus> result) {
-                    view.getActivityStatus()
-                        .setOptions(
-                            new ArrayList<ActivityStatus>(result.getMap()
-                                .values()));
-                    view.getActivityStatus().setOptionLabeller(labeller);
-                }
-            });
+        state.add(view.getActivityStatus());
     }
 
     @Override
     protected void onUnbind() {
+        state.dispose();
+    }
+
+    @Override
+    public HasState getState() {
+        return state;
+    }
+
+    public ActivityStatus getActivityStatus() {
+        return view.getActivityStatus().getValue();
+    }
+
+    public Integer getActivityStatusId() {
+        return getActivityStatus() != null ? getActivityStatus().getId() : null;
+    }
+
+    public void setActivityStatus(ActivityStatus activityStatus)
+        throws InitPresenterException {
+        loadOptions();
+
+        view.getActivityStatus().setValue(activityStatus);
+    }
+
+    private void loadOptions() throws InitPresenterException {
+        try {
+            ActivityStatusGetAllAction action =
+                new ActivityStatusGetAllAction();
+
+            MapResult<Integer, ActivityStatus> result = dispatcher.exec(action);
+
+            view.getActivityStatus()
+                .setOptions(new ArrayList<ActivityStatus>(
+                    result.getMap().values()));
+
+        } catch (Exception caught) {
+            throw new InitPresenterException(caught);
+        }
     }
 
     private static class OptionLabeller implements

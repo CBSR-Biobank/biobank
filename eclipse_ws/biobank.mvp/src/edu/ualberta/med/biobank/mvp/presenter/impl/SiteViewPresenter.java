@@ -5,7 +5,6 @@ import java.util.Collection;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.common.action.info.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
@@ -16,9 +15,9 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
+import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteViewPresenter.View;
-import edu.ualberta.med.biobank.mvp.user.ui.HasField;
+import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IViewFormView;
 
 public class SiteViewPresenter extends AbstractViewFormPresenter<View> {
@@ -26,33 +25,33 @@ public class SiteViewPresenter extends AbstractViewFormPresenter<View> {
     private Integer siteId;
 
     public interface View extends IViewFormView {
-        HasField<String> getName();
+        ValueField<String> getName();
 
-        HasField<String> getNameShort();
+        ValueField<String> getNameShort();
 
-        HasField<Long> getStudyCount();
+        ValueField<Long> getStudyCount();
 
-        HasField<Long> getContainerTypeCount();
+        ValueField<Long> getContainerTypeCount();
 
-        HasField<Long> getTopContainerCount();
+        ValueField<Long> getTopContainerCount();
 
-        HasField<Long> getPatientCount();
+        ValueField<Long> getPatientCount();
 
-        HasField<Long> getCollectionEventCount();
+        ValueField<Long> getCollectionEventCount();
 
-        HasField<Long> getAliquotedSpecimenCount();
+        ValueField<Long> getAliquotedSpecimenCount();
 
-        HasField<ActivityStatus> getActivityStatus();
+        ValueField<ActivityStatus> getActivityStatus();
 
-        HasField<Address> getAddress();
+        ValueField<Address> getAddress();
 
-        HasField<Collection<Comment>> getCommentCollection();
+        ValueField<Collection<Comment>> getCommentCollection();
 
-        HasField<Collection<StudyInfo>> getStudyCollection();
+        ValueField<Collection<StudyInfo>> getStudyCollection();
 
-        HasField<Collection<ContainerTypeInfo>> getContainerTypeCollection();
+        ValueField<Collection<ContainerTypeInfo>> getContainerTypeCollection();
 
-        HasField<Collection<Container>> getTopContainerCollection();
+        ValueField<Collection<Container>> getTopContainerCollection();
     }
 
     @Inject
@@ -62,34 +61,11 @@ public class SiteViewPresenter extends AbstractViewFormPresenter<View> {
     }
 
     @Override
-    public void doReload() {
-        viewSite(siteId);
-    }
-
-    @Override
     protected void onUnbind() {
     }
 
-    public boolean viewSite(Integer siteId) {
-        this.siteId = siteId;
-
-        SiteGetInfoAction siteGetInfoAction = new SiteGetInfoAction(siteId);
-
-        boolean success = dispatcher.exec(siteGetInfoAction,
-            new ActionCallback<SiteInfo>() {
-                @Override
-                public void onFailure(Throwable caught) {
-                    eventBus.fireEvent(new ExceptionEvent(caught));
-                    close();
-                }
-
-                @Override
-                public void onSuccess(SiteInfo siteInfo) {
-                    viewSite(siteInfo);
-                }
-            });
-
-        return success;
+    public View viewSite(Integer siteId) throws InitPresenterException {
+        return load(new SiteView(siteId));
     }
 
     private void viewSite(SiteInfo siteInfo) {
@@ -122,5 +98,22 @@ public class SiteViewPresenter extends AbstractViewFormPresenter<View> {
             .setValue(siteInfo.getContainerTypeCollection());
         view.getTopContainerCollection()
             .setValue(siteInfo.getTopContainerCollection());
+    }
+
+    private class SiteView implements Loadable {
+        private final Integer newSiteId;
+
+        public SiteView(Integer newSiteId) {
+            this.newSiteId = newSiteId;
+        }
+
+        @Override
+        public void run() throws Exception {
+            siteId = newSiteId;
+
+            SiteInfo siteInfo = dispatcher.exec(new SiteGetInfoAction(siteId));
+
+            viewSite(siteInfo);
+        }
     }
 }

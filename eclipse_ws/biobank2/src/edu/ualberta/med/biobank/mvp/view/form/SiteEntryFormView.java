@@ -1,8 +1,5 @@
 package edu.ualberta.med.biobank.mvp.view.form;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -15,12 +12,13 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
-import edu.ualberta.med.biobank.mvp.user.ui.HasField;
+import edu.ualberta.med.biobank.mvp.user.ui.ListField;
+import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IView;
+import edu.ualberta.med.biobank.mvp.view.item.AdaptedListField;
+import edu.ualberta.med.biobank.mvp.view.item.Adapter;
 import edu.ualberta.med.biobank.mvp.view.item.TableItem;
-import edu.ualberta.med.biobank.mvp.view.item.TextItem;
-import edu.ualberta.med.biobank.mvp.view.item.TranslatedItem;
-import edu.ualberta.med.biobank.mvp.view.item.TranslatedItem.Translator;
+import edu.ualberta.med.biobank.mvp.view.item.TextBox;
 import edu.ualberta.med.biobank.mvp.view.util.InputTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -32,44 +30,30 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  */
 public class SiteEntryFormView extends AbstractEntryFormView implements
     SiteEntryPresenter.View {
-    private final TextItem name = new TextItem();
-    private final TextItem nameShort = new TextItem();
+    private final TextBox name = new TextBox();
+    private final TextBox nameShort = new TextBox();
     private final TableItem<StudyWrapper> studyWrappers =
         new TableItem<StudyWrapper>();
-    private final TranslatedItem<Collection<StudyInfo>, Collection<StudyWrapper>> studies =
-        TranslatedItem.from(studyWrappers, STUDY_TRANSLATOR);
+    private final AdaptedListField<StudyInfo, StudyWrapper> studies =
+        new AdaptedListField<StudyInfo, StudyWrapper>(studyWrappers,
+            STUDY_ADAPTER);
 
     private IView addressEntryView;
     private IView activityStatusComboView;
 
-    private static final StudyTranslator STUDY_TRANSLATOR =
-        new StudyTranslator();
+    private static final StudyAdapter STUDY_ADAPTER = new StudyAdapter();
 
-    private static class StudyTranslator implements
-        Translator<Collection<StudyInfo>, Collection<StudyWrapper>> {
+    private static class StudyAdapter implements
+        Adapter<StudyInfo, StudyWrapper> {
         @Override
-        public Collection<StudyInfo> fromDelegate(
-            Collection<StudyWrapper> delegate) {
-            Collection<StudyInfo> studies = new ArrayList<StudyInfo>();
-            for (StudyWrapper study : delegate) {
-                StudyInfo studyInfo =
-                    new StudyInfo(study.getWrappedObject(), -1l, -1l);
-                studies.add(studyInfo);
-            }
-            return studies;
+        public StudyInfo adapt(StudyWrapper unadapted) {
+            return new StudyInfo(unadapted.getWrappedObject(), -1l, -1l);
         }
 
         @Override
-        public Collection<StudyWrapper> toDelegate(Collection<StudyInfo> foreign) {
-            Collection<StudyWrapper> studies = new ArrayList<StudyWrapper>();
-            WritableApplicationService appService =
-                SessionManager.getAppService();
-            for (StudyInfo study : foreign) {
-                StudyWrapper wrapper =
-                    new StudyWrapper(appService, study.getStudy());
-                studies.add(wrapper);
-            }
-            return studies;
+        public StudyWrapper unadapt(StudyInfo adapted) {
+            return new StudyWrapper(SessionManager.getAppService(),
+                adapted.getStudy());
         }
     }
 
@@ -84,17 +68,17 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
     }
 
     @Override
-    public HasField<String> getName() {
+    public ValueField<String> getName() {
         return name;
     }
 
     @Override
-    public HasField<String> getNameShort() {
+    public ValueField<String> getNameShort() {
         return nameShort;
     }
 
     @Override
-    public HasField<Collection<StudyInfo>> getStudies() {
+    public ListField<StudyInfo> getStudies() {
         return studies;
     }
 

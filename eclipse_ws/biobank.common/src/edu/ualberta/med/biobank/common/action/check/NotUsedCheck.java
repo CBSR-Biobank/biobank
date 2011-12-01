@@ -27,7 +27,7 @@ public class NotUsedCheck<E extends IBiobankModel> extends ActionCheck<E> {
     private static final String EXCEPTION_MESSAGE =
         "{0} {1} is still in use by {2}."; //$NON-NLS-1$
 
-    private final CountUsesAction<E> countAction;
+    private final UsageCountAction countAction;
     private final String modelString;
     private final String exceptionMessage;
 
@@ -39,8 +39,7 @@ public class NotUsedCheck<E extends IBiobankModel> extends ActionCheck<E> {
     public <T> NotUsedCheck(E object, Property<? super E, ? super T> property,
         Class<T> propertyClass, String modelString, String errorMessage) {
         super(null, null);
-        this.countAction = new CountUsesAction<E>(object, property,
-            propertyClass);
+        this.countAction = new UsageCountAction(object, property);
         this.modelString = modelString;
         this.exceptionMessage = errorMessage;
     }
@@ -69,7 +68,7 @@ public class NotUsedCheck<E extends IBiobankModel> extends ActionCheck<E> {
         if (exceptionMessage == null) {
             String modelClass = Format.modelClass(getModelClass());
             String propertyClass = Format.modelClass(countAction
-                .getPropertyClass());
+                .getProperty().getClass());
 
             exceptionMessage = MessageFormat.format(EXCEPTION_MESSAGE,
                 modelClass, modelString, propertyClass);

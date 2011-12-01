@@ -11,22 +11,23 @@ import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 import com.pietschy.gwt.pectin.client.form.validation.component.ValidationDisplay;
 import com.pietschy.gwt.pectin.client.form.validation.message.ValidationMessage;
 
-public abstract class ValidationItem<T> extends AbstractHasFieldItem<T> implements
-    ValidationDisplay {
-    private static final FieldDecoration ERROR_FIELD_DECORATION = FieldDecorationRegistry
-        .getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
+public class AbstractValidationField extends AbstractControlField
+    implements ValidationDisplay {
+    private static final FieldDecoration ERROR_FIELD_DECORATION =
+        FieldDecorationRegistry.getDefault()
+            .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
     private ValidationResult validationResult;
     private ControlDecoration controlDecoration;
-
-    @Override
-    public void setValidationResult(ValidationResult result) {
-        validationResult = result;
-        updateControlDecoration();
-    }
 
     public void setValidationControl(Control control) {
         disposeOldControlDecoration();
         controlDecoration = createControlDecoration(control);
+        updateControlDecoration();
+    }
+
+    @Override
+    public void setValidationResult(ValidationResult result) {
+        validationResult = result;
         updateControlDecoration();
     }
 

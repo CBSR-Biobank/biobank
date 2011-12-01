@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.mvp.event.model.study.StudyCreateEvent;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 
 public class StudyMasterGroup extends AbstractStudyGroup {
@@ -47,9 +48,7 @@ public class StudyMasterGroup extends AbstractStudyGroup {
     }
 
     public void addStudy() {
-        StudyWrapper study = new StudyWrapper(SessionManager.getAppService());
-        StudyAdapter adapter = new StudyAdapter(this, study);
-        adapter.openEntryForm();
+        eventBus.fireEvent(new StudyCreateEvent());
     }
 
 }
