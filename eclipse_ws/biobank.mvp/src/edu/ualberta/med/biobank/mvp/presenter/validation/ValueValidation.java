@@ -15,8 +15,6 @@ import com.pietschy.gwt.pectin.client.form.validation.ValidationResultImpl;
 import com.pietschy.gwt.pectin.client.form.validation.Validator;
 import com.pietschy.gwt.pectin.client.form.validation.component.ValidationDisplay;
 
-import edu.ualberta.med.biobank.mvp.util.HandlerRegistry;
-
 /**
  * 
  * @author jferland
@@ -24,7 +22,6 @@ import edu.ualberta.med.biobank.mvp.util.HandlerRegistry;
  * @param <T> source value type
  */
 class ValueValidation<T> extends AbstractValidation implements Disposable {
-    private final HandlerRegistry handlerReg = new HandlerRegistry();
     private final SourceMonitor sourceMonitor = new SourceMonitor();
     private final List<ConditionalValidator> validators =
         new ArrayList<ConditionalValidator>();
@@ -35,7 +32,7 @@ class ValueValidation<T> extends AbstractValidation implements Disposable {
 
         bindValidationTo(source);
 
-        handlerReg.add(source.addValueChangeHandler(sourceMonitor));
+        handlerRegistry.add(source.addValueChangeHandler(sourceMonitor));
     }
 
     public void add(Validator<? super T> validator, Condition condition) {
@@ -47,7 +44,7 @@ class ValueValidation<T> extends AbstractValidation implements Disposable {
 
     public void bindValidationTo(ValidationDisplay validationDisplay) {
         ValidationBinding binding = new ValidationBinding(validationDisplay);
-        handlerReg.add(addValidationHandler(binding));
+        handlerRegistry.add(addValidationHandler(binding));
     }
 
     @Override
@@ -57,11 +54,6 @@ class ValueValidation<T> extends AbstractValidation implements Disposable {
         updateValidationResult();
 
         return getValidationResult().contains(Severity.ERROR);
-    }
-
-    @Override
-    public void dispose() {
-        handlerReg.dispose();
     }
 
     private void updateValidationResult() {

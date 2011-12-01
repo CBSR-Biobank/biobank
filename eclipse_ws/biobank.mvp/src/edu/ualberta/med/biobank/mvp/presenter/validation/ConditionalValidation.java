@@ -11,8 +11,6 @@ import com.pietschy.gwt.pectin.client.form.validation.ValidationHandler;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationResultImpl;
 
-import edu.ualberta.med.biobank.mvp.util.HandlerRegistry;
-
 /**
  * A delegating validator, with a condition for the validation result. Useful
  * for conditional validation of a {@link HasValidation}.
@@ -35,7 +33,6 @@ import edu.ualberta.med.biobank.mvp.util.HandlerRegistry;
 class ConditionalValidation extends AbstractValidation implements Disposable {
     private final ConditionMonitor conditionMonitor = new ConditionMonitor();
     private final ValidatorMonitor validatorMonitor = new ValidatorMonitor();
-    private final HandlerRegistry handlerReg = new HandlerRegistry();
     private final HasValidation delegate;
     private final Condition condition;
 
@@ -43,8 +40,8 @@ class ConditionalValidation extends AbstractValidation implements Disposable {
         this.delegate = delegate;
         this.condition = condition;
 
-        handlerReg.add(condition.addValueChangeHandler(conditionMonitor));
-        handlerReg.add(delegate.addValidationHandler(validatorMonitor));
+        handlerRegistry.add(condition.addValueChangeHandler(conditionMonitor));
+        handlerRegistry.add(delegate.addValidationHandler(validatorMonitor));
     }
 
     @Override
@@ -74,11 +71,6 @@ class ConditionalValidation extends AbstractValidation implements Disposable {
         super.clear();
 
         delegate.clear();
-    }
-
-    @Override
-    public void dispose() {
-        handlerReg.dispose();
     }
 
     private void updateValidationResult() {

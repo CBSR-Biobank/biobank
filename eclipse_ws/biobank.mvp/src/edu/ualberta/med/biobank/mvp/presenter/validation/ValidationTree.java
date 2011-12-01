@@ -16,7 +16,6 @@ import com.pietschy.gwt.pectin.client.value.ValueHolder;
 import com.pietschy.gwt.pectin.client.value.ValueModel;
 
 import edu.ualberta.med.biobank.mvp.presenter.IValidatablePresenter;
-import edu.ualberta.med.biobank.mvp.util.HandlerRegistry;
 
 /**
  * Created so presenters can use the validation of other presenters, possibly
@@ -27,7 +26,6 @@ import edu.ualberta.med.biobank.mvp.util.HandlerRegistry;
  */
 public class ValidationTree extends AbstractValidation {
     private final ValidationMonitor validationMonitor = new ValidationMonitor();
-    private final HandlerRegistry handlerReg = new HandlerRegistry();
     private final Map<HasValue<?>, ValueValidation<?>> valueValidations =
         new HashMap<HasValue<?>, ValueValidation<?>>();
     private final List<HasValidation> validations =
@@ -84,23 +82,20 @@ public class ValidationTree extends AbstractValidation {
         }
     }
 
-    public void dispose() {
-        handlerReg.dispose();
-    }
-
     <T> ValueValidation<T> getValueValidation(HasValue<T> source) {
         @SuppressWarnings("unchecked")
-        ValueValidation<T> v =
+        ValueValidation<T> validation =
             (ValueValidation<T>) valueValidations.get(source);
-        if (v == null) {
-            v = new ValueValidation<T>(source);
+        if (validation == null) {
+            validation = new ValueValidation<T>(source);
+            add(validation);
         }
-        return v;
+        return validation;
     }
 
-    private void add(ConditionalValidation validation) {
+    private void add(HasValidation validation) {
         validations.add(validation);
-        handlerReg.add(validation.addValidationHandler(validationMonitor));
+        handlerRegistry.add(validation.addValidationHandler(validationMonitor));
     }
 
     private boolean runValidations() {
