@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
 import edu.ualberta.med.biobank.mvp.presenter.HasState;
 import edu.ualberta.med.biobank.mvp.presenter.IStatefulPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter.View;
-import edu.ualberta.med.biobank.mvp.presenter.state.SimpleState;
+import edu.ualberta.med.biobank.mvp.presenter.state.ModelState;
 import edu.ualberta.med.biobank.mvp.user.ui.SelectedValueField;
 import edu.ualberta.med.biobank.mvp.util.Converter;
 import edu.ualberta.med.biobank.mvp.view.IView;
@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.mvp.view.IView;
 public class ActivityStatusComboPresenter extends AbstractPresenter<View>
     implements IStatefulPresenter {
     private final static OptionLabeller LABELLER = new OptionLabeller();
-    private final SimpleState state = new SimpleState();
+    private final ModelState state = new ModelState();
     private final Dispatcher dispatcher;
 
     public interface View extends IView {

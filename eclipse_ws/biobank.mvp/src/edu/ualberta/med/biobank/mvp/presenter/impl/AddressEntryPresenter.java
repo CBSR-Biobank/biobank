@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.mvp.presenter.HasState;
 import edu.ualberta.med.biobank.mvp.presenter.IStatefulPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.IValidatablePresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter.View;
-import edu.ualberta.med.biobank.mvp.presenter.state.SimpleState;
+import edu.ualberta.med.biobank.mvp.presenter.state.ModelState;
 import edu.ualberta.med.biobank.mvp.presenter.validation.ValidationTree;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IView;
@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.mvp.view.IView;
 public class AddressEntryPresenter extends AbstractPresenter<View>
     implements IStatefulPresenter, IValidatablePresenter {
     private final ValidationTree validation = new ValidationTree();
-    private final SimpleState state = new SimpleState();
+    private final ModelState state = new ModelState();
     private Integer addressId;
 
     public interface View extends IView {

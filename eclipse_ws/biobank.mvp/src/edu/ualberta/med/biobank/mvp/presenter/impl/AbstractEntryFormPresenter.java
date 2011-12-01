@@ -10,7 +10,7 @@ import com.pietschy.gwt.pectin.client.form.validation.HasValidation;
 import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
 import edu.ualberta.med.biobank.mvp.presenter.HasState;
 import edu.ualberta.med.biobank.mvp.presenter.IEntryFormPresenter;
-import edu.ualberta.med.biobank.mvp.presenter.state.SimpleState;
+import edu.ualberta.med.biobank.mvp.presenter.state.ModelState;
 import edu.ualberta.med.biobank.mvp.presenter.validation.ValidationTree;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
 
@@ -18,7 +18,7 @@ public abstract class AbstractEntryFormPresenter<V extends IEntryFormView>
     extends AbstractFormPresenter<V>
     implements IEntryFormPresenter<V> {
     protected final ValidationTree validation = new ValidationTree();
-    protected final SimpleState state = new SimpleState();
+    protected final ModelState state = new ModelState();
     private final SaveClickHandler saveClickHandler = new SaveClickHandler();
 
     @SuppressWarnings("unchecked")

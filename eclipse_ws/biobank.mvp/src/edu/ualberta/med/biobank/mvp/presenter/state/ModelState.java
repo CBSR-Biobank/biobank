@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.mvp.presenter.IStatefulPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.HasList;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
-public class SimpleState implements HasState, Disposable {
+public class ModelState implements HasState, Disposable {
     private final ReducingCondition dirty = new ReducingCondition(
         new OrFunction(), new ArrayList<ValueModel<Boolean>>());
     private final Set<HasState> states = new HashSet<HasState>();
