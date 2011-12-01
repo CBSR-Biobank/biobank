@@ -74,13 +74,8 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         addressEntryPresenter.bind();
 
-        // TODO: replace with reflection?
-        state.add(view.getName());
-        state.add(view.getNameShort());
-        state.add(view.getStudies());
-
-        state.add(addressEntryPresenter);
-        state.add(activityStatusComboPresenter);
+        state.addPresenter(addressEntryPresenter);
+        state.addPresenter(activityStatusComboPresenter);
 
         validation.add(addressEntryPresenter);
 

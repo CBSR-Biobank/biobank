@@ -46,15 +46,7 @@ public class AddressEntryPresenter extends AbstractPresenter<View>
 
     @Override
     protected void onBind() {
-        // TODO: replace with reflection?
-        state.add(view.getStreet1());
-        state.add(view.getStreet2());
-        state.add(view.getCity());
-        state.add(view.getProvince());
-        state.add(view.getPostalCode());
-        state.add(view.getPhoneNumber());
-        state.add(view.getFaxNumber());
-        state.add(view.getCountry());
+        state.addView(view);
 
         validation.validate(view.getCity())
             .using(new NotEmptyValidator("city"));

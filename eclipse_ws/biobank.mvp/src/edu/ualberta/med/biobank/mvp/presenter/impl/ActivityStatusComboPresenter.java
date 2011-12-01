@@ -39,7 +39,7 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View>
 
     @Override
     protected void onBind() {
-        state.add(view.getActivityStatus());
+        state.addValue(view.getActivityStatus());
     }
 
     @Override
