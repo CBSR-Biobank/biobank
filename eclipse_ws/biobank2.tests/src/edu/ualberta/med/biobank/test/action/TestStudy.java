@@ -16,6 +16,7 @@ import org.junit.rules.TestName;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.aliquotedspecimen.AliquotedSpecimenSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
+import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
@@ -38,6 +39,11 @@ import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
+/**
+ * This test suite assumes that the association between Sites and Studies is
+ * tested in the Site test class.
+ * 
+ */
 public class TestStudy extends TestAction {
 
     @Rule
@@ -202,8 +208,7 @@ public class TestStudy extends TestAction {
         return contacts;
     }
 
-    @Test
-    public void testSourceSpecimens() throws Exception {
+    private List<SpecimenType> getSpecimenTypes() {
         openHibernateSession();
         Query q = session.createQuery("from " + SpecimenType.class.getName());
         @SuppressWarnings("unchecked")
@@ -211,26 +216,60 @@ public class TestStudy extends TestAction {
         closeHibernateSession();
         Assert.assertTrue("specimen types not found in database",
             !spcTypes.isEmpty());
+        return spcTypes;
+    }
 
-        Set<Integer> idsAll = new HashSet<Integer>();
-        Set<Integer> set1 = new HashSet<Integer>();
-        Set<Integer> set2 = new HashSet<Integer>();
-
-        for (int i = 0; i < 10; ++i) {
+    private static Set<Integer> addSourceSpecimens(Integer studyId,
+        int numSourceSpecimens, List<SpecimenType> specimenType)
+        throws ApplicationException {
+        Set<Integer> result = new HashSet<Integer>();
+        for (int i = 0; i < numSourceSpecimens; ++i) {
             SourceSpecimenSaveAction srcSpcSaveAction =
                 new SourceSpecimenSaveAction();
             srcSpcSaveAction.setNeedOriginalVolume(r.nextBoolean());
             srcSpcSaveAction.setStudyId(studyId);
-            SpecimenType spcType = spcTypes.get(r.nextInt(spcTypes.size()));
+            SpecimenType spcType =
+                specimenType.get(r.nextInt(specimenType.size()));
             srcSpcSaveAction.setSpecimenTypeId(spcType.getId());
-            Integer id = appService.doAction(srcSpcSaveAction).getId();
+            result.add(appService.doAction(srcSpcSaveAction).getId());
+        }
+        return result;
+    }
 
-            idsAll.add(id);
-            if (i < 5) {
+    private Long getSourceSpecimenCount(Integer studyId) {
+        openHibernateSession();
+        Query q = session.createQuery("SELECT COUNT(*) FROM "
+            + SourceSpecimen.class.getName()
+            + " ss WHERE ss.study.id=?");
+        q.setParameter(0, studyId);
+        Long result = HibernateUtil.getCountFromQuery(q);
+        closeHibernateSession();
+        return result;
+    }
+
+    private Set<Integer> getSourceSpecimenIds(StudyInfo studyInfo) {
+        Set<Integer> actualIds = new HashSet<Integer>();
+        for (SourceSpecimen srcSpc : studyInfo.sourceSpcs) {
+            actualIds.add(srcSpc.getId());
+        }
+        return actualIds;
+    }
+
+    @Test
+    public void testSourceSpecimens() throws Exception {
+        Set<Integer> idsAll =
+            addSourceSpecimens(studyId, 10, getSpecimenTypes());
+        Set<Integer> set1 = new HashSet<Integer>();
+        Set<Integer> set2 = new HashSet<Integer>();
+
+        int count = 0;
+        for (Integer id : idsAll) {
+            if (count < 5) {
                 set1.add(id);
             } else {
                 set2.add(id);
             }
+            ++count;
         }
 
         StudyInfo studyInfo =
@@ -255,36 +294,14 @@ public class TestStudy extends TestAction {
         Assert.assertTrue(studyInfo.sourceSpcs.isEmpty());
 
         // check that this study no longer has any source specimens
-        openHibernateSession();
-        q = session.createQuery("SELECT COUNT(*) FROM "
-            + SourceSpecimen.class.getName()
-            + " ss WHERE ss.study.id=?");
-        q.setParameter(0, studyId);
-        Assert.assertTrue(HibernateUtil.getCountFromQuery(q).equals(0L));
-        closeHibernateSession();
+        Assert.assertTrue(getSourceSpecimenCount(studyId).equals(0L));
     }
 
-    private Set<Integer> getSourceSpecimenIds(StudyInfo studyInfo) {
-        Set<Integer> actualIds = new HashSet<Integer>();
-        for (SourceSpecimen srcSpc : studyInfo.sourceSpcs) {
-            actualIds.add(srcSpc.getId());
-        }
-        return actualIds;
-    }
-
-    @Test
-    public void testAliquotedSpecimens() throws Exception {
-        openHibernateSession();
-        Query q = session.createQuery("from " + SpecimenType.class.getName());
-        @SuppressWarnings("unchecked")
-        List<SpecimenType> spcTypes = q.list();
-        closeHibernateSession();
-
-        Set<Integer> idsAll = new HashSet<Integer>();
-        Set<Integer> set1 = new HashSet<Integer>();
-        Set<Integer> set2 = new HashSet<Integer>();
-
-        for (int i = 0; i < 10; ++i) {
+    private static Set<Integer> addAliquotedSpecimens(Integer studyId,
+        int numAliquotedSpecimens, List<SpecimenType> specimenTypes)
+        throws ApplicationException {
+        Set<Integer> result = new HashSet<Integer>();
+        for (int i = 0; i < numAliquotedSpecimens; ++i) {
             AliquotedSpecimenSaveAction aqSpcSaveAction =
                 new AliquotedSpecimenSaveAction();
             aqSpcSaveAction.setQuantity(r.nextInt());
@@ -292,17 +309,49 @@ public class TestStudy extends TestAction {
             aqSpcSaveAction.setStudyId(studyId);
             aqSpcSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE
                 .getId());
-            aqSpcSaveAction.setSpecimenTypeId(spcTypes.get(
-                r.nextInt(spcTypes.size()))
+            aqSpcSaveAction.setSpecimenTypeId(specimenTypes.get(
+                r.nextInt(specimenTypes.size()))
                 .getId());
-            Integer id = appService.doAction(aqSpcSaveAction).getId();
+            result.add(appService.doAction(aqSpcSaveAction).getId());
+        }
+        return result;
 
-            idsAll.add(id);
-            if (i < 5) {
+    }
+
+    private Long getAliquotedSpecimenCount(Integer studyId) {
+        openHibernateSession();
+        Query q = session.createQuery("SELECT COUNT(*) FROM "
+            + AliquotedSpecimen.class.getName()
+            + " aspc WHERE aspc.study.id=?");
+        q.setParameter(0, studyId);
+        Long result = HibernateUtil.getCountFromQuery(q);
+        closeHibernateSession();
+        return result;
+    }
+
+    private Set<Integer> getAliquotedSpecimenIds(StudyInfo studyInfo) {
+        Set<Integer> actualIds = new HashSet<Integer>();
+        for (AliquotedSpecimen aqSpc : studyInfo.aliquotedSpcs) {
+            actualIds.add(aqSpc.getId());
+        }
+        return actualIds;
+    }
+
+    @Test
+    public void testAliquotedSpecimens() throws Exception {
+        Set<Integer> idsAll =
+            addAliquotedSpecimens(studyId, 10, getSpecimenTypes());
+        Set<Integer> set1 = new HashSet<Integer>();
+        Set<Integer> set2 = new HashSet<Integer>();
+
+        int count = 0;
+        for (Integer id : idsAll) {
+            if (count < 5) {
                 set1.add(id);
             } else {
                 set2.add(id);
             }
+            count++;
         }
 
         StudyInfo studyInfo =
@@ -327,36 +376,37 @@ public class TestStudy extends TestAction {
         Assert.assertTrue(studyInfo.aliquotedSpcs.isEmpty());
 
         // check that this study no longer has any aliquoted specimens
-        openHibernateSession();
-        q = session.createQuery("SELECT COUNT(*) FROM "
-            + AliquotedSpecimen.class.getName()
-            + " aspc WHERE aspc.study.id=?");
-        q.setParameter(0, studyId);
-        Assert.assertTrue(HibernateUtil.getCountFromQuery(q).equals(0L));
-        closeHibernateSession();
+        Assert.assertTrue(getAliquotedSpecimenCount(studyId).equals(0L));
     }
 
-    private Set<Integer> getAliquotedSpecimenIds(StudyInfo studyInfo) {
-        Set<Integer> actualIds = new HashSet<Integer>();
-        for (AliquotedSpecimen aqSpc : studyInfo.aliquotedSpcs) {
-            actualIds.add(aqSpc.getId());
-        }
-        return actualIds;
-    }
-
-    @Test
-    public void testStudyEventAttrs() throws Exception {
+    private List<GlobalEventAttr> getGlobalEvAttrs() {
         openHibernateSession();
         Query q = session.createQuery("FROM " + GlobalEventAttr.class.getName()
             + " gea INNER JOIN FETCH gea.eventAttrType");
         @SuppressWarnings("unchecked")
-        List<GlobalEventAttr> globalEvAttrs = q.list();
+        List<GlobalEventAttr> result = q.list();
         closeHibernateSession();
+        return result;
+    }
 
-        Set<Integer> idsAll = new HashSet<Integer>();
+    private Long getStudyEventAttrCount(Integer studyId) {
+        // check that this study no longer has any study event attributes
+        openHibernateSession();
+        Query q = session.createQuery("SELECT COUNT(*) FROM "
+            + StudyEventAttr.class.getName()
+            + " sea WHERE sea.study.id=?");
+        q.setParameter(0, studyId);
+        Long result = HibernateUtil.getCountFromQuery(q);
+        closeHibernateSession();
+        return result;
+    }
+
+    private Set<Integer> addStudyEventAttrToStudy(Integer studyId)
+        throws ApplicationException {
+        Set<Integer> result = new HashSet<Integer>();
 
         // add a study event attribute for each global event attribute
-        for (GlobalEventAttr gEvAttr : globalEvAttrs) {
+        for (GlobalEventAttr gEvAttr : getGlobalEvAttrs()) {
             StudyEventAttrSaveAction stEvAttrSave =
                 new StudyEventAttrSaveAction();
 
@@ -370,15 +420,21 @@ public class TestStudy extends TestAction {
             stEvAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE
                 .getId());
             Integer id = appService.doAction(stEvAttrSave).getId();
-            idsAll.add(id);
+            result.add(id);
         }
+        return result;
+    }
+
+    @Test
+    public void testStudyEventAttrs() throws Exception {
+        Set<Integer> idsAll = addStudyEventAttrToStudy(studyId);
 
         StudyInfo studyInfo =
             appService.doAction(new StudyGetInfoAction(studyId));
         Assert.assertEquals(idsAll, getStudyEventAttrIds(studyInfo));
 
-        // attempt to add 1 of each global type again - should not be allowed
-        for (GlobalEventAttr gEvAttr : globalEvAttrs) {
+        // attempt to add 1 of each global type again -> should not be allowed
+        for (GlobalEventAttr gEvAttr : getGlobalEvAttrs()) {
             StudyEventAttrSaveAction stEvAttrSave =
                 new StudyEventAttrSaveAction();
 
@@ -415,13 +471,7 @@ public class TestStudy extends TestAction {
         }
 
         // check that this study no longer has any study event attributes
-        openHibernateSession();
-        q = session.createQuery("SELECT COUNT(*) FROM "
-            + StudyEventAttr.class.getName()
-            + " sea WHERE sea.study.id=?");
-        q.setParameter(0, studyId);
-        Assert.assertTrue(HibernateUtil.getCountFromQuery(q).equals(0L));
-        closeHibernateSession();
+        Assert.assertTrue(getStudyEventAttrCount(studyId).equals(0L));
     }
 
     private Set<Integer> getStudyEventAttrIds(StudyInfo studyInfo) {
@@ -433,13 +483,19 @@ public class TestStudy extends TestAction {
     }
 
     @Test
+    public void testComments() {
+        // TODO: requires implementation
+    }
+
+    @Test
     public void testDelete() throws ApplicationException {
         // delete a study with no patients and no other associations
         appService.doAction(new StudyDeleteAction(studyId));
+    }
 
+    @Test
+    public void testDeleteWithPatients() throws ApplicationException {
         // add patients to study
-        studyId = StudyHelper.createStudy(appService, name,
-            ActivityStatusEnum.ACTIVE);
         PatientSaveAction patientSaveAction =
             new PatientSaveAction(null, studyId, Utils.getRandomString(5, 10),
                 Utils.getRandomDate());
@@ -454,19 +510,55 @@ public class TestStudy extends TestAction {
         }
         appService.doAction(new PatientDeleteAction(patientId));
         appService.doAction(new StudyDeleteAction(studyId));
-
-        // add contacts to study
-        Integer clinicId =
-            ClinicHelper.createClinic(appService, name + "_clinic",
-                ActivityStatusEnum.ACTIVE);
-
-        // add source specimens to study
-        studyId = StudyHelper.createStudy(appService, name,
-            ActivityStatusEnum.ACTIVE);
     }
 
     @Test
-    public void testComments() {
+    public void testDeleteWithContacts() throws ApplicationException {
+        // add contact to study - should be allowed to delete
+        //
+        // there should be none for this study after the delete
+        StudyInfo studyInfo =
+            appService.doAction(new StudyGetInfoAction(studyId));
+        Integer clinicId =
+            ClinicHelper.createClinic(appService, name + "_clinic",
+                ActivityStatusEnum.ACTIVE);
+        ContactSaveAction contactSave = new ContactSaveAction();
+        contactSave.setName(name + "_contact");
+        contactSave.setClinicId(clinicId);
+        Integer contactId = appService.doAction(contactSave).getId();
+        StudySaveAction studySaveAction =
+            StudyHelper.getSaveAction(appService, studyInfo);
+        studySaveAction.setContactIds(new HashSet<Integer>(contactId));
+        appService.doAction(studySaveAction);
+        appService.doAction(new StudyDeleteAction(studyId));
+    }
+
+    @Test
+    public void testDeleteWithSourceSpecimens() throws ApplicationException {
+        // add source specimens to study
+        addSourceSpecimens(studyId, 5, getSpecimenTypes());
+        appService.doAction(new StudyDeleteAction(studyId));
+        Assert.assertTrue(getSourceSpecimenCount(studyId).equals(0L));
+    }
+
+    @Test
+    public void testDeleteWithAliquotedSpecimens() throws ApplicationException {
+        // add source specimens to study
+        //
+        // there should be none for this study after the delete
+        addAliquotedSpecimens(studyId, 5, getSpecimenTypes());
+        appService.doAction(new StudyDeleteAction(studyId));
+        Assert.assertTrue(getAliquotedSpecimenCount(studyId).equals(0L));
+    }
+
+    @Test
+    public void testDeleteWithStudyEventAttrs() throws ApplicationException {
+        // add study event attributes to study
+        //
+        // there should be none for this study after the delete
+        addStudyEventAttrToStudy(studyId);
+        appService.doAction(new StudyDeleteAction(studyId));
+        Assert.assertTrue(getStudyEventAttrCount(studyId).equals(0L));
 
     }
 }
