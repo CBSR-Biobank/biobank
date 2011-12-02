@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.mvp.view.form;
 
+import com.pietschy.gwt.pectin.client.form.validation.EmptyValidationResult;
 import com.pietschy.gwt.pectin.client.form.validation.Severity;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationResult;
 import com.pietschy.gwt.pectin.client.form.validation.message.ValidationMessage;
@@ -14,7 +15,7 @@ public abstract class AbstractEntryFormView extends AbstractFormView implements
     IEntryFormView {
     protected final DelegatingButton save = new DelegatingButton();
     private final DirtyValueTarget dirtyValueTarget = new DirtyValueTarget();
-    private ValidationResult validationResult;
+    private ValidationResult validationResult = EmptyValidationResult.INSTANCE;
     private boolean dirty = false;
 
     @Override

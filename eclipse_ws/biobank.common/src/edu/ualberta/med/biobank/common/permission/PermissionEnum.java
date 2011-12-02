@@ -52,16 +52,30 @@ public enum PermissionEnum {
     ORIGIN_INFO_READ(26),
     ORIGIN_INFO_UPDATE(27),
     ORIGIN_INFO_DELETE(28),
-    
+
     DISPATCH_READ(29),
     DISPATCH_CHANGE_STATE(30),
     DISPATCH_UPDATE(31),
     DISPATCH_DELETE(32),
-    
+
     RESEARCH_GROUP_CREATE(33),
     RESEARCH_GROUP_READ(34),
     RESEARCH_GROUP_UPDATE(35),
-    RESEARCH_GROUP_DELETE(36);
+    RESEARCH_GROUP_DELETE(36),
+
+    STUDY_CREATE(37),
+    STUDY_READ(38),
+    STUDY_UPDATE(39),
+    STUDY_DELETE(40),
+
+    REQUEST_READ(41),
+    REQUEST_UPDATE(42),
+    REQUEST_SAVE(43),
+
+    CLINIC_CREATE(44),
+    CLINIC_READ(45),
+    CLINIC_UPDATE(46),
+    CLINIC_DELETE(47);
 
     private final Integer permissionId;
 
@@ -108,7 +122,8 @@ public enum PermissionEnum {
         Collection<Membership> membs = principal.getMembershipCollection();
         if (membs != null) {
             for (Membership memb : membs) {
-                if (isMembershipAllowed(memb, center, study)) {
+                boolean x = isMembershipAllowed(memb, center, study);
+                if (x) {
                     return true;
                 }
             }
@@ -129,9 +144,11 @@ public enum PermissionEnum {
         Collection<Permission> permissions =
             membership.getPermissionCollection();
         boolean hasPermission =
-            permissions != null && isPermissionAllowed(permissions);
+            ((permissions != null) && isPermissionAllowed(permissions));
 
-        return hasCenter && hasStudy && hasPermission;
+        boolean result = hasCenter && hasStudy && hasPermission;
+
+        return result;
     }
 
     private boolean isPermissionAllowed(Collection<Permission> permissions) {

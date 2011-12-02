@@ -4,10 +4,10 @@ import java.util.Collection;
 
 import edu.ualberta.med.biobank.common.wrappers.Property;
 
-class Format {
+public class Format {
     private static final String DELIMITER = ", "; //$NON-NLS-1$
 
-    static String modelClass(Class<?> modelClass) {
+    public static String modelClass(Class<?> modelClass) {
         // TODO: some formatting? language translation lookup?
         return modelClass.getSimpleName();
     }
@@ -43,7 +43,7 @@ class Format {
         return sb.toString();
     }
 
-    static String propertyName(Property<?, ?> property) {
+    public static String propertyName(Property<?, ?> property) {
         // TODO: some formatting? language translation lookup?
         // TODO: what about things like address.city? lookup probably best.
         return property.getName();

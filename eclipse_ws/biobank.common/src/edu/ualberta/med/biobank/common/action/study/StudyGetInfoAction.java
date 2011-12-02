@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
@@ -46,9 +47,7 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        // TODO: implement StudyReadPermission
-        // return new StudyReadPermission(studyId).isAllowed(user, session);
-        return true;
+        return new StudyReadPermission(studyId).isAllowed(user, session);
     }
 
     @Override

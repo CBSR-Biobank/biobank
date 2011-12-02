@@ -10,14 +10,6 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
-import edu.ualberta.med.biobank.common.peer.ContainerPeer;
-import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
-import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
-import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
-import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
@@ -25,48 +17,37 @@ public class CollectionEventGetSpecimenInfosAction implements
     Action<ListResult<SpecimenInfo>> {
     private static final long serialVersionUID = 1L;
 
-    // @formatter:off
     @SuppressWarnings("nls")
-    private static final String COMMON_SPEC_QRY = 
-        "select spec, parent." + ContainerPeer.LABEL.getName() 
-        + ", pos." + SpecimenPositionPeer.POSITION_STRING.getName() 
-        + ", toptype." + ContainerTypePeer.NAME_SHORT.getName()
-        + " from " + Specimen.class.getName() + " as spec"
-        + " inner join fetch spec." + SpecimenPeer.SPECIMEN_TYPE.getName() 
-        + " left join spec." + SpecimenPeer.SPECIMEN_POSITION.getName() + " pos"
-        + " left join pos." + SpecimenPositionPeer.CONTAINER.getName() + " parent"
-        + " left join parent." + ContainerPeer.TOP_CONTAINER.getName() + " topparent"
-        + " left join topparent." + ContainerPeer.CONTAINER_TYPE.getName() + " toptype"
-        + " inner join fetch spec." + SpecimenPeer.ACTIVITY_STATUS.getName() 
-        + " inner join fetch spec." + SpecimenPeer.COLLECTION_EVENT.getName() + " cevent"
-        + " inner join fetch spec." + SpecimenPeer.ORIGIN_INFO.getName() + " originInfo"
-        + " inner join fetch originInfo." + OriginInfoPeer.CENTER.getName() 
-        + " inner join fetch spec." + SpecimenPeer.CURRENT_CENTER.getName() 
-        + " left join fetch spec." + SpecimenPeer.COMMENT_COLLECTION.getName()
-        + " inner join fetch cevent." + CollectionEventPeer.PATIENT.getName() + " as patient"
-        + " inner join fetch patient." + PatientPeer.STUDY.getName() + " study";
+    private static final String COMMON_SPEC_QRY =
+        "SELECT spec,parent.label,pos.positionString,toptype.nameShort"
+            + " FROM " + Specimen.class.getName() + " spec"
+            + " INNER JOIN FETCH spec.specimenType"
+            + " LEFT JOIN spec.specimenPosition pos"
+            + " LEFT JOIN pos.container parent"
+            + " LEFT JOIN parent.topContainer topparent"
+            + " LEFT JOIN topparent.containerType toptype"
+            + " INNER JOIN FETCH spec.activityStatus"
+            + " INNER JOIN FETCH spec.collectionEvent cevent"
+            + " INNER JOIN FETCH spec.originInfo originInfo"
+            + " INNER JOIN FETCH originInfo.center"
+            + " INNER JOIN FETCH spec.currentCenter"
+            + " LEFT JOIN FETCH spec.commentCollection"
+            + " INNER JOIN FETCH cevent.patient patient"
+            + " INNER JOIN FETCH patient.study study";
+
     @SuppressWarnings("nls")
     private static final String SOURCE_SPEC_QRY =
         COMMON_SPEC_QRY
-            + " left join fetch spec."
-            + SpecimenPeer.PROCESSING_EVENT.getName()
-            + " where spec."
-            + Property.concatNames(SpecimenPeer.ORIGINAL_COLLECTION_EVENT,
-                CollectionEventPeer.ID) + " =?";
+            + " LEFT JOIN FETCH spec.processingEvent"
+            + " WHERE spec.originalCollectionEvent.id=?";
+
     @SuppressWarnings("nls")
     private static final String ALIQUOTED_SPEC_QRY =
         COMMON_SPEC_QRY
-            + " left join fetch spec."
-            + SpecimenPeer.PARENT_SPECIMEN.getName()
-            + " parentSpec"
-            + " left join fetch parentSpec."
-            + SpecimenPeer.PROCESSING_EVENT.getName()
-            + " where spec."
-            + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-                CollectionEventPeer.ID) + " =?"
-            + " and spec." + SpecimenPeer.PARENT_SPECIMEN.getName()
-            + " is not null";
-    // @formatter:on
+            + " LEFT JOIN FETCH spec.parentSpecimen parentSpec"
+            + " LEFT JOIN FETCH parentSpec.processingEvent"
+            + " WHERE spec.collectionEvent.id=?"
+            + " AND spec.parentSpecimen IS NOT null";
 
     private Integer ceventId;
     private boolean aliquotedSpecimens = false;

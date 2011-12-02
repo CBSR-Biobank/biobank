@@ -21,8 +21,8 @@ public class SetDifference<T> {
     private Set<T> addSet;
 
     public static class Pair<T> {
-        T oldObject;
-        T newObject;
+        public T oldObject;
+        public T newObject;
 
         public Pair(T oldObj, T newObj) {
             this.oldObject = oldObj;
@@ -51,10 +51,10 @@ public class SetDifference<T> {
         }
 
         removeSet = new HashSet<T>(oldSet);
-        removeSet.removeAll(intersection);
+        removeSet.removeAll(oldObjIntersection);
 
         addSet = new HashSet<T>(newSet);
-        addSet.removeAll(intersection);
+        addSet.removeAll(oldObjIntersection);
     }
 
     /**

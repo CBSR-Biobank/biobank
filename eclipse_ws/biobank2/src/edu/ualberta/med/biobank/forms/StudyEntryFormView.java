@@ -1,18 +1,12 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
@@ -21,14 +15,15 @@ import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter;
-import edu.ualberta.med.biobank.mvp.user.ui.HasField;
+import edu.ualberta.med.biobank.mvp.user.ui.ListField;
+import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IView;
 import edu.ualberta.med.biobank.mvp.view.form.AbstractEntryFormView;
 import edu.ualberta.med.biobank.mvp.view.form.BaseForm;
+import edu.ualberta.med.biobank.mvp.view.item.AdaptedListField;
+import edu.ualberta.med.biobank.mvp.view.item.Adapter;
 import edu.ualberta.med.biobank.mvp.view.item.TableItem;
-import edu.ualberta.med.biobank.mvp.view.item.TextItem;
-import edu.ualberta.med.biobank.mvp.view.item.TranslatedItem;
-import edu.ualberta.med.biobank.mvp.view.item.TranslatedItem.Translator;
+import edu.ualberta.med.biobank.mvp.view.item.TextBox;
 import edu.ualberta.med.biobank.mvp.view.util.InputTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.AliquotedSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ClinicAddInfoTable;
@@ -38,8 +33,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class StudyEntryFormView extends AbstractEntryFormView implements
     StudyEntryPresenter.View {
 
-    private final TextItem name = new TextItem();
-    private final TextItem nameShort = new TextItem();
+    private final TextBox name = new TextBox();
+    private final TextBox nameShort = new TextBox();
     private IView activityStatusComboView;
     private final TableItem<ContactWrapper> contactWrappers =
         new TableItem<ContactWrapper>();
@@ -48,113 +43,64 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
     private final TableItem<AliquotedSpecimenWrapper> aqSpcWrappers =
         new TableItem<AliquotedSpecimenWrapper>();
 
-    private final TranslatedItem<Collection<ClinicInfo>, Collection<ContactWrapper>> clinicsTranslator =
-        TranslatedItem.from(contactWrappers, CONTACT_TRANSLATOR);
+    private final AdaptedListField<Contact, ContactWrapper> contactsAdapter =
+        new AdaptedListField<Contact, ContactWrapper>(contactWrappers,
+            CONTACT_ADAPTER);
 
-    private static final ContactTranslator CONTACT_TRANSLATOR =
-        new ContactTranslator();
+    private static final ContactAdapter CONTACT_ADAPTER = new ContactAdapter();
 
-    private static class ContactTranslator implements
-        Translator<Collection<ClinicInfo>, Collection<ContactWrapper>> {
+    private static class ContactAdapter implements
+        Adapter<Contact, ContactWrapper> {
         @Override
-        public Collection<ClinicInfo> fromDelegate(
-            Collection<ContactWrapper> delegate) {
-            Collection<ClinicInfo> clinicInfos = new ArrayList<ClinicInfo>();
-            for (ContactWrapper contact : delegate) {
-                ClinicInfo clinicInfo =
-                    new ClinicInfo(contact.getClinic().getWrappedObject(), -1l,
-                        -1l, Arrays.asList(contact.getWrappedObject()));
-                clinicInfos.add(clinicInfo);
-            }
-            return clinicInfos;
+        public Contact adapt(ContactWrapper contact) {
+            return contact.getWrappedObject();
         }
 
         @Override
-        public Collection<ContactWrapper> toDelegate(
-            Collection<ClinicInfo> foreign) {
-            Collection<ContactWrapper> contactWrappers =
-                new ArrayList<ContactWrapper>();
-            WritableApplicationService appService =
-                SessionManager.getAppService();
-            for (ClinicInfo info : foreign) {
-                for (Contact c : info.getContacts()) {
-                    ContactWrapper wrapper = new ContactWrapper(appService, c);
-                    contactWrappers.add(wrapper);
-                }
-            }
-            return contactWrappers;
+        public ContactWrapper unadapt(Contact adapted) {
+            return new ContactWrapper(SessionManager.getAppService(), adapted);
         }
     }
 
-    private final TranslatedItem<Collection<SourceSpecimen>, Collection<SourceSpecimenWrapper>> srcSpcsTranslator =
-        TranslatedItem.from(srcSpcWrappers, SOURCE_SPC_TRANSLATOR);
+    private final AdaptedListField<SourceSpecimen, SourceSpecimenWrapper> srcSpcsAdapter =
+        new AdaptedListField<SourceSpecimen, SourceSpecimenWrapper>(
+            srcSpcWrappers, SOURCE_SPC_ADAPTER);
 
-    private static final SrcSpcTranslator SOURCE_SPC_TRANSLATOR =
+    private static final SrcSpcTranslator SOURCE_SPC_ADAPTER =
         new SrcSpcTranslator();
 
     private static class SrcSpcTranslator
-        implements
-        Translator<Collection<SourceSpecimen>, Collection<SourceSpecimenWrapper>> {
+        implements Adapter<SourceSpecimen, SourceSpecimenWrapper> {
         @Override
-        public Collection<SourceSpecimen> fromDelegate(
-            Collection<SourceSpecimenWrapper> delegate) {
-            Collection<SourceSpecimen> srcSpcs =
-                new ArrayList<SourceSpecimen>();
-            for (SourceSpecimenWrapper ssWrapper : delegate) {
-                srcSpcs.add(ssWrapper.getWrappedObject());
-            }
-            return srcSpcs;
+        public SourceSpecimen adapt(SourceSpecimenWrapper unadapted) {
+            return unadapted.getWrappedObject();
         }
 
         @Override
-        public Collection<SourceSpecimenWrapper> toDelegate(
-            Collection<SourceSpecimen> foreign) {
-            Collection<SourceSpecimenWrapper> ssWrappers =
-                new ArrayList<SourceSpecimenWrapper>();
-            WritableApplicationService appService =
-                SessionManager.getAppService();
-            for (SourceSpecimen ss : foreign) {
-                SourceSpecimenWrapper wrapper =
-                    new SourceSpecimenWrapper(appService, ss);
-                ssWrappers.add(wrapper);
-            }
-            return ssWrappers;
+        public SourceSpecimenWrapper unadapt(SourceSpecimen adapted) {
+            return new SourceSpecimenWrapper(SessionManager.getAppService(),
+                adapted);
         }
     }
 
-    private final TranslatedItem<Collection<AliquotedSpecimen>, Collection<AliquotedSpecimenWrapper>> aqSpcsTranslator =
-        TranslatedItem.from(aqSpcWrappers, ALIQUOTED_SPC_TRANSLATOR);
+    private final AdaptedListField<AliquotedSpecimen, AliquotedSpecimenWrapper> aqSpcsTranslator =
+        new AdaptedListField<AliquotedSpecimen, AliquotedSpecimenWrapper>(
+            aqSpcWrappers, ALIQUOTED_SPC_ADAPTER);
 
-    private static final AqSpcTranslator ALIQUOTED_SPC_TRANSLATOR =
-        new AqSpcTranslator();
+    private static final AqSpcAdapter ALIQUOTED_SPC_ADAPTER =
+        new AqSpcAdapter();
 
-    private static class AqSpcTranslator
-        implements
-        Translator<Collection<AliquotedSpecimen>, Collection<AliquotedSpecimenWrapper>> {
+    private static class AqSpcAdapter
+        implements Adapter<AliquotedSpecimen, AliquotedSpecimenWrapper> {
         @Override
-        public Collection<AliquotedSpecimen> fromDelegate(
-            Collection<AliquotedSpecimenWrapper> delegate) {
-            Collection<AliquotedSpecimen> aqSpcs =
-                new ArrayList<AliquotedSpecimen>();
-            for (AliquotedSpecimenWrapper ssWrapper : delegate) {
-                aqSpcs.add(ssWrapper.getWrappedObject());
-            }
-            return aqSpcs;
+        public AliquotedSpecimen adapt(AliquotedSpecimenWrapper unadapted) {
+            return unadapted.getWrappedObject();
         }
 
         @Override
-        public Collection<AliquotedSpecimenWrapper> toDelegate(
-            Collection<AliquotedSpecimen> foreign) {
-            Collection<AliquotedSpecimenWrapper> asWrappers =
-                new ArrayList<AliquotedSpecimenWrapper>();
-            WritableApplicationService appService =
-                SessionManager.getAppService();
-            for (AliquotedSpecimen ss : foreign) {
-                AliquotedSpecimenWrapper wrapper =
-                    new AliquotedSpecimenWrapper(appService, ss);
-                asWrappers.add(wrapper);
-            }
-            return asWrappers;
+        public AliquotedSpecimenWrapper unadapt(AliquotedSpecimen adapted) {
+            return new AliquotedSpecimenWrapper(SessionManager.getAppService(),
+                adapted);
         }
     }
 
@@ -169,27 +115,27 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
     }
 
     @Override
-    public HasField<String> getName() {
+    public ValueField<String> getName() {
         return name;
     }
 
     @Override
-    public HasField<String> getNameShort() {
+    public ValueField<String> getNameShort() {
         return nameShort;
     }
 
     @Override
-    public HasField<Collection<ClinicInfo>> getClinics() {
-        return clinicsTranslator;
+    public ListField<Contact> getContacts() {
+        return contactsAdapter;
     }
 
     @Override
-    public HasField<Collection<SourceSpecimen>> getSourceSpecimens() {
-        return srcSpcsTranslator;
+    public ListField<SourceSpecimen> getSourceSpecimens() {
+        return srcSpcsAdapter;
     }
 
     @Override
-    public HasField<Collection<AliquotedSpecimen>> getAliquotedSpecimens() {
+    public ListField<AliquotedSpecimen> getAliquotedSpecimens() {
         return aqSpcsTranslator;
     }
 

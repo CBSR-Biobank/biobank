@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.test.presenters;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Before;
@@ -26,8 +25,9 @@ import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
-import edu.ualberta.med.biobank.mvp.user.ui.HasField;
-import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedField;
+import edu.ualberta.med.biobank.mvp.user.ui.ListField;
+import edu.ualberta.med.biobank.mvp.user.ui.SelectedValueField;
+import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.test.TestingDispatcher;
 
 public class TestSiteEntryPresenter {
@@ -78,15 +78,16 @@ public class TestSiteEntryPresenter {
         SiteEntryPresenter presenter = injector
             .getInstance(SiteEntryPresenter.class);
 
-        HasField<String> nameHs = Mockito.mock(HasField.class);
-        HasField<String> nameShortHs = Mockito.mock(HasField.class);
-        HasField<List<Comment>> commentsHs = Mockito.mock(HasField.class);
-        HasField<Collection<StudyCountInfo>> studiesHs = Mockito
-            .mock(HasField.class);
+        ValueField<String> nameHs = Mockito.mock(ValueField.class);
+        ValueField<String> nameShortHs = Mockito.mock(ValueField.class);
+        ValueField<List<Comment>> commentsHs =
+            Mockito.mock(ValueField.class);
+        ListField<StudyInfo> studiesHs = Mockito
+            .mock(ListField.class);
 
-        HasField<String> nullString = Mockito.mock(HasField.class);
-        HasSelectedField<ActivityStatus> astatus = Mockito
-            .mock(HasSelectedField.class);
+        ValueField<String> nullString = Mockito.mock(ValueField.class);
+        SelectedValueField<ActivityStatus> astatus = Mockito
+            .mock(SelectedValueField.class);
 
         List<Comment> comments = new ArrayList<Comment>();
 
@@ -115,7 +116,13 @@ public class TestSiteEntryPresenter {
             .thenReturn(astatus);
 
         presenter.bind();
-        presenter.createSite();
+
+        try {
+            // TODO: deal with this better
+            presenter.createSite();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         siteEntryView.getSave();
     }

@@ -25,38 +25,42 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
-import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 @SuppressWarnings("unused")
 public class ResearchGroupEntryForm extends AddressEntryFormCommon {
-    public static final String ID = "edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"; //$NON-NLS-1$
 
-    private static final String MSG_NEW_RG_OK = Messages.ResearchGroupEntryForm_creation_msg;
+    private static final String MSG_NEW_RG_OK =
+        Messages.ResearchGroupEntryForm_creation_msg;
 
-    private static final String MSG_RG_OK = Messages.ResearchGroupEntryForm_msg_ok;
+    private static final String MSG_RG_OK =
+        Messages.ResearchGroupEntryForm_msg_ok;
 
-    private static final String MSG_NO_RG_NAME = Messages.ResearchGroupEntryForm_msg_noResearchGroupName;
+    private static final String MSG_NO_RG_NAME =
+        Messages.ResearchGroupEntryForm_msg_noResearchGroupName;
 
-    private static final String MSG_NO_RG_NAME_SHORT = Messages.ResearchGroupEntryForm_msg_noResearchGroupNameShort;
+    private static final String MSG_NO_RG_NAME_SHORT =
+        Messages.ResearchGroupEntryForm_msg_noResearchGroupNameShort;
 
     private ResearchGroupAdapter researchGroupAdapter;
 
     private ResearchGroupWrapper researchGroup;
-    
+
     private BgcBaseText commentWidget;
     private CommentWrapper comment;
 
-    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BgcEntryFormWidgetListener listener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     private ComboViewer activityStatusComboViewer;
 
@@ -71,11 +75,15 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
                 + adapter.getClass().getName());
         researchGroupAdapter = (ResearchGroupAdapter) adapter;
         comment = new CommentWrapper(SessionManager.getAppService());
-        
-        if (adapter.getId()!=null)
-            researchGroup = new ResearchGroupWrapper(SessionManager.getAppService(), SessionManager.getAppService().doAction(new ResearchGroupGetInfoAction(adapter.getId())).rg);
-        else 
-            researchGroup= new ResearchGroupWrapper(SessionManager.getAppService());
+
+        if (adapter.getId() != null)
+            researchGroup =
+                new ResearchGroupWrapper(SessionManager.getAppService(),
+                    SessionManager.getAppService().doAction(
+                        new ResearchGroupGetInfoAction(adapter.getId())).rg);
+        else
+            researchGroup =
+                new ResearchGroupWrapper(SessionManager.getAppService());
         String tabName;
         if (researchGroup.isNew()) {
             tabName = Messages.ResearchGroupEntryForm_title_new;
@@ -174,8 +182,10 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        commentWidget = (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add, null, comment, "message", null);
+        commentWidget =
+            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
+                SWT.MULTI,
+                Messages.Comments_add, null, comment, "message", null);
 
     }
 
@@ -190,10 +200,24 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
     @Override
     public void saveForm() throws Exception {
-        AddressSaveInfo addressInfo = new AddressSaveInfo(researchGroup.getAddress().getId(), researchGroup.getAddress().getStreet1(), researchGroup.getAddress().getStreet2(), researchGroup.getAddress().getCity(), researchGroup.getAddress().getProvince(), researchGroup.getAddress().getPostalCode(), researchGroup.getAddress().getEmailAddress(),
-            researchGroup.getAddress().getPhoneNumber(), researchGroup.getAddress().getFaxNumber(), researchGroup.getAddress().getCountry(), researchGroup.getAddress().getName());
-        ResearchGroupSaveInfo info = new ResearchGroupSaveInfo(researchGroup.getId(), researchGroup.getName(), researchGroup.getNameShort(), researchGroup.getStudy().getId(), comment.getMessage(), addressInfo, researchGroup.getActivityStatus().getId());
-        ResearchGroupSaveAction save = new ResearchGroupSaveAction(info); 
+        AddressSaveInfo addressInfo =
+            new AddressSaveInfo(researchGroup.getAddress().getId(),
+                researchGroup.getAddress().getStreet1(), researchGroup
+                    .getAddress().getStreet2(), researchGroup.getAddress()
+                    .getCity(), researchGroup.getAddress().getProvince(),
+                researchGroup.getAddress().getPostalCode(), researchGroup
+                    .getAddress().getEmailAddress(),
+                researchGroup.getAddress().getPhoneNumber(), researchGroup
+                    .getAddress().getFaxNumber(), researchGroup.getAddress()
+                    .getCountry(), researchGroup.getAddress().getName());
+        ResearchGroupSaveInfo info =
+            new ResearchGroupSaveInfo(researchGroup.getId(),
+                researchGroup.getName(), researchGroup.getNameShort(),
+                researchGroup.getStudy().getId(),
+                comment.getMessage() == null ? ""
+                    : comment.getMessage(), addressInfo, researchGroup
+                    .getActivityStatus().getId());
+        ResearchGroupSaveAction save = new ResearchGroupSaveAction(info);
         adapter.setId(SessionManager.getAppService().doAction(save).getId());
     }
 
@@ -201,7 +225,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     protected void doAfterSave() throws Exception {
         SessionManager.getUser().updateCurrentCenter(researchGroup);
     }
-    
+
     @Override
     public String getNextOpenedFormID() {
         return ResearchGroupViewForm.ID;

@@ -493,7 +493,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         OriginInfoSaveInfo oiInfo =
             new OriginInfoSaveInfo(originInfo.getId(), originInfo
                 .getReceiverSite().getId(), originInfo.getCenter().getId(),
-                comment.getMessage(), addedSpecimenIds, removedSpecimenIds);
+                comment.getMessage() == null ? ""
+                    : comment.getMessage(), addedSpecimenIds,
+                removedSpecimenIds);
         ShipmentInfoSaveInfo siInfo =
             new ShipmentInfoSaveInfo(shipmentInfo.getId(),
                 shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(),

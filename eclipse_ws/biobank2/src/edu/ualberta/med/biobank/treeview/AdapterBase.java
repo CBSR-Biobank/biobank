@@ -29,12 +29,14 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  * Base class for all "Session" tree view nodes. Generally, most of the nodes in
  * the tree are adapters for classes in the ORM model.
  */
+@Deprecated
 public abstract class AdapterBase extends AbstractAdapterBase {
 
     private static BgcLogger logger = BgcLogger.getLogger(AdapterBase.class
         .getName());
 
-    protected static final String BGR_LOADING_LABEL = Messages.AdapterBase_loading;
+    protected static final String BGR_LOADING_LABEL =
+        Messages.AdapterBase_loading;
 
     private boolean loadChildrenInBackground;
 
@@ -193,7 +195,8 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         }
 
         try {
-            Collection<? extends ModelWrapper<?>> children = getWrapperChildren();
+            Collection<? extends ModelWrapper<?>> children =
+                getWrapperChildren();
             if (children != null) {
                 for (ModelWrapper<?> child : children) {
                     AbstractAdapterBase node = getChild(child.getId());
@@ -233,7 +236,8 @@ public abstract class AdapterBase extends AbstractAdapterBase {
                 setHasChildren(false);
             } else
                 setHasChildren(true);
-            final List<AbstractAdapterBase> newNodes = new ArrayList<AbstractAdapterBase>();
+            final List<AbstractAdapterBase> newNodes =
+                new ArrayList<AbstractAdapterBase>();
             for (int i = 0, n = childCount - children.size(); i < n; ++i) {
                 final AbstractAdapterBase node = createChildNode(-i);
                 addChild(node);
@@ -244,7 +248,8 @@ public abstract class AdapterBase extends AbstractAdapterBase {
                 @Override
                 public void run() {
                     try {
-                        Collection<? extends ModelWrapper<?>> childObjects = getWrapperChildren();
+                        Collection<? extends ModelWrapper<?>> childObjects =
+                            getWrapperChildren();
                         if (childObjects != null) {
                             for (ModelWrapper<?> child : childObjects) {
                                 // first see if this object is among the

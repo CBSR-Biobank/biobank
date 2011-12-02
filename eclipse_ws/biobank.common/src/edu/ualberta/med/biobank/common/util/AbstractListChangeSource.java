@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AbstractListChangeSource<E> implements ListChangeSource<E> {
-    private final List<ListChangeHandler<E>> handlers = new ArrayList<ListChangeHandler<E>>();
+    private final List<ListChangeHandler<E>> handlers =
+        new ArrayList<ListChangeHandler<E>>();
 
     @Override
     public void addListChangeHandler(ListChangeHandler<E> handler) {
@@ -18,7 +19,9 @@ public class AbstractListChangeSource<E> implements ListChangeSource<E> {
 
     protected void fireListChangeEvent() {
         ListChangeEvent<E> event = new ListChangeEvent<E>();
-        for (ListChangeHandler<E> handler : handlers) {
+        List<ListChangeHandler<E>> handlersCopy =
+            new ArrayList<ListChangeHandler<E>>(handlers);
+        for (ListChangeHandler<E> handler : handlersCopy) {
             handler.onListChange(event);
         }
     }

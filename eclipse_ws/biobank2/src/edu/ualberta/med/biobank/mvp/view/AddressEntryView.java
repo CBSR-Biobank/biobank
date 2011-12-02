@@ -5,59 +5,59 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter;
-import edu.ualberta.med.biobank.mvp.user.ui.HasField;
-import edu.ualberta.med.biobank.mvp.view.item.TextItem;
+import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
+import edu.ualberta.med.biobank.mvp.view.item.TextBox;
 import edu.ualberta.med.biobank.mvp.view.util.InputTable;
 
 public class AddressEntryView extends AbstractView implements
     AddressEntryPresenter.View {
-    private final TextItem street1 = new TextItem();
-    private final TextItem street2 = new TextItem();
-    private final TextItem city = new TextItem();
-    private final TextItem province = new TextItem();
-    private final TextItem postalCode = new TextItem();
-    private final TextItem phoneNumber = new TextItem();
-    private final TextItem faxNumber = new TextItem();
-    private final TextItem country = new TextItem();
+    private final TextBox street1 = new TextBox();
+    private final TextBox street2 = new TextBox();
+    private final TextBox city = new TextBox();
+    private final TextBox province = new TextBox();
+    private final TextBox postalCode = new TextBox();
+    private final TextBox phoneNumber = new TextBox();
+    private final TextBox faxNumber = new TextBox();
+    private final TextBox country = new TextBox();
     private InputTable table;
 
     @Override
-    public HasField<String> getStreet1() {
+    public ValueField<String> getStreet1() {
         return street1;
     }
 
     @Override
-    public HasField<String> getStreet2() {
+    public ValueField<String> getStreet2() {
         return street2;
     }
 
     @Override
-    public HasField<String> getCity() {
+    public ValueField<String> getCity() {
         return city;
     }
 
     @Override
-    public HasField<String> getProvince() {
+    public ValueField<String> getProvince() {
         return province;
     }
 
     @Override
-    public HasField<String> getPostalCode() {
+    public ValueField<String> getPostalCode() {
         return postalCode;
     }
 
     @Override
-    public HasField<String> getPhoneNumber() {
+    public ValueField<String> getPhoneNumber() {
         return phoneNumber;
     }
 
     @Override
-    public HasField<String> getFaxNumber() {
+    public ValueField<String> getFaxNumber() {
         return faxNumber;
     }
 
     @Override
-    public HasField<String> getCountry() {
+    public ValueField<String> getCountry() {
         return country;
     }
 

@@ -72,7 +72,7 @@ public class TestCollectionEvent extends TestAction {
     }
 
     @Test
-    public void testSaveNoSpecsNoAttrs() throws Exception {
+    public void saveNoSpecsNoAttrs() throws Exception {
         final Integer visitNumber = r.nextInt(20);
         final List<CommentInfo> comments =
             Utils.getRandomCommentInfos(currentUser.getId());
@@ -94,7 +94,7 @@ public class TestCollectionEvent extends TestAction {
     }
 
     @Test
-    public void testSaveWithSpecs() throws Exception {
+    public void saveWithSpecs() throws Exception {
         String s = name + r.nextInt();
         final Integer visitNumber = r.nextInt(20);
         final List<CommentInfo> comments =
@@ -209,7 +209,7 @@ public class TestCollectionEvent extends TestAction {
     }
 
     @Test
-    public void testSaveWithAttrs() throws Exception {
+    public void saveWithAttrs() throws Exception {
         setEventAttrs(studyId);
         StudyInfo studyInfo =
             appService.doAction(new StudyGetInfoAction(studyId));
@@ -364,7 +364,7 @@ public class TestCollectionEvent extends TestAction {
     }
 
     @Test
-    public void testDeleteWithoutSpecimens() throws Exception {
+    public void deleteWithoutSpecimens() throws Exception {
         final Integer ceventId =
             appService.doAction(new CollectionEventSaveAction(null, patientId,
                 r.nextInt(20), 1, Utils.getRandomCommentInfos(currentUser
@@ -380,7 +380,7 @@ public class TestCollectionEvent extends TestAction {
     }
 
     @Test
-    public void testDeleteWithSpecimens() throws Exception {
+    public void deleteWithSpecimens() throws Exception {
         // add specimen type
         final Integer typeId =
             edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
@@ -414,7 +414,7 @@ public class TestCollectionEvent extends TestAction {
     }
 
     @Test
-    public void testSaveNotUniqueVisitNumber() throws Exception {
+    public void saveNotUniqueVisitNumber() throws Exception {
         final Integer visitNumber = r.nextInt(20);
         final Integer statusId = 1;
         // add
@@ -433,7 +433,7 @@ public class TestCollectionEvent extends TestAction {
     }
 
     @Test
-    public void testGetInfos() throws Exception {
+    public void getInfos() throws Exception {
         // add specimen type
         final Integer typeId =
             edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
@@ -495,7 +495,7 @@ public class TestCollectionEvent extends TestAction {
     }
 
     @Test
-    public void testGetEventAttrInfos() throws Exception {
+    public void gsetEventAttrInfos() throws Exception {
         // add specimen type
         setEventAttrs(studyId);
         StudyInfo studyInfo =

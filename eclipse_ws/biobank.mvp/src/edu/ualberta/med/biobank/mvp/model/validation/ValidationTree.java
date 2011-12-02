@@ -13,13 +13,13 @@ import com.pietschy.gwt.pectin.client.form.validation.ValidationEvent;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationHandler;
 import com.pietschy.gwt.pectin.client.form.validation.ValidationResultImpl;
 
-import edu.ualberta.med.biobank.mvp.util.HandlerRegManager;
+import edu.ualberta.med.biobank.mvp.util.HandlerRegistry;
 
 public class ValidationTree extends AbstractValidation {
     private static final Condition TRUE = new DelegatingCondition(true);
     private final ConditionMonitor conditionMonitor = new ConditionMonitor();
     private final ValidationMonitor validationMonitor = new ValidationMonitor();
-    private final HandlerRegManager hrManager = new HandlerRegManager();
+    private final HandlerRegistry handlerReg = new HandlerRegistry();
     private final Map<HasValidation, Condition> validators =
         new LinkedHashMap<HasValidation, Condition>();
 
@@ -33,8 +33,8 @@ public class ValidationTree extends AbstractValidation {
             validators.put(validator, condition);
 
             // TODO: don't listen to the same condition twice?
-            hrManager.add(validator.addValidationHandler(validationMonitor));
-            hrManager.add(condition.addValueChangeHandler(conditionMonitor));
+            handlerReg.add(validator.addValidationHandler(validationMonitor));
+            handlerReg.add(condition.addValueChangeHandler(conditionMonitor));
         }
     }
 
@@ -48,8 +48,7 @@ public class ValidationTree extends AbstractValidation {
             updateValidationResult();
 
             return valid;
-        }
-        finally {
+        } finally {
             validationMonitor.setIgnoreEvents(false);
         }
     }
@@ -66,14 +65,13 @@ public class ValidationTree extends AbstractValidation {
             }
 
             super.clear();
-        }
-        finally {
+        } finally {
             validationMonitor.setIgnoreEvents(false);
         }
     }
 
     public void dispose() {
-        hrManager.clear();
+        handlerReg.dispose();
     }
 
     private boolean runValidators() {

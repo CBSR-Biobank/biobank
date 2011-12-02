@@ -11,33 +11,24 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
-import edu.ualberta.med.biobank.common.peer.CommentPeer;
-import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.User;
 
 public class CollectionEventGetInfoAction implements Action<CEventInfo> {
     private static final long serialVersionUID = 1L;
-    // @formatter:off
+
     @SuppressWarnings("nls")
     private static final String CEVENT_INFO_QRY =
-        "select cevent"
-            + " from " + CollectionEvent.class.getName() + " as cevent"
-            + " inner join fetch cevent."
-            + CollectionEventPeer.PATIENT.getName() + " patient"
-            + " inner join fetch cevent."
-            + CollectionEventPeer.ACTIVITY_STATUS.getName() + " status"
-            + " left join fetch cevent."
-            + CollectionEventPeer.COMMENT_COLLECTION.getName() + " comments"
-            + " left join fetch comments."
-            + CommentPeer.USER.getName() + " commentsUser"
-            + " inner join fetch patient." + PatientPeer.STUDY.getName()
-            + " study"
-            + " where cevent." + CollectionEventPeer.ID.getName() + "=?"
+        "SELECT cevent"
+            + " FROM " + CollectionEvent.class.getName() + " cevent"
+            + " INNER JOIN FETCH cevent.patient patient"
+            + " INNER JOIN FETCH cevent.activityStatus status"
+            + " LEFT JOIN FETCH cevent.commentCollection comments"
+            + " LEFT JOIN FETCH comments.user commentsUser"
+            + " INNER JOIN FETCH patient.study study"
+            + " WHERE cevent.id=?"
             + " GROUP BY cevent";
-    // @formatter:on
 
     private final Integer ceventId;
 

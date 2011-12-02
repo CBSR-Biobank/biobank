@@ -34,7 +34,7 @@ import com.pietschy.gwt.pectin.client.value.ValueModel;
 import com.pietschy.gwt.pectin.reflect.ReflectionBeanModelProvider;
 
 import edu.ualberta.med.biobank.mvp.model.validation.ValidationTree;
-import edu.ualberta.med.biobank.mvp.util.HandlerRegManager;
+import edu.ualberta.med.biobank.mvp.util.HandlerRegistry;
 
 /**
  * For use by {@link edu.ualberta.med.biobank.mvp.presenter.IPresenter}-s.
@@ -63,7 +63,7 @@ public abstract class AbstractModel<T> extends FormModel {
     private final ValueHolder<Boolean> valid = new ValueHolder<Boolean>(false);
     private final List<AbstractModel<?>> models =
         new ArrayList<AbstractModel<?>>();
-    private final HandlerRegManager hrManager = new HandlerRegManager();
+    private final HandlerRegistry handlerRegistry = new HandlerRegistry();
     private final ValidationMonitor validationMonitor = new ValidationMonitor();
     private boolean bound = false;
 
@@ -199,7 +199,7 @@ public abstract class AbstractModel<T> extends FormModel {
             onUnbind();
 
             dirty.setDelegate(provider.dirty());
-            hrManager.clear();
+            handlerRegistry.dispose();
             binder.dispose();
             validationBinder.dispose();
             validationTree.dispose();
@@ -233,7 +233,7 @@ public abstract class AbstractModel<T> extends FormModel {
                         }
                     });
 
-            hrManager.add(handlerRegistration);
+            handlerRegistry.add(handlerRegistration);
 
             // TODO: listen to conditions of validation, then re-validate().
             // But how?

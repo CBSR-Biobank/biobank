@@ -15,41 +15,27 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.event.shared.HandlerRegistration;
-
-import edu.ualberta.med.biobank.mvp.event.SimpleValueChangeEvent;
-import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedField;
+import edu.ualberta.med.biobank.mvp.user.ui.SelectedValueField;
 import edu.ualberta.med.biobank.mvp.util.Converter;
 
-public class ComboItem<T> extends ValidationItem<T> implements
-    HasSelectedField<T> {
+public class ComboItem<T> extends AbstractValueField<T>
+    implements SelectedValueField<T> {
     private static final Listener KILL_MOUSE_WHEEL_LISTENER = new Listener() {
         @Override
         public void handleEvent(Event event) {
             event.doit = false;
         }
     };
-    private final HandlerManager handlerManager = new HandlerManager(this);
-    private final ISelectionChangedListener selectionChangedListener =
+    private final ISelectionChangedListener selectionListener =
         new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
-                if (fireEvents) {
-                    T value = getValue();
-                    handlerManager.fireEvent(new SimpleValueChangeEvent<T>(
-                        value));
-                }
+                setValue(getSelectedValue(), true);
             }
         };
     private ComboViewer comboViewer;
-    private T value = null; // track value while Widget not bound
     private List<T> options = new ArrayList<T>();
     private Converter<T, String> optionLabeler;
-    private boolean fireEvents;
 
     public synchronized void setComboViewer(ComboViewer comboViewer) {
         unbindOldComboViewer();
@@ -58,56 +44,27 @@ public class ComboItem<T> extends ValidationItem<T> implements
         comboViewer.setContentProvider(new ArrayContentProvider());
         comboViewer.setLabelProvider(new CustomLabelProvider());
         setOptions(options);
-        setValue(value);
 
-        comboViewer.addSelectionChangedListener(selectionChangedListener);
+        update();
+
+        comboViewer.addSelectionChangedListener(selectionListener);
         disableMouseWheel();
     }
 
     @Override
-    public HandlerRegistration addValueChangeHandler(
-        ValueChangeHandler<T> handler) {
-        return handlerManager.addHandler(ValueChangeEvent.getType(), handler);
-    }
-
-    @Override
-    public void fireEvent(GwtEvent<?> event) {
-        handlerManager.fireEvent(event);
-    }
-
-    @Override
-    public T getValue() {
+    protected void update() {
         if (comboViewer != null) {
-            IStructuredSelection selection = (IStructuredSelection) comboViewer
-                .getSelection();
+            comboViewer.removeSelectionChangedListener(selectionListener);
 
-            if ((selection != null) && !selection.isEmpty()) {
-                @SuppressWarnings("unchecked")
-                T tmp = (T) selection.getFirstElement();
-                return tmp;
-            }
-        }
+            comboViewer.setSelection(getStructuredSelection(), true);
 
-        return value;
-    }
-
-    @Override
-    public void setValue(T value, boolean fireEvents) {
-        this.value = value;
-
-        if (comboViewer != null) {
-            this.fireEvents = fireEvents;
-            IStructuredSelection selection =
-                value != null ? new StructuredSelection(
-                    value) : new StructuredSelection();
-            comboViewer.setSelection(selection, true);
-            this.fireEvents = true;
+            comboViewer.addSelectionChangedListener(selectionListener);
         }
     }
 
     @Override
     public void setOptions(List<T> options) {
-        this.options = options;
+        this.options = new ArrayList<T>(options);
 
         if (comboViewer != null) {
             comboViewer.setInput(options);
@@ -122,7 +79,7 @@ public class ComboItem<T> extends ValidationItem<T> implements
     private void unbindOldComboViewer() {
         if (comboViewer != null) {
             comboViewer
-                .removeSelectionChangedListener(selectionChangedListener);
+                .removeSelectionChangedListener(selectionListener);
         }
     }
 
@@ -137,5 +94,28 @@ public class ComboItem<T> extends ValidationItem<T> implements
         public String getText(Object element) {
             return optionLabeler.convert((T) element);
         }
+    }
+
+    private IStructuredSelection getStructuredSelection() {
+        if (getValue() != null) {
+            return new StructuredSelection(getValue());
+        } else {
+            return new StructuredSelection();
+        }
+    }
+
+    private T getSelectedValue() {
+        T value = null;
+
+        IStructuredSelection selection = (IStructuredSelection) comboViewer
+            .getSelection();
+
+        if (selection != null && !selection.isEmpty()) {
+            @SuppressWarnings("unchecked")
+            T tmp = (T) selection.getFirstElement();
+            value = tmp;
+        }
+
+        return value;
     }
 }
