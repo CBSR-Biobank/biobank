@@ -9,6 +9,7 @@ import java.util.Set;
 import org.hibernate.Query;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -19,6 +20,7 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicDeleteAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
+import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.sourcespecimen.SourceSpecimenSaveAction;
@@ -63,7 +65,99 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void testNameChecks() throws Exception {
+    public void saveNew() throws Exception {
+        // null name
+        String altName = name + "_alt";
+        StudySaveAction saveAction =
+            StudyHelper.getSaveAction(null, altName, ActivityStatusEnum.ACTIVE);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add study with no name");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+
+        // null short name
+        saveAction =
+            StudyHelper.getSaveAction(altName, null, ActivityStatusEnum.ACTIVE);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add study with no short name");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+
+        saveAction = StudyHelper.getSaveAction(altName, altName,
+            ActivityStatusEnum.ACTIVE);
+        saveAction.setActivityStatusId(null);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add study with no activity status");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+
+        saveAction = StudyHelper.getSaveAction(altName, altName,
+            ActivityStatusEnum.ACTIVE);
+        saveAction.setSiteIds(null);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add study with null site ids");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+
+        saveAction = StudyHelper.getSaveAction(altName, altName,
+            ActivityStatusEnum.ACTIVE);
+        saveAction.setContactIds(null);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add study with null site ids");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+
+        saveAction = StudyHelper.getSaveAction(altName, altName,
+            ActivityStatusEnum.ACTIVE);
+        saveAction.setSourceSpcIds(null);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add study with null site ids");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+
+        saveAction = StudyHelper.getSaveAction(altName, altName,
+            ActivityStatusEnum.ACTIVE);
+        saveAction.setAliquotSpcIds(null);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add study with null site ids");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+
+        saveAction = StudyHelper.getSaveAction(altName, altName,
+            ActivityStatusEnum.ACTIVE);
+        saveAction.setStudyEventAttrIds(null);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add study with null site ids");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void nameChecks() throws Exception {
         // ensure we can change name on existing study
         StudyInfo studyInfo =
             appService.doAction(new StudyGetInfoAction(studyId));
@@ -105,7 +199,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void testContactCollection() throws Exception {
+    public void contactCollection() throws Exception {
         // check for empty contact list after creation of study
         Assert.assertTrue(getStudyContacts(studyId).isEmpty());
 
@@ -274,7 +368,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void testSourceSpecimens() throws Exception {
+    public void sourceSpecimens() throws Exception {
         Set<Integer> idsAll =
             addSourceSpecimens(studyId, 10, getSpecimenTypes());
         Set<Integer> set1 = new HashSet<Integer>();
@@ -356,7 +450,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void testAliquotedSpecimens() throws Exception {
+    public void aliquotedSpecimens() throws Exception {
         Set<Integer> idsAll =
             addAliquotedSpecimens(studyId, 10, getSpecimenTypes());
         Set<Integer> set1 = new HashSet<Integer>();
@@ -444,7 +538,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void testStudyEventAttrs() throws Exception {
+    public void studyEventAttrs() throws Exception {
         Set<Integer> idsAll = addStudyEventAttrToStudy(studyId);
 
         StudyInfo studyInfo =
@@ -500,19 +594,20 @@ public class TestStudy extends TestAction {
         return actualIds;
     }
 
+    @Ignore("needs implementation")
     @Test
-    public void testComments() {
+    public void comments() {
         // TODO: requires implementation
     }
 
     @Test
-    public void testDelete() throws ApplicationException {
+    public void delete() throws ApplicationException {
         // delete a study with no patients and no other associations
         appService.doAction(new StudyDeleteAction(studyId));
     }
 
     @Test
-    public void testDeleteWithPatients() throws ApplicationException {
+    public void deleteWithPatients() throws ApplicationException {
         // add patients to study
         PatientSaveAction patientSaveAction =
             new PatientSaveAction(null, studyId, Utils.getRandomString(5, 10),
@@ -531,7 +626,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void testDeleteWithContacts() throws ApplicationException {
+    public void deleteWithContacts() throws ApplicationException {
         // add contact to study - should be allowed to delete
         //
         // there should be none for this study after the delete
@@ -552,7 +647,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void testDeleteWithSourceSpecimens() throws ApplicationException {
+    public void deleteWithSourceSpecimens() throws ApplicationException {
         // add source specimens to study
         addSourceSpecimens(studyId, 5, getSpecimenTypes());
         appService.doAction(new StudyDeleteAction(studyId));
@@ -560,7 +655,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void testDeleteWithAliquotedSpecimens() throws ApplicationException {
+    public void deleteWithAliquotedSpecimens() throws ApplicationException {
         // add source specimens to study
         //
         // there should be none for this study after the delete
@@ -570,7 +665,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void testDeleteWithStudyEventAttrs() throws ApplicationException {
+    public void deleteWithStudyEventAttrs() throws ApplicationException {
         // add study event attributes to study
         //
         // there should be none for this study after the delete

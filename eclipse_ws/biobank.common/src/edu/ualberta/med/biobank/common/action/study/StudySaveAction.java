@@ -13,7 +13,9 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
@@ -93,25 +95,33 @@ public class StudySaveAction implements Action<IdResult> {
     @Override
     public IdResult run(User user, Session session) throws ActionException {
         if (name == null) {
-            throw new NullPointerException("name not specified");
+            throw new NullPropertyException(Study.class, StudyPeer.NAME);
         }
         if (nameShort == null) {
-            throw new NullPointerException("name short not specified");
-        }
-        if (siteIds == null) {
-            throw new NullPointerException("site ids cannot be null");
-        }
-        if (contactIds == null) {
-            throw new NullPointerException("contact ids cannot be null");
-        }
-        if (sourceSpcIds == null) {
-            throw new NullPointerException("specimen ids cannot be null");
-        }
-        if (aliquotSpcIds == null) {
-            throw new NullPointerException("aliquot ids cannot be null");
+            throw new NullPropertyException(Study.class, StudyPeer.NAME_SHORT);
         }
         if (aStatusId == null) {
-            throw new NullPointerException("activity status not specified");
+            throw new NullPropertyException(Study.class, "activity status id");
+        }
+        if (siteIds == null) {
+            throw new NullPropertyException(Study.class,
+                "site ids cannot be null");
+        }
+        if (contactIds == null) {
+            throw new NullPropertyException(Study.class,
+                "contact ids cannot be null");
+        }
+        if (sourceSpcIds == null) {
+            throw new NullPropertyException(Study.class,
+                "specimen ids cannot be null");
+        }
+        if (aliquotSpcIds == null) {
+            throw new NullPropertyException(Study.class,
+                "aliquot ids cannot be null");
+        }
+        if (studyEventAttrIds == null) {
+            throw new NullPropertyException(Study.class,
+                "aliquot ids cannot be null");
         }
 
         this.session = session;

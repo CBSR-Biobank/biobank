@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
-import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestClinic extends TestAction {
@@ -32,7 +31,6 @@ public class TestClinic extends TestAction {
     private String name;
 
     private Integer clinicId;
-    private Integer siteId;
 
     @Override
     @Before
@@ -42,9 +40,6 @@ public class TestClinic extends TestAction {
 
         clinicId = ClinicHelper.createClinic(appService, name,
             ActivityStatusEnum.ACTIVE);
-        siteId = SiteHelper.createSite(appService, "Site-" + name, "Edmonton",
-            ActivityStatusEnum.ACTIVE,
-            new HashSet<Integer>(clinicId));
     }
 
     @Test

@@ -18,16 +18,16 @@ public class StudyHelper extends Helper {
 
     public static StudySaveAction getSaveAction(String name, String nameShort,
         ActivityStatusEnum activityStatus) {
-        StudySaveAction saveStudy = new StudySaveAction();
-        saveStudy.setName(name);
-        saveStudy.setNameShort(name);
-        saveStudy.setActivityStatusId(activityStatus.getId());
-        saveStudy.setSiteIds(new HashSet<Integer>());
-        saveStudy.setContactIds(new HashSet<Integer>());
-        saveStudy.setSourceSpcIds(new HashSet<Integer>());
-        saveStudy.setAliquotSpcIds(new HashSet<Integer>());
-        saveStudy.setStudyEventAttrIds(new HashSet<Integer>());
-        return saveStudy;
+        StudySaveAction saveAction = new StudySaveAction();
+        saveAction.setName(name);
+        saveAction.setNameShort(nameShort);
+        saveAction.setActivityStatusId(activityStatus.getId());
+        saveAction.setSiteIds(new HashSet<Integer>());
+        saveAction.setContactIds(new HashSet<Integer>());
+        saveAction.setSourceSpcIds(new HashSet<Integer>());
+        saveAction.setAliquotSpcIds(new HashSet<Integer>());
+        saveAction.setStudyEventAttrIds(new HashSet<Integer>());
+        return saveAction;
     }
 
     public static Integer createStudy(BiobankApplicationService appService,
