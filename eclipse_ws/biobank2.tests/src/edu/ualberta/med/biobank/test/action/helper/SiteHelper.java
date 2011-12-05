@@ -57,7 +57,7 @@ public class SiteHelper extends Helper {
         siteSaveAction.setAddress(siteInfo.site.getAddress());
 
         Set<Integer> ids = new HashSet<Integer>();
-        for (StudyCountInfo infos : siteInfo.studies) {
+        for (StudyCountInfo infos : siteInfo.studyCountInfo) {
             ids.add(infos.getStudy().getId());
         }
         siteSaveAction.setStudyIds(ids);

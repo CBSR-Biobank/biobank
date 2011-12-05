@@ -37,7 +37,6 @@ public class StudyHelper extends Helper {
         return appService.doAction(saveStudy).getId();
     }
 
-    @SuppressWarnings("unused")
     public static StudySaveAction getSaveAction(
         BiobankApplicationService appService, StudyInfo studyInfo) {
         StudySaveAction saveStudy = new StudySaveAction();

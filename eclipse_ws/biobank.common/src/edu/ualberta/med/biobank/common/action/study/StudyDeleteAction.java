@@ -5,7 +5,9 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
+import edu.ualberta.med.biobank.common.action.check.CollectionIsEmptyCheck;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
@@ -27,7 +29,10 @@ public class StudyDeleteAction implements Action<EmptyResult> {
     @Override
     public EmptyResult run(User user, Session session) throws ActionException {
         Study study = ActionUtil.sessionGet(session, Study.class, studyId);
-        new StudyPreDeleteChecks(study).run(user, session);
+
+        new CollectionIsEmptyCheck<Study>(
+            Study.class, study, StudyPeer.PATIENT_COLLECTION,
+            study.getNameShort(), null).run(user, session);
 
         // cascades delete all source specimens, aliquoted specimens and
         // study event attributes

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.site;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,6 +12,7 @@ import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.site.SiteCreatePermission;
 import edu.ualberta.med.biobank.common.permission.site.SiteUpdatePermission;
+import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
@@ -46,13 +46,12 @@ public class SiteSaveAction extends CenterSaveAction {
         // TODO: check that the user has access to at least the studies they are
         // removing or adding?
         Map<Integer, Study> studies = sessionUtil.get(Study.class, studyIds);
-
-        // TODO: write a Diff class?
-        // Diff<Collection<Study>> diff = Diff.from(center.getStudyCollection(),
-        // studies.values());
-        // diff.getRemoved()
-        // diff.getAdded()
-        site.setStudyCollection(new HashSet<Study>(studies.values()));
+        SetDifference<Study> sitesDiff = new SetDifference<Study>(
+            site.getStudyCollection(), studies.values());
+        site.setStudyCollection(sitesDiff.getNewSet());
+        for (Study study : sitesDiff.getRemoveSet()) {
+            session.delete(study);
+        }
 
         return run(user, session, sessionUtil, site);
     }
