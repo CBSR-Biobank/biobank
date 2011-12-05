@@ -1,16 +1,17 @@
 package edu.ualberta.med.biobank.common.action.center;
 
-import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
+import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
+import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
-import edu.ualberta.med.biobank.common.util.HibernateUtil;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Center;
@@ -69,7 +70,21 @@ public abstract class CenterSaveAction implements Action<IdResult> {
 
         this.session = session;
 
-        performChecks(session);
+        // check for duplicate name
+        List<ValueProperty<Center>> uniqueValProps =
+            new ArrayList<ValueProperty<Center>>();
+        uniqueValProps.add(new ValueProperty<Center>(CenterPeer.NAME, name));
+        new UniquePreCheck<Center>(
+            new ValueProperty<Center>(CenterPeer.ID, centerId), Center.class,
+            uniqueValProps).run(user, session);
+
+        // check for duplicate name short
+        uniqueValProps = new ArrayList<ValueProperty<Center>>();
+        uniqueValProps.add(new ValueProperty<Center>(CenterPeer.NAME_SHORT,
+            nameShort));
+        new UniquePreCheck<Center>(
+            new ValueProperty<Center>(CenterPeer.ID, centerId), Center.class,
+            uniqueValProps).run(user, session);
 
         // TODO: check permission? (can edit site?)
 
@@ -96,40 +111,5 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         // value instead?
 
         return new IdResult(center.getId());
-    }
-
-    private static final String CENTER_UNIQUE_ATTR_HQL =
-        "SELECT COUNT(*) FROM " + Center.class.getName()
-            + " s WHERE {0}=? {1}"; //$NON-NLS-1$
-
-    private void performChecks(Session session) throws ActionException {
-        if (session == null) {
-            throw new NullPointerException("session not initialized");
-        }
-
-        if (!peformUniqueQuery("name", name).equals(0L)) {
-            throw new ActionCheckException("duplicate name");
-        }
-
-        if (!peformUniqueQuery("nameShort", nameShort).equals(0L)) {
-            throw new ActionCheckException("duplicate name short");
-        }
-    }
-
-    private Long peformUniqueQuery(String attribute, String value) {
-        String msg;
-
-        if (centerId == null) {
-            msg =
-                MessageFormat
-                    .format(CENTER_UNIQUE_ATTR_HQL, attribute, "");
-        } else {
-            msg = MessageFormat.format(CENTER_UNIQUE_ATTR_HQL, attribute,
-                "AND id<>" + centerId);
-        }
-
-        Query query = session.createQuery(msg);
-        query.setParameter(0, value);
-        return HibernateUtil.getCountFromQuery(query);
     }
 }

@@ -8,7 +8,6 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.util.StringUtil;
@@ -25,7 +24,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
  * 
  * @author delphine
  */
-public class UniquePreCheck<T extends IBiobankModel> {
+public class UniquePreCheck<T extends IBiobankModel> extends ActionCheck<T> {
 
     private static final String HQL =
         "SELECT COUNT(*) FROM {0} o WHERE ({1}) = ({2}) {3}"; //$NON-NLS-1$
@@ -34,39 +33,40 @@ public class UniquePreCheck<T extends IBiobankModel> {
     // Can we generated an exception that contain the information to display
     // that can create the appropriate message on the client?
     private static final String EXCEPTION_STRING =
-        "There already exists a {0} with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique."; //$NON-NLS-1$
+        "There already exists a {0} with property value(s) ({1}) for ({2}), "
+            + "respectively. These field(s) must be unique."; //$NON-NLS-1$
 
     protected final Collection<ValueProperty<T>> valueProperties;
 
-    public UniquePreCheck(Class<T> modelClass,
+    public UniquePreCheck(ValueProperty<T> idProperty, Class<T> modelClass,
         Collection<ValueProperty<T>> valueProperties) {
+        super(idProperty, modelClass);
         this.valueProperties = valueProperties;
     }
 
-    public EmptyResult run(User user, Session session) throws ActionException {
+    public void run(User user, Session session) throws ActionException {
         Query query = getQuery(session);
         Long count = HibernateUtil.getCountFromQuery(query);
 
         if (count > 0) {
             throwException();
         }
-
-        return new EmptyResult();
     }
 
     private void throwException() throws DuplicatePropertySetException {
-        String modelClass = Format.modelClass(getModelClass());
+        String modelClassName = Format.modelClass(modelClass);
         String values = Format.propertyValues(valueProperties);
         String names = Format.propertyNames(valueProperties);
 
-        String msg = MessageFormat.format(EXCEPTION_STRING, modelClass, values,
-            names);
+        String msg =
+            MessageFormat.format(EXCEPTION_STRING, modelClassName, values,
+                names);
 
         throw new DuplicatePropertySetException(msg);
     }
 
     private Query getQuery(Session session) {
-        String modelName = getModelClass().getName();
+        String modelName = modelClass.getName();
         String propertyNames = StringUtil.join(getPropertyNames(), ", "); //$NON-NLS-1$
         String valueBindings = getValueBindings();
         String notSelfCondition = getNotSelfCondition();

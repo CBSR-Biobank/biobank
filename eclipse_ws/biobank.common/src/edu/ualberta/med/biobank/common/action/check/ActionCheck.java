@@ -1,12 +1,8 @@
 package edu.ualberta.med.biobank.common.action.check;
 
-import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 
-public abstract class ActionCheck<T> implements Action<EmptyResult> {
-
-    private static final long serialVersionUID = 1L;
+public abstract class ActionCheck<T> {
 
     protected ValueProperty<? extends T> idProperty;
     protected Class<T> modelClass;

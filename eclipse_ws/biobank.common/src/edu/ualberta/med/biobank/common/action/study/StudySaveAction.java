@@ -1,17 +1,18 @@
 package edu.ualberta.med.biobank.common.action.study;
 
-import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
+import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
+import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
@@ -19,7 +20,6 @@ import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
-import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -128,7 +128,21 @@ public class StudySaveAction implements Action<IdResult> {
         sessionUtil = new SessionUtil(session);
         study = sessionUtil.get(Study.class, id, new Study());
 
-        performChecks(session);
+        // check for duplicate name
+        List<ValueProperty<Study>> uniqueValProps =
+            new ArrayList<ValueProperty<Study>>();
+        uniqueValProps.add(new ValueProperty<Study>(StudyPeer.NAME, name));
+        new UniquePreCheck<Study>(
+            new ValueProperty<Study>(StudyPeer.ID, id), Study.class,
+            uniqueValProps).run(user, session);
+
+        // check for duplicate name short
+        uniqueValProps = new ArrayList<ValueProperty<Study>>();
+        uniqueValProps.add(new ValueProperty<Study>(StudyPeer.NAME_SHORT,
+            nameShort));
+        new UniquePreCheck<Study>(
+            new ValueProperty<Study>(StudyPeer.ID, id), Study.class,
+            uniqueValProps).run(user, session);
 
         // TODO: check permission? (can edit site?)
         // TODO: version check?
@@ -142,40 +156,6 @@ public class StudySaveAction implements Action<IdResult> {
         session.flush();
 
         return new IdResult(study.getId());
-    }
-
-    private static final String STUDY_UNIQUE_ATTR_HQL =
-        "SELECT COUNT(*) FROM " + Study.class.getName()
-            + " s WHERE {0}=? {1}"; //$NON-NLS-1$
-
-    private void performChecks(Session session) throws ActionException {
-        if (session == null) {
-            throw new NullPointerException("session not initialized");
-        }
-
-        if (!peformUniqueQuery("name", name).equals(0L)) {
-            throw new ActionCheckException("duplicate name");
-        }
-
-        if (!peformUniqueQuery("nameShort", nameShort).equals(0L)) {
-            throw new ActionCheckException("duplicate name short");
-        }
-    }
-
-    private Long peformUniqueQuery(String attribute, String value) {
-        String msg;
-
-        if (id == null) {
-            msg =
-                MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, attribute, "");
-        } else {
-            msg = MessageFormat.format(STUDY_UNIQUE_ATTR_HQL, attribute,
-                "AND id<>" + id);
-        }
-
-        Query query = session.createQuery(msg);
-        query.setParameter(0, value);
-        return HibernateUtil.getCountFromQuery(query);
     }
 
     private void saveContacts() {

@@ -4,7 +4,6 @@ import java.text.MessageFormat;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
@@ -44,13 +43,7 @@ public class NotUsedCheck<E extends IBiobankModel> extends ActionCheck<E> {
         this.exceptionMessage = errorMessage;
     }
 
-    @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return true;
-    }
-
-    @Override
-    public EmptyResult run(User user, Session session) throws ActionException {
+    public void run(User user, Session session) throws ActionException {
         // TODO Auto-generated method stub
         Long count = countAction.run(user, session).getCount();
 
@@ -58,8 +51,6 @@ public class NotUsedCheck<E extends IBiobankModel> extends ActionCheck<E> {
             String message = getExceptionMessage();
             throw new ModelIsUsedException(message);
         }
-
-        return new EmptyResult();
     }
 
     private String getExceptionMessage() {
