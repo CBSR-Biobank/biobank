@@ -25,9 +25,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
  * 
  * @author delphine
  */
-public class UniquePreCheck<T extends IBiobankModel> extends
-    ActionCheck<T> {
-    private static final long serialVersionUID = 1L;
+public class UniquePreCheck<T extends IBiobankModel> {
 
     private static final String HQL =
         "SELECT COUNT(*) FROM {0} o WHERE ({1}) = ({2}) {3}"; //$NON-NLS-1$
@@ -40,18 +38,11 @@ public class UniquePreCheck<T extends IBiobankModel> extends
 
     protected final Collection<ValueProperty<T>> valueProperties;
 
-    public UniquePreCheck(ValueProperty<T> idProperty, Class<T> modelClass,
+    public UniquePreCheck(Class<T> modelClass,
         Collection<ValueProperty<T>> valueProperties) {
-        super(idProperty, modelClass);
         this.valueProperties = valueProperties;
     }
 
-    @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return true;
-    }
-
-    @Override
     public EmptyResult run(User user, Session session) throws ActionException {
         Query query = getQuery(session);
         Long count = HibernateUtil.getCountFromQuery(query);
