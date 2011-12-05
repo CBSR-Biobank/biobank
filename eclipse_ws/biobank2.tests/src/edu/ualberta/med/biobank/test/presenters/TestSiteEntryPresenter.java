@@ -82,7 +82,7 @@ public class TestSiteEntryPresenter {
         ValueField<String> nameShortHs = Mockito.mock(ValueField.class);
         ValueField<List<Comment>> commentsHs =
             Mockito.mock(ValueField.class);
-        ListField<StudyInfo> studiesHs = Mockito
+        ListField<StudyCountInfo> studiesHs = Mockito
             .mock(ListField.class);
 
         ValueField<String> nullString = Mockito.mock(ValueField.class);

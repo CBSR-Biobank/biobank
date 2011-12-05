@@ -7,7 +7,6 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -35,8 +34,8 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
     private final TextBox nameShort = new TextBox();
     private final TableItem<StudyWrapper> studyWrappers =
         new TableItem<StudyWrapper>();
-    private final AdaptedListField<StudyInfo, StudyWrapper> studies =
-        new AdaptedListField<StudyInfo, StudyWrapper>(studyWrappers,
+    private final AdaptedListField<StudyCountInfo, StudyWrapper> studies =
+        new AdaptedListField<StudyCountInfo, StudyWrapper>(studyWrappers,
             STUDY_ADAPTER);
 
     private IView addressEntryView;
@@ -45,15 +44,14 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
     private static final StudyAdapter STUDY_ADAPTER = new StudyAdapter();
 
     private static class StudyAdapter implements
-        Adapter<StudyInfo, StudyWrapper> {
+        Adapter<StudyCountInfo, StudyWrapper> {
         @Override
-        public StudyInfo adapt(StudyWrapper unadapted) {
-            return new StudyInfo(unadapted.getWrappedObject(), -1l, -1l,
-                null, null, null, null);
+        public StudyCountInfo adapt(StudyWrapper unadapted) {
+            return new StudyCountInfo(unadapted.getWrappedObject(), -1l, -1l);
         }
 
         @Override
-        public StudyWrapper unadapt(StudyInfo adapted) {
+        public StudyWrapper unadapt(StudyCountInfo adapted) {
             return new StudyWrapper(SessionManager.getAppService(),
                 adapted.getStudy());
         }
