@@ -18,7 +18,7 @@ public class CollectionEventGetSpecimenInfosAction implements
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
-    private static final String COMMON_SPEC_QRY =
+    private static final String SPEC_BASE_QRY =
         "SELECT spec,parent.label,pos.positionString,toptype.nameShort"
             + " FROM " + Specimen.class.getName() + " spec"
             + " INNER JOIN FETCH spec.specimenType"
@@ -36,18 +36,23 @@ public class CollectionEventGetSpecimenInfosAction implements
             + " INNER JOIN FETCH patient.study study";
 
     @SuppressWarnings("nls")
+    private static final String SPEC_END_QRY = " GROUP BY spec";
+
+    @SuppressWarnings("nls")
     private static final String SOURCE_SPEC_QRY =
-        COMMON_SPEC_QRY
+        SPEC_BASE_QRY
             + " LEFT JOIN FETCH spec.processingEvent"
-            + " WHERE spec.originalCollectionEvent.id=?";
+            + " WHERE spec.originalCollectionEvent.id=?"
+            + SPEC_END_QRY;
 
     @SuppressWarnings("nls")
     private static final String ALIQUOTED_SPEC_QRY =
-        COMMON_SPEC_QRY
+        SPEC_BASE_QRY
             + " LEFT JOIN FETCH spec.parentSpecimen parentSpec"
             + " LEFT JOIN FETCH parentSpec.processingEvent"
             + " WHERE spec.collectionEvent.id=?"
-            + " AND spec.parentSpecimen IS NOT null";
+            + " AND spec.parentSpecimen IS NOT null"
+            + SPEC_END_QRY;
 
     private Integer ceventId;
     private boolean aliquotedSpecimens = false;
