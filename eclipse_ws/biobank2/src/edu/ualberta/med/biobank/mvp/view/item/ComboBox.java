@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Listener;
 import edu.ualberta.med.biobank.mvp.user.ui.SelectedValueField;
 import edu.ualberta.med.biobank.mvp.util.Converter;
 
-public class ComboItem<T> extends AbstractValueField<T>
+public class ComboBox<T> extends AbstractValueField<T>
     implements SelectedValueField<T> {
     private static final Listener KILL_MOUSE_WHEEL_LISTENER = new Listener() {
         @Override
