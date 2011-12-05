@@ -12,6 +12,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
@@ -54,11 +55,8 @@ public class ComboBox<T> extends AbstractValueField<T>
     @Override
     protected void update() {
         if (comboViewer != null) {
-            comboViewer.removeSelectionChangedListener(selectionListener);
-
-            comboViewer.setSelection(getStructuredSelection(), true);
-
-            comboViewer.addSelectionChangedListener(selectionListener);
+            Display display = comboViewer.getCombo().getDisplay();
+            display.asyncExec(new Update());
         }
     }
 
@@ -67,7 +65,8 @@ public class ComboBox<T> extends AbstractValueField<T>
         this.options = new ArrayList<T>(options);
 
         if (comboViewer != null) {
-            comboViewer.setInput(options);
+            Display display = comboViewer.getCombo().getDisplay();
+            display.asyncExec(new UpdateOptions(options));
         }
     }
 
@@ -117,5 +116,42 @@ public class ComboBox<T> extends AbstractValueField<T>
         }
 
         return value;
+    }
+
+    private boolean hasIllegalValue() {
+        return getValue() != null && !options.contains(getValue());
+    }
+
+    private class UpdateOptions implements Runnable {
+        private final List<T> options;
+
+        public UpdateOptions(List<T> options) {
+            this.options = options;
+        }
+
+        @Override
+        public void run() {
+            if (comboViewer != null && !comboViewer.getCombo().isDisposed()) {
+                comboViewer.setInput(options);
+
+                if (hasIllegalValue()) {
+                    setValue(null, true);
+                }
+            }
+        }
+    }
+
+    private class Update implements Runnable {
+        @Override
+        public void run() {
+            if (hasIllegalValue()) {
+                setValue(null, false);
+            } else if (comboViewer != null
+                && !comboViewer.getCombo().isDisposed()) {
+                comboViewer.removeSelectionChangedListener(selectionListener);
+                comboViewer.setSelection(getStructuredSelection(), true);
+                comboViewer.addSelectionChangedListener(selectionListener);
+            }
+        }
     }
 }

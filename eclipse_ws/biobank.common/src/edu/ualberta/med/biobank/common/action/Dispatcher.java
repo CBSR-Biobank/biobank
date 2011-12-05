@@ -11,4 +11,14 @@ public interface Dispatcher {
      */
     public <T extends ActionResult> boolean exec(Action<T> action,
         ActionCallback<T> cb);
+
+    /**
+     * Asynchronously execute the {@link Action} and run the
+     * {@link ActionCallback} when the server returns a result.
+     * 
+     * @param action
+     * @param cb
+     */
+    public <T extends ActionResult> void asyncExec(Action<T> action,
+        ActionCallback<T> cb);
 }

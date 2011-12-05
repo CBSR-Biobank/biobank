@@ -47,7 +47,9 @@ public abstract class AbstractValueField<T> extends AbstractValidationField
         update();
 
         if (fireEvents) {
-            fireEvent(new SimpleValueChangeEvent<T>(value));
+            // use internal value, since update() could further modify or reject
+            // the value.
+            fireEvent(new SimpleValueChangeEvent<T>(this.value));
         }
     }
 

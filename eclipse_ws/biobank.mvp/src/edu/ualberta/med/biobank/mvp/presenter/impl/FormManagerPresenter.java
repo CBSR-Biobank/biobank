@@ -92,6 +92,10 @@ public class FormManagerPresenter extends AbstractPresenter<View> {
         presenter.bind();
 
         try {
+            // TODO: but the presenter.editSite(siteId) method should probably
+            // return IMMEDIATELY while the data is loaded in the background,
+            // but then there should never be an exception thrown. Oops,
+            // probably undo this work.
             view.openForm(presenter.editSite(siteId));
         } catch (InitPresenterException caught) {
             eventBus.fireEvent(new ExceptionEvent(caught));

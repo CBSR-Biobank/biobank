@@ -50,6 +50,17 @@ public class ValidationTree extends AbstractValidation {
         return valid;
     }
 
+    public <T> ValueValidation<T> getValueValidation(HasValue<T> source) {
+        @SuppressWarnings("unchecked")
+        ValueValidation<T> validation =
+            (ValueValidation<T>) valueValidations.get(source);
+        if (validation == null) {
+            validation = new ValueValidation<T>(source);
+            add(validation);
+        }
+        return validation;
+    }
+
     @Override
     public boolean validate() {
         try {
@@ -80,17 +91,6 @@ public class ValidationTree extends AbstractValidation {
         } finally {
             validationMonitor.setIgnoreEvents(false);
         }
-    }
-
-    <T> ValueValidation<T> getValueValidation(HasValue<T> source) {
-        @SuppressWarnings("unchecked")
-        ValueValidation<T> validation =
-            (ValueValidation<T>) valueValidations.get(source);
-        if (validation == null) {
-            validation = new ValueValidation<T>(source);
-            add(validation);
-        }
-        return validation;
     }
 
     private void add(HasValidation validation) {

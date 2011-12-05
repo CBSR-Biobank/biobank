@@ -41,4 +41,11 @@ public class TestingDispatcher implements Dispatcher {
         }
         return success;
     }
+
+    @Override
+    public <T extends ActionResult> void asyncExec(Action<T> action,
+        ActionCallback<T> cb) {
+        throw new UnsupportedOperationException(
+            "TODO: implement asyncExec for tests.");
+    }
 }
