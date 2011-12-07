@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
-import edu.ualberta.med.biobank.mvp.ApplicationContext;
+import edu.ualberta.med.biobank.mvp.AppContext;
 import edu.ualberta.med.biobank.mvp.action.StaleSafeDispatcher;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.event.impl.DelayedValueChangeHandler.Delayed500MsValueChangeHandler;
@@ -40,7 +40,7 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
     private final IsRecentMonitor isRecentMonitor = new IsRecentMonitor();
     private final CEventMonitor cEventMonitor = new CEventMonitor();
     private final StaleSafeDispatcher dispatcher;
-    private final ApplicationContext appContext;
+    private final AppContext appContext;
 
     private boolean patientExists = false;
     private List<ProcessingEvent> processingEvents = Collections.emptyList();
@@ -73,7 +73,7 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
     @Inject
     public SpecimenLinkPresenter(View view, EventBus eventBus,
         StaleSafeDispatcher dispatcher,
-        ApplicationContext appContext) {
+        AppContext appContext) {
         super(view, eventBus);
         this.dispatcher = dispatcher;
         this.appContext = appContext;

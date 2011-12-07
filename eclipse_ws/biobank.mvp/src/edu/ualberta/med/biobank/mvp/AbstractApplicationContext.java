@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.mvp;
 
 
-public abstract class AbstractApplicationContext implements ApplicationContext {
+public abstract class AbstractApplicationContext implements AppContext {
     @Override
     public Integer getUserId() {
         return getUser() != null ? getUser().getId() : null;
