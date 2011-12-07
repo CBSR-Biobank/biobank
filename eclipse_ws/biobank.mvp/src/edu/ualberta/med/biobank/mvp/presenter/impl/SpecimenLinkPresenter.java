@@ -27,6 +27,7 @@ import edu.ualberta.med.biobank.mvp.action.StaleSafeDispatcher;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.event.impl.DelayedValueChangeHandler.Delayed500MsValueChangeHandler;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SpecimenLinkPresenter.View;
+import edu.ualberta.med.biobank.mvp.presenter.validation.ValueValidation;
 import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotNullValidator;
 import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 import edu.ualberta.med.biobank.mvp.user.ui.SelectedValueField;
@@ -138,7 +139,13 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
         }
 
         private void update() {
-            validation.getValueValidation(view.getPatientNumber()).validate();
+            ValueValidation<String> patientNumberValidation =
+                validation.getValueValidation(view.getPatientNumber());
+
+            if (patientNumberValidation != null) {
+                patientNumberValidation.validate();
+            }
+
             updatePEventOptions();
         }
     }
@@ -181,13 +188,13 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
         @Override
         public void validate(String value, ValidationResultCollector results) {
             if (value == null || value.isEmpty()) {
-                // TODO: better validation.
+                results.add(new ErrorMessage("Patient number is required"));
             } else if (!patientExists) {
-                results.add(
-                    new ErrorMessage("Patient Number '" + value
-                        + "' does not exist"));
+                results.add(new ErrorMessage("Patient number '" + value
+                    + "' does not exist"));
             } else if (processingEvents.isEmpty()) {
-
+                results.add(new ErrorMessage("Patient number '" + value
+                    + "' has no processing events."));
             }
         }
     }

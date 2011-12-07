@@ -13,12 +13,14 @@ import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteViewPresenter;
+import edu.ualberta.med.biobank.mvp.presenter.impl.SpecimenLinkPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter;
 import edu.ualberta.med.biobank.mvp.view.ActivityStatusComboView;
 import edu.ualberta.med.biobank.mvp.view.AddressEntryView;
 import edu.ualberta.med.biobank.mvp.view.FormManagerView;
 import edu.ualberta.med.biobank.mvp.view.form.SiteEntryFormView;
 import edu.ualberta.med.biobank.mvp.view.form.SiteViewFormView;
+import edu.ualberta.med.biobank.mvp.view.form.SpecimenLinkView;
 
 public class BiobankModule extends AbstractModule {
     @Override
@@ -38,5 +40,7 @@ public class BiobankModule extends AbstractModule {
         bind(StudyEntryPresenter.View.class).to(StudyEntryFormView.class);
 
         bind(FormManagerPresenter.View.class).to(FormManagerView.class);
+
+        bind(SpecimenLinkPresenter.View.class).to(SpecimenLinkView.class);
     }
 }
