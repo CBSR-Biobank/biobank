@@ -43,7 +43,8 @@ public class CheckBox extends AbstractValueField<Boolean> {
         if (button != null) {
             button.removeSelectionListener(selectionListener);
 
-            Boolean value = getValue();
+            // treat null values as false
+            Boolean value = Boolean.TRUE.equals(getValue());
             button.setSelection(value);
 
             button.addSelectionListener(selectionListener);
