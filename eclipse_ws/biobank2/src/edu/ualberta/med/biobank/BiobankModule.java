@@ -7,6 +7,7 @@ import com.google.web.bindery.event.shared.SimpleEventBus;
 
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.forms.StudyEntryFormView;
+import edu.ualberta.med.biobank.mvp.AppContext;
 import edu.ualberta.med.biobank.mvp.PresenterModule;
 import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter;
@@ -27,6 +28,7 @@ public class BiobankModule extends AbstractModule {
     protected void configure() {
         install(new PresenterModule());
 
+        bind(AppContext.class).to(BiobankAppContext.class).in(Singleton.class);
         bind(EventBus.class).to(SimpleEventBus.class).in(Singleton.class);
         bind(Dispatcher.class).to(BiobankDispatcher.class).in(Singleton.class);
 
