@@ -6,11 +6,11 @@ import com.pietschy.gwt.pectin.client.form.validation.ValidationResultCollector;
 import com.pietschy.gwt.pectin.client.form.validation.Validator;
 import com.pietschy.gwt.pectin.client.form.validation.message.ErrorMessage;
 
-public class NotNull implements Validator<Object> {
+public class NotNullValidator implements Validator<Object> {
     private static final String MESSAGE = "{0} is required";
     private String label;
 
-    public NotNull(String label) {
+    public NotNullValidator(String label) {
         this.label = label;
     }
 

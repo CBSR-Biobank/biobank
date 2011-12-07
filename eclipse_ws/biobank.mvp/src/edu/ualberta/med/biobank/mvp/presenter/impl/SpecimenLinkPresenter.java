@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.mvp.action.StaleSafeDispatcher;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.event.impl.DelayedValueChangeHandler.Delayed500MsValueChangeHandler;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SpecimenLinkPresenter.View;
-import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotNull;
+import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotNullValidator;
 import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 import edu.ualberta.med.biobank.mvp.user.ui.SelectedValueField;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
@@ -94,9 +94,9 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
         validation.validate(view.getPatientNumber())
             .using(new PNumberValidator());
         validation.validate(view.getProcessingEvent())
-            .using(new NotNull("asdf"));
+            .using(new NotNullValidator("asdf"));
         validation.validate(view.getCollectionEvent())
-            .using(new NotNull("asdf"));
+            .using(new NotNullValidator("asdf"));
     }
 
     @Override

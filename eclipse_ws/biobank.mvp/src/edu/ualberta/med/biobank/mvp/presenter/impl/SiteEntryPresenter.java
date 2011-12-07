@@ -21,8 +21,8 @@ import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.site.SiteViewPresenterShowEvent;
 import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
-import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotEmpty;
-import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotNull;
+import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotEmptyValidator;
+import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotNullValidator;
 import edu.ualberta.med.biobank.mvp.user.ui.ListField;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
@@ -77,13 +77,13 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         validation.add(addressEntryPresenter);
 
         validation.validate(view.getName())
-            .using(new NotEmpty("name"));
+            .using(new NotEmptyValidator("name"));
         validation.validate(view.getNameShort())
-            .using(new NotEmpty("nameShort"));
+            .using(new NotEmptyValidator("nameShort"));
 
         validation.validate(
             activityStatusComboPresenter.getView().getActivityStatus())
-            .using(new NotNull("activityStatus"));
+            .using(new NotNullValidator("activityStatus"));
     }
 
     @Override

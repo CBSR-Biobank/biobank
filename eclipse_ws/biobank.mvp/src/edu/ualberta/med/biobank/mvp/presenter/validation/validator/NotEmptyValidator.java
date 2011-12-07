@@ -6,11 +6,11 @@ import com.pietschy.gwt.pectin.client.form.validation.ValidationResultCollector;
 import com.pietschy.gwt.pectin.client.form.validation.Validator;
 import com.pietschy.gwt.pectin.client.form.validation.message.ErrorMessage;
 
-public class NotEmpty implements Validator<String> {
+public class NotEmptyValidator implements Validator<String> {
     private static final String MESSAGE = "{0} cannot be empty";
     private final String label;
 
-    public NotEmpty(String label) {
+    public NotEmptyValidator(String label) {
         this.label = label;
     }
 
