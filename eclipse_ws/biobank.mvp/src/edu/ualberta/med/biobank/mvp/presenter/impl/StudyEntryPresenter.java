@@ -106,7 +106,8 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         saveStudy.setAliquotSpcIds(getAliquotedSepcimenIds());
         saveStudy.setStudyEventAttrIds(getStudyEventAttrIds());
 
-        dispatcher.exec(saveStudy, new ActionCallback<IdResult>() {
+        // TODO: this happens asynchronously now, how to inform GUI?
+        dispatcher.asyncExec(saveStudy, new ActionCallback<IdResult>() {
             @Override
             public void onFailure(Throwable caught) {
                 eventBus.fireEvent(new ExceptionEvent(caught));

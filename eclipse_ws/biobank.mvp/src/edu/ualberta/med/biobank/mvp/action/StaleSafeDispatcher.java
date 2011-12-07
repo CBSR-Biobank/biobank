@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.mvp.action;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.inject.Inject;
@@ -44,25 +45,19 @@ public class StaleSafeDispatcher implements Dispatcher {
     }
 
     @Override
-    public <T extends ActionResult> boolean exec(Action<T> action,
-        ActionCallback<T> cb) {
-        return dispatcher.exec(action, cb);
-    }
-
-    @Override
-    public synchronized <T extends ActionResult> void asyncExec(
+    public synchronized <T extends ActionResult> Future<T> asyncExec(
         Action<T> action, ActionCallback<T> callback) {
-        asyncExec(action.getClass(), action, callback);
+        return asyncExec(action.getClass(), action, callback);
     }
 
-    private synchronized <T extends ActionResult> void asyncExec(
+    private synchronized <T extends ActionResult> Future<T> asyncExec(
         Object contextKey, Action<T> action, ActionCallback<T> callback) {
 
         AsyncContext context = new AsyncContext();
         Call call = context.start();
 
-        dispatcher.asyncExec(action, new StaleSafeActionCallback<T>(call,
-            callback));
+        return dispatcher.asyncExec(action, new StaleSafeActionCallback<T>(
+            call, callback));
     }
 
     public static class AsyncContext {
@@ -70,7 +65,7 @@ public class StaleSafeDispatcher implements Dispatcher {
         private Integer lastFinished = -1;
 
         public Call start() {
-            return null;
+            return new Call();
         }
 
         public class Call {

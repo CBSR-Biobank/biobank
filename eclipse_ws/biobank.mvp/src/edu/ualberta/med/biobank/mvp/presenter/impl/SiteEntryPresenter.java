@@ -105,7 +105,8 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         saveSite.setActivityStatusId(getActivityStatusId());
         saveSite.setStudyIds(getStudyIds());
 
-        dispatcher.exec(saveSite, new ActionCallback<IdResult>() {
+        // TODO: this happens asynchronously now, how to inform GUI?
+        dispatcher.asyncExec(saveSite, new ActionCallback<IdResult>() {
             @Override
             public void onFailure(Throwable caught) {
                 eventBus.fireEvent(new ExceptionEvent(caught));
