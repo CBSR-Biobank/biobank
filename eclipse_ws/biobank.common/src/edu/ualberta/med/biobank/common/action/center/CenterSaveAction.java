@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -62,10 +63,17 @@ public abstract class CenterSaveAction implements Action<IdResult> {
     protected IdResult run(User user, Session session,
         SessionUtil sessionUtil, Center center) throws ActionException {
         if (name == null) {
-            throw new NullPointerException("name not specified");
+            throw new NullPropertyException(Center.class, CenterPeer.NAME);
         }
         if (nameShort == null) {
-            throw new NullPointerException("name short not specified");
+            throw new NullPropertyException(Center.class, CenterPeer.NAME_SHORT);
+        }
+        if (address == null) {
+            throw new NullPropertyException(Center.class, "address");
+        }
+        if (aStatusId == null) {
+            throw new NullPropertyException(Center.class,
+                CenterPeer.ACTIVITY_STATUS);
         }
 
         this.session = session;

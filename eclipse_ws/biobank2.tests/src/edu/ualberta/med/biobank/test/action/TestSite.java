@@ -13,6 +13,7 @@ import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
+import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
@@ -43,7 +44,61 @@ public class TestSite extends TestAction {
 
     @Test
     public void saveNew() throws Exception {
+        // null name
+        String altName = name + "_alt";
+        SiteSaveAction saveAction =
+            SiteHelper.getSaveAction(null, altName, ActivityStatusEnum.ACTIVE);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add site with no name");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
 
+        // null short name
+        saveAction =
+            SiteHelper.getSaveAction(altName, null, ActivityStatusEnum.ACTIVE);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add site with no short name");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+
+        saveAction = SiteHelper.getSaveAction(altName, altName,
+            ActivityStatusEnum.ACTIVE);
+        saveAction.setActivityStatusId(null);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add Site with no activity status");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+
+        saveAction = SiteHelper.getSaveAction(altName, altName,
+            ActivityStatusEnum.ACTIVE);
+        saveAction.setAddress(null);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add site with no address");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+
+        saveAction = SiteHelper.getSaveAction(altName, altName,
+            ActivityStatusEnum.ACTIVE);
+        saveAction.setStudyIds(null);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add site with null site ids");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
@@ -79,8 +134,8 @@ public class TestSite extends TestAction {
 
         try {
             appService.doAction(saveSite);
-            Assert
-                .fail("should not be allowed to add site with same name short");
+            Assert.fail(
+                "should not be allowed to add site with same name short");
         } catch (ActionCheckException e) {
             Assert.assertTrue(true);
         }
@@ -90,7 +145,7 @@ public class TestSite extends TestAction {
     @Test
     public void studyCollection() throws Exception {
         List<Integer> allStudyIds = new ArrayList<Integer>();
-        List<Integer> expectedResult = new ArrayList<Integer>();
+        Set<Integer> expectedResult = new HashSet<Integer>();
         Set<Integer> studyIdsSet1 = new HashSet<Integer>();
         Set<Integer> studyIdsSet2 = new HashSet<Integer>();
 
@@ -135,8 +190,8 @@ public class TestSite extends TestAction {
             getStudyIds(siteInfo.studyCountInfo));
     }
 
-    private List<Integer> getStudyIds(List<StudyCountInfo> studyCountInfo) {
-        List<Integer> ids = new ArrayList<Integer>();
+    private Set<Integer> getStudyIds(List<StudyCountInfo> studyCountInfo) {
+        Set<Integer> ids = new HashSet<Integer>();
         for (StudyCountInfo info : studyCountInfo) {
             ids.add(info.getStudy().getId());
         }

@@ -8,7 +8,9 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.center.CenterSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.site.SiteCreatePermission;
 import edu.ualberta.med.biobank.common.permission.site.SiteUpdatePermission;
@@ -40,6 +42,11 @@ public class SiteSaveAction extends CenterSaveAction {
 
     @Override
     public IdResult run(User user, Session session) throws ActionException {
+        if (studyIds == null) {
+            throw new NullPropertyException(Site.class,
+                SitePeer.STUDY_COLLECTION);
+        }
+
         SessionUtil sessionUtil = new SessionUtil(session);
         Site site = sessionUtil.get(Site.class, centerId, new Site());
 

@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicI
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
+import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.test.Utils;
@@ -43,12 +44,69 @@ public class TestClinic extends TestAction {
     }
 
     @Test
-    public void testSaveNew() throws Exception {
+    public void saveNew() throws Exception {
+        // null name
+        String altName = name + "_alt";
+        ClinicSaveAction saveAction =
+            ClinicHelper.getSaveAction(null, altName,
+                ActivityStatusEnum.ACTIVE, true);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add site with no name");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+
+        // null short name
+        saveAction =
+            ClinicHelper.getSaveAction(altName, null,
+                ActivityStatusEnum.ACTIVE, true);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add site with no short name");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+
+        saveAction = ClinicHelper.getSaveAction(altName, altName,
+            ActivityStatusEnum.ACTIVE, true);
+        saveAction.setActivityStatusId(null);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add Clinic with no activity status");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+
+        saveAction = ClinicHelper.getSaveAction(altName, altName,
+            ActivityStatusEnum.ACTIVE, true);
+        saveAction.setAddress(null);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add site with no address");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
+
+        saveAction = ClinicHelper.getSaveAction(altName, altName,
+            ActivityStatusEnum.ACTIVE, true);
+        saveAction.setContactIds(null);
+        try {
+            appService.doAction(saveAction);
+            Assert.fail(
+                "should not be allowed to add site with null site ids");
+        } catch (NullPropertyException e) {
+            Assert.assertTrue(true);
+        }
 
     }
 
     @Test
-    public void testNameChecks() throws Exception {
+    public void nameChecks() throws Exception {
         // ensure we can change name on existing clinic
         ClinicInfo clinicInfo =
             appService.doAction(new ClinicGetInfoAction(clinicId));
@@ -89,7 +147,7 @@ public class TestClinic extends TestAction {
     }
 
     @Test
-    public void testContacts() throws Exception {
+    public void contacts() throws Exception {
         Set<Integer> idsAll = new HashSet<Integer>();
         Set<Integer> set1 = new HashSet<Integer>();
         Set<Integer> set2 = new HashSet<Integer>();

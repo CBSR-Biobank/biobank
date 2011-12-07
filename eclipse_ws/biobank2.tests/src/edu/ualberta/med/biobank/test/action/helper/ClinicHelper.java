@@ -23,7 +23,7 @@ public class ClinicHelper extends Helper {
 
         ClinicSaveAction saveClinic = new ClinicSaveAction();
         saveClinic.setName(name);
-        saveClinic.setNameShort(name);
+        saveClinic.setNameShort(nameShort);
         saveClinic.setActivityStatusId(activityStatus.getId());
         saveClinic.setSendsShipments(sendsShipments);
         saveClinic.setContactIds(new HashSet<Integer>());

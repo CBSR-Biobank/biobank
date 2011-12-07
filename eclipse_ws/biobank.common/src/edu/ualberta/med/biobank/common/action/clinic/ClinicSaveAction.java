@@ -8,7 +8,9 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.center.CenterSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicCreatePermission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
@@ -45,8 +47,10 @@ public class ClinicSaveAction extends CenterSaveAction {
     @Override
     public IdResult run(User user, Session session) throws ActionException {
         if (contactIds == null) {
-            throw new NullPointerException("contact ids cannot be null");
+            throw new NullPropertyException(Clinic.class,
+                ClinicPeer.CONTACT_COLLECTION);
         }
+
         SessionUtil sessionUtil = new SessionUtil(session);
         Clinic clinic = sessionUtil.get(Clinic.class, centerId, new Clinic());
         clinic.setSendsShipments(sendsShipments);
