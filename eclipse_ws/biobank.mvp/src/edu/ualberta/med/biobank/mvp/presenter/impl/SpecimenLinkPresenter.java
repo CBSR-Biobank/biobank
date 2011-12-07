@@ -21,11 +21,13 @@ import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.mvp.ApplicationContext;
 import edu.ualberta.med.biobank.mvp.action.StaleSafeDispatcher;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.event.impl.DelayedValueChangeHandler.Delayed500MsValueChangeHandler;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SpecimenLinkPresenter.View;
+import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotNull;
 import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 import edu.ualberta.med.biobank.mvp.user.ui.SelectedValueField;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
@@ -40,7 +42,9 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
     private final ApplicationContext appContext;
 
     private boolean patientExists = false;
-    private List<ProcessingEvent> pEventOptions = Collections.emptyList();
+    private List<ProcessingEvent> processingEvents = Collections.emptyList();
+    private List<CollectionEvent> collectionEvents = Collections.emptyList();
+    private List<SourceSpecimen> sourceSpecimens = Collections.emptyList();
 
     public interface View extends IEntryFormView {
         ValueField<String> getPatientNumber();
@@ -89,6 +93,10 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
 
         validation.validate(view.getPatientNumber())
             .using(new PNumberValidator());
+        validation.validate(view.getProcessingEvent())
+            .using(new NotNull("asdf"));
+        validation.validate(view.getCollectionEvent())
+            .using(new NotNull("asdf"));
     }
 
     @Override
@@ -111,7 +119,7 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
                 new ActionCallback<ProcessingEventGetListResult>() {
                     @Override
                     public void onFailure(Throwable caught) {
-                        pEventOptions = Collections.emptyList();
+                        processingEvents = Collections.emptyList();
                         patientExists = false;
 
                         update();
@@ -121,7 +129,7 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
 
                     @Override
                     public void onSuccess(ProcessingEventGetListResult result) {
-                        pEventOptions = result.getProcessingEvents();
+                        processingEvents = result.getProcessingEvents();
                         patientExists = result.isPatientExists();
 
                         update();
@@ -137,10 +145,10 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
 
     private void updatePEventOptions() {
         List<ProcessingEvent> options = new ArrayList<ProcessingEvent>();
-        options.addAll(pEventOptions);
+        options.addAll(processingEvents);
 
         if (view.isRecentProcessingEvent().getValue()) {
-            PredicateUtil.filterOut(pEventOptions, new PEventOver7DaysOld());
+            PredicateUtil.filterOut(processingEvents, new PEventOver7DaysOld());
         }
 
         view.getProcessingEvent().setOptions(options);
@@ -153,16 +161,18 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
         }
     }
 
-    private class PEventMonitor implements ValueChangeHandler<ProcessingEvent> {
+    private class PEventMonitor extends
+        Delayed500MsValueChangeHandler<ProcessingEvent> {
         @Override
-        public void onValueChange(ValueChangeEvent<ProcessingEvent> event) {
+        public void onDelayedValueChange(ValueChangeEvent<ProcessingEvent> event) {
             // TODO: run async thing to update collection visit options
         }
     }
 
-    private class CEventMonitor implements ValueChangeHandler<CollectionEvent> {
+    private class CEventMonitor extends
+        Delayed500MsValueChangeHandler<CollectionEvent> {
         @Override
-        public void onValueChange(ValueChangeEvent<CollectionEvent> event) {
+        public void onDelayedValueChange(ValueChangeEvent<CollectionEvent> event) {
             // TODO: update source-specimen list on all views.
         }
     }
@@ -176,7 +186,7 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
                 results.add(
                     new ErrorMessage("Patient Number '" + value
                         + "' does not exist"));
-            } else if (pEventOptions.isEmpty()) {
+            } else if (processingEvents.isEmpty()) {
 
             }
         }
