@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.peer.RolePeer;
+import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Permission;
 import edu.ualberta.med.biobank.model.Role;
@@ -27,7 +28,7 @@ public class RoleSaveAction implements Action<IdResult> {
     private String name;
     private Set<Integer> permissionIds;
 
-    public void setRoleId(Integer roleId) {
+    public void setId(Integer roleId) {
         this.roleId = roleId;
     }
 
@@ -41,8 +42,7 @@ public class RoleSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        // TODO not sure?
-        return true;
+        return new UserManagementPermission().isAllowed(user, session);
     }
 
     @Override

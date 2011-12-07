@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.peer.MembershipPeer;
+import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Membership;
@@ -54,7 +55,7 @@ public class MembershipSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        return true;
+        return new UserManagementPermission().isAllowed(user, session);
     }
 
     @Override

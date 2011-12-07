@@ -75,7 +75,9 @@ public enum PermissionEnum {
     CLINIC_CREATE(44),
     CLINIC_READ(45),
     CLINIC_UPDATE(46),
-    CLINIC_DELETE(47);
+    CLINIC_DELETE(47),
+
+    USER_MANAGEMENT(48);
 
     private final Integer permissionId;
 
