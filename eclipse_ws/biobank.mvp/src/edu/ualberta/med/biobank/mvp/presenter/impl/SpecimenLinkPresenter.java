@@ -15,14 +15,16 @@ import com.pietschy.gwt.pectin.client.form.validation.Validator;
 import com.pietschy.gwt.pectin.client.form.validation.message.ErrorMessage;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
-import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetListAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetListResult;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.mvp.ApplicationContext;
+import edu.ualberta.med.biobank.mvp.action.StaleSafeDispatcher;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
+import edu.ualberta.med.biobank.mvp.event.impl.DelayedValueChangeHandler.Delayed500MsValueChangeHandler;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SpecimenLinkPresenter.View;
 import edu.ualberta.med.biobank.mvp.user.ui.HasButton;
 import edu.ualberta.med.biobank.mvp.user.ui.SelectedValueField;
@@ -34,7 +36,8 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
     private final PEventMonitor pEventMonitor = new PEventMonitor();
     private final IsRecentMonitor isRecentMonitor = new IsRecentMonitor();
     private final CEventMonitor cEventMonitor = new CEventMonitor();
-    private final Dispatcher dispatcher;
+    private final StaleSafeDispatcher dispatcher;
+    private final ApplicationContext appContext;
 
     private boolean patientExists = false;
     private List<ProcessingEvent> pEventOptions = Collections.emptyList();
@@ -64,9 +67,11 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
 
     @Inject
     public SpecimenLinkPresenter(View view, EventBus eventBus,
-        Dispatcher dispatcher) {
+        StaleSafeDispatcher dispatcher,
+        ApplicationContext appContext) {
         super(view, eventBus);
         this.dispatcher = dispatcher;
+        this.appContext = appContext;
     }
 
     @Override
@@ -95,11 +100,11 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
         // TODO Auto-generated method stub
     }
 
-    private class PNumberMonitor implements ValueChangeHandler<String> {
+    private class PNumberMonitor extends Delayed500MsValueChangeHandler<String> {
         @Override
-        public void onValueChange(ValueChangeEvent<String> event) {
+        public void onDelayedValueChange(ValueChangeEvent<String> event) {
             String pNumber = event.getValue();
-            Integer centerId = 2; // TODO: get working center id
+            Integer centerId = appContext.getWorkingCenterId();
 
             dispatcher.asyncExec(
                 new ProcessingEventGetListAction(pNumber, centerId),

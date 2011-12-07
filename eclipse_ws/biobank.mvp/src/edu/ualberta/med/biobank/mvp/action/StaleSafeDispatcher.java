@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.google.gwt.user.client.History;
 import com.google.inject.Inject;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
+import edu.ualberta.med.biobank.mvp.action.StaleSafeDispatcher.AsyncContext.Call;
 
 /**
  * Thread-safe delegating {@link Dispatcher} that will not execute the callback
@@ -23,15 +23,15 @@ import edu.ualberta.med.biobank.common.action.Dispatcher;
  * implementation will invoke the callback of the second {@link Action}, but not
  * the first, if and when it does finally return.
  * <p>
- * TODO: explain default realm and optional realm.
+ * Staleness is determined according to an {@link Action}'s class.
  * 
  * @author jferland
  * 
  */
 public class StaleSafeDispatcher implements Dispatcher {
     private final Dispatcher dispatcher;
-    private final Map<Object, History> histories =
-        new HashMap<Object, History>();
+    private final Map<Object, AsyncContext> contexts =
+        new HashMap<Object, AsyncContext>();
 
     @Inject
     public StaleSafeDispatcher(Dispatcher dispatcher) {
@@ -51,53 +51,42 @@ public class StaleSafeDispatcher implements Dispatcher {
 
     @Override
     public synchronized <T extends ActionResult> void asyncExec(
-        Action<T> action, ActionCallback<T> cb) {
-        // asyncExec(action.getClass(), action, cb);
+        Action<T> action, ActionCallback<T> callback) {
+        asyncExec(action.getClass(), action, callback);
     }
 
-    public synchronized <T extends ActionResult> void asyncExec(
-        StaleContext context, Action<T> action, ActionCallback<T> cb) {
-        // context.start
-        dispatcher.asyncExec(action, new StaleSafeActionCallback<T>(cb));
+    private synchronized <T extends ActionResult> void asyncExec(
+        Object contextKey, Action<T> action, ActionCallback<T> callback) {
+
+        AsyncContext context = new AsyncContext();
+        Call call = context.start();
+
+        dispatcher.asyncExec(action, new StaleSafeActionCallback<T>(call,
+            callback));
     }
 
-    private synchronized History getHistory(Object object) {
-        History history = histories.get(object);
-        if (history == null) {
-            history = new History();
-            histories.put(object, history);
-        }
-        return history;
-    }
-
-    /**
-     * 
-     * @author jferland
-     * 
-     */
-    public static class StaleContext {
-        private AtomicInteger numberProvider = new AtomicInteger(0);
-        private Call lastCompleted;
+    public static class AsyncContext {
+        private AtomicInteger placeProvider = new AtomicInteger(0);
+        private Integer lastFinished = -1;
 
         public Call start() {
             return null;
         }
 
         public class Call {
-            private final Integer number;
+            private final Integer place;
 
             private Call() {
-                this.number = numberProvider.getAndIncrement();
+                this.place = placeProvider.getAndIncrement();
             }
 
-            /**
-             * Returns true if the {@link Call} should be allowed to finish.
-             * 
-             * @param point
-             * @return
-             */
             public synchronized boolean finish() {
-                return false;
+                if (place > lastFinished) {
+                    lastFinished = place;
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
     }
