@@ -102,7 +102,7 @@ public class TestSite extends TestAction {
     }
 
     @Test
-    public void testNameChecks() throws Exception {
+    public void nameChecks() throws Exception {
         // ensure we can change name on existing clinic
         SiteInfo siteInfo =
             appService.doAction(new SiteGetInfoAction(siteId));

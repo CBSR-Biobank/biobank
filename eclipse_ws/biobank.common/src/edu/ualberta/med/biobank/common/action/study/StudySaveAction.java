@@ -132,20 +132,26 @@ public class StudySaveAction implements Action<IdResult> {
         List<ValueProperty<Study>> uniqueValProps =
             new ArrayList<ValueProperty<Study>>();
         uniqueValProps.add(new ValueProperty<Study>(StudyPeer.NAME, name));
-        new UniquePreCheck<Study>(
-            new ValueProperty<Study>(StudyPeer.ID, id), Study.class,
-            uniqueValProps).run(user, session);
+        new UniquePreCheck<Study>(Study.class, id, uniqueValProps).run(user,
+            session);
 
         // check for duplicate name short
         uniqueValProps = new ArrayList<ValueProperty<Study>>();
         uniqueValProps.add(new ValueProperty<Study>(StudyPeer.NAME_SHORT,
             nameShort));
-        new UniquePreCheck<Study>(
-            new ValueProperty<Study>(StudyPeer.ID, id), Study.class,
-            uniqueValProps).run(user, session);
+        new UniquePreCheck<Study>(Study.class, id, uniqueValProps).run(user,
+            session);
 
         // TODO: check permission? (can edit site?)
         // TODO: version check?
+
+        study.setId(id);
+        study.setName(name);
+        study.setNameShort(nameShort);
+
+        ActivityStatus aStatus =
+            sessionUtil.load(ActivityStatus.class, aStatusId);
+        study.setActivityStatus(aStatus);
 
         saveContacts();
         saveSourceSpecimens();
@@ -159,21 +165,12 @@ public class StudySaveAction implements Action<IdResult> {
     }
 
     private void saveContacts() {
-        study.setId(id);
-        study.setName(name);
-        study.setNameShort(nameShort);
+        Map<Integer, Site> sites = sessionUtil.load(Site.class, siteIds);
 
-        ActivityStatus aStatus =
-            sessionUtil.load(ActivityStatus.class, aStatusId);
-        study.setActivityStatus(aStatus);
-
-        Map<Integer, Site> sites =
-            sessionUtil.load(Site.class, siteIds);
-
-        study.setSiteCollection(new HashSet<Site>(sites.values()));
         SetDifference<Site> sitesDiff =
             new SetDifference<Site>(study.getSiteCollection(),
                 sites.values());
+        study.setSiteCollection(sitesDiff.getNewSet());
 
         // remove this study from sites in removed list
         for (Site site : sitesDiff.getRemoveSet()) {

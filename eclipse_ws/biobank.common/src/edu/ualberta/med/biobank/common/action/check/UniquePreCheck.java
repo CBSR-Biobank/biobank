@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
  * 
  * @author delphine
  */
-public class UniquePreCheck<T extends IBiobankModel> extends ActionCheck<T> {
+public class UniquePreCheck<T extends IBiobankModel> {
 
     private static final String HQL =
         "SELECT COUNT(*) FROM {0} o WHERE ({1}) = ({2}) {3}"; //$NON-NLS-1$
@@ -38,9 +38,13 @@ public class UniquePreCheck<T extends IBiobankModel> extends ActionCheck<T> {
 
     protected final Collection<ValueProperty<T>> valueProperties;
 
-    public UniquePreCheck(ValueProperty<T> idProperty, Class<T> modelClass,
+    protected Class<T> modelClass;
+    private final Integer id;
+
+    public UniquePreCheck(Class<T> modelClass, Integer id,
         Collection<ValueProperty<T>> valueProperties) {
-        super(idProperty, modelClass);
+        this.modelClass = modelClass;
+        this.id = id;
         this.valueProperties = valueProperties;
     }
 
@@ -102,15 +106,13 @@ public class UniquePreCheck<T extends IBiobankModel> extends ActionCheck<T> {
     }
 
     private String getNotSelfCondition() {
-        String idCheck = ""; //$NON-NLS-1$
+        StringBuffer idCheck = new StringBuffer();
 
-        Integer id = getModelId();
         if (id != null) {
-            String idName = getIdProperty().getName();
-            idCheck = " AND " + idName + " <> " + id; //$NON-NLS-1$ //$NON-NLS-2$
+            idCheck.append(" AND o.id <> ").append(id); //$NON-NLS-1$ 
         }
 
-        return idCheck;
+        return idCheck.toString();
     }
 
     private List<String> getPropertyNames() {

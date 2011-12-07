@@ -32,8 +32,8 @@ public class TestAction extends TestDatabase {
         // biobank-orm jar
         sessionFactory = new Configuration().configure().buildSessionFactory();
         super.setUp();
-        currentUser = appService
-            .doAction(new UserGetAction(AllTests.userLogin)).getUser();
+        currentUser = appService.doAction(
+            new UserGetAction(AllTests.userLogin)).getUser();
     }
 
     /**

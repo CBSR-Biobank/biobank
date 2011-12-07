@@ -152,9 +152,9 @@ public class UserWrapper extends UserBaseWrapper {
     }
 
     public boolean needChangePassword() {
-        if (getNeedChangePwd() == null)
+        if (getNeedPwdChange() == null)
             return false;
-        return getNeedChangePwd();
+        return getNeedPwdChange();
     }
 
     /**
@@ -193,8 +193,8 @@ public class UserWrapper extends UserBaseWrapper {
                     .isUserLockedOut(getCsmUserId());
             } catch (ApplicationException e) {
                 // TODO log error ?
-                lockedOut = false;
-            }
+            lockedOut = false;
+        }
         if (lockedOut == null)
             return false;
         return lockedOut;
@@ -230,7 +230,7 @@ public class UserWrapper extends UserBaseWrapper {
     @Override
     public UserWrapper createDuplicate() {
         UserWrapper newUser = new UserWrapper(appService);
-        newUser.setBulkEmails(getBulkEmails());
+        newUser.setRecvBulkEmails(getRecvBulkEmails());
         return newUser;
     }
 

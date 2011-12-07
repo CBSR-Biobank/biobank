@@ -151,8 +151,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
             CollectionEventPeer.PATIENT.to(PatientPeer.ID), patientId));
         propUple.add(new ValueProperty<CollectionEvent>(
             CollectionEventPeer.VISIT_NUMBER, visitNumber));
-        new UniquePreCheck<CollectionEvent>(new ValueProperty<CollectionEvent>(
-            CollectionEventPeer.ID, ceventId), CollectionEvent.class,
+        new UniquePreCheck<CollectionEvent>(CollectionEvent.class, ceventId,
             propUple).run(user, session);
     }
 

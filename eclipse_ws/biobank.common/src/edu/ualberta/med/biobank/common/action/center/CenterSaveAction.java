@@ -82,17 +82,15 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         List<ValueProperty<Center>> uniqueValProps =
             new ArrayList<ValueProperty<Center>>();
         uniqueValProps.add(new ValueProperty<Center>(CenterPeer.NAME, name));
-        new UniquePreCheck<Center>(
-            new ValueProperty<Center>(CenterPeer.ID, centerId), Center.class,
-            uniqueValProps).run(user, session);
+        new UniquePreCheck<Center>(Center.class, centerId, uniqueValProps).run(
+            user, session);
 
         // check for duplicate name short
         uniqueValProps = new ArrayList<ValueProperty<Center>>();
         uniqueValProps.add(new ValueProperty<Center>(CenterPeer.NAME_SHORT,
             nameShort));
-        new UniquePreCheck<Center>(
-            new ValueProperty<Center>(CenterPeer.ID, centerId), Center.class,
-            uniqueValProps).run(user, session);
+        new UniquePreCheck<Center>(Center.class, centerId, uniqueValProps).run(
+            user, session);
 
         // TODO: check permission? (can edit site?)
 

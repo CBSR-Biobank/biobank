@@ -83,8 +83,7 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
 
         // check worksheet number unique. Can't set it as a database constraint
         // since imported pevent can have a null worksheet:
-        new UniquePreCheck<ProcessingEvent>(new ValueProperty<ProcessingEvent>(
-            ProcessingEventPeer.ID, peventId), ProcessingEvent.class,
+        new UniquePreCheck<ProcessingEvent>(ProcessingEvent.class, peventId,
             Arrays.asList(new ValueProperty<ProcessingEvent>(
                 ProcessingEventPeer.WORKSHEET, worksheet))).run(user, session);
 

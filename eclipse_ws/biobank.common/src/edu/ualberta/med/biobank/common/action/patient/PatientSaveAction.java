@@ -51,8 +51,7 @@ public class PatientSaveAction implements Action<IdResult> {
     @Override
     public IdResult run(User user, Session session) throws ActionException {
         // checks pnumber unique to send a proper message:
-        new UniquePreCheck<Patient>(new ValueProperty<Patient>(
-            PatientPeer.ID, patientId), Patient.class,
+        new UniquePreCheck<Patient>(Patient.class, patientId,
             Arrays.asList(new ValueProperty<Patient>(PatientPeer.PNUMBER,
                 pnumber))).run(user, session);
 
