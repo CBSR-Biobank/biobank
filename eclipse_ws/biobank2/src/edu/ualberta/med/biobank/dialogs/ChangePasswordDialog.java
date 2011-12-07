@@ -106,7 +106,8 @@ public class ChangePasswordDialog extends BgcBaseDialog {
             checkBulk = new Button(contents, SWT.CHECK);
             checkBulk
                 .setText(Messages.ChangePasswordDialog_receive_email_check);
-            checkBulk.setSelection(SessionManager.getUser().getBulkEmails());
+            checkBulk
+                .setSelection(SessionManager.getUser().getRecvBulkEmails());
         }
     }
 

@@ -10,6 +10,7 @@ import java.util.Set;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
@@ -148,10 +149,8 @@ public class StudySaveAction implements Action<IdResult> {
         study.setId(id);
         study.setName(name);
         study.setNameShort(nameShort);
-
-        ActivityStatus aStatus =
-            sessionUtil.load(ActivityStatus.class, aStatusId);
-        study.setActivityStatus(aStatus);
+        study.setActivityStatus(ActionUtil.sessionGet(
+            session, ActivityStatus.class, aStatusId));
 
         saveContacts();
         saveSourceSpecimens();

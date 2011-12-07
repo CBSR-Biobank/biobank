@@ -6,25 +6,35 @@ import java.util.Set;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.common.peer.MembershipPeer;
 import edu.ualberta.med.biobank.common.util.SetDifference;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Membership;
+import edu.ualberta.med.biobank.model.Permission;
 import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
 public class MembershipSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
+    private Integer membershipId;
     private Set<Integer> roleIds;
     private Set<Integer> permissionIds;
-    private Set<Integer> centerIds;
-    private Set<Integer> studyIds;
+    private Integer centerId;
+    private Integer studyId;
     private Session session = null;
     private SessionUtil sessionUtil = null;
     private Membership membership = null;
+
+    public void setId(Integer id) {
+        this.membershipId = id;
+    }
 
     public void setRoleIds(Set<Integer> roleIds) {
         this.roleIds = roleIds;
@@ -34,12 +44,12 @@ public class MembershipSaveAction implements Action<IdResult> {
         this.permissionIds = permissionIds;
     }
 
-    public void setCenterIds(Set<Integer> centerIds) {
-        this.centerIds = centerIds;
+    public void setCenterId(Integer centerId) {
+        this.centerId = centerId;
     }
 
-    public void setStudyIds(Set<Integer> studyIds) {
-        this.studyIds = studyIds;
+    public void setStudyId(Integer studyId) {
+        this.studyId = studyId;
     }
 
     @Override
@@ -57,31 +67,55 @@ public class MembershipSaveAction implements Action<IdResult> {
             throw new NullPropertyException(Membership.class,
                 "permission ids cannot be null");
         }
-        if (centerIds == null) {
+        if (centerId == null) {
             throw new NullPropertyException(Membership.class,
-                "center ids cannot be null");
+                MembershipPeer.CENTER);
         }
-        if (studyIds == null) {
+        if (studyId == null) {
             throw new NullPropertyException(Membership.class,
-                "study ids cannot be null");
+                MembershipPeer.STUDY);
         }
 
         this.session = session;
         sessionUtil = new SessionUtil(session);
 
-        return null;
+        membership = sessionUtil.get(
+            Membership.class, membershipId, new Membership());
+        membership.setCenter(ActionUtil.sessionGet(
+            session, Center.class, centerId));
+        membership.setStudy(ActionUtil.sessionGet(
+            session, Study.class, studyId));
+
+        saveRoles();
+        savePermissions();
+
+        session.saveOrUpdate(membership);
+        session.flush();
+
+        return new IdResult(membership.getId());
     }
 
-    private saveRoles() {
-        // delete source specimens no longer in use
+    /*
+     * Membership to Role association is unidirectional.
+     */
+    private void saveRoles() {
         Map<Integer, Role> roles = sessionUtil.load(Role.class, roleIds);
 
         SetDifference<Role> rolesDiff = new SetDifference<Role>(
             membership.getRoleCollection(), roles.values());
         membership.setRoleCollection(rolesDiff.getAddSet());
-        for (Role srcSpc : rolesDiff.getRemoveSet()) {
-            session.delete(srcSpc);
-        }
+    }
 
+    /*
+     * Membership to Permission association is unidirectional.
+     */
+    private void savePermissions() {
+        Map<Integer, Permission> permissions =
+            sessionUtil.load(Permission.class, permissionIds);
+
+        SetDifference<Permission> permissionsDiff =
+            new SetDifference<Permission>(
+                membership.getPermissionCollection(), permissions.values());
+        membership.setPermissionCollection(permissionsDiff.getAddSet());
     }
 }
