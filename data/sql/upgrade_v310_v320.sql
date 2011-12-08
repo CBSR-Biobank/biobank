@@ -53,6 +53,7 @@ or protection_element_name = 'edu.ualberta.med.biobank.model.Comment';
 CREATE TABLE `bb_group` (
   `PRINCIPAL_ID` int(11) NOT NULL,
   `NAME` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  `DESCRIPTION` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '',
   PRIMARY KEY (`PRINCIPAL_ID`),
   KEY `FK119439A0FF154DAF` (`PRINCIPAL_ID`),
   CONSTRAINT `FK119439A0FF154DAF` FOREIGN KEY (`PRINCIPAL_ID`) REFERENCES `principal` (`ID`)
@@ -140,21 +141,27 @@ CREATE TABLE `user` (
   `PRINCIPAL_ID` int(11) NOT NULL,
   `LOGIN` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
   `CSM_USER_ID` bigint(20) DEFAULT NULL,
-  `BULK_EMAILS` bit(1) DEFAULT NULL,
+  `RECV_BULK_EMAILS` bit(1) DEFAULT NULL,
   `FULL_NAME` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
   `EMAIL` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  `NEED_CHANGE_PWD` bit(1) DEFAULT NULL,
+  `NEED_PWD_CHANGE` bit(1) DEFAULT NULL,
+  `ACTIVITY_STATUS_ID` int(11) NOT NULL,
   PRIMARY KEY (`PRINCIPAL_ID`),
   KEY `FK27E3CBFF154DAF` (`PRINCIPAL_ID`),
+  KEY `FK27E3CBC449A4` (`ACTIVITY_STATUS_ID`),
+  CONSTRAINT `FK27E3CBC449A4` FOREIGN KEY (`ACTIVITY_STATUS_ID`) REFERENCES `activity_status` (`ID`),
   CONSTRAINT `FK27E3CBFF154DAF` FOREIGN KEY (`PRINCIPAL_ID`) REFERENCES `principal` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-
 
 -- add 'Unknown user' which is used in upgrade scripts
 insert into principal (id, version) values (1,0);
 
-insert into user (principal_id, login, csm_user_id, bulk_emails, full_name, email, need_change_pwd)
-values (1, 'Unknown user', -1, 0, '', '', 0);
+set @asactive = null;
+
+select id from activity_status where name='Active' into @asactive;
+
+insert into user (principal_id, login, csm_user_id, recv_bulk_emails, full_name, email, need_pwd_change,activity_status_id)
+values (1, 'Unknown user', -1, 0, '', '', 0, @asactive);
 
 -- -----------------------------------------------------------------------
 --
