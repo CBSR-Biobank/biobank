@@ -19,7 +19,7 @@ public class TableItem<E> extends AbstractListField<E> {
         new ListChangeHandler<E>() {
             @Override
             public void onListChange(ListChangeEvent<E> event) {
-                setElements(table.getList(), true);
+                setElementsInternal(table.getList());
             }
         };
     private AbstractInfoTableWidget<E> table;
@@ -28,12 +28,12 @@ public class TableItem<E> extends AbstractListField<E> {
         unbindOldTable();
 
         this.table = table;
-        update();
+        updateGui();
         table.addListChangeHandler(listChangeHandler);
     }
 
     @Override
-    protected void update() {
+    protected void updateGui() {
         if (table != null) {
             table.removeListChangeHandler(listChangeHandler);
 

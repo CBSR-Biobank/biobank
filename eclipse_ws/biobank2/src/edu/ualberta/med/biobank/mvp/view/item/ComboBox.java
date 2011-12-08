@@ -31,7 +31,7 @@ public class ComboBox<T> extends AbstractValueField<T>
         new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
-                setValue(getSelectedValue(), true);
+                setValueInternal(getSelectedValue());
             }
         };
     private ComboViewer comboViewer;
@@ -46,14 +46,14 @@ public class ComboBox<T> extends AbstractValueField<T>
         comboViewer.setLabelProvider(new CustomLabelProvider());
         setOptions(options);
 
-        update();
+        updateGui();
 
         comboViewer.addSelectionChangedListener(selectionListener);
         disableMouseWheel();
     }
 
     @Override
-    protected void update() {
+    protected void updateGui() {
         if (comboViewer != null) {
             Display display = comboViewer.getCombo().getDisplay();
             display.asyncExec(new Update());
@@ -133,6 +133,7 @@ public class ComboBox<T> extends AbstractValueField<T>
         public void run() {
             if (comboViewer != null && !comboViewer.getCombo().isDisposed()) {
                 comboViewer.setInput(options);
+                comboViewer.refresh();
 
                 if (hasIllegalValue()) {
                     setValue(null, true);

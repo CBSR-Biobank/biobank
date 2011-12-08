@@ -12,7 +12,7 @@ public class CheckBox extends AbstractValueField<Boolean> {
         @Override
         public void widgetSelected(SelectionEvent e) {
             boolean value = button.getSelection();
-            setValue(value, true);
+            setValueInternal(value);
         }
     };
     private Button button;
@@ -29,7 +29,7 @@ public class CheckBox extends AbstractValueField<Boolean> {
         unbindOldButton();
 
         this.button = button;
-        update();
+        updateGui();
 
         forwardEnabled(button);
         forwardVisible(button);
@@ -39,7 +39,7 @@ public class CheckBox extends AbstractValueField<Boolean> {
     }
 
     @Override
-    protected void update() {
+    protected void updateGui() {
         if (button != null) {
             button.removeSelectionListener(selectionListener);
 

@@ -20,6 +20,16 @@ public abstract class AbstractListField<E> extends AbstractValidationField
     private final List<E> unmodifiableList = Collections.unmodifiableList(list);
 
     @Override
+    public HandlerRegistration addListChangeHandler(ListChangeHandler<E> handler) {
+        return handlerManager.addHandler(ListChangeEvent.getType(), handler);
+    }
+
+    @Override
+    public void fireEvent(GwtEvent<?> event) {
+        handlerManager.fireEvent(event);
+    }
+
+    @Override
     public List<E> asUnmodifiableList() {
         return unmodifiableList;
     }
@@ -31,29 +41,30 @@ public abstract class AbstractListField<E> extends AbstractValidationField
 
     @Override
     public void setElements(Collection<? extends E> elements, boolean fireEvents) {
-        list.clear();
-        list.addAll(elements);
-
-        update();
-
-        if (fireEvents) {
-            fireEvent(new ListChangeEvent<E>(this));
-        }
+        setElements(elements, fireEvents, true);
     }
 
-    @Override
-    public HandlerRegistration addListChangeHandler(ListChangeHandler<E> handler) {
-        return handlerManager.addHandler(ListChangeEvent.getType(), handler);
-    }
-
-    @Override
-    public void fireEvent(GwtEvent<?> event) {
-        handlerManager.fireEvent(event);
+    protected void setElementsInternal(Collection<? extends E> elements) {
+        setElements(elements, true, false);
     }
 
     /**
      * Update the GUI's value to match {@link #asUnmodifiableList()}. Do so
      * without firing any events.
      */
-    protected abstract void update();
+    protected abstract void updateGui();
+
+    private synchronized void setElements(Collection<? extends E> elements,
+        boolean fireEvents, boolean updateGui) {
+        list.clear();
+        list.addAll(elements);
+
+        if (updateGui) {
+            updateGui();
+        }
+
+        if (fireEvents) {
+            fireEvent(new ListChangeEvent<E>(this));
+        }
+    }
 }
