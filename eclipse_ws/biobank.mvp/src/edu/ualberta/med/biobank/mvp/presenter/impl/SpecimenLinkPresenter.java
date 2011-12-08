@@ -15,8 +15,8 @@ import com.pietschy.gwt.pectin.client.form.validation.Validator;
 import com.pietschy.gwt.pectin.client.form.validation.message.ErrorMessage;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
-import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetListAction;
-import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetListResult;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetProcessingEventsByPNumberResult;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetProcessingEventsByPNumberAction;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -116,8 +116,8 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
             Integer centerId = appContext.getWorkingCenterId();
 
             dispatcher.asyncExec(
-                new ProcessingEventGetListAction(pNumber, centerId),
-                new ActionCallback<ProcessingEventGetListResult>() {
+                new PatientGetProcessingEventsByPNumberAction(pNumber, centerId),
+                new ActionCallback<PatientGetProcessingEventsByPNumberResult>() {
                     @Override
                     public void onFailure(Throwable caught) {
                         processingEvents = Collections.emptyList();
@@ -129,7 +129,7 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
                     }
 
                     @Override
-                    public void onSuccess(ProcessingEventGetListResult result) {
+                    public void onSuccess(PatientGetProcessingEventsByPNumberResult result) {
                         processingEvents = result.getProcessingEvents();
                         patientExists = result.isPatientExists();
 
