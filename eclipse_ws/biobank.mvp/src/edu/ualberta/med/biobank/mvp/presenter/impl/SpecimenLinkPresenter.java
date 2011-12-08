@@ -154,8 +154,8 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
         List<ProcessingEvent> options = new ArrayList<ProcessingEvent>();
         options.addAll(processingEvents);
 
-        if (view.isRecentProcessingEvent().getValue()) {
-            PredicateUtil.filterOut(processingEvents, new PEventOver7DaysOld());
+        if (Boolean.TRUE.equals(view.isRecentProcessingEvent().getValue())) {
+            PredicateUtil.filterOut(options, new PEventOver7DaysOld());
         }
 
         view.getProcessingEvent().setOptions(options);
