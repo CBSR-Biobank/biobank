@@ -15,8 +15,8 @@ import com.pietschy.gwt.pectin.client.form.validation.Validator;
 import com.pietschy.gwt.pectin.client.form.validation.message.ErrorMessage;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
-import edu.ualberta.med.biobank.common.action.patient.PatientGetProcessingEventsByPNumberResult;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetProcessingEventsByPNumberAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetProcessingEventsByPNumberResult;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.mvp.AppContext;
 import edu.ualberta.med.biobank.mvp.action.StaleSafeDispatcher;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
-import edu.ualberta.med.biobank.mvp.event.impl.DelayedValueChangeHandler.Delayed500MsValueChangeHandler;
+import edu.ualberta.med.biobank.mvp.event.impl.DelayedValueChangeHandler;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SpecimenLinkPresenter.View;
 import edu.ualberta.med.biobank.mvp.presenter.validation.ValueValidation;
 import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotNullValidator;
@@ -109,33 +109,40 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
         // TODO Auto-generated method stub
     }
 
-    private class PNumberMonitor extends Delayed500MsValueChangeHandler<String> {
+    private class PNumberMonitor extends DelayedValueChangeHandler<String> {
+        public PNumberMonitor() {
+            super(500);
+        }
+
         @Override
         public void onDelayedValueChange(ValueChangeEvent<String> event) {
             String pNumber = event.getValue();
             Integer centerId = appContext.getWorkingCenterId();
 
-            dispatcher.asyncExec(
-                new PatientGetProcessingEventsByPNumberAction(pNumber, centerId),
-                new ActionCallback<PatientGetProcessingEventsByPNumberResult>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                        processingEvents = Collections.emptyList();
-                        patientExists = false;
+            dispatcher
+                .asyncExec(
+                    new PatientGetProcessingEventsByPNumberAction(pNumber,
+                        centerId),
+                    new ActionCallback<PatientGetProcessingEventsByPNumberResult>() {
+                        @Override
+                        public void onFailure(Throwable caught) {
+                            processingEvents = Collections.emptyList();
+                            patientExists = false;
 
-                        update();
+                            update();
 
-                        eventBus.fireEvent(new ExceptionEvent(caught));
-                    }
+                            eventBus.fireEvent(new ExceptionEvent(caught));
+                        }
 
-                    @Override
-                    public void onSuccess(PatientGetProcessingEventsByPNumberResult result) {
-                        processingEvents = result.getProcessingEvents();
-                        patientExists = result.isPatientExists();
+                        @Override
+                        public void onSuccess(
+                            PatientGetProcessingEventsByPNumberResult result) {
+                            processingEvents = result.getProcessingEvents();
+                            patientExists = result.isPatientExists();
 
-                        update();
-                    }
-                });
+                            update();
+                        }
+                    });
         }
 
         private void update() {
@@ -169,7 +176,11 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
     }
 
     private class PEventMonitor extends
-        Delayed500MsValueChangeHandler<ProcessingEvent> {
+        DelayedValueChangeHandler<ProcessingEvent> {
+        public PEventMonitor() {
+            super(500);
+        }
+
         @Override
         public void onDelayedValueChange(ValueChangeEvent<ProcessingEvent> event) {
             // TODO: run async thing to update collection visit options
@@ -177,7 +188,11 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
     }
 
     private class CEventMonitor extends
-        Delayed500MsValueChangeHandler<CollectionEvent> {
+        DelayedValueChangeHandler<CollectionEvent> {
+        public CEventMonitor() {
+            super(500);
+        }
+
         @Override
         public void onDelayedValueChange(ValueChangeEvent<CollectionEvent> event) {
             // TODO: update source-specimen list on all views.

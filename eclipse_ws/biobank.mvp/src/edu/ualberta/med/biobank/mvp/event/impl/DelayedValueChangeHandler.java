@@ -55,13 +55,6 @@ public abstract class DelayedValueChangeHandler<T> implements
      */
     protected abstract void onDelayedValueChange(ValueChangeEvent<T> event);
 
-    public abstract static class Delayed500MsValueChangeHandler<T> extends
-        DelayedValueChangeHandler<T> {
-        public Delayed500MsValueChangeHandler() {
-            super(500);
-        }
-    }
-
     private class DelayedEventRunnable implements Runnable {
         private ValueChangeEvent<T> event;
 
