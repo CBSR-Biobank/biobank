@@ -32,7 +32,8 @@ public class PatientGetProcessingEventsByPNumberAction implements
     private final String pNumber;
     private final Integer centerId;
 
-    public PatientGetProcessingEventsByPNumberAction(String pNumber, Integer centerId) {
+    public PatientGetProcessingEventsByPNumberAction(String pNumber,
+        Integer centerId) {
         this.pNumber = pNumber;
         this.centerId = centerId;
     }
@@ -43,7 +44,8 @@ public class PatientGetProcessingEventsByPNumberAction implements
     }
 
     @Override
-    public PatientGetProcessingEventsByPNumberResult run(User user, Session session)
+    public PatientGetProcessingEventsByPNumberResult run(User user,
+        Session session)
         throws ActionException {
 
         boolean exists = isPatientExists(session);
