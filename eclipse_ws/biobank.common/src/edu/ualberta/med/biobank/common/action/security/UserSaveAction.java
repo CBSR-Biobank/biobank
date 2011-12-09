@@ -1,7 +1,10 @@
 package edu.ualberta.med.biobank.common.action.security;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.Session;
 
@@ -12,7 +15,9 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
+import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.BbGroup;
 import edu.ualberta.med.biobank.model.User;
 
 public class UserSaveAction extends PrincipalSaveAction {
@@ -26,6 +31,8 @@ public class UserSaveAction extends PrincipalSaveAction {
     private String email;
     private Boolean needPwdChange;
     private Integer aStatusId;
+    private Set<Integer> groupIds;
+    private User newUser;
 
     public void setLogin(String login) {
         this.login = login;
@@ -55,6 +62,10 @@ public class UserSaveAction extends PrincipalSaveAction {
         this.aStatusId = activityStatusId;
     }
 
+    public void setGroupIds(Set<Integer> groupIds) {
+        this.groupIds = groupIds;
+    }
+
     @Override
     public IdResult run(User user, Session session) throws ActionException {
         if (login == null) {
@@ -80,6 +91,9 @@ public class UserSaveAction extends PrincipalSaveAction {
         if (aStatusId == null) {
             throw new NullPropertyException(User.class, "activity status id");
         }
+        if (groupIds == null) {
+            throw new NullPropertyException(User.class, "group ids");
+        }
 
         SessionUtil sessionUtil = new SessionUtil(session);
 
@@ -104,7 +118,7 @@ public class UserSaveAction extends PrincipalSaveAction {
         new UniquePreCheck<User>(User.class, principalId, uniqueValProps).run(
             user, session);
 
-        User newUser =
+        newUser =
             sessionUtil.get(User.class, principalId, new User());
 
         newUser.setLogin(login);
@@ -118,6 +132,29 @@ public class UserSaveAction extends PrincipalSaveAction {
             sessionUtil.load(ActivityStatus.class, aStatusId);
         newUser.setActivityStatus(aStatus);
 
+        saveGroups();
+
         return run(user, session, newUser);
+    }
+
+    private void saveGroups() {
+        Map<Integer, BbGroup> groups =
+            sessionUtil.load(BbGroup.class, groupIds);
+
+        SetDifference<BbGroup> groupsDiff =
+            new SetDifference<BbGroup>(newUser.getGroupCollection(),
+                groups.values());
+        newUser.setGroupCollection(groupsDiff.getNewSet());
+
+        // remove newUser from groups in removed list
+        for (BbGroup group : groupsDiff.getRemoveSet()) {
+            Collection<User> groupUsers = group.getUserCollection();
+            if (groupUsers.remove(newUser)) {
+                group.setUserCollection(groupUsers);
+            } else {
+                throw new ActionException(
+                    "user not found in group's collection");
+            }
+        }
     }
 }

@@ -18,6 +18,8 @@ import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecimenSaveInfo;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
@@ -51,7 +53,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         ListField<AliquotedSpecimen> getAliquotedSpecimens();
 
-        // TODO: add study event attributes
+        // ListField<StudyEventAttr> getAliquotedSpecimens();
     }
 
     @Inject
@@ -103,9 +105,32 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         saveStudy.setNameShort(view.getNameShort().getValue());
         saveStudy.setActivityStatusId(getActivityStatusId());
         saveStudy.setContactIds(getContactIds());
-        saveStudy.setSourceSpcIds(getSourceSpecimenIds());
-        saveStudy.setAliquotSpcIds(getAliquotedSepcimenIds());
-        saveStudy.setStudyEventAttrIds(getStudyEventAttrIds());
+
+        Set<SourceSpecimenSaveInfo> ssSaveInfos =
+            new HashSet<SourceSpecimenSaveInfo>();
+        for (SourceSpecimen ss : view.getSourceSpecimens().asUnmodifiableList()) {
+            SourceSpecimenSaveInfo ssSaveInfo = new SourceSpecimenSaveInfo();
+            ssSaveInfo.id = ss.getId();
+            ssSaveInfo.needOriginalVolume = ss.getNeedOriginalVolume();
+            ssSaveInfo.specimenTypeId = ss.getSpecimenType().getId();
+        }
+
+        Set<AliquotedSpecimenSaveInfo> asSaveInfos =
+            new HashSet<AliquotedSpecimenSaveInfo>();
+        for (AliquotedSpecimen as : view.getAliquotedSpecimens()
+            .asUnmodifiableList()) {
+            AliquotedSpecimenSaveInfo asSaveInfo =
+                new AliquotedSpecimenSaveInfo();
+            asSaveInfo.id = as.getId();
+            asSaveInfo.quantity = as.getQuantity();
+            asSaveInfo.volume = as.getVolume();
+            asSaveInfo.aStatusId = as.getActivityStatus().getId();
+            asSaveInfo.specimenTypeId = as.getSpecimenType().getId();
+        }
+
+        saveStudy.setSourceSpecimenSaveInfo(ssSaveInfos);
+        saveStudy.setAliquotSpecimenSaveInfo(asSaveInfos);
+        // saveStudy.setStudyEventAttrIds(getStudyEventAttrIds());
 
         dispatcher.exec(saveStudy, new ActionCallback<IdResult>() {
             @Override

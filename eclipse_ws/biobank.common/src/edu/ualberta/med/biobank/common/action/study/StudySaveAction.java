@@ -10,6 +10,7 @@ import java.util.Set;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
@@ -25,8 +26,10 @@ import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
@@ -34,15 +37,43 @@ import edu.ualberta.med.biobank.model.User;
 public class StudySaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
+    public static class SourceSpecimenSaveInfo implements ActionResult {
+        private static final long serialVersionUID = 1L;
+
+        public Integer id = null;
+        public Boolean needOriginalVolume;
+        public Integer specimenTypeId;
+    }
+
+    public static class AliquotedSpecimenSaveInfo implements ActionResult {
+        private static final long serialVersionUID = 1L;
+
+        public Integer id = null;
+        public Integer quantity;
+        public Double volume;
+        public Integer aStatusId;
+        public Integer specimenTypeId;
+    }
+
+    public static class StudyEventAttrSaveInfo implements ActionResult {
+        private static final long serialVersionUID = 1L;
+
+        public Integer id = null;
+        public Integer globalEventAttrId;
+        public Boolean required;
+        public String permissible;
+        public Integer aStatusId;
+    }
+
     private Integer id = null;
     private String name;
     private String nameShort;
     private Integer aStatusId;
     private Set<Integer> siteIds;
     private Set<Integer> contactIds;
-    private Set<Integer> sourceSpcIds;
-    private Set<Integer> aliquotSpcIds;
-    private Set<Integer> studyEventAttrIds;
+    private Collection<SourceSpecimenSaveInfo> sourceSpecimenSaveInfo;
+    private Collection<AliquotedSpecimenSaveInfo> aliquotSpecimenSaveInfo;
+    private Collection<StudyEventAttrSaveInfo> studyEventAttrSaveInfo;
     private Session session = null;
     private SessionUtil sessionUtil = null;
     private Study study = null;
@@ -71,16 +102,19 @@ public class StudySaveAction implements Action<IdResult> {
         this.contactIds = contactIds;
     }
 
-    public void setSourceSpcIds(Set<Integer> sourceSpcIds) {
-        this.sourceSpcIds = sourceSpcIds;
+    public void setSourceSpecimenSaveInfo(
+        Collection<SourceSpecimenSaveInfo> sourceSpecimenSaveInfo) {
+        this.sourceSpecimenSaveInfo = sourceSpecimenSaveInfo;
     }
 
-    public void setAliquotSpcIds(Set<Integer> aliquotSpcIds) {
-        this.aliquotSpcIds = aliquotSpcIds;
+    public void setAliquotSpecimenSaveInfo(
+        Collection<AliquotedSpecimenSaveInfo> aliquotSpecimenSaveInfo) {
+        this.aliquotSpecimenSaveInfo = aliquotSpecimenSaveInfo;
     }
 
-    public void setStudyEventAttrIds(Set<Integer> attrIds) {
-        this.studyEventAttrIds = attrIds;
+    public void setStudyEventAttrSaveInfo(
+        Collection<StudyEventAttrSaveInfo> studyEventAttrSaveInfo) {
+        this.studyEventAttrSaveInfo = studyEventAttrSaveInfo;
     }
 
     @Override
@@ -112,15 +146,15 @@ public class StudySaveAction implements Action<IdResult> {
             throw new NullPropertyException(Study.class,
                 "contact ids cannot be null");
         }
-        if (sourceSpcIds == null) {
+        if (sourceSpecimenSaveInfo == null) {
             throw new NullPropertyException(Study.class,
                 "specimen ids cannot be null");
         }
-        if (aliquotSpcIds == null) {
+        if (aliquotSpecimenSaveInfo == null) {
             throw new NullPropertyException(Study.class,
                 "aliquot ids cannot be null");
         }
-        if (studyEventAttrIds == null) {
+        if (studyEventAttrSaveInfo == null) {
             throw new NullPropertyException(Study.class,
                 "aliquot ids cannot be null");
         }
@@ -143,7 +177,6 @@ public class StudySaveAction implements Action<IdResult> {
         new UniquePreCheck<Study>(Study.class, id, uniqueValProps).run(user,
             session);
 
-        // TODO: check permission? (can edit site?)
         // TODO: version check?
 
         study.setId(id);
@@ -152,6 +185,7 @@ public class StudySaveAction implements Action<IdResult> {
         study.setActivityStatus(ActionUtil.sessionGet(
             session, ActivityStatus.class, aStatusId));
 
+        saveSites();
         saveContacts();
         saveSourceSpecimens();
         saveAliquotedSpecimens();
@@ -163,7 +197,7 @@ public class StudySaveAction implements Action<IdResult> {
         return new IdResult(study.getId());
     }
 
-    private void saveContacts() {
+    private void saveSites() {
         Map<Integer, Site> sites = sessionUtil.load(Site.class, siteIds);
 
         SetDifference<Site> sitesDiff =
@@ -181,7 +215,9 @@ public class StudySaveAction implements Action<IdResult> {
                     "study not found in removed site's collection");
             }
         }
+    }
 
+    private void saveContacts() {
         Map<Integer, Contact> contacts =
             sessionUtil.load(Contact.class, contactIds);
         study.setContactCollection(new HashSet<Contact>(contacts.values()));
@@ -208,14 +244,27 @@ public class StudySaveAction implements Action<IdResult> {
     }
 
     private void saveSourceSpecimens() {
-        // delete source specimens no longer in use
-        Map<Integer, SourceSpecimen> sourceSpcs =
-            sessionUtil.load(SourceSpecimen.class, sourceSpcIds);
+        Set<SourceSpecimen> newSsCollection = new HashSet<SourceSpecimen>();
+        for (SourceSpecimenSaveInfo ssSaveInfo : sourceSpecimenSaveInfo) {
+            SourceSpecimen ss;
+            if (ssSaveInfo.id == null) {
+                ss = new SourceSpecimen();
+                ss.setNeedOriginalVolume(ssSaveInfo.needOriginalVolume);
+            } else {
+                ss = ActionUtil.sessionGet(session, SourceSpecimen.class,
+                    ssSaveInfo.id);
+            }
+            ss.setStudy(study);
+            ss.setSpecimenType(ActionUtil.sessionGet(session,
+                SpecimenType.class, ssSaveInfo.specimenTypeId));
+            newSsCollection.add(ss);
+        }
 
+        // delete source specimens no longer in use
         SetDifference<SourceSpecimen> srcSpcsDiff =
             new SetDifference<SourceSpecimen>(
                 study.getSourceSpecimenCollection(),
-                sourceSpcs.values());
+                newSsCollection);
         study.setSourceSpecimenCollection(srcSpcsDiff.getAddSet());
         for (SourceSpecimen srcSpc : srcSpcsDiff.getRemoveSet()) {
             session.delete(srcSpc);
@@ -223,12 +272,30 @@ public class StudySaveAction implements Action<IdResult> {
     }
 
     private void saveAliquotedSpecimens() {
-        Map<Integer, AliquotedSpecimen> aliquotedSpcs =
-            sessionUtil.load(AliquotedSpecimen.class, aliquotSpcIds);
+        Set<AliquotedSpecimen> newAsCollection =
+            new HashSet<AliquotedSpecimen>();
+        for (AliquotedSpecimenSaveInfo asSaveInfo : aliquotSpecimenSaveInfo) {
+            AliquotedSpecimen as;
+            if (asSaveInfo.id == null) {
+                as = new AliquotedSpecimen();
+            } else {
+                as = ActionUtil.sessionGet(session, AliquotedSpecimen.class,
+                    asSaveInfo.id);
+            }
+            as.setStudy(study);
+            as.setQuantity(asSaveInfo.quantity);
+            as.setVolume(asSaveInfo.volume);
+            as.setActivityStatus(ActionUtil.sessionGet(session,
+                ActivityStatus.class, asSaveInfo.aStatusId));
+            as.setSpecimenType(ActionUtil.sessionGet(session,
+                SpecimenType.class, asSaveInfo.specimenTypeId));
+            newAsCollection.add(as);
+        }
+
         SetDifference<AliquotedSpecimen> aqSpcsDiff =
             new SetDifference<AliquotedSpecimen>(
                 study.getAliquotedSpecimenCollection(),
-                aliquotedSpcs.values());
+                newAsCollection);
 
         // delete aliquoted specimens no longer in use
         study.setAliquotedSpecimenCollection(aqSpcsDiff.getAddSet());
@@ -238,12 +305,30 @@ public class StudySaveAction implements Action<IdResult> {
     }
 
     private void saveEventAttributes() {
-        Map<Integer, StudyEventAttr> studyEventAttrs =
-            sessionUtil.load(StudyEventAttr.class, studyEventAttrIds);
+        Set<StudyEventAttr> newEAttrCollection =
+            new HashSet<StudyEventAttr>();
+        for (StudyEventAttrSaveInfo eAttrSaveInfo : studyEventAttrSaveInfo) {
+            StudyEventAttr eAttr;
+            if (eAttrSaveInfo.id == null) {
+                eAttr = new StudyEventAttr();
+            } else {
+                eAttr = ActionUtil.sessionGet(session, StudyEventAttr.class,
+                    eAttrSaveInfo.id);
+            }
+            GlobalEventAttr gEAttr = ActionUtil.sessionGet(session,
+                GlobalEventAttr.class, eAttrSaveInfo.globalEventAttrId);
+
+            eAttr.setStudy(study);
+            eAttr.setLabel(gEAttr.getLabel());
+            eAttr.setPermissible(eAttrSaveInfo.permissible);
+            eAttr.setRequired(eAttrSaveInfo.required);
+            newEAttrCollection.add(eAttr);
+        }
+
         SetDifference<StudyEventAttr> attrsDiff =
             new SetDifference<StudyEventAttr>(
                 study.getStudyEventAttrCollection(),
-                studyEventAttrs.values());
+                newEAttrCollection);
 
         study.setStudyEventAttrCollection(attrsDiff.getAddSet());
         for (StudyEventAttr attr : attrsDiff.getRemoveSet()) {

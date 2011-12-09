@@ -24,9 +24,9 @@ public class StudyHelper extends Helper {
         saveAction.setActivityStatusId(activityStatus.getId());
         saveAction.setSiteIds(new HashSet<Integer>());
         saveAction.setContactIds(new HashSet<Integer>());
-        saveAction.setSourceSpcIds(new HashSet<Integer>());
-        saveAction.setAliquotSpcIds(new HashSet<Integer>());
-        saveAction.setStudyEventAttrIds(new HashSet<Integer>());
+        saveAction.setSourceSpecimenSaveInfo(new HashSet<Integer>());
+        saveAction.setAliquotSpecimenSaveInfo(new HashSet<Integer>());
+        saveAction.setStudyEventAttrSaveInfo(new HashSet<Integer>());
         return saveAction;
     }
 
@@ -60,19 +60,19 @@ public class StudyHelper extends Helper {
         for (SourceSpecimen spc : studyInfo.sourceSpcs) {
             ids.add(spc.getId());
         }
-        saveStudy.setSourceSpcIds(ids);
+        saveStudy.setSourceSpecimenSaveInfo(ids);
 
         ids = new HashSet<Integer>();
         for (AliquotedSpecimen spc : studyInfo.aliquotedSpcs) {
             ids.add(spc.getId());
         }
-        saveStudy.setAliquotSpcIds(ids);
+        saveStudy.setAliquotSpecimenSaveInfo(ids);
 
         ids = new HashSet<Integer>();
         for (StudyEventAttr attr : studyInfo.studyEventAttrs) {
             ids.add(attr.getId());
         }
-        saveStudy.setStudyEventAttrIds(ids);
+        saveStudy.setStudyEventAttrSaveInfo(ids);
 
         return saveStudy;
     }

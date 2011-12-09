@@ -125,7 +125,7 @@ public class TestStudy extends TestAction {
 
         saveAction = StudyHelper.getSaveAction(altName, altName,
             ActivityStatusEnum.ACTIVE);
-        saveAction.setSourceSpcIds(null);
+        saveAction.setSourceSpecimenSaveInfo(null);
         try {
             appService.doAction(saveAction);
             Assert.fail(
@@ -136,7 +136,7 @@ public class TestStudy extends TestAction {
 
         saveAction = StudyHelper.getSaveAction(altName, altName,
             ActivityStatusEnum.ACTIVE);
-        saveAction.setAliquotSpcIds(null);
+        saveAction.setAliquotSpecimenSaveInfo(null);
         try {
             appService.doAction(saveAction);
             Assert.fail(
@@ -147,7 +147,7 @@ public class TestStudy extends TestAction {
 
         saveAction = StudyHelper.getSaveAction(altName, altName,
             ActivityStatusEnum.ACTIVE);
-        saveAction.setStudyEventAttrIds(null);
+        saveAction.setStudyEventAttrSaveInfo(null);
         try {
             appService.doAction(saveAction);
             Assert.fail(
@@ -392,7 +392,7 @@ public class TestStudy extends TestAction {
         // remove Set 2 from the study, Set 1 should be left
         StudySaveAction studySave =
             StudyHelper.getSaveAction(appService, studyInfo);
-        studySave.setSourceSpcIds(set1);
+        studySave.setSourceSpecimenSaveInfo(set1);
         appService.doAction(studySave);
 
         studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
@@ -400,7 +400,7 @@ public class TestStudy extends TestAction {
 
         // remove all
         studySave = StudyHelper.getSaveAction(appService, studyInfo);
-        studySave.setSourceSpcIds(new HashSet<Integer>());
+        studySave.setSourceSpecimenSaveInfo(new HashSet<Integer>());
         appService.doAction(studySave);
 
         studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
@@ -474,7 +474,7 @@ public class TestStudy extends TestAction {
         // remove Set 2 from the study, Set 1 should be left
         StudySaveAction studySave =
             StudyHelper.getSaveAction(appService, studyInfo);
-        studySave.setAliquotSpcIds(set1);
+        studySave.setAliquotSpecimenSaveInfo(set1);
         appService.doAction(studySave);
 
         studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
@@ -482,7 +482,7 @@ public class TestStudy extends TestAction {
 
         // remove all
         studySave = StudyHelper.getSaveAction(appService, studyInfo);
-        studySave.setAliquotSpcIds(new HashSet<Integer>());
+        studySave.setAliquotSpecimenSaveInfo(new HashSet<Integer>());
         appService.doAction(studySave);
 
         studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
@@ -576,7 +576,7 @@ public class TestStudy extends TestAction {
             idsRemaining.remove(id);
             StudySaveAction studySave =
                 StudyHelper.getSaveAction(appService, studyInfo);
-            studySave.setStudyEventAttrIds(idsRemaining);
+            studySave.setStudyEventAttrSaveInfo(idsRemaining);
             appService.doAction(studySave);
 
             studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
