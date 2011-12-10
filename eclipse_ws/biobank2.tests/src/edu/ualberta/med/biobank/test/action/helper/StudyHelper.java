@@ -1,12 +1,19 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.eventattr.GlobalEventAttrInfo;
+import edu.ualberta.med.biobank.common.action.eventattr.GlobalEventAttrInfoGetAction;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecimenSaveInfo;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction.StudyEventAttrSaveInfo;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
@@ -24,9 +31,12 @@ public class StudyHelper extends Helper {
         saveAction.setActivityStatusId(activityStatus.getId());
         saveAction.setSiteIds(new HashSet<Integer>());
         saveAction.setContactIds(new HashSet<Integer>());
-        saveAction.setSourceSpecimenSaveInfo(new HashSet<Integer>());
-        saveAction.setAliquotSpecimenSaveInfo(new HashSet<Integer>());
-        saveAction.setStudyEventAttrSaveInfo(new HashSet<Integer>());
+        saveAction
+            .setSourceSpecimenSaveInfo(new HashSet<SourceSpecimenSaveInfo>());
+        saveAction
+            .setAliquotSpecimenSaveInfo(new HashSet<AliquotedSpecimenSaveInfo>());
+        saveAction
+            .setStudyEventAttrSaveInfo(new HashSet<StudyEventAttrSaveInfo>());
         return saveAction;
     }
 
@@ -38,7 +48,8 @@ public class StudyHelper extends Helper {
     }
 
     public static StudySaveAction getSaveAction(
-        BiobankApplicationService appService, StudyInfo studyInfo) {
+        BiobankApplicationService appService, StudyInfo studyInfo)
+        throws ApplicationException {
         StudySaveAction saveStudy = new StudySaveAction();
         saveStudy.setId(studyInfo.study.getId());
         saveStudy.setName(studyInfo.study.getName());
@@ -56,23 +67,53 @@ public class StudyHelper extends Helper {
         }
         saveStudy.setContactIds(ids);
 
-        ids = new HashSet<Integer>();
-        for (SourceSpecimen spc : studyInfo.sourceSpcs) {
-            ids.add(spc.getId());
+        Set<SourceSpecimenSaveInfo> ssSaveInfos =
+            new HashSet<SourceSpecimenSaveInfo>();
+        for (SourceSpecimen ss : studyInfo.sourceSpcs) {
+            SourceSpecimenSaveInfo ssSaveInfo = new SourceSpecimenSaveInfo();
+            ssSaveInfo.id = ss.getId();
+            ssSaveInfo.needOriginalVolume = ss.getNeedOriginalVolume();
+            ssSaveInfo.specimenTypeId = ss.getSpecimenType().getId();
+            ssSaveInfos.add(ssSaveInfo);
         }
-        saveStudy.setSourceSpecimenSaveInfo(ids);
+        saveStudy.setSourceSpecimenSaveInfo(ssSaveInfos);
 
-        ids = new HashSet<Integer>();
-        for (AliquotedSpecimen spc : studyInfo.aliquotedSpcs) {
-            ids.add(spc.getId());
+        Set<AliquotedSpecimenSaveInfo> asSaveInfos =
+            new HashSet<AliquotedSpecimenSaveInfo>();
+        for (AliquotedSpecimen as : studyInfo.aliquotedSpcs) {
+            AliquotedSpecimenSaveInfo asSaveInfo =
+                new AliquotedSpecimenSaveInfo();
+            asSaveInfo.id = as.getId();
+            asSaveInfo.quantity = as.getQuantity();
+            asSaveInfo.volume = as.getVolume();
+            asSaveInfo.aStatusId = as.getActivityStatus().getId();
+            asSaveInfo.specimenTypeId = as.getSpecimenType().getId();
+            asSaveInfos.add(asSaveInfo);
         }
-        saveStudy.setAliquotSpecimenSaveInfo(ids);
+        saveStudy.setAliquotSpecimenSaveInfo(asSaveInfos);
 
-        ids = new HashSet<Integer>();
-        for (StudyEventAttr attr : studyInfo.studyEventAttrs) {
-            ids.add(attr.getId());
+        Map<Integer, GlobalEventAttrInfo> globalEattrs =
+            appService.doAction(new GlobalEventAttrInfoGetAction()).getMap();
+        Map<String, GlobalEventAttrInfo> globalEattrsByLabel =
+            new HashMap<String, GlobalEventAttrInfo>();
+        for (GlobalEventAttrInfo gEattr : globalEattrs.values()) {
+            globalEattrsByLabel.put(gEattr.attr.getLabel(), gEattr);
         }
-        saveStudy.setStudyEventAttrSaveInfo(ids);
+
+        Set<StudyEventAttrSaveInfo> eAttrSaveInfos =
+            new HashSet<StudyEventAttrSaveInfo>();
+        for (StudyEventAttr eAttr : studyInfo.studyEventAttrs) {
+            StudyEventAttrSaveInfo eAttrSaveInfo =
+                new StudyEventAttrSaveInfo();
+            eAttrSaveInfo.id = eAttr.getId();
+            eAttrSaveInfo.globalEventAttrId =
+                globalEattrsByLabel.get(eAttr.getLabel()).attr.getId();
+            eAttrSaveInfo.required = eAttr.getRequired();
+            eAttrSaveInfo.permissible = eAttr.getPermissible();
+            eAttrSaveInfo.aStatusId = eAttr.getActivityStatus().getId();
+            eAttrSaveInfos.add(eAttrSaveInfo);
+        }
+        saveStudy.setStudyEventAttrSaveInfo(eAttrSaveInfos);
 
         return saveStudy;
     }

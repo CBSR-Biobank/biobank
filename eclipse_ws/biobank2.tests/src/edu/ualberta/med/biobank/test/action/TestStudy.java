@@ -15,7 +15,6 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
-import edu.ualberta.med.biobank.common.action.aliquotedspecimen.AliquotedSpecimenSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicDeleteAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
@@ -24,12 +23,13 @@ import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
-import edu.ualberta.med.biobank.common.action.sourcespecimen.SourceSpecimenSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyDeleteAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecimenSaveInfo;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
@@ -332,19 +332,21 @@ public class TestStudy extends TestAction {
         return spcTypes;
     }
 
-    private static Set<Integer> addSourceSpecimens(Integer studyId,
+    private static Set<SourceSpecimenSaveInfo> addSourceSpecimens(
+        Integer studyId,
         int numSourceSpecimens, List<SpecimenType> specimenType)
         throws ApplicationException {
-        Set<Integer> result = new HashSet<Integer>();
+        Set<SourceSpecimenSaveInfo> result =
+            new HashSet<SourceSpecimenSaveInfo>();
         for (int i = 0; i < numSourceSpecimens; ++i) {
-            SourceSpecimenSaveAction srcSpcSaveAction =
-                new SourceSpecimenSaveAction();
-            srcSpcSaveAction.setNeedOriginalVolume(r.nextBoolean());
-            srcSpcSaveAction.setStudyId(studyId);
+            SourceSpecimenSaveInfo ssSaveInfo =
+                new SourceSpecimenSaveInfo();
+            ssSaveInfo.id = null;
+            ssSaveInfo.needOriginalVolume = r.nextBoolean();
             SpecimenType spcType =
                 specimenType.get(r.nextInt(specimenType.size()));
-            srcSpcSaveAction.setSpecimenTypeId(spcType.getId());
-            result.add(appService.doAction(srcSpcSaveAction).getId());
+            ssSaveInfo.specimenTypeId = spcType.getId();
+            result.add(ssSaveInfo);
         }
         return result;
     }
@@ -370,24 +372,26 @@ public class TestStudy extends TestAction {
 
     @Test
     public void sourceSpecimens() throws Exception {
-        Set<Integer> idsAll =
+        Set<SourceSpecimenSaveInfo> ssSaveInfosAll =
             addSourceSpecimens(studyId, 10, getSpecimenTypes());
-        Set<Integer> set1 = new HashSet<Integer>();
-        Set<Integer> set2 = new HashSet<Integer>();
+        Set<SourceSpecimenSaveInfo> set1 =
+            new HashSet<SourceSpecimenSaveInfo>();
+        Set<SourceSpecimenSaveInfo> set2 =
+            new HashSet<SourceSpecimenSaveInfo>();
 
         int count = 0;
-        for (Integer id : idsAll) {
+        for (SourceSpecimenSaveInfo ssSaveInfo : ssSaveInfosAll) {
             if (count < 5) {
-                set1.add(id);
+                set1.add(ssSaveInfo);
             } else {
-                set2.add(id);
+                set2.add(ssSaveInfo);
             }
             ++count;
         }
 
         StudyInfo studyInfo =
             appService.doAction(new StudyGetInfoAction(studyId));
-        Assert.assertEquals(idsAll, getSourceSpecimenIds(studyInfo));
+        Assert.assertEquals(ssSaveInfosAll, getSourceSpecimenIds(studyInfo));
 
         // remove Set 2 from the study, Set 1 should be left
         StudySaveAction studySave =
@@ -400,7 +404,8 @@ public class TestStudy extends TestAction {
 
         // remove all
         studySave = StudyHelper.getSaveAction(appService, studyInfo);
-        studySave.setSourceSpecimenSaveInfo(new HashSet<Integer>());
+        studySave
+            .setSourceSpecimenSaveInfo(new HashSet<SourceSpecimenSaveInfo>());
         appService.doAction(studySave);
 
         studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
@@ -410,22 +415,24 @@ public class TestStudy extends TestAction {
         Assert.assertTrue(getSourceSpecimenCount(studyId).equals(0L));
     }
 
-    private static Set<Integer> addAliquotedSpecimens(Integer studyId,
+    private static Set<AliquotedSpecimenSaveInfo> addAliquotedSpecimens(
+        Integer studyId,
         int numAliquotedSpecimens, List<SpecimenType> specimenTypes)
         throws ApplicationException {
-        Set<Integer> result = new HashSet<Integer>();
+        Set<AliquotedSpecimenSaveInfo> result =
+            new HashSet<AliquotedSpecimenSaveInfo>();
         for (int i = 0; i < numAliquotedSpecimens; ++i) {
-            AliquotedSpecimenSaveAction aqSpcSaveAction =
-                new AliquotedSpecimenSaveAction();
-            aqSpcSaveAction.setQuantity(r.nextInt());
-            aqSpcSaveAction.setVolume(r.nextDouble());
-            aqSpcSaveAction.setStudyId(studyId);
-            aqSpcSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE
-                .getId());
-            aqSpcSaveAction.setSpecimenTypeId(specimenTypes.get(
+            AliquotedSpecimenSaveInfo asSaveInfo =
+                new AliquotedSpecimenSaveInfo();
+            asSaveInfo.id = null;
+            asSaveInfo.quantity = r.nextInt();
+            asSaveInfo.volume = r.nextDouble();
+            asSaveInfo.aStatusId = ActivityStatusEnum.ACTIVE
+                .getId();
+            asSaveInfo.specimenTypeId = specimenTypes.get(
                 r.nextInt(specimenTypes.size()))
-                .getId());
-            result.add(appService.doAction(aqSpcSaveAction).getId());
+                .getId();
+            result.add(asSaveInfo);
         }
         return result;
 
@@ -452,13 +459,15 @@ public class TestStudy extends TestAction {
 
     @Test
     public void aliquotedSpecimens() throws Exception {
-        Set<Integer> idsAll =
+        Set<AliquotedSpecimenSaveInfo> asSaveInfosAll =
             addAliquotedSpecimens(studyId, 10, getSpecimenTypes());
-        Set<Integer> set1 = new HashSet<Integer>();
-        Set<Integer> set2 = new HashSet<Integer>();
+        Set<AliquotedSpecimenSaveInfo> set1 =
+            new HashSet<AliquotedSpecimenSaveInfo>();
+        Set<AliquotedSpecimenSaveInfo> set2 =
+            new HashSet<AliquotedSpecimenSaveInfo>();
 
         int count = 0;
-        for (Integer id : idsAll) {
+        for (AliquotedSpecimenSaveInfo id : asSaveInfosAll) {
             if (count < 5) {
                 set1.add(id);
             } else {
@@ -469,7 +478,7 @@ public class TestStudy extends TestAction {
 
         StudyInfo studyInfo =
             appService.doAction(new StudyGetInfoAction(studyId));
-        Assert.assertEquals(idsAll, getAliquotedSpecimenIds(studyInfo));
+        Assert.assertEquals(asSaveInfosAll, getAliquotedSpecimenIds(studyInfo));
 
         // remove Set 2 from the study, Set 1 should be left
         StudySaveAction studySave =
@@ -482,7 +491,8 @@ public class TestStudy extends TestAction {
 
         // remove all
         studySave = StudyHelper.getSaveAction(appService, studyInfo);
-        studySave.setAliquotSpecimenSaveInfo(new HashSet<Integer>());
+        studySave
+            .setAliquotSpecimenSaveInfo(new HashSet<AliquotedSpecimenSaveInfo>());
         appService.doAction(studySave);
 
         studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
