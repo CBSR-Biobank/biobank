@@ -1,13 +1,10 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
-import edu.ualberta.med.biobank.common.action.eventattr.GlobalEventAttrInfo;
-import edu.ualberta.med.biobank.common.action.eventattr.GlobalEventAttrInfoGetAction;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
@@ -16,12 +13,15 @@ import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecim
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.StudyEventAttrSaveInfo;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyHelper extends Helper {
+
+    private Map<String, GlobalEventAttr> globalEventAttrs = null;
 
     public static StudySaveAction getSaveAction(String name, String nameShort,
         ActivityStatusEnum activityStatus) {
@@ -50,6 +50,12 @@ public class StudyHelper extends Helper {
     public static StudySaveAction getSaveAction(
         BiobankApplicationService appService, StudyInfo studyInfo)
         throws ApplicationException {
+        return getSaveAction(appService, studyInfo, null);
+    }
+
+    public static StudySaveAction getSaveAction(
+        BiobankApplicationService appService, StudyInfo studyInfo,
+        Map<String, GlobalEventAttr> globalEventAttrs) {
         StudySaveAction saveStudy = new StudySaveAction();
         saveStudy.setId(studyInfo.study.getId());
         saveStudy.setName(studyInfo.study.getName());
@@ -92,30 +98,23 @@ public class StudyHelper extends Helper {
         }
         saveStudy.setAliquotSpecimenSaveInfo(asSaveInfos);
 
-        Map<Integer, GlobalEventAttrInfo> globalEattrs =
-            appService.doAction(new GlobalEventAttrInfoGetAction()).getMap();
-        Map<String, GlobalEventAttrInfo> globalEattrsByLabel =
-            new HashMap<String, GlobalEventAttrInfo>();
-        for (GlobalEventAttrInfo gEattr : globalEattrs.values()) {
-            globalEattrsByLabel.put(gEattr.attr.getLabel(), gEattr);
-        }
-
         Set<StudyEventAttrSaveInfo> eAttrSaveInfos =
             new HashSet<StudyEventAttrSaveInfo>();
-        for (StudyEventAttr eAttr : studyInfo.studyEventAttrs) {
-            StudyEventAttrSaveInfo eAttrSaveInfo =
-                new StudyEventAttrSaveInfo();
-            eAttrSaveInfo.id = eAttr.getId();
-            eAttrSaveInfo.globalEventAttrId =
-                globalEattrsByLabel.get(eAttr.getLabel()).attr.getId();
-            eAttrSaveInfo.required = eAttr.getRequired();
-            eAttrSaveInfo.permissible = eAttr.getPermissible();
-            eAttrSaveInfo.aStatusId = eAttr.getActivityStatus().getId();
-            eAttrSaveInfos.add(eAttrSaveInfo);
+        if (globalEventAttrs != null) {
+            for (StudyEventAttr eAttr : studyInfo.studyEventAttrs) {
+                StudyEventAttrSaveInfo eAttrSaveInfo =
+                    new StudyEventAttrSaveInfo();
+                eAttrSaveInfo.id = eAttr.getId();
+                eAttrSaveInfo.globalEventAttrId =
+                    globalEventAttrs.get(eAttr.getLabel()).getId();
+                eAttrSaveInfo.required = eAttr.getRequired();
+                eAttrSaveInfo.permissible = eAttr.getPermissible();
+                eAttrSaveInfo.aStatusId = eAttr.getActivityStatus().getId();
+                eAttrSaveInfos.add(eAttrSaveInfo);
+            }
         }
         saveStudy.setStudyEventAttrSaveInfo(eAttrSaveInfos);
 
         return saveStudy;
     }
-
 }

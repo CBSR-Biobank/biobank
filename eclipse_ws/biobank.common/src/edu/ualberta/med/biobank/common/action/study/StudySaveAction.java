@@ -182,8 +182,8 @@ public class StudySaveAction implements Action<IdResult> {
         study.setId(id);
         study.setName(name);
         study.setNameShort(nameShort);
-        study.setActivityStatus(ActionUtil.sessionGet(
-            session, ActivityStatus.class, aStatusId));
+        study.setActivityStatus(ActionUtil.sessionGet(session,
+            ActivityStatus.class, aStatusId));
 
         saveSites();
         saveContacts();
@@ -201,8 +201,7 @@ public class StudySaveAction implements Action<IdResult> {
         Map<Integer, Site> sites = sessionUtil.load(Site.class, siteIds);
 
         SetDifference<Site> sitesDiff =
-            new SetDifference<Site>(study.getSiteCollection(),
-                sites.values());
+            new SetDifference<Site>(study.getSiteCollection(), sites.values());
         study.setSiteCollection(sitesDiff.getNewSet());
 
         // remove this study from sites in removed list
@@ -251,8 +250,9 @@ public class StudySaveAction implements Action<IdResult> {
                 ss = new SourceSpecimen();
                 ss.setNeedOriginalVolume(ssSaveInfo.needOriginalVolume);
             } else {
-                ss = ActionUtil.sessionGet(session, SourceSpecimen.class,
-                    ssSaveInfo.id);
+                ss =
+                    ActionUtil.sessionGet(session, SourceSpecimen.class,
+                        ssSaveInfo.id);
             }
             ss.setStudy(study);
             ss.setSpecimenType(ActionUtil.sessionGet(session,
@@ -263,8 +263,7 @@ public class StudySaveAction implements Action<IdResult> {
         // delete source specimens no longer in use
         SetDifference<SourceSpecimen> srcSpcsDiff =
             new SetDifference<SourceSpecimen>(
-                study.getSourceSpecimenCollection(),
-                newSsCollection);
+                study.getSourceSpecimenCollection(), newSsCollection);
         study.setSourceSpecimenCollection(srcSpcsDiff.getAddSet());
         for (SourceSpecimen srcSpc : srcSpcsDiff.getRemoveSet()) {
             session.delete(srcSpc);
@@ -279,8 +278,9 @@ public class StudySaveAction implements Action<IdResult> {
             if (asSaveInfo.id == null) {
                 as = new AliquotedSpecimen();
             } else {
-                as = ActionUtil.sessionGet(session, AliquotedSpecimen.class,
-                    asSaveInfo.id);
+                as =
+                    ActionUtil.sessionGet(session, AliquotedSpecimen.class,
+                        asSaveInfo.id);
             }
             as.setStudy(study);
             as.setQuantity(asSaveInfo.quantity);
@@ -294,8 +294,7 @@ public class StudySaveAction implements Action<IdResult> {
 
         SetDifference<AliquotedSpecimen> aqSpcsDiff =
             new SetDifference<AliquotedSpecimen>(
-                study.getAliquotedSpecimenCollection(),
-                newAsCollection);
+                study.getAliquotedSpecimenCollection(), newAsCollection);
 
         // delete aliquoted specimens no longer in use
         study.setAliquotedSpecimenCollection(aqSpcsDiff.getAddSet());
@@ -305,30 +304,33 @@ public class StudySaveAction implements Action<IdResult> {
     }
 
     private void saveEventAttributes() {
-        Set<StudyEventAttr> newEAttrCollection =
-            new HashSet<StudyEventAttr>();
+        Set<StudyEventAttr> newEAttrCollection = new HashSet<StudyEventAttr>();
         for (StudyEventAttrSaveInfo eAttrSaveInfo : studyEventAttrSaveInfo) {
             StudyEventAttr eAttr;
             if (eAttrSaveInfo.id == null) {
                 eAttr = new StudyEventAttr();
             } else {
-                eAttr = ActionUtil.sessionGet(session, StudyEventAttr.class,
-                    eAttrSaveInfo.id);
+                eAttr =
+                    ActionUtil.sessionGet(session, StudyEventAttr.class,
+                        eAttrSaveInfo.id);
             }
-            GlobalEventAttr gEAttr = ActionUtil.sessionGet(session,
-                GlobalEventAttr.class, eAttrSaveInfo.globalEventAttrId);
+            GlobalEventAttr gEAttr =
+                ActionUtil.sessionGet(session, GlobalEventAttr.class,
+                    eAttrSaveInfo.globalEventAttrId);
 
             eAttr.setStudy(study);
             eAttr.setLabel(gEAttr.getLabel());
+            eAttr.setEventAttrType(gEAttr.getEventAttrType());
             eAttr.setPermissible(eAttrSaveInfo.permissible);
             eAttr.setRequired(eAttrSaveInfo.required);
+            eAttr.setActivityStatus(ActionUtil.sessionGet(session,
+                ActivityStatus.class, eAttrSaveInfo.aStatusId));
             newEAttrCollection.add(eAttr);
         }
 
         SetDifference<StudyEventAttr> attrsDiff =
             new SetDifference<StudyEventAttr>(
-                study.getStudyEventAttrCollection(),
-                newEAttrCollection);
+                study.getStudyEventAttrCollection(), newEAttrCollection);
 
         study.setStudyEventAttrCollection(attrsDiff.getAddSet());
         for (StudyEventAttr attr : attrsDiff.getRemoveSet()) {
