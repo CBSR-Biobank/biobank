@@ -137,6 +137,7 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
                         @Override
                         public void onSuccess(
                             PatientGetProcessingEventsByPNumberResult result) {
+
                             processingEvents = result.getProcessingEvents();
                             patientExists = result.isPatientExists();
 

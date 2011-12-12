@@ -7,11 +7,20 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.LocalizedActionException;
+import edu.ualberta.med.biobank.common.i18n.Messages;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.User;
 
+/**
+ * 
+ * @author jferland
+ * 
+ */
 public class PatientGetProcessingEventsByPNumberAction implements
     Action<PatientGetProcessingEventsByPNumberResult> {
     private static final long serialVersionUID = 1L;
@@ -47,6 +56,27 @@ public class PatientGetProcessingEventsByPNumberAction implements
     public PatientGetProcessingEventsByPNumberResult run(User user,
         Session session)
         throws ActionException {
+        ActionContext context = new ActionContext(user, session);
+
+        if (pNumber == null || pNumber.isEmpty()) {
+            throw new LocalizedActionException(Messages.Greeting, "one", "two");
+
+            // throw new EmptyValueException(Patient.class,
+            // PatientPeer.PNUMBER);
+            // throw new LocalizedException(Messages.badPNumber, pNumber);
+
+            // "asdf" = "{0} is a {1} dog";
+            // "asdf" = ""
+            //
+            // "action.check.pnumberNotNull" =
+            // "Patient number '{0}' is not a legal value";
+        }
+
+        if (centerId == null) {
+            // throw new IllegalValueException(Center.class, CenterPeer.ID);
+        }
+
+        context.load(Center.class, centerId); // ensure Center exists
 
         boolean exists = isPatientExists(session);
         List<ProcessingEvent> pEvents = getProcessingEvents(session);
