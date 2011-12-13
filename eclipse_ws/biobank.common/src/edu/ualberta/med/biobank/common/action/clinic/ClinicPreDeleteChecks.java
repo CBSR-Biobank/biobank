@@ -26,11 +26,9 @@ public class ClinicPreDeleteChecks {
         this.clinic = clinic;
     }
 
-    public void performChecks(Session session) {
-        checkHasStudies(session);
-    }
-
-    private void checkHasStudies(Session session) {
+    public void run(Session session) {
+        // this HQL query is faster than using multiple instantiations of
+        // CollectionIsEmptyCheck
         Query query = session.createQuery(COUNT_STUDIES_HQL);
         query.setParameter(0, clinic.getId());
 

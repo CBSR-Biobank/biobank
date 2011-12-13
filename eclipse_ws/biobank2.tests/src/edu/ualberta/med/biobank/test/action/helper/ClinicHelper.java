@@ -6,6 +6,7 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Contact;
@@ -26,7 +27,7 @@ public class ClinicHelper extends Helper {
         saveClinic.setNameShort(nameShort);
         saveClinic.setActivityStatusId(activityStatus.getId());
         saveClinic.setSendsShipments(sendsShipments);
-        saveClinic.setContactIds(new HashSet<Integer>());
+        saveClinic.setContactSaveInfos(new HashSet<ContactSaveInfo>());
         saveClinic.setAddress(address);
         return saveClinic;
     }
@@ -39,7 +40,7 @@ public class ClinicHelper extends Helper {
         clinicSave.setName(name);
         clinicSave.setNameShort(name);
         clinicSave.setSendsShipments(true);
-        clinicSave.setContactIds(new HashSet<Integer>());
+        clinicSave.setContactSaveInfos(new HashSet<ContactSaveInfo>());
         clinicSave.setActivityStatusId(activityStatus.getId());
 
         Address address = new Address();
@@ -100,11 +101,11 @@ public class ClinicHelper extends Helper {
         saveAction.setSendsShipments(clinicInfo.clinic.getSendsShipments());
         saveAction.setAddress(clinicInfo.clinic.getAddress());
 
-        Set<Integer> ids = new HashSet<Integer>();
-        for (Contact c : clinicInfo.contacts) {
-            ids.add(c.getId());
+        Set<ContactSaveInfo> contactSaveInfos = new HashSet<ContactSaveInfo>();
+        for (Contact contact : clinicInfo.contacts) {
+            contactSaveInfos.add(new ContactSaveInfo(contact));
         }
-        saveAction.setContactIds(ids);
+        saveAction.setContactSaveInfos(contactSaveInfos);
 
         return saveAction;
     }

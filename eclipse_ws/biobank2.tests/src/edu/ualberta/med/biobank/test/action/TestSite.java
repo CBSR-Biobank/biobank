@@ -198,4 +198,24 @@ public class TestSite extends TestAction {
         return ids;
     }
 
+    @Test
+    public void delete() {
+
+    }
+
+    @Test
+    public void deleteWithStudies() {
+
+    }
+
+    @Test
+    public void deleteWithSrcDispatch() {
+
+    }
+
+    @Test
+    public void deleteWithDstDispatch() {
+
+    }
+
 }

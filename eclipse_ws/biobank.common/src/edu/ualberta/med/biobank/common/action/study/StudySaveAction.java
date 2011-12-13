@@ -71,9 +71,9 @@ public class StudySaveAction implements Action<IdResult> {
     private Integer aStatusId;
     private Set<Integer> siteIds;
     private Set<Integer> contactIds;
-    private Collection<SourceSpecimenSaveInfo> sourceSpecimenSaveInfo;
-    private Collection<AliquotedSpecimenSaveInfo> aliquotSpecimenSaveInfo;
-    private Collection<StudyEventAttrSaveInfo> studyEventAttrSaveInfo;
+    private Collection<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos;
+    private Collection<AliquotedSpecimenSaveInfo> aliquotSpecimenSaveInfos;
+    private Collection<StudyEventAttrSaveInfo> studyEventAttrSaveInfos;
     private Session session = null;
     private SessionUtil sessionUtil = null;
     private Study study = null;
@@ -103,18 +103,18 @@ public class StudySaveAction implements Action<IdResult> {
     }
 
     public void setSourceSpecimenSaveInfo(
-        Collection<SourceSpecimenSaveInfo> sourceSpecimenSaveInfo) {
-        this.sourceSpecimenSaveInfo = sourceSpecimenSaveInfo;
+        Collection<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos) {
+        this.sourceSpecimenSaveInfos = sourceSpecimenSaveInfos;
     }
 
     public void setAliquotSpecimenSaveInfo(
-        Collection<AliquotedSpecimenSaveInfo> aliquotSpecimenSaveInfo) {
-        this.aliquotSpecimenSaveInfo = aliquotSpecimenSaveInfo;
+        Collection<AliquotedSpecimenSaveInfo> aliquotSpecimenSaveInfos) {
+        this.aliquotSpecimenSaveInfos = aliquotSpecimenSaveInfos;
     }
 
     public void setStudyEventAttrSaveInfo(
-        Collection<StudyEventAttrSaveInfo> studyEventAttrSaveInfo) {
-        this.studyEventAttrSaveInfo = studyEventAttrSaveInfo;
+        Collection<StudyEventAttrSaveInfo> studyEventAttrSaveInfos) {
+        this.studyEventAttrSaveInfos = studyEventAttrSaveInfos;
     }
 
     @Override
@@ -146,15 +146,15 @@ public class StudySaveAction implements Action<IdResult> {
             throw new NullPropertyException(Study.class,
                 "contact ids cannot be null");
         }
-        if (sourceSpecimenSaveInfo == null) {
+        if (sourceSpecimenSaveInfos == null) {
             throw new NullPropertyException(Study.class,
                 "specimen ids cannot be null");
         }
-        if (aliquotSpecimenSaveInfo == null) {
+        if (aliquotSpecimenSaveInfos == null) {
             throw new NullPropertyException(Study.class,
                 "aliquot ids cannot be null");
         }
-        if (studyEventAttrSaveInfo == null) {
+        if (studyEventAttrSaveInfos == null) {
             throw new NullPropertyException(Study.class,
                 "aliquot ids cannot be null");
         }
@@ -244,16 +244,16 @@ public class StudySaveAction implements Action<IdResult> {
 
     private void saveSourceSpecimens() {
         Set<SourceSpecimen> newSsCollection = new HashSet<SourceSpecimen>();
-        for (SourceSpecimenSaveInfo ssSaveInfo : sourceSpecimenSaveInfo) {
+        for (SourceSpecimenSaveInfo ssSaveInfo : sourceSpecimenSaveInfos) {
             SourceSpecimen ss;
             if (ssSaveInfo.id == null) {
                 ss = new SourceSpecimen();
-                ss.setNeedOriginalVolume(ssSaveInfo.needOriginalVolume);
             } else {
                 ss =
                     ActionUtil.sessionGet(session, SourceSpecimen.class,
                         ssSaveInfo.id);
             }
+            ss.setNeedOriginalVolume(ssSaveInfo.needOriginalVolume);
             ss.setStudy(study);
             ss.setSpecimenType(ActionUtil.sessionGet(session,
                 SpecimenType.class, ssSaveInfo.specimenTypeId));
@@ -273,7 +273,7 @@ public class StudySaveAction implements Action<IdResult> {
     private void saveAliquotedSpecimens() {
         Set<AliquotedSpecimen> newAsCollection =
             new HashSet<AliquotedSpecimen>();
-        for (AliquotedSpecimenSaveInfo asSaveInfo : aliquotSpecimenSaveInfo) {
+        for (AliquotedSpecimenSaveInfo asSaveInfo : aliquotSpecimenSaveInfos) {
             AliquotedSpecimen as;
             if (asSaveInfo.id == null) {
                 as = new AliquotedSpecimen();
@@ -305,7 +305,7 @@ public class StudySaveAction implements Action<IdResult> {
 
     private void saveEventAttributes() {
         Set<StudyEventAttr> newEAttrCollection = new HashSet<StudyEventAttr>();
-        for (StudyEventAttrSaveInfo eAttrSaveInfo : studyEventAttrSaveInfo) {
+        for (StudyEventAttrSaveInfo eAttrSaveInfo : studyEventAttrSaveInfos) {
             StudyEventAttr eAttr;
             if (eAttrSaveInfo.id == null) {
                 eAttr = new StudyEventAttr();
