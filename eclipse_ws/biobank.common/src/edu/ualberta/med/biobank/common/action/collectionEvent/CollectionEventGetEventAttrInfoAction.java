@@ -9,12 +9,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
-import edu.ualberta.med.biobank.common.peer.EventAttrPeer;
-import edu.ualberta.med.biobank.common.peer.EventAttrTypePeer;
-import edu.ualberta.med.biobank.common.peer.StudyEventAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.User;
 
@@ -24,29 +19,15 @@ public class CollectionEventGetEventAttrInfoAction implements
     private static final long serialVersionUID = 1L;
     private Integer ceventId;
 
-    // @formatter:off
     @SuppressWarnings("nls")
     private static final String EVENT_ATTR_QRY =
-        "select attr,"
-            + " sAttr."
-            + StudyEventAttrPeer.ID.getName()
-            + ", attrType."
-            + EventAttrTypePeer.NAME.getName()
-            + " from "
-            + EventAttr.class.getName()
-            + " as attr"
-            + " left join fetch attr."
-            + EventAttrPeer.STUDY_EVENT_ATTR.getName()
-            + " as sAttr"
-            + " left join sAttr."
-            + StudyEventAttrPeer.EVENT_ATTR_TYPE.getName()
-            + " as attrType"
-            + " where attr."
-            + Property.concatNames(EventAttrPeer.COLLECTION_EVENT,
-                CollectionEventPeer.ID) + " =?"
-            + " group by attr";
-
-    // @formatter:on
+        "SELECT eAttr,seAttr.id,attrType.name"
+            + " FROM " + EventAttr.class.getName() + " as eAttr"
+            + " LEFT JOIN FETCH eAttr.studyEventAttr as seAttr"
+            + " LEFT JOIN seAttr.globalEventAttr as geAttr"
+            + " LEFT JOIN geAttr.eventAttrType as attrType"
+            + " WHERE eAttr.collectionEvent.id =?"
+            + " GROUP BY eAttr";
 
     public CollectionEventGetEventAttrInfoAction(Integer ceventId) {
         this.ceventId = ceventId;

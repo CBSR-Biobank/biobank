@@ -367,8 +367,7 @@ public class StudySaveAction implements Action<IdResult> {
                     eAttrSaveInfo.globalEventAttrId);
 
             eAttr.setStudy(study);
-            eAttr.setLabel(gEAttr.getLabel());
-            eAttr.setEventAttrType(gEAttr.getEventAttrType());
+            eAttr.setGlobalEventAttr(gEAttr);
             eAttr.setPermissible(eAttrSaveInfo.permissible);
             eAttr.setRequired(eAttrSaveInfo.required);
             eAttr.setActivityStatus(ActionUtil.sessionGet(session,

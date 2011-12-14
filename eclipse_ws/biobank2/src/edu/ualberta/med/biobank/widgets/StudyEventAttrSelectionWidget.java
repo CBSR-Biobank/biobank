@@ -67,8 +67,7 @@ public class StudyEventAttrSelectionWidget extends BgcBaseWidget {
             if (!seAttrCustom.widget.getSelected()) continue;
 
             StudyEventAttr seAttr = new StudyEventAttr();
-            seAttr.setLabel(seAttrCustom.getLabel());
-            seAttr.setEventAttrType(seAttrCustom.geAttr.getEventAttrType());
+            seAttr.setGlobalEventAttr(seAttrCustom.geAttr);
             seAttr.setPermissible(seAttrCustom.widget.getValues());
             newSeAttrs.add(seAttr);
         }

@@ -26,10 +26,11 @@ public class StudyEventAttrWrapper extends StudyEventAttrBaseWrapper {
     }
 
     @SuppressWarnings("nls")
-    public static final String IS_USED_BY_COL_EVENTS_QRY = "select count(ea) from "
-        + EventAttr.class.getName()
-        + " as ea where ea."
-        + EventAttrPeer.STUDY_EVENT_ATTR.getName() + "=?)";
+    public static final String IS_USED_BY_COL_EVENTS_QRY =
+        "select count(ea) from "
+            + EventAttr.class.getName()
+            + " as ea where ea."
+            + EventAttrPeer.STUDY_EVENT_ATTR.getName() + "=?)";
 
     public boolean isUsedByCollectionEvents() throws ApplicationException,
         BiobankException {
@@ -44,9 +45,10 @@ public class StudyEventAttrWrapper extends StudyEventAttrBaseWrapper {
     @SuppressWarnings("nls")
     @Override
     public String toString() {
-        return "" + getId() + ":\"" + getLabel() + "\":\"" + getPermissible()
-            + "\":" + getActivityStatus() + ":" + getEventAttrType().getName()
-            + ":" + getStudy();
+        return "" + getId() + ":\"" + getGlobalEventAttr().getLabel() + "\":\""
+            + getPermissible() + "\":" + getActivityStatus() + ":"
+            + getGlobalEventAttr().getEventAttrType().getName() + ":"
+            + getStudy();
     }
 
     public static List<StudyEventAttrWrapper> getStudyEventAttrCollection(

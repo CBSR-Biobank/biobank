@@ -317,7 +317,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                     + "\" does not exist"); //$NON-NLS-1$
             }
         }
-        return studyEventAttr.getEventAttrType().getName();
+        return studyEventAttr.getGlobalEventAttr().getEventAttrType().getName();
     }
 
     public String[] getEventAttrPermissible(String label) throws Exception {
@@ -381,7 +381,9 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             // validate the value
             value = value.trim();
             if (value.length() > 0) {
-                String type = studyEventAttr.getEventAttrType().getName();
+                String type =
+                    studyEventAttr.getGlobalEventAttr().getEventAttrType()
+                        .getName();
                 List<String> permissibleSplit = null;
 
                 if (EventAttrTypeEnum.SELECT_SINGLE.isSameType(type)

@@ -236,6 +236,7 @@ public class TestCollectionEvent extends TestAction {
                 phlebotomistStudyAttr
                     .getId(),
                 EventAttrTypeEnum.getEventAttrType(phlebotomistStudyAttr
+                    .getGlobalEventAttr()
                     .getEventAttrType()
                     .getName()), value1);
 
@@ -462,7 +463,8 @@ public class TestCollectionEvent extends TestAction {
             CollectionEventHelper.createSaveCEventAttrInfo(
                 phlebotomistStudyAttr.getId(),
                 EventAttrTypeEnum.getEventAttrType(phlebotomistStudyAttr
-                    .getEventAttrType().getName()), "abcdefghi");
+                    .getGlobalEventAttr().getEventAttrType().getName()),
+                "abcdefghi");
         attrs.add(attrInfo);
 
         Integer visitNber = r.nextInt(20);
@@ -512,7 +514,7 @@ public class TestCollectionEvent extends TestAction {
 
         EventAttrTypeEnum eventAttrType =
             EventAttrTypeEnum.getEventAttrType(phlebotomistStudyAttr
-                .getEventAttrType().getName());
+                .getGlobalEventAttr().getEventAttrType().getName());
         List<CEventAttrSaveInfo> attrs =
             new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
         String value = "abcdefghi";

@@ -61,7 +61,8 @@ public class StudyWrapper extends StudyBaseWrapper {
 
         studyEventAttrMap = new HashMap<String, StudyEventAttrWrapper>();
 
-        List<StudyEventAttrWrapper> eventAttrList = getStudyEventAttrCollection(false);
+        List<StudyEventAttrWrapper> eventAttrList =
+            getStudyEventAttrCollection(false);
         // StudyEventAttrWrapper.getStudyEventAttrCollection(this);
 
         for (StudyEventAttrWrapper studyEventAttr : eventAttrList) {
@@ -72,7 +73,8 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     private void updateStudyEventAttrCollection() {
         if (studyEventAttrMap != null) {
-            List<StudyEventAttrWrapper> allStudyEventAttrWrappers = new ArrayList<StudyEventAttrWrapper>();
+            List<StudyEventAttrWrapper> allStudyEventAttrWrappers =
+                new ArrayList<StudyEventAttrWrapper>();
             for (StudyEventAttrWrapper ss : studyEventAttrMap.values()) {
                 allStudyEventAttrWrappers.add(ss);
             }
@@ -100,7 +102,7 @@ public class StudyWrapper extends StudyBaseWrapper {
     public EventAttrTypeEnum getStudyEventAttrType(String label)
         throws Exception {
         return EventAttrTypeEnum.getEventAttrType(getStudyEventAttr(label)
-            .getEventAttrType().getName());
+            .getGlobalEventAttr().getEventAttrType().getName());
     }
 
     /**
@@ -144,8 +146,9 @@ public class StudyWrapper extends StudyBaseWrapper {
      */
     public void setStudyEventAttr(String label, EventAttrTypeEnum type,
         String[] permissibleValues) throws Exception {
-        Map<String, EventAttrTypeWrapper> EventAttrTypeMap = EventAttrTypeWrapper
-            .getAllEventAttrTypesMap(appService);
+        Map<String, EventAttrTypeWrapper> EventAttrTypeMap =
+            EventAttrTypeWrapper
+                .getAllEventAttrTypesMap(appService);
         EventAttrTypeWrapper EventAttrType = EventAttrTypeMap.get(type
             .getName());
         if (EventAttrType == null) {
@@ -173,7 +176,7 @@ public class StudyWrapper extends StudyBaseWrapper {
             // does not yet exist
             studyEventAttr = new StudyEventAttrWrapper(appService);
             studyEventAttr.setLabel(label);
-            studyEventAttr.setEventAttrType(EventAttrType);
+            studyEventAttr.getGlobalEventAttr().setEventAttrType(EventAttrType);
             studyEventAttr.setStudy(this);
         }
 
@@ -295,13 +298,14 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     @SuppressWarnings("nls")
-    public static final String IS_LINKED_TO_CLINIC_QRY = "select count(clinics) from "
-        + Contact.class.getName()
-        + " as contacts join contacts."
-        + ContactPeer.CLINIC.getName()
-        + " as clinics where contacts."
-        + Property.concatNames(ContactPeer.STUDY_COLLECTION, StudyPeer.ID)
-        + " = ? and clinics." + ClinicPeer.ID.getName() + " = ?";
+    public static final String IS_LINKED_TO_CLINIC_QRY =
+        "select count(clinics) from "
+            + Contact.class.getName()
+            + " as contacts join contacts."
+            + ContactPeer.CLINIC.getName()
+            + " as clinics where contacts."
+            + Property.concatNames(ContactPeer.STUDY_COLLECTION, StudyPeer.ID)
+            + " = ? and clinics." + ClinicPeer.ID.getName() + " = ?";
 
     /**
      * return true if this study is linked to the given clinic (through
@@ -345,11 +349,13 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     @SuppressWarnings("nls")
-    private static final String COLLECTION_EVENT_COUNT_QRY = "select count(distinct ce) from "
-        + CollectionEvent.class.getName()
-        + " as ce where ce."
-        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.STUDY,
-            StudyPeer.ID) + "=?";
+    private static final String COLLECTION_EVENT_COUNT_QRY =
+        "select count(distinct ce) from "
+            + CollectionEvent.class.getName()
+            + " as ce where ce."
+            + Property.concatNames(CollectionEventPeer.PATIENT,
+                PatientPeer.STUDY,
+                StudyPeer.ID) + "=?";
 
     public long getCollectionEventCount() throws ApplicationException,
         BiobankException {
@@ -402,17 +408,18 @@ public class StudyWrapper extends StudyBaseWrapper {
     // }
 
     @SuppressWarnings("nls")
-    private static final String ACTIVE_ALIQUOTED_SPECIMENS_TYPE_QRY = "select aspec."
-        + AliquotedSpecimenPeer.SPECIMEN_TYPE.getName()
-        + " from "
-        + AliquotedSpecimen.class.getName()
-        + " as aspec where aspec."
-        + Property.concatNames(AliquotedSpecimenPeer.STUDY, StudyPeer.ID)
-        + " = ? and aspec."
-        + Property.concatNames(AliquotedSpecimenPeer.ACTIVITY_STATUS,
-            ActivityStatusPeer.NAME)
-        + " = '"
-        + ActivityStatusWrapper.ACTIVE_STATUS_STRING + "'";
+    private static final String ACTIVE_ALIQUOTED_SPECIMENS_TYPE_QRY =
+        "select aspec."
+            + AliquotedSpecimenPeer.SPECIMEN_TYPE.getName()
+            + " from "
+            + AliquotedSpecimen.class.getName()
+            + " as aspec where aspec."
+            + Property.concatNames(AliquotedSpecimenPeer.STUDY, StudyPeer.ID)
+            + " = ? and aspec."
+            + Property.concatNames(AliquotedSpecimenPeer.ACTIVITY_STATUS,
+                ActivityStatusPeer.NAME)
+            + " = '"
+            + ActivityStatusWrapper.ACTIVE_STATUS_STRING + "'";
 
     public List<SpecimenTypeWrapper> getAuthorizedActiveAliquotedTypes(
         List<SpecimenTypeWrapper> authorizedTypes) throws ApplicationException {
@@ -422,7 +429,8 @@ public class StudyWrapper extends StudyBaseWrapper {
         if (raw == null) {
             return new ArrayList<SpecimenTypeWrapper>();
         }
-        List<SpecimenTypeWrapper> studiesAliquotedTypes = new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> studiesAliquotedTypes =
+            new ArrayList<SpecimenTypeWrapper>();
         for (SpecimenType st : raw) {
             SpecimenTypeWrapper type = new SpecimenTypeWrapper(appService, st);
             if (authorizedTypes == null || authorizedTypes.contains(type)) {
