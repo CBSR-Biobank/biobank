@@ -20,12 +20,12 @@ import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
 public class ClinicSaveAction extends CenterSaveAction {
     private static final long serialVersionUID = 1L;
 
+    // This info class does not support the Contact <-> Study association
     public static class ContactSaveInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
 
@@ -37,7 +37,6 @@ public class ClinicSaveAction extends CenterSaveAction {
         public String pagerNumber;
         public String officeNumber;
         public String emailAddress;
-        public Set<Integer> studyIds;
 
         public ContactSaveInfo() {
 
@@ -52,16 +51,11 @@ public class ClinicSaveAction extends CenterSaveAction {
             this.pagerNumber = contact.getPagerNumber();
             this.officeNumber = contact.getOfficeNumber();
             this.emailAddress = contact.getEmailAddress();
-
-            HashSet<Integer> studyIds = new HashSet<Integer>();
-            for (Study study : contact.getStudyCollection()) {
-                studyIds.add(study.getId());
-            }
-            this.studyIds = studyIds;
         }
 
         public Contact populateContcat(Clinic clinic, Contact contact) {
             contact.setClinic(clinic);
+            contact.setId(this.id);
             contact.setName(this.name);
             contact.setTitle(this.title);
             contact.setMobileNumber(this.mobileNumber);
@@ -129,7 +123,8 @@ public class ClinicSaveAction extends CenterSaveAction {
                     ActionUtil.sessionGet(session, Contact.class,
                         contactSaveInfo.id);
             }
-            contact = contactSaveInfo.populateContcat(clinic, contact);
+            newContactCollection.add(contactSaveInfo.populateContcat(clinic,
+                contact));
         }
 
         // delete contacts no longer in use

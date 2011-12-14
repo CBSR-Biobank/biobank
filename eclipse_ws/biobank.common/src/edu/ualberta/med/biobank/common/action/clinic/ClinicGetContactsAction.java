@@ -16,14 +16,12 @@ public class ClinicGetContactsAction implements Action<ListResult<Contact>> {
 
     private static final long serialVersionUID = 1L;
 
-    // @formatter:off
     @SuppressWarnings("nls")
     private static final String HQL =
-        "SELECT contact " 
-        + " FROM " + Contact.class.getName() + " contact"
-        + " INNER JOIN contact.clinic clinic"
-        + " WHERE clinic.id=?";
-    // @formatter:on
+        "SELECT contact "
+            + " FROM " + Contact.class.getName() + " contact"
+            + " INNER JOIN contact.clinic clinic"
+            + " WHERE clinic.id=?";
 
     private final Integer clinicId;
 

@@ -109,23 +109,14 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         Set<SourceSpecimenSaveInfo> ssSaveInfos =
             new HashSet<SourceSpecimenSaveInfo>();
         for (SourceSpecimen ss : view.getSourceSpecimens().asUnmodifiableList()) {
-            SourceSpecimenSaveInfo ssSaveInfo = new SourceSpecimenSaveInfo();
-            ssSaveInfo.id = ss.getId();
-            ssSaveInfo.needOriginalVolume = ss.getNeedOriginalVolume();
-            ssSaveInfo.specimenTypeId = ss.getSpecimenType().getId();
+            ssSaveInfos.add(new SourceSpecimenSaveInfo(ss));
         }
 
         Set<AliquotedSpecimenSaveInfo> asSaveInfos =
             new HashSet<AliquotedSpecimenSaveInfo>();
         for (AliquotedSpecimen as : view.getAliquotedSpecimens()
             .asUnmodifiableList()) {
-            AliquotedSpecimenSaveInfo asSaveInfo =
-                new AliquotedSpecimenSaveInfo();
-            asSaveInfo.id = as.getId();
-            asSaveInfo.quantity = as.getQuantity();
-            asSaveInfo.volume = as.getVolume();
-            asSaveInfo.aStatusId = as.getActivityStatus().getId();
-            asSaveInfo.specimenTypeId = as.getSpecimenType().getId();
+            asSaveInfos.add(new AliquotedSpecimenSaveInfo(as));
         }
 
         saveStudy.setSourceSpecimenSaveInfo(ssSaveInfos);

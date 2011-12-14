@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.test.action;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Query;
@@ -168,11 +168,11 @@ public class TestClinic extends TestAction {
             ClinicHelper.getSaveAction(name + "_2",
                 name + "_2", ActivityStatusEnum.ACTIVE, true);
         clinicSave.setContactSaveInfos(contactsAll);
-        appService.doAction(clinicSave);
+        clinicId = appService.doAction(clinicSave).getId();
 
         ClinicInfo clinicInfo =
             appService.doAction(new ClinicGetInfoAction(clinicId));
-        Assert.assertEquals(getContactNames(contactsAll),
+        Assert.assertEquals(getContactNamesFromSaveInfo(contactsAll),
             getContactNames(clinicInfo.contacts));
 
         // remove Set 2 from the clinic, Set 1 should be left
@@ -181,11 +181,12 @@ public class TestClinic extends TestAction {
         appService.doAction(clinicSave);
 
         clinicInfo = appService.doAction(new ClinicGetInfoAction(clinicId));
-        Assert.assertEquals(set1, getContactNames(clinicInfo.contacts));
+        Assert.assertEquals(getContactNamesFromSaveInfo(set1),
+            getContactNames(clinicInfo.contacts));
 
         // remove all
         clinicSave = ClinicHelper.getSaveAction(appService, clinicInfo);
-        clinicSave.setContactSaveInfos(new HashSet<Integer>());
+        clinicSave.setContactSaveInfos(new HashSet<ContactSaveInfo>());
         appService.doAction(clinicSave);
 
         clinicInfo = appService.doAction(new ClinicGetInfoAction(clinicId));
@@ -203,11 +204,21 @@ public class TestClinic extends TestAction {
         // TODO attempt to delete a contact that is assoc to a study
     }
 
-    private Set<String> getContactNames(List<ContactSaveInfo> contactSaveInfos)
+    private Set<String> getContactNamesFromSaveInfo(
+        Collection<ContactSaveInfo> contactSaveInfos)
         throws ApplicationException {
         Set<String> result = new HashSet<String>();
         for (ContactSaveInfo contactSaveInfo : contactSaveInfos) {
             result.add(contactSaveInfo.name);
+        }
+        return result;
+    }
+
+    private Set<String> getContactNames(Collection<Contact> contacts)
+        throws ApplicationException {
+        Set<String> result = new HashSet<String>();
+        for (Contact contact : contacts) {
+            result.add(contact.getName());
         }
         return result;
     }

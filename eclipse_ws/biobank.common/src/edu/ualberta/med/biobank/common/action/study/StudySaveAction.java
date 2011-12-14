@@ -43,6 +43,25 @@ public class StudySaveAction implements Action<IdResult> {
         public Integer id = null;
         public Boolean needOriginalVolume;
         public Integer specimenTypeId;
+
+        public SourceSpecimenSaveInfo() {
+
+        }
+
+        public SourceSpecimenSaveInfo(SourceSpecimen sourceSpecimen) {
+            this.id = sourceSpecimen.getId();
+            this.needOriginalVolume = sourceSpecimen.getNeedOriginalVolume();
+            this.specimenTypeId = sourceSpecimen.getSpecimenType().getId();
+        }
+
+        public SourceSpecimen populateSourceSpecimen(Study study,
+            SourceSpecimen sourceSpecimen,
+            SpecimenType specimenType) {
+            sourceSpecimen.setId(this.id);
+            sourceSpecimen.setNeedOriginalVolume(this.needOriginalVolume);
+            sourceSpecimen.setSpecimenType(specimenType);
+            return sourceSpecimen;
+        }
     }
 
     public static class AliquotedSpecimenSaveInfo implements ActionResult {
@@ -53,6 +72,29 @@ public class StudySaveAction implements Action<IdResult> {
         public Double volume;
         public Integer aStatusId;
         public Integer specimenTypeId;
+
+        public AliquotedSpecimenSaveInfo() {
+
+        }
+
+        public AliquotedSpecimenSaveInfo(AliquotedSpecimen aliquotedSpecimen) {
+            this.id = aliquotedSpecimen.getId();
+            this.quantity = aliquotedSpecimen.getQuantity();
+            this.volume = aliquotedSpecimen.getVolume();
+            this.aStatusId = aliquotedSpecimen.getActivityStatus().getId();
+            this.specimenTypeId = aliquotedSpecimen.getSpecimenType().getId();
+        }
+
+        public AliquotedSpecimen populateAliquotedSpecimen(Study study,
+            AliquotedSpecimen aliquotedSpecimen, ActivityStatus activityStatus,
+            SpecimenType specimenType) {
+            aliquotedSpecimen.setId(this.id);
+            aliquotedSpecimen.setQuantity(this.quantity);
+            aliquotedSpecimen.setVolume(this.volume);
+            aliquotedSpecimen.setActivityStatus(activityStatus);
+            aliquotedSpecimen.setSpecimenType(specimenType);
+            return aliquotedSpecimen;
+        }
     }
 
     public static class StudyEventAttrSaveInfo implements ActionResult {
@@ -63,6 +105,16 @@ public class StudySaveAction implements Action<IdResult> {
         public Boolean required;
         public String permissible;
         public Integer aStatusId;
+
+        public StudyEventAttrSaveInfo() {
+
+        }
+
+        public StudyEventAttrSaveInfo(StudyEventAttr studyEventAttr) {
+            this.id = studyEventAttr.getId();
+            this.id = studyEventAttr.getId();
+
+        }
     }
 
     private Integer id = null;
@@ -253,11 +305,10 @@ public class StudySaveAction implements Action<IdResult> {
                     ActionUtil.sessionGet(session, SourceSpecimen.class,
                         ssSaveInfo.id);
             }
-            ss.setNeedOriginalVolume(ssSaveInfo.needOriginalVolume);
-            ss.setStudy(study);
-            ss.setSpecimenType(ActionUtil.sessionGet(session,
-                SpecimenType.class, ssSaveInfo.specimenTypeId));
-            newSsCollection.add(ss);
+
+            newSsCollection.add(ssSaveInfo.populateSourceSpecimen(study, ss,
+                ActionUtil.sessionGet(session,
+                    SpecimenType.class, ssSaveInfo.specimenTypeId)));
         }
 
         // delete source specimens no longer in use
@@ -282,14 +333,11 @@ public class StudySaveAction implements Action<IdResult> {
                     ActionUtil.sessionGet(session, AliquotedSpecimen.class,
                         asSaveInfo.id);
             }
-            as.setStudy(study);
-            as.setQuantity(asSaveInfo.quantity);
-            as.setVolume(asSaveInfo.volume);
-            as.setActivityStatus(ActionUtil.sessionGet(session,
-                ActivityStatus.class, asSaveInfo.aStatusId));
-            as.setSpecimenType(ActionUtil.sessionGet(session,
-                SpecimenType.class, asSaveInfo.specimenTypeId));
-            newAsCollection.add(as);
+            newAsCollection.add(asSaveInfo.populateAliquotedSpecimen(study, as,
+                ActionUtil.sessionGet(session, ActivityStatus.class,
+                    asSaveInfo.aStatusId),
+                ActionUtil.sessionGet(session, SpecimenType.class,
+                    asSaveInfo.specimenTypeId)));
         }
 
         SetDifference<AliquotedSpecimen> aqSpcsDiff =

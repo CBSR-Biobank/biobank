@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -368,8 +369,8 @@ public class TestStudy extends TestAction {
         return result;
     }
 
-    private Set<Integer> getSourceSpecimenSpecimenTypes(
-        Set<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos) {
+    private Set<Integer> getSourceSpecimenSpecimenTypesFromSaveInfo(
+        Collection<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos) {
         Set<Integer> result = new HashSet<Integer>();
         for (SourceSpecimenSaveInfo ssSaveInfo : sourceSpecimenSaveInfos) {
             result.add(ssSaveInfo.specimenTypeId);
@@ -377,19 +378,11 @@ public class TestStudy extends TestAction {
         return result;
     }
 
-    private Set<SourceSpecimenSaveInfo> getSourceSpecimenSpecimenSaveInfos(
-        StudyInfo studyInfo) {
-        Set<SourceSpecimenSaveInfo> result =
-            new HashSet<SourceSpecimenSaveInfo>();
-        for (SourceSpecimen srcSpc : studyInfo.sourceSpcs) {
-            SourceSpecimenSaveInfo sourceSpecimenSaveInfo =
-                new SourceSpecimenSaveInfo();
-            sourceSpecimenSaveInfo.id = srcSpc.getId();
-            sourceSpecimenSaveInfo.needOriginalVolume =
-                srcSpc.getNeedOriginalVolume();
-            sourceSpecimenSaveInfo.specimenTypeId =
-                srcSpc.getSpecimenType().getId();
-            result.add(sourceSpecimenSaveInfo);
+    private Set<Integer> getSourceSpecimenSpecimenTypes(
+        List<SourceSpecimen> sourceSpecimens) {
+        Set<Integer> result = new HashSet<Integer>();
+        for (SourceSpecimen ss : sourceSpecimens) {
+            result.add(ss.getSpecimenType().getId());
         }
         return result;
     }
@@ -421,10 +414,9 @@ public class TestStudy extends TestAction {
         studyId = appService.doAction(studySave).getId();
         StudyInfo studyInfo =
             appService.doAction(new StudyGetInfoAction(studyId));
-        Assert
-            .assertEquals(
-                getSourceSpecimenSpecimenTypes(ssSaveInfosAll),
-                getSourceSpecimenSpecimenTypes(getSourceSpecimenSpecimenSaveInfos(studyInfo)));
+        Assert.assertEquals(
+            getSourceSpecimenSpecimenTypesFromSaveInfo(ssSaveInfosAll),
+            getSourceSpecimenSpecimenTypes(studyInfo.sourceSpcs));
 
         // remove Set 2 from the study, Set 1 should be left
         studySave = StudyHelper.getSaveAction(appService, studyInfo);
@@ -432,10 +424,9 @@ public class TestStudy extends TestAction {
         appService.doAction(studySave);
 
         studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
-        Assert
-            .assertEquals(
-                getSourceSpecimenSpecimenTypes(set1),
-                getSourceSpecimenSpecimenTypes(getSourceSpecimenSpecimenSaveInfos(studyInfo)));
+        Assert.assertEquals(
+            getSourceSpecimenSpecimenTypesFromSaveInfo(set1),
+            getSourceSpecimenSpecimenTypes(studyInfo.sourceSpcs));
 
         // remove all
         studySave = StudyHelper.getSaveAction(appService, studyInfo);
@@ -482,30 +473,20 @@ public class TestStudy extends TestAction {
         return result;
     }
 
-    private Set<Integer> getAliquotedSpecimenSpecimenTypes(
-        Set<AliquotedSpecimenSaveInfo> sourceSpecimenSaveInfos) {
+    private Set<Integer> getAliquotedSpecimenSpecimenTypesFromSaveInfo(
+        Collection<AliquotedSpecimenSaveInfo> aliquotedSpecimenSaveInfos) {
         Set<Integer> result = new HashSet<Integer>();
-        for (AliquotedSpecimenSaveInfo asSaveInfo : sourceSpecimenSaveInfos) {
+        for (AliquotedSpecimenSaveInfo asSaveInfo : aliquotedSpecimenSaveInfos) {
             result.add(asSaveInfo.specimenTypeId);
         }
         return result;
     }
 
-    private Set<AliquotedSpecimenSaveInfo> getAliquotedSpecimenSpecimenSaveInfos(
-        StudyInfo studyInfo) {
-        Set<AliquotedSpecimenSaveInfo> result =
-            new HashSet<AliquotedSpecimenSaveInfo>();
-        for (AliquotedSpecimen srcSpc : studyInfo.aliquotedSpcs) {
-            AliquotedSpecimenSaveInfo sourceSpecimenSaveInfo =
-                new AliquotedSpecimenSaveInfo();
-            sourceSpecimenSaveInfo.id = srcSpc.getId();
-            sourceSpecimenSaveInfo.quantity = srcSpc.getQuantity();
-            sourceSpecimenSaveInfo.volume = srcSpc.getVolume();
-            sourceSpecimenSaveInfo.aStatusId =
-                srcSpc.getActivityStatus().getId();
-            sourceSpecimenSaveInfo.specimenTypeId =
-                srcSpc.getSpecimenType().getId();
-            result.add(sourceSpecimenSaveInfo);
+    private Set<Integer> getAliquotedSpecimenSpecimenTypes(
+        Collection<AliquotedSpecimen> aliquotedSpecimens) {
+        Set<Integer> result = new HashSet<Integer>();
+        for (AliquotedSpecimen as : aliquotedSpecimens) {
+            result.add(as.getSpecimenType().getId());
         }
         return result;
     }
@@ -538,8 +519,8 @@ public class TestStudy extends TestAction {
             appService.doAction(new StudyGetInfoAction(studyId));
         Assert
             .assertEquals(
-                getAliquotedSpecimenSpecimenTypes(asSaveInfosAll),
-                getAliquotedSpecimenSpecimenTypes(getAliquotedSpecimenSpecimenSaveInfos(studyInfo)));
+                getAliquotedSpecimenSpecimenTypesFromSaveInfo(asSaveInfosAll),
+                getAliquotedSpecimenSpecimenTypes(studyInfo.aliquotedSpcs));
 
         // remove Set 2 from the study, Set 1 should be left
         studySave = StudyHelper.getSaveAction(appService, studyInfo);
@@ -549,8 +530,8 @@ public class TestStudy extends TestAction {
         studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
         Assert
             .assertEquals(
-                getAliquotedSpecimenSpecimenTypes(set1),
-                getAliquotedSpecimenSpecimenTypes(getAliquotedSpecimenSpecimenSaveInfos(studyInfo)));
+                getAliquotedSpecimenSpecimenTypesFromSaveInfo(set1),
+                getAliquotedSpecimenSpecimenTypes(studyInfo.aliquotedSpcs));
 
         // remove all
         studySave = StudyHelper.getSaveAction(appService, studyInfo);
