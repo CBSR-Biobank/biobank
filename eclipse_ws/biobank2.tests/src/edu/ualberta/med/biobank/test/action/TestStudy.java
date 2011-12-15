@@ -546,6 +546,18 @@ public class TestStudy extends TestAction {
         Assert.assertTrue(getAliquotedSpecimenCount(studyId).equals(0L));
     }
 
+    private Long getStudyEventAttrCount(Integer studyId) {
+        // check that this study no longer has any study event attributes
+        openHibernateSession();
+        Query q =
+            session.createQuery("SELECT COUNT(*) FROM "
+                + StudyEventAttr.class.getName() + " sea WHERE sea.study.id=?");
+        q.setParameter(0, studyId);
+        Long result = HibernateUtil.getCountFromQuery(q);
+        closeHibernateSession();
+        return result;
+    }
+
     private Map<String, GlobalEventAttr> getGlobalEvAttrs() {
         if (globalEventAttrs == null) {
             openHibernateSession();
@@ -562,94 +574,62 @@ public class TestStudy extends TestAction {
         return globalEventAttrs;
     }
 
-    private Long getStudyEventAttrCount(Integer studyId) {
-        // check that this study no longer has any study event attributes
-        openHibernateSession();
-        Query q =
-            session.createQuery("SELECT COUNT(*) FROM "
-                + StudyEventAttr.class.getName() + " sea WHERE sea.study.id=?");
-        q.setParameter(0, studyId);
-        Long result = HibernateUtil.getCountFromQuery(q);
-        closeHibernateSession();
-        return result;
-    }
-
     private Set<StudyEventAttrSaveInfo> getStudyEventAttrSaveInfosAll(
         Integer studyId) throws ApplicationException {
         HashSet<StudyEventAttrSaveInfo> result =
             new HashSet<StudyEventAttrSaveInfo>();
 
-        // attempt to add 1 of each global type again -> should not be allowed
         for (GlobalEventAttr gEvAttr : getGlobalEvAttrs().values()) {
-            StudyEventAttrSaveInfo stEvAttrSave = new StudyEventAttrSaveInfo();
+            StudyEventAttrSaveInfo seAttrSave = new StudyEventAttrSaveInfo();
 
-            stEvAttrSave.id = null;
-            stEvAttrSave.globalEventAttrId = gEvAttr.getId();
-            stEvAttrSave.required = r.nextBoolean();
+            seAttrSave.id = null;
+            seAttrSave.globalEventAttrId = gEvAttr.getId();
+            seAttrSave.required = r.nextBoolean();
 
             if (gEvAttr.getEventAttrType().getName().startsWith("select_")) {
-                stEvAttrSave.permissible = "a;b;c;d;e;f";
+                seAttrSave.permissible = "a;b;c;d;e;f";
             }
-            stEvAttrSave.aStatusId = ActivityStatusEnum.ACTIVE.getId();
-            result.add(stEvAttrSave);
+            seAttrSave.aStatusId = ActivityStatusEnum.ACTIVE.getId();
+            result.add(seAttrSave);
         }
         return result;
     }
 
     @Test
     public void studyEventAttrs() throws Exception {
-        // ensure study does not have any event attributes
-        StudyInfo studyInfo =
-            appService.doAction(new StudyGetInfoAction(studyId));
-        Assert.assertTrue(studyInfo.studyEventAttrs.isEmpty());
-
-        // add all global event attributes to study
+        // add a new study and add all global event attributes to study
         StudySaveAction studySaveAction =
-            StudyHelper
-                .getSaveAction(appService, studyInfo, getGlobalEvAttrs());
+            StudyHelper.getSaveAction(name + "_2", name + "_2",
+                ActivityStatusEnum.ACTIVE);
         Set<StudyEventAttrSaveInfo> studyEventAttrSaveInfos =
             getStudyEventAttrSaveInfosAll(studyId);
         studySaveAction.setStudyEventAttrSaveInfo(studyEventAttrSaveInfos);
-        appService.doAction(studySaveAction);
+        studyId = appService.doAction(studySaveAction).getId();
 
-        studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
-        Assert.assertEquals(
-            getStudyEventAttrGlobalIds(studyEventAttrSaveInfos),
-            getStudyEventAttrGlobalIds(getStudyEventAttrSaveInfos(studyInfo)));
+        StudyInfo studyInfo =
+            appService.doAction(new StudyGetInfoAction(studyId));
+        Assert
+            .assertEquals(
+                getStudyEventAttrSaveInfoGlobalIds(studyEventAttrSaveInfos),
+                getStudyEventAttrGlobalIds(studyInfo.studyEventAttrs));
 
         // attempt to add 1 of each global type again -> should not be allowed
-        studyEventAttrSaveInfos.clear();
-        for (GlobalEventAttr gEvAttr : getGlobalEvAttrs().values()) {
-            StudyEventAttrSaveInfo stEvAttrSave = new StudyEventAttrSaveInfo();
-
-            stEvAttrSave.globalEventAttrId = gEvAttr.getId();
-            stEvAttrSave.required = r.nextBoolean();
-
-            if (gEvAttr.getEventAttrType().getName().startsWith("select_")) {
-                stEvAttrSave.permissible = "a;b;c;d;e;f";
-            }
-            stEvAttrSave.aStatusId = ActivityStatusEnum.ACTIVE.getId();
-            studyEventAttrSaveInfos.add(stEvAttrSave);
-        }
-
-        studySaveAction =
-            StudyHelper
-                .getSaveAction(appService, studyInfo, getGlobalEvAttrs());
+        studySaveAction = StudyHelper.getSaveAction(appService, studyInfo);
+        studyEventAttrSaveInfos
+            .addAll(getStudyEventAttrSaveInfosAll(studyId));
         studySaveAction.setStudyEventAttrSaveInfo(studyEventAttrSaveInfos);
         try {
             appService.doAction(studySaveAction);
             Assert.fail("should not be allowed to add more than 1 global type");
-        } catch (ApplicationException e) {
+        } catch (ActionCheckException e) {
             Assert.assertTrue(true);
         }
 
         // remove each study event attr
-        StudySaveAction studySave =
-            StudyHelper
-                .getSaveAction(appService, studyInfo, getGlobalEvAttrs());
-        studySave
+        studySaveAction = StudyHelper.getSaveAction(appService, studyInfo);
+        studySaveAction
             .setStudyEventAttrSaveInfo(new HashSet<StudyEventAttrSaveInfo>());
-        appService.doAction(studySave);
+        appService.doAction(studySaveAction);
 
         studyInfo = appService.doAction(new StudyGetInfoAction(studyId));
         Assert.assertTrue(studyInfo.studyEventAttrs.isEmpty());
@@ -658,9 +638,8 @@ public class TestStudy extends TestAction {
         Assert.assertTrue(getStudyEventAttrCount(studyId).equals(0L));
     }
 
-    private Set<Integer> getStudyEventAttrGlobalIds(
-        Set<StudyEventAttrSaveInfo> studyEventAttrSaveInfos) {
-        getGlobalEvAttrs();
+    private Set<Integer> getStudyEventAttrSaveInfoGlobalIds(
+        Collection<StudyEventAttrSaveInfo> studyEventAttrSaveInfos) {
         Set<Integer> result = new HashSet<Integer>();
         for (StudyEventAttrSaveInfo seAttrSaveInfo : studyEventAttrSaveInfos) {
             result.add(seAttrSaveInfo.globalEventAttrId);
@@ -668,21 +647,11 @@ public class TestStudy extends TestAction {
         return result;
     }
 
-    private Set<StudyEventAttrSaveInfo> getStudyEventAttrSaveInfos(
-        StudyInfo studyInfo) {
-        Set<StudyEventAttrSaveInfo> result =
-            new HashSet<StudyEventAttrSaveInfo>();
-        for (StudyEventAttr seAttr : studyInfo.studyEventAttrs) {
-            StudyEventAttrSaveInfo studyEventAttrSaveInfo =
-                new StudyEventAttrSaveInfo();
-            studyEventAttrSaveInfo.id = seAttr.getId();
-            studyEventAttrSaveInfo.globalEventAttrId =
-                globalEventAttrs.get(seAttr.getLabel()).getId();
-            studyEventAttrSaveInfo.required = seAttr.getRequired();
-            studyEventAttrSaveInfo.permissible = seAttr.getPermissible();
-            studyEventAttrSaveInfo.aStatusId =
-                seAttr.getActivityStatus().getId();
-            result.add(studyEventAttrSaveInfo);
+    private Set<Integer> getStudyEventAttrGlobalIds(
+        Collection<StudyEventAttr> studyEventAttrs) {
+        Set<Integer> result = new HashSet<Integer>();
+        for (StudyEventAttr seAttr : studyEventAttrs) {
+            result.add(seAttr.getGlobalEventAttr().getId());
         }
         return result;
     }

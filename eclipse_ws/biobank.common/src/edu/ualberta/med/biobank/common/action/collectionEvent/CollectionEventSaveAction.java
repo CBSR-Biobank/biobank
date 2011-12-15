@@ -239,7 +239,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 if (!ActivityStatusEnum.ACTIVE.getId().equals(
                     sAttr.getActivityStatus().getId())) {
                     throw new ActionException(
-                        "Attribute for \"" + sAttr.getLabel() //$NON-NLS-1$
+                        "Attribute for \"" + sAttr.getGlobalEventAttr().getLabel() //$NON-NLS-1$
                             + "\" is locked, changes not premitted"); //$NON-NLS-1$
                 }
 
@@ -263,7 +263,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                             if (!permissibleSplit.contains(attrInfo.value)) {
                                 throw new ActionException(
                                     "value " + attrInfo.value //$NON-NLS-1$
-                                        + "is invalid for label \"" + sAttr.getLabel() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+                                        + "is invalid for label \"" + sAttr.getGlobalEventAttr().getLabel() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
                             }
                         } else if (type == EventAttrTypeEnum.SELECT_MULTIPLE) {
                             for (String singleVal : attrInfo.value.split(";")) { //$NON-NLS-1$
@@ -271,7 +271,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                                     throw new ActionException(
                                         "value " + singleVal + " (" //$NON-NLS-1$ //$NON-NLS-2$
                                             + attrInfo.value
-                                            + ") is invalid for label \"" + sAttr.getLabel() //$NON-NLS-1$
+                                            + ") is invalid for label \"" + sAttr.getGlobalEventAttr().getLabel() //$NON-NLS-1$
                                             + "\""); //$NON-NLS-1$
                                 }
                             }

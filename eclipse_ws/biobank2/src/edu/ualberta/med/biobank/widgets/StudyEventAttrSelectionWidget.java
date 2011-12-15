@@ -45,7 +45,8 @@ public class StudyEventAttrSelectionWidget extends BgcBaseWidget {
         }
 
         for (StudyEventAttr seAttr : studyEventAttrs) {
-            seAttrCustom = seAttrSettings.get(seAttr.getLabel());
+            seAttrCustom =
+                seAttrSettings.get(seAttr.getGlobalEventAttr().getLabel());
             if (seAttrCustom == null) {
                 throw new NullPointerException();
             }

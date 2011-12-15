@@ -259,7 +259,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                     .getStudy().getStudyEventAttrCollection();
             if (studyEventAttrCollection != null) {
                 for (StudyEventAttrWrapper studyEventAttr : studyEventAttrCollection) {
-                    studyEventAttrMap.put(studyEventAttr.getLabel(),
+                    studyEventAttrMap.put(studyEventAttr.getGlobalEventAttr()
+                        .getLabel(),
                         studyEventAttr);
                 }
             }
@@ -276,7 +277,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         List<EventAttrWrapper> pvAttrCollection = getEventAttrCollection(false);
         if (pvAttrCollection != null) {
             for (EventAttrWrapper pvAttr : pvAttrCollection) {
-                eventAttrMap.put(pvAttr.getStudyEventAttr().getLabel(), pvAttr);
+                eventAttrMap.put(pvAttr.getStudyEventAttr()
+                    .getGlobalEventAttr().getLabel(), pvAttr);
             }
         }
         return eventAttrMap;

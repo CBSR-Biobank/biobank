@@ -17,13 +17,12 @@ public class StudyGetStudyEventAttrsAction implements
     Action<ListResult<StudyEventAttr>> {
     private static final long serialVersionUID = 1L;
 
-    // @formatter:off
     @SuppressWarnings("nls")
     private static final String SELECT_STUDY_EVENT_ATTR_HQL =
-        " FROM " + StudyEventAttr.class.getName() + " AS seattr"
-        + " INNER JOIN FETCH seattr.eventAttrType"
-        + " WHERE seattr.study.id=?";
-    // @formatter:on
+        " FROM " + StudyEventAttr.class.getName() + " AS seAttr"
+            + " INNER JOIN FETCH seAttr.globalEventAttr geAttr"
+            + " INNER JOIN FETCH geAttr.eventAttrType"
+            + " WHERE seAttr.study.id=?";
 
     private final Integer studyId;
 

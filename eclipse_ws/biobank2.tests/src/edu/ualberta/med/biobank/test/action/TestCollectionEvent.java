@@ -217,7 +217,7 @@ public class TestCollectionEvent extends TestAction {
 
         StudyEventAttr phlebotomistStudyAttr = null;
         for (StudyEventAttr attr : studyInfo.studyEventAttrs) {
-            if ("Phlebotomist".equals(attr.getLabel())) {
+            if ("Phlebotomist".equals(attr.getGlobalEventAttr().getLabel())) {
                 phlebotomistStudyAttr = attr;
             }
         }
@@ -451,7 +451,7 @@ public class TestCollectionEvent extends TestAction {
 
         StudyEventAttr phlebotomistStudyAttr = null;
         for (StudyEventAttr attr : studyInfo.studyEventAttrs) {
-            if ("Phlebotomist".equals(attr.getLabel())) {
+            if ("Phlebotomist".equals(attr.getGlobalEventAttr().getLabel())) {
                 phlebotomistStudyAttr = attr;
             }
         }
@@ -506,7 +506,7 @@ public class TestCollectionEvent extends TestAction {
 
         StudyEventAttr phlebotomistStudyAttr = null;
         for (StudyEventAttr attr : studyInfo.studyEventAttrs) {
-            if ("Phlebotomist".equals(attr.getLabel())) {
+            if ("Phlebotomist".equals(attr.getGlobalEventAttr().getLabel())) {
                 phlebotomistStudyAttr = attr;
             }
         }

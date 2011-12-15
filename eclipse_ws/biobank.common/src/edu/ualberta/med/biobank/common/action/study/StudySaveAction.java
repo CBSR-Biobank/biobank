@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
+import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
@@ -60,6 +61,7 @@ public class StudySaveAction implements Action<IdResult> {
             sourceSpecimen.setId(this.id);
             sourceSpecimen.setNeedOriginalVolume(this.needOriginalVolume);
             sourceSpecimen.setSpecimenType(specimenType);
+            sourceSpecimen.setStudy(study);
             return sourceSpecimen;
         }
     }
@@ -93,6 +95,7 @@ public class StudySaveAction implements Action<IdResult> {
             aliquotedSpecimen.setVolume(this.volume);
             aliquotedSpecimen.setActivityStatus(activityStatus);
             aliquotedSpecimen.setSpecimenType(specimenType);
+            aliquotedSpecimen.setStudy(study);
             return aliquotedSpecimen;
         }
     }
@@ -112,8 +115,23 @@ public class StudySaveAction implements Action<IdResult> {
 
         public StudyEventAttrSaveInfo(StudyEventAttr studyEventAttr) {
             this.id = studyEventAttr.getId();
-            this.id = studyEventAttr.getId();
+            this.globalEventAttrId =
+                studyEventAttr.getGlobalEventAttr().getId();
+            this.required = studyEventAttr.getRequired();
+            this.permissible = studyEventAttr.getPermissible();
+            this.aStatusId = studyEventAttr.getActivityStatus().getId();
+        }
 
+        public StudyEventAttr populateStudyEventAttr(Study study,
+            StudyEventAttr studyEventAttr,
+            GlobalEventAttr globalEventAttr, ActivityStatus activityStatus) {
+            studyEventAttr.setId(this.id);
+            studyEventAttr.setGlobalEventAttr(globalEventAttr);
+            studyEventAttr.setRequired(this.required);
+            studyEventAttr.setPermissible(this.permissible);
+            studyEventAttr.setActivityStatus(activityStatus);
+            studyEventAttr.setStudy(study);
+            return studyEventAttr;
         }
     }
 
@@ -352,27 +370,28 @@ public class StudySaveAction implements Action<IdResult> {
     }
 
     private void saveEventAttributes() {
+        Set<Integer> geAttrIdsUsed = new HashSet<Integer>();
         Set<StudyEventAttr> newEAttrCollection = new HashSet<StudyEventAttr>();
         for (StudyEventAttrSaveInfo eAttrSaveInfo : studyEventAttrSaveInfos) {
-            StudyEventAttr eAttr;
+            if (geAttrIdsUsed.contains(eAttrSaveInfo.globalEventAttrId)) {
+                throw new ActionCheckException(
+                    "canot add multiple study event attributes with same global id "
+                        + eAttrSaveInfo.globalEventAttrId);
+            }
+            StudyEventAttr seAttr;
             if (eAttrSaveInfo.id == null) {
-                eAttr = new StudyEventAttr();
+                seAttr = new StudyEventAttr();
             } else {
-                eAttr =
+                seAttr =
                     ActionUtil.sessionGet(session, StudyEventAttr.class,
                         eAttrSaveInfo.id);
             }
-            GlobalEventAttr gEAttr =
-                ActionUtil.sessionGet(session, GlobalEventAttr.class,
-                    eAttrSaveInfo.globalEventAttrId);
-
-            eAttr.setStudy(study);
-            eAttr.setGlobalEventAttr(gEAttr);
-            eAttr.setPermissible(eAttrSaveInfo.permissible);
-            eAttr.setRequired(eAttrSaveInfo.required);
-            eAttr.setActivityStatus(ActionUtil.sessionGet(session,
-                ActivityStatus.class, eAttrSaveInfo.aStatusId));
-            newEAttrCollection.add(eAttr);
+            newEAttrCollection.add(eAttrSaveInfo.populateStudyEventAttr(study,
+                seAttr, ActionUtil.sessionGet(session, GlobalEventAttr.class,
+                    eAttrSaveInfo.globalEventAttrId),
+                ActionUtil.sessionGet(session,
+                    ActivityStatus.class, eAttrSaveInfo.aStatusId)));
+            geAttrIdsUsed.add(eAttrSaveInfo.globalEventAttrId);
         }
 
         SetDifference<StudyEventAttr> attrsDiff =

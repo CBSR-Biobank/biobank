@@ -66,7 +66,8 @@ public class StudyWrapper extends StudyBaseWrapper {
         // StudyEventAttrWrapper.getStudyEventAttrCollection(this);
 
         for (StudyEventAttrWrapper studyEventAttr : eventAttrList) {
-            studyEventAttrMap.put(studyEventAttr.getLabel(), studyEventAttr);
+            studyEventAttrMap.put(studyEventAttr.getGlobalEventAttr()
+                .getLabel(), studyEventAttr);
         }
         return studyEventAttrMap;
     }
@@ -175,7 +176,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         if (studyEventAttr == null) {
             // does not yet exist
             studyEventAttr = new StudyEventAttrWrapper(appService);
-            studyEventAttr.setLabel(label);
+            studyEventAttr.getGlobalEventAttr().setLabel(label);
             studyEventAttr.getGlobalEventAttr().setEventAttrType(EventAttrType);
             studyEventAttr.setStudy(this);
         }
