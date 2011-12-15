@@ -165,6 +165,30 @@ values (1, 'Unknown user', -1, 0, '', '', 0, @asactive);
 
 -- -----------------------------------------------------------------------
 --
+-- Global event attributes
+--
+-- -----------------------------------------------------------------------
+
+ALTER TABLE global_event_attr MODIFY COLUMN LABEL VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL;
+ALTER TABLE study_event_attr ADD COLUMN GLOBAL_EVENT_ATTR_ID INT(11) NOT NULL COMMENT '', ADD INDEX FK3EACD8EC44556025 (GLOBAL_EVENT_ATTR_ID);
+
+ALTER TABLE study_event_attr
+      ADD CONSTRAINT FK3EACD8EC44556025 FOREIGN KEY FK3EACD8EC44556025 (GLOBAL_EVENT_ATTR_ID) REFERENCES global_event_attr (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+UPDATE study_event_attr sea, global_event_attr gea
+    SET sea.global_event_attr_id=gea.id
+    WHERE sea.label=gea.label;
+
+ALTER TABLE study_event_attr DROP KEY uc_label;
+ALTER TABLE study_event_attr DROP FOREIGN KEY FK3EACD8EC5B770B31;
+ALTER TABLE study_event_attr DROP INDEX FK3EACD8EC5B770B31;
+ALTER TABLE study_event_attr DROP COLUMN LABEL, DROP COLUMN EVENT_ATTR_TYPE_ID;
+ALTER TABLE global_event_attr ADD CONSTRAINT LABEL UNIQUE KEY(LABEL);
+ALTER TABLE event_attr_type MODIFY COLUMN NAME VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL;
+ALTER TABLE event_attr_type ADD CONSTRAINT NAME UNIQUE KEY(NAME);
+
+-- -----------------------------------------------------------------------
+--
 -- Comment field changes
 --
 -- Needs to run after User and Principal tables are created since
@@ -443,6 +467,7 @@ ALTER TABLE comment
       MODIFY COLUMN ID INT(11) NOT NULL,
       DROP COLUMN SRC_ID;
 
+
 -- -----------------------------------------------------------------------
 --
 -- Other changes
@@ -454,8 +479,6 @@ ALTER TABLE collection_event DROP KEY uc_visit_number;
 ALTER TABLE container DROP KEY uc_label, DROP KEY uc_productbarcode;
 
 ALTER TABLE container_type DROP KEY uc_name, DROP KEY uc_nameshort;
-
-ALTER TABLE study_event_attr DROP KEY uc_label;
 
 ALTER TABLE address
       ADD COLUMN NAME VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '';
@@ -470,11 +493,6 @@ ALTER TABLE container
 ALTER TABLE container_type
       ADD CONSTRAINT uc_ct_nameshort UNIQUE KEY(NAME_SHORT, SITE_ID),
       ADD CONSTRAINT uc_ct_name UNIQUE KEY(NAME, SITE_ID);
-
-ALTER TABLE study_event_attr
-      ADD CONSTRAINT uc_se_label UNIQUE KEY(LABEL, STUDY_ID);
-
-
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
