@@ -32,13 +32,6 @@ public class CalgaryPaxgeneFix {
     private static final Logger LOGGER = Logger
         .getLogger(CalgaryPaxgeneFix.class.getName());
 
-    private static class AppArgs {
-        public boolean verbose = false;
-        public String hostname = null;
-        public String username = null;
-        public String password = null;
-    }
-
     public static final String[] PAXGENE_INV_IDS = { "CCWK", "CCWL", "DAHK",
         "DAHL", "DAHP", "DAHQ", "DAHR", "DAHS", "DAHT", "DAHU", "DAHV", "DAHW",
         "DAHX", "DAHY", "DAHZ", "DAIA", "DAIG", "DAII", "DAIP", "DAIQ", "DAIU",
