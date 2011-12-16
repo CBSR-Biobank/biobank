@@ -12,16 +12,19 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicDeleteAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
+import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestClinic extends TestAction {
@@ -200,8 +203,6 @@ public class TestClinic extends TestAction {
         q.setParameter(0, clinicId);
         Assert.assertTrue(HibernateUtil.getCountFromQuery(q).equals(0L));
         closeHibernateSession();
-
-        // TODO attempt to delete a contact that is assoc to a study
     }
 
     private Set<String> getContactNamesFromSaveInfo(
@@ -224,13 +225,30 @@ public class TestClinic extends TestAction {
     }
 
     @Test
-    public void delete() {
-
+    public void delete() throws ApplicationException {
+        // delete a study with no patients and no other associations
+        appService.doAction(new ClinicDeleteAction(clinicId));
     }
 
     @Test
-    public void deleteWithStudies() {
-
+    public void deleteWithStudies() throws ApplicationException {
+        clinicId =
+            ClinicHelper.createClinicWithContacts(appService, name + "_2", 10);
+        ClinicInfo clinicInfo =
+            appService.doAction(new ClinicGetInfoAction(clinicId));
+        StudySaveAction studySaveAction =
+            StudyHelper.getSaveAction(name, name, ActivityStatusEnum.ACTIVE);
+        HashSet<Integer> contactIds = new HashSet<Integer>();
+        contactIds.add(clinicInfo.contacts.get(0).getId());
+        studySaveAction.setContactIds(contactIds);
+        appService.doAction(studySaveAction).getId();
+        try {
+            appService.doAction(new ClinicDeleteAction(clinicId));
+            Assert
+                .fail("should not be allowed to delete a clinic linked to a study");
+        } catch (ActionCheckException e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test

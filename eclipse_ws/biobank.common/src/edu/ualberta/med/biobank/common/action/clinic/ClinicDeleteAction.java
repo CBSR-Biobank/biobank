@@ -25,8 +25,7 @@ public class ClinicDeleteAction extends CenterDeleteAction {
     @Override
     public EmptyResult run(User user, Session session) throws ActionException {
         Clinic clinic = ActionUtil.sessionGet(session, Clinic.class, centerId);
-        ClinicPreDeleteChecks preCheck = new ClinicPreDeleteChecks(clinic);
-        preCheck.run(session);
+        new ClinicPreDeleteChecks(clinic).run(session);
         return super.run(user, session, clinic);
     }
 }
