@@ -96,7 +96,7 @@ public class ClinicHelper extends Helper {
         Set<Integer> result = new HashSet<Integer>();
 
         for (int i = 0; i < numClinics; ++i) {
-            result.add(createClinicWithContacts(appService, name,
+            result.add(createClinicWithContacts(appService, name + "_" + i,
                 numContactsPerClinic));
         }
 
