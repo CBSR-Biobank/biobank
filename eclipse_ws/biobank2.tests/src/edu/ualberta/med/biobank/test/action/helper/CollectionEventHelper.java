@@ -14,6 +14,9 @@ import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 
 public class CollectionEventHelper extends Helper {
 
+    /**
+     * Creates a collection event with random specimens.
+     */
     public static SaveCEventSpecimenInfo createSaveCEventSpecimenInfoRandom(
         Integer specimenTypeId, Integer userId) {
         SaveCEventSpecimenInfo info = new SaveCEventSpecimenInfo();

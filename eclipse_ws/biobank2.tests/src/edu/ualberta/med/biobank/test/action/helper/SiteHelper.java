@@ -16,6 +16,21 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteHelper extends Helper {
 
+    public static SiteSaveAction getSaveAction(String name,
+        String nameShort, ActivityStatusEnum active) {
+        Address address = new Address();
+        address.setCity(Utils.getRandomString(5, 10));
+
+        SiteSaveAction siteSaveAction = new SiteSaveAction();
+        siteSaveAction.setName(name);
+        siteSaveAction.setNameShort(nameShort);
+        siteSaveAction.setActivityStatusId(active.getId());
+        siteSaveAction.setAddress(address);
+        siteSaveAction.setStudyIds(new HashSet<Integer>());
+
+        return siteSaveAction;
+    }
+
     public static Integer createSite(BiobankApplicationService appService,
         String name, String city, ActivityStatusEnum activityStatus,
         Set<Integer> studyIds) throws ApplicationException {
@@ -61,21 +76,6 @@ public class SiteHelper extends Helper {
             ids.add(infos.getStudy().getId());
         }
         siteSaveAction.setStudyIds(ids);
-
-        return siteSaveAction;
-    }
-
-    public static SiteSaveAction getSaveAction(String name,
-        String nameShort, ActivityStatusEnum active) {
-        Address address = new Address();
-        address.setCity(Utils.getRandomString(5, 10));
-
-        SiteSaveAction siteSaveAction = new SiteSaveAction();
-        siteSaveAction.setName(name);
-        siteSaveAction.setNameShort(nameShort);
-        siteSaveAction.setActivityStatusId(active.getId());
-        siteSaveAction.setAddress(address);
-        siteSaveAction.setStudyIds(new HashSet<Integer>());
 
         return siteSaveAction;
     }

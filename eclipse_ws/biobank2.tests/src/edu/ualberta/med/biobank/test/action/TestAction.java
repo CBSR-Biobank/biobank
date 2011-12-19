@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.action;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import org.hibernate.FlushMode;
@@ -12,9 +13,11 @@ import org.junit.After;
 import org.junit.Before;
 
 import edu.ualberta.med.biobank.common.action.security.UserGetAction;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.AllTests;
 import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.action.helper.SpecimenTypeHelper;
 
 public class TestAction extends TestDatabase {
     private SessionFactory sessionFactory;
@@ -89,5 +92,13 @@ public class TestAction extends TestDatabase {
 
     public static boolean compareDouble(Double d1, Double d2) {
         return Math.abs((d1 - d2)) < 0.0001;
+    }
+
+    protected List<SpecimenType> getSpecimenTypes() {
+        openHibernateSession();
+        List<SpecimenType> spcTypes =
+            SpecimenTypeHelper.getSpecimenTypes(session);
+        closeHibernateSession();
+        return spcTypes;
     }
 }

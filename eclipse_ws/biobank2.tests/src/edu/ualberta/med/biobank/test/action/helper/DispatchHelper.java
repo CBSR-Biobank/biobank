@@ -14,24 +14,16 @@ public class DispatchHelper extends Helper {
 
     public static Set<DispatchSpecimenInfo> createSaveDispatchSpecimenInfoRandom(
         BiobankApplicationService appService, Integer patientId,
-        Integer centerId
-        ) {
+        Integer centerId) throws Exception {
         Set<DispatchSpecimenInfo> infos = new HashSet<DispatchSpecimenInfo>();
         Integer id = null;
-        try {
-            id =
-                CollectionEventHelper.createCEventWithSourceSpecimens(
-                    appService,
-                    patientId, centerId);
-            CollectionEvent added =
-                (CollectionEvent) appService.search(CollectionEvent.class, id);
-            for (Specimen spec : added.getAllSpecimenCollection()) {
-                infos.add(new DispatchSpecimenInfo(null, spec.getId(),
-                    DispatchSpecimenState.NONE.getId()));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        id = CollectionEventHelper.createCEventWithSourceSpecimens(
+            appService, patientId, centerId);
+        CollectionEvent added =
+            (CollectionEvent) appService.search(CollectionEvent.class, id);
+        for (Specimen spec : added.getAllSpecimenCollection()) {
+            infos.add(new DispatchSpecimenInfo(null, spec.getId(),
+                DispatchSpecimenState.NONE.getId()));
         }
 
         return infos;

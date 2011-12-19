@@ -312,17 +312,6 @@ public class TestStudy extends TestAction {
         return contacts;
     }
 
-    private List<SpecimenType> getSpecimenTypes() {
-        openHibernateSession();
-        Query q = session.createQuery("from " + SpecimenType.class.getName());
-        @SuppressWarnings("unchecked")
-        List<SpecimenType> spcTypes = q.list();
-        closeHibernateSession();
-        Assert.assertTrue("specimen types not found in database",
-            !spcTypes.isEmpty());
-        return spcTypes;
-    }
-
     private static Set<SourceSpecimenSaveInfo> getSourceSpecimens(
         int numSourceSpecimens, List<SpecimenType> specimenType)
         throws ApplicationException {

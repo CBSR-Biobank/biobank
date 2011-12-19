@@ -95,16 +95,12 @@ public class TestCollectionEvent extends TestAction {
 
     @Test
     public void saveWithSpecs() throws Exception {
-        String s = name + r.nextInt();
         final Integer visitNumber = r.nextInt(20);
         final List<CommentInfo> comments =
             Utils.getRandomCommentInfos(currentUser.getId());
         final Integer statusId = 1;
 
-        // add specimen type
-        final Integer typeId =
-            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-                .addSpecimenType(s).getId();
+        final Integer typeId = getSpecimenTypes().get(0).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,

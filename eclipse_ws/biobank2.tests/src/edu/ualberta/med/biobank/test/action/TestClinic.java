@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.test.action;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Query;
@@ -17,13 +19,25 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
+import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
+import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
+import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
+import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
+import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
+import edu.ualberta.med.biobank.test.action.helper.ShipmentInfoHelper;
+import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -34,7 +48,7 @@ public class TestClinic extends TestAction {
 
     private String name;
 
-    private Integer clinicId;
+    private ClinicSaveAction clinicSaveAction;
 
     @Override
     @Before
@@ -42,19 +56,15 @@ public class TestClinic extends TestAction {
         super.setUp();
         name = testname.getMethodName() + r.nextInt();
 
-        clinicId = ClinicHelper.createClinic(appService, name,
-            ActivityStatusEnum.ACTIVE);
+        clinicSaveAction = ClinicHelper.getSaveAction(name, name,
+            ActivityStatusEnum.ACTIVE, r.nextBoolean());
     }
 
     @Test
     public void saveNew() throws Exception {
-        // null name
-        String altName = name + "_alt";
-        ClinicSaveAction saveAction =
-            ClinicHelper.getSaveAction(null, altName,
-                ActivityStatusEnum.ACTIVE, true);
+        clinicSaveAction.setName(null);
         try {
-            appService.doAction(saveAction);
+            appService.doAction(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no name");
         } catch (NullPropertyException e) {
@@ -62,44 +72,40 @@ public class TestClinic extends TestAction {
         }
 
         // null short name
-        saveAction =
-            ClinicHelper.getSaveAction(altName, null,
-                ActivityStatusEnum.ACTIVE, true);
+        clinicSaveAction.setName(name);
+        clinicSaveAction.setNameShort(null);
         try {
-            appService.doAction(saveAction);
+            appService.doAction(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no short name");
         } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
 
-        saveAction = ClinicHelper.getSaveAction(altName, altName,
-            ActivityStatusEnum.ACTIVE, true);
-        saveAction.setActivityStatusId(null);
+        clinicSaveAction.setNameShort(name);
+        clinicSaveAction.setActivityStatusId(null);
         try {
-            appService.doAction(saveAction);
+            appService.doAction(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add Clinic with no activity status");
         } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
 
-        saveAction = ClinicHelper.getSaveAction(altName, altName,
-            ActivityStatusEnum.ACTIVE, true);
-        saveAction.setAddress(null);
+        clinicSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        clinicSaveAction.setAddress(null);
         try {
-            appService.doAction(saveAction);
+            appService.doAction(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no address");
         } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
 
-        saveAction = ClinicHelper.getSaveAction(altName, altName,
-            ActivityStatusEnum.ACTIVE, true);
-        saveAction.setContactSaveInfos(null);
+        clinicSaveAction.setAddress(new Address());
+        clinicSaveAction.setContactSaveInfos(null);
         try {
-            appService.doAction(saveAction);
+            appService.doAction(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add site with null site ids");
         } catch (NullPropertyException e) {
@@ -111,6 +117,7 @@ public class TestClinic extends TestAction {
     @Test
     public void nameChecks() throws Exception {
         // ensure we can change name on existing clinic
+        Integer clinicId = appService.doAction(clinicSaveAction).getId();
         ClinicInfo clinicInfo =
             appService.doAction(new ClinicGetInfoAction(clinicId));
         clinicInfo.clinic.setName(name + "_2");
@@ -125,22 +132,22 @@ public class TestClinic extends TestAction {
         appService.doAction(clinicSave);
 
         // test for duplicate name
-        ClinicSaveAction saveClinic =
+        ClinicSaveAction saveClinic2 =
             ClinicHelper.getSaveAction(name + "_2", name,
                 ActivityStatusEnum.ACTIVE, false);
         try {
-            appService.doAction(saveClinic);
+            appService.doAction(saveClinic2);
             Assert.fail("should not be allowed to add clinic with same name");
         } catch (ActionCheckException e) {
             Assert.assertTrue(true);
         }
 
         // test for duplicate name short
-        saveClinic.setName(Utils.getRandomString(5, 10));
-        saveClinic.setNameShort(name + "_2");
+        saveClinic2.setName(Utils.getRandomString(5, 10));
+        saveClinic2.setNameShort(name + "_2");
 
         try {
-            appService.doAction(saveClinic);
+            appService.doAction(saveClinic2);
             Assert
                 .fail("should not be allowed to add clinic with same name short");
         } catch (ActionCheckException e) {
@@ -167,11 +174,8 @@ public class TestClinic extends TestAction {
             }
         }
 
-        ClinicSaveAction clinicSave =
-            ClinicHelper.getSaveAction(name + "_2",
-                name + "_2", ActivityStatusEnum.ACTIVE, true);
-        clinicSave.setContactSaveInfos(contactsAll);
-        clinicId = appService.doAction(clinicSave).getId();
+        clinicSaveAction.setContactSaveInfos(contactsAll);
+        Integer clinicId = appService.doAction(clinicSaveAction).getId();
 
         ClinicInfo clinicInfo =
             appService.doAction(new ClinicGetInfoAction(clinicId));
@@ -179,18 +183,18 @@ public class TestClinic extends TestAction {
             getContactNames(clinicInfo.contacts));
 
         // remove Set 2 from the clinic, Set 1 should be left
-        clinicSave = ClinicHelper.getSaveAction(appService, clinicInfo);
-        clinicSave.setContactSaveInfos(set1);
-        appService.doAction(clinicSave);
+        clinicSaveAction = ClinicHelper.getSaveAction(appService, clinicInfo);
+        clinicSaveAction.setContactSaveInfos(set1);
+        appService.doAction(clinicSaveAction);
 
         clinicInfo = appService.doAction(new ClinicGetInfoAction(clinicId));
         Assert.assertEquals(getContactNamesFromSaveInfo(set1),
             getContactNames(clinicInfo.contacts));
 
         // remove all
-        clinicSave = ClinicHelper.getSaveAction(appService, clinicInfo);
-        clinicSave.setContactSaveInfos(new HashSet<ContactSaveInfo>());
-        appService.doAction(clinicSave);
+        clinicSaveAction = ClinicHelper.getSaveAction(appService, clinicInfo);
+        clinicSaveAction.setContactSaveInfos(new HashSet<ContactSaveInfo>());
+        appService.doAction(clinicSaveAction);
 
         clinicInfo = appService.doAction(new ClinicGetInfoAction(clinicId));
         Assert.assertTrue(clinicInfo.contacts.isEmpty());
@@ -227,23 +231,66 @@ public class TestClinic extends TestAction {
     @Test
     public void delete() throws ApplicationException {
         // delete a study with no patients and no other associations
+        Integer clinicId = appService.doAction(clinicSaveAction).getId();
         appService.doAction(new ClinicDeleteAction(clinicId));
+    }
+
+    public static class Provisioning {
+        Integer siteId;
+        Integer studyId;
+        Integer clinicId;
+        List<Integer> patientIds;
+
+        public Provisioning() {
+            patientIds = new ArrayList<Integer>();
+        }
+    }
+
+    /*
+     * Creates a clinic, study and site. Clinic is linked to study via contact.
+     * Study is linked to Site.
+     * 
+     * @returns site ID.
+     */
+    private static Provisioning provisionProcessingConfiguration(
+        BiobankApplicationService appService, String basename)
+        throws ApplicationException {
+        Provisioning provisioning = new Provisioning();
+        provisioning.clinicId =
+            ClinicHelper.createClinicWithContacts(appService, basename
+                + "_clinic", 10);
+        ClinicInfo clinicInfo =
+            appService.doAction(new ClinicGetInfoAction(provisioning.clinicId));
+        StudySaveAction studySaveAction =
+            StudyHelper.getSaveAction(basename + "_study", basename + "_study",
+                ActivityStatusEnum.ACTIVE);
+        HashSet<Integer> ids = new HashSet<Integer>();
+        ids.add(clinicInfo.contacts.get(0).getId());
+        studySaveAction.setContactIds(ids);
+        provisioning.studyId = appService.doAction(studySaveAction).getId();
+
+        SiteSaveAction siteSaveAction =
+            SiteHelper.getSaveAction(basename + "_site", basename + "_site",
+                ActivityStatusEnum.ACTIVE);
+        ids = new HashSet<Integer>();
+        ids.add(provisioning.studyId);
+        siteSaveAction.setStudyIds(ids);
+        provisioning.siteId = appService.doAction(siteSaveAction).getId();
+
+        PatientSaveAction patientSaveAction =
+            new PatientSaveAction(null, provisioning.studyId,
+                basename + "_patient1", Utils.getRandomDate());
+        provisioning.patientIds.add(appService.doAction(patientSaveAction)
+            .getId());
+        return provisioning;
     }
 
     @Test
     public void deleteWithStudies() throws ApplicationException {
-        clinicId =
-            ClinicHelper.createClinicWithContacts(appService, name + "_2", 10);
-        ClinicInfo clinicInfo =
-            appService.doAction(new ClinicGetInfoAction(clinicId));
-        StudySaveAction studySaveAction =
-            StudyHelper.getSaveAction(name, name, ActivityStatusEnum.ACTIVE);
-        HashSet<Integer> contactIds = new HashSet<Integer>();
-        contactIds.add(clinicInfo.contacts.get(0).getId());
-        studySaveAction.setContactIds(contactIds);
-        appService.doAction(studySaveAction).getId();
+        Provisioning provisioning =
+            provisionProcessingConfiguration(appService, name);
         try {
-            appService.doAction(new ClinicDeleteAction(clinicId));
+            appService.doAction(new ClinicDeleteAction(provisioning.clinicId));
             Assert
                 .fail("should not be allowed to delete a clinic linked to a study");
         } catch (ActionCheckException e) {
@@ -252,7 +299,29 @@ public class TestClinic extends TestAction {
     }
 
     @Test
-    public void deleteWithSrcDispatch() {
+    public void deleteWithSrcDispatch() throws Exception {
+        Provisioning provisioning =
+            provisionProcessingConfiguration(appService, name);
+
+        DispatchSaveInfo d =
+            DispatchHelper.createSaveDispatchInfoRandom(appService,
+                provisioning.siteId, provisioning.clinicId,
+                DispatchState.CREATION.getId(), Utils.getRandomString(5));
+        Set<DispatchSpecimenInfo> specs =
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(appService,
+                provisioning.patientIds.get(0), provisioning.clinicId);
+        ShipmentInfoSaveInfo shipsave =
+            ShipmentInfoHelper.createRandomShipmentInfo(appService);
+        appService.doAction(new DispatchSaveAction(d, specs, shipsave));
+
+        try {
+            appService.doAction(new ClinicDeleteAction(provisioning.clinicId));
+            Assert
+                .fail(
+                "should not be allowed to delete a clinic which is a source of dispatches");
+        } catch (ActionCheckException e) {
+            Assert.assertTrue(true);
+        }
 
     }
 
