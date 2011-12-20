@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
@@ -21,10 +22,12 @@ import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestSite extends TestAction {
 
@@ -200,12 +203,40 @@ public class TestSite extends TestAction {
     }
 
     @Test
-    public void delete() {
+    public void delete() throws ApplicationException {
+        Integer siteId = appService.doAction(siteSaveAction).getId();
+        appService.doAction(new SiteDeleteAction(siteId));
 
     }
 
     @Test
-    public void deleteWithStudies() {
+    public void deleteWithContainerTypes() throws ApplicationException {
+        Provisioning provisioning =
+            SiteHelper.provisionProcessingConfiguration(appService, name);
+
+        ContainerTypeSaveAction ctSaveAction =
+            ContainerTypeHelper.getSaveAction(name, name, provisioning.siteId,
+                true, 3, 10,
+                getContainerLabelingSchemes().get(0).getId());
+        appService.doAction(ctSaveAction);
+
+        try {
+            appService.doAction(new SiteDeleteAction(provisioning.siteId));
+            Assert
+                .fail(
+                "should not be allowed to delete a site which is linked to studies");
+        } catch (ActionCheckException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void deleteWithContainers() throws ApplicationException {
+
+    }
+
+    @Test
+    public void deleteWithProcessingEvents() throws ApplicationException {
 
     }
 
@@ -230,7 +261,7 @@ public class TestSite extends TestAction {
             appService.doAction(new SiteDeleteAction(provisioning.siteId));
             Assert
                 .fail(
-                "should not be allowed to delete a clinic which is a source of dispatches");
+                "should not be allowed to delete a site which is a source of dispatches");
         } catch (ActionCheckException e) {
             Assert.assertTrue(true);
         }

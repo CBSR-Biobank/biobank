@@ -6,12 +6,12 @@ import java.util.List;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
@@ -32,7 +32,6 @@ public abstract class CenterSaveAction implements Action<IdResult> {
     private String nameShort;
     private Address address;
     private Integer aStatusId;
-    private Session session = null;
 
     public void setId(Integer id) {
         this.centerId = id;
@@ -61,7 +60,7 @@ public abstract class CenterSaveAction implements Action<IdResult> {
     }
 
     protected IdResult run(User user, Session session,
-        SessionUtil sessionUtil, Center center) throws ActionException {
+        ActionContext context, Center center) throws ActionException {
         if (name == null) {
             throw new NullPropertyException(Center.class, CenterPeer.NAME);
         }
@@ -75,8 +74,6 @@ public abstract class CenterSaveAction implements Action<IdResult> {
             throw new NullPropertyException(Center.class,
                 CenterPeer.ACTIVITY_STATUS);
         }
-
-        this.session = session;
 
         // check for duplicate name
         List<ValueProperty<Center>> uniqueValProps =
@@ -102,8 +99,7 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         center.setName(name);
         center.setNameShort(nameShort);
 
-        ActivityStatus aStatus = sessionUtil.get(ActivityStatus.class,
-            aStatusId);
+        ActivityStatus aStatus = context.load(ActivityStatus.class, aStatusId);
         center.setActivityStatus(aStatus);
 
         // TODO: remember to check the address

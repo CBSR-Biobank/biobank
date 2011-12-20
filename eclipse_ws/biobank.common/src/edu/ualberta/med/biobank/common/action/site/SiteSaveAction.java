@@ -5,11 +5,11 @@ import java.util.Set;
 
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.center.CenterSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.site.SiteCreatePermission;
@@ -47,12 +47,12 @@ public class SiteSaveAction extends CenterSaveAction {
                 SitePeer.STUDY_COLLECTION);
         }
 
-        SessionUtil sessionUtil = new SessionUtil(session);
-        Site site = sessionUtil.get(Site.class, centerId, new Site());
+        ActionContext context = new ActionContext(user, session);
+        Site site = context.load(Site.class, centerId, new Site());
 
         // TODO: check that the user has access to at least the studies they are
         // removing or adding?
-        Map<Integer, Study> studies = sessionUtil.get(Study.class, studyIds);
+        Map<Integer, Study> studies = context.load(Study.class, studyIds);
         SetDifference<Study> sitesDiff = new SetDifference<Study>(
             site.getStudyCollection(), studies.values());
         site.setStudyCollection(sitesDiff.getNewSet());
@@ -60,7 +60,7 @@ public class SiteSaveAction extends CenterSaveAction {
             session.delete(study);
         }
 
-        return run(user, session, sessionUtil, site);
+        return run(user, session, context, site);
     }
 
 }

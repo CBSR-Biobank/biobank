@@ -6,13 +6,16 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.hibernate.FlushMode;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 
 import edu.ualberta.med.biobank.common.action.security.UserGetAction;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.AllTests;
@@ -100,5 +103,17 @@ public class TestAction extends TestDatabase {
             SpecimenTypeHelper.getSpecimenTypes(session);
         closeHibernateSession();
         return spcTypes;
+    }
+
+    protected List<ContainerLabelingScheme> getContainerLabelingSchemes() {
+        openHibernateSession();
+        Query q =
+            session.createQuery("from "
+                + ContainerLabelingScheme.class.getName());
+        @SuppressWarnings("unchecked")
+        List<ContainerLabelingScheme> labelingSchemes = q.list();
+        Assert.assertTrue("container labeling schemes not found in database",
+            !labelingSchemes.isEmpty());
+        return labelingSchemes;
     }
 }

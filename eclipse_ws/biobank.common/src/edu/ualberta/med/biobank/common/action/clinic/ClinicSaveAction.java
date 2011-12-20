@@ -6,13 +6,12 @@ import java.util.Set;
 
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
-import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.center.CenterSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicCreatePermission;
@@ -70,7 +69,7 @@ public class ClinicSaveAction extends CenterSaveAction {
     private Boolean sendsShipments;
     private Collection<ContactSaveInfo> contactSaveInfos;
     private Session session = null;
-    private SessionUtil sessionUtil = null;
+    private ActionContext context = null;
     private Clinic clinic = null;
 
     public void setSendsShipments(Boolean sendsShipments) {
@@ -102,13 +101,13 @@ public class ClinicSaveAction extends CenterSaveAction {
         }
 
         this.session = session;
-        sessionUtil = new SessionUtil(session);
-        clinic = sessionUtil.get(Clinic.class, centerId, new Clinic());
+        context = new ActionContext(user, session);
+        clinic = context.load(Clinic.class, centerId, new Clinic());
         clinic.setSendsShipments(sendsShipments);
 
         saveContacts();
 
-        return run(user, session, sessionUtil, clinic);
+        return run(user, session, context, clinic);
     }
 
     // TODO: do not allow delete of a contact linked to a study
@@ -119,9 +118,7 @@ public class ClinicSaveAction extends CenterSaveAction {
             if (contactSaveInfo.id == null) {
                 contact = new Contact();
             } else {
-                contact =
-                    ActionUtil.sessionGet(session, Contact.class,
-                        contactSaveInfo.id);
+                contact = context.load(Contact.class, contactSaveInfo.id);
             }
             newContactCollection.add(contactSaveInfo.populateContcat(clinic,
                 contact));

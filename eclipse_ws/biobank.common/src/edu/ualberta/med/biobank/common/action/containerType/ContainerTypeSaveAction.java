@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 
 public class ContainerTypeSaveAction implements Action<ContainerTypeIdResult> {
@@ -22,6 +23,7 @@ public class ContainerTypeSaveAction implements Action<ContainerTypeIdResult> {
     private Integer containerTypeId;
     private String name;
     private String nameShort;
+    private Integer siteId;
     private boolean topLevel;
     private Integer rowCapacity;
     private Integer colCapacity;
@@ -33,6 +35,58 @@ public class ContainerTypeSaveAction implements Action<ContainerTypeIdResult> {
 
     private Set<Integer> specimenTypeIds;
     private Set<Integer> containerTypeIds;
+
+    public void setId(Integer containerTypeId) {
+        this.containerTypeId = containerTypeId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setNameShort(String nameShort) {
+        this.nameShort = nameShort;
+    }
+
+    public void setSiteId(Integer siteId) {
+        this.siteId = siteId;
+    }
+
+    public void setTopLevel(boolean topLevel) {
+        this.topLevel = topLevel;
+    }
+
+    public void setRowCapacity(Integer rowCapacity) {
+        this.rowCapacity = rowCapacity;
+    }
+
+    public void setColCapacity(Integer colCapacity) {
+        this.colCapacity = colCapacity;
+    }
+
+    public void setDefaultTemperature(Double defaultTemperature) {
+        this.defaultTemperature = defaultTemperature;
+    }
+
+    public void setChildLabelingSchemeId(Integer childLabelingSchemeId) {
+        this.childLabelingSchemeId = childLabelingSchemeId;
+    }
+
+    public void setActivityStatusId(Integer activityStatusId) {
+        this.activityStatusId = activityStatusId;
+    }
+
+    public void setCommentMessage(String commentMessage) {
+        this.commentMessage = commentMessage;
+    }
+
+    public void setSpecimenTypeIds(Set<Integer> specimenTypeIds) {
+        this.specimenTypeIds = specimenTypeIds;
+    }
+
+    public void setContainerTypeIds(Set<Integer> containerTypeIds) {
+        this.containerTypeIds = containerTypeIds;
+    }
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
@@ -48,6 +102,7 @@ public class ContainerTypeSaveAction implements Action<ContainerTypeIdResult> {
 
         containerType.setName(name);
         containerType.setNameShort(nameShort);
+        containerType.setSite(context.load(Site.class, siteId));
         containerType.setTopLevel(topLevel);
         containerType.getCapacity().setRowCapacity(rowCapacity);
         containerType.getCapacity().setColCapacity(colCapacity);
