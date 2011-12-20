@@ -1,9 +1,7 @@
 package edu.ualberta.med.biobank.test.action;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Query;
@@ -19,26 +17,16 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
-import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
-import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
-import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
-import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
-import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
-import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
-import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
-import edu.ualberta.med.biobank.test.action.helper.ShipmentInfoHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
-import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
+import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestClinic extends TestAction {
@@ -235,60 +223,10 @@ public class TestClinic extends TestAction {
         appService.doAction(new ClinicDeleteAction(clinicId));
     }
 
-    public static class Provisioning {
-        Integer siteId;
-        Integer studyId;
-        Integer clinicId;
-        List<Integer> patientIds;
-
-        public Provisioning() {
-            patientIds = new ArrayList<Integer>();
-        }
-    }
-
-    /*
-     * Creates a clinic, study and site. Clinic is linked to study via contact.
-     * Study is linked to Site.
-     * 
-     * @returns site ID.
-     */
-    private static Provisioning provisionProcessingConfiguration(
-        BiobankApplicationService appService, String basename)
-        throws ApplicationException {
-        Provisioning provisioning = new Provisioning();
-        provisioning.clinicId =
-            ClinicHelper.createClinicWithContacts(appService, basename
-                + "_clinic", 10);
-        ClinicInfo clinicInfo =
-            appService.doAction(new ClinicGetInfoAction(provisioning.clinicId));
-        StudySaveAction studySaveAction =
-            StudyHelper.getSaveAction(basename + "_study", basename + "_study",
-                ActivityStatusEnum.ACTIVE);
-        HashSet<Integer> ids = new HashSet<Integer>();
-        ids.add(clinicInfo.contacts.get(0).getId());
-        studySaveAction.setContactIds(ids);
-        provisioning.studyId = appService.doAction(studySaveAction).getId();
-
-        SiteSaveAction siteSaveAction =
-            SiteHelper.getSaveAction(basename + "_site", basename + "_site",
-                ActivityStatusEnum.ACTIVE);
-        ids = new HashSet<Integer>();
-        ids.add(provisioning.studyId);
-        siteSaveAction.setStudyIds(ids);
-        provisioning.siteId = appService.doAction(siteSaveAction).getId();
-
-        PatientSaveAction patientSaveAction =
-            new PatientSaveAction(null, provisioning.studyId,
-                basename + "_patient1", Utils.getRandomDate());
-        provisioning.patientIds.add(appService.doAction(patientSaveAction)
-            .getId());
-        return provisioning;
-    }
-
     @Test
     public void deleteWithStudies() throws ApplicationException {
         Provisioning provisioning =
-            provisionProcessingConfiguration(appService, name);
+            SiteHelper.provisionProcessingConfiguration(appService, name);
         try {
             appService.doAction(new ClinicDeleteAction(provisioning.clinicId));
             Assert
@@ -298,26 +236,13 @@ public class TestClinic extends TestAction {
         }
     }
 
-    private void createDispatch(Integer srcCenterId, Integer dstCenterId,
-        Integer patientId) throws Exception {
-        DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(appService,
-                dstCenterId, srcCenterId, DispatchState.CREATION.getId(),
-                Utils.getRandomString(5));
-        Set<DispatchSpecimenInfo> specs =
-            DispatchHelper.createSaveDispatchSpecimenInfoRandom(appService,
-                patientId, srcCenterId);
-        ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(appService);
-        appService.doAction(new DispatchSaveAction(d, specs, shipsave));
-    }
-
     @Test
     public void deleteWithSrcDispatch() throws Exception {
         Provisioning provisioning =
-            provisionProcessingConfiguration(appService, name);
+            SiteHelper.provisionProcessingConfiguration(appService, name);
 
-        createDispatch(provisioning.clinicId, provisioning.siteId,
+        DispatchHelper.createDispatch(appService, provisioning.clinicId,
+            provisioning.siteId,
             provisioning.patientIds.get(0));
 
         try {
@@ -333,7 +258,7 @@ public class TestClinic extends TestAction {
     @Test
     public void deleteWithDstDispatch() throws Exception {
         Provisioning provisioning =
-            provisionProcessingConfiguration(appService, name);
+            SiteHelper.provisionProcessingConfiguration(appService, name);
 
         // add second clinic to be the destination of the dispatch
 
@@ -342,7 +267,8 @@ public class TestClinic extends TestAction {
                 ActivityStatusEnum.ACTIVE, r.nextBoolean());
         Integer clinicId2 = appService.doAction(csa2).getId();
 
-        createDispatch(provisioning.clinicId, clinicId2,
+        DispatchHelper.createDispatch(appService, provisioning.clinicId,
+            clinicId2,
             provisioning.patientIds.get(0));
 
         try {

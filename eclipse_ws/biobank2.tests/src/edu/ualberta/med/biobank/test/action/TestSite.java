@@ -16,10 +16,14 @@ import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteDeleteAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
+import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
+import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
 public class TestSite extends TestAction {
@@ -29,7 +33,7 @@ public class TestSite extends TestAction {
 
     private String name;
 
-    private Integer siteId;
+    private SiteSaveAction siteSaveAction;
 
     @Override
     @Before
@@ -37,19 +41,16 @@ public class TestSite extends TestAction {
         super.setUp();
         name = testname.getMethodName() + r.nextInt();
 
-        siteId = SiteHelper.createSite(appService, name,
-            Utils.getRandomString(8, 12),
-            ActivityStatusEnum.ACTIVE, new HashSet<Integer>());
+        siteSaveAction =
+            SiteHelper.getSaveAction(name, name, ActivityStatusEnum.ACTIVE);
     }
 
     @Test
     public void saveNew() throws Exception {
         // null name
-        String altName = name + "_alt";
-        SiteSaveAction saveAction =
-            SiteHelper.getSaveAction(null, altName, ActivityStatusEnum.ACTIVE);
+        siteSaveAction.setName(null);
         try {
-            appService.doAction(saveAction);
+            appService.doAction(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no name");
         } catch (NullPropertyException e) {
@@ -57,43 +58,41 @@ public class TestSite extends TestAction {
         }
 
         // null short name
-        saveAction =
-            SiteHelper.getSaveAction(altName, null, ActivityStatusEnum.ACTIVE);
+        siteSaveAction.setName(name);
+        siteSaveAction.setNameShort(null);
         try {
-            appService.doAction(saveAction);
+            appService.doAction(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no short name");
         } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
 
-        saveAction = SiteHelper.getSaveAction(altName, altName,
-            ActivityStatusEnum.ACTIVE);
-        saveAction.setActivityStatusId(null);
+        siteSaveAction.setName(name);
+        siteSaveAction.setActivityStatusId(null);
         try {
-            appService.doAction(saveAction);
+            appService.doAction(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add Site with no activity status");
         } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
 
-        saveAction = SiteHelper.getSaveAction(altName, altName,
-            ActivityStatusEnum.ACTIVE);
-        saveAction.setAddress(null);
+        siteSaveAction.setActivityStatusId(
+            ActivityStatusEnum.ACTIVE.getId());
+        siteSaveAction.setAddress(null);
         try {
-            appService.doAction(saveAction);
+            appService.doAction(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no address");
         } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
 
-        saveAction = SiteHelper.getSaveAction(altName, altName,
-            ActivityStatusEnum.ACTIVE);
-        saveAction.setStudyIds(null);
+        siteSaveAction.setAddress(new Address());
+        siteSaveAction.setStudyIds(null);
         try {
-            appService.doAction(saveAction);
+            appService.doAction(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with null site ids");
         } catch (NullPropertyException e) {
@@ -103,19 +102,20 @@ public class TestSite extends TestAction {
 
     @Test
     public void nameChecks() throws Exception {
+        Integer siteId = appService.doAction(siteSaveAction).getId();
+
         // ensure we can change name on existing clinic
         SiteInfo siteInfo =
             appService.doAction(new SiteGetInfoAction(siteId));
         siteInfo.site.setName(name + "_2");
-        SiteSaveAction siteSave =
-            SiteHelper.getSaveAction(appService, siteInfo);
-        appService.doAction(siteSave);
+        siteSaveAction = SiteHelper.getSaveAction(appService, siteInfo);
+        appService.doAction(siteSaveAction);
 
         // ensure we can change short name on existing site
         siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
         siteInfo.site.setNameShort(name + "_2");
-        siteSave = SiteHelper.getSaveAction(appService, siteInfo);
-        appService.doAction(siteSave);
+        siteSaveAction = SiteHelper.getSaveAction(appService, siteInfo);
+        appService.doAction(siteSaveAction);
 
         // test for duplicate name
         SiteSaveAction saveSite =
@@ -161,6 +161,7 @@ public class TestSite extends TestAction {
         }
 
         // add study set 1 to site created in startup
+        Integer siteId = appService.doAction(siteSaveAction).getId();
         SiteInfo siteInfo =
             appService.doAction(new SiteGetInfoAction(siteId));
         SiteSaveAction siteSaveAction =
@@ -209,13 +210,49 @@ public class TestSite extends TestAction {
     }
 
     @Test
-    public void deleteWithSrcDispatch() {
+    public void deleteWithSrcDispatch() throws Exception {
+        Provisioning provisioning =
+            SiteHelper.provisionProcessingConfiguration(appService, name);
 
+        DispatchHelper.createDispatch(appService, provisioning.clinicId,
+            provisioning.siteId,
+            provisioning.patientIds.get(0));
+
+        // create a second site to dispatch to
+        Integer siteId2 = appService.doAction(
+            SiteHelper.getSaveAction(name + "_site2", name + "_site2",
+                ActivityStatusEnum.ACTIVE)).getId();
+
+        DispatchHelper.createDispatch(appService, provisioning.siteId, siteId2,
+            provisioning.patientIds.get(0));
+
+        try {
+            appService.doAction(new SiteDeleteAction(provisioning.siteId));
+            Assert
+                .fail(
+                "should not be allowed to delete a clinic which is a source of dispatches");
+        } catch (ActionCheckException e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
-    public void deleteWithDstDispatch() {
+    public void deleteWithDstDispatch() throws Exception {
+        Provisioning provisioning =
+            SiteHelper.provisionProcessingConfiguration(appService, name);
 
+        DispatchHelper.createDispatch(appService, provisioning.clinicId,
+            provisioning.siteId,
+            provisioning.patientIds.get(0));
+
+        try {
+            appService.doAction(new SiteDeleteAction(provisioning.siteId));
+            Assert
+                .fail(
+                "should not be allowed to delete a site which is a destination for dispatches");
+        } catch (ActionCheckException e) {
+            Assert.assertTrue(true);
+        }
     }
 
 }

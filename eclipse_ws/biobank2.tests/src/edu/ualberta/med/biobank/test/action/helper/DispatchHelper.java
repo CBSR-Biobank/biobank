@@ -4,12 +4,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
+import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.test.Utils;
 
 public class DispatchHelper extends Helper {
 
@@ -36,5 +40,21 @@ public class DispatchHelper extends Helper {
         BiobankApplicationService appService,
         Integer siteId, Integer centerId, Integer state, String comment) {
         return new DispatchSaveInfo(null, siteId, centerId, state, comment);
+    }
+
+    public static Integer createDispatch(BiobankApplicationService appService,
+        Integer srcCenterId, Integer dstCenterId,
+        Integer patientId) throws Exception {
+        DispatchSaveInfo d =
+            DispatchHelper.createSaveDispatchInfoRandom(appService,
+                dstCenterId, srcCenterId, DispatchState.CREATION.getId(),
+                Utils.getRandomString(5));
+        Set<DispatchSpecimenInfo> specs =
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(appService,
+                patientId, srcCenterId);
+        ShipmentInfoSaveInfo shipsave =
+            ShipmentInfoHelper.createRandomShipmentInfo(appService);
+        return appService.doAction(new DispatchSaveAction(d, specs, shipsave))
+            .getId();
     }
 }
