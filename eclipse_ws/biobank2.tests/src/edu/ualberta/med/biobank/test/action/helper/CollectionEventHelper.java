@@ -75,8 +75,7 @@ public class CollectionEventHelper extends Helper {
 
         // Save a new cevent with specimens
         return appService.doAction(new CollectionEventSaveAction(
-            null, patientId, r
-                .nextInt(20), 1, null, siteId,
+            null, patientId, r.nextInt(20), 1, null, siteId,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
             .getId();
 

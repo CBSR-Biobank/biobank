@@ -298,21 +298,27 @@ public class TestClinic extends TestAction {
         }
     }
 
+    private void createDispatch(Integer srcCenterId, Integer dstCenterId,
+        Integer patientId) throws Exception {
+        DispatchSaveInfo d =
+            DispatchHelper.createSaveDispatchInfoRandom(appService,
+                dstCenterId, srcCenterId, DispatchState.CREATION.getId(),
+                Utils.getRandomString(5));
+        Set<DispatchSpecimenInfo> specs =
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(appService,
+                patientId, srcCenterId);
+        ShipmentInfoSaveInfo shipsave =
+            ShipmentInfoHelper.createRandomShipmentInfo(appService);
+        appService.doAction(new DispatchSaveAction(d, specs, shipsave));
+    }
+
     @Test
     public void deleteWithSrcDispatch() throws Exception {
         Provisioning provisioning =
             provisionProcessingConfiguration(appService, name);
 
-        DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(appService,
-                provisioning.siteId, provisioning.clinicId,
-                DispatchState.CREATION.getId(), Utils.getRandomString(5));
-        Set<DispatchSpecimenInfo> specs =
-            DispatchHelper.createSaveDispatchSpecimenInfoRandom(appService,
-                provisioning.patientIds.get(0), provisioning.clinicId);
-        ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(appService);
-        appService.doAction(new DispatchSaveAction(d, specs, shipsave));
+        createDispatch(provisioning.clinicId, provisioning.siteId,
+            provisioning.patientIds.get(0));
 
         try {
             appService.doAction(new ClinicDeleteAction(provisioning.clinicId));
@@ -322,11 +328,31 @@ public class TestClinic extends TestAction {
         } catch (ActionCheckException e) {
             Assert.assertTrue(true);
         }
-
     }
 
     @Test
-    public void deleteWithDstDispatch() {
+    public void deleteWithDstDispatch() throws Exception {
+        Provisioning provisioning =
+            provisionProcessingConfiguration(appService, name);
+
+        // add second clinic to be the destination of the dispatch
+
+        ClinicSaveAction csa2 =
+            ClinicHelper.getSaveAction(name + "_clinic2", name,
+                ActivityStatusEnum.ACTIVE, r.nextBoolean());
+        Integer clinicId2 = appService.doAction(csa2).getId();
+
+        createDispatch(provisioning.clinicId, clinicId2,
+            provisioning.patientIds.get(0));
+
+        try {
+            appService.doAction(new ClinicDeleteAction(clinicId2));
+            Assert
+                .fail(
+                "should not be allowed to delete a clinic which is a destination for dispatches");
+        } catch (ActionCheckException e) {
+            Assert.assertTrue(true);
+        }
 
     }
 
