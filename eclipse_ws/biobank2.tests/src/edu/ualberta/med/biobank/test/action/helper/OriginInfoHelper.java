@@ -21,8 +21,12 @@ public class OriginInfoHelper extends Helper {
                 CollectionEventHelper.createCEventWithSourceSpecimens(
                     appService,
                     patientId, centerId);
-            CollectionEvent added =
-                (CollectionEvent) appService.search(CollectionEvent.class, id);
+            CollectionEvent added = new CollectionEvent();
+            added.setId(id);
+            added =
+                (CollectionEvent) appService.search(CollectionEvent.class,
+                    added)
+                    .get(0);
             for (Specimen spec : added.getAllSpecimenCollection()) {
                 ids.add(spec.getId());
             }
