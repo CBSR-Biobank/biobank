@@ -5,10 +5,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/biobank.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/biobank2.tools"/>
-	<classpathentry kind="lib" path="lib/c3p0-0.9.0.jar"/>
-	<classpathentry kind="lib" path="lib/clm-4.1.jar" sourcepath="/home/delphine/projects/sources/CaCore/CLM/CLM_API_4_1_Source/src"/>
-	<classpathentry kind="lib" path="lib/dom4j-1.4.jar"/>
-	<classpathentry kind="lib" path="lib/jta.jar"/>
 	<classpathentry kind="lib" path="lib/biobank-orm.jar"/>
 	<classpathentry kind="lib" path="lib/ehcache-1.2.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/biobank.mvp"/>
