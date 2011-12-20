@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.action;
 
 import java.util.HashSet;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -9,9 +10,12 @@ import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentFormReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
+import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.action.helper.ShipmentInfoHelper;
@@ -55,7 +59,31 @@ public class TestShipment extends TestAction {
                 patientId, siteId, centerId);
         ShipmentInfoSaveInfo shipsave =
             ShipmentInfoHelper.createRandomShipmentInfo(appService);
-        appService.doAction(new OriginInfoSaveAction(oisave, shipsave));
-    }
+        Integer id =
+            appService.doAction(new OriginInfoSaveAction(oisave, shipsave))
+                .getId();
 
+        ShipmentFormReadInfo info =
+            appService.doAction(new ShipmentGetInfoAction(id));
+
+        Assert.assertTrue(info.oi.getCenter().getId().equals(oisave.centerId));
+        Assert.assertTrue(info.oi.getReceiverSite().getId()
+            .equals(oisave.siteId));
+        for (Specimen spec : info.specimens)
+            Assert.assertTrue(oisave.addedSpecIds.contains(spec.getId()));
+        for (Specimen spec : info.specimens)
+            Assert.assertTrue(!oisave.removedSpecIds.contains(spec.getId()));
+
+        oisave.removedSpecIds = oisave.addedSpecIds;
+        oisave.addedSpecIds = null;
+        id =
+            appService.doAction(new OriginInfoSaveAction(oisave, shipsave))
+                .getId();
+
+        info =
+            appService.doAction(new ShipmentGetInfoAction(id));
+
+        Assert.assertTrue(info.specimens.size() == 0);
+
+    }
 }
