@@ -51,24 +51,25 @@ public class OriginInfoSaveAction implements Action<IdResult> {
 
         oi.setReceiverSite(sessionUtil.get(Site.class, oiInfo.siteId));
         oi.setCenter(sessionUtil.get(Center.class, oiInfo.centerId));
-        
+
         Collection<Specimen> oiSpecimens = oi.getSpecimenCollection();
-        if(oiSpecimens == null) oiSpecimens = new HashSet<Specimen>();
-        
-        for (Integer specId : oiInfo.removedSpecIds) {
-            Specimen spec =
-                sessionUtil.load(Specimen.class, specId);
-            oiSpecimens.remove(spec);
-        }
-        
-        for (Integer specId : oiInfo.addedSpecIds) {
-            Specimen spec =
-                sessionUtil.load(Specimen.class, specId);
-            oiSpecimens.add(spec);
-        }
-        
+        if (oiSpecimens == null) oiSpecimens = new HashSet<Specimen>();
+
+        if (oiInfo.removedSpecIds != null)
+            for (Integer specId : oiInfo.removedSpecIds) {
+                Specimen spec =
+                    sessionUtil.load(Specimen.class, specId);
+                oiSpecimens.remove(spec);
+            }
+        if (oiInfo.addedSpecIds != null)
+            for (Integer specId : oiInfo.addedSpecIds) {
+                Specimen spec =
+                    sessionUtil.load(Specimen.class, specId);
+                oiSpecimens.add(spec);
+            }
+
         oi.setSpecimenCollection(oiSpecimens);
-        
+
         ShipmentInfo si =
             sessionUtil
                 .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
@@ -92,7 +93,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
             newComment.setMessage(oiInfo.comment);
             newComment.setUser(user);
             session.saveOrUpdate(newComment);
-            
+
             comments.add(newComment);
             oi.setCommentCollection(comments);
         }

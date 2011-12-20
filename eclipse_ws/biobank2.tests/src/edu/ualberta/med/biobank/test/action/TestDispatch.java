@@ -41,10 +41,10 @@ public class TestDispatch extends TestAction {
             StudyHelper
                 .createStudy(appService, name, ActivityStatusEnum.ACTIVE);
         siteId =
-            SiteHelper.createSite(appService, name, "Edmonton",
+            SiteHelper.createSite(appService, name + "1", "Edmonton",
                 ActivityStatusEnum.ACTIVE, new HashSet<Integer>(studyId));
         centerId =
-            SiteHelper.createSite(appService, name, "Calgary",
+            SiteHelper.createSite(appService, name + "2", "Calgary",
                 ActivityStatusEnum.ACTIVE, new HashSet<Integer>(studyId));
         patientId =
             appService.doAction(new PatientSaveAction(null, studyId, name,

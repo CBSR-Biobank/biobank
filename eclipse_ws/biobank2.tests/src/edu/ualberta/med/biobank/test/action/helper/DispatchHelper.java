@@ -21,13 +21,14 @@ public class DispatchHelper extends Helper {
         BiobankApplicationService appService, Integer patientId,
         Integer centerId) throws Exception {
         Set<DispatchSpecimenInfo> infos = new HashSet<DispatchSpecimenInfo>();
-        Integer id = CollectionEventHelper.createCEventWithSourceSpecimens(
+        Integer id = null;
+        id = CollectionEventHelper.createCEventWithSourceSpecimens(
             appService, patientId, centerId);
         CollectionEvent added = new CollectionEvent();
         added.setId(id);
-        List<CollectionEvent> rs =
-            appService.search(CollectionEvent.class, added);
-        added = rs.get(0);
+        added =
+            (CollectionEvent) appService.search(CollectionEvent.class, added)
+                .get(0);
         for (Specimen spec : added.getAllSpecimenCollection()) {
             infos.add(new DispatchSpecimenInfo(null, spec.getId(),
                 DispatchSpecimenState.NONE.getId()));
