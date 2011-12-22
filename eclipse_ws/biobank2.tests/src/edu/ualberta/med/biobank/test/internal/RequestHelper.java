@@ -12,14 +12,16 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class RequestHelper extends DbHelper {
 
-    public static List<RequestWrapper> createdRequests = new ArrayList<RequestWrapper>();
+    public static List<RequestWrapper> createdRequests =
+        new ArrayList<RequestWrapper>();
 
     public static RequestWrapper newRequest(StudyWrapper study,
         SpecimenWrapper... specimens) throws Exception {
         RequestWrapper request = new RequestWrapper(appService);
-        request.setStudy(study);
+        // request.setStudy(study);
 
-        List<RequestSpecimenWrapper> specs = new ArrayList<RequestSpecimenWrapper>();
+        List<RequestSpecimenWrapper> specs =
+            new ArrayList<RequestSpecimenWrapper>();
         if (specimens != null) {
             for (SpecimenWrapper spec : specimens) {
                 RequestSpecimenWrapper rs = new RequestSpecimenWrapper(

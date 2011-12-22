@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -23,11 +22,9 @@ import org.supercsv.prefs.CsvPreference;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
-import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
-import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
+import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcFileBrowser;
@@ -161,26 +158,15 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         } finally {
             reader.close();
         }
+        List<String> specs = new ArrayList<String>();
 
         for (RequestInput ob : requests) {
-            SpecimenWrapper spec =
-                SpecimenWrapper.getSpecimen(SessionManager.getAppService(),
-                    ob.getInventoryID());
-            if (spec == null)
-                continue;
-            RequestSpecimenWrapper r =
-                new RequestSpecimenWrapper(SessionManager.getAppService());
-            r.setRequest(request);
-            r.setState(RequestSpecimenState.AVAILABLE_STATE);
-            r.setSpecimen(spec);
+            specs.add(ob.getInventoryID());
         }
 
-        request.setStudy(researchGroup.getStudy());
-        request.setCreated(new Date());
-        request.setSubmitted(new Date());
-        request.setAddress(request.getStudy().getResearchGroup().getAddress());
-
-        request.persist();
+        SubmitRequestAction action =
+            new SubmitRequestAction(researchGroup.getId(), specs);
+        SessionManager.getAppService().doAction(action);
 
         BgcPlugin.openMessage(Messages.ResearchGroupViewForm_success_title,
             Messages.ResearchGroupViewForm_success_msg);
