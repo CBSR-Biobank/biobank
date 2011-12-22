@@ -22,6 +22,7 @@ import org.supercsv.io.ICsvBeanReader;
 import org.supercsv.prefs.CsvPreference;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
@@ -62,9 +63,14 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        researchGroup =
-            ResearchGroupWrapper.getResearchGroupById(
-                SessionManager.getAppService(), adapter.getId());
+        if (adapter.getId() != null)
+            researchGroup =
+                new ResearchGroupWrapper(SessionManager.getAppService(),
+                    SessionManager.getAppService().doAction(
+                        new ResearchGroupGetInfoAction(adapter.getId())).rg);
+        else
+            researchGroup =
+                new ResearchGroupWrapper(SessionManager.getAppService());
         setPartName(NLS.bind(Messages.ResearchGroupViewForm_title,
             researchGroup.getNameShort()));
     }

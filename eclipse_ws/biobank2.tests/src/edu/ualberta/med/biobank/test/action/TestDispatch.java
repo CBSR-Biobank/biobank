@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchFormReadInfo;
@@ -96,4 +97,46 @@ public class TestDispatch extends TestAction {
 
         Assert.assertTrue(info.specimens.size() == 0);
     }
+
+    @Test
+    public void testStateChange() throws Exception {
+        DispatchSaveInfo d =
+            DispatchHelper.createSaveDispatchInfoRandom(appService, siteId,
+                centerId, DispatchState.CREATION.getId(),
+                Utils.getRandomString(5));
+        Set<DispatchSpecimenInfo> specs =
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(appService,
+                patientId, centerId);
+        ShipmentInfoSaveInfo shipsave =
+            ShipmentInfoHelper.createRandomShipmentInfo(appService);
+        Integer id =
+            appService.doAction(new DispatchSaveAction(d, specs, shipsave))
+                .getId();
+
+        appService.doAction(new DispatchChangeStateAction(id,
+            DispatchState.IN_TRANSIT, shipsave));
+        Assert
+            .assertTrue(appService.doAction(new DispatchGetInfoAction(id)).dispatch.state
+                .equals(DispatchState.IN_TRANSIT.getId()));
+
+        appService.doAction(new DispatchChangeStateAction(id,
+            DispatchState.LOST, shipsave));
+        Assert
+            .assertTrue(appService.doAction(new DispatchGetInfoAction(id)).dispatch.state
+                .equals(DispatchState.LOST.getId()));
+
+        appService.doAction(new DispatchChangeStateAction(id,
+            DispatchState.CLOSED, shipsave));
+        Assert
+            .assertTrue(appService.doAction(new DispatchGetInfoAction(id)).dispatch.state
+                .equals(DispatchState.CLOSED.getId()));
+
+        appService.doAction(new DispatchChangeStateAction(id,
+            DispatchState.RECEIVED, shipsave));
+        Assert
+            .assertTrue(appService.doAction(new DispatchGetInfoAction(id)).dispatch.state
+                .equals(DispatchState.RECEIVED.getId()));
+
+    }
+
 }
