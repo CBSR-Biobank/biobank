@@ -4,6 +4,10 @@ import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.reports.QueryProcess;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServiceImpl.ExampleRequestData;
 import edu.ualberta.med.biobank.server.applicationservice.ReportData;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import edu.ualberta.med.biobank.server.reports.ReportRunner;
@@ -13,9 +17,11 @@ import gov.nih.nci.system.dao.Request;
 import gov.nih.nci.system.dao.Response;
 import gov.nih.nci.system.dao.orm.WritableORMDAOImpl;
 
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.HibernateException;
@@ -92,9 +98,40 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
                     queryMap.remove(qhr.getQueryHandle());
                 }
             }
+        } else if (obj instanceof ExampleRequestData) { // PATCH
+            return query((ExampleRequestData) obj);
         }
         return super.query(request);
     }
+
+    // PATCH
+    private Response query(ExampleRequestData object) {
+        Response response = new Response();
+
+        Session session = getSession();
+
+        Address address = new Address();
+        address.setCity("argmonton");
+
+        ActivityStatus active = (ActivityStatus) session
+            .createQuery(
+                "SELECT activityStatus FROM " + ActivityStatus.class.getName()
+                    + " activityStatus WHERE activityStatus.name = ?")
+            .setParameter(0, "Active").list().get(0);
+
+        Site site = new Site();
+        site.setAddress(address); // address is automatically saved via cascade
+        site.setActivityStatus(active);
+        site.setName("example_"
+            + new BigInteger(130, new Random()).toString(32));
+        site.setNameShort(site.getName() + "_short");
+
+        session.save(site);
+
+        return response;
+    }
+
+    // PATCH
 
     protected Response query(Request request, BiobankSQLCriteria sqlCriteria)
         throws Exception {

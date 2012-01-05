@@ -17,10 +17,11 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService.Dummy;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
@@ -71,6 +72,12 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 site.getNameShort());
         }
         setPartName(tabName);
+
+        // appService.executeGetSourceSpecimenUniqueInventoryIds(10);
+        // appService.sessionExample(new Dummy());
+        Dummy tmp = new Dummy();
+        appService.wrapperExample(tmp);
+        System.out.println("adfasdf");
     }
 
     @Override

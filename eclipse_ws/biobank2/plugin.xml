@@ -860,7 +860,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.TecanEventAddHandler2"
+            class="edu.ualberta.med.biobank.handlers.TecanEventAddHandler"
             commandId="edu.ualberta.med.biobank.commands.processing.tecan">
          <activeWhen>
             <and>

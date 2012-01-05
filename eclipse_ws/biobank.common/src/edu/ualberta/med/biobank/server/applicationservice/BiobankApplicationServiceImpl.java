@@ -12,8 +12,13 @@ import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PrintedSsInvItem;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
@@ -35,7 +40,6 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -43,11 +47,9 @@ import java.util.Random;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseDate;
-import org.supercsv.cellprocessor.ParseInt;
-import org.supercsv.cellprocessor.constraint.StrMinMax;
-import org.supercsv.cellprocessor.constraint.Unique;
+import org.supercsv.cellprocessor.constraint.DMinMax;
+import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvBeanReader;
 import org.supercsv.io.ICsvBeanReader;
@@ -352,18 +354,21 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public String tecanloadFile(byte[] bytes, String deviceID)
-        throws ApplicationException {
+    public List<String> tecanloadFile(byte[] bytes) throws ApplicationException {
 
-        System.out.printf("Came From Client: %s", deviceID);
+        System.out.printf("Came From Client: %s", this.getCurrentUser()
+            .getFirstName());
         String uploadDir = System.getProperty("upload.dir");
 
         Calendar currentDate = Calendar.getInstance();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MMM_dd-HH_mm");
         String dateNow = formatter.format(currentDate.getTime());
 
-        String newFile = uploadDir + "/" + dateNow + "_ID_" + deviceID + ".pdf";
+        String newFile = uploadDir + "/" + dateNow + "_ID_" + "currentSite"
+            + ".csv";
         File fl = new File(newFile);
+
+        List<String> processed = new ArrayList<String>();
 
         try {
             boolean success = fl.createNewFile();
@@ -382,77 +387,235 @@ public class BiobankApplicationServiceImpl extends
         }
 
         try {
-            MyCVS(newFile);
+            processed = TecanProcessCVS(newFile);
         } catch (Exception e) {
             // TODO
         }
 
-        return newFile;
+        return processed;
     }
 
     // DFE May go to a helper class
-    static final CellProcessor[] userProcessors = new CellProcessor[] {
-        new Unique(new StrMinMax(5, 20)), new StrMinMax(8, 35),
-        new ParseDate("dd/MM/yyyy"), new Optional(new ParseInt()), null };
+    // static final CellProcessor[] userProcessors = new CellProcessor[] {
+    // new Unique(new StrMinMax(5, 20)), new StrMinMax(8, 35),
+    // new ParseDate("dd/MM/yyyy"), new Optional(new ParseInt()), null };
 
-    public static void MyCVS(String myfile) throws Exception {
+    public List<String> TecanProcessCVS(String myfile) throws Exception {
+
+        // ProcessingEventWrapper pEvent;
+
+        // pEvent = (ProcessingEventWrapper)
+        // ProcessingEvent tt;
+        // pEvent = (ProcessingEventWrapper) getModelObject();
+        // ModelWrapper<?> modelObject = adapter.getModelObject();
+        System.out.println("SITE*** " + Site.class.getName());
+        System.out.println("ELP: " + myfile);
+        List<String> processed = new ArrayList<String>();
         ICsvBeanReader inFile = new CsvBeanReader(new FileReader(myfile),
             CsvPreference.EXCEL_PREFERENCE);
+
+        // final CellProcessor[] userProcessors = new CellProcessor[] {
+        // new Unique(new StrMinMax(5, 20)), new StrMinMax(8, 35),
+        // new ParseDate("dd/MM/yyyy"), new Optional(new ParseInt()),
+        // new StrMinMax(1, 35) };
+        // private String orgSample;
+        // private String processId;
+        // private String aliquotId;
+        // private String aliquotType;
+        // private int volume;
+        // private Date startProcess;
+        // private Date endProcess;
+
+        final CellProcessor[] userProcessors = new CellProcessor[] {
+            new StrNotNullOrEmpty(), new StrNotNullOrEmpty(),
+            new StrNotNullOrEmpty(), new StrNotNullOrEmpty(),
+            new DMinMax(0, Double.MAX_VALUE), new ParseDate("yyyy-MM-dd"),
+            new ParseDate("yyyy-MM-dd") };
+
+        // String[] header = new String[] { "username", "date", "password",
+        // "zip" };
+
         try {
+            System.out.println("MyFile: " + myfile);
+
             final String[] header = inFile.getCSVHeader(true);
-            UserBean user;
-            while ((user = inFile.read(UserBean.class, header, userProcessors)) != null) {
-                System.out.println(user.getZip());
+
+            String tmpString = new String();
+            TecanCSV tecanCsv;
+            TecanCSV tecanCsv2;
+
+            System.out.println("Header Length: " + header.length);
+            System.out.println("Header: " + header);
+
+            processed.add("Header Length: " + header.length);
+            int i = 0;
+            tmpString = "";
+            while (i < header.length) {
+                System.out.println("HEADER" + i + ": " + header[i]);
+                tmpString = tmpString + header[i] + ",";
+                i++;
             }
-        } finally {
+            System.out.println("HEADER: " + tmpString);
+            processed.add("HEADER: " + tmpString);
+
+            System.out.println("LENGTH: " + inFile.length());
+            System.out.println("Line NUMBER: " + inFile.getLineNumber());
+            System.out.println("userProcessors.length: "
+                + userProcessors.length);
+
+            // Boolean oneOrgSample = true;
+            // String tmpOrgSample = "";
+            // while (oneOrgSample) {
+            while ((tecanCsv = inFile.read(TecanCSV.class, header,
+                userProcessors)) != null) {
+
+                // if (!tecanCsv.getOrgSample().contentEquals(tmpOrgSample))
+                // {
+                // // createProcess(pEvent.getComment();
+                // // Create Process
+                // }
+                // tmpOrgSample = tecanCsv.getOrgSample();
+                ProcessingEvent pe = new ProcessingEvent();
+                Center center = new Center() {
+
+                    /**
+                     * 
+                     */
+                    private static final long serialVersionUID = 1L;
+                };
+                String centy = center.getName();
+                System.out.println("CENTY: " + centy);
+
+                pe.setCenter(center);
+                // ProcessingEventWrapper pEvent = new
+                // ProcessingEventWrapper(this,
+                // (ProcessingEvent) pe);
+
+                System.out.println("In the while");
+                System.out.println("ZIP " + tecanCsv.getAliquotId());
+            }
+            // }
+            System.out.println("OUT OF THE WHILE");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // ************************************
+
+        try {
+            // AddressWrapper address = new AddressWrapper(this);
+            // address.setCity("towmonton");
+            // // address is automatically saved via cascade
+            //
+            // ActivityStatusWrapper active = ActivityStatusWrapper
+            // .getActiveActivityStatus(this);
+            //
+            SiteWrapper currentSite = (SiteWrapper) this.getCurrentUser()
+                .getCurrentWorkingCenter();
+            String tmp = currentSite.getNameShort();
+            // SiteWrapper site = new SiteWrapper(this);
+            // String siteName = "example_" + randString();
+            // site.setActivityStatus(active);
+            // site.setName(siteName);
+            // site.setNameShort(siteName + "_short");
+            // site.setAddress(address);
+            // site.persist();
+            currentSite.setComment("TESTY COMMENT");
+            currentSite.persist();
+
+        } catch (Exception caught) {
+            // transaction will be rollback if exception thrown
+            caught.printStackTrace();
+            throw new RuntimeException(caught);
+
+        }
+
+        // ***********************************
+
+        finally {
             inFile.close();
+        }
+        return processed;
+    }
+
+    @Override
+    public void wrapperExample(Dummy data) throws ApplicationException {
+        try {
+            AddressWrapper address = new AddressWrapper(this);
+            address.setCity("towmonton");
+            // address is automatically saved via cascade
+
+            ActivityStatusWrapper active = ActivityStatusWrapper
+                .getActiveActivityStatus(this);
+
+            SiteWrapper site = new SiteWrapper(this);
+            String siteName = "example_" + randString();
+            site.setActivityStatus(active);
+            site.setName(siteName);
+            site.setNameShort(siteName + "_short");
+            site.setAddress(address);
+            site.persist();
+
+            // StudyWrapper study = new StudyWrapper(this);
+            // String studyName = "example_" + randString();
+            // study.setName(studyName);
+            // study.setNameShort(studyName + "_short");
+            // study.persist();
+            //
+            // PatientWrapper patient = new PatientWrapper(this);
+            // patient.setPnumber(randString());
+            // patient.setStudy(study);
+            // patient.setCreatedAt(new Date());
+            // patient.persist();
+            //
+            // CollectionEventWrapper cEvent = new CollectionEventWrapper(this);
+            // cEvent.setActivityStatus(active);
+            // cEvent.setPatient(patient);
+            // cEvent.setVisitNumber(1);
+            //
+            // ProcessingEventWrapper pEvent = new ProcessingEventWrapper(this);
+            // pEvent.setCenter(site);
+            // pEvent.setCreatedAt(new Date());
+            // pEvent.setWorksheet(randString());
+            // pEvent.persist();
+            //
+            // SpecimenWrapper specimen = new SpecimenWrapper(this);
+            // specimen.setActivityStatus(active);
+            // specimen.setInventoryId(randString());
+            // specimen.setCreatedAt(new Date());
+            // specimen.setCollectionEvent(cEvent);
+            // specimen.setProcessingEvent(pEvent);
+            // specimen.persist();
+        } catch (Exception caught) {
+            // transaction will be rollback if exception thrown
+            throw new RuntimeException(caught);
         }
     }
 
-    public class UserBean {
-        String username, password, town;
-        Date date;
-        int zip;
+    private static final Random R = new Random();
 
-        public Date getDate() {
-            return date;
-        }
+    private static String randString() {
+        return new BigInteger(130, R).toString(32);
+    }
 
-        public String getPassword() {
-            return password;
-        }
+    @Override
+    public void sessionExample(Dummy data) throws ApplicationException {
+        ExampleRequestData example = new ExampleRequestData();
+        example.data = data;
 
-        public String getTown() {
-            return town;
-        }
+        Request request = new Request(example);
+        request.setIsCount(Boolean.FALSE);
+        request.setFirstRow(0);
 
-        public String getUsername() {
-            return username;
-        }
+        // used for security checks
+        request.setDomainObjectName(ProcessingEvent.class.getName());
 
-        public int getZip() {
-            return zip;
-        }
+        Response response = query(request);
+    }
 
-        public void setDate(final Date date) {
-            this.date = date;
-        }
-
-        public void setPassword(final String password) {
-            this.password = password;
-        }
-
-        public void setTown(final String town) {
-            this.town = town;
-        }
-
-        public void setUsername(final String username) {
-            this.username = username;
-        }
-
-        public void setZip(final int zip) {
-            this.zip = zip;
-        }
+    public static class ExampleRequestData {
+        public Object data;
     }
 
     // DFE

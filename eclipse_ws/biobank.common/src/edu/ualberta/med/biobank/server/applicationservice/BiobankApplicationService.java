@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
@@ -16,6 +17,7 @@ import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -95,7 +97,15 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public String uploadFile(byte[] bytes, String uploadFile)
         throws ApplicationException;
 
-    public String tecanloadFile(byte[] bytes, String uploadFile)
-        throws ApplicationException;
+    public List<String> tecanloadFile(byte[] bytes) throws ApplicationException;
+
+    public void wrapperExample(Dummy data) throws ApplicationException;
+
+    public void sessionExample(Dummy data) throws ApplicationException;
+
+    public static class Dummy implements Serializable, NotAProxy {
+        private static final long serialVersionUID = 1L;
+        public Object data;
+    }
 
 }
