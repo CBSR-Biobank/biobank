@@ -65,10 +65,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         pEventAdapter = (ProcessingEventAdapter) adapter;
         pEvent = (ProcessingEventWrapper) getModelObject();
 
-        // DFE
-        CenterWrapper<?> tmp = pEvent.getCenter();
-        String tmp2 = tmp.getName();
-
         String tabName;
         if (pEvent.isNew()) {
             tabName = Messages.getString("ProcessingEventEntryForm.title.new"); //$NON-NLS-1$

@@ -29,19 +29,13 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.TecanScanLinkDialog;
 import edu.ualberta.med.biobank.forms.linkassign.AbstractSpecimenAdminForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
-import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 
 public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
 
@@ -50,22 +44,6 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.TecanScanLinkEntryForm"; //$NON-NLS-1$
 
-    private static final String MSG_NEW_PEVENT_OK = Messages
-        .getString("ProcessingEventEntryForm.creation.msg"); //$NON-NLS-1$
-
-    private static final String MSG_PEVENT_OK = Messages
-        .getString("ProcessingEventEntryForm.edition.msg"); //$NON-NLS-1$
-
-    private ProcessingEventAdapter pEventAdapter;
-
-    private ProcessingEventWrapper pEvent;
-
-    private ComboViewer activityStatusComboViewer;
-
-    private DateTimeWidget dateWidget;
-
-    private SpecimenEntryWidget specimenEntryWidget;
-
     // DFE
     private Button uploadButton;
     private String path;
@@ -73,15 +51,17 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
     private ComboViewer studiesViewer;
     private Button processButton;
     private int enableProcessButton;
-    List<String> processed;
-
-    // private BgcBaseText fileToUpload;
+    private List<String> processed;
+    private BgcBaseText processComment;
+    private BgcBaseText processWorkSheet;
+    private String pComment;
+    private String pWorkSheet;
 
     @Override
     protected void init() throws Exception {
         super.init();
         setPartName("Tecan Scan Link");
-        appendLog("TESTY_MESSAGE_TESTY");
+        appendLog("Start Process");
     }
 
     @Override
@@ -90,7 +70,6 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         createMainSection();
-        // createSpecimensSection();
     }
 
     private void createMainSection() {
@@ -123,9 +102,6 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
                     enableProcessButton = enableProcessButton + 1;
                     if (enableProcessButton >= 2)
                         processButton.setEnabled(true);
-                    // processButton.setEnabled(true);
-                    // do something WITH OBJECT
-                    // patient.setStudy((StudyWrapper) selectedObject);
                 }
             });
 
@@ -135,8 +111,33 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
             GridData.VERTICAL_ALIGN_BEGINNING));
         createUpload(leftComposite);
 
-        BgcBaseText pnumber2Text = (BgcBaseText) createLabelledWidget(
-            leftComposite, BgcBaseText.class, SWT.MULTI, "Comment");
+        processWorkSheet = (BgcBaseText) createLabelledWidget(leftComposite,
+            BgcBaseText.class, SWT.SINGLE, "WorkSheet");
+        processWorkSheet.addListener(SWT.Modify, new Listener() {
+            // org.eclipse.swt.widgets.Event conflicts with the other Event
+            @Override
+            public void handleEvent(org.eclipse.swt.widgets.Event event) {
+                if (processWorkSheet.getText().trim().isEmpty()) {
+                    pWorkSheet = "";
+                } else {
+                    pWorkSheet = processWorkSheet.getText().trim();
+                }
+            }
+        });
+
+        processComment = (BgcBaseText) createLabelledWidget(leftComposite,
+            BgcBaseText.class, SWT.MULTI, "Comment");
+        processComment.addListener(SWT.Modify, new Listener() {
+            // org.eclipse.swt.widgets.Event conflicts with the other Event
+            @Override
+            public void handleEvent(org.eclipse.swt.widgets.Event event) {
+                if (processComment.getText().trim().isEmpty()) {
+                    pComment = "";
+                } else {
+                    pComment = processComment.getText().trim();
+                }
+            }
+        });
 
         processButton = createSendButton();
 
@@ -156,16 +157,10 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
         composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(composite);
 
-        // private Label uploadtLabel;
-        // final Label uploadtLabel = widgetCreator.createLabel(composite,
-        // "Upload tempurature logger report");
-        // uploadtLabel.setLayoutData(new GridData(
-        // GridData.VERTICAL_ALIGN_BEGINNING));
-
         final BgcBaseText fileToUpload = widgetCreator.createReadOnlyField(
             composite, SWT.NONE, "CSV File", true);
 
-        uploadButton = toolkit.createButton(composite, "Upload", SWT.NONE);
+        uploadButton = toolkit.createButton(composite, "Select", SWT.NONE);
         uploadButton.addListener(SWT.Selection, new Listener() {
             // org.eclipse.swt.widgets.Event conflicts with the other Event
             @Override
@@ -195,7 +190,7 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
     private String runFileDialog(String name, String[] exts) {
         FileDialog fd = new FileDialog(form.getShell(), SWT.OPEN);
         fd.setOverwrite(true);
-        fd.setText("Select PDF");
+        fd.setText("Select CSV");
         fd.setFilterExtensions(exts);
         fd.setFileName(name);
         return fd.open();
@@ -216,18 +211,11 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
                             public void run(final IProgressMonitor monitor) {
                                 monitor.beginTask("Processing...",
                                     IProgressMonitor.UNKNOWN);
-                                // dispatch.setState(DispatchState.IN_TRANSIT);
 
                                 try {
-                                    SiteWrapper currentSite = SessionManager
-                                        .getUser().getCurrentWorkingSite();
-                                    User currentUser = SessionManager.getUser();
-                                    String tmp = currentUser.getFirstName();
-                                    // SEND DATA TO SERVER DFE
-                                    processed = appService
-                                        .tecanloadFile(csvfile);
-
-                                    // dispatch.persist();
+                                    // SEND DATA TO SERVER
+                                    processed = appService.tecanloadFile(
+                                        csvfile, pWorkSheet, pComment);
                                 } catch (final RemoteConnectFailureException exp) {
                                     BgcPlugin
                                         .openRemoteConnectErrorMessage(exp);
@@ -253,9 +241,7 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
                         appendLog(processed.get(i));
                         i++;
                     }
-                    appendLog("ENDOOOR");
-                    // .getCurrent().reload();
-                    // TecanScanLinkAdapter.openForm();
+                    appendLog("END Process");
                 }
             }
         });
@@ -273,7 +259,7 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
     @Override
     protected String getOkMessage() {
         // return (pEvent.isNew()) ? MSG_NEW_PEVENT_OK : MSG_PEVENT_OK;
-        return "testy";
+        return "";
     }
 
     @Override

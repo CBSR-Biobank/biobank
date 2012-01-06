@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
-import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PrintedSsInvItem;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
@@ -354,10 +353,9 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public List<String> tecanloadFile(byte[] bytes) throws ApplicationException {
+    public List<String> tecanloadFile(byte[] bytes, String pWorkSheet,
+        String pComment) throws ApplicationException {
 
-        System.out.printf("Came From Client: %s", this.getCurrentUser()
-            .getFirstName());
         String uploadDir = System.getProperty("upload.dir");
 
         Calendar currentDate = Calendar.getInstance();
@@ -387,29 +385,24 @@ public class BiobankApplicationServiceImpl extends
         }
 
         try {
-            processed = TecanProcessCVS(newFile);
+            processed = tecanProcessCVS(newFile, pWorkSheet, pComment);
         } catch (Exception e) {
             // TODO
+            e.printStackTrace();
         }
 
         return processed;
     }
 
-    // DFE May go to a helper class
-    // static final CellProcessor[] userProcessors = new CellProcessor[] {
-    // new Unique(new StrMinMax(5, 20)), new StrMinMax(8, 35),
-    // new ParseDate("dd/MM/yyyy"), new Optional(new ParseInt()), null };
+    public List<String> tecanProcessCVS(String myfile, String pWorkSheet,
+        String pComment) throws Exception {
 
-    public List<String> TecanProcessCVS(String myfile) throws Exception {
-
-        // ProcessingEventWrapper pEvent;
-
-        // pEvent = (ProcessingEventWrapper)
-        // ProcessingEvent tt;
-        // pEvent = (ProcessingEventWrapper) getModelObject();
-        // ModelWrapper<?> modelObject = adapter.getModelObject();
-        System.out.println("SITE*** " + Site.class.getName());
-        System.out.println("ELP: " + myfile);
+        // User cUser = this.getCurrentUser();
+        // cUser.initCurrentWorkingCenter(this);
+        // SiteWrapper cSite = cUser.getCurrentWorkingSite();
+        // String GGG = cSite.getNameShort();
+        // System.out.println("SITE GGG: " + GGG);
+        System.out.println("FILE: " + myfile);
         List<String> processed = new ArrayList<String>();
         ICsvBeanReader inFile = new CsvBeanReader(new FileReader(myfile),
             CsvPreference.EXCEL_PREFERENCE);
@@ -432,17 +425,13 @@ public class BiobankApplicationServiceImpl extends
             new DMinMax(0, Double.MAX_VALUE), new ParseDate("yyyy-MM-dd"),
             new ParseDate("yyyy-MM-dd") };
 
-        // String[] header = new String[] { "username", "date", "password",
-        // "zip" };
-
         try {
-            System.out.println("MyFile: " + myfile);
+            processed.add("Uploaded File: " + myfile);
 
             final String[] header = inFile.getCSVHeader(true);
 
             String tmpString = new String();
             TecanCSV tecanCsv;
-            TecanCSV tecanCsv2;
 
             System.out.println("Header Length: " + header.length);
             System.out.println("Header: " + header);
@@ -455,7 +444,6 @@ public class BiobankApplicationServiceImpl extends
                 tmpString = tmpString + header[i] + ",";
                 i++;
             }
-            System.out.println("HEADER: " + tmpString);
             processed.add("HEADER: " + tmpString);
 
             System.out.println("LENGTH: " + inFile.length());
@@ -463,39 +451,18 @@ public class BiobankApplicationServiceImpl extends
             System.out.println("userProcessors.length: "
                 + userProcessors.length);
 
-            // Boolean oneOrgSample = true;
-            // String tmpOrgSample = "";
-            // while (oneOrgSample) {
             while ((tecanCsv = inFile.read(TecanCSV.class, header,
                 userProcessors)) != null) {
-
-                // if (!tecanCsv.getOrgSample().contentEquals(tmpOrgSample))
-                // {
-                // // createProcess(pEvent.getComment();
-                // // Create Process
-                // }
-                // tmpOrgSample = tecanCsv.getOrgSample();
-                ProcessingEvent pe = new ProcessingEvent();
-                Center center = new Center() {
-
-                    /**
-                     * 
-                     */
-                    private static final long serialVersionUID = 1L;
-                };
-                String centy = center.getName();
-                System.out.println("CENTY: " + centy);
-
-                pe.setCenter(center);
-                // ProcessingEventWrapper pEvent = new
-                // ProcessingEventWrapper(this,
-                // (ProcessingEvent) pe);
-
-                System.out.println("In the while");
-                System.out.println("ZIP " + tecanCsv.getAliquotId());
+                // orgSample, processId, aliquotId, aliquotType, volume,
+                // startProcess, endProcess
+                // String csvLine = tecanCsv.getOrgSample() + ","
+                // + tecanCsv.getProcessId() + "," + tecanCsv.getAliquotId()
+                // + "," + tecanCsv.getAliquotType() + ","
+                // + tecanCsv.getVolume() + "," + tecanCsv.getStartProcess()
+                // + "," + tecanCsv.getEndProcess();
+                processed.add(tecanCsv.getLine());
             }
             // }
-            System.out.println("OUT OF THE WHILE");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -503,33 +470,33 @@ public class BiobankApplicationServiceImpl extends
 
         // ************************************
 
-        try {
-            // AddressWrapper address = new AddressWrapper(this);
-            // address.setCity("towmonton");
-            // // address is automatically saved via cascade
-            //
-            // ActivityStatusWrapper active = ActivityStatusWrapper
-            // .getActiveActivityStatus(this);
-            //
-            SiteWrapper currentSite = (SiteWrapper) this.getCurrentUser()
-                .getCurrentWorkingCenter();
-            String tmp = currentSite.getNameShort();
-            // SiteWrapper site = new SiteWrapper(this);
-            // String siteName = "example_" + randString();
-            // site.setActivityStatus(active);
-            // site.setName(siteName);
-            // site.setNameShort(siteName + "_short");
-            // site.setAddress(address);
-            // site.persist();
-            currentSite.setComment("TESTY COMMENT");
-            currentSite.persist();
-
-        } catch (Exception caught) {
-            // transaction will be rollback if exception thrown
-            caught.printStackTrace();
-            throw new RuntimeException(caught);
-
-        }
+        // try {
+        // // AddressWrapper address = new AddressWrapper(this);
+        // // address.setCity("towmonton");
+        // // // address is automatically saved via cascade
+        // //
+        // // ActivityStatusWrapper active = ActivityStatusWrapper
+        // // .getActiveActivityStatus(this);
+        // //
+        // SiteWrapper currentSite = (SiteWrapper) this.getCurrentUser()
+        // .getCurrentWorkingCenter();
+        // String tmp = currentSite.getNameShort();
+        // // SiteWrapper site = new SiteWrapper(this);
+        // // String siteName = "example_" + randString();
+        // // site.setActivityStatus(active);
+        // // site.setName(siteName);
+        // // site.setNameShort(siteName + "_short");
+        // // site.setAddress(address);
+        // // site.persist();
+        // currentSite.setComment("TESTY COMMENT");
+        // currentSite.persist();
+        //
+        // } catch (Exception caught) {
+        // // transaction will be rollback if exception thrown
+        // caught.printStackTrace();
+        // throw new RuntimeException(caught);
+        //
+        // }
 
         // ***********************************
 

@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class TecanCSV implements Serializable {
@@ -71,4 +73,15 @@ public class TecanCSV implements Serializable {
         this.endProcess = endProcess;
     }
 
+    public String getLine() {
+
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        cal.setTime(startProcess);
+        String sDate = formatter.format(cal.getTime());
+        cal.setTime(endProcess);
+        String eDate = formatter.format(cal.getTime());
+        return orgSample + "," + processId + "," + aliquotId + ","
+            + aliquotType + "," + volume + "," + sDate + "," + eDate;
+    }
 }
