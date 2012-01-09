@@ -1,14 +1,11 @@
 package edu.ualberta.med.biobank.common.action.container;
 
-import java.io.Serializable;
-
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
@@ -20,52 +17,75 @@ public class ContainerSaveAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
 
-    public static class ContainerInfo implements Serializable, NotAProxy {
-        private static final long serialVersionUID = 1L;
-        public Integer containerId;
-        public Integer statusId;
-        public String barcode;
-        public String label;
-        public Integer siteId;
-        public Integer typeId;
-        public RowColPos position;
-        public Integer parentId;
+    public Integer containerId;
+    public Integer statusId;
+    public String barcode;
+    public String label;
+    public Integer siteId;
+    public Integer typeId;
+    public RowColPos position;
+    public Integer parentId;
+
+    public void setId(Integer containerId) {
+        this.containerId = containerId;
     }
 
-    private ContainerInfo containerInfo;
+    public void setStatusId(Integer statusId) {
+        this.statusId = statusId;
+    }
 
-    public ContainerSaveAction(ContainerInfo cinfo) {
-        this.containerInfo = cinfo;
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public void setSiteId(Integer siteId) {
+        this.siteId = siteId;
+    }
+
+    public void setTypeId(Integer typeId) {
+        this.typeId = typeId;
+    }
+
+    public void setPosition(RowColPos position) {
+        this.position = position;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
     }
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        // TODO Auto-generated method stub
+        // FIXME add specific permission for this?
         return true;
     }
 
     @Override
     public IdResult run(User user, Session session) throws ActionException {
-        // FIXME permissions
-        // FIXME loggings
+        // FIXME logging
         // FIXME checks
+
+        ActionContext actionContext = new ActionContext(user, session);
+
         Container container;
-        if (containerInfo.containerId != null) {
-            container = ActionUtil.sessionGet(session, Container.class,
-                containerInfo.containerId);
+        if (containerId != null) {
+            container = actionContext.load(Container.class, containerId);
         } else {
             container = new Container();
         }
-        container.setActivityStatus(ActionUtil.sessionGet(session,
-            ActivityStatus.class, containerInfo.statusId));
-        container.setSite(ActionUtil.sessionGet(session, Site.class,
-            containerInfo.siteId));
-        container.setProductBarcode(containerInfo.barcode);
-        container.setContainerType(ActionUtil.sessionGet(session,
-            ContainerType.class, containerInfo.typeId));
-        container.setLabel(containerInfo.label);
-        ContainerActionHelper.setPosition(session, container,
-            containerInfo.position, containerInfo.parentId);
+        container.setActivityStatus(actionContext.load(ActivityStatus.class,
+            statusId));
+        container.setSite(actionContext.load(Site.class, siteId));
+        container.setProductBarcode(barcode);
+        container.setContainerType(actionContext.load(ContainerType.class,
+            typeId));
+        container.setLabel(label);
+        ContainerActionHelper.setPosition(user, session, container, position,
+            parentId);
 
         session.saveOrUpdate(container);
 

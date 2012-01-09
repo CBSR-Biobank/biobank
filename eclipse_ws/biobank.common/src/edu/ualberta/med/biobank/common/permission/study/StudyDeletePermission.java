@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.permission.study;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.Study;
@@ -19,7 +19,8 @@ public class StudyDeletePermission implements Permission {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        Study study = ActionUtil.sessionGet(session, Study.class, studyId);
+        Study study =
+            new ActionContext(user, session).load(Study.class, studyId);
         return PermissionEnum.STUDY_DELETE.isAllowed(user, study);
     }
 

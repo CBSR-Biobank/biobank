@@ -36,7 +36,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction.ContainerInfo;
+import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenAssignProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.AssignProcessInfo;
@@ -991,20 +991,30 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     }
                 }
                 if (currentMultipleContainer.getId() == null) {
-                    ContainerInfo ci = new ContainerInfo();
-                    ci.label = currentMultipleContainer.getLabel();
-                    ci.parentId = currentMultipleContainer.getParentContainer()
-                        .getId();
-                    ci.position = currentMultipleContainer
+                    ContainerSaveAction csAction = new ContainerSaveAction();
+                    csAction.label = currentMultipleContainer.getLabel();
+                    csAction.parentId =
+                        currentMultipleContainer.getParentContainer()
+                            .getId();
+                    csAction.position = currentMultipleContainer
                         .getPositionAsRowCol();
-                    ci.barcode = currentMultipleContainer.getProductBarcode();
-                    ci.typeId = currentMultipleContainer.getContainerType()
-                        .getId();
-                    ci.statusId = currentMultipleContainer.getActivityStatus()
-                        .getId();
-                    ci.siteId = currentMultipleContainer.getSite().getId();
+                    csAction.barcode =
+                        currentMultipleContainer.getProductBarcode();
+                    csAction.typeId =
+                        currentMultipleContainer.getContainerType()
+                            .getId();
+                    csAction.statusId =
+                        currentMultipleContainer.getActivityStatus()
+                            .getId();
+                    csAction.siteId =
+                        currentMultipleContainer.getSite().getId();
+
+                    Integer containerId =
+                        SessionManager.getAppService().doAction(csAction)
+                            .getId();
+
                     res = SessionManager.getAppService().doAction(
-                        new SpecimenAssignSaveAction(ci, specInfos));
+                        new SpecimenAssignSaveAction(containerId, specInfos));
                 } else {
                     res = SessionManager.getAppService().doAction(
                         new SpecimenAssignSaveAction(currentMultipleContainer

@@ -7,6 +7,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -17,7 +18,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 
-public class ContainerTypeSaveAction implements Action<ContainerTypeIdResult> {
+public class ContainerTypeSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
     private Integer containerTypeId;
@@ -94,7 +95,7 @@ public class ContainerTypeSaveAction implements Action<ContainerTypeIdResult> {
     }
 
     @Override
-    public ContainerTypeIdResult run(User user, Session session)
+    public IdResult run(User user, Session session)
         throws ActionException {
         ActionContext context = new ActionContext(user, session);
 
@@ -115,7 +116,7 @@ public class ContainerTypeSaveAction implements Action<ContainerTypeIdResult> {
 
         context.getSession().save(containerType);
 
-        return new ContainerTypeIdResult(containerType.getId());
+        return new IdResult(containerType.getId());
     }
 
     private ContainerType getContainerType(ActionContext context) {

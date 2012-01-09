@@ -89,9 +89,11 @@ public class SiteHelper extends Helper {
         public Integer studyId;
         public Integer clinicId;
         public List<Integer> patientIds;
+        public List<Integer> containerTypeIds;
 
         public Provisioning() {
             patientIds = new ArrayList<Integer>();
+            containerTypeIds = new ArrayList<Integer>();
         }
     }
 

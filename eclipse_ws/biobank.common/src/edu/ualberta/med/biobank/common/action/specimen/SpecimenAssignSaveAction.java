@@ -6,10 +6,8 @@ import java.util.List;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
-import edu.ualberta.med.biobank.common.action.ActionUtil;
-import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
-import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenAssignResInfo;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenAssignPermission;
@@ -52,14 +50,7 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
     }
 
     private List<SpecimenInfo> specInfos;
-    private ContainerInfo containerInfo;
     private Integer containerId;
-
-    public SpecimenAssignSaveAction(ContainerInfo containerInfo,
-        List<SpecimenInfo> specInfos) {
-        this.specInfos = specInfos;
-        this.containerInfo = containerInfo;
-    }
 
     public SpecimenAssignSaveAction(Integer containerId,
         List<SpecimenInfo> specInfos) {
@@ -69,15 +60,10 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        Integer centerId;
-        if (containerId != null) {
-            Container container = ActionUtil.sessionGet(session,
+        Container container =
+            new ActionContext(user, session).load(
                 Container.class, containerId);
-            centerId = container.getSite().getId();
-        } else if (containerInfo != null) {
-            centerId = containerInfo.siteId;
-        } else
-            return true;
+        Integer centerId = container.getSite().getId();
         return new SpecimenAssignPermission(centerId).isAllowed(user,
             session);
     }
@@ -86,15 +72,13 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
     public SpecimenAssignResInfo run(User user, Session session)
         throws ActionException {
         SpecimenAssignResInfo res = new SpecimenAssignResInfo();
-        if (containerId == null && containerInfo == null)
+        if (containerId == null && containerId == null)
             throw new ActionException("problem in data sent"); //$NON-NLS-1$
-        if (containerId == null) {
-            containerId = new ContainerSaveAction(containerInfo).run(user,
-                session).getId();
-        }
         res.parentContainerId = containerId;
-        Container container = ActionUtil.sessionGet(session, Container.class,
-            containerId);
+
+        ActionContext actionContext = new ActionContext(user, session);
+
+        Container container = actionContext.load(Container.class, containerId);
         res.parentBarcode = container.getProductBarcode();
         res.parentTypeName = container.getContainerType().getName();
         res.parentLabel = container.getLabel();
@@ -103,8 +87,8 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
         res.specimens =
             new ArrayList<SpecimenAssignSaveAction.SpecimenResInfo>();
         for (SpecimenInfo si : specInfos) {
-            Specimen specimen = ActionUtil.sessionGet(session, Specimen.class,
-                si.specimenId);
+            Specimen specimen =
+                actionContext.load(Specimen.class, si.specimenId);
             SpecimenActionHelper.setPosition(session, specimen, si.position,
                 containerId);
             session.saveOrUpdate(specimen);
