@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.action.researchGroup;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -40,8 +41,10 @@ public class SubmitRequestAction implements Action<IdResult> {
     public IdResult run(User user, Session session) throws ActionException {
         Request request = new Request();
         for (String id : specs) {
-            Specimen spec =
-                new SessionUtil(session).get(Specimen.class, id);
+            Query q = session.createQuery("from "
+                + Specimen.class.getName() + " where inventoryId=?");
+            q.setParameter(0, id);
+            Specimen spec = (Specimen) q.list().get(0);
             if (spec == null)
                 continue;
             RequestSpecimen r =
@@ -51,6 +54,9 @@ public class SubmitRequestAction implements Action<IdResult> {
             r.setSpecimen(spec);
         }
 
+        request.setResearchGroup(new SessionUtil(session).get(
+            ResearchGroup.class,
+            rgId));
         request.setCreated(new Date());
         request.setSubmitted(new Date());
         request.setAddress(new SessionUtil(session).get(ResearchGroup.class,
@@ -61,5 +67,4 @@ public class SubmitRequestAction implements Action<IdResult> {
 
         return new IdResult(request.getId());
     }
-
 }
