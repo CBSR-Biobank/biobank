@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.RequestFormReadInfo;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
-import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
+import edu.ualberta.med.biobank.common.permission.request.RequestReadPermission;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.User;
 
@@ -38,7 +38,7 @@ public class RequestGetInfoAction implements Action<RequestFormReadInfo> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        return new DispatchReadPermission(id).isAllowed(user, session);
+        return new RequestReadPermission().isAllowed(user, session);
     }
 
     @Override

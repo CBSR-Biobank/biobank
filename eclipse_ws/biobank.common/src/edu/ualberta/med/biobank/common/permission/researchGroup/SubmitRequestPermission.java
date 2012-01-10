@@ -23,6 +23,6 @@ public class SubmitRequestPermission implements Permission {
         ResearchGroup rg =
             new SessionUtil(session).get(ResearchGroup.class, rgId,
                 new ResearchGroup());
-        return PermissionEnum.REQUEST_SAVE.isAllowed(user, rg);
+        return PermissionEnum.REQUEST_CREATE.isAllowed(user, rg);
     }
 }
