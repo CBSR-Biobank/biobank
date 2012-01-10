@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
@@ -20,11 +22,15 @@ import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.common.action.site.SiteDeleteAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
@@ -238,7 +244,7 @@ public class TestSite extends TestAction {
             Assert.assertTrue(true);
         }
 
-        // delete container followed by site - should work now
+        // delete container type followed by site - should work now
         appService.doAction(new ContainerTypeDeleteAction(
             provisioning.containerTypeIds.get(0)));
         appService.doAction(new SiteDeleteAction(provisioning.siteId));
@@ -274,8 +280,38 @@ public class TestSite extends TestAction {
     }
 
     @Test
-    public void deleteWithProcessingEvents() throws ApplicationException {
+    public void deleteWithProcessingEvents() throws Exception {
+        Provisioning provisioning =
+            SiteHelper.provisionProcessingConfiguration(appService, name);
 
+        // create a collection event
+        Integer ceventId = CollectionEventHelper
+            .createCEventWithSourceSpecimens(appService,
+                provisioning.patientIds.get(0), provisioning.clinicId);
+        ArrayList<SpecimenInfo> sourceSpecs = appService
+            .doAction(new CollectionEventGetSpecimenInfosAction(ceventId,
+                false)).getList();
+
+        // create a processing event with one of the collection event source
+        // specimens
+        Integer pEventId = appService.doAction(
+            new ProcessingEventSaveAction(
+                null, provisioning.siteId, Utils.getRandomDate(), Utils
+                    .getRandomString(5, 8), 1, null, Arrays
+                    .asList(sourceSpecs.get(0).specimen.getId()))).getId();
+
+        try {
+            appService.doAction(new SiteDeleteAction(provisioning.siteId));
+            Assert
+                .fail(
+                "should not be allowed to delete a site with processing events");
+        } catch (ActionCheckException e) {
+            Assert.assertTrue(true);
+        }
+
+        // delete the processing event
+        appService.doAction(new ProcessingEventDeleteAction(pEventId));
+        appService.doAction(new SiteDeleteAction(provisioning.siteId));
     }
 
     @Test
@@ -303,6 +339,8 @@ public class TestSite extends TestAction {
         } catch (ActionCheckException e) {
             Assert.assertTrue(true);
         }
+
+        // TODO: delete the dispatch and then the site
     }
 
     @Test
@@ -322,6 +360,8 @@ public class TestSite extends TestAction {
         } catch (ActionCheckException e) {
             Assert.assertTrue(true);
         }
+
+        // TODO: delete the dispatch and then the site
     }
 
 }

@@ -14,6 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
@@ -163,7 +164,7 @@ public class TestProcessingEvent extends TestAction {
         appService.doAction(new ProcessingEventDeleteAction(pEventId));
 
         openHibernateSession();
-        ProcessingEvent pe = ActionUtil.sessionGet(session,
+        ProcessingEvent pe = new ActionContext(currentUser, session).load(
             ProcessingEvent.class, pEventId);
         Assert.assertNull(pe);
         closeHibernateSession();
@@ -188,8 +189,10 @@ public class TestProcessingEvent extends TestAction {
             Arrays
                 .asList(spcId))).getId();
 
+        ActionContext actionContext = new ActionContext(currentUser, session);
+
         openHibernateSession();
-        Specimen spc = ActionUtil.sessionGet(session, Specimen.class, spcId);
+        Specimen spc = actionContext.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);
         Assert.assertNotNull(spc.getProcessingEvent());
         Assert.assertEquals(pEventId, spc.getProcessingEvent().getId());
@@ -200,10 +203,10 @@ public class TestProcessingEvent extends TestAction {
         appService.doAction(new ProcessingEventDeleteAction(pEventId));
 
         openHibernateSession();
-        ProcessingEvent pe = ActionUtil.sessionGet(session,
-            ProcessingEvent.class, pEventId);
+        ProcessingEvent pe =
+            actionContext.load(ProcessingEvent.class, pEventId);
         Assert.assertNull(pe);
-        spc = ActionUtil.sessionGet(session, Specimen.class, spcId);
+        spc = actionContext.load(Specimen.class, spcId);
         session.refresh(spc);
         Assert.assertNotNull(spc);
         Assert.assertNull(spc.getProcessingEvent());
@@ -235,8 +238,10 @@ public class TestProcessingEvent extends TestAction {
                 Utils.getRandomString(50), 1, null,
                 Arrays.asList(spcId))).getId();
 
+        ActionContext actionContext = new ActionContext(currentUser, session);
+
         openHibernateSession();
-        Specimen spc = ActionUtil.sessionGet(session, Specimen.class, spcId);
+        Specimen spc = actionContext.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);
         Assert.assertNotNull(spc.getProcessingEvent());
         Assert.assertEquals(pEventId, spc.getProcessingEvent().getId());
