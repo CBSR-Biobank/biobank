@@ -14,6 +14,7 @@ import org.junit.rules.TestName;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
@@ -236,18 +237,25 @@ public class TestSite extends TestAction {
         } catch (ActionCheckException e) {
             Assert.assertTrue(true);
         }
+
+        // delete container followed by site - should work now
+        appService.doAction(new ContainerTypeDeleteAction(
+            provisioning.containerTypeIds.get(0)));
+        appService.doAction(new SiteDeleteAction(provisioning.siteId));
     }
 
     @Test
     public void deleteWithContainers() throws ApplicationException {
         Provisioning provisioning = createSiteWithContainerType();
 
+        Integer containerTypeId = provisioning.containerTypeIds.get(0);
+
         ContainerSaveAction containerSaveAction = new ContainerSaveAction();
         containerSaveAction.setStatusId(ActivityStatusEnum.ACTIVE.getId());
         containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
         containerSaveAction.setLabel("01");
         containerSaveAction.setSiteId(provisioning.siteId);
-        containerSaveAction.setTypeId(provisioning.containerTypeIds.get(0));
+        containerSaveAction.setTypeId(containerTypeId);
         Integer containerId = appService.doAction(containerSaveAction).getId();
 
         try {
@@ -261,6 +269,7 @@ public class TestSite extends TestAction {
 
         // delete container followed by site - should work now
         appService.doAction(new ContainerDeleteAction(containerId));
+        appService.doAction(new ContainerTypeDeleteAction(containerTypeId));
         appService.doAction(new SiteDeleteAction(provisioning.siteId));
     }
 

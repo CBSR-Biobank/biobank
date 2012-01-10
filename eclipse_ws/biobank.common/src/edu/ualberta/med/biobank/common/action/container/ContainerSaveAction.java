@@ -6,6 +6,9 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.permission.Permission;
+import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
+import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
@@ -61,7 +64,12 @@ public class ContainerSaveAction implements Action<IdResult> {
     @Override
     public boolean isAllowed(User user, Session session) {
         // FIXME add specific permission for this?
-        return true;
+        Permission permission;
+        if (containerId == null)
+            permission = new ContainerCreatePermission();
+        else
+            permission = new ContainerUpdatePermission(containerId);
+        return permission.isAllowed(user, session);
     }
 
     @Override

@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.permission.site;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.Site;
@@ -23,8 +23,7 @@ public class SiteReadPermission implements Permission {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        SessionUtil sessionUtil = new SessionUtil(session);
-        Site site = sessionUtil.get(Site.class, siteId);
+        Site site = new ActionContext(user, session).load(Site.class, siteId);
         return PermissionEnum.SITE_READ.isAllowed(user, site);
     }
 }

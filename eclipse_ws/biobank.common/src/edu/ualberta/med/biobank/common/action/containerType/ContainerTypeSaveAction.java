@@ -10,6 +10,9 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.permission.Permission;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCreatePermission;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeUpdatePermission;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Comment;
@@ -91,7 +94,12 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        return true; // TODO: real permissions.
+        Permission permission;
+        if (containerTypeId == null)
+            permission = new ContainerTypeCreatePermission();
+        else
+            permission = new ContainerTypeUpdatePermission(containerTypeId);
+        return permission.isAllowed(user, session);
     }
 
     @Override

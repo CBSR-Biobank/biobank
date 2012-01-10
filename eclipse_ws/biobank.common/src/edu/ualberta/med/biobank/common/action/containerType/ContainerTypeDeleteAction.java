@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.check.CollectionIsEmptyCheck;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
-import edu.ualberta.med.biobank.common.permission.site.SiteDeletePermission;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeDeletePermission;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.User;
 
@@ -23,7 +23,8 @@ public class ContainerTypeDeleteAction implements Action<EmptyResult> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        return new SiteDeletePermission(typeId).isAllowed(user, session);
+        return new ContainerTypeDeletePermission(typeId).isAllowed(user,
+            session);
     }
 
     @Override

@@ -22,5 +22,4 @@ public class SiteDeletePermission implements Permission {
         Site site = new ActionContext(user, session).load(Site.class, siteId);
         return PermissionEnum.SITE_DELETE.isAllowed(user, site);
     }
-
 }
