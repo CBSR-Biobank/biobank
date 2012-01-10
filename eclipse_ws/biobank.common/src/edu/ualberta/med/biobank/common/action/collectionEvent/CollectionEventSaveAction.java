@@ -11,8 +11,8 @@ import java.util.Map;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
-import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.DiffUtils;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -81,6 +81,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
     private List<CEventAttrSaveInfo> ceAttrList;
 
+    private ActionContext actionContext;
+
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
         Integer visitNumber, Integer statusId,
         Collection<CommentInfo> comments, Integer centerId,
@@ -111,28 +113,27 @@ public class CollectionEventSaveAction implements Action<IdResult> {
     public IdResult run(User user, Session session) throws ActionException {
 
         check(user, session);
+        actionContext = new ActionContext(user, session);
 
         CollectionEvent ceventToSave;
         if (ceventId == null) {
             ceventToSave = new CollectionEvent();
         } else {
-            ceventToSave = ActionUtil.sessionGet(session,
-                CollectionEvent.class, ceventId);
+            ceventToSave = actionContext.load(CollectionEvent.class, ceventId);
         }
 
         // FIXME Version check?
 
-        Patient patient = ActionUtil.sessionGet(session, Patient.class,
-            patientId);
+        Patient patient = actionContext.load(Patient.class, patientId);
         ceventToSave.setPatient(patient);
         ceventToSave.setVisitNumber(visitNumber);
-        ceventToSave.setActivityStatus(ActionUtil.sessionGet(session,
-            ActivityStatus.class, statusId));
+        ceventToSave.setActivityStatus(actionContext.load(ActivityStatus.class,
+            statusId));
 
         Collection<Comment> commentsToSave = CollectionUtils.getCollection(
             ceventToSave, CollectionEventPeer.COMMENT_COLLECTION);
         CommentInfo
-            .setCommentModelCollection(session, commentsToSave, comments);
+            .setCommentModelCollection(actionContext, commentsToSave, comments);
 
         setSourceSpecimens(session, ceventToSave);
 
@@ -165,7 +166,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
         if (sourceSpecimens != null) {
             OriginInfo oi = new OriginInfo();
-            oi.setCenter(ActionUtil.sessionGet(session, Center.class, centerId));
+            oi.setCenter(actionContext.load(Center.class, centerId));
             session.saveOrUpdate(oi);
             for (SaveCEventSpecimenInfo specInfo : sourceSpecimens) {
                 Specimen specimen;
@@ -175,10 +176,9 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     specimen.setOriginInfo(oi);
                     specimen.setTopSpecimen(specimen);
                 } else {
-                    specimen = ActionUtil.sessionGet(session, Specimen.class,
-                        specInfo.id);
+                    specimen = actionContext.load(Specimen.class, specInfo.id);
                 }
-                specimen.setActivityStatus(ActionUtil.sessionGet(session,
+                specimen.setActivityStatus(actionContext.load(
                     ActivityStatus.class, specInfo.statusId));
                 specimen.setCollectionEvent(ceventToSave);
                 // cascade will save-update the specimens from this list:
@@ -188,13 +188,13 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 Collection<Comment> commentsToSave = CollectionUtils
                     .getCollection(specimen,
                         SpecimenPeer.COMMENT_COLLECTION);
-                CommentInfo.setCommentModelCollection(session, commentsToSave,
-                    specInfo.comments);
+                CommentInfo.setCommentModelCollection(actionContext,
+                    commentsToSave, specInfo.comments);
                 specimen.setCreatedAt(specInfo.timeDrawn);
                 specimen.setInventoryId(specInfo.inventoryId);
                 specimen.setQuantity(specInfo.quantity);
-                specimen.setSpecimenType(ActionUtil.sessionGet(session,
-                    SpecimenType.class, specInfo.specimenTypeId));
+                specimen.setSpecimenType(actionContext.load(SpecimenType.class,
+                    specInfo.specimenTypeId));
             }
         }
         // need to remove from collections. the delete-orphan cascade on

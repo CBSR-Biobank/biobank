@@ -6,7 +6,7 @@ import java.util.EnumSet;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
@@ -39,8 +39,9 @@ public class SpecimenIsUsedInDispatchAction implements Action<BooleanResult> {
 
     @Override
     public BooleanResult run(User user, Session session) throws ActionException {
-        Specimen specimen = ActionUtil.sessionGet(session, Specimen.class,
-            specimenId);
+        Specimen specimen =
+            new ActionContext(user, session).load(Specimen.class,
+                specimenId);
         // FIXME reused code from wrapper. Might be more efficient to use a hql
         // query!
         Collection<DispatchSpecimen> dsas = specimen

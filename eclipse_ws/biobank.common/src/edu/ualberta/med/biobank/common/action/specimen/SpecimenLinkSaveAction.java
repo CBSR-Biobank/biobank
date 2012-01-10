@@ -8,7 +8,7 @@ import java.util.List;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
@@ -77,8 +77,8 @@ public class SpecimenLinkSaveAction implements
     @Override
     public ListResult<AliquotedSpecimenResInfo> run(User user, Session session)
         throws ActionException {
-        Center currentCenter = ActionUtil.sessionGet(session, Center.class,
-            centerId);
+        ActionContext actionContext = new ActionContext(user, session);
+        Center currentCenter = actionContext.load(Center.class, centerId);
         Date currentDate = new Date();
 
         // FIXME permissions?
@@ -96,17 +96,18 @@ public class SpecimenLinkSaveAction implements
             Specimen specimen = new Specimen();
             specimen.setInventoryId(asi.inventoryId);
             specimen.setCreatedAt(currentDate);
-            specimen.setSpecimenType(ActionUtil.sessionGet(session,
-                SpecimenType.class, asi.typeId));
-            specimen.setActivityStatus(ActionUtil.sessionGet(session,
-                ActivityStatus.class, asi.statusId));
+            specimen.setSpecimenType(actionContext.load(SpecimenType.class,
+                asi.typeId));
+            specimen.setActivityStatus(actionContext.load(ActivityStatus.class,
+                asi.statusId));
             specimen.setCurrentCenter(currentCenter);
             specimen.setOriginInfo(originInfo);
 
-            SpecimenActionHelper.setParent(session, specimen,
+            SpecimenActionHelper.setParent(actionContext, specimen,
                 asi.parentSpecimenId);
             SpecimenActionHelper.setQuantityFromType(specimen);
-            SpecimenActionHelper.setPosition(session, specimen, asi.position,
+            SpecimenActionHelper.setPosition(actionContext, specimen,
+                asi.position,
                 asi.containerId);
 
             session.save(specimen);

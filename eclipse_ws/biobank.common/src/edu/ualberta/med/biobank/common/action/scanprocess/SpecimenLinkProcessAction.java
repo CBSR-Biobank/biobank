@@ -39,7 +39,7 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
     }
 
     @Override
-    protected ScanProcessResult getScanProcessResult(Session session,
+    protected ScanProcessResult getScanProcessResult(
         Map<RowColPos, CellInfo> cells, boolean isRescanMode)
         throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
@@ -94,8 +94,7 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
     }
 
     @Override
-    protected CellProcessResult getCellProcessResult(Session session,
-        CellInfo cell)
+    protected CellProcessResult getCellProcessResult(CellInfo cell)
         throws ActionException {
         CellProcessResult res = new CellProcessResult();
         processCellLinkStatus(session, cell);

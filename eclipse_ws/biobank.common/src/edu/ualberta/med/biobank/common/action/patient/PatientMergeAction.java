@@ -6,7 +6,7 @@ import java.util.Collection;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -46,11 +46,10 @@ public class PatientMergeAction implements Action<BooleanResult> {
     public BooleanResult run(User user, Session session) throws ActionException {
         // FIXME add checks
         // FIXME logging?
+        ActionContext actionContext = new ActionContext(user, session);
 
-        Patient patient1 = ActionUtil.sessionGet(session, Patient.class,
-            patient1Id);
-        Patient patient2 = ActionUtil.sessionGet(session, Patient.class,
-            patient2Id);
+        Patient patient1 = actionContext.load(Patient.class, patient1Id);
+        Patient patient2 = actionContext.load(Patient.class, patient2Id);
         if (patient1.getStudy().equals(patient2.getStudy())) {
             Collection<CollectionEvent> c1events = CollectionUtils
                 .getCollection(patient1,

@@ -15,7 +15,6 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSpecimenInfosAction;
@@ -189,9 +188,8 @@ public class TestProcessingEvent extends TestAction {
             Arrays
                 .asList(spcId))).getId();
 
-        ActionContext actionContext = new ActionContext(currentUser, session);
-
         openHibernateSession();
+        ActionContext actionContext = new ActionContext(currentUser, session);
         Specimen spc = actionContext.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);
         Assert.assertNotNull(spc.getProcessingEvent());
@@ -259,8 +257,9 @@ public class TestProcessingEvent extends TestAction {
         }
 
         openHibernateSession();
-        ProcessingEvent pe = ActionUtil.sessionGet(session,
-            ProcessingEvent.class, pEventId);
+        ProcessingEvent pe =
+            new ActionContext(currentUser, session).load(ProcessingEvent.class,
+                pEventId);
         Assert.assertNotNull(pe);
         closeHibernateSession();
     }

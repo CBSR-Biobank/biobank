@@ -31,7 +31,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-@SuppressWarnings("unused")
 public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     private static final CollectionEventLogProvider LOG_PROVIDER =
         new CollectionEventLogProvider();

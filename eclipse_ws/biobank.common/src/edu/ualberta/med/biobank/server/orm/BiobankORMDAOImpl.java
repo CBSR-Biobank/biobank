@@ -96,8 +96,8 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         return res.get(0);
     }
 
-    protected Response query(@SuppressWarnings("unused") Request request,
-        BiobankSessionAction sessionAction) throws BiobankSessionException {
+    protected Response query(Request request, BiobankSessionAction sessionAction)
+        throws BiobankSessionException {
 
         Session session = getSession();
 
@@ -114,8 +114,7 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         return response;
     }
 
-    protected Response query(@SuppressWarnings("unused") Request request,
-        ReportData reportData) {
+    protected Response query(Request request, ReportData reportData) {
 
         Response rsp = new Response();
 
@@ -127,8 +126,8 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         return rsp;
     }
 
-    protected Response query(@SuppressWarnings("unused") Request request,
-        QueryHandleRequest qhr) throws DAOException {
+    protected Response query(Request request, QueryHandleRequest qhr)
+        throws DAOException {
 
         CommandType command = qhr.getCommandType();
 

@@ -19,19 +19,23 @@ public class AbstractReport {
 
     protected static final String SITE_OPERATOR = "$$siteOperator$$"; //$NON-NLS-1$
 
-    protected static final String SITE_OPERATOR_SEARCH_STRING = replacePatternString(SITE_OPERATOR);
+    protected static final String SITE_OPERATOR_SEARCH_STRING =
+        replacePatternString(SITE_OPERATOR);
 
     protected static final String SITE_ID = "$$siteId$$"; //$NON-NLS-1$
 
-    protected static final String SITE_ID_SEARCH_STRING = replacePatternString(SITE_ID);
+    protected static final String SITE_ID_SEARCH_STRING =
+        replacePatternString(SITE_ID);
 
     protected static final String GROUPBY_DATE = "$$groupBy$$"; //$NON-NLS-1$
 
-    protected static final String GROUPBY_DATE_SEARCH_STRING = replacePatternString(GROUPBY_DATE);
+    protected static final String GROUPBY_DATE_SEARCH_STRING =
+        replacePatternString(GROUPBY_DATE);
 
     protected static final String CONTAINER_LIST = "$$containerList$$"; //$NON-NLS-1$
 
-    protected static final String CONTAINER_LIST_SEARCH_STRING = replacePatternString(CONTAINER_LIST);
+    protected static final String CONTAINER_LIST_SEARCH_STRING =
+        replacePatternString(CONTAINER_LIST);
 
     public static final String FTA_CARD_SAMPLE_TYPE_NAME = "DNA(Blood)"; //$NON-NLS-1$
 
@@ -48,13 +52,11 @@ public class AbstractReport {
     /**
      * Post process the whole collection after its retrieval
      */
-    public List<Object> postProcess(
-        @SuppressWarnings("unused") WritableApplicationService appService,
+    public List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
         return results;
     }
 
-    @SuppressWarnings("unused")
     public List<Object> executeQuery(WritableApplicationService appService)
         throws ApplicationException {
         if (report.getOp() != null)

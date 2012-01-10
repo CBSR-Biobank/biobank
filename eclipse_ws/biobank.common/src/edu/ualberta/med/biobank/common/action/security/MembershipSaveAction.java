@@ -6,7 +6,7 @@ import java.util.Set;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
@@ -79,13 +79,12 @@ public class MembershipSaveAction implements Action<IdResult> {
 
         this.session = session;
         sessionUtil = new SessionUtil(session);
+        ActionContext actionContext = new ActionContext(user, session);
 
         membership = sessionUtil.get(
             Membership.class, membershipId, new Membership());
-        membership.setCenter(ActionUtil.sessionGet(
-            session, Center.class, centerId));
-        membership.setStudy(ActionUtil.sessionGet(
-            session, Study.class, studyId));
+        membership.setCenter(actionContext.load(Center.class, centerId));
+        membership.setStudy(actionContext.load(Study.class, studyId));
 
         saveRoles();
         savePermissions();

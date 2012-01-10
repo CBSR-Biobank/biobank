@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.permission.specimen;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.Center;
@@ -22,8 +22,9 @@ public class SpecimenLinkPermission implements Permission {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        Center center = ActionUtil.sessionGet(session, Center.class, centerId);
-        Study study = ActionUtil.sessionGet(session, Study.class, studyId);
+        ActionContext actionContext = new ActionContext(user, session);
+        Center center = actionContext.load(Center.class, centerId);
+        Study study = actionContext.load(Study.class, studyId);
         return PermissionEnum.SPECIMEN_LINK.isAllowed(user, center, study)
             && new SpecimenCreatePermission(centerId, studyId).isAllowed(user,
                 session);

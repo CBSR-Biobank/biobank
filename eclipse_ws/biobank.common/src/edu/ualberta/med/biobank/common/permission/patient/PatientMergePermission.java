@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.permission.patient;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.Patient;
@@ -23,7 +23,7 @@ public class PatientMergePermission implements Permission {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        Patient patient1 = ActionUtil.sessionGet(session, Patient.class,
+        Patient patient1 = new ActionContext(user, session).load(Patient.class,
             patientId1);
         // both patients are supposed to be in the same study for the merge
         return PermissionEnum.PATIENT_MERGE

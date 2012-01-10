@@ -13,7 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
@@ -196,9 +196,10 @@ public class TestPatient extends TestAction {
         appService.doAction(new PatientMergeAction(patientId1, patientId2));
 
         openHibernateSession();
-        Patient p1 = ActionUtil.sessionGet(session, Patient.class, patientId1);
+        ActionContext actionContext = new ActionContext(currentUser, session);
+        Patient p1 = actionContext.load(Patient.class, patientId1);
         Assert.assertNotNull(p1);
-        Patient p2 = ActionUtil.sessionGet(session, Patient.class, patientId2);
+        Patient p2 = actionContext.load(Patient.class, patientId2);
         Assert.assertNull(p2);
         Collection<CollectionEvent> cevents = p1.getCollectionEventCollection();
         Assert.assertEquals(3, cevents.size());

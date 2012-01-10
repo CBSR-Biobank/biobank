@@ -3,10 +3,8 @@ package edu.ualberta.med.biobank.common.action.info;
 import java.util.Collection;
 import java.util.Date;
 
-import org.hibernate.Session;
-
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
-import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.User;
 
@@ -25,25 +23,25 @@ public class CommentInfo implements ActionResult {
         this.userId = userId;
     }
 
-    public Comment getCommentModel(Session session) {
+    public Comment getCommentModel(ActionContext actionContext) {
         Comment dbComment;
         if (id == null)
             dbComment = new Comment();
         else
-            dbComment = ActionUtil.sessionGet(session, Comment.class, id);
+            dbComment = actionContext.load(Comment.class, id);
         dbComment.setMessage(message);
-        User user = ActionUtil.sessionGet(session, User.class, userId);
+        User user = actionContext.load(User.class, userId);
         dbComment.setUser(user);
         return dbComment;
     }
 
-    public static void setCommentModelCollection(Session session,
+    public static void setCommentModelCollection(ActionContext actionContext,
         Collection<Comment> modelCommentList, Collection<CommentInfo> newList) {
         if (newList != null) for (CommentInfo info : newList) {
-            Comment commentModel = info.getCommentModel(session);
+            Comment commentModel = info.getCommentModel(actionContext);
             modelCommentList.add(commentModel);
             // FIXME add a hibernate cascade?
-            session.saveOrUpdate(commentModel);
+            actionContext.getSession().saveOrUpdate(commentModel);
         }
     }
 

@@ -91,7 +91,7 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         peventToSave.setActivityStatus(actionContext.load(ActivityStatus.class,
             statusId));
         peventToSave.setCenter(actionContext.load(Center.class, centerId));
-        setComments(session, peventToSave);
+        setComments(actionContext, peventToSave);
         peventToSave.setCreatedAt(createdAt);
         peventToSave.setWorksheet(worksheet);
 
@@ -113,14 +113,15 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         return new IdResult(peventToSave.getId());
     }
 
-    protected void setComments(Session session, ProcessingEvent peventToSave) {
+    protected void setComments(ActionContext actionContext,
+        ProcessingEvent peventToSave) {
         if (comments != null) {
             Collection<Comment> dbComments = CollectionUtils.getCollection(
                 peventToSave, ProcessingEventPeer.COMMENT_COLLECTION);
             for (CommentInfo info : comments) {
-                Comment commentModel = info.getCommentModel(session);
+                Comment commentModel = info.getCommentModel(actionContext);
                 dbComments.add(commentModel);
-                session.saveOrUpdate(commentModel);
+                actionContext.getSession().saveOrUpdate(commentModel);
             }
         }
     }

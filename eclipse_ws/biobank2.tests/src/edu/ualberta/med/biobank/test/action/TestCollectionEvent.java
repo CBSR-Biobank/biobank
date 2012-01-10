@@ -277,13 +277,14 @@ public class TestCollectionEvent extends TestAction {
 
         openHibernateSession();
         // make sure only one value in database
-        Query q =
-            session
-                .createQuery("select eattr from "
-                    + CollectionEvent.class.getName()
-                    + " as ce "
-                    + "join ce.eventAttrCollection as eattr "
-                    + "join eattr.studyEventAttr as seattr where ce.id = ? and seattr.label= ?");
+        Query q = session.createQuery(
+            "select eattr from "
+                + CollectionEvent.class.getName()
+                + " as ce "
+                + "join ce.eventAttrCollection as eattr "
+                + "join eattr.studyEventAttr as seattr "
+                + "join seattr.globalEventAttr as geattr "
+                + "where ce.id = ? and geattr.label= ?");
         q.setParameter(0, cevent.getId());
         q.setParameter(1, "Phlebotomist");
         @SuppressWarnings("unchecked")

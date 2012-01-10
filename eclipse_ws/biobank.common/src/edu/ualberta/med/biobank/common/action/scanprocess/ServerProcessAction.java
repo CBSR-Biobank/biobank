@@ -10,6 +10,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
@@ -29,6 +30,10 @@ public abstract class ServerProcessAction implements Action<ProcessResult> {
     private boolean isRescanMode = false;
     private boolean processOneCell;
     private CellInfo cell;
+
+    protected User user;
+    protected Session session;
+    protected ActionContext actionContext;
 
     public ServerProcessAction(
         Integer currentWorkingCenterId,
@@ -57,20 +62,24 @@ public abstract class ServerProcessAction implements Action<ProcessResult> {
     public ProcessResult run(User user, Session session)
         throws ActionException {
         ProcessResult res;
+
+        this.user = user;
+        this.session = session;
+        this.actionContext = new ActionContext(user, session);
+
         if (processOneCell)
-            res = getCellProcessResult(session, cell);
+            res = getCellProcessResult(cell);
         else
-            res = getScanProcessResult(session, cells, isRescanMode);
+            res = getScanProcessResult(cells, isRescanMode);
         res.setLogs(logs);
         return res;
     }
 
-    protected abstract ScanProcessResult getScanProcessResult(Session session,
+    protected abstract ScanProcessResult getScanProcessResult(
         Map<RowColPos, CellInfo> cells, boolean isRescanMode)
         throws ActionException;
 
-    protected abstract CellProcessResult getCellProcessResult(Session session,
-        CellInfo cell)
+    protected abstract CellProcessResult getCellProcessResult(CellInfo cell)
         throws ActionException;
 
     public void appendNewLog(String log) {

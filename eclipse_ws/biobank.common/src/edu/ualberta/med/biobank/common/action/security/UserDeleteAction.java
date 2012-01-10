@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.action.security;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
@@ -25,7 +25,8 @@ public class UserDeleteAction implements Action<EmptyResult> {
 
     @Override
     public EmptyResult run(User user, Session session) throws ActionException {
-        User userToDelete = ActionUtil.sessionGet(session, User.class, userToDeleteId);
+        User userToDelete =
+            new ActionContext(user, session).load(User.class, userToDeleteId);
         session.delete(userToDelete);
         return new EmptyResult();
     }

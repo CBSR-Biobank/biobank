@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.action.study;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.check.CollectionIsEmptyCheck;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -28,7 +28,8 @@ public class StudyDeleteAction implements Action<EmptyResult> {
 
     @Override
     public EmptyResult run(User user, Session session) throws ActionException {
-        Study study = ActionUtil.sessionGet(session, Study.class, studyId);
+        Study study =
+            new ActionContext(user, session).load(Study.class, studyId);
 
         new CollectionIsEmptyCheck<Study>(
             Study.class, study, StudyPeer.PATIENT_COLLECTION,
