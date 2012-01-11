@@ -6,19 +6,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.Query;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
+import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
@@ -27,8 +32,13 @@ import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSav
 import edu.ualberta.med.biobank.common.action.site.SiteDeleteAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenDeleteAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
@@ -80,7 +90,7 @@ public class TestSite extends TestAction {
             Assert.assertTrue(true);
         }
 
-        siteSaveAction.setName(name);
+        siteSaveAction.setNameShort(name);
         siteSaveAction.setActivityStatusId(null);
         try {
             appService.doAction(siteSaveAction);
@@ -113,7 +123,9 @@ public class TestSite extends TestAction {
             Assert.assertTrue(true);
         }
 
-        // TODO success path test missing
+        // success path
+        siteSaveAction.setStudyIds(new HashSet<Integer>());
+        appService.doAction(siteSaveAction);
     }
 
     @Test
@@ -160,8 +172,8 @@ public class TestSite extends TestAction {
 
     @Test
     public void studyCollection() throws Exception {
+        Set<Integer> studyIds;
         List<Integer> allStudyIds = new ArrayList<Integer>();
-        Set<Integer> expectedResult = new HashSet<Integer>();
         Set<Integer> studyIdsSet1 = new HashSet<Integer>();
         Set<Integer> studyIdsSet2 = new HashSet<Integer>();
 
@@ -176,37 +188,80 @@ public class TestSite extends TestAction {
             }
         }
 
-        // add study set 1 to site created in startup
+        // add study set 1 one by one
         Integer siteId = appService.doAction(siteSaveAction).getId();
         SiteInfo siteInfo =
             appService.doAction(new SiteGetInfoAction(siteId));
-        SiteSaveAction siteSaveAction =
-            SiteHelper.getSaveAction(appService, siteInfo);
-        siteSaveAction.setStudyIds(studyIdsSet1);
-        appService.doAction(siteSaveAction);
-        expectedResult.addAll(studyIdsSet1);
-        siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
-        Assert.assertEquals(expectedResult,
-            getStudyIds(siteInfo.studyCountInfo));
+        Set<Integer> expectedStudyIds = new HashSet<Integer>();
+
+        for (Integer studyId : studyIdsSet1) {
+            expectedStudyIds.add(studyId);
+
+            SiteSaveAction siteSaveAction =
+                SiteHelper.getSaveAction(appService, siteInfo);
+            studyIds = getStudyIds(siteInfo.studyCountInfo);
+            studyIds.add(studyId);
+            siteSaveAction.setStudyIds(studyIds);
+            appService.doAction(siteSaveAction);
+            siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
+            Assert.assertEquals(expectedStudyIds,
+                getStudyIds(siteInfo.studyCountInfo));
+        }
 
         // create a second site, site 2, with the second set of studies
         Integer siteId2 = SiteHelper.createSite(appService, name + "_2",
             Utils.getRandomString(8, 12),
             ActivityStatusEnum.ACTIVE, studyIdsSet2);
         siteInfo = appService.doAction(new SiteGetInfoAction(siteId2));
-        expectedResult.clear();
-        expectedResult.addAll(studyIdsSet2);
-        Assert.assertEquals(expectedResult,
+        expectedStudyIds.clear();
+        expectedStudyIds.addAll(studyIdsSet2);
+        Assert.assertEquals(expectedStudyIds,
             getStudyIds(siteInfo.studyCountInfo));
 
         // make sure site 1 still has same collection
         siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
-        expectedResult.clear();
-        expectedResult.addAll(studyIdsSet1);
-        Assert.assertEquals(expectedResult,
+        expectedStudyIds.clear();
+        expectedStudyIds.addAll(studyIdsSet1);
+        Assert.assertEquals(expectedStudyIds,
             getStudyIds(siteInfo.studyCountInfo));
 
-        // TODO edit studies in an existing site
+        // delete studies one by one from Site 1
+        siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
+        for (Integer studyId : studyIdsSet1) {
+            expectedStudyIds.remove(studyId);
+
+            siteSaveAction = SiteHelper.getSaveAction(appService, siteInfo);
+            studyIds = getStudyIds(siteInfo.studyCountInfo);
+            studyIds.remove(studyId);
+            siteSaveAction.setStudyIds(studyIds);
+            appService.doAction(siteSaveAction);
+            siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
+            Assert.assertEquals(expectedStudyIds,
+                getStudyIds(siteInfo.studyCountInfo));
+        }
+
+        // delete studies from Site 2
+        siteInfo = appService.doAction(new SiteGetInfoAction(siteId2));
+        studyIds = getStudyIds(siteInfo.studyCountInfo);
+        studyIds.removeAll(studyIdsSet2);
+        siteSaveAction = SiteHelper.getSaveAction(appService, siteInfo);
+        appService.doAction(siteSaveAction);
+        siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
+        Assert.assertTrue(getStudyIds(siteInfo.studyCountInfo).isEmpty());
+
+        // attempt to add an invalid study ID
+        siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
+        SiteSaveAction siteSaveAction =
+            SiteHelper.getSaveAction(appService, siteInfo);
+        studyIds = getStudyIds(siteInfo.studyCountInfo);
+        studyIds.add(-1);
+        siteSaveAction.setStudyIds(studyIds);
+        try {
+            appService.doAction(siteSaveAction);
+            Assert.fail("should not be allowed to add an invalid study id");
+        } catch (ModelNotFoundException e) {
+            Assert.assertTrue(true);
+        }
     }
 
     private Set<Integer> getStudyIds(List<StudyCountInfo> studyCountInfo) {
@@ -222,7 +277,16 @@ public class TestSite extends TestAction {
         Integer siteId = appService.doAction(siteSaveAction).getId();
         appService.doAction(new SiteDeleteAction(siteId));
 
-        // TODO hql query for site with id should return empty
+        // hql query for site should return empty
+        openHibernateSession();
+        Query q =
+            session.createQuery("SELECT COUNT(*) FROM "
+                + Site.class.getName() + " WHERE id=?");
+        q.setParameter(0, siteId);
+        Long result = HibernateUtil.getCountFromQuery(q);
+        closeHibernateSession();
+
+        Assert.assertTrue(result.equals(0L));
     }
 
     private Provisioning createSiteWithContainerType()
@@ -326,17 +390,19 @@ public class TestSite extends TestAction {
         Provisioning provisioning =
             SiteHelper.provisionProcessingConfiguration(appService, name);
 
-        DispatchHelper.createDispatch(appService, provisioning.clinicId,
-            provisioning.siteId,
-            provisioning.patientIds.get(0));
+        Integer dispatchId1 =
+            DispatchHelper.createDispatch(appService, provisioning.clinicId,
+                provisioning.siteId,
+                provisioning.patientIds.get(0));
 
         // create a second site to dispatch to
         Integer siteId2 = appService.doAction(
             SiteHelper.getSaveAction(name + "_site2", name + "_site2",
                 ActivityStatusEnum.ACTIVE)).getId();
 
-        DispatchHelper.createDispatch(appService, provisioning.siteId, siteId2,
-            provisioning.patientIds.get(0));
+        Integer dispatchId2 =
+            DispatchHelper.createDispatch(appService, provisioning.siteId,
+                siteId2, provisioning.patientIds.get(0));
 
         try {
             appService.doAction(new SiteDeleteAction(provisioning.siteId));
@@ -347,7 +413,30 @@ public class TestSite extends TestAction {
             Assert.assertTrue(true);
         }
 
-        // TODO: delete the dispatch and then the site
+        // delete the dispatch and then the site
+        Set<Specimen> specimens = new HashSet<Specimen>();
+        ListResult<DispatchSpecimen> dispatchSpecimens =
+            appService
+                .doAction(new DispatchGetSpecimenInfosAction(dispatchId1));
+        for (DispatchSpecimen dspec : dispatchSpecimens.getList()) {
+            specimens.add(dspec.getSpecimen());
+        }
+
+        dispatchSpecimens =
+            appService
+                .doAction(new DispatchGetSpecimenInfosAction(dispatchId2));
+        for (DispatchSpecimen dspec : dispatchSpecimens.getList()) {
+            specimens.add(dspec.getSpecimen());
+        }
+
+        appService.doAction(new DispatchDeleteAction(dispatchId2));
+        appService.doAction(new DispatchDeleteAction(dispatchId1));
+
+        for (Specimen specimen : specimens) {
+            appService.doAction(new SpecimenDeleteAction(specimen.getId()));
+        }
+        deleteOriginInfos(provisioning.siteId);
+        appService.doAction(new SiteDeleteAction(provisioning.siteId));
     }
 
     @Test
@@ -355,9 +444,10 @@ public class TestSite extends TestAction {
         Provisioning provisioning =
             SiteHelper.provisionProcessingConfiguration(appService, name);
 
-        DispatchHelper.createDispatch(appService, provisioning.clinicId,
-            provisioning.siteId,
-            provisioning.patientIds.get(0));
+        Integer dispatchId =
+            DispatchHelper.createDispatch(appService, provisioning.clinicId,
+                provisioning.siteId,
+                provisioning.patientIds.get(0));
 
         try {
             appService.doAction(new SiteDeleteAction(provisioning.siteId));
@@ -368,7 +458,10 @@ public class TestSite extends TestAction {
             Assert.assertTrue(true);
         }
 
-        // TODO: delete the dispatch and then the site
+        // delete the dispatch and then the site - no need to delete dispatch
+        // specimens
+        appService.doAction(new DispatchDeleteAction(dispatchId));
+        appService.doAction(new SiteDeleteAction(provisioning.siteId));
     }
 
 }

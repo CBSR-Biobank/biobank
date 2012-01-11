@@ -16,6 +16,7 @@ import org.junit.Before;
 
 import edu.ualberta.med.biobank.common.action.security.UserGetAction;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.AllTests;
@@ -115,5 +116,16 @@ public class TestAction extends TestDatabase {
         Assert.assertTrue("container labeling schemes not found in database",
             !labelingSchemes.isEmpty());
         return labelingSchemes;
+    }
+
+    protected void deleteOriginInfos(Integer centerId) {
+        // delete origin infos
+        openHibernateSession();
+        Query q =
+            session.createQuery("DELETE FROM "
+                + OriginInfo.class.getName() + " oi WHERE oi.center.id=?");
+        q.setParameter(0, centerId);
+        q.executeUpdate();
+        closeHibernateSession();
     }
 }

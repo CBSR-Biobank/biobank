@@ -197,9 +197,9 @@ public class TestPatient extends TestAction {
 
         openHibernateSession();
         ActionContext actionContext = new ActionContext(currentUser, session);
-        Patient p1 = actionContext.load(Patient.class, patientId1);
+        Patient p1 = actionContext.get(Patient.class, patientId1);
         Assert.assertNotNull(p1);
-        Patient p2 = actionContext.load(Patient.class, patientId2);
+        Patient p2 = actionContext.get(Patient.class, patientId2);
         Assert.assertNull(p2);
         Collection<CollectionEvent> cevents = p1.getCollectionEventCollection();
         Assert.assertEquals(3, cevents.size());

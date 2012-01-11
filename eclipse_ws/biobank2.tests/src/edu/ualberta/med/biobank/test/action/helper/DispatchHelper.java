@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
@@ -44,8 +43,8 @@ public class DispatchHelper extends Helper {
     }
 
     public static Integer createDispatch(BiobankApplicationService appService,
-        Integer srcCenterId, Integer dstCenterId,
-        Integer patientId) throws Exception {
+        Integer srcCenterId, Integer dstCenterId, Integer patientId)
+        throws Exception {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(appService,
                 dstCenterId, srcCenterId, DispatchState.CREATION.getId(),

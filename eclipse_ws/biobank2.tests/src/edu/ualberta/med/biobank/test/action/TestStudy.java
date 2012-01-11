@@ -276,8 +276,7 @@ public class TestStudy extends TestAction {
     }
 
     private void studyRemoveContacts(Integer studyId,
-        List<Contact> contactsToRemove)
-        throws ApplicationException {
+        List<Contact> contactsToRemove) throws ApplicationException {
         // get a list of contact IDs to remove
         List<Integer> idsToRemove = new ArrayList<Integer>();
         for (Contact c : contactsToRemove) {
