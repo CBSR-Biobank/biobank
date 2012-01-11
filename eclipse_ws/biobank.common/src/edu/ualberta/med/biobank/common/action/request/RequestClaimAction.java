@@ -5,14 +5,14 @@ import java.util.List;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.IdResult;
+import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class RequestClaimAction implements Action<IdResult> {
+public class RequestClaimAction implements Action<EmptyResult> {
 
     /**
      * 
@@ -30,7 +30,7 @@ public class RequestClaimAction implements Action<IdResult> {
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
+    public EmptyResult run(User user, Session session) throws ActionException {
         SessionUtil sessionUtil = new SessionUtil(session);
 
         for (Integer id : rSpecIds) {
@@ -39,6 +39,6 @@ public class RequestClaimAction implements Action<IdResult> {
             session.saveOrUpdate(rs);
         }
         session.flush();
-        return null;
+        return new EmptyResult();
     }
 }

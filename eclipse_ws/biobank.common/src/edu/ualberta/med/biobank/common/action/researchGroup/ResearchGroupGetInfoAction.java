@@ -7,7 +7,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.info.ResearchGroupFormReadInfo;
+import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupReadPermission;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.User;
@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.model.User;
  * @author aaron
  * 
  */
-public class ResearchGroupGetInfoAction implements Action<ResearchGroupFormReadInfo> {
+public class ResearchGroupGetInfoAction implements Action<ResearchGroupReadInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -38,8 +38,8 @@ public class ResearchGroupGetInfoAction implements Action<ResearchGroupFormReadI
     }
 
     @Override
-    public ResearchGroupFormReadInfo run(User user, Session session) throws ActionException {
-        ResearchGroupFormReadInfo sInfo = new ResearchGroupFormReadInfo();
+    public ResearchGroupReadInfo run(User user, Session session) throws ActionException {
+        ResearchGroupReadInfo sInfo = new ResearchGroupReadInfo();
 
         Query query = session.createQuery(RESEARCH_INFO_HQL);
         query.setParameter(0, rgId);

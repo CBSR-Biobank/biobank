@@ -8,7 +8,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.info.ShipmentFormReadInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
@@ -44,7 +44,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private CommentCollectionInfoTable commentEntryTable;
 
-    private ShipmentFormReadInfo oiInfo;
+    private ShipmentReadInfo oiInfo;
 
     @Override
     protected void init() throws Exception {

@@ -21,7 +21,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.info.RequestFormReadInfo;
+import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
@@ -54,7 +54,7 @@ public class RequestEntryForm extends BiobankViewForm {
     private Button addButton;
     private Button openScanButton;
     private CommentWrapper comment;
-    private RequestFormReadInfo requestInfo;
+    private RequestReadInfo requestInfo;
 
     @Override
     protected void init() throws Exception {

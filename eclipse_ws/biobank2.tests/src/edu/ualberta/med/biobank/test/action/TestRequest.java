@@ -12,8 +12,8 @@ import org.junit.rules.TestName;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.info.RequestFormReadInfo;
-import edu.ualberta.med.biobank.common.action.info.ResearchGroupFormReadInfo;
+import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
+import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestClaimAction;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.action.request.RequestStateChangeAction;
@@ -57,7 +57,7 @@ public class TestRequest extends TestAction {
 
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupFormReadInfo rg = appService.doAction(reader);
+        ResearchGroupReadInfo rg = appService.doAction(reader);
 
         // create specs
         Integer p =
@@ -86,7 +86,7 @@ public class TestRequest extends TestAction {
         // make sure you got what was requested
         RequestGetInfoAction requestGetInfoAction =
             new RequestGetInfoAction(rId);
-        RequestFormReadInfo rInfo = appService.doAction(requestGetInfoAction);
+        RequestReadInfo rInfo = appService.doAction(requestGetInfoAction);
 
         for (RequestSpecimen spec : rInfo.specimens) {
             Assert.assertTrue(specs.contains(spec.getSpecimen()
@@ -100,7 +100,7 @@ public class TestRequest extends TestAction {
 
         RequestGetInfoAction requestGetInfoAction =
             new RequestGetInfoAction(rId);
-        RequestFormReadInfo rInfo = appService.doAction(requestGetInfoAction);
+        RequestReadInfo rInfo = appService.doAction(requestGetInfoAction);
 
         List<Integer> ids = new ArrayList<Integer>();
         for (RequestSpecimen rs : rInfo.specimens) {
@@ -124,7 +124,7 @@ public class TestRequest extends TestAction {
 
         RequestGetInfoAction requestGetInfoAction =
             new RequestGetInfoAction(rId);
-        RequestFormReadInfo rInfo = appService.doAction(requestGetInfoAction);
+        RequestReadInfo rInfo = appService.doAction(requestGetInfoAction);
 
         List<Integer> ids = new ArrayList<Integer>();
         for (RequestSpecimen rs : rInfo.specimens) {

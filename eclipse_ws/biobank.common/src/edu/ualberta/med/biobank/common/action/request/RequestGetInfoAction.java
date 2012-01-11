@@ -7,14 +7,14 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.info.RequestFormReadInfo;
+import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.permission.request.RequestReadPermission;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.User;
 
-public class RequestGetInfoAction implements Action<RequestFormReadInfo> {
+public class RequestGetInfoAction implements Action<RequestReadInfo> {
 
     /**
      * 
@@ -42,9 +42,9 @@ public class RequestGetInfoAction implements Action<RequestFormReadInfo> {
     }
 
     @Override
-    public RequestFormReadInfo run(User user, Session session)
+    public RequestReadInfo run(User user, Session session)
         throws ActionException {
-        RequestFormReadInfo sInfo = new RequestFormReadInfo();
+        RequestReadInfo sInfo = new RequestReadInfo();
 
         Query query = session.createQuery(REQUEST_HQL);
         query.setParameter(0, id);

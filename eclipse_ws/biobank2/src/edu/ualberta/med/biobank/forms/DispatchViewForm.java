@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
-import edu.ualberta.med.biobank.common.action.info.DispatchFormReadInfo;
+import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
@@ -73,7 +73,7 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private CommentCollectionInfoTable commentTable;
 
-    private DispatchFormReadInfo dispatchInfo;
+    private DispatchReadInfo dispatchInfo;
 
     @Override
     protected void init() throws Exception {

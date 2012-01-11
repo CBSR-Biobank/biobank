@@ -7,12 +7,12 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.info.DispatchFormReadInfo;
+import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.User;
 
-public class DispatchGetInfoAction implements Action<DispatchFormReadInfo> {
+public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
@@ -39,9 +39,9 @@ public class DispatchGetInfoAction implements Action<DispatchFormReadInfo> {
     }
 
     @Override
-    public DispatchFormReadInfo run(User user, Session session)
+    public DispatchReadInfo run(User user, Session session)
         throws ActionException {
-        DispatchFormReadInfo sInfo = new DispatchFormReadInfo();
+        DispatchReadInfo sInfo = new DispatchReadInfo();
 
         Query query = session.createQuery(DISPATCH_HQL);
         query.setParameter(0, id);
@@ -57,8 +57,7 @@ public class DispatchGetInfoAction implements Action<DispatchFormReadInfo> {
                     .getList();
 
         } else {
-            throw new ActionException(
-                "No dispatch specimens found for id:" + id); //$NON-NLS-1$
+            throw new ActionException("No dispatch specimens found for id:" + id); //$NON-NLS-1$
         }
 
         return sInfo;
