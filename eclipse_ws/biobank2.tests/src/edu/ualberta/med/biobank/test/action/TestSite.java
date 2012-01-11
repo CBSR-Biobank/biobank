@@ -101,6 +101,8 @@ public class TestSite extends TestAction {
             Assert.assertTrue(true);
         }
 
+        // test invalid act status: 5, -1
+
         siteSaveAction.setAddress(new Address());
         siteSaveAction.setStudyIds(null);
         try {
@@ -110,6 +112,8 @@ public class TestSite extends TestAction {
         } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
+
+        // TODO success path test missing
     }
 
     @Test
@@ -201,6 +205,8 @@ public class TestSite extends TestAction {
         expectedResult.addAll(studyIdsSet1);
         Assert.assertEquals(expectedResult,
             getStudyIds(siteInfo.studyCountInfo));
+
+        // TODO edit studies in an existing site
     }
 
     private Set<Integer> getStudyIds(List<StudyCountInfo> studyCountInfo) {
@@ -216,6 +222,7 @@ public class TestSite extends TestAction {
         Integer siteId = appService.doAction(siteSaveAction).getId();
         appService.doAction(new SiteDeleteAction(siteId));
 
+        // TODO hql query for site with id should return empty
     }
 
     private Provisioning createSiteWithContainerType()
