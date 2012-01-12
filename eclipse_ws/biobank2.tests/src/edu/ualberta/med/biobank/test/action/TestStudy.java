@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicDeleteAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
+import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
@@ -39,6 +40,7 @@ import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
 import edu.ualberta.med.biobank.test.Utils;
@@ -146,6 +148,11 @@ public class TestStudy extends TestAction {
         } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
+
+        // success path
+        studySaveAction
+            .setStudyEventAttrSaveInfo(new HashSet<StudyEventAttrSaveInfo>());
+        appService.doAction(studySaveAction);
     }
 
     @Test
@@ -258,6 +265,20 @@ public class TestStudy extends TestAction {
             } catch (ActionCheckException e) {
                 Assert.assertTrue(true);
             }
+        }
+
+        // attempt to add an invalid contact ID
+        StudyInfo studyInfo =
+            appService.doAction(new StudyGetInfoAction(studyId));
+        StudySaveAction studySave =
+            StudyHelper.getSaveAction(appService, studyInfo);
+        studySave.setContactIds(new HashSet<Integer>(Arrays.asList(-1)));
+        try {
+            appService.doAction(studySave);
+            Assert.fail(
+                "should not be allowed to add an invalid contact ID");
+        } catch (ModelNotFoundException e) {
+            Assert.assertTrue(true);
         }
     }
 
@@ -627,6 +648,17 @@ public class TestStudy extends TestAction {
         // delete a study with no patients and no other associations
         Integer studyId = appService.doAction(studySaveAction).getId();
         appService.doAction(new StudyDeleteAction(studyId));
+
+        // hql query for study should return empty
+        openHibernateSession();
+        Query q =
+            session.createQuery("SELECT COUNT(*) FROM "
+                + Study.class.getName() + " WHERE id=?");
+        q.setParameter(0, studyId);
+        Long result = HibernateUtil.getCountFromQuery(q);
+        closeHibernateSession();
+
+        Assert.assertTrue(result.equals(0L));
     }
 
     @Test

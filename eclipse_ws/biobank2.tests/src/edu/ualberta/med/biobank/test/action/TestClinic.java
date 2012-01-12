@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
@@ -221,6 +222,17 @@ public class TestClinic extends TestAction {
         // delete a study with no patients and no other associations
         Integer clinicId = appService.doAction(clinicSaveAction).getId();
         appService.doAction(new ClinicDeleteAction(clinicId));
+
+        // hql query for site should return empty
+        openHibernateSession();
+        Query q =
+            session.createQuery("SELECT COUNT(*) FROM "
+                + Clinic.class.getName() + " WHERE id=?");
+        q.setParameter(0, clinicId);
+        Long result = HibernateUtil.getCountFromQuery(q);
+        closeHibernateSession();
+
+        Assert.assertTrue(result.equals(0L));
     }
 
     @Test
