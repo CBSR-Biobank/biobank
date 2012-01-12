@@ -12,8 +12,10 @@ import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
@@ -167,6 +169,36 @@ public class TestDispatch extends TestAction {
             .assertTrue(appService.doAction(new DispatchGetInfoAction(id)).dispatch.state
                 .equals(DispatchState.RECEIVED.getId()));
 
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        DispatchSaveInfo d =
+            DispatchHelper.createSaveDispatchInfoRandom(appService, siteId,
+                centerId, DispatchState.IN_TRANSIT.getId(),
+                Utils.getRandomString(5));
+        Set<DispatchSpecimenInfo> specs =
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(appService,
+                patientId, centerId);
+        ShipmentInfoSaveInfo shipsave =
+            ShipmentInfoHelper.createRandomShipmentInfo(appService);
+        Integer id =
+            appService.doAction(new DispatchSaveAction(d, specs, shipsave))
+                .getId();
+
+        DispatchReadInfo info =
+            appService.doAction(new DispatchGetInfoAction(id));
+        DispatchDeleteAction delete = new DispatchDeleteAction(id);
+        try {
+            appService.doAction(delete);
+            Assert.fail();
+        } catch (ActionException e) {
+        }
+
+        DispatchChangeStateAction stateChange =
+            new DispatchChangeStateAction(id, DispatchState.CREATION, shipsave);
+        appService.doAction(stateChange);
+        appService.doAction(delete);
     }
 
 }

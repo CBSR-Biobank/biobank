@@ -7,7 +7,9 @@ import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.permission.shipment.ShipmentDeletePermission;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
 public class ShipmentDeleteAction implements Action<EmptyResult> {
@@ -29,8 +31,17 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
         OriginInfo ship =
             new SessionUtil(session).get(OriginInfo.class, shipId);
 
-        // / ??? what checks???
-
+        OriginInfo oi = new OriginInfo();
+        Center currentCenter = null;
+        for (Specimen spc : ship.getSpecimenCollection()) {
+            if (currentCenter == null)
+                currentCenter = spc.getCurrentCenter();
+            else if (currentCenter != spc.getCurrentCenter())
+                throw new ActionException(
+                    "Specimens do not come from the same place.");
+            spc.setOriginInfo(oi);
+        }
+        oi.setCenter(currentCenter);
         session.delete(ship);
         return new EmptyResult();
     }

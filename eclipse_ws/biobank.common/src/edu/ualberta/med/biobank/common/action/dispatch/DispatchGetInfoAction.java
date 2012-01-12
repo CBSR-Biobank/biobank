@@ -19,7 +19,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
     private static final String DISPATCH_HQL =
         "select dispatch from "
             + Dispatch.class.getName()
-            + " dispatch left join fetch dispatch.shipmentMethod"
+            + " dispatch left join fetch dispatch.shipmentInfo"
             + " si left join fetch si.shippingMethod"
             + " join fetch dispatch.receiverCenter"
             + " join fetch dispatch.senderCenter"
@@ -57,7 +57,8 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
                     .getList();
 
         } else {
-            throw new ActionException("No dispatch specimens found for id:" + id); //$NON-NLS-1$
+            throw new ActionException(
+                "No dispatch specimens found for id:" + id); //$NON-NLS-1$
         }
 
         return sInfo;
