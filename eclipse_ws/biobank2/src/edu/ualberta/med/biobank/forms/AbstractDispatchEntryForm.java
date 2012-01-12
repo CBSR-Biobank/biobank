@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Listener;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
-import edu.ualberta.med.biobank.common.action.info.DispatchFormReadInfo;
+import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.util.ModelUtil;
@@ -53,7 +53,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     protected boolean tryAgain;
 
-    protected DispatchFormReadInfo dispatchInfo;
+    protected DispatchReadInfo dispatchInfo;
 
     protected CommentWrapper comment;
 

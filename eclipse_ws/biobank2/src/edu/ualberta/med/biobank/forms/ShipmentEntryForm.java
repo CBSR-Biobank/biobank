@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
-import edu.ualberta.med.biobank.common.action.info.ShipmentFormReadInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShippingMethodInfo;
 import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
@@ -120,7 +120,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private OriginInfo oiCopy;
 
-    private ShipmentFormReadInfo oiInfo;
+    private ShipmentReadInfo oiInfo;
 
     private OriginInfoWrapper originInfo;
     private ShipmentInfoWrapper shipmentInfo;

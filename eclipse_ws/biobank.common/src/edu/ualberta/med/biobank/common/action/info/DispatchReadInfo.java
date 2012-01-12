@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 
-public class DispatchFormReadInfo implements ActionResult {
+public class DispatchReadInfo implements ActionResult {
 
     /**
      * 

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -13,13 +14,14 @@ import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
-import edu.ualberta.med.biobank.common.action.info.DispatchFormReadInfo;
+import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.ShipmentInfoHelper;
@@ -71,7 +73,7 @@ public class TestDispatch extends TestAction {
             appService.doAction(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
-        DispatchFormReadInfo info =
+        DispatchReadInfo info =
             appService.doAction(new DispatchGetInfoAction(id));
 
         Assert.assertTrue(info.dispatch.getReceiverCenter().getId()
@@ -87,6 +89,33 @@ public class TestDispatch extends TestAction {
             Assert.assertTrue(found);
         }
 
+        // test duplicates
+        specs = DispatchHelper.createSaveDispatchSpecimenInfoRandom(appService,
+            patientId, centerId);
+        Iterator<DispatchSpecimenInfo> it = specs.iterator();
+
+        Integer specId = it.next().specimenId;
+        it.next().specimenId = specId;
+
+        id =
+            appService.doAction(new DispatchSaveAction(d, specs, shipsave))
+                .getId();
+
+        // test null
+
+        specId = null;
+        it.next().specimenId = specId;
+
+        try {
+            id =
+                appService.doAction(new DispatchSaveAction(d, specs, shipsave))
+                    .getId();
+            Assert.fail();
+        } catch (ValueNotSetException e) {
+        }
+
+        // test empty
+
         specs = new HashSet<DispatchSpecimenInfo>();
         id =
             appService.doAction(new DispatchSaveAction(d, specs, shipsave))
@@ -96,6 +125,7 @@ public class TestDispatch extends TestAction {
             appService.doAction(new DispatchGetInfoAction(id));
 
         Assert.assertTrue(info.specimens.size() == 0);
+
     }
 
     @Test

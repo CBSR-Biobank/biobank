@@ -12,8 +12,8 @@ import org.junit.rules.TestName;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.info.RequestFormReadInfo;
-import edu.ualberta.med.biobank.common.action.info.ResearchGroupFormReadInfo;
+import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
+import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
@@ -51,7 +51,7 @@ public class TestResearchGroup extends TestAction {
                 studyId);
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupFormReadInfo rg = appService.doAction(reader);
+        ResearchGroupReadInfo rg = appService.doAction(reader);
 
         Assert.assertTrue(rg.rg.name.equals(name + "rg"));
         Assert.assertTrue(rg.rg.nameShort.equals(name + "rg"));
@@ -69,7 +69,7 @@ public class TestResearchGroup extends TestAction {
                 studyId);
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupFormReadInfo rg = appService.doAction(reader);
+        ResearchGroupReadInfo rg = appService.doAction(reader);
 
         // create specs
         Integer p =
@@ -98,7 +98,7 @@ public class TestResearchGroup extends TestAction {
         // make sure you got what was requested
         RequestGetInfoAction requestGetInfoAction =
             new RequestGetInfoAction(rId);
-        RequestFormReadInfo rInfo = appService.doAction(requestGetInfoAction);
+        RequestReadInfo rInfo = appService.doAction(requestGetInfoAction);
 
         for (RequestSpecimen spec : rInfo.specimens) {
             Assert.assertTrue(specs.contains(spec.getSpecimen()
