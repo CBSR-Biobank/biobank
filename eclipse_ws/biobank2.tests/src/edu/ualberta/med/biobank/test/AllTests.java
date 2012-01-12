@@ -7,7 +7,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.test.action.IActionExecutor;
 import edu.ualberta.med.biobank.test.action.TestClinic;
 import edu.ualberta.med.biobank.test.action.TestCollectionEvent;
 import edu.ualberta.med.biobank.test.action.TestDispatch;
@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.test.internal.DbHelper;
     TestResearchGroup.class,
     TestShipment.class, TestSite.class, TestStudy.class })
 public class AllTests {
-    public static BiobankApplicationService appService = null;
+    public static IActionExecutor appService = null;
     public static final String userLogin = "testuser";
     public static final String userPwd = "test";
 
@@ -41,7 +41,7 @@ public class AllTests {
     public static void tearDown() throws Exception {
     }
 
-    public static BiobankApplicationService connect(String user, String password)
+    public static IActionExecutor connect(String user, String password)
         throws Exception {
         return ServiceConnection.getAppService(
             System.getProperty("server", "http://localhost:8080") + "/biobank",

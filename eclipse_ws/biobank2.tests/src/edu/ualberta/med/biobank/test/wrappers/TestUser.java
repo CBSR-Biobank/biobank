@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.test.action.IActionExecutor;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
 import edu.ualberta.med.biobank.test.AllTests;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -55,7 +55,7 @@ public class TestUser extends TestDatabase {
         Assert.assertFalse(csmUser.getPassword().isEmpty());
 
         // check user can connect
-        BiobankApplicationService newUserAppService = AllTests.connect(name,
+        IActionExecutor newUserAppService = AllTests.connect(name,
             password);
         // check user can access a biobank object using the new appService
         try {
@@ -213,7 +213,7 @@ public class TestUser extends TestDatabase {
         UserWrapper user = UserHelper.addUser(name, password, true);
 
         // check user can connect
-        BiobankApplicationService newUserAppService = AllTests.connect(name,
+        IActionExecutor newUserAppService = AllTests.connect(name,
             password);
         String newPwd = "new123";
         // search the user again otherwise the appService will still try with

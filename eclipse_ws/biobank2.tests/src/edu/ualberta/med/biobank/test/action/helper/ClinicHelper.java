@@ -10,8 +10,8 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSav
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.action.IActionExecutor;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicHelper extends Helper {
@@ -32,7 +32,7 @@ public class ClinicHelper extends Helper {
         return saveClinic;
     }
 
-    public static Integer createClinic(BiobankApplicationService appService,
+    public static Integer createClinic(IActionExecutor appService,
         String name, ActivityStatusEnum activityStatus)
         throws ApplicationException {
 
@@ -47,21 +47,21 @@ public class ClinicHelper extends Helper {
         address.setCity(Utils.getRandomString(5, 10));
         clinicSave.setAddress(address);
 
-        return appService.doAction(clinicSave).getId();
+        return appService.exec(clinicSave).getId();
     }
 
-    public static Integer createContact(BiobankApplicationService appService,
+    public static Integer createContact(IActionExecutor appService,
         String name, Integer clinicId) throws ApplicationException {
         ContactSaveAction contactSave = new ContactSaveAction();
 
         contactSave.setName(name);
         contactSave.setClinicId(clinicId);
 
-        return appService.doAction(contactSave).getId();
+        return appService.exec(contactSave).getId();
     }
 
     public static Set<Integer> createContacts(
-        BiobankApplicationService appService,
+        IActionExecutor appService,
         Integer clinicId, String basename, int numContacts)
         throws ApplicationException {
         Set<Integer> result = new HashSet<Integer>();
@@ -73,8 +73,8 @@ public class ClinicHelper extends Helper {
     }
 
     public static Integer createClinicWithContacts(
-        BiobankApplicationService appService,
-        String name, int numContacts) throws ApplicationException {
+        IActionExecutor actionExecutor, String name, int numContacts)
+        throws ApplicationException {
         Set<ContactSaveInfo> contactsAll = new HashSet<ContactSaveInfo>();
 
         for (int i = 0; i < 10; ++i) {
@@ -86,25 +86,24 @@ public class ClinicHelper extends Helper {
         ClinicSaveAction clinicSave = ClinicHelper.getSaveAction(
             name, name, ActivityStatusEnum.ACTIVE, true);
         clinicSave.setContactSaveInfos(contactsAll);
-        return appService.doAction(clinicSave).getId();
+        return actionExecutor.exec(clinicSave).getId();
     }
 
     public static Set<Integer> createClinicsWithContacts(
-        BiobankApplicationService appService,
-        String name, int numClinics, int numContactsPerClinic)
+        IActionExecutor actionExecutor, String name, int numClinics,
+        int numContactsPerClinic)
         throws ApplicationException {
         Set<Integer> result = new HashSet<Integer>();
 
         for (int i = 0; i < numClinics; ++i) {
-            result.add(createClinicWithContacts(appService, name + "_" + i,
+            result.add(createClinicWithContacts(actionExecutor, name + "_" + i,
                 numContactsPerClinic));
         }
 
         return result;
     }
 
-    public static ClinicSaveAction getSaveAction(
-        BiobankApplicationService appService, ClinicInfo clinicInfo) {
+    public static ClinicSaveAction getSaveAction(ClinicInfo clinicInfo) {
         ClinicSaveAction saveAction = new ClinicSaveAction();
 
         saveAction.setId(clinicInfo.clinic.getId());

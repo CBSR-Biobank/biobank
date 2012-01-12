@@ -55,28 +55,28 @@ public class TestProcessingEvent extends TestAction {
         super.setUp();
         name = testname.getMethodName() + r.nextInt();
 
-        studyId = StudyHelper.createStudy(appService, name,
+        studyId = StudyHelper.createStudy(actionExecutor, name,
             ActivityStatusEnum.ACTIVE);
 
         Integer clinicId =
-            ClinicHelper.createClinic(appService, name + "_clinic",
+            ClinicHelper.createClinic(actionExecutor, name + "_clinic",
                 ActivityStatusEnum.ACTIVE);
         ContactSaveAction contactSave = new ContactSaveAction();
         contactSave.setName(name + "_contact");
         contactSave.setClinicId(clinicId);
-        Integer contactId = appService.doAction(contactSave).getId();
+        Integer contactId = actionExecutor.exec(contactSave).getId();
 
         StudyInfo studyInfo =
-            appService.doAction(new StudyGetInfoAction(studyId));
+            actionExecutor.exec(new StudyGetInfoAction(studyId));
         StudySaveAction studySaveAction =
-            StudyHelper.getSaveAction(appService, studyInfo);
+            StudyHelper.getSaveAction(actionExecutor, studyInfo);
         studySaveAction.setContactIds(new HashSet<Integer>(contactId));
-        appService.doAction(studySaveAction);
+        actionExecutor.exec(studySaveAction);
 
-        patientId = PatientHelper.createPatient(appService,
+        patientId = PatientHelper.createPatient(actionExecutor,
             name, studyId);
 
-        siteId = SiteHelper.createSite(appService, name, "Edmonton",
+        siteId = SiteHelper.createSite(actionExecutor, name, "Edmonton",
             ActivityStatusEnum.ACTIVE,
             new HashSet<Integer>(studyId));
     }
@@ -87,7 +87,7 @@ public class TestProcessingEvent extends TestAction {
         List<CommentInfo> comments = Utils.getRandomCommentInfos(currentUser
             .getId());
         Date date = Utils.getRandomDate();
-        Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
+        Integer pEventId = actionExecutor.exec(new ProcessingEventSaveAction(
             null, siteId, date, worksheet, 1, comments, null)).getId();
 
         openHibernateSession();
@@ -110,15 +110,15 @@ public class TestProcessingEvent extends TestAction {
         Date date = Utils.getRandomDate();
 
         Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(appService,
+            .createCEventWithSourceSpecimens(actionExecutor,
                 patientId, siteId);
-        ArrayList<SpecimenInfo> sourceSpecs = appService
-            .doAction(new CollectionEventGetSpecimenInfosAction(ceventId,
+        ArrayList<SpecimenInfo> sourceSpecs = actionExecutor
+            .exec(new CollectionEventGetSpecimenInfosAction(ceventId,
                 false)).getList();
 
         // create a processing event with one of the collection event source
         // specimen
-        Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
+        Integer pEventId = actionExecutor.exec(new ProcessingEventSaveAction(
             null, siteId, date, worksheet, 1, comments, Arrays
                 .asList(sourceSpecs.get(0).specimen.getId()))).getId();
 
@@ -140,12 +140,12 @@ public class TestProcessingEvent extends TestAction {
     public void saveSameWorksheet() throws Exception {
         String worksheet = Utils.getRandomString(50);
         Date date = Utils.getRandomDate();
-        appService.doAction(new ProcessingEventSaveAction(
+        actionExecutor.exec(new ProcessingEventSaveAction(
             null, siteId, date, worksheet, 1, null, null));
 
         // try to save another pevent with the same worksheet
         try {
-            appService.doAction(new ProcessingEventSaveAction(null, siteId,
+            actionExecutor.exec(new ProcessingEventSaveAction(null, siteId,
                 new Date(), worksheet, 1, null, null));
             Assert
                 .fail("should not be able to use the same worksheet to 2 different pevents");
@@ -156,11 +156,11 @@ public class TestProcessingEvent extends TestAction {
 
     @Test
     public void delete() throws Exception {
-        Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
+        Integer pEventId = actionExecutor.exec(new ProcessingEventSaveAction(
             null, siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), 1, null, null)).getId();
 
-        appService.doAction(new ProcessingEventDeleteAction(pEventId));
+        actionExecutor.exec(new ProcessingEventDeleteAction(pEventId));
 
         openHibernateSession();
         ProcessingEvent pe = new ActionContext(currentUser, session).load(
@@ -173,16 +173,16 @@ public class TestProcessingEvent extends TestAction {
     public void deleteWithSourcesSpecimens() throws Exception {
         // add cevent and source specimens
         Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(appService,
+            .createCEventWithSourceSpecimens(actionExecutor,
                 patientId, siteId);
-        ArrayList<SpecimenInfo> sourceSpecs = appService
-            .doAction(new CollectionEventGetSpecimenInfosAction(ceventId,
+        ArrayList<SpecimenInfo> sourceSpecs = actionExecutor
+            .exec(new CollectionEventGetSpecimenInfosAction(ceventId,
                 false)).getList();
         Integer spcId = sourceSpecs.get(0).specimen.getId();
 
         // create a processing event with one of the collection event source
         // specimen.
-        Integer pEventId = appService.doAction(new ProcessingEventSaveAction(
+        Integer pEventId = actionExecutor.exec(new ProcessingEventSaveAction(
             null, siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), 1, null,
             Arrays
@@ -198,7 +198,7 @@ public class TestProcessingEvent extends TestAction {
 
         // delete this processing event. Can do it since the specimen has no
         // children
-        appService.doAction(new ProcessingEventDeleteAction(pEventId));
+        actionExecutor.exec(new ProcessingEventDeleteAction(pEventId));
 
         openHibernateSession();
         ProcessingEvent pe =
@@ -219,10 +219,10 @@ public class TestProcessingEvent extends TestAction {
     public void deleteWithAliquotedSpecimens() throws Exception {
         // add cevent and source specimens
         Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(appService,
+            .createCEventWithSourceSpecimens(actionExecutor,
                 patientId, siteId);
-        ArrayList<SpecimenInfo> sourceSpecs = appService
-            .doAction(new CollectionEventGetSpecimenInfosAction(ceventId,
+        ArrayList<SpecimenInfo> sourceSpecs = actionExecutor
+            .exec(new CollectionEventGetSpecimenInfosAction(ceventId,
                 false)).getList();
         Integer spcId = sourceSpecs.get(0).specimen.getId();
 
@@ -230,7 +230,7 @@ public class TestProcessingEvent extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimen.
-        Integer pEventId = appService.doAction(
+        Integer pEventId = actionExecutor.exec(
             new ProcessingEventSaveAction(
                 null, siteId, Utils.getRandomDate(),
                 Utils.getRandomString(50), 1, null,
@@ -248,7 +248,7 @@ public class TestProcessingEvent extends TestAction {
         // delete this processing event. Can do it since the specimen has no
         // children
         try {
-            appService.doAction(new ProcessingEventDeleteAction(pEventId));
+            actionExecutor.exec(new ProcessingEventDeleteAction(pEventId));
             Assert
                 .fail("one of the source specimen of this pevent has children. "
                     + "Can't delete the processing event");

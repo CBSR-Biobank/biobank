@@ -39,19 +39,19 @@ public class TestResearchGroup extends TestAction {
         name = testname.getMethodName() + r.nextInt();
         studyId =
             StudyHelper
-                .createStudy(appService, name, ActivityStatusEnum.ACTIVE);
+                .createStudy(actionExecutor, name, ActivityStatusEnum.ACTIVE);
     }
 
     @Test
     public void saveResearchGroup() throws Exception {
 
         Integer rgId =
-            ResearchGroupHelper.createResearchGroup(appService, name,
+            ResearchGroupHelper.createResearchGroup(actionExecutor, name,
                 name,
                 studyId);
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = appService.doAction(reader);
+        ResearchGroupReadInfo rg = actionExecutor.exec(reader);
 
         Assert.assertTrue(rg.rg.name.equals(name + "rg"));
         Assert.assertTrue(rg.rg.nameShort.equals(name + "rg"));
@@ -64,24 +64,24 @@ public class TestResearchGroup extends TestAction {
     @Test
     public void testUpload() throws Exception {
         Integer rgId =
-            ResearchGroupHelper.createResearchGroup(appService, name + "rg",
+            ResearchGroupHelper.createResearchGroup(actionExecutor, name + "rg",
                 name + "rg",
                 studyId);
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = appService.doAction(reader);
+        ResearchGroupReadInfo rg = actionExecutor.exec(reader);
 
         // create specs
         Integer p =
-            PatientHelper.createPatient(appService, name + "_patient",
+            PatientHelper.createPatient(actionExecutor, name + "_patient",
                 rg.rg.getStudy().getId());
         Integer ceId =
-            CollectionEventHelper.createCEventWithSourceSpecimens(appService,
+            CollectionEventHelper.createCEventWithSourceSpecimens(actionExecutor,
                 p, rgId);
 
         CollectionEventGetInfoAction ceReader =
             new CollectionEventGetInfoAction(ceId);
-        CEventInfo ceInfo = appService.doAction(ceReader);
+        CEventInfo ceInfo = actionExecutor.exec(ceReader);
         List<String> specs = new ArrayList<String>();
         for (SpecimenInfo specInfo : ceInfo.sourceSpecimenInfos)
             specs.add(specInfo.specimen.getInventoryId());
@@ -93,12 +93,12 @@ public class TestResearchGroup extends TestAction {
         // request specs
         SubmitRequestAction action =
             new SubmitRequestAction(rgId, specs);
-        Integer rId = appService.doAction(action).getId();
+        Integer rId = actionExecutor.exec(action).getId();
 
         // make sure you got what was requested
         RequestGetInfoAction requestGetInfoAction =
             new RequestGetInfoAction(rId);
-        RequestReadInfo rInfo = appService.doAction(requestGetInfoAction);
+        RequestReadInfo rInfo = actionExecutor.exec(requestGetInfoAction);
 
         for (RequestSpecimen spec : rInfo.specimens) {
             Assert.assertTrue(specs.contains(spec.getSpecimen()

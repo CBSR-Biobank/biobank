@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.test.action.IActionExecutor;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyHelper extends Helper {
@@ -40,15 +40,15 @@ public class StudyHelper extends Helper {
         return saveAction;
     }
 
-    public static Integer createStudy(BiobankApplicationService appService,
+    public static Integer createStudy(IActionExecutor appService,
         String name, ActivityStatusEnum activityStatus)
         throws ApplicationException {
         StudySaveAction saveStudy = getSaveAction(name, name, activityStatus);
-        return appService.doAction(saveStudy).getId();
+        return appService.exec(saveStudy).getId();
     }
 
     public static StudySaveAction getSaveAction(
-        BiobankApplicationService appService, StudyInfo studyInfo) {
+        IActionExecutor appService, StudyInfo studyInfo) {
         StudySaveAction saveStudy = new StudySaveAction();
         saveStudy.setId(studyInfo.study.getId());
         saveStudy.setName(studyInfo.study.getName());

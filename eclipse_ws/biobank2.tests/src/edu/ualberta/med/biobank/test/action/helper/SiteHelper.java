@@ -14,8 +14,8 @@ import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.action.IActionExecutor;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteHelper extends Helper {
@@ -35,7 +35,7 @@ public class SiteHelper extends Helper {
         return siteSaveAction;
     }
 
-    public static Integer createSite(BiobankApplicationService appService,
+    public static Integer createSite(IActionExecutor appService,
         String name, String city, ActivityStatusEnum activityStatus,
         Set<Integer> studyIds) throws ApplicationException {
 
@@ -49,11 +49,11 @@ public class SiteHelper extends Helper {
         saveSite.setActivityStatusId(activityStatus.getId());
         saveSite.setStudyIds(studyIds);
 
-        return appService.doAction(saveSite).getId();
+        return appService.exec(saveSite).getId();
     }
 
     public static List<Integer> createSites(
-        BiobankApplicationService appService,
+        IActionExecutor appService,
         String name, ActivityStatusEnum activityStatus, int numToCreate)
         throws ApplicationException {
         List<Integer> result = new ArrayList<Integer>();
@@ -65,7 +65,7 @@ public class SiteHelper extends Helper {
     }
 
     public static SiteSaveAction getSaveAction(
-        BiobankApplicationService appService, SiteInfo siteInfo) {
+        IActionExecutor appService, SiteInfo siteInfo) {
         SiteSaveAction siteSaveAction = new SiteSaveAction();
 
         siteSaveAction.setId(siteInfo.site.getId());
@@ -104,21 +104,22 @@ public class SiteHelper extends Helper {
      * @returns site ID.
      */
     public static Provisioning provisionProcessingConfiguration(
-        BiobankApplicationService appService, String basename)
+        IActionExecutor actionExecutor, String basename)
         throws ApplicationException {
         Provisioning provisioning = new Provisioning();
         provisioning.clinicId =
-            ClinicHelper.createClinicWithContacts(appService, basename
+            ClinicHelper.createClinicWithContacts(actionExecutor, basename
                 + "_clinic", 10);
         ClinicInfo clinicInfo =
-            appService.doAction(new ClinicGetInfoAction(provisioning.clinicId));
+            actionExecutor.exec(new ClinicGetInfoAction(
+                provisioning.clinicId));
         StudySaveAction studySaveAction =
             StudyHelper.getSaveAction(basename + "_study", basename + "_study",
                 ActivityStatusEnum.ACTIVE);
         HashSet<Integer> ids = new HashSet<Integer>();
         ids.add(clinicInfo.contacts.get(0).getId());
         studySaveAction.setContactIds(ids);
-        provisioning.studyId = appService.doAction(studySaveAction).getId();
+        provisioning.studyId = actionExecutor.exec(studySaveAction).getId();
 
         SiteSaveAction siteSaveAction =
             SiteHelper.getSaveAction(basename + "_site", basename + "_site",
@@ -126,12 +127,12 @@ public class SiteHelper extends Helper {
         ids = new HashSet<Integer>();
         ids.add(provisioning.studyId);
         siteSaveAction.setStudyIds(ids);
-        provisioning.siteId = appService.doAction(siteSaveAction).getId();
+        provisioning.siteId = actionExecutor.exec(siteSaveAction).getId();
 
         PatientSaveAction patientSaveAction =
             new PatientSaveAction(null, provisioning.studyId,
                 basename + "_patient1", Utils.getRandomDate());
-        provisioning.patientIds.add(appService.doAction(patientSaveAction)
+        provisioning.patientIds.add(actionExecutor.exec(patientSaveAction)
             .getId());
         return provisioning;
     }

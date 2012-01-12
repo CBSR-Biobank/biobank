@@ -8,8 +8,8 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.action.IActionExecutor;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 
 public class CollectionEventHelper extends Helper {
@@ -63,7 +63,7 @@ public class CollectionEventHelper extends Helper {
     }
 
     public static Integer createCEventWithSourceSpecimens(
-        BiobankApplicationService appService, Integer patientId, Integer siteId)
+        IActionExecutor actionExecutor, Integer patientId, Integer siteId)
         throws Exception {
         // add specimen type
         final Integer typeId = SpecimenTypeHelper
@@ -74,7 +74,7 @@ public class CollectionEventHelper extends Helper {
             .createSaveCEventSpecimenInfoRandomList(5, typeId);
 
         // Save a new cevent with specimens
-        return appService.doAction(new CollectionEventSaveAction(
+        return actionExecutor.exec(new CollectionEventSaveAction(
             null, patientId, r.nextInt(20), 1, null, siteId,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
             .getId();

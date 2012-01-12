@@ -46,35 +46,35 @@ public class TestDispatch extends TestAction {
         name = testname.getMethodName() + r.nextInt();
         studyId =
             StudyHelper
-                .createStudy(appService, name, ActivityStatusEnum.ACTIVE);
+                .createStudy(actionExecutor, name, ActivityStatusEnum.ACTIVE);
         siteId =
-            SiteHelper.createSite(appService, name + "1", "Edmonton",
+            SiteHelper.createSite(actionExecutor, name + "1", "Edmonton",
                 ActivityStatusEnum.ACTIVE, new HashSet<Integer>(studyId));
         centerId =
-            SiteHelper.createSite(appService, name + "2", "Calgary",
+            SiteHelper.createSite(actionExecutor, name + "2", "Calgary",
                 ActivityStatusEnum.ACTIVE, new HashSet<Integer>(studyId));
         patientId =
-            appService.doAction(new PatientSaveAction(null, studyId, name,
+            actionExecutor.exec(new PatientSaveAction(null, studyId, name,
                 Utils.getRandomDate())).getId();
     }
 
     @Test
     public void saveWithSpecs() throws Exception {
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(appService, siteId,
+            DispatchHelper.createSaveDispatchInfoRandom(actionExecutor, siteId,
                 centerId, DispatchState.CREATION.getId(),
                 Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
-            DispatchHelper.createSaveDispatchSpecimenInfoRandom(appService,
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(actionExecutor,
                 patientId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(appService);
+            ShipmentInfoHelper.createRandomShipmentInfo(actionExecutor);
         Integer id =
-            appService.doAction(new DispatchSaveAction(d, specs, shipsave))
+            actionExecutor.exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
         DispatchReadInfo info =
-            appService.doAction(new DispatchGetInfoAction(id));
+            actionExecutor.exec(new DispatchGetInfoAction(id));
 
         Assert.assertTrue(info.dispatch.getReceiverCenter().getId()
             .equals(d.receiverId));
@@ -90,7 +90,7 @@ public class TestDispatch extends TestAction {
         }
 
         // test duplicates
-        specs = DispatchHelper.createSaveDispatchSpecimenInfoRandom(appService,
+        specs = DispatchHelper.createSaveDispatchSpecimenInfoRandom(actionExecutor,
             patientId, centerId);
         Iterator<DispatchSpecimenInfo> it = specs.iterator();
 
@@ -98,7 +98,7 @@ public class TestDispatch extends TestAction {
         it.next().specimenId = specId;
 
         id =
-            appService.doAction(new DispatchSaveAction(d, specs, shipsave))
+            actionExecutor.exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
         // test null
@@ -108,7 +108,7 @@ public class TestDispatch extends TestAction {
 
         try {
             id =
-                appService.doAction(new DispatchSaveAction(d, specs, shipsave))
+                actionExecutor.exec(new DispatchSaveAction(d, specs, shipsave))
                     .getId();
             Assert.fail();
         } catch (ValueNotSetException e) {
@@ -118,11 +118,11 @@ public class TestDispatch extends TestAction {
 
         specs = new HashSet<DispatchSpecimenInfo>();
         id =
-            appService.doAction(new DispatchSaveAction(d, specs, shipsave))
+            actionExecutor.exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
         info =
-            appService.doAction(new DispatchGetInfoAction(id));
+            actionExecutor.exec(new DispatchGetInfoAction(id));
 
         Assert.assertTrue(info.specimens.size() == 0);
 
@@ -131,40 +131,40 @@ public class TestDispatch extends TestAction {
     @Test
     public void testStateChange() throws Exception {
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(appService, siteId,
+            DispatchHelper.createSaveDispatchInfoRandom(actionExecutor, siteId,
                 centerId, DispatchState.CREATION.getId(),
                 Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
-            DispatchHelper.createSaveDispatchSpecimenInfoRandom(appService,
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(actionExecutor,
                 patientId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(appService);
+            ShipmentInfoHelper.createRandomShipmentInfo(actionExecutor);
         Integer id =
-            appService.doAction(new DispatchSaveAction(d, specs, shipsave))
+            actionExecutor.exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
-        appService.doAction(new DispatchChangeStateAction(id,
+        actionExecutor.exec(new DispatchChangeStateAction(id,
             DispatchState.IN_TRANSIT, shipsave));
         Assert
-            .assertTrue(appService.doAction(new DispatchGetInfoAction(id)).dispatch.state
+            .assertTrue(actionExecutor.exec(new DispatchGetInfoAction(id)).dispatch.state
                 .equals(DispatchState.IN_TRANSIT.getId()));
 
-        appService.doAction(new DispatchChangeStateAction(id,
+        actionExecutor.exec(new DispatchChangeStateAction(id,
             DispatchState.LOST, shipsave));
         Assert
-            .assertTrue(appService.doAction(new DispatchGetInfoAction(id)).dispatch.state
+            .assertTrue(actionExecutor.exec(new DispatchGetInfoAction(id)).dispatch.state
                 .equals(DispatchState.LOST.getId()));
 
-        appService.doAction(new DispatchChangeStateAction(id,
+        actionExecutor.exec(new DispatchChangeStateAction(id,
             DispatchState.CLOSED, shipsave));
         Assert
-            .assertTrue(appService.doAction(new DispatchGetInfoAction(id)).dispatch.state
+            .assertTrue(actionExecutor.exec(new DispatchGetInfoAction(id)).dispatch.state
                 .equals(DispatchState.CLOSED.getId()));
 
-        appService.doAction(new DispatchChangeStateAction(id,
+        actionExecutor.exec(new DispatchChangeStateAction(id,
             DispatchState.RECEIVED, shipsave));
         Assert
-            .assertTrue(appService.doAction(new DispatchGetInfoAction(id)).dispatch.state
+            .assertTrue(actionExecutor.exec(new DispatchGetInfoAction(id)).dispatch.state
                 .equals(DispatchState.RECEIVED.getId()));
 
     }
