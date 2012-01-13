@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
@@ -21,7 +22,6 @@ import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.ShipmentInfoHelper;
@@ -90,8 +90,9 @@ public class TestDispatch extends TestAction {
         }
 
         // test duplicates
-        specs = DispatchHelper.createSaveDispatchSpecimenInfoRandom(actionExecutor,
-            patientId, centerId);
+        specs =
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(actionExecutor,
+                patientId, centerId);
         Iterator<DispatchSpecimenInfo> it = specs.iterator();
 
         Integer specId = it.next().specimenId;
@@ -110,8 +111,9 @@ public class TestDispatch extends TestAction {
             id =
                 actionExecutor.exec(new DispatchSaveAction(d, specs, shipsave))
                     .getId();
-            Assert.fail();
-        } catch (ValueNotSetException e) {
+            Assert.fail("test should fail");
+        } catch (ActionException e) {
+            Assert.assertTrue(true);
         }
 
         // test empty

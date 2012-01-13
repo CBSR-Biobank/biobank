@@ -26,14 +26,15 @@ public class TestAction {
 
     protected User currentUser;
 
+    protected Session session;
+
     /**
      * Done for each test of this class.
      */
     @Before
     public void setUp() throws Exception {
         r = new Random();
-
-        actionExecutor = new MockActionExecutor(true);
+        actionExecutor = new MockActionExecutor(false);
     }
 
     /**

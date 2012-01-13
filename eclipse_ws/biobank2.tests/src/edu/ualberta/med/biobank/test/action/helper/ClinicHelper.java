@@ -32,7 +32,7 @@ public class ClinicHelper extends Helper {
         return saveClinic;
     }
 
-    public static Integer createClinic(IActionExecutor appService,
+    public static Integer createClinic(IActionExecutor actionExecutor,
         String name, ActivityStatusEnum activityStatus)
         throws ApplicationException {
 
@@ -47,26 +47,25 @@ public class ClinicHelper extends Helper {
         address.setCity(Utils.getRandomString(5, 10));
         clinicSave.setAddress(address);
 
-        return appService.exec(clinicSave).getId();
+        return actionExecutor.exec(clinicSave).getId();
     }
 
-    public static Integer createContact(IActionExecutor appService,
+    public static Integer createContact(IActionExecutor actionExecutor,
         String name, Integer clinicId) throws ApplicationException {
         ContactSaveAction contactSave = new ContactSaveAction();
 
         contactSave.setName(name);
         contactSave.setClinicId(clinicId);
 
-        return appService.exec(contactSave).getId();
+        return actionExecutor.exec(contactSave).getId();
     }
 
-    public static Set<Integer> createContacts(
-        IActionExecutor appService,
+    public static Set<Integer> createContacts(IActionExecutor actionExecutor,
         Integer clinicId, String basename, int numContacts)
         throws ApplicationException {
         Set<Integer> result = new HashSet<Integer>();
         for (int j = 0; j < numContacts; ++j) {
-            result.add(createContact(appService, basename + "_contact" + j,
+            result.add(createContact(actionExecutor, basename + "_contact" + j,
                 clinicId));
         }
         return result;

@@ -5,18 +5,18 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
-import edu.ualberta.med.biobank.test.action.IActionExecutor;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
 public class TestingDispatcher implements Dispatcher {
     @Override
     public <T extends ActionResult> T exec(Action<T> action) {
         T result = null;
         try {
-            IActionExecutor service = ServiceConnection
+            BiobankApplicationService service = ServiceConnection
                 .getAppService(
                     System.getProperty("server", "http://localhost:8080")
                         + "/biobank", "testuser", "test");
-            result = service.exec(action);
+            result = service.doAction(action);
         } catch (Exception e) {
             // TODO: handle this better by (1) declaring thrown exception(s)?
             throw new RuntimeException(e);
@@ -29,11 +29,11 @@ public class TestingDispatcher implements Dispatcher {
         ActionCallback<T> callback) {
         boolean success = false;
         try {
-            IActionExecutor service = ServiceConnection
+            BiobankApplicationService service = ServiceConnection
                 .getAppService(
                     System.getProperty("server", "http://localhost:8080")
                         + "/biobank", "testuser", "test");
-            T result = service.exec(action);
+            T result = service.doAction(action);
             success = true;
             callback.onSuccess(result);
         } catch (Throwable caught) {

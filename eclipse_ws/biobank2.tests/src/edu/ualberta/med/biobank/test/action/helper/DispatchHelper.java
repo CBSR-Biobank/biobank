@@ -1,19 +1,17 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.hibernate.Query;
-
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
-import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
@@ -27,17 +25,11 @@ public class DispatchHelper extends Helper {
         id = CollectionEventHelper.createCEventWithSourceSpecimens(
             actionExecutor, patientId, centerId);
 
-        Query q = actionExecutor.getSession().createQuery("FROM "
-            + CollectionEvent.class.getName()
-            + " WHERE id=?");
-        q.setParameter(0, id);
+        CEventInfo ceventInfo =
+            actionExecutor.exec(new CollectionEventGetInfoAction(id));
 
-        @SuppressWarnings("unchecked")
-        List<CollectionEvent> rows = q.list();
-
-        CollectionEvent cevent = rows.get(0);
-        for (Specimen spec : cevent.getAllSpecimenCollection()) {
-            infos.add(new DispatchSpecimenInfo(null, spec.getId(),
+        for (SpecimenInfo specInfo : ceventInfo.sourceSpecimenInfos) {
+            infos.add(new DispatchSpecimenInfo(null, specInfo.specimen.getId(),
                 DispatchSpecimenState.NONE.getId()));
         }
 

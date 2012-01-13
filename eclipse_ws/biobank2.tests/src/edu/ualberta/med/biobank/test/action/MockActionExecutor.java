@@ -36,14 +36,17 @@ public class MockActionExecutor implements IActionExecutor {
         session.setFlushMode(FlushMode.COMMIT);
     }
 
+    @Override
     public void setUser(User user) {
         this.user = user;
     }
 
+    @Override
     public Session getSession() {
         return session;
     }
 
+    @Override
     public <T extends ActionResult> T exec(Action<T> action)
         throws ActionException {
         session.beginTransaction();
