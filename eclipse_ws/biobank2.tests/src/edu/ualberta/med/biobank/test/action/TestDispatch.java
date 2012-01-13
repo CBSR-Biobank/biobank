@@ -175,31 +175,31 @@ public class TestDispatch extends TestAction {
     @Test
     public void testDelete() throws Exception {
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(appService, siteId,
+            DispatchHelper.createSaveDispatchInfoRandom(actionExecutor, siteId,
                 centerId, DispatchState.IN_TRANSIT.getId(),
                 Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
-            DispatchHelper.createSaveDispatchSpecimenInfoRandom(appService,
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(actionExecutor,
                 patientId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(appService);
+            ShipmentInfoHelper.createRandomShipmentInfo(actionExecutor);
         Integer id =
-            appService.doAction(new DispatchSaveAction(d, specs, shipsave))
+            actionExecutor.exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
         DispatchReadInfo info =
-            appService.doAction(new DispatchGetInfoAction(id));
+            actionExecutor.exec(new DispatchGetInfoAction(id));
         DispatchDeleteAction delete = new DispatchDeleteAction(id);
         try {
-            appService.doAction(delete);
+            actionExecutor.exec(delete);
             Assert.fail();
         } catch (ActionException e) {
         }
 
         DispatchChangeStateAction stateChange =
             new DispatchChangeStateAction(id, DispatchState.CREATION, shipsave);
-        appService.doAction(stateChange);
-        appService.doAction(delete);
+        actionExecutor.exec(stateChange);
+        actionExecutor.exec(delete);
     }
 
 }
