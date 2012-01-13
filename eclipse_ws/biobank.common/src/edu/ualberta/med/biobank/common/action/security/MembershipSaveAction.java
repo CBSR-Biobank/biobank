@@ -11,12 +11,12 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.util.SessionUtil;
-import edu.ualberta.med.biobank.common.peer.MembershipPeer;
 import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Permission;
+import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
@@ -25,6 +25,7 @@ public class MembershipSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
     private Integer membershipId;
+    private Integer principalId;
     private Set<Integer> roleIds;
     private Set<Integer> permissionIds;
     private Integer centerId;
@@ -35,6 +36,10 @@ public class MembershipSaveAction implements Action<IdResult> {
 
     public void setId(Integer id) {
         this.membershipId = id;
+    }
+
+    public void setPrincipalId(Integer principalId) {
+        this.principalId = principalId;
     }
 
     public void setRoleIds(Set<Integer> roleIds) {
@@ -68,14 +73,6 @@ public class MembershipSaveAction implements Action<IdResult> {
             throw new NullPropertyException(Membership.class,
                 "permission ids cannot be null");
         }
-        if (centerId == null) {
-            throw new NullPropertyException(Membership.class,
-                MembershipPeer.CENTER);
-        }
-        if (studyId == null) {
-            throw new NullPropertyException(Membership.class,
-                MembershipPeer.STUDY);
-        }
 
         this.session = session;
         sessionUtil = new SessionUtil(session);
@@ -83,6 +80,8 @@ public class MembershipSaveAction implements Action<IdResult> {
 
         membership = sessionUtil.get(
             Membership.class, membershipId, new Membership());
+        membership.setPrincipal(actionContext
+            .load(Principal.class, principalId));
         membership.setCenter(actionContext.load(Center.class, centerId));
         membership.setStudy(actionContext.load(Study.class, studyId));
 

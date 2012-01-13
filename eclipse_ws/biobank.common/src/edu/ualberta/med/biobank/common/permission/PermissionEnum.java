@@ -91,7 +91,12 @@ public enum PermissionEnum {
     CONTAINER_CREATE(56),
     CONTAINER_READ(57),
     CONTAINER_UPDATE(58),
-    CONTAINER_DELETE(59);
+    CONTAINER_DELETE(59),
+
+    SPECIMEN_TYPE_CREATE(60),
+    SPECIMEN_TYPE_READ(61),
+    SPECIMEN_TYPE_UPDATE(62),
+    SPECIMEN_TYPE_DELETE(63);
 
     private final Integer permissionId;
 
