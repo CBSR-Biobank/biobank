@@ -363,8 +363,6 @@ public class TestProcessingEvent extends TestDatabase {
         List<SpecimenWrapper> parentSpcs = new ArrayList<SpecimenWrapper>();
         List<ProcessingEventWrapper> pevents =
             new ArrayList<ProcessingEventWrapper>();
-        List<SpecimenTypeWrapper> allSpcTypes = SpecimenTypeWrapper
-            .getAllSpecimenTypes(appService, true);
 
         final int NUM_PARENTS = 3;
         final int NUM_CHILDREN = 4;

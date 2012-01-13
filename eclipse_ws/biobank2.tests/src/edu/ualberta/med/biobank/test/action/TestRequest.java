@@ -45,9 +45,9 @@ public class TestRequest extends TestAction {
         name = testname.getMethodName() + r.nextInt();
         studyId =
             StudyHelper
-                .createStudy(appService, name, ActivityStatusEnum.ACTIVE);
+                .createStudy(actionExecutor, name, ActivityStatusEnum.ACTIVE);
         rgId =
-            ResearchGroupHelper.createResearchGroup(appService, name + "rg",
+            ResearchGroupHelper.createResearchGroup(actionExecutor, name + "rg",
                 name + "rg",
                 studyId);
     }
@@ -57,19 +57,19 @@ public class TestRequest extends TestAction {
 
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = appService.doAction(reader);
+        ResearchGroupReadInfo rg = actionExecutor.exec(reader);
 
         // create specs
         Integer p =
-            PatientHelper.createPatient(appService, name + "_patient",
+            PatientHelper.createPatient(actionExecutor, name + "_patient",
                 rg.rg.getStudy().getId());
         Integer ceId =
-            CollectionEventHelper.createCEventWithSourceSpecimens(appService,
+            CollectionEventHelper.createCEventWithSourceSpecimens(actionExecutor,
                 p, rgId);
 
         CollectionEventGetInfoAction ceReader =
             new CollectionEventGetInfoAction(ceId);
-        CEventInfo ceInfo = appService.doAction(ceReader);
+        CEventInfo ceInfo = actionExecutor.exec(ceReader);
         List<String> specs = new ArrayList<String>();
         for (SpecimenInfo specInfo : ceInfo.sourceSpecimenInfos)
             specs.add(specInfo.specimen.getInventoryId());
@@ -81,12 +81,12 @@ public class TestRequest extends TestAction {
         // request specs
         SubmitRequestAction action =
             new SubmitRequestAction(rgId, specs);
-        Integer rId = appService.doAction(action).getId();
+        Integer rId = actionExecutor.exec(action).getId();
 
         // make sure you got what was requested
         RequestGetInfoAction requestGetInfoAction =
             new RequestGetInfoAction(rId);
-        RequestReadInfo rInfo = appService.doAction(requestGetInfoAction);
+        RequestReadInfo rInfo = actionExecutor.exec(requestGetInfoAction);
 
         for (RequestSpecimen spec : rInfo.specimens) {
             Assert.assertTrue(specs.contains(spec.getSpecimen()
@@ -96,11 +96,11 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testClaim() throws Exception {
-        Integer rId = RequestHelper.createRequest(appService, rgId);
+        Integer rId = RequestHelper.createRequest(actionExecutor, rgId);
 
         RequestGetInfoAction requestGetInfoAction =
             new RequestGetInfoAction(rId);
-        RequestReadInfo rInfo = appService.doAction(requestGetInfoAction);
+        RequestReadInfo rInfo = actionExecutor.exec(requestGetInfoAction);
 
         List<Integer> ids = new ArrayList<Integer>();
         for (RequestSpecimen rs : rInfo.specimens) {
@@ -109,9 +109,9 @@ public class TestRequest extends TestAction {
 
         RequestClaimAction claimAction =
             new RequestClaimAction(ids);
-        appService.doAction(claimAction);
+        actionExecutor.exec(claimAction);
 
-        rInfo = appService.doAction(requestGetInfoAction);
+        rInfo = actionExecutor.exec(requestGetInfoAction);
         for (RequestSpecimen spec : rInfo.specimens)
             Assert.assertTrue(spec.claimedBy != null
                 && !spec.claimedBy.equals(""));
@@ -120,11 +120,11 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testStateChanges() throws Exception {
-        Integer rId = RequestHelper.createRequest(appService, rgId);
+        Integer rId = RequestHelper.createRequest(actionExecutor, rgId);
 
         RequestGetInfoAction requestGetInfoAction =
             new RequestGetInfoAction(rId);
-        RequestReadInfo rInfo = appService.doAction(requestGetInfoAction);
+        RequestReadInfo rInfo = actionExecutor.exec(requestGetInfoAction);
 
         List<Integer> ids = new ArrayList<Integer>();
         for (RequestSpecimen rs : rInfo.specimens) {
@@ -134,9 +134,9 @@ public class TestRequest extends TestAction {
         RequestStateChangeAction dispatchAction =
             new RequestStateChangeAction(ids,
                 RequestSpecimenState.DISPATCHED_STATE);
-        appService.doAction(dispatchAction);
+        actionExecutor.exec(dispatchAction);
 
-        rInfo = appService.doAction(requestGetInfoAction);
+        rInfo = actionExecutor.exec(requestGetInfoAction);
         for (RequestSpecimen spec : rInfo.specimens)
             Assert.assertTrue(RequestSpecimenState.getState(spec.getState())
                 .equals(RequestSpecimenState.DISPATCHED_STATE));

@@ -37,13 +37,14 @@ public class TestDatabase {
 
     protected static Random r;
 
-    private static final List<Class<?>> IGNORE_RETURN_TYPES = new ArrayList<Class<?>>() {
-        private static final long serialVersionUID = 1L;
-        {
-            add(java.lang.Class.class);
-            add(java.lang.Object.class);
-        }
-    };
+    private static final List<Class<?>> IGNORE_RETURN_TYPES =
+        new ArrayList<Class<?>>() {
+            private static final long serialVersionUID = 1L;
+            {
+                add(java.lang.Class.class);
+                add(java.lang.Object.class);
+            }
+        };
 
     private class GetterInfo {
         Method getMethod;

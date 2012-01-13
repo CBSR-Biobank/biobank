@@ -45,8 +45,9 @@ public class TestUser extends TestDatabase {
         Assert.assertNotNull(dbUser.getCsmUserId());
 
         // check csm user
-        UserProvisioningManager upm = SecurityServiceProvider
-            .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
+        UserProvisioningManager upm =
+            SecurityServiceProvider
+                .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
 
         gov.nih.nci.security.authorization.domainobjects.User csmUser = upm
             .getUser(name);
@@ -89,8 +90,9 @@ public class TestUser extends TestDatabase {
         User dbUser = ModelUtils.getObjectWithId(appService, User.class,
             user.getId());
         Assert.assertNotNull(dbUser);
-        UserProvisioningManager upm = SecurityServiceProvider
-            .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
+        UserProvisioningManager upm =
+            SecurityServiceProvider
+                .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
         gov.nih.nci.security.authorization.domainobjects.User csmUser = upm
             .getUser(name);
         Assert.assertNotNull(csmUser);
@@ -250,8 +252,9 @@ public class TestUser extends TestDatabase {
             Assert.assertTrue("should fail because login is too long", true);
         }
         // check csm user
-        UserProvisioningManager upm = SecurityServiceProvider
-            .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
+        UserProvisioningManager upm =
+            SecurityServiceProvider
+                .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
 
         gov.nih.nci.security.authorization.domainobjects.User csmUser = upm
             .getUser(login);

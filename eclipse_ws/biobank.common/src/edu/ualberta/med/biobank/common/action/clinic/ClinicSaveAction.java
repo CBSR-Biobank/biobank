@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
 public class ClinicSaveAction extends CenterSaveAction {
@@ -130,7 +131,8 @@ public class ClinicSaveAction extends CenterSaveAction {
                 clinic.getContactCollection(), newContactCollection);
         clinic.setContactCollection(contactsDiff.getAddSet());
         for (Contact contact : contactsDiff.getRemoveSet()) {
-            if (!contact.getStudyCollection().isEmpty()) {
+            Collection<Study> studyCollection = contact.getStudyCollection();
+            if ((studyCollection != null) && !studyCollection.isEmpty()) {
                 throw new ActionException("canot delete contact "
                     + contact.getName());
             }

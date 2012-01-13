@@ -72,7 +72,7 @@ public class TestSite extends TestAction {
         // null name
         siteSaveAction.setName(null);
         try {
-            appService.doAction(siteSaveAction);
+            actionExecutor.exec(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no name");
         } catch (NullPropertyException e) {
@@ -83,7 +83,7 @@ public class TestSite extends TestAction {
         siteSaveAction.setName(name);
         siteSaveAction.setNameShort(null);
         try {
-            appService.doAction(siteSaveAction);
+            actionExecutor.exec(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no short name");
         } catch (NullPropertyException e) {
@@ -93,7 +93,7 @@ public class TestSite extends TestAction {
         siteSaveAction.setNameShort(name);
         siteSaveAction.setActivityStatusId(null);
         try {
-            appService.doAction(siteSaveAction);
+            actionExecutor.exec(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add Site with no activity status");
         } catch (NullPropertyException e) {
@@ -104,7 +104,7 @@ public class TestSite extends TestAction {
             ActivityStatusEnum.ACTIVE.getId());
         siteSaveAction.setAddress(null);
         try {
-            appService.doAction(siteSaveAction);
+            actionExecutor.exec(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no address");
         } catch (NullPropertyException e) {
@@ -116,7 +116,7 @@ public class TestSite extends TestAction {
         siteSaveAction.setAddress(new Address());
         siteSaveAction.setStudyIds(null);
         try {
-            appService.doAction(siteSaveAction);
+            actionExecutor.exec(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with null site ids");
         } catch (NullPropertyException e) {
@@ -125,32 +125,32 @@ public class TestSite extends TestAction {
 
         // success path
         siteSaveAction.setStudyIds(new HashSet<Integer>());
-        appService.doAction(siteSaveAction);
+        actionExecutor.exec(siteSaveAction);
     }
 
     @Test
     public void nameChecks() throws Exception {
-        Integer siteId = appService.doAction(siteSaveAction).getId();
+        Integer siteId = actionExecutor.exec(siteSaveAction).getId();
 
         // ensure we can change name on existing clinic
         SiteInfo siteInfo =
-            appService.doAction(new SiteGetInfoAction(siteId));
+            actionExecutor.exec(new SiteGetInfoAction(siteId));
         siteInfo.site.setName(name + "_2");
-        siteSaveAction = SiteHelper.getSaveAction(appService, siteInfo);
-        appService.doAction(siteSaveAction);
+        siteSaveAction = SiteHelper.getSaveAction(actionExecutor, siteInfo);
+        actionExecutor.exec(siteSaveAction);
 
         // ensure we can change short name on existing site
-        siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
+        siteInfo = actionExecutor.exec(new SiteGetInfoAction(siteId));
         siteInfo.site.setNameShort(name + "_2");
-        siteSaveAction = SiteHelper.getSaveAction(appService, siteInfo);
-        appService.doAction(siteSaveAction);
+        siteSaveAction = SiteHelper.getSaveAction(actionExecutor, siteInfo);
+        actionExecutor.exec(siteSaveAction);
 
         // test for duplicate name
         SiteSaveAction saveSite =
             SiteHelper.getSaveAction(name + "_2", name,
                 ActivityStatusEnum.ACTIVE);
         try {
-            appService.doAction(saveSite);
+            actionExecutor.exec(saveSite);
             Assert.fail("should not be allowed to add site with same name");
         } catch (ActionCheckException e) {
             Assert.assertTrue(true);
@@ -161,7 +161,7 @@ public class TestSite extends TestAction {
         saveSite.setNameShort(name + "_2");
 
         try {
-            appService.doAction(saveSite);
+            actionExecutor.exec(saveSite);
             Assert.fail(
                 "should not be allowed to add site with same name short");
         } catch (ActionCheckException e) {
@@ -179,7 +179,7 @@ public class TestSite extends TestAction {
 
         for (int i = 0; i < 20; ++i) {
             Integer id = StudyHelper.createStudy(
-                appService, name + "_study" + i, ActivityStatusEnum.ACTIVE);
+                actionExecutor, name + "_study" + i, ActivityStatusEnum.ACTIVE);
             allStudyIds.add(id);
             if (i < 10) {
                 studyIdsSet1.add(id);
@@ -189,75 +189,75 @@ public class TestSite extends TestAction {
         }
 
         // add study set 1 one by one
-        Integer siteId = appService.doAction(siteSaveAction).getId();
+        Integer siteId = actionExecutor.exec(siteSaveAction).getId();
         SiteInfo siteInfo =
-            appService.doAction(new SiteGetInfoAction(siteId));
+            actionExecutor.exec(new SiteGetInfoAction(siteId));
         Set<Integer> expectedStudyIds = new HashSet<Integer>();
 
         for (Integer studyId : studyIdsSet1) {
             expectedStudyIds.add(studyId);
 
             SiteSaveAction siteSaveAction =
-                SiteHelper.getSaveAction(appService, siteInfo);
+                SiteHelper.getSaveAction(actionExecutor, siteInfo);
             studyIds = getStudyIds(siteInfo.studyCountInfo);
             studyIds.add(studyId);
             siteSaveAction.setStudyIds(studyIds);
-            appService.doAction(siteSaveAction);
-            siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
+            actionExecutor.exec(siteSaveAction);
+            siteInfo = actionExecutor.exec(new SiteGetInfoAction(siteId));
             Assert.assertEquals(expectedStudyIds,
                 getStudyIds(siteInfo.studyCountInfo));
         }
 
         // create a second site, site 2, with the second set of studies
-        Integer siteId2 = SiteHelper.createSite(appService, name + "_2",
+        Integer siteId2 = SiteHelper.createSite(actionExecutor, name + "_2",
             Utils.getRandomString(8, 12),
             ActivityStatusEnum.ACTIVE, studyIdsSet2);
-        siteInfo = appService.doAction(new SiteGetInfoAction(siteId2));
+        siteInfo = actionExecutor.exec(new SiteGetInfoAction(siteId2));
         expectedStudyIds.clear();
         expectedStudyIds.addAll(studyIdsSet2);
         Assert.assertEquals(expectedStudyIds,
             getStudyIds(siteInfo.studyCountInfo));
 
         // make sure site 1 still has same collection
-        siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
+        siteInfo = actionExecutor.exec(new SiteGetInfoAction(siteId));
         expectedStudyIds.clear();
         expectedStudyIds.addAll(studyIdsSet1);
         Assert.assertEquals(expectedStudyIds,
             getStudyIds(siteInfo.studyCountInfo));
 
         // delete studies one by one from Site 1
-        siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
+        siteInfo = actionExecutor.exec(new SiteGetInfoAction(siteId));
         for (Integer studyId : studyIdsSet1) {
             expectedStudyIds.remove(studyId);
 
-            siteSaveAction = SiteHelper.getSaveAction(appService, siteInfo);
+            siteSaveAction = SiteHelper.getSaveAction(actionExecutor, siteInfo);
             studyIds = getStudyIds(siteInfo.studyCountInfo);
             studyIds.remove(studyId);
             siteSaveAction.setStudyIds(studyIds);
-            appService.doAction(siteSaveAction);
-            siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
+            actionExecutor.exec(siteSaveAction);
+            siteInfo = actionExecutor.exec(new SiteGetInfoAction(siteId));
             Assert.assertEquals(expectedStudyIds,
                 getStudyIds(siteInfo.studyCountInfo));
         }
 
         // delete studies from Site 2
-        siteInfo = appService.doAction(new SiteGetInfoAction(siteId2));
+        siteInfo = actionExecutor.exec(new SiteGetInfoAction(siteId2));
         studyIds = getStudyIds(siteInfo.studyCountInfo);
         studyIds.removeAll(studyIdsSet2);
-        siteSaveAction = SiteHelper.getSaveAction(appService, siteInfo);
-        appService.doAction(siteSaveAction);
-        siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
+        siteSaveAction = SiteHelper.getSaveAction(actionExecutor, siteInfo);
+        actionExecutor.exec(siteSaveAction);
+        siteInfo = actionExecutor.exec(new SiteGetInfoAction(siteId));
         Assert.assertTrue(getStudyIds(siteInfo.studyCountInfo).isEmpty());
 
         // attempt to add an invalid study ID
-        siteInfo = appService.doAction(new SiteGetInfoAction(siteId));
+        siteInfo = actionExecutor.exec(new SiteGetInfoAction(siteId));
         SiteSaveAction siteSaveAction =
-            SiteHelper.getSaveAction(appService, siteInfo);
+            SiteHelper.getSaveAction(actionExecutor, siteInfo);
         studyIds = getStudyIds(siteInfo.studyCountInfo);
         studyIds.add(-1);
         siteSaveAction.setStudyIds(studyIds);
         try {
-            appService.doAction(siteSaveAction);
+            actionExecutor.exec(siteSaveAction);
             Assert.fail("should not be allowed to add an invalid study id");
         } catch (ModelNotFoundException e) {
             Assert.assertTrue(true);
@@ -274,8 +274,8 @@ public class TestSite extends TestAction {
 
     @Test
     public void delete() throws ApplicationException {
-        Integer siteId = appService.doAction(siteSaveAction).getId();
-        appService.doAction(new SiteDeleteAction(siteId));
+        Integer siteId = actionExecutor.exec(siteSaveAction).getId();
+        actionExecutor.exec(new SiteDeleteAction(siteId));
 
         // hql query for site should return empty
         openHibernateSession();
@@ -292,13 +292,13 @@ public class TestSite extends TestAction {
     private Provisioning createSiteWithContainerType()
         throws ApplicationException {
         Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(appService, name);
+            SiteHelper.provisionProcessingConfiguration(actionExecutor, name);
 
         ContainerTypeSaveAction ctSaveAction =
             ContainerTypeHelper.getSaveAction(name, name, provisioning.siteId,
                 true, 3, 10,
                 getContainerLabelingSchemes().get(0).getId());
-        Integer containerTypeId = appService.doAction(ctSaveAction).getId();
+        Integer containerTypeId = actionExecutor.exec(ctSaveAction).getId();
         provisioning.containerTypeIds.add(containerTypeId);
         return provisioning;
     }
@@ -307,7 +307,7 @@ public class TestSite extends TestAction {
     public void deleteWithContainerTypes() throws ApplicationException {
         Provisioning provisioning = createSiteWithContainerType();
         try {
-            appService.doAction(new SiteDeleteAction(provisioning.siteId));
+            actionExecutor.exec(new SiteDeleteAction(provisioning.siteId));
             Assert
                 .fail(
                 "should not be allowed to delete a site with container types");
@@ -316,9 +316,9 @@ public class TestSite extends TestAction {
         }
 
         // delete container type followed by site - should work now
-        appService.doAction(new ContainerTypeDeleteAction(
+        actionExecutor.exec(new ContainerTypeDeleteAction(
             provisioning.containerTypeIds.get(0)));
-        appService.doAction(new SiteDeleteAction(provisioning.siteId));
+        actionExecutor.exec(new SiteDeleteAction(provisioning.siteId));
     }
 
     @Test
@@ -333,10 +333,10 @@ public class TestSite extends TestAction {
         containerSaveAction.setLabel("01");
         containerSaveAction.setSiteId(provisioning.siteId);
         containerSaveAction.setTypeId(containerTypeId);
-        Integer containerId = appService.doAction(containerSaveAction).getId();
+        Integer containerId = actionExecutor.exec(containerSaveAction).getId();
 
         try {
-            appService.doAction(new SiteDeleteAction(provisioning.siteId));
+            actionExecutor.exec(new SiteDeleteAction(provisioning.siteId));
             Assert
                 .fail(
                 "should not be allowed to delete a site with containers");
@@ -345,34 +345,34 @@ public class TestSite extends TestAction {
         }
 
         // delete container followed by site - should work now
-        appService.doAction(new ContainerDeleteAction(containerId));
-        appService.doAction(new ContainerTypeDeleteAction(containerTypeId));
-        appService.doAction(new SiteDeleteAction(provisioning.siteId));
+        actionExecutor.exec(new ContainerDeleteAction(containerId));
+        actionExecutor.exec(new ContainerTypeDeleteAction(containerTypeId));
+        actionExecutor.exec(new SiteDeleteAction(provisioning.siteId));
     }
 
     @Test
     public void deleteWithProcessingEvents() throws Exception {
         Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(appService, name);
+            SiteHelper.provisionProcessingConfiguration(actionExecutor, name);
 
         // create a collection event
         Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(appService,
+            .createCEventWithSourceSpecimens(actionExecutor,
                 provisioning.patientIds.get(0), provisioning.clinicId);
-        ArrayList<SpecimenInfo> sourceSpecs = appService
-            .doAction(new CollectionEventGetSpecimenInfosAction(ceventId,
+        ArrayList<SpecimenInfo> sourceSpecs = actionExecutor
+            .exec(new CollectionEventGetSpecimenInfosAction(ceventId,
                 false)).getList();
 
         // create a processing event with one of the collection event source
         // specimens
-        Integer pEventId = appService.doAction(
+        Integer pEventId = actionExecutor.exec(
             new ProcessingEventSaveAction(
                 null, provisioning.siteId, Utils.getRandomDate(), Utils
                     .getRandomString(5, 8), 1, null, Arrays
                     .asList(sourceSpecs.get(0).specimen.getId()))).getId();
 
         try {
-            appService.doAction(new SiteDeleteAction(provisioning.siteId));
+            actionExecutor.exec(new SiteDeleteAction(provisioning.siteId));
             Assert
                 .fail(
                 "should not be allowed to delete a site with processing events");
@@ -381,31 +381,31 @@ public class TestSite extends TestAction {
         }
 
         // delete the processing event
-        appService.doAction(new ProcessingEventDeleteAction(pEventId));
-        appService.doAction(new SiteDeleteAction(provisioning.siteId));
+        actionExecutor.exec(new ProcessingEventDeleteAction(pEventId));
+        actionExecutor.exec(new SiteDeleteAction(provisioning.siteId));
     }
 
     @Test
     public void deleteWithSrcDispatch() throws Exception {
         Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(appService, name);
+            SiteHelper.provisionProcessingConfiguration(actionExecutor, name);
 
         Integer dispatchId1 =
-            DispatchHelper.createDispatch(appService, provisioning.clinicId,
+            DispatchHelper.createDispatch(actionExecutor, provisioning.clinicId,
                 provisioning.siteId,
                 provisioning.patientIds.get(0));
 
         // create a second site to dispatch to
-        Integer siteId2 = appService.doAction(
+        Integer siteId2 = actionExecutor.exec(
             SiteHelper.getSaveAction(name + "_site2", name + "_site2",
                 ActivityStatusEnum.ACTIVE)).getId();
 
         Integer dispatchId2 =
-            DispatchHelper.createDispatch(appService, provisioning.siteId,
+            DispatchHelper.createDispatch(actionExecutor, provisioning.siteId,
                 siteId2, provisioning.patientIds.get(0));
 
         try {
-            appService.doAction(new SiteDeleteAction(provisioning.siteId));
+            actionExecutor.exec(new SiteDeleteAction(provisioning.siteId));
             Assert
                 .fail(
                 "should not be allowed to delete a site which is a source of dispatches");
@@ -416,41 +416,41 @@ public class TestSite extends TestAction {
         // delete the dispatch and then the site
         Set<Specimen> specimens = new HashSet<Specimen>();
         ListResult<DispatchSpecimen> dispatchSpecimens =
-            appService
-                .doAction(new DispatchGetSpecimenInfosAction(dispatchId1));
+            actionExecutor
+                .exec(new DispatchGetSpecimenInfosAction(dispatchId1));
         for (DispatchSpecimen dspec : dispatchSpecimens.getList()) {
             specimens.add(dspec.getSpecimen());
         }
 
         dispatchSpecimens =
-            appService
-                .doAction(new DispatchGetSpecimenInfosAction(dispatchId2));
+            actionExecutor
+                .exec(new DispatchGetSpecimenInfosAction(dispatchId2));
         for (DispatchSpecimen dspec : dispatchSpecimens.getList()) {
             specimens.add(dspec.getSpecimen());
         }
 
-        appService.doAction(new DispatchDeleteAction(dispatchId2));
-        appService.doAction(new DispatchDeleteAction(dispatchId1));
+        actionExecutor.exec(new DispatchDeleteAction(dispatchId2));
+        actionExecutor.exec(new DispatchDeleteAction(dispatchId1));
 
         for (Specimen specimen : specimens) {
-            appService.doAction(new SpecimenDeleteAction(specimen.getId()));
+            actionExecutor.exec(new SpecimenDeleteAction(specimen.getId()));
         }
         deleteOriginInfos(provisioning.siteId);
-        appService.doAction(new SiteDeleteAction(provisioning.siteId));
+        actionExecutor.exec(new SiteDeleteAction(provisioning.siteId));
     }
 
     @Test
     public void deleteWithDstDispatch() throws Exception {
         Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(appService, name);
+            SiteHelper.provisionProcessingConfiguration(actionExecutor, name);
 
         Integer dispatchId =
-            DispatchHelper.createDispatch(appService, provisioning.clinicId,
+            DispatchHelper.createDispatch(actionExecutor, provisioning.clinicId,
                 provisioning.siteId,
                 provisioning.patientIds.get(0));
 
         try {
-            appService.doAction(new SiteDeleteAction(provisioning.siteId));
+            actionExecutor.exec(new SiteDeleteAction(provisioning.siteId));
             Assert
                 .fail(
                 "should not be allowed to delete a site which is a destination for dispatches");
@@ -460,8 +460,8 @@ public class TestSite extends TestAction {
 
         // delete the dispatch and then the site - no need to delete dispatch
         // specimens
-        appService.doAction(new DispatchDeleteAction(dispatchId));
-        appService.doAction(new SiteDeleteAction(provisioning.siteId));
+        actionExecutor.exec(new DispatchDeleteAction(dispatchId));
+        actionExecutor.exec(new SiteDeleteAction(provisioning.siteId));
     }
 
 }
