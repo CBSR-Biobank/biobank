@@ -357,13 +357,11 @@ public class TestStudy extends TestAction {
     }
 
     private Long getSourceSpecimenCount(Integer studyId) {
-        openHibernateSession();
         Query q =
             session.createQuery("SELECT COUNT(*) FROM "
                 + SourceSpecimen.class.getName() + " ss WHERE ss.study.id=?");
         q.setParameter(0, studyId);
         Long result = HibernateUtil.getCountFromQuery(q);
-        closeHibernateSession();
         return result;
     }
 
@@ -459,14 +457,12 @@ public class TestStudy extends TestAction {
     }
 
     private Long getAliquotedSpecimenCount(Integer studyId) {
-        openHibernateSession();
         Query q =
             session.createQuery("SELECT COUNT(*) FROM "
                 + AliquotedSpecimen.class.getName()
                 + " aspc WHERE aspc.study.id=?");
         q.setParameter(0, studyId);
         Long result = HibernateUtil.getCountFromQuery(q);
-        closeHibernateSession();
         return result;
     }
 
@@ -541,19 +537,16 @@ public class TestStudy extends TestAction {
 
     private Long getStudyEventAttrCount(Integer studyId) {
         // check that this study no longer has any study event attributes
-        openHibernateSession();
         Query q =
             session.createQuery("SELECT COUNT(*) FROM "
                 + StudyEventAttr.class.getName() + " sea WHERE sea.study.id=?");
         q.setParameter(0, studyId);
         Long result = HibernateUtil.getCountFromQuery(q);
-        closeHibernateSession();
         return result;
     }
 
     private Map<String, GlobalEventAttr> getGlobalEvAttrs() {
         if (globalEventAttrs == null) {
-            openHibernateSession();
             Query q =
                 session.createQuery("FROM " + GlobalEventAttr.class.getName()
                     + " gea INNER JOIN FETCH gea.eventAttrType");
@@ -562,7 +555,6 @@ public class TestStudy extends TestAction {
                 GlobalEventAttr geAttr = (GlobalEventAttr) o;
                 globalEventAttrs.put(geAttr.getLabel(), geAttr);
             }
-            closeHibernateSession();
         }
         return globalEventAttrs;
     }
@@ -657,14 +649,11 @@ public class TestStudy extends TestAction {
         actionExecutor.exec(new StudyDeleteAction(studyId));
 
         // hql query for study should return empty
-        openHibernateSession();
         Query q =
             session.createQuery("SELECT COUNT(*) FROM "
                 + Study.class.getName() + " WHERE id=?");
         q.setParameter(0, studyId);
         Long result = HibernateUtil.getCountFromQuery(q);
-        closeHibernateSession();
-
         Assert.assertTrue(result.equals(0L));
     }
 

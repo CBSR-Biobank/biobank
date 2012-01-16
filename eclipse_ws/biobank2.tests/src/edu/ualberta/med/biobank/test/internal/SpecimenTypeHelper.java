@@ -5,9 +5,11 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 
+@Deprecated
 public class SpecimenTypeHelper extends DbHelper {
 
-    public static List<SpecimenTypeWrapper> createdSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
+    public static List<SpecimenTypeWrapper> createdSpecimenTypes =
+        new ArrayList<SpecimenTypeWrapper>();
 
     public static SpecimenTypeWrapper newSpecimenType(String name)
         throws Exception {

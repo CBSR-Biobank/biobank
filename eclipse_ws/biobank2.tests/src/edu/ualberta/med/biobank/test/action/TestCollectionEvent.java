@@ -30,6 +30,7 @@ import edu.ualberta.med.biobank.common.action.eventattr.GlobalEventAttrInfoGetAc
 import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
@@ -186,8 +187,7 @@ public class TestCollectionEvent extends TestAction {
                     .getSpecimenType().getId());
                 Assert.assertEquals(newSpec.statusId, sp.getActivityStatus()
                     .getId());
-                Assert.assertTrue(compareDateInHibernate(newSpec.timeDrawn,
-                    sp.getCreatedAt()));
+                Assert.assertEquals(newSpec.timeDrawn, sp.getCreatedAt());
             }
             if (sp.getInventoryId().equals(modifiedSpec.inventoryId)) {
                 Assert.assertEquals(modifiedSpec.inventoryId,
@@ -237,7 +237,7 @@ public class TestCollectionEvent extends TestAction {
             actionExecutor.exec(new CollectionEventSaveAction(null, patientId,
                 visitNumber, statusId, comments, siteId, null, attrs)).getId();
 
-        openHibernateSession();
+        
         // Check CollectionEvent is in database with correct values
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
@@ -252,24 +252,21 @@ public class TestCollectionEvent extends TestAction {
             .getStudyEventAttr()
             .getId());
         Integer eventAttrId = eventAttr.getId();
-        closeHibernateSession();
-
         String value2 = name + "jklmnopqr";
         attrInfo.value = value2;
         // Save with a different value for attrinfo
         actionExecutor.exec(new CollectionEventSaveAction(ceventId, patientId,
             visitNumber, statusId, comments, siteId, null, attrs));
 
-        openHibernateSession();
         cevent = (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         session.refresh(cevent);
         Assert.assertEquals(1, cevent.getEventAttrCollection().size());
         eventAttr = cevent.getEventAttrCollection().iterator().next();
         Assert.assertEquals(value2, eventAttr.getValue());
         Assert.assertEquals(eventAttrId, eventAttr.getId());
-        closeHibernateSession();
+        
 
-        openHibernateSession();
+        
         // make sure only one value in database
         Query q = session.createQuery(
             "select eattr from "
@@ -284,7 +281,6 @@ public class TestCollectionEvent extends TestAction {
         @SuppressWarnings("unchecked")
         List<EventAttr> results = q.list();
         Assert.assertEquals(1, results.size());
-        closeHibernateSession();
     }
 
     /*
@@ -366,20 +362,16 @@ public class TestCollectionEvent extends TestAction {
 
         // test delete
         actionExecutor.exec(new CollectionEventDeleteAction(ceventId));
-        openHibernateSession();
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         Assert.assertNull(cevent);
-        closeHibernateSession();
     }
 
     @Test
     public void deleteWithSpecimens() throws Exception {
         // add specimen type
         final Integer typeId =
-            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-                .addSpecimenType(name + r.nextInt())
-                .getId();
+            actionExecutor.exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,
@@ -400,7 +392,7 @@ public class TestCollectionEvent extends TestAction {
         } catch (CollectionNotEmptyException ae) {
             Assert.assertTrue(true);
         }
-        openHibernateSession();
+        
         // Check CollectionEvent is in database with correct values
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
@@ -430,8 +422,7 @@ public class TestCollectionEvent extends TestAction {
     public void getInfos() throws Exception {
         // add specimen type
         final Integer typeId =
-            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-                .addSpecimenType(name + r.nextInt()).getId();
+            actionExecutor.exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,

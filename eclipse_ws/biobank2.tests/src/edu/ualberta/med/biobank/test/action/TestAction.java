@@ -50,7 +50,6 @@ public class TestAction {
 
     @AfterClass
     public static void tearDownBeforeClass() throws Exception {
-        deleteSuperAdminUser();
     }
 
     /**
@@ -76,6 +75,12 @@ public class TestAction {
     }
 
     public static User createSuperAdminUser() {
+        // check if user already exists
+        UserGetResult userInfo =
+            actionExecutor.exec(new UserGetAction(SUPER_ADMIN_LOGIN));
+
+        if (userInfo != null) return userInfo.getUser();
+
         UserSaveAction userSaveAction = new UserSaveAction();
         userSaveAction.setLogin(SUPER_ADMIN_LOGIN);
         userSaveAction.setCsmUserId(0L);
@@ -166,13 +171,5 @@ public class TestAction {
 
     public Session getSession() {
         return actionExecutor.getSession();
-    }
-
-    public void openHibernateSession() {
-
-    }
-
-    public void closeHibernateSession() {
-
     }
 }

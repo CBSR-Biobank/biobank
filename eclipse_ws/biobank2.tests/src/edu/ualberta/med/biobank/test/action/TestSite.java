@@ -278,14 +278,11 @@ public class TestSite extends TestAction {
         actionExecutor.exec(new SiteDeleteAction(siteId));
 
         // hql query for site should return empty
-        openHibernateSession();
         Query q =
             session.createQuery("SELECT COUNT(*) FROM "
                 + Site.class.getName() + " WHERE id=?");
         q.setParameter(0, siteId);
         Long result = HibernateUtil.getCountFromQuery(q);
-        closeHibernateSession();
-
         Assert.assertTrue(result.equals(0L));
     }
 
