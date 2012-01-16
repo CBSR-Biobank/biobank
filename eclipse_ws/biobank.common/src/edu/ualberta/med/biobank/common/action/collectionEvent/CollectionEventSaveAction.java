@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.Session;
 
@@ -14,7 +16,6 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
-import edu.ualberta.med.biobank.common.action.DiffUtils;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
@@ -30,6 +31,7 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventCreatePermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
+import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
@@ -75,7 +77,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
     }
 
-    private Collection<SaveCEventSpecimenInfo> sourceSpecimens;
+    private Collection<SaveCEventSpecimenInfo> sourceSpecimenInfos;
 
     private Integer centerId;
 
@@ -94,7 +96,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         this.statusId = statusId;
         this.comments = comments;
         this.centerId = centerId;
-        this.sourceSpecimens = sourceSpecs;
+        this.sourceSpecimenInfos = sourceSpecs;
         this.ceAttrList = ceAttrList;
     }
 
@@ -158,19 +160,19 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
     private void setSourceSpecimens(Session session,
         CollectionEvent ceventToSave) {
-        DiffUtils<Specimen> originalSpec = new DiffUtils<Specimen>(
-            CollectionUtils.getCollection(ceventToSave,
-                CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION));
-        Collection<Specimen> allSpec = CollectionUtils.getCollection(
-            ceventToSave, CollectionEventPeer.ALL_SPECIMEN_COLLECTION);
+        Set<Specimen> newSsCollection = new HashSet<Specimen>();
 
-        if (sourceSpecimens != null) {
-            OriginInfo oi = new OriginInfo();
-            oi.setCenter(actionContext.load(Center.class, centerId));
-            session.saveOrUpdate(oi);
-            for (SaveCEventSpecimenInfo specInfo : sourceSpecimens) {
+        if (sourceSpecimenInfos != null) {
+            OriginInfo oi = null;
+
+            for (SaveCEventSpecimenInfo specInfo : sourceSpecimenInfos) {
                 Specimen specimen;
                 if (specInfo.id == null) {
+                    if (oi == null) {
+                        oi = new OriginInfo();
+                        oi.setCenter(actionContext.load(Center.class, centerId));
+
+                    }
                     specimen = new Specimen();
                     specimen.setCurrentCenter(oi.getCenter());
                     specimen.setOriginInfo(oi);
@@ -182,9 +184,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     ActivityStatus.class, specInfo.statusId));
                 specimen.setCollectionEvent(ceventToSave);
                 // cascade will save-update the specimens from this list:
-                allSpec.add(specimen);
                 specimen.setOriginalCollectionEvent(ceventToSave);
-                originalSpec.add(specimen);
                 Collection<Comment> commentsToSave = CollectionUtils
                     .getCollection(specimen,
                         SpecimenPeer.COMMENT_COLLECTION);
@@ -195,15 +195,64 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 specimen.setQuantity(specInfo.quantity);
                 specimen.setSpecimenType(actionContext.load(SpecimenType.class,
                     specInfo.specimenTypeId));
+                newSsCollection.add(specimen);
             }
         }
-        // need to remove from collections. the delete-orphan cascade on
-        // allspecimencollection will delete orphans
-        Collection<Specimen> removedSpecimens = originalSpec.pullRemoved();
-        allSpec.removeAll(removedSpecimens);
-        for (Specimen sp : removedSpecimens) {
-            session.delete(sp);
+
+        SetDifference<Specimen> origSpecDiff = new SetDifference<Specimen>(
+            ceventToSave.getOriginalSpecimenCollection(), newSsCollection);
+        ceventToSave.setOriginalSpecimenCollection(origSpecDiff.getAddSet());
+        for (Specimen srcSpc : origSpecDiff.getRemoveSet()) {
+            session.delete(srcSpc);
         }
+
+        // -----------------------------------------
+        // SetDifference<Specimen> origSpecDiff = new SetDifference<Specimen>(
+        // CollectionUtils.getCollection(ceventToSave,
+        // CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION));
+        // Collection<Specimen> allSpec = CollectionUtils.getCollection(
+        // ceventToSave, CollectionEventPeer.ALL_SPECIMEN_COLLECTION);
+        //
+        // if (sourceSpecimenInfos != null) {
+        // OriginInfo oi = new OriginInfo();
+        // oi.setCenter(actionContext.load(Center.class, centerId));
+        // session.saveOrUpdate(oi);
+        // for (SaveCEventSpecimenInfo specInfo : sourceSpecimenInfos) {
+        // Specimen specimen;
+        // if (specInfo.id == null) {
+        // specimen = new Specimen();
+        // specimen.setCurrentCenter(oi.getCenter());
+        // specimen.setOriginInfo(oi);
+        // specimen.setTopSpecimen(specimen);
+        // } else {
+        // specimen = actionContext.load(Specimen.class, specInfo.id);
+        // }
+        // specimen.setActivityStatus(actionContext.load(
+        // ActivityStatus.class, specInfo.statusId));
+        // specimen.setCollectionEvent(ceventToSave);
+        // // cascade will save-update the specimens from this list:
+        // allSpec.add(specimen);
+        // specimen.setOriginalCollectionEvent(ceventToSave);
+        // origSpecDiff.add(specimen);
+        // Collection<Comment> commentsToSave = CollectionUtils
+        // .getCollection(specimen,
+        // SpecimenPeer.COMMENT_COLLECTION);
+        // CommentInfo.setCommentModelCollection(actionContext,
+        // commentsToSave, specInfo.comments);
+        // specimen.setCreatedAt(specInfo.timeDrawn);
+        // specimen.setInventoryId(specInfo.inventoryId);
+        // specimen.setQuantity(specInfo.quantity);
+        // specimen.setSpecimenType(actionContext.load(SpecimenType.class,
+        // specInfo.specimenTypeId));
+        // }
+        // }
+        // // need to remove from collections. the delete-orphan cascade on
+        // // allspecimencollection will delete orphans
+        // Collection<Specimen> removedSpecimens = origSpecDiff.pullRemoved();
+        // allSpec.removeAll(removedSpecimens);
+        // for (Specimen sp : removedSpecimens) {
+        // session.delete(sp);
+        // }
     }
 
     public void setEventAttrs(Session session, User user, Study study,
