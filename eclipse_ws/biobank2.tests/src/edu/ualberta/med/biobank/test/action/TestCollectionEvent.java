@@ -237,7 +237,7 @@ public class TestCollectionEvent extends TestAction {
             actionExecutor.exec(new CollectionEventSaveAction(null, patientId,
                 visitNumber, statusId, comments, siteId, null, attrs)).getId();
 
-        openHibernateSession();
+        
         // Check CollectionEvent is in database with correct values
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
@@ -252,24 +252,21 @@ public class TestCollectionEvent extends TestAction {
             .getStudyEventAttr()
             .getId());
         Integer eventAttrId = eventAttr.getId();
-        closeHibernateSession();
-
         String value2 = name + "jklmnopqr";
         attrInfo.value = value2;
         // Save with a different value for attrinfo
         actionExecutor.exec(new CollectionEventSaveAction(ceventId, patientId,
             visitNumber, statusId, comments, siteId, null, attrs));
 
-        openHibernateSession();
         cevent = (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         session.refresh(cevent);
         Assert.assertEquals(1, cevent.getEventAttrCollection().size());
         eventAttr = cevent.getEventAttrCollection().iterator().next();
         Assert.assertEquals(value2, eventAttr.getValue());
         Assert.assertEquals(eventAttrId, eventAttr.getId());
-        closeHibernateSession();
+        
 
-        openHibernateSession();
+        
         // make sure only one value in database
         Query q = session.createQuery(
             "select eattr from "
@@ -284,7 +281,6 @@ public class TestCollectionEvent extends TestAction {
         @SuppressWarnings("unchecked")
         List<EventAttr> results = q.list();
         Assert.assertEquals(1, results.size());
-        closeHibernateSession();
     }
 
     /*
@@ -366,11 +362,9 @@ public class TestCollectionEvent extends TestAction {
 
         // test delete
         actionExecutor.exec(new CollectionEventDeleteAction(ceventId));
-        openHibernateSession();
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         Assert.assertNull(cevent);
-        closeHibernateSession();
     }
 
     @Test
@@ -398,7 +392,7 @@ public class TestCollectionEvent extends TestAction {
         } catch (CollectionNotEmptyException ae) {
             Assert.assertTrue(true);
         }
-        openHibernateSession();
+        
         // Check CollectionEvent is in database with correct values
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);

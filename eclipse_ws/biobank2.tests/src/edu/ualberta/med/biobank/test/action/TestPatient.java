@@ -73,13 +73,12 @@ public class TestPatient extends TestAction {
         final Integer id = actionExecutor.exec(new PatientSaveAction(null,
             studyId, pnumber, date)).getId();
 
-        openHibernateSession();
+        
         // Check patient is in database with correct values
         Patient p = (Patient) session.get(Patient.class, id);
         Assert.assertNotNull(p);
         Assert.assertEquals(pnumber, p.getPnumber());
         Assert.assertEquals(date, p.getCreatedAt());
-        closeHibernateSession();
     }
 
     @Test
@@ -96,12 +95,11 @@ public class TestPatient extends TestAction {
         actionExecutor.exec(new PatientSaveAction(id, studyId,
             newPNumber, newDate));
 
-        openHibernateSession();
+        
         // Check patient is in database with correct values
         Patient p = (Patient) session.get(Patient.class, id);
         Assert.assertEquals(newPNumber, p.getPnumber());
         Assert.assertEquals(newDate, p.getCreatedAt());
-        closeHibernateSession();
     }
 
     @Test
@@ -111,11 +109,11 @@ public class TestPatient extends TestAction {
         final Integer id = actionExecutor.exec(new PatientSaveAction(null,
             studyId, pnumber, date)).getId();
 
-        openHibernateSession();
+        
         // Check patient is in database with correct values
         Patient p = (Patient) session.get(Patient.class, id);
         Assert.assertNotNull(p);
-        closeHibernateSession();
+        
 
         // try to save with same pnumber
         try {
@@ -138,10 +136,8 @@ public class TestPatient extends TestAction {
         // delete the patient
         actionExecutor.exec(new PatientDeleteAction(id));
 
-        openHibernateSession();
         Patient patient = (Patient) session.get(Patient.class, id);
         Assert.assertNull(patient);
-        closeHibernateSession();
     }
 
     @Test
@@ -165,10 +161,8 @@ public class TestPatient extends TestAction {
             Assert.assertTrue(true);
         }
 
-        openHibernateSession();
         Patient patient = (Patient) session.get(Patient.class, patientId);
         Assert.assertNotNull(patient);
-        closeHibernateSession();
     }
 
     @Test
@@ -196,7 +190,6 @@ public class TestPatient extends TestAction {
         // merge patient1 into patient2
         actionExecutor.exec(new PatientMergeAction(patientId1, patientId2));
 
-        openHibernateSession();
         ActionContext actionContext =
             new ActionContext(actionExecutor.getUser(), session);
         Patient p1 = actionContext.get(Patient.class, patientId1);
@@ -223,8 +216,6 @@ public class TestPatient extends TestAction {
                 Assert.fail("wrong visit number");
             }
         }
-
-        closeHibernateSession();
     }
 
     @Test
@@ -417,11 +408,11 @@ public class TestPatient extends TestAction {
             vnber + 1, 1, null, siteId, null,
             null));
 
-        openHibernateSession();
+        
         // Check patient is in database
         Patient p = (Patient) session.get(Patient.class, patientId);
         Assert.assertNotNull(p);
-        closeHibernateSession();
+        
 
         // search for it using the pnumber:
         SearchedPatientInfo info = actionExecutor.exec(new PatientSearchAction(

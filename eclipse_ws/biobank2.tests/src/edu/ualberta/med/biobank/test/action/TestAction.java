@@ -172,12 +172,4 @@ public class TestAction {
     public Session getSession() {
         return actionExecutor.getSession();
     }
-
-    public void openHibernateSession() {
-
-    }
-
-    public void closeHibernateSession() {
-
-    }
 }

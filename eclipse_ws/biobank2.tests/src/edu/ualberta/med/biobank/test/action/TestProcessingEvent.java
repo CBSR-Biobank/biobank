@@ -90,7 +90,7 @@ public class TestProcessingEvent extends TestAction {
         Integer pEventId = actionExecutor.exec(new ProcessingEventSaveAction(
             null, siteId, date, worksheet, 1, comments, null)).getId();
 
-        openHibernateSession();
+        
         // Check ProcessingEvent is in database with correct values
         ProcessingEvent pevent = (ProcessingEvent) session.get(
             ProcessingEvent.class, pEventId);
@@ -99,7 +99,6 @@ public class TestProcessingEvent extends TestAction {
             .size());
         Assert.assertTrue(compareDateInHibernate(date, pevent.getCreatedAt()));
         Assert.assertEquals(0, pevent.getSpecimenCollection().size());
-        closeHibernateSession();
     }
 
     @Test
@@ -124,7 +123,7 @@ public class TestProcessingEvent extends TestAction {
 
         // FIXME should test to add specimens that can't add ???
 
-        openHibernateSession();
+        
         // Check ProcessingEvent is in database with correct values
         ProcessingEvent pevent = (ProcessingEvent) session.get(
             ProcessingEvent.class, pEventId);
@@ -133,7 +132,6 @@ public class TestProcessingEvent extends TestAction {
             .size());
         Assert.assertTrue(compareDateInHibernate(date, pevent.getCreatedAt()));
         Assert.assertEquals(1, pevent.getSpecimenCollection().size());
-        closeHibernateSession();
     }
 
     @Test
@@ -162,11 +160,9 @@ public class TestProcessingEvent extends TestAction {
 
         actionExecutor.exec(new ProcessingEventDeleteAction(pEventId));
 
-        openHibernateSession();
         ProcessingEvent pe = new ActionContext(actionExecutor.getUser(), session).load(
             ProcessingEvent.class, pEventId);
         Assert.assertNull(pe);
-        closeHibernateSession();
     }
 
     @Test
@@ -188,19 +184,17 @@ public class TestProcessingEvent extends TestAction {
             Arrays
                 .asList(spcId))).getId();
 
-        openHibernateSession();
         ActionContext actionContext = new ActionContext(actionExecutor.getUser(), session);
         Specimen spc = actionContext.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);
         Assert.assertNotNull(spc.getProcessingEvent());
         Assert.assertEquals(pEventId, spc.getProcessingEvent().getId());
-        closeHibernateSession();
+        
 
         // delete this processing event. Can do it since the specimen has no
         // children
         actionExecutor.exec(new ProcessingEventDeleteAction(pEventId));
 
-        openHibernateSession();
         ProcessingEvent pe =
             actionContext.load(ProcessingEvent.class, pEventId);
         Assert.assertNull(pe);
@@ -208,7 +202,6 @@ public class TestProcessingEvent extends TestAction {
         session.refresh(spc);
         Assert.assertNotNull(spc);
         Assert.assertNull(spc.getProcessingEvent());
-        closeHibernateSession();
     }
 
     @Ignore
@@ -238,12 +231,11 @@ public class TestProcessingEvent extends TestAction {
 
         ActionContext actionContext = new ActionContext(actionExecutor.getUser(), session);
 
-        openHibernateSession();
         Specimen spc = actionContext.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);
         Assert.assertNotNull(spc.getProcessingEvent());
         Assert.assertEquals(pEventId, spc.getProcessingEvent().getId());
-        closeHibernateSession();
+        
 
         // delete this processing event. Can do it since the specimen has no
         // children
@@ -256,11 +248,9 @@ public class TestProcessingEvent extends TestAction {
             Assert.assertTrue(true);
         }
 
-        openHibernateSession();
         ProcessingEvent pe =
             new ActionContext(actionExecutor.getUser(), session).load(ProcessingEvent.class,
                 pEventId);
         Assert.assertNotNull(pe);
-        closeHibernateSession();
     }
 }
