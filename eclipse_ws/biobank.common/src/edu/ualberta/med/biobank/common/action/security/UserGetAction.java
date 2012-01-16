@@ -33,9 +33,11 @@ public class UserGetAction implements Action<UserGetResult> {
 
         @SuppressWarnings("unchecked")
         List<User> list = c.list();
-        if (list.size() == 0)
-            throw new ActionException("Problem getting user with login=" //$NON-NLS-1$
-                + login);
+        if (list.size() == 0) {
+            return null;
+            //throw new ActionException("Problem getting user with login=" //$NON-NLS-1$
+            // + login);
+        }
         return new UserGetResult(list.get(0));
     }
 }

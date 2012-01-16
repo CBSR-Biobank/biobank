@@ -30,6 +30,7 @@ import edu.ualberta.med.biobank.common.action.eventattr.GlobalEventAttrInfoGetAc
 import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
@@ -186,8 +187,7 @@ public class TestCollectionEvent extends TestAction {
                     .getSpecimenType().getId());
                 Assert.assertEquals(newSpec.statusId, sp.getActivityStatus()
                     .getId());
-                Assert.assertTrue(compareDateInHibernate(newSpec.timeDrawn,
-                    sp.getCreatedAt()));
+                Assert.assertEquals(newSpec.timeDrawn, sp.getCreatedAt());
             }
             if (sp.getInventoryId().equals(modifiedSpec.inventoryId)) {
                 Assert.assertEquals(modifiedSpec.inventoryId,
@@ -377,9 +377,7 @@ public class TestCollectionEvent extends TestAction {
     public void deleteWithSpecimens() throws Exception {
         // add specimen type
         final Integer typeId =
-            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-                .addSpecimenType(name + r.nextInt())
-                .getId();
+            actionExecutor.exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,
@@ -430,8 +428,7 @@ public class TestCollectionEvent extends TestAction {
     public void getInfos() throws Exception {
         // add specimen type
         final Integer typeId =
-            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-                .addSpecimenType(name + r.nextInt()).getId();
+            actionExecutor.exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,

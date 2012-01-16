@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
+import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
@@ -162,6 +163,14 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         CollectionEvent ceventToSave) {
         Set<Specimen> newSsCollection = new HashSet<Specimen>();
 
+        Set<Specimen> newAllSpecCollection =
+            new HashSet<Specimen>();
+        Collection<Specimen> allSpecimenCollection =
+            ceventToSave.getAllSpecimenCollection();
+        if (allSpecimenCollection != null) {
+            newAllSpecCollection.addAll(allSpecimenCollection);
+        }
+
         if (sourceSpecimenInfos != null) {
             OriginInfo oi = null;
 
@@ -171,14 +180,20 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     if (oi == null) {
                         oi = new OriginInfo();
                         oi.setCenter(actionContext.load(Center.class, centerId));
-
+                        session.saveOrUpdate(oi);
                     }
                     specimen = new Specimen();
                     specimen.setCurrentCenter(oi.getCenter());
                     specimen.setOriginInfo(oi);
                     specimen.setTopSpecimen(specimen);
+                    newAllSpecCollection.add(specimen);
                 } else {
                     specimen = actionContext.load(Specimen.class, specInfo.id);
+
+                    if (!newAllSpecCollection.contains(specimen)) {
+                        throw new ActionCheckException(
+                            "specimen not found in collection");
+                    }
                 }
                 specimen.setActivityStatus(actionContext.load(
                     ActivityStatus.class, specInfo.statusId));
@@ -201,58 +216,13 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
         SetDifference<Specimen> origSpecDiff = new SetDifference<Specimen>(
             ceventToSave.getOriginalSpecimenCollection(), newSsCollection);
+        newAllSpecCollection.removeAll(origSpecDiff.getRemoveSet());
+        ceventToSave.setAllSpecimenCollection(newAllSpecCollection);
         ceventToSave.setOriginalSpecimenCollection(origSpecDiff.getAddSet());
         for (Specimen srcSpc : origSpecDiff.getRemoveSet()) {
             session.delete(srcSpc);
         }
 
-        // -----------------------------------------
-        // SetDifference<Specimen> origSpecDiff = new SetDifference<Specimen>(
-        // CollectionUtils.getCollection(ceventToSave,
-        // CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION));
-        // Collection<Specimen> allSpec = CollectionUtils.getCollection(
-        // ceventToSave, CollectionEventPeer.ALL_SPECIMEN_COLLECTION);
-        //
-        // if (sourceSpecimenInfos != null) {
-        // OriginInfo oi = new OriginInfo();
-        // oi.setCenter(actionContext.load(Center.class, centerId));
-        // session.saveOrUpdate(oi);
-        // for (SaveCEventSpecimenInfo specInfo : sourceSpecimenInfos) {
-        // Specimen specimen;
-        // if (specInfo.id == null) {
-        // specimen = new Specimen();
-        // specimen.setCurrentCenter(oi.getCenter());
-        // specimen.setOriginInfo(oi);
-        // specimen.setTopSpecimen(specimen);
-        // } else {
-        // specimen = actionContext.load(Specimen.class, specInfo.id);
-        // }
-        // specimen.setActivityStatus(actionContext.load(
-        // ActivityStatus.class, specInfo.statusId));
-        // specimen.setCollectionEvent(ceventToSave);
-        // // cascade will save-update the specimens from this list:
-        // allSpec.add(specimen);
-        // specimen.setOriginalCollectionEvent(ceventToSave);
-        // origSpecDiff.add(specimen);
-        // Collection<Comment> commentsToSave = CollectionUtils
-        // .getCollection(specimen,
-        // SpecimenPeer.COMMENT_COLLECTION);
-        // CommentInfo.setCommentModelCollection(actionContext,
-        // commentsToSave, specInfo.comments);
-        // specimen.setCreatedAt(specInfo.timeDrawn);
-        // specimen.setInventoryId(specInfo.inventoryId);
-        // specimen.setQuantity(specInfo.quantity);
-        // specimen.setSpecimenType(actionContext.load(SpecimenType.class,
-        // specInfo.specimenTypeId));
-        // }
-        // }
-        // // need to remove from collections. the delete-orphan cascade on
-        // // allspecimencollection will delete orphans
-        // Collection<Specimen> removedSpecimens = origSpecDiff.pullRemoved();
-        // allSpec.removeAll(removedSpecimens);
-        // for (Specimen sp : removedSpecimens) {
-        // session.delete(sp);
-        // }
     }
 
     public void setEventAttrs(Session session, User user, Study study,

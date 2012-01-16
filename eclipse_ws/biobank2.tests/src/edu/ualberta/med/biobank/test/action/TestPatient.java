@@ -30,6 +30,7 @@ import edu.ualberta.med.biobank.common.action.patient.PatientNextVisitNumberActi
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
@@ -77,7 +78,7 @@ public class TestPatient extends TestAction {
         Patient p = (Patient) session.get(Patient.class, id);
         Assert.assertNotNull(p);
         Assert.assertEquals(pnumber, p.getPnumber());
-        Assert.assertTrue(compareDateInHibernate(date, p.getCreatedAt()));
+        Assert.assertEquals(date, p.getCreatedAt());
         closeHibernateSession();
     }
 
@@ -99,7 +100,7 @@ public class TestPatient extends TestAction {
         // Check patient is in database with correct values
         Patient p = (Patient) session.get(Patient.class, id);
         Assert.assertEquals(newPNumber, p.getPnumber());
-        Assert.assertTrue(compareDateInHibernate(newDate, p.getCreatedAt()));
+        Assert.assertEquals(newDate, p.getCreatedAt());
         closeHibernateSession();
     }
 
@@ -176,8 +177,8 @@ public class TestPatient extends TestAction {
 
         // add specimen type
         final Integer typeId =
-            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-                .addSpecimenType(string).getId();
+            actionExecutor.exec(new SpecimenTypeSaveAction(name, name)).getId();
+
         // create a new patient 1
         final Integer patientId1 = actionExecutor.exec(new PatientSaveAction(
             null, studyId, string + "1", Utils.getRandomDate())).getId();
@@ -196,7 +197,8 @@ public class TestPatient extends TestAction {
         actionExecutor.exec(new PatientMergeAction(patientId1, patientId2));
 
         openHibernateSession();
-        ActionContext actionContext = new ActionContext(actionExecutor.getUser(), session);
+        ActionContext actionContext =
+            new ActionContext(actionExecutor.getUser(), session);
         Patient p1 = actionContext.get(Patient.class, patientId1);
         Assert.assertNotNull(p1);
         Patient p2 = actionContext.get(Patient.class, patientId2);
@@ -229,8 +231,7 @@ public class TestPatient extends TestAction {
     public void mergeDifferentStudies() throws Exception {
         // add specimen type
         final Integer typeId =
-            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-                .addSpecimenType(name).getId();
+            actionExecutor.exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         // create a new patient 1
         final Integer patientId1 = actionExecutor.exec(new PatientSaveAction(
@@ -277,8 +278,7 @@ public class TestPatient extends TestAction {
 
         // add specimen type
         final Integer typeId =
-            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-                .addSpecimenType(name).getId();
+            actionExecutor.exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
             .createSaveCEventSpecimenInfoRandomList(5, typeId);
@@ -318,8 +318,7 @@ public class TestPatient extends TestAction {
 
         // add specimen type
         final Integer typeId =
-            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-                .addSpecimenType(name).getId();
+            actionExecutor.exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
             .createSaveCEventSpecimenInfoRandomList(5, typeId);
@@ -359,8 +358,7 @@ public class TestPatient extends TestAction {
 
         // add specimen type
         final Integer typeId =
-            edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper
-                .addSpecimenType(name).getId();
+            actionExecutor.exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
             .createSaveCEventSpecimenInfoRandomList(5, typeId);
