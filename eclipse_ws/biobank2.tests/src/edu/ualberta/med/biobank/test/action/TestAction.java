@@ -18,9 +18,6 @@ import org.junit.BeforeClass;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.security.MembershipSaveAction;
-import edu.ualberta.med.biobank.common.action.security.UserDeleteAction;
-import edu.ualberta.med.biobank.common.action.security.UserGetAction;
-import edu.ualberta.med.biobank.common.action.security.UserGetResult;
 import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
@@ -76,10 +73,13 @@ public class TestAction {
 
     public static User createSuperAdminUser() {
         // check if user already exists
-        UserGetResult userInfo =
-            actionExecutor.exec(new UserGetAction(SUPER_ADMIN_LOGIN));
+        Query q = actionExecutor.getSession().createQuery("FROM "
+            + User.class.getName() + " WHERE login=?");
+        q.setParameter(0, SUPER_ADMIN_LOGIN);
+        @SuppressWarnings("unchecked")
+        List<User> users = q.list();
 
-        if (userInfo != null) return userInfo.getUser();
+        if (users.size() >= 1) return users.get(0);
 
         UserSaveAction userSaveAction = new UserSaveAction();
         userSaveAction.setLogin(SUPER_ADMIN_LOGIN);
@@ -102,12 +102,6 @@ public class TestAction {
         actionExecutor.exec(membershipSaveAction).getId();
 
         return (User) session.load(User.class, userId);
-    }
-
-    private static void deleteSuperAdminUser() {
-        UserGetResult userInfo =
-            actionExecutor.exec(new UserGetAction(SUPER_ADMIN_LOGIN));
-        actionExecutor.exec(new UserDeleteAction(userInfo.getUser().getId()));
     }
 
     private static Date convertToGmt(Date localDate) {
