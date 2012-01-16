@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.test.action;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,13 +19,10 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.security.MembershipSaveAction;
-import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
@@ -259,21 +255,6 @@ public class TestClinic extends TestAction {
     public void deleteWithSrcDispatch() throws Exception {
         Provisioning provisioning =
             SiteHelper.provisionProcessingConfiguration(actionExecutor, name);
-
-        UserSaveAction userSaveAction = new UserSaveAction();
-        userSaveAction.setLogin("test");
-        Integer userId = actionExecutor.exec(userSaveAction).getId();
-
-        // set up a super admin user
-        MembershipSaveAction membershipSaveAction = new MembershipSaveAction();
-        membershipSaveAction.setPermissionIds(new HashSet<Integer>(Arrays
-            .asList(1)));
-        membershipSaveAction.setRoleIds(new HashSet<Integer>());
-        membershipSaveAction.setPrincipalId(userId);
-        Integer membershipId =
-            actionExecutor.exec(membershipSaveAction).getId();
-
-        User user = (User) session.load(User.class, userId);
 
         DispatchHelper.createDispatch(actionExecutor, provisioning.clinicId,
             provisioning.siteId,

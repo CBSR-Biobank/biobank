@@ -8,12 +8,12 @@ import java.util.Set;
 
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -95,7 +95,7 @@ public class UserSaveAction extends PrincipalSaveAction {
             throw new NullPropertyException(User.class, "group ids");
         }
 
-        SessionUtil sessionUtil = new SessionUtil(session);
+        actionContext = new ActionContext(user, session);
 
         // check for duplicate login
         List<ValueProperty<User>> uniqueValProps =
@@ -119,7 +119,7 @@ public class UserSaveAction extends PrincipalSaveAction {
             user, session);
 
         newUser =
-            sessionUtil.get(User.class, principalId, new User());
+            actionContext.get(User.class, principalId, new User());
 
         newUser.setLogin(login);
         newUser.setCsmUserId(csmUserId);
@@ -129,7 +129,7 @@ public class UserSaveAction extends PrincipalSaveAction {
         newUser.setNeedPwdChange(needPwdChange);
 
         ActivityStatus aStatus =
-            sessionUtil.load(ActivityStatus.class, aStatusId);
+            actionContext.load(ActivityStatus.class, aStatusId);
         newUser.setActivityStatus(aStatus);
 
         saveGroups();
@@ -139,7 +139,7 @@ public class UserSaveAction extends PrincipalSaveAction {
 
     private void saveGroups() {
         Map<Integer, BbGroup> groups =
-            sessionUtil.load(BbGroup.class, groupIds);
+            actionContext.load(BbGroup.class, groupIds);
 
         SetDifference<BbGroup> groupsDiff =
             new SetDifference<BbGroup>(newUser.getGroupCollection(),

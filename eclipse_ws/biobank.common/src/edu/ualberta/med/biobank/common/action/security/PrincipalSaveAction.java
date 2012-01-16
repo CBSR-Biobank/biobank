@@ -6,10 +6,10 @@ import java.util.Set;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Membership;
@@ -23,7 +23,7 @@ public abstract class PrincipalSaveAction implements Action<IdResult> {
 
     private Set<Integer> membershipIds;
 
-    protected SessionUtil sessionUtil;
+    protected ActionContext actionContext;
 
     public void setId(Integer id) {
         this.principalId = id;
@@ -47,12 +47,12 @@ public abstract class PrincipalSaveAction implements Action<IdResult> {
 
         principal.setId(principalId);
 
-        if (sessionUtil == null) {
-            sessionUtil = new SessionUtil(session);
+        if (actionContext == null) {
+            actionContext = new ActionContext(user, session);
         }
 
         Map<Integer, Membership> memberships =
-            sessionUtil.load(Membership.class, membershipIds);
+            actionContext.load(Membership.class, membershipIds);
 
         SetDifference<Membership> sitesDiff =
             new SetDifference<Membership>(principal.getMembershipCollection(),

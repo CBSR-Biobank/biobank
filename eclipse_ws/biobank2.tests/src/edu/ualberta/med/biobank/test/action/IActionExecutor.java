@@ -11,6 +11,8 @@ public interface IActionExecutor {
 
     public void setUser(User user);
 
+    public User getUser();
+
     public Session getSession();
 
     public <T extends ActionResult> T exec(Action<T> action)

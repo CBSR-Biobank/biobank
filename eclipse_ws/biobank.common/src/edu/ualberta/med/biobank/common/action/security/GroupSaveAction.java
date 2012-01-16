@@ -44,7 +44,7 @@ public class GroupSaveAction extends PrincipalSaveAction {
     }
 
     private void saveUsers() {
-        Map<Integer, User> users = sessionUtil.load(User.class, userIds);
+        Map<Integer, User> users = actionContext.load(User.class, userIds);
 
         SetDifference<User> usersDiff =
             new SetDifference<User>(group.getUserCollection(),

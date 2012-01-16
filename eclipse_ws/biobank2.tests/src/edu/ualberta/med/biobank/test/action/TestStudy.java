@@ -104,6 +104,7 @@ public class TestStudy extends TestAction {
             Assert.assertTrue(true);
         }
 
+        studySaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
         studySaveAction.setSiteIds(null);
         try {
             actionExecutor.exec(studySaveAction);
@@ -113,6 +114,7 @@ public class TestStudy extends TestAction {
             Assert.assertTrue(true);
         }
 
+        studySaveAction.setSiteIds(new HashSet<Integer>());
         studySaveAction.setContactIds(null);
         try {
             actionExecutor.exec(studySaveAction);
@@ -122,6 +124,7 @@ public class TestStudy extends TestAction {
             Assert.assertTrue(true);
         }
 
+        studySaveAction.setContactIds(new HashSet<Integer>());
         studySaveAction.setSourceSpecimenSaveInfo(null);
         try {
             actionExecutor.exec(studySaveAction);
@@ -131,6 +134,8 @@ public class TestStudy extends TestAction {
             Assert.assertTrue(true);
         }
 
+        studySaveAction
+            .setSourceSpecimenSaveInfo(new HashSet<SourceSpecimenSaveInfo>());
         studySaveAction.setAliquotSpecimenSaveInfo(null);
         try {
             actionExecutor.exec(studySaveAction);
@@ -140,6 +145,8 @@ public class TestStudy extends TestAction {
             Assert.assertTrue(true);
         }
 
+        studySaveAction
+            .setAliquotSpecimenSaveInfo(new HashSet<AliquotedSpecimenSaveInfo>());
         studySaveAction.setStudyEventAttrSaveInfo(null);
         try {
             actionExecutor.exec(studySaveAction);

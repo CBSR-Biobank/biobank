@@ -84,7 +84,7 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void saveWithoutSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(20, 50);
-        List<CommentInfo> comments = Utils.getRandomCommentInfos(currentUser
+        List<CommentInfo> comments = Utils.getRandomCommentInfos(actionExecutor.getUser()
             .getId());
         Date date = Utils.getRandomDate();
         Integer pEventId = actionExecutor.exec(new ProcessingEventSaveAction(
@@ -105,7 +105,7 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void sveWithSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(50);
-        List<CommentInfo> comments = Utils.getRandomCommentInfos(currentUser
+        List<CommentInfo> comments = Utils.getRandomCommentInfos(actionExecutor.getUser()
             .getId());
         Date date = Utils.getRandomDate();
 
@@ -163,7 +163,7 @@ public class TestProcessingEvent extends TestAction {
         actionExecutor.exec(new ProcessingEventDeleteAction(pEventId));
 
         openHibernateSession();
-        ProcessingEvent pe = new ActionContext(currentUser, session).load(
+        ProcessingEvent pe = new ActionContext(actionExecutor.getUser(), session).load(
             ProcessingEvent.class, pEventId);
         Assert.assertNull(pe);
         closeHibernateSession();
@@ -189,7 +189,7 @@ public class TestProcessingEvent extends TestAction {
                 .asList(spcId))).getId();
 
         openHibernateSession();
-        ActionContext actionContext = new ActionContext(currentUser, session);
+        ActionContext actionContext = new ActionContext(actionExecutor.getUser(), session);
         Specimen spc = actionContext.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);
         Assert.assertNotNull(spc.getProcessingEvent());
@@ -236,7 +236,7 @@ public class TestProcessingEvent extends TestAction {
                 Utils.getRandomString(50), 1, null,
                 Arrays.asList(spcId))).getId();
 
-        ActionContext actionContext = new ActionContext(currentUser, session);
+        ActionContext actionContext = new ActionContext(actionExecutor.getUser(), session);
 
         openHibernateSession();
         Specimen spc = actionContext.load(Specimen.class, spcId);
@@ -258,7 +258,7 @@ public class TestProcessingEvent extends TestAction {
 
         openHibernateSession();
         ProcessingEvent pe =
-            new ActionContext(currentUser, session).load(ProcessingEvent.class,
+            new ActionContext(actionExecutor.getUser(), session).load(ProcessingEvent.class,
                 pEventId);
         Assert.assertNotNull(pe);
         closeHibernateSession();
