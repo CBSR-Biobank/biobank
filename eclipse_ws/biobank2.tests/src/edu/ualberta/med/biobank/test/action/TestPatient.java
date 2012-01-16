@@ -196,7 +196,7 @@ public class TestPatient extends TestAction {
         actionExecutor.exec(new PatientMergeAction(patientId1, patientId2));
 
         openHibernateSession();
-        ActionContext actionContext = new ActionContext(currentUser, session);
+        ActionContext actionContext = new ActionContext(actionExecutor.getUser(), session);
         Patient p1 = actionContext.get(Patient.class, patientId1);
         Assert.assertNotNull(p1);
         Patient p2 = actionContext.get(Patient.class, patientId2);

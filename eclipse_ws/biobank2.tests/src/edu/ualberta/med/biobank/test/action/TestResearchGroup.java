@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -18,11 +19,14 @@ import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
 import edu.ualberta.med.biobank.test.action.helper.ResearchGroupHelper;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
+import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 
 public class TestResearchGroup extends TestAction {
 
@@ -105,4 +109,27 @@ public class TestResearchGroup extends TestAction {
                 .getInventoryId()));
         }
     }
+    
+    @Test
+    public void testDelete() throws Exception {
+    	// only one failure case specific to rg, rest are in center
+    	
+    	Integer rgId =
+                ResearchGroupHelper.createResearchGroup(actionExecutor, name,
+                    name,
+                    studyId);
+        ResearchGroupGetInfoAction reader =
+        new ResearchGroupGetInfoAction(rgId);
+        ResearchGroupReadInfo rg = actionExecutor.exec(reader);
+        try {
+        	rg.rg.setRequestCollection(Arrays.asList(new Request()));
+        	Assert.fail();
+        } catch (Exception e) { 
+        	
+        }
+        
+        session.delete(rg);
+        session.flush();
+    }
+    
 }

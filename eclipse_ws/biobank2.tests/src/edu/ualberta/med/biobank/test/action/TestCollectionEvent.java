@@ -75,7 +75,7 @@ public class TestCollectionEvent extends TestAction {
     public void saveNoSpecsNoAttrs() throws Exception {
         final Integer visitNumber = r.nextInt(20);
         final List<CommentInfo> comments =
-            Utils.getRandomCommentInfos(currentUser.getId());
+            Utils.getRandomCommentInfos(actionExecutor.getUser().getId());
         final Integer statusId = 1;
         // test add
         final Integer ceventId =
@@ -95,14 +95,14 @@ public class TestCollectionEvent extends TestAction {
     public void saveWithSpecs() throws Exception {
         final Integer visitNumber = r.nextInt(20);
         final List<CommentInfo> comments =
-            Utils.getRandomCommentInfos(currentUser.getId());
+            Utils.getRandomCommentInfos(actionExecutor.getUser().getId());
         final Integer statusId = 1;
 
         final Integer typeId = getSpecimenTypes().get(0).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,
-                typeId, currentUser.getId());
+                typeId, actionExecutor.getUser().getId());
 
         // Save a new cevent
         final Integer ceventId =
@@ -156,7 +156,7 @@ public class TestCollectionEvent extends TestAction {
         newSpecList.add(modifiedSpec);
         SaveCEventSpecimenInfo newSpec =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandom(typeId,
-                currentUser.getId());
+                actionExecutor.getUser().getId());
         newSpecList.add(newSpec);
         // modify cevent
         actionExecutor.exec(new CollectionEventSaveAction(ceventId, patientId,
@@ -216,7 +216,7 @@ public class TestCollectionEvent extends TestAction {
 
         final Integer visitNumber = r.nextInt(20);
         final List<CommentInfo> comments =
-            Utils.getRandomCommentInfos(currentUser.getId());
+            Utils.getRandomCommentInfos(actionExecutor.getUser().getId());
         final Integer statusId = 1;
 
         List<CEventAttrSaveInfo> attrs =
@@ -359,9 +359,11 @@ public class TestCollectionEvent extends TestAction {
     @Test
     public void deleteWithoutSpecimens() throws Exception {
         final Integer ceventId =
-            actionExecutor.exec(new CollectionEventSaveAction(null, patientId,
-                r.nextInt(20), 1, Utils.getRandomCommentInfos(currentUser
-                    .getId()), siteId, null, null)).getId();
+            actionExecutor.exec(
+                new CollectionEventSaveAction(null, patientId,
+                    r.nextInt(20), 1, Utils
+                        .getRandomCommentInfos(actionExecutor.getUser()
+                            .getId()), siteId, null, null)).getId();
 
         // test delete
         actionExecutor.exec(new CollectionEventDeleteAction(ceventId));
@@ -382,7 +384,7 @@ public class TestCollectionEvent extends TestAction {
 
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,
-                typeId, currentUser.getId());
+                typeId, actionExecutor.getUser().getId());
 
         // Save a new cevent
         final Integer ceventId =
@@ -434,7 +436,7 @@ public class TestCollectionEvent extends TestAction {
 
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,
-                typeId, currentUser.getId());
+                typeId, actionExecutor.getUser().getId());
 
         setEventAttrs(studyId);
         StudyInfo studyInfo =
@@ -462,7 +464,7 @@ public class TestCollectionEvent extends TestAction {
         Integer visitNber = r.nextInt(20);
         Integer statusId = 1;
         List<CommentInfo> comments =
-            Utils.getRandomCommentInfos(currentUser.getId());
+            Utils.getRandomCommentInfos(actionExecutor.getUser().getId());
         // Save a new cevent
         final Integer ceventId =
             actionExecutor.exec(new CollectionEventSaveAction(null, patientId,

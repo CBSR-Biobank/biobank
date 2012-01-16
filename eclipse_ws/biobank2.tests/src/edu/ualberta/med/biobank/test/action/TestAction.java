@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.test.action;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
@@ -9,9 +11,18 @@ import java.util.TimeZone;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 
+import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.security.MembershipSaveAction;
+import edu.ualberta.med.biobank.common.action.security.UserDeleteAction;
+import edu.ualberta.med.biobank.common.action.security.UserGetAction;
+import edu.ualberta.med.biobank.common.action.security.UserGetResult;
+import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
+import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -20,21 +31,46 @@ import edu.ualberta.med.biobank.test.action.helper.SpecimenTypeHelper;
 
 public class TestAction {
 
-    protected MockActionExecutor actionExecutor;
-
     protected static Random r;
 
-    protected User currentUser;
+    protected static MockActionExecutor actionExecutor;
 
-    protected Session session;
+    protected static Session session;
+
+    protected static final String SUPER_ADMIN_LOGIN = "superadmin";
+
+    @SuppressWarnings("unused")
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        r = new Random();
+        actionExecutor = new MockActionExecutor(false);
+        session = actionExecutor.getSession();
+
+        // TODO remove after comments fix
+        if (false) {
+            User user = createSuperAdminUser();
+            actionExecutor.setUser(user);
+        } else {
+            UserGetResult userInfo =
+                actionExecutor.exec(new UserGetAction(SUPER_ADMIN_LOGIN));
+            actionExecutor.setUser(userInfo.getUser());
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @AfterClass
+    public static void tearDownBeforeClass() throws Exception {
+        // TODO remove after comments fix
+        if (false) {
+            deleteSuperAdminUser();
+        }
+    }
 
     /**
      * Done for each test of this class.
      */
     @Before
     public void setUp() throws Exception {
-        r = new Random();
-        actionExecutor = new MockActionExecutor(false);
     }
 
     /**
@@ -42,6 +78,44 @@ public class TestAction {
      */
     @After
     public void tearDown() throws Exception {
+    }
+
+    public void setUser(User user) {
+        actionExecutor.setUser(user);
+    }
+
+    public User getUser() {
+        return actionExecutor.getUser();
+    }
+
+    public static User createSuperAdminUser() {
+        UserSaveAction userSaveAction = new UserSaveAction();
+        userSaveAction.setLogin(SUPER_ADMIN_LOGIN);
+        userSaveAction.setCsmUserId(0L);
+        userSaveAction.setRecvBulkEmails(false);
+        userSaveAction.setFullName("super admin");
+        userSaveAction.setEmail("");
+        userSaveAction.setNeedPwdChange(false);
+        userSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        userSaveAction.setGroupIds(new HashSet<Integer>());
+        userSaveAction.setMembershipIds(new HashSet<Integer>());
+        Integer userId = actionExecutor.exec(userSaveAction).getId();
+
+        // set up a super admin user
+        MembershipSaveAction membershipSaveAction = new MembershipSaveAction();
+        membershipSaveAction.setPermissionIds(new HashSet<Integer>(Arrays
+            .asList(PermissionEnum.ADMINISTRATION.getId())));
+        membershipSaveAction.setRoleIds(new HashSet<Integer>());
+        membershipSaveAction.setPrincipalId(userId);
+        actionExecutor.exec(membershipSaveAction).getId();
+
+        return (User) session.load(User.class, userId);
+    }
+
+    private static void deleteSuperAdminUser() {
+        UserGetResult userInfo =
+            actionExecutor.exec(new UserGetAction(SUPER_ADMIN_LOGIN));
+        actionExecutor.exec(new UserDeleteAction(userInfo.getUser().getId()));
     }
 
     private static Date convertToGmt(Date localDate) {

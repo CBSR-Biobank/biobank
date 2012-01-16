@@ -42,6 +42,11 @@ public class MockActionExecutor implements IActionExecutor {
     }
 
     @Override
+    public User getUser() {
+        return user;
+    }
+
+    @Override
     public Session getSession() {
         return session;
     }
