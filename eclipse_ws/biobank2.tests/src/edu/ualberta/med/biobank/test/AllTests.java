@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.test.action.TestResearchGroup;
 import edu.ualberta.med.biobank.test.action.TestShipment;
 import edu.ualberta.med.biobank.test.action.TestSite;
 import edu.ualberta.med.biobank.test.action.TestStudy;
-import edu.ualberta.med.biobank.test.internal.DbHelper;
 
 @RunWith(Suite.class)
 @SuiteClasses({ TestClinic.class, TestCollectionEvent.class,
@@ -33,8 +32,8 @@ public class AllTests {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        appService = connect(userLogin, userPwd);
-        DbHelper.setAppService(appService);
+        // appService = connect(userLogin, userPwd);
+        // DbHelper.setAppService(appService);
     }
 
     @AfterClass

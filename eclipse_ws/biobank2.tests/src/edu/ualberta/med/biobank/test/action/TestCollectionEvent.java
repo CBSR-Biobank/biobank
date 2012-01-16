@@ -139,8 +139,7 @@ public class TestCollectionEvent extends TestAction {
                     .getId());
                 Assert.assertEquals(info.statusId, sp.getActivityStatus()
                     .getId());
-                Assert.assertTrue(compareDateInHibernate(info.timeDrawn,
-                    sp.getCreatedAt()));
+                Assert.assertEquals(info.timeDrawn, sp.getCreatedAt());
                 // set the id to make some modification tests after that.
                 info.id = sp.getId();
             }

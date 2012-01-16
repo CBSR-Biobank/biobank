@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+@Deprecated
 public class DiffUtils<T> {
 
     private Collection<T> collection;

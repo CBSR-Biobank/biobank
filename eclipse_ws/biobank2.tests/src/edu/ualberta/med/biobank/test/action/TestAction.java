@@ -39,31 +39,18 @@ public class TestAction {
 
     protected static final String SUPER_ADMIN_LOGIN = "superadmin";
 
-    @SuppressWarnings("unused")
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         r = new Random();
         actionExecutor = new MockActionExecutor(false);
         session = actionExecutor.getSession();
-
-        // TODO remove after comments fix
-        if (false) {
-            User user = createSuperAdminUser();
-            actionExecutor.setUser(user);
-        } else {
-            UserGetResult userInfo =
-                actionExecutor.exec(new UserGetAction(SUPER_ADMIN_LOGIN));
-            actionExecutor.setUser(userInfo.getUser());
-        }
+        User user = createSuperAdminUser();
+        actionExecutor.setUser(user);
     }
 
-    @SuppressWarnings("unused")
     @AfterClass
     public static void tearDownBeforeClass() throws Exception {
-        // TODO remove after comments fix
-        if (false) {
-            deleteSuperAdminUser();
-        }
+        deleteSuperAdminUser();
     }
 
     /**
@@ -137,6 +124,10 @@ public class TestAction {
         return gmtCal.getTime();
     }
 
+    /**
+     * NOT REQUIRED ANYMORE SINCE TESTS ARE RUN LOCALLY
+     */
+    @Deprecated
     public static boolean compareDateInHibernate(Date localDate,
         Date hibernateDate) {
         Date convertdate = convertToGmt(localDate);
