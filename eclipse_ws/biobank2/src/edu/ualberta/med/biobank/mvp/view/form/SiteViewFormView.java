@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.mvp.view.form;
 import java.util.Collection;
 
 import edu.ualberta.med.biobank.common.action.info.ContainerTypeInfo;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
@@ -137,7 +137,7 @@ public class SiteViewFormView extends AbstractViewFormView
     }
 
     @Override
-    public ValueField<Collection<StudyInfo>> getStudyCollection() {
+    public ValueField<Collection<StudyCountInfo>> getStudyCollection() {
         // TODO Auto-generated method stub
         return null;
     }

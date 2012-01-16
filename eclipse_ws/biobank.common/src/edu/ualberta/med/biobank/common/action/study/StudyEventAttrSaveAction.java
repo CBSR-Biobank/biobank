@@ -10,7 +10,6 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.EventAttrType;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -79,11 +78,9 @@ public class StudyEventAttrSaveAction implements Action<IdResult> {
         GlobalEventAttr globalAttr =
             sessionUtil.load(GlobalEventAttr.class, globalEventAttrId);
 
-        attr.setLabel(globalAttr.getLabel());
+        attr.setGlobalEventAttr(globalAttr);
         attr.setPermissible(permissible);
         attr.setRequired(required);
-        attr.setEventAttrType(sessionUtil.load(EventAttrType.class, globalAttr
-            .getEventAttrType().getId()));
         attr.setActivityStatus(sessionUtil
             .load(ActivityStatus.class, aStatusId));
         attr.setStudy(sessionUtil.load(Study.class, studyId));

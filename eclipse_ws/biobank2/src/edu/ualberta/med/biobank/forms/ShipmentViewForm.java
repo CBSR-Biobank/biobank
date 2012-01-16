@@ -8,6 +8,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
+import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -38,18 +40,26 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private BgcBaseText boxNumberLabel;
 
-
     private SpecimenEntryWidget specimenWidget;
 
     private CommentCollectionInfoTable commentEntryTable;
+
+    private ShipmentReadInfo oiInfo;
 
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ShipmentAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
-
-        originInfo = (OriginInfoWrapper) getModelObject();
+        if (adapter.getId() != null) {
+            oiInfo =
+                SessionManager.getAppService().doAction(
+                    new ShipmentGetInfoAction(adapter.getId()));
+            originInfo =
+                new OriginInfoWrapper(SessionManager.getAppService(), oiInfo.oi);
+        } else
+            originInfo =
+                new OriginInfoWrapper(SessionManager.getAppService());
         setPartName();
     }
 
@@ -109,7 +119,7 @@ public class ShipmentViewForm extends BiobankViewForm {
                 Messages.ShipmentViewForm_received_label);
 
         createCommentSection();
-        
+
         setShipmentValues();
     }
 
@@ -120,7 +130,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         client.setLayout(gl);
         commentEntryTable =
             new CommentCollectionInfoTable(client,
-                    originInfo.getCommentCollection(false));
+                originInfo.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
@@ -128,7 +138,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         commentEntryTable.setLayoutData(gd);
 
     }
-    
+
     private void setShipmentValues() {
         ShipmentInfoWrapper shipInfo = originInfo.getShipmentInfo();
         ShippingMethodWrapper shipMethod = shipInfo.getShippingMethod();
@@ -155,7 +165,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         setPartName();
         setFormText();
         setShipmentValues();
-        
+
         commentEntryTable.setList(originInfo.getCommentCollection(false));
         specimenWidget.setSpecimens(originInfo.getSpecimenCollection());
     }

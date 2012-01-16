@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.permission.specimen;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.Center;
@@ -22,10 +22,9 @@ public class SpecimenCreatePermission implements Permission {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        Study study = ActionUtil.sessionGet(session,
-            Study.class, studyId);
-        Center center = ActionUtil.sessionGet(session,
-            Center.class, centerId);
+        ActionContext actionContext = new ActionContext(user, session);
+        Study study = actionContext.load(Study.class, studyId);
+        Center center = actionContext.load(Center.class, centerId);
         return PermissionEnum.SPECIMEN_CREATE.isAllowed(user, center, study);
     }
 }

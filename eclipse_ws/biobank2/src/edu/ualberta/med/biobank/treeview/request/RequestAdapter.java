@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.forms.RequestEntryForm;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -30,7 +30,7 @@ public class RequestAdapter extends AdapterBase {
     protected String getLabelInternal() {
         RequestWrapper shipment = (RequestWrapper) getModelObject();
         Assert.isNotNull(shipment, "Request is null"); //$NON-NLS-1$
-        StudyWrapper study = shipment.getStudy();
+        ResearchGroupWrapper study = shipment.getResearchGroup();
         String label = shipment.getId() + " - "; //$NON-NLS-1$
         label += study.getNameShort() + " - "; //$NON-NLS-1$
         label += DateFormatter.formatAsDate(shipment.getCreated());

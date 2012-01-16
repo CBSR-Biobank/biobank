@@ -11,10 +11,12 @@ import com.google.web.bindery.event.shared.EventBus;
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.common.action.IdResult;
+import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
-import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecimenSaveInfo;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
@@ -50,7 +52,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         ListField<AliquotedSpecimen> getAliquotedSpecimens();
 
-        // TODO: add study event attributes
+        // ListField<StudyEventAttr> getAliquotedSpecimens();
     }
 
     @Inject
@@ -102,9 +104,23 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         saveStudy.setNameShort(view.getNameShort().getValue());
         saveStudy.setActivityStatusId(getActivityStatusId());
         saveStudy.setContactIds(getContactIds());
-        saveStudy.setSourceSpcIds(getSourceSpecimenIds());
-        saveStudy.setAliquotSpcIds(getAliquotedSepcimenIds());
-        saveStudy.setStudyEventAttrIds(getStudyEventAttrIds());
+
+        Set<SourceSpecimenSaveInfo> ssSaveInfos =
+            new HashSet<SourceSpecimenSaveInfo>();
+        for (SourceSpecimen ss : view.getSourceSpecimens().asUnmodifiableList()) {
+            ssSaveInfos.add(new SourceSpecimenSaveInfo(ss));
+        }
+
+        Set<AliquotedSpecimenSaveInfo> asSaveInfos =
+            new HashSet<AliquotedSpecimenSaveInfo>();
+        for (AliquotedSpecimen as : view.getAliquotedSpecimens()
+            .asUnmodifiableList()) {
+            asSaveInfos.add(new AliquotedSpecimenSaveInfo(as));
+        }
+
+        saveStudy.setSourceSpecimenSaveInfo(ssSaveInfos);
+        saveStudy.setAliquotSpecimenSaveInfo(asSaveInfos);
+        // saveStudy.setStudyEventAttrIds(getStudyEventAttrIds());
 
         // TODO: this happens asynchronously now, how to inform GUI?
         dispatcher.asyncExec(saveStudy, new ActionCallback<IdResult>() {

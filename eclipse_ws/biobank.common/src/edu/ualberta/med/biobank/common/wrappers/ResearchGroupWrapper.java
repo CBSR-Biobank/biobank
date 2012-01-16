@@ -64,14 +64,12 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
         return wrappers;
     }
 
-    public long getCollectionEventCountForStudy(
-        @SuppressWarnings("unused") StudyWrapper study) {
+    public long getCollectionEventCountForStudy(StudyWrapper study) {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    public long getPatientCountForStudy(
-        @SuppressWarnings("unused") StudyWrapper study) {
+    public long getPatientCountForStudy(StudyWrapper study) {
         // TODO Auto-generated method stub
         return 0;
     }

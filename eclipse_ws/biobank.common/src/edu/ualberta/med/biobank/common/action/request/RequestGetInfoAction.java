@@ -7,15 +7,14 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.info.RequestFormReadInfo;
+import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
-import edu.ualberta.med.biobank.common.peer.StudyPeer;
-import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
+import edu.ualberta.med.biobank.common.permission.request.RequestReadPermission;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.User;
 
-public class RequestGetInfoAction implements Action<RequestFormReadInfo> {
+public class RequestGetInfoAction implements Action<RequestReadInfo> {
 
     /**
      * 
@@ -26,9 +25,8 @@ public class RequestGetInfoAction implements Action<RequestFormReadInfo> {
     @SuppressWarnings("nls")
     private static final String REQUEST_HQL = "select request from "
     + Request.class.getName() 
-    + " request join fetch request." + RequestPeer.STUDY.getName()
-    + " study join fetch study." + StudyPeer.RESEARCH_GROUP.getName()
-    + " left join fetch request." + RequestPeer.DISPATCH_COLLECTION.getName()
+    + " request join fetch request." + RequestPeer.RESEARCH_GROUP.getName()
+    + " rg left join fetch request." + RequestPeer.DISPATCH_COLLECTION.getName()
     + " dispatchCollection join fetch request." + RequestPeer.ADDRESS.getName()
     + " where request." + DispatchPeer.ID.getName()
     +"=? group by request";
@@ -40,13 +38,13 @@ public class RequestGetInfoAction implements Action<RequestFormReadInfo> {
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        return new DispatchReadPermission(id).isAllowed(user, session);
+        return new RequestReadPermission().isAllowed(user, session);
     }
 
     @Override
-    public RequestFormReadInfo run(User user, Session session)
+    public RequestReadInfo run(User user, Session session)
         throws ActionException {
-        RequestFormReadInfo sInfo = new RequestFormReadInfo();
+        RequestReadInfo sInfo = new RequestReadInfo();
 
         Query query = session.createQuery(REQUEST_HQL);
         query.setParameter(0, id);

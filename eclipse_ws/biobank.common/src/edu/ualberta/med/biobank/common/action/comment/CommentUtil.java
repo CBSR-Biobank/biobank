@@ -12,13 +12,16 @@ public class CommentUtil {
 
     public static Comment create(User user, Date date, String message) {
         Comment comment = null;
-        String trimmedMessage = message.trim();
 
-        if (!trimmedMessage.isEmpty()) {
-            comment = new Comment();
-            comment.setUser(user);
-            comment.setCreatedAt(date);
-            comment.setMessage(trimmedMessage);
+        if ((message != null) && !message.isEmpty()) {
+            String trimmedMessage = message.trim();
+
+            if (!trimmedMessage.isEmpty()) {
+                comment = new Comment();
+                comment.setUser(user);
+                comment.setCreatedAt(date);
+                comment.setMessage(trimmedMessage);
+            }
         }
 
         return comment;

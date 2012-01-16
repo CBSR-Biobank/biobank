@@ -18,7 +18,7 @@ public class SiteInfo implements ActionResult {
     private static final long serialVersionUID = 1L;
     public final Site site;
     public final List<ContainerTypeInfo> containerTypes;
-    public final List<StudyInfo> studies;
+    public final List<StudyCountInfo> studyCountInfo;
     public final List<Container> topContainers;
     public final Long patientCount;
     public final Long collectionEventCount;
@@ -32,8 +32,8 @@ public class SiteInfo implements ActionResult {
         return Collections.unmodifiableList(containerTypes);
     }
 
-    public List<StudyInfo> getStudyCollection() {
-        return Collections.unmodifiableList(studies);
+    public List<StudyCountInfo> getStudyCollection() {
+        return Collections.unmodifiableList(studyCountInfo);
     }
 
     public List<Container> getTopContainerCollection() {
@@ -45,7 +45,7 @@ public class SiteInfo implements ActionResult {
     }
 
     public Long getStudyCount() {
-        return new Long(studies.size());
+        return new Long(studyCountInfo.size());
     }
 
     public Long getTopContainerCount() {
@@ -85,12 +85,12 @@ public class SiteInfo implements ActionResult {
     }
 
     private SiteInfo(Site site, List<ContainerTypeInfo> containerTypes,
-        List<StudyInfo> studies, List<Container> topContainers,
+        List<StudyCountInfo> studies, List<Container> topContainers,
         Long patientCount, Long collectionEventCount,
         Long aliquotedSpecimenCount) {
         this.site = site;
         this.containerTypes = containerTypes;
-        this.studies = studies;
+        this.studyCountInfo = studies;
         this.topContainers = topContainers;
         this.patientCount = patientCount;
         this.collectionEventCount = collectionEventCount;
@@ -101,7 +101,7 @@ public class SiteInfo implements ActionResult {
         private Site site = new Site();
         private List<ContainerTypeInfo> containerTypes =
             new ArrayList<ContainerTypeInfo>();
-        private List<StudyInfo> studies = new ArrayList<StudyInfo>();
+        private List<StudyCountInfo> studies = new ArrayList<StudyCountInfo>();
         private List<Container> topContainers = new ArrayList<Container>();
         private Long patientCount;
         private Long collectionEventCount;
@@ -121,7 +121,7 @@ public class SiteInfo implements ActionResult {
             return this;
         }
 
-        public Builder setStudies(List<StudyInfo> studies) {
+        public Builder setStudies(List<StudyCountInfo> studies) {
             this.studies = studies;
             return this;
         }

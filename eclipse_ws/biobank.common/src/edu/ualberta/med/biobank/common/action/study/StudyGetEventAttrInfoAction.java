@@ -9,11 +9,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.peer.EventAttrTypePeer;
-import edu.ualberta.med.biobank.common.peer.StudyEventAttrPeer;
-import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
@@ -23,20 +19,14 @@ public class StudyGetEventAttrInfoAction implements
     private static final long serialVersionUID = 1L;
     private Integer studyId;
 
-    // @formatter:off
     @SuppressWarnings("nls")
     private static final String STUDY_EVENT_ATTR_QRY =
-        "select attr,"
-            + " type." + EventAttrTypePeer.NAME.getName()
-            + " from " + StudyEventAttr.class.getName() + " as attr"
-            + " left join fetch attr."
-            + StudyEventAttrPeer.EVENT_ATTR_TYPE.getName() + " as type"
-            + " where attr."
-            + Property.concatNames(StudyEventAttrPeer.STUDY, StudyPeer.ID)
-            + " =?"
-            + " group by attr";
-
-    // @formatter:on
+        "SELECT seAttr,attrType.name"
+            + " FROM " + StudyEventAttr.class.getName() + " as seAttr"
+            + " LEFT JOIN FETCH seAttr.globalEventAttr as geAttr"
+            + " LEFT JOIN FETCH geAttr.eventAttrType as attrType"
+            + " WHERE seAttr.study.id=?"
+            + " GROUP BY seAttr";
 
     public StudyGetEventAttrInfoAction(Integer studyId) {
         this.studyId = studyId;

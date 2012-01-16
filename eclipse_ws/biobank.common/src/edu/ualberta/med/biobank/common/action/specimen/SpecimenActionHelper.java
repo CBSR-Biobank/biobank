@@ -2,9 +2,7 @@ package edu.ualberta.med.biobank.common.action.specimen;
 
 import java.util.Collection;
 
-import org.hibernate.Session;
-
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -17,11 +15,12 @@ import edu.ualberta.med.biobank.model.Study;
 
 public class SpecimenActionHelper {
 
-    public static void setParent(Session session, Specimen specimen,
+    public static void setParent(ActionContext actionContext,
+        Specimen specimen,
         Integer parentSpecimenId) {
         Specimen parent = null;
         if (parentSpecimenId != null) {
-            parent = ActionUtil.sessionGet(session, Specimen.class,
+            parent = actionContext.load(Specimen.class,
                 parentSpecimenId);
             specimen.setCollectionEvent(parent.getCollectionEvent());
             specimen.setParentSpecimen(parent);
@@ -47,14 +46,15 @@ public class SpecimenActionHelper {
                 }
     }
 
-    public static void setPosition(Session session, Specimen specimen,
+    public static void setPosition(ActionContext actionContext,
+        Specimen specimen,
         RowColPos rcp, Integer containerId) {
         // FIXME check if a position exists?
         SpecimenPosition pos = specimen.getSpecimenPosition();
         if (pos != null && rcp == null && containerId == null) {
             specimen.setSpecimenPosition(null);
             // FIXME not sure this will work. Needs to be tested.
-            session.delete(pos);
+            actionContext.getSession().delete(pos);
         }
         if (rcp != null && containerId != null) {
             if (pos == null) {
@@ -65,8 +65,8 @@ public class SpecimenActionHelper {
             pos.setRow(rcp.getRow());
             pos.setCol(rcp.getCol());
 
-            Container container = ActionUtil.sessionGet(session,
-                Container.class, containerId);
+            Container container = actionContext.load(Container.class,
+                containerId);
             pos.setContainer(container);
             ContainerType type = container.getContainerType();
             String positionString = ContainerLabelingSchemeWrapper

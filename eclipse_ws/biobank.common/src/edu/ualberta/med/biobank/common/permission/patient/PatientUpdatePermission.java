@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.permission.patient;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.Patient;
@@ -20,7 +20,7 @@ public class PatientUpdatePermission implements Permission {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        Patient patient = ActionUtil.sessionGet(session, Patient.class,
+        Patient patient = new ActionContext(user, session).load(Patient.class,
             patientId);
         return PermissionEnum.PATIENT_UPDATE
             .isAllowed(user, patient.getStudy());

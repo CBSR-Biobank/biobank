@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.permission.researchGroup;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.ResearchGroup;
@@ -20,7 +20,8 @@ public class ResearchGroupReadPermission implements Permission {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        ResearchGroup rg = ActionUtil.sessionGet(session, ResearchGroup.class, rgId);
+        ResearchGroup rg =
+            new ActionContext(user, session).load(ResearchGroup.class, rgId);
         return PermissionEnum.RESEARCH_GROUP_READ.isAllowed(user,
             rg);
     }

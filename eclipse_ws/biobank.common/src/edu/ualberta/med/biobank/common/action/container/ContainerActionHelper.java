@@ -2,31 +2,34 @@ package edu.ualberta.med.biobank.common.action.container;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.User;
 
 public class ContainerActionHelper {
 
-    public static void setPosition(Session session, Container container,
-        RowColPos rcp, Integer parentId) {
+    public static void setPosition(User user, Session session,
+        Container container, RowColPos rcp, Integer parentId) {
         ContainerPosition pos = container.getPosition();
-        if (pos == null) {
+        if ((pos == null) && (rcp != null)) {
             pos = new ContainerPosition();
             pos.setContainer(container);
             container.setPosition(pos);
         }
 
         Container parent = null;
-        if (parentId != null && rcp != null) {
+        if ((parentId != null) && (rcp != null)) {
             pos.setRow(rcp.getRow());
             pos.setCol(rcp.getCol());
 
-            parent = ActionUtil.sessionGet(session, Container.class, parentId);
+            ActionContext context = new ActionContext(user, session);
+
+            parent = context.load(Container.class, parentId);
             pos.setParentContainer(parent);
             ContainerType parentType = parent.getContainerType();
             String positionString = ContainerLabelingSchemeWrapper
@@ -34,9 +37,10 @@ public class ContainerActionHelper {
                     .getId(), parentType.getCapacity().getRowCapacity(),
                     parentType.getCapacity().getColCapacity());
             pos.setPositionString(positionString);
-        } else if (parentId == null && rcp == null) {
-            if (pos.getId() != null)
+        } else if ((parentId == null) && (rcp == null)) {
+            if ((pos != null) && (pos.getId() != null)) {
                 session.delete(pos);
+            }
         } else {
             throw new ActionException(
                 "Problem: parent and position should be both set or both null"); //$NON-NLS-1$

@@ -5,7 +5,6 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.CollectionIsEmptyCheck;
-import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.patient.PatientDeletePermission;
@@ -34,8 +33,7 @@ public class PatientDeleteAction implements Action<IdResult> {
     public IdResult run(User user, Session session) throws ActionException {
         Patient patient = (Patient) session.load(Patient.class, patientId);
 
-        new CollectionIsEmptyCheck<Patient>(new ValueProperty<Patient>(
-            PatientPeer.ID, patientId), Patient.class,
+        new CollectionIsEmptyCheck<Patient>(Patient.class, patient,
             PatientPeer.COLLECTION_EVENT_COLLECTION, patient.getPnumber(),
             HAS_COLLECTION_EVENTS_MSG).run(user, session);
 

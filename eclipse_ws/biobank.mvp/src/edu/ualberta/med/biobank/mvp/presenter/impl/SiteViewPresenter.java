@@ -8,7 +8,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.common.action.info.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
@@ -47,7 +47,7 @@ public class SiteViewPresenter extends AbstractViewFormPresenter<View> {
 
         ValueField<Collection<Comment>> getCommentCollection();
 
-        ValueField<Collection<StudyInfo>> getStudyCollection();
+        ValueField<Collection<StudyCountInfo>> getStudyCollection();
 
         ValueField<Collection<ContainerTypeInfo>> getContainerTypeCollection();
 

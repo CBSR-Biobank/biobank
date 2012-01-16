@@ -122,7 +122,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     private void setSiteSectionValues() {
         setTextValue(nameLabel, siteInfo.site.getName());
         setTextValue(nameShortLabel, siteInfo.site.getNameShort());
-        setTextValue(studyCountLabel, siteInfo.studies.size());
+        setTextValue(studyCountLabel, siteInfo.studyCountInfo.size());
         setTextValue(containerTypeCountLabel, siteInfo.containerTypes.size());
         setTextValue(topContainerCountLabel, siteInfo.topContainers.size());
         setTextValue(patientCountLabel, siteInfo.patientCount);
@@ -134,7 +134,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private void createStudySection() {
         Section section = createSection(Messages.SiteViewForm_studies_title);
-        studiesTable = new NewStudyInfoTable(section, siteInfo.studies);
+        studiesTable = new NewStudyInfoTable(section, siteInfo.studyCountInfo);
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addClickListener(collectionDoubleClickListener);
 
@@ -205,7 +205,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         setSiteSectionValues();
         setAddressValues(site);
 
-        studiesTable.setCollection(siteInfo.studies);
+        studiesTable.setCollection(siteInfo.studyCountInfo);
         containerTypesTable.setList(siteInfo.containerTypes);
         topContainersTable.setList(siteInfo.topContainers);
         // TODO: load comments?

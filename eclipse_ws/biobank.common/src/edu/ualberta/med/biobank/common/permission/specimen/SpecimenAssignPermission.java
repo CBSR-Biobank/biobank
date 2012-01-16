@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.permission.specimen;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.Center;
@@ -19,8 +19,8 @@ public class SpecimenAssignPermission implements Permission {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        Center center = ActionUtil.sessionGet(session,
-            Center.class, centerId);
+        Center center =
+            new ActionContext(user, session).load(Center.class, centerId);
         // FIXME check also permission to create/update containers?
         return PermissionEnum.SPECIMEN_ASSIGN.isAllowed(user, center);
     }

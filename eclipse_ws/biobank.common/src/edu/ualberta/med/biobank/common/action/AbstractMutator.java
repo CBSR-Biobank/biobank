@@ -39,7 +39,7 @@ public class AbstractMutator<M extends IBiobankModel> {
     }
 
     protected void unique(Collection<PropertyValue> propertyValues) {
-        PropertySetCountAction count =
+        PropertySetCountAction count = 
             new PropertySetCountAction(model, modelClass, propertyValues);
         if (count.run(context.getUser(), context.getSession()).notZero()) {
 

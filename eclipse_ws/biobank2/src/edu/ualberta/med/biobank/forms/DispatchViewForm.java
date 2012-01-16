@@ -22,6 +22,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
+import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
@@ -71,6 +73,8 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private CommentCollectionInfoTable commentTable;
 
+    private DispatchReadInfo dispatchInfo;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof DispatchAdapter),
@@ -78,7 +82,14 @@ public class DispatchViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         dispatchAdapter = (DispatchAdapter) adapter;
-        dispatch = (DispatchWrapper) getModelObject();
+        if (adapter.getId() != null) {
+            dispatchInfo = SessionManager.getAppService().doAction(
+                new DispatchGetInfoAction(adapter.getId()));
+            dispatch =
+                new DispatchWrapper(SessionManager.getAppService(),
+                    dispatchInfo.dispatch);
+        } else
+            dispatch = new DispatchWrapper(SessionManager.getAppService());
         SessionManager.logLookup(dispatch);
         retrieveDispatch();
         setPartName(Messages.DispatchViewForm_title);

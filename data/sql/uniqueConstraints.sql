@@ -8,9 +8,6 @@ ALTER TABLE container_type
   ADD CONSTRAINT uc_ct_name UNIQUE (name,site_id),
   ADD CONSTRAINT uc_ct_nameshort UNIQUE (name_short,site_id);
 
-ALTER TABLE study_event_attr
-  ADD CONSTRAINT uc_se_label UNIQUE (label,study_id);
-
 ALTER TABLE collection_event
   ADD CONSTRAINT uc_ce_visit_number UNIQUE (VISIT_NUMBER,PATIENT_ID);
 

@@ -2,64 +2,46 @@ package edu.ualberta.med.biobank.test.action;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Random;
 import java.util.TimeZone;
 
-import org.hibernate.FlushMode;
+import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 
-import edu.ualberta.med.biobank.common.action.security.UserGetAction;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.test.AllTests;
-import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.action.helper.SpecimenTypeHelper;
 
-public class TestAction extends TestDatabase {
-    private SessionFactory sessionFactory;
-    protected Session session;
+public class TestAction {
+
+    protected MockActionExecutor actionExecutor;
+
+    protected static Random r;
 
     protected User currentUser;
 
+    protected Session session;
+
     /**
      * Done for each test of this class.
      */
-    @Override
     @Before
     public void setUp() throws Exception {
-        // configure() configures settings from hibernate.cfg.xml found into the
-        // biobank-orm jar
-        sessionFactory = new Configuration().configure().buildSessionFactory();
-        super.setUp();
-        currentUser = appService
-            .doAction(new UserGetAction(AllTests.userLogin)).getUser();
+        r = new Random();
+        actionExecutor = new MockActionExecutor(false);
     }
 
     /**
      * Done for each test of this class.
      */
-    @Override
     @After
     public void tearDown() throws Exception {
-        closeHibernateSession();
-        if (sessionFactory != null) {
-            sessionFactory.close();
-        }
-    }
-
-    public void openHibernateSession() {
-        session = sessionFactory.openSession();
-        session.setFlushMode(FlushMode.MANUAL);
-        session.beginTransaction();
-    }
-
-    public void closeHibernateSession() {
-        if ((session != null) && session.isConnected()) {
-            session.getTransaction().commit();
-            session.close();
-            session = null;
-        }
     }
 
     private static Date convertToGmt(Date localDate) {
@@ -89,5 +71,43 @@ public class TestAction extends TestDatabase {
 
     public static boolean compareDouble(Double d1, Double d2) {
         return Math.abs((d1 - d2)) < 0.0001;
+    }
+
+    protected List<SpecimenType> getSpecimenTypes() {
+        List<SpecimenType> spcTypes =
+            SpecimenTypeHelper.getSpecimenTypes(getSession());
+        return spcTypes;
+    }
+
+    protected List<ContainerLabelingScheme> getContainerLabelingSchemes() {
+        Query q =
+            getSession().createQuery("from "
+                + ContainerLabelingScheme.class.getName());
+        @SuppressWarnings("unchecked")
+        List<ContainerLabelingScheme> labelingSchemes = q.list();
+        Assert.assertTrue("container labeling schemes not found in database",
+            !labelingSchemes.isEmpty());
+        return labelingSchemes;
+    }
+
+    protected void deleteOriginInfos(Integer centerId) {
+        // delete origin infos
+        Query q =
+            getSession().createQuery("DELETE FROM "
+                + OriginInfo.class.getName() + " oi WHERE oi.center.id=?");
+        q.setParameter(0, centerId);
+        q.executeUpdate();
+    }
+
+    public Session getSession() {
+        return actionExecutor.getSession();
+    }
+
+    public void openHibernateSession() {
+
+    }
+
+    public void closeHibernateSession() {
+
     }
 }

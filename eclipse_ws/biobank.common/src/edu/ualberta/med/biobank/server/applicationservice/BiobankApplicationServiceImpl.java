@@ -150,7 +150,7 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public void executeModifyPassword(Long csmUserId, String oldPassword,
-        String newPassword, Boolean bulkEmails) throws ApplicationException {
+        String newPassword, Boolean recvBulkEmails) throws ApplicationException {
         BiobankCSMSecurityUtil.modifyPassword(csmUserId, oldPassword,
             newPassword);
         List<User> users = query(new HQLCriteria(GET_USER_QRY,
@@ -159,9 +159,9 @@ public class BiobankApplicationServiceImpl extends
             throw new ApplicationException("Problem with HQL result size"); //$NON-NLS-1$
         }
         User user = users.get(0);
-        user.setNeedChangePwd(false);
-        if (bulkEmails != null)
-            user.setBulkEmails(bulkEmails);
+        user.setNeedPwdChange(false);
+        if (recvBulkEmails != null)
+            user.setRecvBulkEmails(recvBulkEmails);
         executeQuery(new UpdateExampleQuery(user));
     }
 

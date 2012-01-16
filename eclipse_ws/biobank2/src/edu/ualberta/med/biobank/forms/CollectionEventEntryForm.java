@@ -302,7 +302,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             .entrySet()) {
             FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
             pvCustomInfo.setStudyEventAttrId(entry.getValue().attr.getId());
-            pvCustomInfo.setLabel(entry.getValue().attr.getLabel());
+            pvCustomInfo.setLabel(entry.getValue().attr.getGlobalEventAttr()
+                .getLabel());
             pvCustomInfo.setType(entry.getValue().type);
             pvCustomInfo.setAllowedValues(entry.getValue()
                 .getStudyEventAttrPermissible());

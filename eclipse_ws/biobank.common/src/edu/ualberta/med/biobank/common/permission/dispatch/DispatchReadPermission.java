@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.permission.dispatch;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.Dispatch;
@@ -21,11 +21,11 @@ public class DispatchReadPermission implements Permission {
     @Override
     public boolean isAllowed(User user, Session session) {
         Dispatch dispatch =
-            ActionUtil.sessionGet(session, Dispatch.class, dispatchId);
+            new SessionUtil(session).get(Dispatch.class, dispatchId,
+                new Dispatch());
         return PermissionEnum.DISPATCH_READ.isAllowed(user,
             dispatch.getReceiverCenter())
             || PermissionEnum.DISPATCH_READ.isAllowed(user,
                 dispatch.getSenderCenter());
     }
-
 }

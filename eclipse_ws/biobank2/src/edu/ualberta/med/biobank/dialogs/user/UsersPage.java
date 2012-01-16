@@ -86,10 +86,12 @@ public abstract class UsersPage extends BgcDialogPage {
             public void run() {
                 final UserWrapper user = new UserWrapper(SessionManager
                     .getAppService());
-                user.setBulkEmails(true);
+                user.setRecvBulkEmails(true);
 
-                UserEditDialog dlg = new UserEditDialog(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(), user);
+                UserEditDialog dlg =
+                    new UserEditDialog(PlatformUI
+                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                        user);
                 int res = dlg.open();
                 if (res == Status.OK) {
                     BgcPlugin.openAsyncInformation(

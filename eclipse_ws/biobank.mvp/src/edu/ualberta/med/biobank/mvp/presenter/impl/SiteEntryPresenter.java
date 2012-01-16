@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -48,7 +48,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         ValueField<String> getNameShort();
 
-        ListField<StudyInfo> getStudies();
+        ListField<StudyCountInfo> getStudies();
     }
 
     @Inject
@@ -155,7 +155,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
 
     private Set<Integer> getStudyIds() {
         Set<Integer> studyIds = new HashSet<Integer>();
-        for (StudyInfo studyInfo : view.getStudies().asUnmodifiableList()) {
+        for (StudyCountInfo studyInfo : view.getStudies().asUnmodifiableList()) {
             studyIds.add(studyInfo.getStudy().getId());
         }
         return studyIds;

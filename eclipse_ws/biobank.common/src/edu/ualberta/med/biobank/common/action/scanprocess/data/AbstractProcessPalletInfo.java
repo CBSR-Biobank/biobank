@@ -8,6 +8,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
@@ -17,7 +18,8 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
 
-public abstract class AbstractProcessPalletInfo implements Serializable, NotAProxy {
+public abstract class AbstractProcessPalletInfo implements Serializable,
+    NotAProxy {
 
     private static final long serialVersionUID = 1L;
 
@@ -62,15 +64,17 @@ public abstract class AbstractProcessPalletInfo implements Serializable, NotAPro
         return null;
     }
 
-    public Integer getPalletRowCapacity(Session session) {
-        ContainerType type = getPallet(session).getContainerType();
+    public Integer getPalletRowCapacity(ActionContext actionContext) {
+        ContainerType type =
+            getPallet(actionContext.getSession()).getContainerType();
         if (type.getCapacity() != null)
             return type.getCapacity().getRowCapacity();
         return null;
     }
 
-    public Integer getPalletColCapacity(Session session) {
-        ContainerType type = getPallet(session).getContainerType();
+    public Integer getPalletColCapacity(ActionContext actionContext) {
+        ContainerType type =
+            getPallet(actionContext.getSession()).getContainerType();
         if (type.getCapacity() != null)
             return type.getCapacity().getColCapacity();
         return null;

@@ -820,7 +820,7 @@ public class Messages extends NLS {
 
     public static String RequestEntryForm_processed_error_msg;
 
-    public static String RequestEntryForm_requestedOn_date_studyName;
+    public static String RequestEntryForm_requestedOn_date_rgName;
 
     public static String RequestEntryForm_rgroup_Label;
 

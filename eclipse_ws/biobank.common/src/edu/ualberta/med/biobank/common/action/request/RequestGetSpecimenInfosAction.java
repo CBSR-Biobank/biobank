@@ -56,7 +56,7 @@ public class RequestGetSpecimenInfosAction implements
 
     @Override
     public boolean isAllowed(User user, Session session) throws ActionException {
-        return new RequestReadPermission(oiId).isAllowed(user, session);
+        return new RequestReadPermission().isAllowed(user, session);
     }
 
     @Override

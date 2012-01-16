@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.action.scanprocess.data;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -29,28 +29,27 @@ public class AssignProcessInfo extends AbstractProcessPalletInfo {
         return getPallet(session).getLabel();
     }
 
-    public ContainerType getContainerType(
-        Session session) {
+    public ContainerType getContainerType(Session session,
+        ActionContext actionContext) {
         if (palletId == null) {
-            return ActionUtil.sessionGet(session, ContainerType.class,
-                containerTypeId);
+            return actionContext.load(ContainerType.class, containerTypeId);
         }
         return getPallet(session).getContainerType();
     }
 
     @Override
-    public Integer getPalletRowCapacity(Session session) {
-        ContainerType type = ActionUtil.sessionGet(session,
-            ContainerType.class, containerTypeId);
+    public Integer getPalletRowCapacity(ActionContext actionContext) {
+        ContainerType type =
+            actionContext.load(ContainerType.class, containerTypeId);
         if (type.getCapacity() != null)
             return type.getCapacity().getRowCapacity();
         return null;
     }
 
     @Override
-    public Integer getPalletColCapacity(Session session) {
-        ContainerType type = ActionUtil.sessionGet(session,
-            ContainerType.class, containerTypeId);
+    public Integer getPalletColCapacity(ActionContext actionContext) {
+        ContainerType type =
+            actionContext.load(ContainerType.class, containerTypeId);
         if (type.getCapacity() != null)
             return type.getCapacity().getColCapacity();
         return null;

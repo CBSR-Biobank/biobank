@@ -31,7 +31,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-@SuppressWarnings("unused")
 public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     private static final CollectionEventLogProvider LOG_PROVIDER =
         new CollectionEventLogProvider();
@@ -259,7 +258,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                     .getStudy().getStudyEventAttrCollection();
             if (studyEventAttrCollection != null) {
                 for (StudyEventAttrWrapper studyEventAttr : studyEventAttrCollection) {
-                    studyEventAttrMap.put(studyEventAttr.getLabel(),
+                    studyEventAttrMap.put(studyEventAttr.getGlobalEventAttr()
+                        .getLabel(),
                         studyEventAttr);
                 }
             }
@@ -276,7 +276,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         List<EventAttrWrapper> pvAttrCollection = getEventAttrCollection(false);
         if (pvAttrCollection != null) {
             for (EventAttrWrapper pvAttr : pvAttrCollection) {
-                eventAttrMap.put(pvAttr.getStudyEventAttr().getLabel(), pvAttr);
+                eventAttrMap.put(pvAttr.getStudyEventAttr()
+                    .getGlobalEventAttr().getLabel(), pvAttr);
             }
         }
         return eventAttrMap;
@@ -317,7 +318,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                     + "\" does not exist"); //$NON-NLS-1$
             }
         }
-        return studyEventAttr.getEventAttrType().getName();
+        return studyEventAttr.getGlobalEventAttr().getEventAttrType().getName();
     }
 
     public String[] getEventAttrPermissible(String label) throws Exception {
@@ -381,7 +382,9 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             // validate the value
             value = value.trim();
             if (value.length() > 0) {
-                String type = studyEventAttr.getEventAttrType().getName();
+                String type =
+                    studyEventAttr.getGlobalEventAttr().getEventAttrType()
+                        .getName();
                 List<String> permissibleSplit = null;
 
                 if (EventAttrTypeEnum.SELECT_SINGLE.isSameType(type)

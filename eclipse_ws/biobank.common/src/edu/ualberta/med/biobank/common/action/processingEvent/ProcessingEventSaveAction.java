@@ -8,7 +8,7 @@ import java.util.List;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.DiffUtils;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -72,27 +72,26 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
     @Override
     public IdResult run(User user, Session session) throws ActionException {
         ProcessingEvent peventToSave;
+        ActionContext actionContext = new ActionContext(user, session);
+
         if (peventId == null) {
             peventToSave = new ProcessingEvent();
         } else {
-            peventToSave = ActionUtil.sessionGet(session,
-                ProcessingEvent.class, peventId);
+            peventToSave = actionContext.load(ProcessingEvent.class, peventId);
         }
 
         // FIXME Version check?
 
         // check worksheet number unique. Can't set it as a database constraint
         // since imported pevent can have a null worksheet:
-        new UniquePreCheck<ProcessingEvent>(new ValueProperty<ProcessingEvent>(
-            ProcessingEventPeer.ID, peventId), ProcessingEvent.class,
+        new UniquePreCheck<ProcessingEvent>(ProcessingEvent.class, peventId,
             Arrays.asList(new ValueProperty<ProcessingEvent>(
                 ProcessingEventPeer.WORKSHEET, worksheet))).run(user, session);
 
-        peventToSave.setActivityStatus(ActionUtil.sessionGet(session,
-            ActivityStatus.class, statusId));
-        peventToSave.setCenter(ActionUtil.sessionGet(session, Center.class,
-            centerId));
-        setComments(session, peventToSave);
+        peventToSave.setActivityStatus(actionContext.load(ActivityStatus.class,
+            statusId));
+        peventToSave.setCenter(actionContext.load(Center.class, centerId));
+        setComments(actionContext, peventToSave);
         peventToSave.setCreatedAt(createdAt);
         peventToSave.setWorksheet(worksheet);
 
@@ -101,8 +100,7 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
                 ProcessingEventPeer.SPECIMEN_COLLECTION));
         if (specimenIds != null)
             for (Integer spcId : specimenIds) {
-                Specimen spc = ActionUtil.sessionGet(session, Specimen.class,
-                    spcId);
+                Specimen spc = actionContext.load(Specimen.class, spcId);
                 spc.setProcessingEvent(peventToSave);
                 specUtil.add(spc);
             }
@@ -115,14 +113,15 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         return new IdResult(peventToSave.getId());
     }
 
-    protected void setComments(Session session, ProcessingEvent peventToSave) {
+    protected void setComments(ActionContext actionContext,
+        ProcessingEvent peventToSave) {
         if (comments != null) {
             Collection<Comment> dbComments = CollectionUtils.getCollection(
                 peventToSave, ProcessingEventPeer.COMMENT_COLLECTION);
             for (CommentInfo info : comments) {
-                Comment commentModel = info.getCommentModel(session);
+                Comment commentModel = info.getCommentModel(actionContext);
                 dbComments.add(commentModel);
-                session.saveOrUpdate(commentModel);
+                actionContext.getSession().saveOrUpdate(commentModel);
             }
         }
     }

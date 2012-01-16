@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
@@ -44,11 +44,11 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
      * Process of a map of cells
      */
     @Override
-    protected ScanProcessResult getScanProcessResult(Session session,
+    protected ScanProcessResult getScanProcessResult(
         Map<RowColPos, CellInfo> cells, boolean isRescanMode)
         throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
-        res.setResult(cells, createProcess(session, cells));
+        res.setResult(cells, createProcess(cells));
         return res;
     }
 
@@ -56,16 +56,16 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
      * Process of only one cell
      */
     @Override
-    protected CellProcessResult getCellProcessResult(Session session, CellInfo cell)
+    protected CellProcessResult getCellProcessResult(CellInfo cell)
         throws ActionException {
         CellProcessResult res = new CellProcessResult();
         ShipmentProcessInfo dispatchData = data;
         Center sender = null;
         if (dispatchData.getSenderId() != null) {
-            sender = ActionUtil.sessionGet(session, Center.class,
-                dispatchData.getSenderId());
+            sender =
+                actionContext.load(Center.class, dispatchData.getSenderId());
         }
-        processCellDipatchCreateStatus(session, cell, sender,
+        processCellDipatchCreateStatus(cell, sender,
             dispatchData.isErrorIfAlreadyAdded());
         res.setResult(cell);
         return res;
@@ -78,24 +78,27 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
      * @return
      * @throws Exception
      */
-    private CellInfoStatus createProcess(Session session, Map<RowColPos, CellInfo> cells) {
+    private CellInfoStatus createProcess(Map<RowColPos, CellInfo> cells) {
         CellInfoStatus currentScanState = CellInfoStatus.EMPTY;
         ShipmentProcessInfo dispatchData = data;
         Center sender = null;
+        ActionContext actionContext = new ActionContext(user, session);
+
         if (dispatchData.getSenderId() != null) {
-            sender = ActionUtil.sessionGet(session, Center.class,
-                dispatchData.getSenderId());
+            sender =
+                actionContext.load(Center.class, dispatchData.getSenderId());
         }
         if (dispatchData.getPallet(session) == null) {
             for (CellInfo cell : cells.values()) {
-                processCellDipatchCreateStatus(session, cell, sender, false);
+                processCellDipatchCreateStatus(cell, sender, false);
                 currentScanState = currentScanState.mergeWith(cell.getStatus());
             }
 
         } else {
-            for (int row = 0; row < dispatchData.getPalletRowCapacity(session); row++) {
+            for (int row = 0; row < dispatchData
+                .getPalletRowCapacity(actionContext); row++) {
                 for (int col = 0; col < dispatchData
-                    .getPalletColCapacity(session); col++) {
+                    .getPalletColCapacity(actionContext); col++) {
                     RowColPos rcp = new RowColPos(row, col);
                     CellInfo cell = cells.get(rcp);
                     Specimen expectedSpecimen = dispatchData
@@ -108,8 +111,7 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
                         cell.setExpectedSpecimenId(expectedSpecimen.getId());
                     }
                     if (cell != null) {
-                        processCellDipatchCreateStatus(session, cell, sender,
-                            false);
+                        processCellDipatchCreateStatus(cell, sender, false);
                         currentScanState = currentScanState.mergeWith(cell
                             .getStatus());
                     }
@@ -125,12 +127,11 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
      * only be 'already added' (this status is used while scanning: the color
      * will be different)
      */
-    private CellInfoStatus processCellDipatchCreateStatus(Session session,
-        CellInfo scanCell,
+    private CellInfoStatus processCellDipatchCreateStatus(CellInfo scanCell,
         Center sender, boolean checkAlreadyAdded) {
         Specimen expectedSpecimen = null;
         if (scanCell.getExpectedSpecimenId() != null) {
-            expectedSpecimen = ActionUtil.sessionGet(session, Specimen.class,
+            expectedSpecimen = actionContext.load(Specimen.class,
                 scanCell.getExpectedSpecimenId());
         }
         String value = scanCell.getValue();

@@ -137,7 +137,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
         for (Entry<Integer, StudyEventAttrInfo> entry : studyAttrInfos
             .entrySet()) {
             FormPvCustomInfo combinedPvInfo = new FormPvCustomInfo();
-            combinedPvInfo.setLabel(entry.getValue().attr.getLabel());
+            combinedPvInfo.setLabel(entry.getValue().attr.getGlobalEventAttr()
+                .getLabel());
             combinedPvInfo.setType(entry.getValue().type);
 
             int style = SWT.NONE;
@@ -156,7 +157,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
             combinedPvInfo.widget =
                 createReadOnlyLabelledField(client, style,
-                    entry.getValue().attr.getLabel(), combinedPvInfo.getValue());
+                    entry.getValue().attr.getGlobalEventAttr().getLabel(),
+                    combinedPvInfo.getValue());
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
             combinedPvInfo.widget.setLayoutData(gd);
 

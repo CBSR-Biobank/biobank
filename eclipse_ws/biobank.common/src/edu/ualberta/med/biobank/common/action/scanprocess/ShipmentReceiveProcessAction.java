@@ -45,7 +45,7 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
      * Process of a map of cells
      */
     @Override
-    protected ScanProcessResult getScanProcessResult(Session session,
+    protected ScanProcessResult getScanProcessResult(
         Map<RowColPos, CellInfo> cells, boolean isRescanMode)
         throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
@@ -57,7 +57,7 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
      * Process of only one cell
      */
     @Override
-    protected CellProcessResult getCellProcessResult(Session session, CellInfo cell)
+    protected CellProcessResult getCellProcessResult(CellInfo cell)
         throws ActionException {
         CellProcessResult res = new CellProcessResult();
         processCellDipatchReceiveStatus(session, cell);

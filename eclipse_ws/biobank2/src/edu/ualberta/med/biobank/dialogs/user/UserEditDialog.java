@@ -63,7 +63,7 @@ public class UserEditDialog extends BgcBaseDialog {
         this.originalUser = originalUser;
 
         if (originalUser.isNew()) {
-            originalUser.setNeedChangePwd(true);
+            originalUser.setNeedPwdChange(true);
         }
     }
 
@@ -135,7 +135,7 @@ public class UserEditDialog extends BgcBaseDialog {
 
         createBoundWidgetWithLabel(contents, Button.class, SWT.CHECK,
             Messages.UserEditDialog_bulkemail_label, null, originalUser,
-            UserPeer.BULK_EMAILS.getName(), null);
+            UserPeer.RECV_BULK_EMAILS.getName(), null);
 
         if (!originalUser.equals(SessionManager.getUser()))
             createPasswordWidgets(contents);
@@ -271,7 +271,7 @@ public class UserEditDialog extends BgcBaseDialog {
         password.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                originalUser.setNeedChangePwd(true);
+                originalUser.setNeedPwdChange(true);
             }
         });
 

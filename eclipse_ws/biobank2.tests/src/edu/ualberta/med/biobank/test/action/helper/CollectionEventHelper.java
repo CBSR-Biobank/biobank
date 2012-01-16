@@ -7,13 +7,16 @@ import java.util.Map;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
+import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
 public class CollectionEventHelper extends Helper {
 
+    /**
+     * Creates a collection event with random specimens.
+     */
     public static SaveCEventSpecimenInfo createSaveCEventSpecimenInfoRandom(
         Integer specimenTypeId, Integer userId) {
         SaveCEventSpecimenInfo info = new SaveCEventSpecimenInfo();
@@ -60,20 +63,19 @@ public class CollectionEventHelper extends Helper {
     }
 
     public static Integer createCEventWithSourceSpecimens(
-        BiobankApplicationService appService, Integer patientId, Integer siteId)
+        IActionExecutor actionExecutor, Integer patientId, Integer siteId)
         throws Exception {
         // add specimen type
-        final Integer typeId = SpecimenTypeHelper
-            .addSpecimenType("createCEventWithSourceSpecimens" + r.nextInt())
-            .getId();
+        String name = "createCEventWithSourceSpecimens" + r.nextInt();
+        final Integer typeId =
+            actionExecutor.exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
             .createSaveCEventSpecimenInfoRandomList(5, typeId);
 
         // Save a new cevent with specimens
-        return appService.doAction(new CollectionEventSaveAction(
-            null, patientId, r
-                .nextInt(20), 1, null, siteId,
+        return actionExecutor.exec(new CollectionEventSaveAction(
+            null, patientId, r.nextInt(20), 1, null, siteId,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
             .getId();
 

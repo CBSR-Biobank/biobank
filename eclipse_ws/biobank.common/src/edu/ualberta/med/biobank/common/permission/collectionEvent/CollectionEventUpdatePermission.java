@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.permission.collectionEvent;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -19,8 +19,9 @@ public class CollectionEventUpdatePermission implements Permission {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        CollectionEvent cevent = ActionUtil.sessionGet(session,
-            CollectionEvent.class, ceventId);
+        CollectionEvent cevent =
+            new ActionContext(user, session).load(CollectionEvent.class,
+                ceventId);
         return PermissionEnum.COLLECTION_EVENT_UPDATE
             .isAllowed(user, cevent.getPatient().getStudy());
     }

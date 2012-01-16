@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.ActionUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.AssignProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
@@ -35,7 +34,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
         this.data = data;
     }
 
-    // single cell assign process   
+    // single cell assign process
     public SpecimenAssignProcessAction(AssignProcessInfo data,
         Integer currentWorkingCenterId,
         CellInfo cell,
@@ -45,7 +44,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     }
 
     @Override
-    protected ScanProcessResult getScanProcessResult(Session session,
+    protected ScanProcessResult getScanProcessResult(
         Map<RowColPos, CellInfo> cells, boolean isRescanMode)
         throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
@@ -59,9 +58,11 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
         boolean rescanMode) throws ActionException {
         AssignProcessInfo assignData = data;
         CellInfoStatus currentScanState = CellInfoStatus.EMPTY;
-        Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet = new HashMap<RowColPos, Boolean>();
-        for (int row = 0; row < assignData.getPalletRowCapacity(session); row++) {
-            for (int col = 0; col < assignData.getPalletColCapacity(session); col++) {
+        Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet =
+            new HashMap<RowColPos, Boolean>();
+        for (int row = 0; row < assignData.getPalletRowCapacity(actionContext); row++) {
+            for (int col = 0; col < assignData
+                .getPalletColCapacity(actionContext); col++) {
                 RowColPos rcp = new RowColPos(row, col);
                 CellInfo cell = cells.get(rcp);
                 if (!rescanMode || cell == null || cell.getStatus() == null
@@ -72,14 +73,15 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
                         .getExpectedSpecimen(session, row, col);
                     if (expectedSpecimen != null) {
                         if (cell == null) {
-                            cell = new CellInfo(rcp.getRow(), rcp.getCol(), null,
-                                null);
+                            cell =
+                                new CellInfo(rcp.getRow(), rcp.getCol(), null,
+                                    null);
                             cells.put(rcp, cell);
                         }
                         cell.setExpectedSpecimenId(expectedSpecimen.getId());
                     }
                     if (cell != null) {
-                        internalProcessCellAssignStatus(session, cell,
+                        internalProcessCellAssignStatus(cell,
                             movedAndMissingSpecimensFromPallet);
                     }
                 }
@@ -94,10 +96,10 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     }
 
     @Override
-    protected CellProcessResult getCellProcessResult(Session session, CellInfo cell)
+    protected CellProcessResult getCellProcessResult(CellInfo cell)
         throws ActionException {
         CellProcessResult res = new CellProcessResult();
-        internalProcessCellAssignStatus(session, cell, null);
+        internalProcessCellAssignStatus(cell, null);
         res.setResult(cell);
         return res;
     }
@@ -105,14 +107,14 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     /**
      * set the status of the cell
      */
-    protected CellInfoStatus internalProcessCellAssignStatus(Session session,
-        CellInfo scanCell,
+    protected CellInfoStatus internalProcessCellAssignStatus(CellInfo scanCell,
         Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet)
         throws ActionException {
         Specimen expectedSpecimen = null;
         if (scanCell.getExpectedSpecimenId() != null) {
-            expectedSpecimen = ActionUtil.sessionGet(session, Specimen.class,
-                scanCell.getExpectedSpecimenId());
+            expectedSpecimen =
+                actionContext.load(Specimen.class,
+                    scanCell.getExpectedSpecimenId());
         }
         String value = scanCell.getValue();
         String positionString = data
@@ -143,8 +145,8 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
                         .getPatient().getPnumber());
                     scanCell.setSpecimenId(expectedSpecimen.getId());
                 } else {
-                    ContainerType cType = data
-                        .getContainerType(session);
+                    ContainerType cType =
+                        data.getContainerType(session, actionContext);
                     if (cType.getSpecimenTypeCollection().contains(
                         foundSpecimen.getSpecimenType())) {
                         if (foundSpecimen.getSpecimenPosition() != null

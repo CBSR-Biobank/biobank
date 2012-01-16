@@ -9,9 +9,6 @@ import edu.ualberta.med.biobank.model.User;
 public class StudyCreatePermission implements Permission {
     private static final long serialVersionUID = 1L;
 
-    public StudyCreatePermission() {
-    }
-
     @Override
     public boolean isAllowed(User user, Session session) {
         return PermissionEnum.STUDY_CREATE.isAllowed(user);

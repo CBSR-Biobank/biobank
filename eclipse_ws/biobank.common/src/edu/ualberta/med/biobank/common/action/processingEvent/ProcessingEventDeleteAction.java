@@ -42,6 +42,7 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
         String hasDerivedSpecimensMsg = MessageFormat.format(
             HAS_DERIVED_SPECIMENS_MSG, pevent.getWorksheet(),
             DateFormatter.formatAsDateTime(pevent.getCreatedAt()));
+
         new NotUsedCheck<ProcessingEvent>(pevent,
             SpecimenPeer.PARENT_SPECIMEN
                 .to(SpecimenPeer.PROCESSING_EVENT),

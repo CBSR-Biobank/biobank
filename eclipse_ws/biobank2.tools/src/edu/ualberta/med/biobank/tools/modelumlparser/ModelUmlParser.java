@@ -25,7 +25,8 @@ import org.w3c.dom.NodeList;
 
 public class ModelUmlParser {
 
-    public static final String INVALID_DATA_MODEL_CLASS_NAME_MSG = "invalid data model class name: ";
+    public static final String INVALID_DATA_MODEL_CLASS_NAME_MSG =
+        "invalid data model class name: ";
 
     private static final Logger LOGGER = Logger.getLogger(ModelUmlParser.class
         .getName());
@@ -137,12 +138,13 @@ public class ModelUmlParser {
         XPath xpath = XPathFactory.newInstance().newXPath();
 
         // path to get all logical model class names
-        XPathExpression expr = xpath
-            .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
-                + "/Namespace.ownedElement/Package[@name='Logical Model']"
-                + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
-                + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
-                + "/Namespace.ownedElement/Package/Namespace.ownedElement/Class");
+        XPathExpression expr =
+            xpath
+                .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
+                    + "/Namespace.ownedElement/Package[@name='Logical Model']"
+                    + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
+                    + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
+                    + "/Namespace.ownedElement/Package/Namespace.ownedElement/Class");
 
         NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
         for (int i = 0, n = nodes.getLength(); i < n; ++i) {
@@ -220,16 +222,17 @@ public class ModelUmlParser {
 
         for (ModelClass modelClass : logicalModelClassMap.values()) {
             // path to get all derived classes
-            expr = xpath
-                .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
-                    + "/Namespace.ownedElement/Package[@name='Logical Model']"
-                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                    + "/Package/Namespace.ownedElement/Package"
-                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                    + "/Package/Namespace.ownedElement/Class[@name='"
-                    + modelClass.getName()
-                    + "']/GeneralizableElement.generalization"
-                    + "/Generalization/@xmi.idref");
+            expr =
+                xpath
+                    .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
+                        + "/Namespace.ownedElement/Package[@name='Logical Model']"
+                        + "/Namespace.ownedElement/Package/Namespace.ownedElement"
+                        + "/Package/Namespace.ownedElement/Package"
+                        + "/Namespace.ownedElement/Package/Namespace.ownedElement"
+                        + "/Package/Namespace.ownedElement/Class[@name='"
+                        + modelClass.getName()
+                        + "']/GeneralizableElement.generalization"
+                        + "/Generalization/@xmi.idref");
 
             nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
             if (nodes.getLength() == 1) {
@@ -283,7 +286,7 @@ public class ModelUmlParser {
             if (typeNodes.getLength() != 1) {
                 throw new Exception(
                     "Attribute does not have only one type child for class "
-                        + modelClass.getName() + " ant attribute "
+                        + modelClass.getName() + " and attribute "
                         + classAttrName + ", num types "
                         + typeNodes.getLength());
             }
@@ -332,13 +335,14 @@ public class ModelUmlParser {
         XPath xpath = XPathFactory.newInstance().newXPath();
 
         // path to get all logical model class names
-        XPathExpression expr = xpath
-            .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
-                + "/Namespace.ownedElement/Package[@name='Logical Model']"
-                + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
-                + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
-                + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                + "/Association");
+        XPathExpression expr =
+            xpath
+                .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
+                    + "/Namespace.ownedElement/Package[@name='Logical Model']"
+                    + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
+                    + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
+                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
+                    + "/Association");
 
         NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
         for (int i = 0, n = nodes.getLength(); i < n; ++i) {
@@ -353,7 +357,8 @@ public class ModelUmlParser {
             NodeList assocEndNodes = (NodeList) assocEndExpr.evaluate(node,
                 XPathConstants.NODESET);
 
-            List<ClassAssociation> classAssocs = new ArrayList<ClassAssociation>();
+            List<ClassAssociation> classAssocs =
+                new ArrayList<ClassAssociation>();
 
             for (int i1 = 0, n1 = assocEndNodes.getLength(); i1 < n1; ++i1) {
                 Node assocEndNode = assocEndNodes.item(i1);
@@ -503,8 +508,9 @@ public class ModelUmlParser {
         XPath xpath = XPathFactory.newInstance().newXPath();
 
         // path to get all logical model class names
-        XPathExpression expr = xpath
-            .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/DataType");
+        XPathExpression expr =
+            xpath
+                .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/DataType");
 
         NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
         int n = nodes.getLength();
@@ -622,8 +628,9 @@ public class ModelUmlParser {
     private void initCustomStereotypes(Document doc)
         throws XPathExpressionException {
         XPath xpath = XPathFactory.newInstance().newXPath();
-        XPathExpression expr = xpath
-            .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Stereotype");
+        XPathExpression expr =
+            xpath
+                .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Stereotype");
         NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); i++) {
             Node node = nodes.item(i);

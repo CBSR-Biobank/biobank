@@ -1,11 +1,18 @@
 package edu.ualberta.med.biobank.common.action.center;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
+import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
+import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Center;
@@ -52,9 +59,35 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         return false;
     }
 
-    protected IdResult run(@SuppressWarnings("unused") User user,
-        Session session,
-        SessionUtil sessionUtil, Center center) throws ActionException {
+    protected IdResult run(User user, Session session,
+        ActionContext context, Center center) throws ActionException {
+        if (name == null) {
+            throw new NullPropertyException(Center.class, CenterPeer.NAME);
+        }
+        if (nameShort == null) {
+            throw new NullPropertyException(Center.class, CenterPeer.NAME_SHORT);
+        }
+        if (address == null) {
+            throw new NullPropertyException(Center.class, "address");
+        }
+        if (aStatusId == null) {
+            throw new NullPropertyException(Center.class,
+                CenterPeer.ACTIVITY_STATUS);
+        }
+
+        // check for duplicate name
+        List<ValueProperty<Center>> uniqueValProps =
+            new ArrayList<ValueProperty<Center>>();
+        uniqueValProps.add(new ValueProperty<Center>(CenterPeer.NAME, name));
+        new UniquePreCheck<Center>(Center.class, centerId, uniqueValProps).run(
+            user, session);
+
+        // check for duplicate name short
+        uniqueValProps = new ArrayList<ValueProperty<Center>>();
+        uniqueValProps.add(new ValueProperty<Center>(CenterPeer.NAME_SHORT,
+            nameShort));
+        new UniquePreCheck<Center>(Center.class, centerId, uniqueValProps).run(
+            user, session);
 
         // TODO: check permission? (can edit site?)
 
@@ -66,8 +99,7 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         center.setName(name);
         center.setNameShort(nameShort);
 
-        ActivityStatus aStatus = sessionUtil.get(ActivityStatus.class,
-            aStatusId);
+        ActivityStatus aStatus = context.load(ActivityStatus.class, aStatusId);
         center.setActivityStatus(aStatus);
 
         // TODO: remember to check the address

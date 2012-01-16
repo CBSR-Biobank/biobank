@@ -21,7 +21,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.info.RequestFormReadInfo;
+import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
@@ -54,7 +54,7 @@ public class RequestEntryForm extends BiobankViewForm {
     private Button addButton;
     private Button openScanButton;
     private CommentWrapper comment;
-    private RequestFormReadInfo requestInfo;
+    private RequestReadInfo requestInfo;
 
     @Override
     protected void init() throws Exception {
@@ -82,8 +82,9 @@ public class RequestEntryForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText(NLS.bind(
-            Messages.RequestEntryForm_requestedOn_date_studyName, DateFormatter
-                .formatAsDateTime(request.getSubmitted()), request.getStudy()
+            Messages.RequestEntryForm_requestedOn_date_rgName, DateFormatter
+                .formatAsDateTime(request.getSubmitted()),
+            request.getResearchGroup()
                 .getNameShort()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -102,14 +103,10 @@ public class RequestEntryForm extends BiobankViewForm {
             SWT.NONE, Messages.RequestEntryForm_number_label);
         setTextValue(orderNumberLabel, request.getId());
 
-        BgcBaseText studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.RequestEntryForm_study_label);
-        setTextValue(studyLabel, request.getStudy().getNameShort());
-
         BgcBaseText researchGroupLabel = createReadOnlyLabelledField(client,
             SWT.NONE, Messages.RequestEntryForm_rgroup_Label);
 
-        setTextValue(researchGroupLabel, request.getStudy().getResearchGroup()
+        setTextValue(researchGroupLabel, request.getResearchGroup()
             .getNameShort());
 
         BgcBaseText submittedLabel = createReadOnlyLabelledField(client,
@@ -322,7 +319,7 @@ public class RequestEntryForm extends BiobankViewForm {
                 .getCurrentWorkingCenter());
 
             dispatch.setState(DispatchState.CREATION);
-            dispatch.setReceiverCenter(request.getStudy().getResearchGroup());
+            dispatch.setReceiverCenter(request.getResearchGroup());
             dispatch.persist();
             request.reload();
             request.addToDispatchCollection(Arrays.asList(dispatch));
