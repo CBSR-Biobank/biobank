@@ -62,9 +62,10 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
         public Integer id;
         public String inventoryId;
-        public Date timeDrawn;
+        public Date createdAt;
         public Integer statusId;
         public Integer specimenTypeId;
+        public Integer centerId;
         public Collection<CommentInfo> comments;
         public Double quantity;
     }
@@ -80,15 +81,13 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
     private Collection<SaveCEventSpecimenInfo> sourceSpecimenInfos;
 
-    private Integer centerId;
-
     private List<CEventAttrSaveInfo> ceAttrList;
 
     private ActionContext actionContext;
 
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
         Integer visitNumber, Integer statusId,
-        Collection<CommentInfo> comments, Integer centerId,
+        Collection<CommentInfo> comments,
         Collection<SaveCEventSpecimenInfo> sourceSpecs,
         List<CEventAttrSaveInfo> ceAttrList) {
         this.ceventId = ceventId;
@@ -96,7 +95,6 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         this.visitNumber = visitNumber;
         this.statusId = statusId;
         this.comments = comments;
-        this.centerId = centerId;
         this.sourceSpecimenInfos = sourceSpecs;
         this.ceAttrList = ceAttrList;
     }
@@ -171,6 +169,12 @@ public class CollectionEventSaveAction implements Action<IdResult> {
             newAllSpecCollection.addAll(allSpecimenCollection);
         }
 
+        Collection<Specimen> originalSpecimens =
+            ceventToSave.getOriginalSpecimenCollection();
+        if (originalSpecimens != null)
+            System.out.println("--- original specimens size is "
+                + originalSpecimens.size());
+
         if (sourceSpecimenInfos != null) {
             OriginInfo oi = null;
 
@@ -179,7 +183,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 if (specInfo.id == null) {
                     if (oi == null) {
                         oi = new OriginInfo();
-                        oi.setCenter(actionContext.load(Center.class, centerId));
+                        oi.setCenter(actionContext.load(Center.class,
+                            specInfo.centerId));
                         session.saveOrUpdate(oi);
                     }
                     specimen = new Specimen();
@@ -188,6 +193,9 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     specimen.setTopSpecimen(specimen);
                     newAllSpecCollection.add(specimen);
                 } else {
+                    System.out
+                        .println("-- loading specimen with id " + specInfo.id);
+
                     specimen = actionContext.load(Specimen.class, specInfo.id);
 
                     if (!newAllSpecCollection.contains(specimen)) {
@@ -205,7 +213,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                         SpecimenPeer.COMMENT_COLLECTION);
                 CommentInfo.setCommentModelCollection(actionContext,
                     commentsToSave, specInfo.comments);
-                specimen.setCreatedAt(specInfo.timeDrawn);
+                specimen.setCreatedAt(specInfo.createdAt);
                 specimen.setInventoryId(specInfo.inventoryId);
                 specimen.setQuantity(specInfo.quantity);
                 specimen.setSpecimenType(actionContext.load(SpecimenType.class,
@@ -215,11 +223,13 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         }
 
         SetDifference<Specimen> origSpecDiff = new SetDifference<Specimen>(
-            ceventToSave.getOriginalSpecimenCollection(), newSsCollection);
+            originalSpecimens, newSsCollection);
         newAllSpecCollection.removeAll(origSpecDiff.getRemoveSet());
         ceventToSave.setAllSpecimenCollection(newAllSpecCollection);
         ceventToSave.setOriginalSpecimenCollection(origSpecDiff.getAddSet());
         for (Specimen srcSpc : origSpecDiff.getRemoveSet()) {
+            System.out
+                .println("-- deleting specimen with id " + srcSpc.getId());
             session.delete(srcSpc);
         }
 

@@ -158,7 +158,8 @@ public class TestAction {
         // delete origin infos
         Query q =
             getSession().createQuery("DELETE FROM "
-                + OriginInfo.class.getName() + " oi WHERE oi.center.id=?");
+                + OriginInfo.class.getName() + " oi WHERE oi.center.id=?"
+                + " AND oi.specimenCollection.size = 0");
         q.setParameter(0, centerId);
         q.executeUpdate();
     }

@@ -15,25 +15,25 @@ import edu.ualberta.med.biobank.test.Utils;
 public class RequestHelper extends Helper {
 
     public static Integer createRequest(
-        IActionExecutor appService, Integer rgId) throws Exception {
+        IActionExecutor actionExecutor, Integer rgId) throws Exception {
 
         String name = Utils.getRandomString(5);
 
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = appService.exec(reader);
+        ResearchGroupReadInfo rg = actionExecutor.exec(reader);
 
         // create specs
         Integer p =
-            PatientHelper.createPatient(appService, name + "_patient",
+            PatientHelper.createPatient(actionExecutor, name + "_patient",
                 rg.rg.getStudy().getId());
         Integer ceId =
-            CollectionEventHelper.createCEventWithSourceSpecimens(appService,
+            CollectionEventHelper.createCEventWithSourceSpecimens(actionExecutor,
                 p, rgId);
 
         CollectionEventGetInfoAction ceReader =
             new CollectionEventGetInfoAction(ceId);
-        CEventInfo ceInfo = appService.exec(ceReader);
+        CEventInfo ceInfo = actionExecutor.exec(ceReader);
         List<String> specs = new ArrayList<String>();
         for (SpecimenInfo specInfo : ceInfo.sourceSpecimenInfos)
             specs.add(specInfo.specimen.getInventoryId());
@@ -41,7 +41,7 @@ public class RequestHelper extends Helper {
         // request specs
         SubmitRequestAction action =
             new SubmitRequestAction(rgId, specs);
-        return appService.exec(action).getId();
+        return actionExecutor.exec(action).getId();
 
     }
 }

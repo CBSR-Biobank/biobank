@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,7 +32,6 @@ import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSav
 import edu.ualberta.med.biobank.common.action.site.SiteDeleteAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenDeleteAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.Address;
@@ -46,6 +44,7 @@ import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
+import edu.ualberta.med.biobank.test.action.helper.SpecimenHelper;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -432,11 +431,7 @@ public class TestSite extends TestAction {
         actionExecutor.exec(new DispatchDeleteAction(dispatchId1));
 
         for (Specimen specimen : specimens) {
-            Collection<Specimen> ceAllSpc =
-                specimen.getCollectionEvent().getAllSpecimenCollection();
-            ceAllSpc.remove(specimen);
-            specimen.getCollectionEvent().setAllSpecimenCollection(ceAllSpc);
-            actionExecutor.exec(new SpecimenDeleteAction(specimen.getId()));
+            SpecimenHelper.deleteSpecimen(actionExecutor, specimen);
         }
 
         deleteOriginInfos(provisioning.siteId);
