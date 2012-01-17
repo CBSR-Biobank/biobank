@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.action.security;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,7 +18,7 @@ public class RoleSaveAction implements Action<IdResult> {
 
     private Integer roleId;
     private String name;
-    private Set<PermissionEnum> permissionEnums;
+    private Set<PermissionEnum> permissionEnums = new HashSet<PermissionEnum>();
 
     public void setId(Integer roleId) {
         this.roleId = roleId;
@@ -48,9 +49,9 @@ public class RoleSaveAction implements Action<IdResult> {
             context.load(Permission.class, permissionIds);
 
         Role role = context.load(Role.class, roleId, new Role());
-        role.setId(roleId);
         role.setName(name);
-        role.setPermissionCollection(permissions.values());
+        role.getPermissionCollection().clear();
+        role.getPermissionCollection().addAll(permissions.values());
 
         context.getSession().saveOrUpdate(role);
 

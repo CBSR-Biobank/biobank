@@ -10,11 +10,12 @@ import java.util.TimeZone;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.security.MembershipSaveAction;
@@ -27,26 +28,20 @@ import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.action.helper.SpecimenTypeHelper;
 
 public class TestAction {
-
-    protected static Random r;
-
-    protected static MockActionExecutor actionExecutor;
-
-    protected static Session session;
-
+    @Rule
+    public final TestName testName = new TestName();
     protected static final String SUPER_ADMIN_LOGIN = "superadmin";
 
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        r = new Random();
+    protected static final Random r = new Random();
+    protected static final MockActionExecutor actionExecutor;
+    protected static final Session session;
+
+    static {
         actionExecutor = new MockActionExecutor(false);
         session = actionExecutor.getSession();
+
         User user = createSuperAdminUser();
         actionExecutor.setUser(user);
-    }
-
-    @AfterClass
-    public static void tearDownBeforeClass() throws Exception {
     }
 
     /**
@@ -54,6 +49,7 @@ public class TestAction {
      */
     @Before
     public void setUp() throws Exception {
+        session.beginTransaction();
     }
 
     /**
@@ -61,14 +57,10 @@ public class TestAction {
      */
     @After
     public void tearDown() throws Exception {
-    }
-
-    public void setUser(User user) {
-        actionExecutor.setUser(user);
-    }
-
-    public User getUser() {
-        return actionExecutor.getUser();
+        Transaction tx = session.getTransaction();
+        if (tx.isActive()) {
+            tx.commit();
+        }
     }
 
     public static User createSuperAdminUser() {
@@ -165,5 +157,13 @@ public class TestAction {
 
     public Session getSession() {
         return actionExecutor.getSession();
+    }
+
+    protected String getMethodName() {
+        return testName.getMethodName();
+    }
+
+    protected String getMethodNameR() {
+        return testName.getMethodName() + r.nextInt();
     }
 }

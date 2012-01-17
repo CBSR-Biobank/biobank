@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.test.action;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -56,7 +57,13 @@ public class MockActionExecutor implements IActionExecutor {
         throws ActionException {
         FlushMode flushMode = session.getFlushMode();
         try {
+            Transaction tx = session.getTransaction();
+            if (tx.isActive()) {
+                tx.commit();
+            }
+
             session.beginTransaction();
+
             session.setFlushMode(FlushMode.COMMIT);
 
             ActionContext context = new ActionContext(user, session);
@@ -64,11 +71,12 @@ public class MockActionExecutor implements IActionExecutor {
             T result = action.run(context);
 
             session.getTransaction().commit();
-            session.flush();
 
             return result;
         } finally {
             session.setFlushMode(flushMode);
+
+            session.beginTransaction();
         }
     }
 }
