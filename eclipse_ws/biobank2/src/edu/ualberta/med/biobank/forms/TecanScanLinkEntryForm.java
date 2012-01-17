@@ -1,3 +1,8 @@
+/*
+ * HEADER
+ * 
+ */
+
 package edu.ualberta.med.biobank.forms;
 
 import java.io.File;
@@ -37,6 +42,9 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 
+/*
+ * Auth
+ */
 public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
 
     private static BgcLogger logger = BgcLogger
@@ -56,6 +64,8 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
     private BgcBaseText processWorkSheet;
     private String pComment;
     private String pWorkSheet;
+    private StudyWrapper selectedStudy;
+    private int pStudy;
 
     @Override
     protected void init() throws Exception {
@@ -90,7 +100,26 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
 
         List<StudyWrapper> studies = SessionManager.getUser()
             .getCurrentWorkingCenter().getStudyCollection();
-        StudyWrapper selectedStudy = null;
+        selectedStudy = null;
+        // if (patient.isNew()) {
+        // if (studies.size() == 1) {
+        // selectedStudy = studies.get(0);
+        // patient.setStudy(selectedStudy);
+        // }
+        // } else {
+        // selectedStudy = patient.getStudy();
+        // }
+        //
+        // studiesViewer = createComboViewer(client,
+        // Messages.getString("PatientEntryForm.field.study.label"), studies,
+        // selectedStudy,
+        // Messages.getString("PatientEntryForm.field.study.validation.msg"),
+        // new ComboSelectionUpdate() {
+        // @Override
+        // public void doSelection(Object selectedObject) {
+        // patient.setStudy((StudyWrapper) selectedObject);
+        // }
+        // });
 
         studiesViewer = createComboViewer(leftComposite,
             Messages.getString("PatientEntryForm.field.study.label"), studies,
@@ -99,6 +128,8 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
+                    selectedStudy = (StudyWrapper) selectedObject;
+                    int pStudy = selectedStudy.getId();
                     enableProcessButton = enableProcessButton + 1;
                     if (enableProcessButton >= 2)
                         processButton.setEnabled(true);
@@ -214,8 +245,11 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
 
                                 try {
                                     // SEND DATA TO SERVER
+                                    int cCenter = SessionManager.getUser()
+                                        .getCurrentWorkingSite().getId();
                                     processed = appService.tecanloadFile(
-                                        csvfile, pWorkSheet, pComment);
+                                        csvfile, pStudy, pWorkSheet, pComment,
+                                        cCenter);
                                 } catch (final RemoteConnectFailureException exp) {
                                     BgcPlugin
                                         .openRemoteConnectErrorMessage(exp);

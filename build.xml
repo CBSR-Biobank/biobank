@@ -345,6 +345,7 @@
       <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-core.jar" />
       <fileset file="${req.jars.dir}/SuperCSV-1.52.jar" />
       <fileset file="${req.jars.dir}/spiffy-all-0.05.jar" />
+      <fileset file="${req.jars.dir}/commons-lang-2.4.jar" />
     </copy>
     <copy todir="${eclipse.proj.dir.common}/conf" overwrite="true">
       <filelist dir="${cacore.sdk.dir}/output/biobank/package/remote-client/conf"
@@ -909,6 +910,7 @@
            includes="*.*"
            excludes="${grid-jaas.file.output.jaas.jndibinder.name}" />
       <lib dir="${req.jars.dir}" includes="SuperCSV-1.52.jar,spiffy-all-0.05.jar" />
+      <lib dir="${req.jars.dir}" includes="SuperCSV-1.52.jar,spiffy-all-0.05.jar,commons-lang-2.4.jar" />
       <fileset dir="${cacore.sdk.dir}/${build.conf.system.web.dir}">
         <include name="**/*" />
         <exclude name="**/web.xml" />

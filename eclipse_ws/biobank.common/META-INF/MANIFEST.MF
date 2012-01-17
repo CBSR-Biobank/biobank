@@ -150,4 +150,5 @@ Export-Package: antlr;
  org.supercsv.prefs,
  org.supercsv.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: edu.ualberta.med.biobank.model
 

@@ -13,7 +13,15 @@ import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PrintedSsInvItem;
@@ -40,6 +48,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
 
@@ -61,8 +70,11 @@ import org.supercsv.prefs.CsvPreference;
  * See build.properties of the sdk for the generator configuration +
  * application-config*.xml for the generated files.
  */
+
 public class BiobankApplicationServiceImpl extends
     WritableApplicationServiceImpl implements BiobankApplicationService {
+
+    private List<String> processed;// = new ArrayList<String>();
 
     public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
@@ -353,8 +365,9 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public List<String> tecanloadFile(byte[] bytes, String pWorkSheet,
-        String pComment) throws ApplicationException {
+    public List<String> tecanloadFile(byte[] bytes, int pStudy,
+        String pWorkSheet, String pComment, int cCenter)
+        throws ApplicationException {
 
         String uploadDir = System.getProperty("upload.dir");
 
@@ -365,8 +378,6 @@ public class BiobankApplicationServiceImpl extends
         String newFile = uploadDir + "/" + dateNow + "_ID_" + "currentSite"
             + ".csv";
         File fl = new File(newFile);
-
-        List<String> processed = new ArrayList<String>();
 
         try {
             boolean success = fl.createNewFile();
@@ -385,7 +396,8 @@ public class BiobankApplicationServiceImpl extends
         }
 
         try {
-            processed = tecanProcessCVS(newFile, pWorkSheet, pComment);
+            processed = tecanProcessCVS(newFile, pStudy, pWorkSheet, pComment,
+                cCenter);
         } catch (Exception e) {
             // TODO
             e.printStackTrace();
@@ -394,8 +406,8 @@ public class BiobankApplicationServiceImpl extends
         return processed;
     }
 
-    public List<String> tecanProcessCVS(String myfile, String pWorkSheet,
-        String pComment) throws Exception {
+    public List<String> tecanProcessCVS(String myfile, int pStudy,
+        String pWorkSheet, String pComment, int cCenter) throws Exception {
 
         // User cUser = this.getCurrentUser();
         // cUser.initCurrentWorkingCenter(this);
@@ -403,7 +415,7 @@ public class BiobankApplicationServiceImpl extends
         // String GGG = cSite.getNameShort();
         // System.out.println("SITE GGG: " + GGG);
         System.out.println("FILE: " + myfile);
-        List<String> processed = new ArrayList<String>();
+
         ICsvBeanReader inFile = new CsvBeanReader(new FileReader(myfile),
             CsvPreference.EXCEL_PREFERENCE);
 
@@ -453,16 +465,11 @@ public class BiobankApplicationServiceImpl extends
 
             while ((tecanCsv = inFile.read(TecanCSV.class, header,
                 userProcessors)) != null) {
-                // orgSample, processId, aliquotId, aliquotType, volume,
-                // startProcess, endProcess
-                // String csvLine = tecanCsv.getOrgSample() + ","
-                // + tecanCsv.getProcessId() + "," + tecanCsv.getAliquotId()
-                // + "," + tecanCsv.getAliquotType() + ","
-                // + tecanCsv.getVolume() + "," + tecanCsv.getStartProcess()
-                // + "," + tecanCsv.getEndProcess();
+
+                persistData(tecanCsv, pStudy, pWorkSheet, pComment, cCenter);
+
                 processed.add(tecanCsv.getLine());
             }
-            // }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -470,40 +477,102 @@ public class BiobankApplicationServiceImpl extends
 
         // ************************************
 
-        // try {
-        // // AddressWrapper address = new AddressWrapper(this);
-        // // address.setCity("towmonton");
-        // // // address is automatically saved via cascade
-        // //
-        // // ActivityStatusWrapper active = ActivityStatusWrapper
-        // // .getActiveActivityStatus(this);
-        // //
-        // SiteWrapper currentSite = (SiteWrapper) this.getCurrentUser()
-        // .getCurrentWorkingCenter();
-        // String tmp = currentSite.getNameShort();
-        // // SiteWrapper site = new SiteWrapper(this);
-        // // String siteName = "example_" + randString();
-        // // site.setActivityStatus(active);
-        // // site.setName(siteName);
-        // // site.setNameShort(siteName + "_short");
-        // // site.setAddress(address);
-        // // site.persist();
-        // currentSite.setComment("TESTY COMMENT");
-        // currentSite.persist();
-        //
-        // } catch (Exception caught) {
-        // // transaction will be rollback if exception thrown
-        // caught.printStackTrace();
-        // throw new RuntimeException(caught);
-        //
-        // }
-
         // ***********************************
 
         finally {
             inFile.close();
         }
         return processed;
+    }
+
+    private void persistData(TecanCSV tecanCsv, int pStudy, String pWorkSheet,
+        String pComment, int cCenter) {
+        try {
+            String sOriginalSample;
+            String tWorkSheet;
+
+            ActivityStatusWrapper active = ActivityStatusWrapper
+                .getActiveActivityStatus(this);
+            CenterWrapper<?> currentWorkingCenter = CenterWrapper
+                .getCenterFromId(this, cCenter);
+
+            ProcessingEventWrapper pEvent = new ProcessingEventWrapper(this);
+            pEvent.setCenter(currentWorkingCenter);
+            pEvent.setCreatedAt(Calendar.getInstance().getTime());
+            tWorkSheet = tecanCsv.getProcessId();
+            if (pWorkSheet == "" || pWorkSheet == null) {
+                pEvent.setWorksheet(tWorkSheet);
+            } else {
+                pEvent.setWorksheet(pWorkSheet + "_" + tWorkSheet);
+            }
+            pEvent.setActivityStatus(active);
+            pEvent.setComment(pComment.trim());
+            pEvent.persist();
+
+            OriginInfoWrapper originInfo = new OriginInfoWrapper(this);
+            originInfo.setCenter(currentWorkingCenter);
+            originInfo.persist();
+
+            SpecimenWrapper aliquoteSpecimen = new SpecimenWrapper(this);
+            sOriginalSample = tecanCsv.getOrgSample();
+            SpecimenWrapper sourceSpecimen = SpecimenWrapper.getSpecimen(this,
+                sOriginalSample);
+
+            // Source specimen is the specimen for pEvent. In the case of the
+            // DNA it would be the Aliquot specimen DFE
+            // Check to see if specimen can be aliquoted
+            // List<AliquotedSpecimenWrapper> allowedAliquotedSpecimen = study
+            // .getAliquotedSpecimenCollection(true);
+            List<StudyWrapper> studyList = StudyWrapper.getAllStudies(this);
+            ListIterator<StudyWrapper> swIterator = studyList.listIterator();
+            StudyWrapper currentStudy = null;
+            int currentStudyId = -1;
+            while (currentStudyId != pStudy && swIterator.hasNext()) {
+                currentStudy = swIterator.next();
+                currentStudyId = currentStudy.getId();
+            }
+
+            CollectionEventWrapper collectionEvent = sourceSpecimen
+                .getCollectionEvent();
+            aliquoteSpecimen.setParentSpecimen(sourceSpecimen);
+            SpecimenTypeWrapper specimenType;
+
+            List<SpecimenTypeWrapper> specimenTypelist = SpecimenTypeWrapper
+                .getAllSpecimenTypes(this, false);
+
+            ListIterator<SpecimenTypeWrapper> stpIterator = specimenTypelist
+                .listIterator();
+            specimenType = null;
+            String specimenTypeName = "";
+            String aAliquotType = tecanCsv.getAliquotType();
+            while (!specimenTypeName.equals(aAliquotType)
+                && stpIterator.hasNext()) {
+                specimenType = stpIterator.next();
+                specimenTypeName = specimenType.getName();
+            }
+            List<AliquotedSpecimenWrapper> allowedAliquotedSpecimen = currentStudy
+                .getAliquotedSpecimenCollection(true);
+            if (allowedAliquotedSpecimen.contains(specimenType)) {
+                // check to see if allowed to aliquot
+            }
+
+            aliquoteSpecimen.setCurrentCenter(currentWorkingCenter);
+            aliquoteSpecimen.setSpecimenType(specimenType);
+            aliquoteSpecimen.setCollectionEvent(collectionEvent);
+            aliquoteSpecimen.setActivityStatus(active);
+            String aAliquotId = tecanCsv.getAliquotId();
+            aliquoteSpecimen.setInventoryId(aAliquotId);
+            aliquoteSpecimen.setCreatedAt(Calendar.getInstance().getTime());
+            aliquoteSpecimen.setProcessingEvent(pEvent);
+            aliquoteSpecimen.setOriginInfo(originInfo);
+            aliquoteSpecimen.persist();
+
+        } catch (Exception caught) {
+            // transaction will be rollback if exception thrown
+            caught.printStackTrace();
+            throw new RuntimeException(caught);
+
+        }
     }
 
     @Override

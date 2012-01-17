@@ -97,8 +97,9 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public String uploadFile(byte[] bytes, String uploadFile)
         throws ApplicationException;
 
-    public List<String> tecanloadFile(byte[] bytes, String pWorkSheet,
-        String pComment) throws ApplicationException;
+    public List<String> tecanloadFile(byte[] bytes, int pStudy,
+        String pWorkSheet, String pComment, int cCenter)
+        throws ApplicationException;
 
     public void wrapperExample(Dummy data) throws ApplicationException;
 
