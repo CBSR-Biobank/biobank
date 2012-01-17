@@ -1,15 +1,13 @@
 package edu.ualberta.med.biobank.common.action.patient;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.CollectionIsEmptyCheck;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.patient.PatientDeletePermission;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.User;
 
 public class PatientDeleteAction implements Action<IdResult> {
 
@@ -25,19 +23,19 @@ public class PatientDeleteAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        return new PatientDeletePermission(patientId).isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) {
+        return new PatientDeletePermission(patientId).isAllowed(null);
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
-        Patient patient = (Patient) session.load(Patient.class, patientId);
+    public IdResult run(ActionContext context) throws ActionException {
+        Patient patient = context.load(Patient.class, patientId);
 
         new CollectionIsEmptyCheck<Patient>(Patient.class, patient,
             PatientPeer.COLLECTION_EVENT_COLLECTION, patient.getPnumber(),
-            HAS_COLLECTION_EVENTS_MSG).run(user, session);
+            HAS_COLLECTION_EVENTS_MSG).run(null);
 
-        session.delete(patient);
+        context.getSession().delete(patient);
 
         return new IdResult(patientId);
     }

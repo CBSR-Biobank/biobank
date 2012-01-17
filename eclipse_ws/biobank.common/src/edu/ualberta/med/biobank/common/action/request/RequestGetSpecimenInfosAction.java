@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.permission.request.RequestReadPermission;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
-import edu.ualberta.med.biobank.model.User;
 
 public class RequestGetSpecimenInfosAction implements
     Action<ListResult<RequestSpecimen>> {
@@ -55,17 +54,18 @@ public class RequestGetSpecimenInfosAction implements
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return new RequestReadPermission().isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return new RequestReadPermission().isAllowed(null);
     }
 
     @Override
-    public ListResult<RequestSpecimen> run(User user, Session session)
+    public ListResult<RequestSpecimen> run(ActionContext context)
         throws ActionException {
         ArrayList<RequestSpecimen> specInfos =
             new ArrayList<RequestSpecimen>();
 
-        Query query = session.createQuery(Request_SPECIMEN_INFO_HQL);
+        Query query =
+            context.getSession().createQuery(Request_SPECIMEN_INFO_HQL);
         query.setParameter(0, oiId);
 
         @SuppressWarnings("unchecked")

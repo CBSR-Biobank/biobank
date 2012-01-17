@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.permission.shipment;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
@@ -19,9 +17,9 @@ public class OriginInfoReadPermission implements Permission {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        OriginInfo oi =
-            new ActionContext(user, session).load(OriginInfo.class, oiId);
+    public boolean isAllowed(ActionContext context) {
+        OriginInfo oi = context.load(OriginInfo.class, oiId);
+        User user = context.getUser();
         return PermissionEnum.ORIGIN_INFO_READ.isAllowed(user,
             oi.getReceiverSite())
             || PermissionEnum.ORIGIN_INFO_READ.isAllowed(user, oi.getCenter());

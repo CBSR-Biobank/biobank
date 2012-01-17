@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
@@ -45,7 +43,6 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
-import edu.ualberta.med.biobank.model.User;
 
 public class CollectionEventSaveAction implements Action<IdResult> {
 
@@ -83,8 +80,6 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
     private List<CEventAttrSaveInfo> ceAttrList;
 
-    private ActionContext actionContext;
-
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
         Integer visitNumber, Integer statusId,
         Collection<CommentInfo> comments,
@@ -100,50 +95,51 @@ public class CollectionEventSaveAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         Permission permission;
         if (ceventId == null) {
             permission = new CollectionEventCreatePermission(patientId);
         } else {
             permission = new CollectionEventUpdatePermission(ceventId);
         }
-        return permission.isAllowed(user, session);
+        return permission.isAllowed(null);
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
+    public IdResult run(ActionContext context) throws ActionException {
 
-        check(user, session);
-        actionContext = new ActionContext(user, session);
+        check(context);
 
         CollectionEvent ceventToSave;
         if (ceventId == null) {
             ceventToSave = new CollectionEvent();
         } else {
-            ceventToSave = actionContext.load(CollectionEvent.class, ceventId);
+            ceventToSave = context.load(CollectionEvent.class, ceventId);
         }
 
         // FIXME Version check?
 
-        Patient patient = actionContext.load(Patient.class, patientId);
+        Patient patient = context.load(Patient.class, patientId);
         ceventToSave.setPatient(patient);
         ceventToSave.setVisitNumber(visitNumber);
-        ceventToSave.setActivityStatus(actionContext.load(ActivityStatus.class,
+        ceventToSave.setActivityStatus(context.load(ActivityStatus.class,
             statusId));
 
         Collection<Comment> commentsToSave = CollectionUtils.getCollection(
             ceventToSave, CollectionEventPeer.COMMENT_COLLECTION);
         CommentInfo
-            .setCommentModelCollection(actionContext, commentsToSave, comments);
+            .setCommentModelCollection(context, commentsToSave, comments);
 
-        setSourceSpecimens(session, ceventToSave);
-        setEventAttrs(session, user, patient.getStudy(), ceventToSave);
-        session.saveOrUpdate(ceventToSave);
+        setSourceSpecimens(context, ceventToSave);
+
+        setEventAttrs(context, patient.getStudy(), ceventToSave);
+
+        context.getSession().saveOrUpdate(ceventToSave);
 
         return new IdResult(ceventToSave.getId());
     }
 
-    private void check(User user, Session session) {
+    private void check(ActionContext context) {
         // Check that the visit number is unique for the patient
         List<ValueProperty<CollectionEvent>> propUple =
             new ArrayList<ValueProperty<CollectionEvent>>();
@@ -152,10 +148,10 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         propUple.add(new ValueProperty<CollectionEvent>(
             CollectionEventPeer.VISIT_NUMBER, visitNumber));
         new UniquePreCheck<CollectionEvent>(CollectionEvent.class, ceventId,
-            propUple).run(user, session);
+            propUple).run(context);
     }
 
-    private void setSourceSpecimens(Session session,
+    private void setSourceSpecimens(ActionContext context,
         CollectionEvent ceventToSave) {
         Set<Specimen> newSsCollection = new HashSet<Specimen>();
 
@@ -178,9 +174,9 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 if (specInfo.id == null) {
                     if (oi == null) {
                         oi = new OriginInfo();
-                        oi.setCenter(actionContext.load(Center.class,
+                        oi.setCenter(context.load(Center.class,
                             specInfo.centerId));
-                        session.saveOrUpdate(oi);
+                        context.getSession().saveOrUpdate(oi);
                     }
                     specimen = new Specimen();
                     specimen.setCurrentCenter(oi.getCenter());
@@ -188,14 +184,14 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     specimen.setTopSpecimen(specimen);
                     newAllSpecCollection.add(specimen);
                 } else {
-                    specimen = actionContext.load(Specimen.class, specInfo.id);
+                    specimen = context.load(Specimen.class, specInfo.id);
 
                     if (!newAllSpecCollection.contains(specimen)) {
                         throw new ActionCheckException(
                             "specimen not found in collection");
                     }
                 }
-                specimen.setActivityStatus(actionContext.load(
+                specimen.setActivityStatus(context.load(
                     ActivityStatus.class, specInfo.statusId));
                 specimen.setCollectionEvent(ceventToSave);
                 // cascade will save-update the specimens from this list:
@@ -203,12 +199,12 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 Collection<Comment> commentsToSave = CollectionUtils
                     .getCollection(specimen,
                         SpecimenPeer.COMMENT_COLLECTION);
-                CommentInfo.setCommentModelCollection(actionContext,
+                CommentInfo.setCommentModelCollection(context,
                     commentsToSave, specInfo.comments);
                 specimen.setCreatedAt(specInfo.createdAt);
                 specimen.setInventoryId(specInfo.inventoryId);
                 specimen.setQuantity(specInfo.quantity);
-                specimen.setSpecimenType(actionContext.load(SpecimenType.class,
+                specimen.setSpecimenType(context.load(SpecimenType.class,
                     specInfo.specimenTypeId));
                 newSsCollection.add(specimen);
             }
@@ -224,20 +220,20 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
         ceventToSave.setOriginalSpecimenCollection(origSpecDiff.getNewSet());
         for (Specimen srcSpc : origSpecDiff.getRemoveSet()) {
-            session.delete(srcSpc);
+            context.getSession().delete(srcSpc);
         }
 
     }
 
-    public void setEventAttrs(Session session, User user, Study study,
+    public void setEventAttrs(ActionContext context, Study study,
         CollectionEvent cevent) throws ActionException {
         Map<Integer, StudyEventAttrInfo> studyEventList =
             new StudyGetEventAttrInfoAction(
-                study.getId()).run(user, session).getMap();
+                study.getId()).run(context).getMap();
 
         Map<Integer, EventAttrInfo> ceventAttrList =
             new CollectionEventGetEventAttrInfoAction(
-                ceventId).run(user, session).getMap();
+                ceventId).run(context).getMap();
         if (ceAttrList != null)
             for (CEventAttrSaveInfo attrInfo : ceAttrList) {
                 EventAttrInfo ceventAttrInfo = ceventAttrList

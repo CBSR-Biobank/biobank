@@ -10,7 +10,7 @@ public class TextBox extends AbstractValueField<String> {
         @Override
         public void modifyText(ModifyEvent e) {
             String value = !text.getText().isEmpty() ? text.getText() : null;
-            setValue(value, true);
+            setValueInternal(value);
         }
     };
     private Text text;
@@ -19,7 +19,7 @@ public class TextBox extends AbstractValueField<String> {
         unbindOldText();
 
         this.text = text;
-        update();
+        updateGui();
 
         forwardEnabled(text);
         forwardVisible(text);
@@ -29,7 +29,7 @@ public class TextBox extends AbstractValueField<String> {
     }
 
     @Override
-    protected void update() {
+    protected void updateGui() {
         if (text != null) {
             text.removeModifyListener(modifyListener);
 

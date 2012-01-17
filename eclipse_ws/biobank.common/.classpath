@@ -18,8 +18,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-discovery-0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-lang-2.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-logging-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/hibernate3.jar" sourcepath="/home/jferland/Downloads/hibernate-distribution-3.6.9.Final/project/hibernate-core"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-validator.jar" sourcepath="/home/delphine/projects/sources/hibernate/hibernate-validator-3.0.0.GA/src"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/hibernate3.jar" sourcepath="/home/loyola/Dropbox/CBSR/libs documentations or sources/hibernate-3.2/hibernate-3.2-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/jaxrpc.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/log4j-1.2.14.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/sdk-client-framework.jar"/>
@@ -34,6 +34,9 @@
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-writable-core.jar"/>
 	<classpathentry kind="lib" path="lib/client/mysql-connector-java-5.1.15-bin.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/server/jta.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/slf4j-api-1.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-jpa-2.0-api-1.0.1.Final.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/javassist-3.12.0.GA.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/jta-1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

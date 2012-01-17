@@ -7,9 +7,6 @@ import java.util.Set;
 
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.pietschy.gwt.pectin.client.form.validation.component.ValidationDisplay;
-import com.pietschy.gwt.pectin.client.form.validation.validator.NotEmptyValidator;
-import com.pietschy.gwt.pectin.client.form.validation.validator.NotNullValidator;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
@@ -30,6 +27,8 @@ import edu.ualberta.med.biobank.mvp.event.model.study.StudyChangedEvent;
 import edu.ualberta.med.biobank.mvp.event.presenter.study.StudyViewPresenterShowEvent;
 import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter.View;
+import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotEmptyValidator;
+import edu.ualberta.med.biobank.mvp.presenter.validation.validator.NotNullValidator;
 import edu.ualberta.med.biobank.mvp.user.ui.ListField;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
@@ -40,7 +39,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
     private final ActivityStatusComboPresenter activityStatusComboPresenter;
     private Integer studyId;
 
-    public interface View extends IEntryFormView, ValidationDisplay {
+    public interface View extends IEntryFormView {
         void setActivityStatusComboView(IView view);
 
         ValueField<String> getName();
@@ -77,13 +76,13 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         state.add(activityStatusComboPresenter);
 
         validation.validate(view.getName())
-            .using(new NotEmptyValidator("asdf"));
+            .using(new NotEmptyValidator("name"));
         validation.validate(view.getNameShort())
-            .using(new NotEmptyValidator("asdf"));
+            .using(new NotEmptyValidator("nameShort"));
 
         validation.validate(
             activityStatusComboPresenter.getView().getActivityStatus())
-            .using(new NotNullValidator("asdfa sdfad"));
+            .using(new NotNullValidator("activityStatus"));
     }
 
     @Override
@@ -123,7 +122,8 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         saveStudy.setAliquotSpecimenSaveInfo(asSaveInfos);
         // saveStudy.setStudyEventAttrIds(getStudyEventAttrIds());
 
-        dispatcher.exec(saveStudy, new ActionCallback<IdResult>() {
+        // TODO: this happens asynchronously now, how to inform GUI?
+        dispatcher.asyncExec(saveStudy, new ActionCallback<IdResult>() {
             @Override
             public void onFailure(Throwable caught) {
                 eventBus.fireEvent(new ExceptionEvent(caught));

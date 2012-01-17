@@ -2,15 +2,12 @@ package edu.ualberta.med.biobank.common.action.request;
 
 import java.util.List;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
-import edu.ualberta.med.biobank.model.User;
 
 public class RequestClaimAction implements Action<EmptyResult> {
 
@@ -25,20 +22,18 @@ public class RequestClaimAction implements Action<EmptyResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return PermissionEnum.REQUEST_PROCESS.isAllowed(user);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return PermissionEnum.REQUEST_PROCESS.isAllowed(context.getUser());
     }
 
     @Override
-    public EmptyResult run(User user, Session session) throws ActionException {
-        SessionUtil sessionUtil = new SessionUtil(session);
-
+    public EmptyResult run(ActionContext context) throws ActionException {
         for (Integer id : rSpecIds) {
-            RequestSpecimen rs = sessionUtil.get(RequestSpecimen.class, id);
-            rs.setClaimedBy(user.getLogin());
-            session.saveOrUpdate(rs);
+            RequestSpecimen rs = context.get(RequestSpecimen.class, id);
+            rs.setClaimedBy(context.getUser().getLogin());
+            context.getSession().saveOrUpdate(rs);
         }
-        session.flush();
+        context.getSession().flush();
         return new EmptyResult();
     }
 }

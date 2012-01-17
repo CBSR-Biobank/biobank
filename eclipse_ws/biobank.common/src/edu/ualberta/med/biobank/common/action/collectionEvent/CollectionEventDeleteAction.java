@@ -1,15 +1,13 @@
 package edu.ualberta.med.biobank.common.action.collectionEvent;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.CollectionIsEmptyCheck;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventDeletePermission;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.User;
 
 public class CollectionEventDeleteAction implements Action<IdResult> {
 
@@ -25,22 +23,19 @@ public class CollectionEventDeleteAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        return new CollectionEventDeletePermission(ceventId).isAllowed(user,
-            session);
+    public boolean isAllowed(ActionContext context) {
+        return new CollectionEventDeletePermission(ceventId).isAllowed(null);
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
-        CollectionEvent cevent = (CollectionEvent) session.load(
-            CollectionEvent.class, ceventId);
+    public IdResult run(ActionContext context) throws ActionException {
+        CollectionEvent cevent = context.load(CollectionEvent.class, ceventId);
 
         new CollectionIsEmptyCheck<CollectionEvent>(CollectionEvent.class,
             cevent, CollectionEventPeer.ALL_SPECIMEN_COLLECTION,
-            cevent.getVisitNumber().toString(), HAS_SPECIMENS_MSG).run(user,
-            session);
+            cevent.getVisitNumber().toString(), HAS_SPECIMENS_MSG).run(context);
 
-        session.delete(cevent);
+        context.getSession().delete(cevent);
 
         return new IdResult(ceventId);
     }

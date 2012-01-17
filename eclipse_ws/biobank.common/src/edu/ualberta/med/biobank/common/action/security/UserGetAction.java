@@ -3,10 +3,10 @@ package edu.ualberta.med.biobank.common.action.security;
 import java.util.List;
 
 import org.hibernate.Criteria;
-import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.model.User;
@@ -21,14 +21,15 @@ public class UserGetAction implements Action<UserGetResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         return true;
     }
 
     @Override
-    public UserGetResult run(User user, Session session) throws ActionException {
-        Criteria c = session.createCriteria(User.class.getName()).add(
-            Restrictions.eq(UserPeer.LOGIN.getName(), login));
+    public UserGetResult run(ActionContext context) throws ActionException {
+        Criteria c =
+            context.getSession().createCriteria(User.class.getName()).add(
+                Restrictions.eq(UserPeer.LOGIN.getName(), login));
         // FIXME need to fetch all the user graph of object?
 
         @SuppressWarnings("unchecked")

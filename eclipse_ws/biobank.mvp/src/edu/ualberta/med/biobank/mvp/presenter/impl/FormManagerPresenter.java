@@ -24,6 +24,7 @@ public class FormManagerPresenter extends AbstractPresenter<View> {
     private Provider<SiteEntryPresenter> siteEntryPresenterProvider;
     private Provider<SiteViewPresenter> siteViewPresenterProvider;
     private Provider<StudyEntryPresenter> studyEntryPresenterProvider;
+    private Provider<SpecimenLinkPresenter> specimenLinkPresenterProvider; // tmp
 
     public interface View extends IView {
         void openForm(IFormView view);
@@ -33,11 +34,13 @@ public class FormManagerPresenter extends AbstractPresenter<View> {
     public FormManagerPresenter(View view, EventBus eventBus,
         Provider<SiteEntryPresenter> siteEntryPresenterProvider,
         Provider<SiteViewPresenter> siteViewPresenterProvider,
-        Provider<StudyEntryPresenter> studyEntryPresenterProvider) {
+        Provider<StudyEntryPresenter> studyEntryPresenterProvider,
+        Provider<SpecimenLinkPresenter> specimenLinkPresenterProvider) { // tmp
         super(view, eventBus);
         this.siteEntryPresenterProvider = siteEntryPresenterProvider;
         this.siteViewPresenterProvider = siteViewPresenterProvider;
         this.studyEntryPresenterProvider = studyEntryPresenterProvider;
+        this.specimenLinkPresenterProvider = specimenLinkPresenterProvider; // tmp
     }
 
     @Override
@@ -54,6 +57,13 @@ public class FormManagerPresenter extends AbstractPresenter<View> {
             new SiteCreateHandler() {
                 @Override
                 public void onSiteCreate(SiteCreateEvent event) {
+                    // start: tmp
+                    SpecimenLinkPresenter p =
+                        specimenLinkPresenterProvider.get();
+                    p.bind();
+                    view.openForm(p.getView());
+                    // end: tmp
+
                     doSiteCreate();
                 }
             }));
@@ -92,6 +102,10 @@ public class FormManagerPresenter extends AbstractPresenter<View> {
         presenter.bind();
 
         try {
+            // TODO: but the presenter.editSite(siteId) method should probably
+            // return IMMEDIATELY while the data is loaded in the background,
+            // but then there should never be an exception thrown. Oops,
+            // probably undo this work.
             view.openForm(presenter.editSite(siteId));
         } catch (InitPresenterException caught) {
             eventBus.fireEvent(new ExceptionEvent(caught));

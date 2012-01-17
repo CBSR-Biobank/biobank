@@ -56,7 +56,7 @@
   <property name="biobank.jar.files"
             value="gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
   <property name="biobank.common.jar.files"
-            value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar" />
+            value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar,hibernate3.jar,slf4j-api-1.6.1.jar,jta-1.1.jar,dom4j-1.6.1.jar,javassist-3.12.0.GA.jar,hibernate-jpa-2.0-api-1.0.1.Final.jar" />
   <property name="biobank.tools.jar.files"
             value="commons-io-1.4.jar, jargs.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar,mysql-connector-java-5.1.15-bin.jar" />
   <property name="biobank.test.jar.files"
@@ -185,6 +185,25 @@
           tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config-security.xml" />
     <copy file="${req.jars.dir}/mysql-connector-java-5.1.15-bin.jar"
           tofile="${cacore.sdk.dir}/system/lib/mysql-connector-java-5.1.15-bin.jar" />
+    <!-- overwrite caCORE's old hibernate3.jar and hibernate-validator.jar -->
+    <copy file="${req.jars.dir}/hibernate3.jar"
+          tofile="${cacore.sdk.dir}/system/lib/hibernate3.jar" />
+    <copy file="${req.jars.dir}/hibernate-validator.jar"
+          tofile="${cacore.sdk.dir}/system/lib/hibernate-validator.jar" />
+    <!-- also bring over other files the updated hibernate3.jar requires -->
+    <copy file="${req.jars.dir}/slf4j-api-1.6.1.jar"
+          tofile="${cacore.sdk.dir}/system/lib/slf4j-api-1.6.1.jar" />
+    <copy file="${req.jars.dir}/jta-1.1.jar"
+          tofile="${cacore.sdk.dir}/system/lib/jta-1.1.jar" />
+    <copy file="${req.jars.dir}/dom4j-1.6.1.jar"
+          tofile="${cacore.sdk.dir}/system/lib/dom4j-1.6.1.jar" />
+    <copy file="${req.jars.dir}/javassist-3.12.0.GA.jar"
+          tofile="${cacore.sdk.dir}/system/lib/javassist-3.12.0.GA.jar" />
+    <copy file="${req.jars.dir}/hibernate-jpa-2.0-api-1.0.1.Final.jar"
+          tofile="${cacore.sdk.dir}/system/lib/hibernate-jpa-2.0-api-1.0.1.Final.jar" />
+    <!-- remove old and conflicting jars -->
+    <delete file="${cacore.sdk.dir}/system/lib/hibernate-commons-annotations.jar" />
+    <delete file="${cacore.sdk.dir}/system/lib/jta.jar" />
     <delete file="${cacore.sdk.dir}/system/lib/mysql-connector-java-3.1.13-bin.jar" />
     <ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
   </target>
@@ -358,7 +377,7 @@
       <fileset file="${cacore.sdk.dir}/system/dist/sdk-core.jar" />
       <fileset file="${cacore.sdk.dir}/system/lib/csmapi-4.1.jar" />
       <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-core.jar" />
-      <fileset file="${cacore.sdk.dir}/system/lib/jta.jar" />
+      <fileset file="${cacore.sdk.dir}/system/lib/jta-1.1.jar" />
     </copy>
     <copy todir="${eclipse.proj.dir.common}/conf" overwrite="true">
       <filelist dir="${cacore.sdk.dir}/output/biobank/package/remote-client/conf"
@@ -400,7 +419,7 @@
   	  <fileset file="${cacore.sdk.dir}/system/lib/dom4j-1.4.jar" />
   	  <fileset file="${cacore.sdk.dir}/system/lib/c3p0-0.9.0.jar" />
   	  <fileset file="${cacore.sdk.dir}/system/lib/clm-4.1.jar" />
-      <fileset file="${cacore.sdk.dir}/system/lib/jta.jar" />
+      <fileset file="${cacore.sdk.dir}/system/lib/jta-1.1.jar" />
       <fileset file="${cacore.sdk.dir}/output/biobank/build/jar/biobank-orm.jar"/>
   	  <fileset file="${cacore.sdk.dir}/system/lib/ehcache-1.2.2.jar"/>
   	</copy>

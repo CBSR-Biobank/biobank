@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.security;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
@@ -19,15 +17,14 @@ public class UserDeleteAction implements Action<EmptyResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return new UserManagementPermission().isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return new UserManagementPermission().isAllowed(null);
     }
 
     @Override
-    public EmptyResult run(User user, Session session) throws ActionException {
-        User userToDelete =
-            new ActionContext(user, session).load(User.class, userToDeleteId);
-        session.delete(userToDelete);
+    public EmptyResult run(ActionContext context) throws ActionException {
+        User userToDelete = context.load(User.class, userToDeleteId);
+        context.getSession().delete(userToDelete);
         return new EmptyResult();
     }
 

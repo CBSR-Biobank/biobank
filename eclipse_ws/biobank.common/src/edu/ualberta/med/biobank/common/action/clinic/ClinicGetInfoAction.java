@@ -3,9 +3,9 @@ package edu.ualberta.med.biobank.common.action.clinic;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicReadPermission;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.User;
 
 public class ClinicGetInfoAction implements Action<ClinicInfo> {
     private static final long serialVersionUID = 1L;
@@ -41,16 +40,15 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return new ClinicReadPermission(clinicId).isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return new ClinicReadPermission(clinicId).isAllowed(null);
     }
 
     @Override
-    public ClinicInfo run(
-        User user, Session session) throws ActionException {
+    public ClinicInfo run(ActionContext context) throws ActionException {
         ClinicInfo info = new ClinicInfo();
 
-        Query query = session.createQuery(CLINIC_INFO_HQL);
+        Query query = context.getSession().createQuery(CLINIC_INFO_HQL);
         query.setParameter(0, clinicId);
 
         @SuppressWarnings("unchecked")
@@ -61,8 +59,8 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
             info.clinic = (Clinic) row[0];
             info.patientCount = (Long) row[1];
             info.ceventCount = (Long) row[2];
-            info.contacts = getContacts.run(user, session).getList();
-            info.studyInfos = getStudyInfo.run(user, session).getList();
+            info.contacts = getContacts.run(context).getList();
+            info.studyInfos = getStudyInfo.run(context).getList();
         }
 
         return info;

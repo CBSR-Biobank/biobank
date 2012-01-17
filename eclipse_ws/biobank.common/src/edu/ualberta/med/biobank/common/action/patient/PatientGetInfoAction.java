@@ -3,9 +3,9 @@ package edu.ualberta.med.biobank.common.action.patient;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.User;
 
 /**
  * Retrieve a patient information using a patient id
@@ -65,15 +64,15 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        return new PatientReadPermission(patientId).isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) {
+        return new PatientReadPermission(patientId).isAllowed(null);
     }
 
     @Override
-    public PatientInfo run(User user, Session session) throws ActionException {
+    public PatientInfo run(ActionContext context) throws ActionException {
         PatientInfo pInfo = new PatientInfo();
 
-        Query query = session.createQuery(PATIENT_INFO_HQL);
+        Query query = context.getSession().createQuery(PATIENT_INFO_HQL);
         query.setParameter(0, patientId);
 
         @SuppressWarnings("unchecked")
@@ -85,7 +84,7 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
             pInfo.sourceSpecimenCount = (Long) row[1];
             pInfo.aliquotedSpecimenCount = (Long) row[2];
             pInfo.cevents = new PatientGetCollectionEventInfosAction(patientId)
-                .run(user, session).getList();
+                .run(context).getList();
 
         } else {
             throw new ActionException("No patient found with id:" + patientId); //$NON-NLS-1$

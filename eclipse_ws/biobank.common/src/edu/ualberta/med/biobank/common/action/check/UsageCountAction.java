@@ -3,14 +3,13 @@ package edu.ualberta.med.biobank.common.action.check;
 import java.text.MessageFormat;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.CountResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.model.User;
 
 /**
  * Count the number of times an object is referenced/ used by a given
@@ -34,12 +33,12 @@ public class UsageCountAction implements Action<CountResult> {
     }
 
     @Override
-    public CountResult run(User user, Session session) throws ActionException {
+    public CountResult run(ActionContext context) throws ActionException {
         String modelClass = property.getModelClass().getName();
         String name = property.getName();
         String hql = MessageFormat.format(COUNT_HQL, modelClass, name);
 
-        Query query = session.createQuery(hql);
+        Query query = context.getSession().createQuery(hql);
         query.setParameter(0, model);
 
         Long count = HibernateUtil.getCountFromQuery(query);
@@ -47,7 +46,7 @@ public class UsageCountAction implements Action<CountResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         return true;
     }
 

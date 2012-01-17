@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.container;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -14,7 +12,6 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.User;
 
 public class ContainerSaveAction implements Action<IdResult> {
 
@@ -62,40 +59,38 @@ public class ContainerSaveAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         // FIXME add specific permission for this?
         Permission permission;
         if (containerId == null)
             permission = new ContainerCreatePermission();
         else
             permission = new ContainerUpdatePermission(containerId);
-        return permission.isAllowed(user, session);
+        return permission.isAllowed(null);
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
+    public IdResult run(ActionContext context) throws ActionException {
         // FIXME logging
         // FIXME checks
 
-        ActionContext actionContext = new ActionContext(user, session);
-
         Container container;
         if (containerId != null) {
-            container = actionContext.load(Container.class, containerId);
+            container = context.load(Container.class, containerId);
         } else {
             container = new Container();
         }
-        container.setActivityStatus(actionContext.load(ActivityStatus.class,
+        container.setActivityStatus(context.load(ActivityStatus.class,
             statusId));
-        container.setSite(actionContext.load(Site.class, siteId));
+        container.setSite(context.load(Site.class, siteId));
         container.setProductBarcode(barcode);
-        container.setContainerType(actionContext.load(ContainerType.class,
+        container.setContainerType(context.load(ContainerType.class,
             typeId));
         container.setLabel(label);
-        ContainerActionHelper.setPosition(user, session, container, position,
+        ContainerActionHelper.setPosition(context, container, position,
             parentId);
 
-        session.saveOrUpdate(container);
+        context.getSession().saveOrUpdate(container);
 
         return new IdResult(container.getId());
     }

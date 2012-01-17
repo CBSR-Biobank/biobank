@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.AssignProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
@@ -18,7 +19,6 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.User;
 
 public class SpecimenAssignProcessAction extends ServerProcessAction {
 
@@ -157,7 +157,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
                                 movedAndMissingSpecimensFromPallet);
                         } else { // new in pallet
                             if (new SpecimenIsUsedInDispatchAction(
-                                foundSpecimen.getId()).run(null, session)
+                                foundSpecimen.getId()).run(actionContext)
                                 .isTrue()) {
                                 updateCellAsDispatchedError(
                                     positionString,
@@ -353,9 +353,9 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         return new SpecimenAssignPermission(currentWorkingCenterId).isAllowed(
-            user, session);
+            null);
     }
 
 }

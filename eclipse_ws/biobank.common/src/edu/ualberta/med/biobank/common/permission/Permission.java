@@ -2,9 +2,8 @@ package edu.ualberta.med.biobank.common.permission;
 
 import java.io.Serializable;
 
-import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 
 /**
  * Implementations of this interface should follow the template
@@ -16,5 +15,5 @@ import edu.ualberta.med.biobank.model.User;
  * @param <T>
  */
 public interface Permission extends Serializable {
-    public boolean isAllowed(User user, Session session);
+    public boolean isAllowed(ActionContext context);
 }

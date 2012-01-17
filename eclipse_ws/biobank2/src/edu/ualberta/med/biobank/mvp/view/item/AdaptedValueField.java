@@ -18,7 +18,7 @@ public class AdaptedValueField<T, U> extends AbstractValueField<T> {
     }
 
     @Override
-    protected void update() {
+    protected void updateGui() {
         T adaptedValue = getValue();
         U unadaptedValue = adapter.unadapt(adaptedValue);
         adaptee.setValue(unadaptedValue, false);

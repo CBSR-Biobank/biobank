@@ -18,12 +18,16 @@ public class BeanModifier {
 
     private static Pattern BEAN_SERIAL_VERSION_DECL = Pattern
         .compile("private static final long serialVersionUID");
-    private static final String LAST_UPDATE_DECL = "        private Integer version;";
+    private static final String LAST_UPDATE_DECL =
+        "        private Integer version;";
 
     private static Pattern IMPLEMENTS_SERIALIZABLE_PATTERN = Pattern
         .compile("^public .* implements Serializable$");
     private static String SERIALIZABLE_TEXT_TO_REPLACE = "Serializable";
     private static String IMPLEMENTS_NEW_TEXT = "IBiobankModel";
+
+    private static Pattern COLLECTION_VARIABLE = Pattern
+        .compile("^(\\s*)private Collection<(\\w+)> (\\w+);$");
 
     private static BeanModifier instance = null;
 
@@ -70,6 +74,21 @@ public class BeanModifier {
                         SERIALIZABLE_TEXT_TO_REPLACE, IMPLEMENTS_NEW_TEXT);
                 }
             }
+
+            // initialize collections
+            if (line.equals("import java.util.Collection;")) {
+                alteredLine = line + "\nimport java.util.HashSet;";
+            }
+            Matcher m = COLLECTION_VARIABLE.matcher(line);
+            if (m.matches()) {
+                String space = m.group(1);
+                String type = m.group(2);
+                String variableName = m.group(3);
+                alteredLine =
+                    space + "private Collection<" + type + "> " + variableName
+                        + " = new HashSet<" + type + ">();\n";
+            }
+
             documentChanged |= !line.equals(alteredLine);
 
             writer.write(alteredLine);

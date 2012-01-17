@@ -4,16 +4,15 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.EventAttrTypePeer;
 import edu.ualberta.med.biobank.common.peer.GlobalEventAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
-import edu.ualberta.med.biobank.model.User;
 
 public class GlobalEventAttrInfoGetAction implements
     Action<MapResult<Integer, GlobalEventAttrInfo>> {
@@ -32,18 +31,17 @@ public class GlobalEventAttrInfoGetAction implements
     // @formatter:on
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         return true;
     }
 
     @Override
-    public MapResult<Integer, GlobalEventAttrInfo> run(User user,
-        Session session)
+    public MapResult<Integer, GlobalEventAttrInfo> run(ActionContext context)
         throws ActionException {
         HashMap<Integer, GlobalEventAttrInfo> attrInfos =
             new HashMap<Integer, GlobalEventAttrInfo>();
 
-        Query query = session.createQuery(GLOBAL_EVENT_ATTR_QRY);
+        Query query = context.getSession().createQuery(GLOBAL_EVENT_ATTR_QRY);
 
         @SuppressWarnings("unchecked")
         List<Object[]> rows = query.list();

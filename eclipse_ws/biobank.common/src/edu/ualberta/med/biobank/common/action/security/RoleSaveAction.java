@@ -1,32 +1,23 @@
 package edu.ualberta.med.biobank.common.action.security;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
-import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
-import edu.ualberta.med.biobank.common.peer.RolePeer;
+import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
-import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Permission;
 import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.model.User;
 
 public class RoleSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
     private Integer roleId;
     private String name;
-    private Set<Integer> permissionIds;
+    private Set<PermissionEnum> permissionEnums;
 
     public void setId(Integer roleId) {
         this.roleId = roleId;
@@ -36,50 +27,33 @@ public class RoleSaveAction implements Action<IdResult> {
         this.name = name;
     }
 
-    public void setPermissionIds(Set<Integer> permissionIds) {
-        this.permissionIds = permissionIds;
+    public void setPermissions(Set<PermissionEnum> permissions) {
+        this.permissionEnums = permissions;
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return new UserManagementPermission().isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return new UserManagementPermission().isAllowed(context);
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
-        if (name == null) {
-            throw new NullPropertyException(Role.class, RolePeer.NAME);
-        }
-        if (permissionIds == null) {
-            throw new NullPropertyException(Role.class,
-                "permission ids cannot be null");
-        }
-
-        SessionUtil sessionUtil = new SessionUtil(session);
-
-        // check for duplicate name
-        List<ValueProperty<Role>> uniqueValProps =
-            new ArrayList<ValueProperty<Role>>();
-        uniqueValProps.add(new ValueProperty<Role>(RolePeer.NAME, name));
-        new UniquePreCheck<Role>(Role.class, roleId, uniqueValProps).run(
-            user, session);
-
-        Role role = sessionUtil.get(Role.class, roleId, new Role());
-        role.setId(roleId);
-
-        // Role to Permission association is unidirectional.
+    public IdResult run(ActionContext context) throws ActionException {
+        // TODO: should just use Hibernate to map a Role to a list of
+        // PermissionEnum-s, see
+        // https://community.jboss.org/wiki/UserTypeForPersistingAnEnumWithAVARCHARColumn
+        // but this is probably only possible once we have access to directly
+        // manipulate the beans/ pojos
+        Set<Integer> permissionIds = PermissionEnum.getIds(permissionEnums);
         Map<Integer, Permission> permissions =
-            sessionUtil.load(Permission.class, permissionIds);
+            context.load(Permission.class, permissionIds);
 
-        SetDifference<Permission> permissionsDiff =
-            new SetDifference<Permission>(
-                role.getPermissionCollection(), permissions.values());
-        role.setPermissionCollection(permissionsDiff.getNewSet());
+        Role role = context.load(Role.class, roleId, new Role());
+        role.setId(roleId);
+        role.setName(name);
+        role.setPermissionCollection(permissions.values());
 
-        session.saveOrUpdate(role);
-        session.flush();
+        context.getSession().saveOrUpdate(role);
 
-        // TODO Auto-generated method stub
         return new IdResult(role.getId());
     }
 

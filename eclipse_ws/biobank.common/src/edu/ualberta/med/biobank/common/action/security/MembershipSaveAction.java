@@ -3,14 +3,11 @@ package edu.ualberta.med.biobank.common.action.security;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Center;
@@ -19,7 +16,6 @@ import edu.ualberta.med.biobank.model.Permission;
 import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
 
 public class MembershipSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
@@ -30,8 +26,6 @@ public class MembershipSaveAction implements Action<IdResult> {
     private Set<Integer> permissionIds;
     private Integer centerId;
     private Integer studyId;
-    private Session session = null;
-    private SessionUtil sessionUtil = null;
     private Membership membership = null;
 
     public void setId(Integer id) {
@@ -59,12 +53,12 @@ public class MembershipSaveAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return new UserManagementPermission().isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return new UserManagementPermission().isAllowed(null);
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
+    public IdResult run(ActionContext context) throws ActionException {
         if (roleIds == null) {
             throw new NullPropertyException(Membership.class,
                 "role ids cannot be null");
@@ -74,22 +68,17 @@ public class MembershipSaveAction implements Action<IdResult> {
                 "permission ids cannot be null");
         }
 
-        this.session = session;
-        sessionUtil = new SessionUtil(session);
-        ActionContext actionContext = new ActionContext(user, session);
+        membership =
+            context.get(Membership.class, membershipId, new Membership());
+        membership.setPrincipal(context.load(Principal.class, principalId));
+        membership.setCenter(context.load(Center.class, centerId));
+        membership.setStudy(context.load(Study.class, studyId));
 
-        membership = sessionUtil.get(
-            Membership.class, membershipId, new Membership());
-        membership.setPrincipal(actionContext
-            .load(Principal.class, principalId));
-        membership.setCenter(actionContext.load(Center.class, centerId));
-        membership.setStudy(actionContext.load(Study.class, studyId));
+        saveRoles(context);
+        savePermissions(context);
 
-        saveRoles();
-        savePermissions();
-
-        session.saveOrUpdate(membership);
-        session.flush();
+        context.getSession().saveOrUpdate(membership);
+        context.getSession().flush();
 
         return new IdResult(membership.getId());
     }
@@ -97,8 +86,8 @@ public class MembershipSaveAction implements Action<IdResult> {
     /*
      * Membership to Role association is unidirectional.
      */
-    private void saveRoles() {
-        Map<Integer, Role> roles = sessionUtil.load(Role.class, roleIds);
+    private void saveRoles(ActionContext context) {
+        Map<Integer, Role> roles = context.load(Role.class, roleIds);
 
         SetDifference<Role> rolesDiff = new SetDifference<Role>(
             membership.getRoleCollection(), roles.values());
@@ -108,9 +97,9 @@ public class MembershipSaveAction implements Action<IdResult> {
     /*
      * Membership to Permission association is unidirectional.
      */
-    private void savePermissions() {
+    private void savePermissions(ActionContext context) {
         Map<Integer, Permission> permissions =
-            sessionUtil.load(Permission.class, permissionIds);
+            context.load(Permission.class, permissionIds);
 
         SetDifference<Permission> permissionsDiff =
             new SetDifference<Permission>(

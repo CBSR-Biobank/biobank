@@ -4,14 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
-import edu.ualberta.med.biobank.model.User;
 
 public class StudyGetEventAttrInfoAction implements
     Action<MapResult<Integer, StudyEventAttrInfo>> {
@@ -33,7 +32,7 @@ public class StudyGetEventAttrInfoAction implements
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         return true;
     }
 
@@ -41,12 +40,12 @@ public class StudyGetEventAttrInfoAction implements
      * Action that return a map of [label=StudyEventAttrInfo]
      */
     @Override
-    public MapResult<Integer, StudyEventAttrInfo> run(User user, Session session)
+    public MapResult<Integer, StudyEventAttrInfo> run(ActionContext context)
         throws ActionException {
         HashMap<Integer, StudyEventAttrInfo> attrInfos =
             new HashMap<Integer, StudyEventAttrInfo>();
 
-        Query query = session.createQuery(STUDY_EVENT_ATTR_QRY);
+        Query query = context.getSession().createQuery(STUDY_EVENT_ATTR_QRY);
         query.setParameter(0, studyId);
 
         @SuppressWarnings("unchecked")

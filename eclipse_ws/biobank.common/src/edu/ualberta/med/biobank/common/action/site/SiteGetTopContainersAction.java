@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.User;
 
 public class SiteGetTopContainersAction implements
     Action<SiteGetTopContainersResult> {
@@ -37,16 +36,17 @@ public class SiteGetTopContainersAction implements
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         return true;
     }
 
     @Override
-    public SiteGetTopContainersResult run(User user, Session session)
+    public SiteGetTopContainersResult run(ActionContext context)
         throws ActionException {
         ArrayList<Container> topContainers = new ArrayList<Container>();
 
-        Query query = session.createQuery(SELECT_TOP_CONTAINERS_HQL);
+        Query query =
+            context.getSession().createQuery(SELECT_TOP_CONTAINERS_HQL);
         query.setParameter(0, siteId);
 
         @SuppressWarnings("unchecked")

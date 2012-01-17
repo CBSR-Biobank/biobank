@@ -8,13 +8,13 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.IBiobankModel;
-import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 
 /**
@@ -48,8 +48,8 @@ public class UniquePreCheck<T extends IBiobankModel> {
         this.valueProperties = valueProperties;
     }
 
-    public void run(User user, Session session) throws ActionException {
-        Query query = getQuery(session);
+    public void run(ActionContext context) throws ActionException {
+        Query query = getQuery(context.getSession());
         Long count = HibernateUtil.getCountFromQuery(query);
 
         if (count > 0) {

@@ -1,12 +1,10 @@
 package edu.ualberta.med.biobank.common.action.shipment;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.ShippingMethod;
-import edu.ualberta.med.biobank.model.User;
 
 public class ShippingMethodSaveAction implements Action<IdResult> {
 
@@ -23,15 +21,15 @@ public class ShippingMethodSaveAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         return true;
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
+    public IdResult run(ActionContext context) throws ActionException {
         ShippingMethod sm = new ShippingMethod();
         sm.setId(id);
         sm.setName(name);
-        return new IdResult((Integer) session.save(sm));
+        return new IdResult((Integer) context.getSession().save(sm));
     }
 }

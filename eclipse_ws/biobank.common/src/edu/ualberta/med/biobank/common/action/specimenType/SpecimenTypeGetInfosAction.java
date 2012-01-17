@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.User;
 
 public class SpecimenTypeGetInfosAction implements
     Action<ListResult<SpecimenTypeInfo>> {
@@ -27,16 +26,16 @@ public class SpecimenTypeGetInfosAction implements
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         return true;
     }
 
     @Override
-    public ListResult<SpecimenTypeInfo> run(User user, Session session)
+    public ListResult<SpecimenTypeInfo> run(ActionContext context)
         throws ActionException {
         ArrayList<SpecimenTypeInfo> specs = new ArrayList<SpecimenTypeInfo>();
 
-        Query query = session.createQuery(SPEC_TYPE_QRY);
+        Query query = context.getSession().createQuery(SPEC_TYPE_QRY);
 
         @SuppressWarnings("unchecked")
         List<SpecimenType> rows = query.list();

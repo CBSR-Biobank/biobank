@@ -3,12 +3,11 @@ package edu.ualberta.med.biobank.common.action.patient;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.User;
 
 public class PatientNextVisitNumberAction implements
     Action<PatientNextVisitNumberResult> {
@@ -27,14 +26,14 @@ public class PatientNextVisitNumberAction implements
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         return true;
     }
 
     @Override
-    public PatientNextVisitNumberResult run(User user, Session session)
+    public PatientNextVisitNumberResult run(ActionContext context)
         throws ActionException {
-        Query query = session.createQuery(NEXT_NUMBER_QRY);
+        Query query = context.getSession().createQuery(NEXT_NUMBER_QRY);
         query.setParameter(0, patientId);
 
         @SuppressWarnings("unchecked")

@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.permission.site.SiteReadPermission;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.User;
 
 public class SiteGetContainerTypeInfoAction implements
     Action<SiteGetContainerTypeInfoResult> {
@@ -42,18 +41,19 @@ public class SiteGetContainerTypeInfoAction implements
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        return new SiteReadPermission(siteId).isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) {
+        return new SiteReadPermission(siteId).isAllowed(null);
     }
 
     @Override
-    public SiteGetContainerTypeInfoResult run(User user, Session session)
+    public SiteGetContainerTypeInfoResult run(ActionContext context)
         throws ActionException {
 
         ArrayList<ContainerTypeInfo> containerTypes =
             new ArrayList<ContainerTypeInfo>();
 
-        Query query = session.createQuery(SELECT_CONTAINER_TYPE_INFO_HQL);
+        Query query =
+            context.getSession().createQuery(SELECT_CONTAINER_TYPE_INFO_HQL);
         query.setParameter(0, siteId);
 
         @SuppressWarnings("unchecked")

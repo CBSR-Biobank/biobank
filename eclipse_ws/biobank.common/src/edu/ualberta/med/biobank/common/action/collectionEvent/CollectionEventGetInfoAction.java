@@ -4,16 +4,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.User;
 
 public class CollectionEventGetInfoAction implements Action<CEventInfo> {
     private static final long serialVersionUID = 1L;
@@ -52,16 +51,15 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        return new CollectionEventReadPermission(ceventId).isAllowed(user,
-            session);
+    public boolean isAllowed(ActionContext context) {
+        return new CollectionEventReadPermission(ceventId).isAllowed(null);
     }
 
     @Override
-    public CEventInfo run(User user, Session session) throws ActionException {
+    public CEventInfo run(ActionContext context) throws ActionException {
         CEventInfo ceventInfo = new CEventInfo();
 
-        Query query = session.createQuery(CEVENT_INFO_QRY);
+        Query query = context.getSession().createQuery(CEVENT_INFO_QRY);
         query.setParameter(0, ceventId);
 
         @SuppressWarnings("unchecked")
@@ -70,13 +68,12 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
             ceventInfo.cevent = rows.get(0);
             ceventInfo.sourceSpecimenInfos =
                 new CollectionEventGetSpecimenInfosAction(
-                    ceventId, false).run(user, session).getList();
+                    ceventId, false).run(context).getList();
             ceventInfo.aliquotedSpecimenInfos =
                 new CollectionEventGetSpecimenInfosAction(
-                    ceventId, true).run(user, session).getList();
+                    ceventId, true).run(context).getList();
             ceventInfo.eventAttrs = new CollectionEventGetEventAttrInfoAction(
-                ceventId).run(
-                user, session).getMap();
+                ceventId).run(context).getMap();
         } else {
             throw new ActionException("Cannot find a collection event with id=" //$NON-NLS-1$
                 + ceventId);

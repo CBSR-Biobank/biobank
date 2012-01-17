@@ -3,16 +3,15 @@ package edu.ualberta.med.biobank.common.action.shipment;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.model.OriginInfo;
-import edu.ualberta.med.biobank.model.User;
 
 /**
  * Retrieve a patient information using a patient id
@@ -40,16 +39,16 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        return new OriginInfoReadPermission(oiId).isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) {
+        return new OriginInfoReadPermission(oiId).isAllowed(null);
     }
 
     @Override
-    public ShipmentReadInfo run(User user, Session session)
+    public ShipmentReadInfo run(ActionContext context)
         throws ActionException {
         ShipmentReadInfo sInfo = new ShipmentReadInfo();
 
-        Query query = session.createQuery(ORIGIN_INFO_HQL);
+        Query query = context.getSession().createQuery(ORIGIN_INFO_HQL);
         query.setParameter(0, oiId);
 
         @SuppressWarnings("unchecked")
@@ -59,7 +58,7 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
 
             sInfo.oi = (OriginInfo) row;
             sInfo.specimens =
-                new ShipmentGetSpecimenInfosAction(oiId).run(user, session)
+                new ShipmentGetSpecimenInfosAction(oiId).run(context)
                     .getList();
 
         } else {

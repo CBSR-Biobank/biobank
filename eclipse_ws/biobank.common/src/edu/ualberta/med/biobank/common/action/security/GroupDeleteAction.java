@@ -1,14 +1,11 @@
 package edu.ualberta.med.biobank.common.action.security;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
 import edu.ualberta.med.biobank.model.BbGroup;
-import edu.ualberta.med.biobank.model.User;
 
 public class GroupDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
@@ -20,15 +17,14 @@ public class GroupDeleteAction implements Action<EmptyResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return new UserManagementPermission().isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return new UserManagementPermission().isAllowed(null);
     }
 
     @Override
-    public EmptyResult run(User user, Session session) throws ActionException {
-        BbGroup group =
-            new ActionContext(user, session).load(BbGroup.class, groupId);
-        session.delete(group);
+    public EmptyResult run(ActionContext context) throws ActionException {
+        BbGroup group = context.load(BbGroup.class, groupId);
+        context.getSession().delete(group);
         return new EmptyResult();
     }
 

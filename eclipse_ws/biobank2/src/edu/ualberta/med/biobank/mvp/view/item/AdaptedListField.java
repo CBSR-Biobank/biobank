@@ -20,7 +20,7 @@ public class AdaptedListField<T, U> extends AbstractListField<T> {
     }
 
     @Override
-    protected void update() {
+    protected void updateGui() {
         List<U> unadaptedElements = unadaptList(asUnmodifiableList());
         adaptee.setElements(unadaptedElements, false);
     }
@@ -47,7 +47,7 @@ public class AdaptedListField<T, U> extends AbstractListField<T> {
         @Override
         public void onListChange(ListChangeEvent<U> event) {
             List<T> adaptedElements = adaptList(adaptee.asUnmodifiableList());
-            setElements(adaptedElements, true);
+            setElementsInternal(adaptedElements);
         }
     }
 }

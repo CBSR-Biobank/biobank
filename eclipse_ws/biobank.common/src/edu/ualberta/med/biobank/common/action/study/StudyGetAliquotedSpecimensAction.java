@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
 
 public class StudyGetAliquotedSpecimensAction implements
     Action<ListResult<AliquotedSpecimen>> {
@@ -38,17 +37,18 @@ public class StudyGetAliquotedSpecimensAction implements
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         return true;
     }
 
     @Override
-    public ListResult<AliquotedSpecimen> run(User user, Session session)
+    public ListResult<AliquotedSpecimen> run(ActionContext context)
         throws ActionException {
         ArrayList<AliquotedSpecimen> result =
             new ArrayList<AliquotedSpecimen>();
 
-        Query query = session.createQuery(SELECT_ALIQUOTED_SPCS_HQL);
+        Query query =
+            context.getSession().createQuery(SELECT_ALIQUOTED_SPCS_HQL);
         query.setParameter(0, studyId);
 
         @SuppressWarnings("unchecked")

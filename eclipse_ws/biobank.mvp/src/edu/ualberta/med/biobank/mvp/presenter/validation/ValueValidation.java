@@ -21,7 +21,8 @@ import com.pietschy.gwt.pectin.client.form.validation.component.ValidationDispla
  * 
  * @param <T> source value type
  */
-class ValueValidation<T> extends AbstractValidation implements Disposable {
+public class ValueValidation<T> extends AbstractValidation implements
+    Disposable {
     private final SourceMonitor sourceMonitor = new SourceMonitor();
     private final List<ConditionalValidator> validators =
         new ArrayList<ConditionalValidator>();

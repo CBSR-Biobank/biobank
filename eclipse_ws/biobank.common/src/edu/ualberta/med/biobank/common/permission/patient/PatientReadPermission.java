@@ -1,12 +1,9 @@
 package edu.ualberta.med.biobank.common.permission.patient;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.User;
 
 public class PatientReadPermission implements Permission {
 
@@ -19,10 +16,11 @@ public class PatientReadPermission implements Permission {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        Patient patient = new ActionContext(user, session).load(Patient.class,
+    public boolean isAllowed(ActionContext context) {
+        Patient patient = context.load(Patient.class,
             patientId);
-        return PermissionEnum.PATIENT_READ.isAllowed(user, patient.getStudy());
+        return PermissionEnum.PATIENT_READ.isAllowed(context.getUser(),
+            patient.getStudy());
     }
 
 }

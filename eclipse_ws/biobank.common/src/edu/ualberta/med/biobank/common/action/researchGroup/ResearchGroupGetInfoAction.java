@@ -3,14 +3,13 @@ package edu.ualberta.med.biobank.common.action.researchGroup;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupReadPermission;
 import edu.ualberta.med.biobank.model.ResearchGroup;
-import edu.ualberta.med.biobank.model.User;
 
 /**
  * Retrieve a patient information using a patient id
@@ -18,7 +17,8 @@ import edu.ualberta.med.biobank.model.User;
  * @author aaron
  * 
  */
-public class ResearchGroupGetInfoAction implements Action<ResearchGroupReadInfo> {
+public class ResearchGroupGetInfoAction implements
+    Action<ResearchGroupReadInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -33,15 +33,16 @@ public class ResearchGroupGetInfoAction implements Action<ResearchGroupReadInfo>
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        return new ResearchGroupReadPermission(rgId).isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) {
+        return new ResearchGroupReadPermission(rgId).isAllowed(null);
     }
 
     @Override
-    public ResearchGroupReadInfo run(User user, Session session) throws ActionException {
+    public ResearchGroupReadInfo run(ActionContext context)
+        throws ActionException {
         ResearchGroupReadInfo sInfo = new ResearchGroupReadInfo();
 
-        Query query = session.createQuery(RESEARCH_INFO_HQL);
+        Query query = context.getSession().createQuery(RESEARCH_INFO_HQL);
         query.setParameter(0, rgId);
 
         @SuppressWarnings("unchecked")

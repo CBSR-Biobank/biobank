@@ -39,9 +39,9 @@ public class AbstractMutator<M extends IBiobankModel> {
     }
 
     protected void unique(Collection<PropertyValue> propertyValues) {
-        PropertySetCountAction count = 
+        PropertySetCountAction count =
             new PropertySetCountAction(model, modelClass, propertyValues);
-        if (count.run(context.getUser(), context.getSession()).notZero()) {
+        if (count.run(context).notZero()) {
 
         }
     }
@@ -49,7 +49,7 @@ public class AbstractMutator<M extends IBiobankModel> {
     protected <T> void notUsedBy(Property<? super M, T> property)
         throws ModelIsUsedException {
         UsageCountAction uses = new UsageCountAction(model, property);
-        if (uses.run(context.getUser(), context.getSession()).notZero()) {
+        if (uses.run(context).notZero()) {
             throw new ModelIsUsedException(modelClass, model.getId(), property);
         }
     }

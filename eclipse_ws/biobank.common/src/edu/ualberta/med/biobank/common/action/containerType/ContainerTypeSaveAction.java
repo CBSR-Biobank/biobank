@@ -3,8 +3,6 @@ package edu.ualberta.med.biobank.common.action.containerType;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -19,7 +17,6 @@ import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.User;
 
 public class ContainerTypeSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
@@ -93,20 +90,18 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         Permission permission;
         if (containerTypeId == null)
             permission = new ContainerTypeCreatePermission();
         else
             permission = new ContainerTypeUpdatePermission(containerTypeId);
-        return permission.isAllowed(user, session);
+        return permission.isAllowed(null);
     }
 
     @Override
-    public IdResult run(User user, Session session)
+    public IdResult run(ActionContext context)
         throws ActionException {
-        ActionContext context = new ActionContext(user, session);
-
         ContainerType containerType = getContainerType(context);
 
         containerType.setName(name);

@@ -59,7 +59,7 @@ public abstract class ServerProcessAction implements Action<ProcessResult> {
     }
 
     @Override
-    public ProcessResult run(User user, Session session)
+    public ProcessResult run(ActionContext context)
         throws ActionException {
         ProcessResult res;
 

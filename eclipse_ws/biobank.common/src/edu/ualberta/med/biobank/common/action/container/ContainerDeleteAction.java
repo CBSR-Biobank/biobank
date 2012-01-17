@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.container;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
@@ -10,7 +8,6 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.User;
 
 public class ContainerDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
@@ -22,27 +19,25 @@ public class ContainerDeleteAction implements Action<EmptyResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        return new ContainerDeletePermission(containerId).isAllowed(user,
-            session);
+    public boolean isAllowed(ActionContext context) {
+        return new ContainerDeletePermission(containerId).isAllowed(null);
     }
 
     @Override
-    public EmptyResult run(User user, Session session) throws ActionException {
-        Container container =
-            new ActionContext(user, session).load(Container.class, containerId);
+    public EmptyResult run(ActionContext context) throws ActionException {
+        Container container = context.load(Container.class, containerId);
 
         new CollectionIsEmptyCheck<Container>(Container.class, container,
             ContainerPeer.CHILD_POSITION_COLLECTION,
-            container.getLabel(), null).run(user, session);
+            container.getLabel(), null).run(context);
 
         new CollectionIsEmptyCheck<Container>(Container.class, container,
             ContainerPeer.SPECIMEN_POSITION_COLLECTION,
-            container.getLabel(), null).run(user, session);
+            container.getLabel(), null).run(context);
 
         // cascades delete all comments
 
-        session.delete(container);
+        context.getSession().delete(container);
         return new EmptyResult();
     }
 

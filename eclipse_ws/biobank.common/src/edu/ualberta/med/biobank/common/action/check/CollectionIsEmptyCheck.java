@@ -4,13 +4,12 @@ import java.text.MessageFormat;
 import java.util.Collection;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
 
 /**
@@ -48,10 +47,10 @@ public class CollectionIsEmptyCheck<T> {
         this.exceptionMessage = exceptionMessage;
     }
 
-    public EmptyResult run(User user, Session session) throws ActionException {
+    public EmptyResult run(ActionContext context) throws ActionException {
         String hql = MessageFormat.format(COUNT_HQL,
             collectionProperty.getName(), modelClass.getName());
-        Query query = session.createQuery(hql);
+        Query query = context.getSession().createQuery(hql);
         query.setParameter(0, modelObject);
 
         Long count = HibernateUtil.getCountFromQuery(query);

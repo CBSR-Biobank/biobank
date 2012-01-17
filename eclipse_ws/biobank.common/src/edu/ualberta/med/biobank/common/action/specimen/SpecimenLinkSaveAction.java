@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
@@ -20,7 +18,6 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.User;
 
 public class SpecimenLinkSaveAction implements
     Action<ListResult<AliquotedSpecimenResInfo>> {
@@ -66,19 +63,17 @@ public class SpecimenLinkSaveAction implements
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        return new SpecimenLinkPermission(centerId, studyId).isAllowed(user,
-            session);
+    public boolean isAllowed(ActionContext context) {
+        return new SpecimenLinkPermission(centerId, studyId).isAllowed(null);
     }
 
     /**
      * Return the number of saved specimen
      */
     @Override
-    public ListResult<AliquotedSpecimenResInfo> run(User user, Session session)
+    public ListResult<AliquotedSpecimenResInfo> run(ActionContext context)
         throws ActionException {
-        ActionContext actionContext = new ActionContext(user, session);
-        Center currentCenter = actionContext.load(Center.class, centerId);
+        Center currentCenter = context.load(Center.class, centerId);
         Date currentDate = new Date();
 
         // FIXME permissions?
@@ -87,7 +82,7 @@ public class SpecimenLinkSaveAction implements
 
         OriginInfo originInfo = new OriginInfo();
         originInfo.setCenter(currentCenter);
-        session.saveOrUpdate(originInfo);
+        context.getSession().saveOrUpdate(originInfo);
 
         ArrayList<AliquotedSpecimenResInfo> resList =
             new ArrayList<SpecimenLinkSaveAction.AliquotedSpecimenResInfo>();
@@ -96,21 +91,21 @@ public class SpecimenLinkSaveAction implements
             Specimen specimen = new Specimen();
             specimen.setInventoryId(asi.inventoryId);
             specimen.setCreatedAt(currentDate);
-            specimen.setSpecimenType(actionContext.load(SpecimenType.class,
+            specimen.setSpecimenType(context.load(SpecimenType.class,
                 asi.typeId));
-            specimen.setActivityStatus(actionContext.load(ActivityStatus.class,
+            specimen.setActivityStatus(context.load(ActivityStatus.class,
                 asi.statusId));
             specimen.setCurrentCenter(currentCenter);
             specimen.setOriginInfo(originInfo);
 
-            SpecimenActionHelper.setParent(actionContext, specimen,
+            SpecimenActionHelper.setParent(context, specimen,
                 asi.parentSpecimenId);
             SpecimenActionHelper.setQuantityFromType(specimen);
-            SpecimenActionHelper.setPosition(actionContext, specimen,
+            SpecimenActionHelper.setPosition(context, specimen,
                 asi.position,
                 asi.containerId);
 
-            session.save(specimen);
+            context.getSession().save(specimen);
 
             AliquotedSpecimenResInfo res = new AliquotedSpecimenResInfo();
             res.id = specimen.getId();

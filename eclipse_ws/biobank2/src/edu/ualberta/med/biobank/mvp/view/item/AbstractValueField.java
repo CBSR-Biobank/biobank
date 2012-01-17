@@ -7,13 +7,12 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasValue;
 
-import edu.ualberta.med.biobank.mvp.event.SimpleValueChangeEvent;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 
 public abstract class AbstractValueField<T> extends AbstractValidationField
     implements ValueField<T> {
     private final HandlerManager handlerManager = new HandlerManager(this);
-    private T value;
+    protected T value;
 
     @Override
     public HandlerRegistration addValueChangeHandler(
@@ -41,19 +40,31 @@ public abstract class AbstractValueField<T> extends AbstractValidationField
     }
 
     @Override
-    public void setValue(T value, boolean fireEvents) {
-        this.value = value;
+    public synchronized void setValue(T value, boolean fireEvents) {
+        setValue(value, fireEvents, true);
+    }
 
-        update();
-
-        if (fireEvents) {
-            fireEvent(new SimpleValueChangeEvent<T>(value));
-        }
+    protected void setValueInternal(T value) {
+        setValue(value, true, false);
     }
 
     /**
      * Update the GUI's value to match {@link #getValue()}. Do so without firing
      * any events.
      */
-    protected abstract void update();
+    protected abstract void updateGui();
+
+    private synchronized void setValue(T newValue, boolean fireEvents,
+        boolean updateGui) {
+        T oldValue = value;
+        value = newValue;
+
+        if (updateGui) {
+            updateGui();
+        }
+
+        if (fireEvents) {
+            ValueChangeEvent.fireIfNotEqual(this, oldValue, newValue);
+        }
+    }
 }

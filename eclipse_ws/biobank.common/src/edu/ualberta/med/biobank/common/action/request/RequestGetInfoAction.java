@@ -3,16 +3,15 @@ package edu.ualberta.med.biobank.common.action.request;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.permission.request.RequestReadPermission;
 import edu.ualberta.med.biobank.model.Request;
-import edu.ualberta.med.biobank.model.User;
 
 public class RequestGetInfoAction implements Action<RequestReadInfo> {
 
@@ -37,16 +36,16 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return new RequestReadPermission().isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return new RequestReadPermission().isAllowed(null);
     }
 
     @Override
-    public RequestReadInfo run(User user, Session session)
+    public RequestReadInfo run(ActionContext context)
         throws ActionException {
         RequestReadInfo sInfo = new RequestReadInfo();
 
-        Query query = session.createQuery(REQUEST_HQL);
+        Query query = context.getSession().createQuery(REQUEST_HQL);
         query.setParameter(0, id);
 
         @SuppressWarnings("unchecked")
@@ -56,7 +55,7 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
 
             sInfo.request = (Request) row;
             sInfo.specimens =
-                new RequestGetSpecimenInfosAction(id).run(user, session)
+                new RequestGetSpecimenInfosAction(id).run(context)
                     .getList();
 
         } else {

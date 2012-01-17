@@ -10,12 +10,12 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.CountResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.IBiobankModel;
-import edu.ualberta.med.biobank.model.User;
 
 public class PropertySetCountAction implements Action<CountResult> {
     private static final long serialVersionUID = 1L;
@@ -35,13 +35,13 @@ public class PropertySetCountAction implements Action<CountResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         return true;
     }
 
     @Override
-    public CountResult run(User user, Session session) throws ActionException {
-        Query query = getQuery(session);
+    public CountResult run(ActionContext context) throws ActionException {
+        Query query = getQuery(context.getSession());
         Long count = HibernateUtil.getCountFromQuery(query);
         return new CountResult(count);
     }

@@ -4,20 +4,17 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupSavePermission;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
 
 public class ResearchGroupSaveAction implements Action<IdResult> {
 
@@ -32,23 +29,21 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return new ResearchGroupSavePermission(rgInfo.id).isAllowed(user,
-            session);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return new ResearchGroupSavePermission(rgInfo.id).isAllowed(null);
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
-        SessionUtil sessionUtil = new SessionUtil(session);
+    public IdResult run(ActionContext context) throws ActionException {
         ResearchGroup rg =
-            sessionUtil
+            context
                 .get(ResearchGroup.class, rgInfo.id, new ResearchGroup());
 
         rg.setName(rgInfo.name);
         rg.setNameShort(rgInfo.nameShort);
 
-        rg.setStudy(sessionUtil.get(Study.class, rgInfo.studyId));
-        rg.setActivityStatus(sessionUtil.get(ActivityStatus.class,
+        rg.setStudy(context.get(Study.class, rgInfo.studyId));
+        rg.setActivityStatus(context.get(ActivityStatus.class,
             rgInfo.activityStatusId));
 
         Address address = new Address();
@@ -74,15 +69,15 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
             Comment newComment = new Comment();
             newComment.setCreatedAt(new Date());
             newComment.setMessage(rgInfo.comment);
-            newComment.setUser(user);
-            session.saveOrUpdate(newComment);
+            newComment.setUser(context.getUser());
+            context.getSession().saveOrUpdate(newComment);
 
             comments.add(newComment);
             rg.setCommentCollection(comments);
         }
 
-        session.saveOrUpdate(rg);
-        session.flush();
+        context.getSession().saveOrUpdate(rg);
+        context.getSession().flush();
 
         return new IdResult(rg.getId());
     }

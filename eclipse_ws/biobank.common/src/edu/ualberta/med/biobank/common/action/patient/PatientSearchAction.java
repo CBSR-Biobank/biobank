@@ -4,16 +4,15 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
 
 public class PatientSearchAction implements Action<SearchedPatientInfo> {
     private static final long serialVersionUID = 1L;
@@ -54,17 +53,17 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         return true;
     }
 
     @Override
-    public SearchedPatientInfo run(User user, Session session)
+    public SearchedPatientInfo run(ActionContext context)
         throws ActionException {
         String hql = MessageFormat.format(PATIENT_INFO_QRY,
             pnumber == null ? WHERE_FOR_ID : WHERE_FOR_PNUMBER);
 
-        Query query = session.createQuery(hql);
+        Query query = context.getSession().createQuery(hql);
         query.setParameter(0, pnumber == null ? patientId : pnumber);
 
         @SuppressWarnings("unchecked")
