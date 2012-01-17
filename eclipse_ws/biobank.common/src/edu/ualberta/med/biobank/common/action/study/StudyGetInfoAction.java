@@ -62,10 +62,10 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
 
             StudyInfo info = new StudyInfo(
                 (Study) row[0], (Long) row[1], (Long) row[2],
-                getClinicInfo.run(null).getList(),
-                getSourceSpecimens.run(null).getList(),
-                getAliquotedSpecimens.run(null).getList(),
-                getStudyEventAttrs.run(null).getList());
+                getClinicInfo.run(context).getList(),
+                getSourceSpecimens.run(context).getList(),
+                getAliquotedSpecimens.run(context).getList(),
+                getStudyEventAttrs.run(context).getList());
 
             return info;
         }

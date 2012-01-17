@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.server.orm;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -68,12 +69,14 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
 
     private <T extends ActionResult> Response query(Action<T> action) {
         Session session = getSession();
-
         User user = getCurrentUser(session);
-        if (!action.isAllowed(null))
+
+        ActionContext context = new ActionContext(user, session);
+
+        if (!action.isAllowed(context))
             throw new AccessDeniedException();
 
-        T actionResult = action.run(null);
+        T actionResult = action.run(context);
 
         session.flush();
         session.clear();

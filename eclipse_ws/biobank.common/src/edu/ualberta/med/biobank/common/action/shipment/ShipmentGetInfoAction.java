@@ -58,7 +58,7 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
 
             sInfo.oi = (OriginInfo) row;
             sInfo.specimens =
-                new ShipmentGetSpecimenInfosAction(oiId).run(null)
+                new ShipmentGetSpecimenInfosAction(oiId).run(context)
                     .getList();
 
         } else {

@@ -50,7 +50,7 @@ public class PatientSaveAction implements Action<IdResult> {
         // checks pnumber unique to send a proper message:
         new UniquePreCheck<Patient>(Patient.class, patientId,
             Arrays.asList(new ValueProperty<Patient>(PatientPeer.PNUMBER,
-                pnumber))).run(null);
+                pnumber))).run(context);
 
         Patient patientToSave;
 

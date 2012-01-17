@@ -223,11 +223,11 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         CollectionEvent cevent) throws ActionException {
         Map<Integer, StudyEventAttrInfo> studyEventList =
             new StudyGetEventAttrInfoAction(
-                study.getId()).run(null).getMap();
+                study.getId()).run(context).getMap();
 
         Map<Integer, EventAttrInfo> ceventAttrList =
             new CollectionEventGetEventAttrInfoAction(
-                ceventId).run(null).getMap();
+                ceventId).run(context).getMap();
         if (ceAttrList != null)
             for (CEventAttrSaveInfo attrInfo : ceAttrList) {
                 EventAttrInfo ceventAttrInfo = ceventAttrList

@@ -66,13 +66,12 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
             ceventInfo.cevent = rows.get(0);
             ceventInfo.sourceSpecimenInfos =
                 new CollectionEventGetSpecimenInfosAction(
-                    ceventId, false).run(null).getList();
+                    ceventId, false).run(context).getList();
             ceventInfo.aliquotedSpecimenInfos =
                 new CollectionEventGetSpecimenInfosAction(
-                    ceventId, true).run(null).getList();
+                    ceventId, true).run(context).getList();
             ceventInfo.eventAttrs = new CollectionEventGetEventAttrInfoAction(
-                ceventId).run(
-                null).getMap();
+                ceventId).run(context).getMap();
         } else {
             throw new ActionException("Cannot find a collection event with id=" //$NON-NLS-1$
                 + ceventId);

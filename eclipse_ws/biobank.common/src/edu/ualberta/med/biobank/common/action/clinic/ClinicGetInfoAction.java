@@ -59,8 +59,8 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
             info.clinic = (Clinic) row[0];
             info.patientCount = (Long) row[1];
             info.ceventCount = (Long) row[2];
-            info.contacts = getContacts.run(null).getList();
-            info.studyInfos = getStudyInfo.run(null).getList();
+            info.contacts = getContacts.run(context).getList();
+            info.studyInfos = getStudyInfo.run(context).getList();
         }
 
         return info;

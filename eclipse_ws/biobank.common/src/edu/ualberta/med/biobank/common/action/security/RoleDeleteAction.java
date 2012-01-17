@@ -14,12 +14,11 @@ public class RoleDeleteAction implements Action<EmptyResult> {
 
     public RoleDeleteAction(Integer id) {
         this.roleId = id;
-
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new UserManagementPermission().isAllowed(null);
+        return new UserManagementPermission().isAllowed(context);
     }
 
     @Override

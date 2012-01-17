@@ -157,7 +157,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
                                 movedAndMissingSpecimensFromPallet);
                         } else { // new in pallet
                             if (new SpecimenIsUsedInDispatchAction(
-                                foundSpecimen.getId()).run(null)
+                                foundSpecimen.getId()).run(actionContext)
                                 .isTrue()) {
                                 updateCellAsDispatchedError(
                                     positionString,

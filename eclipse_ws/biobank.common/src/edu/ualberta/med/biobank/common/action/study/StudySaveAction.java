@@ -229,13 +229,13 @@ public class StudySaveAction implements Action<IdResult> {
         List<ValueProperty<Study>> uniqueValProps =
             new ArrayList<ValueProperty<Study>>();
         uniqueValProps.add(new ValueProperty<Study>(StudyPeer.NAME, name));
-        new UniquePreCheck<Study>(Study.class, id, uniqueValProps).run(null);
+        new UniquePreCheck<Study>(Study.class, id, uniqueValProps).run(context);
 
         // check for duplicate name short
         uniqueValProps = new ArrayList<ValueProperty<Study>>();
         uniqueValProps.add(new ValueProperty<Study>(StudyPeer.NAME_SHORT,
             nameShort));
-        new UniquePreCheck<Study>(Study.class, id, uniqueValProps).run(null);
+        new UniquePreCheck<Study>(Study.class, id, uniqueValProps).run(context);
 
         // TODO: version check?
 

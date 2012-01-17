@@ -98,21 +98,21 @@ public class UserSaveAction extends PrincipalSaveAction {
             new ArrayList<ValueProperty<User>>();
         uniqueValProps.add(new ValueProperty<User>(UserPeer.LOGIN, login));
         new UniquePreCheck<User>(User.class, principalId, uniqueValProps).run(
-            null);
+            context);
 
         // check for duplicate csmUserId
         uniqueValProps = new ArrayList<ValueProperty<User>>();
         uniqueValProps.add(
             new ValueProperty<User>(UserPeer.CSM_USER_ID, csmUserId));
         new UniquePreCheck<User>(User.class, principalId, uniqueValProps).run(
-            null);
+            context);
 
         // check for duplicate fullname
         uniqueValProps = new ArrayList<ValueProperty<User>>();
         uniqueValProps.add(
             new ValueProperty<User>(UserPeer.FULL_NAME, fullName));
         new UniquePreCheck<User>(User.class, principalId, uniqueValProps).run(
-            null);
+            context);
 
         newUser = context.get(User.class, principalId, new User());
 

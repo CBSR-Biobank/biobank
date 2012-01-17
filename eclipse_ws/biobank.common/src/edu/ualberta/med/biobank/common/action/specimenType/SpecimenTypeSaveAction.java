@@ -29,7 +29,6 @@ public class SpecimenTypeSaveAction implements Action<IdResult> {
     public Set<Integer> childSpecimenTypeIds;
 
     private SpecimenType specimenType;
-    private ActionContext context;
 
     public SpecimenTypeSaveAction(String name, String nameShort) {
         this.name = name;
@@ -71,21 +70,21 @@ public class SpecimenTypeSaveAction implements Action<IdResult> {
         uniqueValProps.add(new ValueProperty<SpecimenType>(
             SpecimenTypePeer.NAME, name));
         new UniquePreCheck<SpecimenType>(SpecimenType.class, specimenTypeId,
-            uniqueValProps).run(null);
+            uniqueValProps).run(context);
 
         // check for duplicate name short
         uniqueValProps = new ArrayList<ValueProperty<SpecimenType>>();
         uniqueValProps.add(new ValueProperty<SpecimenType>(
             SpecimenTypePeer.NAME_SHORT, nameShort));
         new UniquePreCheck<SpecimenType>(SpecimenType.class, specimenTypeId,
-            uniqueValProps).run(null);
+            uniqueValProps).run(context);
 
         specimenType =
             context.get(SpecimenType.class, specimenTypeId, new SpecimenType());
         specimenType.setName(name);
         specimenType.setNameShort(nameShort);
 
-        saveChildSpecimenTypes();
+        saveChildSpecimenTypes(context);
 
         context.getSession().saveOrUpdate(specimenType);
         context.getSession().flush();
@@ -93,7 +92,7 @@ public class SpecimenTypeSaveAction implements Action<IdResult> {
         return new IdResult(specimenType.getId());
     }
 
-    private void saveChildSpecimenTypes() {
+    private void saveChildSpecimenTypes(ActionContext context) {
         Map<Integer, SpecimenType> studies =
             context.load(SpecimenType.class, childSpecimenTypeIds);
         SetDifference<SpecimenType> sitesDiff =

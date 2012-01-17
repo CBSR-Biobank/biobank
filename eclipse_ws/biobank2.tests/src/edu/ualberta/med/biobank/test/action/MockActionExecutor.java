@@ -6,12 +6,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.User;
 
 public class MockActionExecutor implements IActionExecutor {
-
     private final Session session;
     private User user;
 
@@ -33,7 +33,7 @@ public class MockActionExecutor implements IActionExecutor {
         SessionFactory sessionFactory = configuration.buildSessionFactory();
 
         session = sessionFactory.openSession();
-        session.setFlushMode(FlushMode.COMMIT);
+        session.setFlushMode(FlushMode.AUTO);
     }
 
     @Override
@@ -54,13 +54,21 @@ public class MockActionExecutor implements IActionExecutor {
     @Override
     public <T extends ActionResult> T exec(Action<T> action)
         throws ActionException {
-        session.beginTransaction();
+        FlushMode flushMode = session.getFlushMode();
+        try {
+            session.beginTransaction();
+            session.setFlushMode(FlushMode.COMMIT);
 
-        T result = action.run(null);
+            ActionContext context = new ActionContext(user, session);
 
-        session.getTransaction().commit();
-        session.flush();
+            T result = action.run(context);
 
-        return result;
+            session.getTransaction().commit();
+            session.flush();
+
+            return result;
+        } finally {
+            session.setFlushMode(flushMode);
+        }
     }
 }

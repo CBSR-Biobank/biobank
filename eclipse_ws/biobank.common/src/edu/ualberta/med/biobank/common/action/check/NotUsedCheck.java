@@ -43,7 +43,7 @@ public class NotUsedCheck<E extends IBiobankModel> extends ActionCheck<E> {
 
     public void run(ActionContext context) throws ActionException {
         // TODO Auto-generated method stub
-        Long count = countAction.run(null).getCount();
+        Long count = countAction.run(context).getCount();
 
         if (count > 0) {
             String message = getExceptionMessage();

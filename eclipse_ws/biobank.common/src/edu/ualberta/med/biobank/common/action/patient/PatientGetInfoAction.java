@@ -84,7 +84,7 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
             pInfo.sourceSpecimenCount = (Long) row[1];
             pInfo.aliquotedSpecimenCount = (Long) row[2];
             pInfo.cevents = new PatientGetCollectionEventInfosAction(patientId)
-                .run(null).getList();
+                .run(context).getList();
 
         } else {
             throw new ActionException("No patient found with id:" + patientId); //$NON-NLS-1$

@@ -217,7 +217,7 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
                     "DispatchProcess.create.specimen.alreadyAdded", locale), //$NON-NLS-1$
                     specimen.getInventoryId()));
             } else if (new SpecimenIsUsedInDispatchAction(specimen.getId())
-                .run(null).isTrue()) {
+                .run(actionContext).isTrue()) {
                 cell.setStatus(CellInfoStatus.ERROR);
                 cell.setInformation(MessageFormat.format(
                     Messages

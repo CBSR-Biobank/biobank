@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.common.permission;
 
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.model.BbGroup;
 import edu.ualberta.med.biobank.model.Center;
@@ -17,7 +20,7 @@ import edu.ualberta.med.biobank.model.User;
  * @author jferland
  * 
  */
-public enum PermissionEnum {
+public enum PermissionEnum implements Serializable {
     ADMINISTRATION(1),
 
     SPECIMEN_CREATE(2),
@@ -136,6 +139,16 @@ public enum PermissionEnum {
         }
 
         return false;
+    }
+
+    public static Set<Integer> getIds(Set<PermissionEnum> permissions) {
+        Set<Integer> ids = new HashSet<Integer>();
+
+        for (PermissionEnum permission : permissions) {
+            ids.add(permission.getId());
+        }
+
+        return ids;
     }
 
     private boolean isPrincipalAllowed(Principal principal, Center center,

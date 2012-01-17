@@ -82,7 +82,7 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         // since imported pevent can have a null worksheet:
         new UniquePreCheck<ProcessingEvent>(ProcessingEvent.class, peventId,
             Arrays.asList(new ValueProperty<ProcessingEvent>(
-                ProcessingEventPeer.WORKSHEET, worksheet))).run(null);
+                ProcessingEventPeer.WORKSHEET, worksheet))).run(context);
 
         peventToSave.setActivityStatus(context.load(ActivityStatus.class,
             statusId));
