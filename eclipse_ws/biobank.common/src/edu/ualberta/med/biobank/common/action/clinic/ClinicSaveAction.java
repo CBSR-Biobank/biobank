@@ -129,7 +129,7 @@ public class ClinicSaveAction extends CenterSaveAction {
         SetDifference<Contact> contactsDiff =
             new SetDifference<Contact>(
                 clinic.getContactCollection(), newContactCollection);
-        clinic.setContactCollection(contactsDiff.getAddSet());
+        clinic.setContactCollection(contactsDiff.getNewSet());
         for (Contact contact : contactsDiff.getRemoveSet()) {
             Collection<Study> studyCollection = contact.getStudyCollection();
             if ((studyCollection != null) && !studyCollection.isEmpty()) {

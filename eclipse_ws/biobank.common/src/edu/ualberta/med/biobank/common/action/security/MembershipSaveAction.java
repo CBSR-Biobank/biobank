@@ -102,7 +102,7 @@ public class MembershipSaveAction implements Action<IdResult> {
 
         SetDifference<Role> rolesDiff = new SetDifference<Role>(
             membership.getRoleCollection(), roles.values());
-        membership.setRoleCollection(rolesDiff.getAddSet());
+        membership.setRoleCollection(rolesDiff.getNewSet());
     }
 
     /*
@@ -115,6 +115,6 @@ public class MembershipSaveAction implements Action<IdResult> {
         SetDifference<Permission> permissionsDiff =
             new SetDifference<Permission>(
                 membership.getPermissionCollection(), permissions.values());
-        membership.setPermissionCollection(permissionsDiff.getAddSet());
+        membership.setPermissionCollection(permissionsDiff.getNewSet());
     }
 }

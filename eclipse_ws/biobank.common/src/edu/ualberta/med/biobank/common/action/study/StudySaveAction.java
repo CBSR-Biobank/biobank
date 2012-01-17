@@ -330,7 +330,7 @@ public class StudySaveAction implements Action<IdResult> {
         SetDifference<SourceSpecimen> srcSpcsDiff =
             new SetDifference<SourceSpecimen>(
                 study.getSourceSpecimenCollection(), newSsCollection);
-        study.setSourceSpecimenCollection(srcSpcsDiff.getAddSet());
+        study.setSourceSpecimenCollection(srcSpcsDiff.getNewSet());
         for (SourceSpecimen srcSpc : srcSpcsDiff.getRemoveSet()) {
             session.delete(srcSpc);
         }
@@ -359,7 +359,7 @@ public class StudySaveAction implements Action<IdResult> {
                 study.getAliquotedSpecimenCollection(), newAsCollection);
 
         // delete aliquoted specimens no longer in use
-        study.setAliquotedSpecimenCollection(aqSpcsDiff.getAddSet());
+        study.setAliquotedSpecimenCollection(aqSpcsDiff.getNewSet());
         for (AliquotedSpecimen aqSpc : aqSpcsDiff.getRemoveSet()) {
             session.delete(aqSpc);
         }
@@ -393,7 +393,7 @@ public class StudySaveAction implements Action<IdResult> {
             new SetDifference<StudyEventAttr>(
                 study.getStudyEventAttrCollection(), newEAttrCollection);
 
-        study.setStudyEventAttrCollection(attrsDiff.getAddSet());
+        study.setStudyEventAttrCollection(attrsDiff.getNewSet());
         for (StudyEventAttr attr : attrsDiff.getRemoveSet()) {
             session.delete(attr);
         }

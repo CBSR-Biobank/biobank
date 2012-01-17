@@ -137,9 +137,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
             .setCommentModelCollection(actionContext, commentsToSave, comments);
 
         setSourceSpecimens(session, ceventToSave);
-
         setEventAttrs(session, user, patient.getStudy(), ceventToSave);
-
         session.saveOrUpdate(ceventToSave);
 
         return new IdResult(ceventToSave.getId());
@@ -171,9 +169,6 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
         Collection<Specimen> originalSpecimens =
             ceventToSave.getOriginalSpecimenCollection();
-        if (originalSpecimens != null)
-            System.out.println("--- original specimens size is "
-                + originalSpecimens.size());
 
         if (sourceSpecimenInfos != null) {
             OriginInfo oi = null;
@@ -193,9 +188,6 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     specimen.setTopSpecimen(specimen);
                     newAllSpecCollection.add(specimen);
                 } else {
-                    System.out
-                        .println("-- loading specimen with id " + specInfo.id);
-
                     specimen = actionContext.load(Specimen.class, specInfo.id);
 
                     if (!newAllSpecCollection.contains(specimen)) {
@@ -226,10 +218,12 @@ public class CollectionEventSaveAction implements Action<IdResult> {
             originalSpecimens, newSsCollection);
         newAllSpecCollection.removeAll(origSpecDiff.getRemoveSet());
         ceventToSave.setAllSpecimenCollection(newAllSpecCollection);
-        ceventToSave.setOriginalSpecimenCollection(origSpecDiff.getAddSet());
+
+        System.out.println("final cevent id " + ceventToSave.getId()
+            + " original specimens size " + origSpecDiff.getNewSet().size());
+
+        ceventToSave.setOriginalSpecimenCollection(origSpecDiff.getNewSet());
         for (Specimen srcSpc : origSpecDiff.getRemoveSet()) {
-            System.out
-                .println("-- deleting specimen with id " + srcSpc.getId());
             session.delete(srcSpc);
         }
 

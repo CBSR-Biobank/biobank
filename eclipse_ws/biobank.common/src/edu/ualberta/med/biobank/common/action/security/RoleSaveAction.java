@@ -74,7 +74,7 @@ public class RoleSaveAction implements Action<IdResult> {
         SetDifference<Permission> permissionsDiff =
             new SetDifference<Permission>(
                 role.getPermissionCollection(), permissions.values());
-        role.setPermissionCollection(permissionsDiff.getAddSet());
+        role.setPermissionCollection(permissionsDiff.getNewSet());
 
         session.saveOrUpdate(role);
         session.flush();

@@ -1,9 +1,13 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
+import java.util.Collection;
+
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
@@ -29,14 +33,23 @@ public class SpecimenHelper extends Helper {
                 "specimen not found in collection event info");
         }
 
-        if (specimen.getId().equals(2)) {
-            System.out.println("deleting specimen with id " + specimen.getId());
-        }
+        CollectionEvent cevent =
+            new ActionContext(actionExecutor.getUser(),
+                actionExecutor.getSession()).load(CollectionEvent.class,
+                specimen.getCollectionEvent().getId());
+        Collection<Specimen> originalSpecimens =
+            cevent.getOriginalSpecimenCollection();
+
+        System.out.println("cevent id " + ceventInfo.cevent.getId()
+            + " original specimens size is "
+            + originalSpecimens.size());
+        System.out.println("sourceSpecimenInfos size "
+            + ceventInfo.sourceSpecimenInfos.size());
 
         ceventInfo.sourceSpecimenInfos.remove(specimenInfoToDelete);
+
         CollectionEventSaveAction ceventSaveAction =
             CollectionEventHelper.getSaveAction(ceventInfo);
         actionExecutor.exec(ceventSaveAction);
     }
-
 }

@@ -21,7 +21,9 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
     @SuppressWarnings("nls")
     private static final String CEVENT_INFO_QRY =
         "SELECT cevent"
-            + " FROM " + CollectionEvent.class.getName() + " cevent"
+            + " FROM "
+            + CollectionEvent.class.getName()
+            + " cevent"
             + " INNER JOIN FETCH cevent.patient patient"
             + " INNER JOIN FETCH cevent.activityStatus status"
             + " LEFT JOIN FETCH cevent.commentCollection comments"
