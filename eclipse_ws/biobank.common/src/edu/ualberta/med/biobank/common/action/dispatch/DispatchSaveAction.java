@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchSavePermission;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.model.Center;
@@ -100,16 +99,16 @@ public class DispatchSaveAction implements Action<IdResult> {
         return new IdResult(disp.getId());
     }
 
-    private Collection<DispatchSpecimen> reassemble(SessionUtil sessionUtil,
+    private Collection<DispatchSpecimen> reassemble(ActionContext context,
         Dispatch dispatch,
         Set<DispatchSpecimenInfo> dsInfos) {
         Collection<DispatchSpecimen> dispSpecimens =
             new HashSet<DispatchSpecimen>();
         for (DispatchSpecimenInfo dsInfo : dsInfos) {
             DispatchSpecimen dspec =
-                sessionUtil.get(DispatchSpecimen.class, dsInfo.id,
+                context.get(DispatchSpecimen.class, dsInfo.id,
                     new DispatchSpecimen());
-            dspec.setSpecimen(sessionUtil.load(Specimen.class,
+            dspec.setSpecimen(context.load(Specimen.class,
                 dsInfo.specimenId));
             dspec.setState(dsInfo.state);
             dspec.setDispatch(dispatch);
