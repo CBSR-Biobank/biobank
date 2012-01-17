@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
+@Deprecated
 public class TestClinic extends TestDatabase {
 
     @Test
@@ -412,7 +413,8 @@ public class TestClinic extends TestDatabase {
 
         PatientWrapper patient;
         List<ClinicWrapper> clinics = Arrays.asList(clinic1, clinic2);
-        Map<Integer, List<PatientWrapper>> patientMap = new HashMap<Integer, List<PatientWrapper>>();
+        Map<Integer, List<PatientWrapper>> patientMap =
+            new HashMap<Integer, List<PatientWrapper>>();
         for (ClinicWrapper clinic : clinics) {
             patientMap.put(clinic.getId(), new ArrayList<PatientWrapper>());
         }
@@ -471,10 +473,12 @@ public class TestClinic extends TestDatabase {
         List<StudyWrapper> studies = Arrays.asList(study1, study2);
 
         // ClinicID = {StudyID = patientCOunt}
-        Map<Integer, Map<Integer, List<PatientWrapper>>> patientMap = new HashMap<Integer, Map<Integer, List<PatientWrapper>>>();
+        Map<Integer, Map<Integer, List<PatientWrapper>>> patientMap =
+            new HashMap<Integer, Map<Integer, List<PatientWrapper>>>();
 
         for (ClinicWrapper clinic : clinics) {
-            Map<Integer, List<PatientWrapper>> studyMap = new HashMap<Integer, List<PatientWrapper>>();
+            Map<Integer, List<PatientWrapper>> studyMap =
+                new HashMap<Integer, List<PatientWrapper>>();
             for (StudyWrapper study : studies) {
                 studyMap.put(study.getId(), new ArrayList<PatientWrapper>());
             }
@@ -553,10 +557,12 @@ public class TestClinic extends TestDatabase {
         List<StudyWrapper> studies = Arrays.asList(study1, study2);
 
         // ClinicID = {StudyID = patientCOunt}
-        Map<Integer, Map<Integer, List<CollectionEventWrapper>>> cEventMap = new HashMap<Integer, Map<Integer, List<CollectionEventWrapper>>>();
+        Map<Integer, Map<Integer, List<CollectionEventWrapper>>> cEventMap =
+            new HashMap<Integer, Map<Integer, List<CollectionEventWrapper>>>();
 
         for (ClinicWrapper clinic : clinics) {
-            Map<Integer, List<CollectionEventWrapper>> studyMap = new HashMap<Integer, List<CollectionEventWrapper>>();
+            Map<Integer, List<CollectionEventWrapper>> studyMap =
+                new HashMap<Integer, List<CollectionEventWrapper>>();
             for (StudyWrapper study : studies) {
                 studyMap.put(study.getId(),
                     new ArrayList<CollectionEventWrapper>());

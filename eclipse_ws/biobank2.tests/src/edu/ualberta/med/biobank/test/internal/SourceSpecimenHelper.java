@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 
+@Deprecated
 public class SourceSpecimenHelper extends DbHelper {
 
     public static SourceSpecimenWrapper newSourceSpecimen(StudyWrapper study,
@@ -44,7 +45,8 @@ public class SourceSpecimenHelper extends DbHelper {
         StudyWrapper study, String name, boolean needTimeDrawn,
         boolean needOriginalVolume) throws Exception {
         int nber = 2; // r.nextInt(15) + 1;
-        List<SourceSpecimenWrapper> sourceSpcs = new ArrayList<SourceSpecimenWrapper>();
+        List<SourceSpecimenWrapper> sourceSpcs =
+            new ArrayList<SourceSpecimenWrapper>();
         for (int i = 0; i < nber; i++) {
             SpecimenTypeWrapper svType = SpecimenTypeHelper
                 .addSpecimenType("newST" + Utils.getRandomString(11));

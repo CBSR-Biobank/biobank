@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 
+@Deprecated
 public class TestCommon {
 
     private static List<String> usedBarcodes;

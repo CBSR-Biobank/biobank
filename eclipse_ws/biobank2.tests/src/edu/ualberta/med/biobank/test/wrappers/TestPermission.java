@@ -5,6 +5,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.test.TestDatabase;
 
+@Deprecated
 public class TestPermission extends TestDatabase {
 
     @Test

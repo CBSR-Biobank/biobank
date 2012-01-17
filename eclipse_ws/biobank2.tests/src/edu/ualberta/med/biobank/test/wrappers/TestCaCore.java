@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.TestDatabase;
 
+@Deprecated
 public class TestCaCore extends TestDatabase {
     /**
      * Check whether ApplicationService method() arguments are incorrectly

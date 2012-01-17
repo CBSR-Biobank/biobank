@@ -41,6 +41,7 @@ import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+@Deprecated
 public class TestSite extends TestDatabase {
 
     @Test
@@ -54,7 +55,8 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient, List<SpecimenTypeWrapper> spcTypes,
         int visitNumber, int maxProcEvent, int spcPerProcEvent)
         throws Exception {
-        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        List<ProcessingEventWrapper> pevents =
+            new ArrayList<ProcessingEventWrapper>();
         SpecimenWrapper parentSpc = SpecimenHelper.newSpecimen(DbHelper
             .chooseRandomlyInList(spcTypes));
         CollectionEventWrapper cevent = CollectionEventHelper
@@ -70,7 +72,8 @@ public class TestSite extends TestDatabase {
     private List<ProcessingEventWrapper> addProcessingEvents(SiteWrapper site,
         List<SpecimenTypeWrapper> spcTypes, int visitNumber, int maxProcEvent,
         int spcPerProcEvent, PatientWrapper... patients) throws Exception {
-        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        List<ProcessingEventWrapper> pevents =
+            new ArrayList<ProcessingEventWrapper>();
         for (PatientWrapper patient : patients) {
             pevents.addAll(addProcessingEvents(site, patient, spcTypes,
                 visitNumber, maxProcEvent, spcPerProcEvent));
@@ -561,8 +564,10 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        List<CollectionEventWrapper> cevents = new ArrayList<CollectionEventWrapper>();
-        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        List<CollectionEventWrapper> cevents =
+            new ArrayList<CollectionEventWrapper>();
+        List<ProcessingEventWrapper> pevents =
+            new ArrayList<ProcessingEventWrapper>();
         for (PatientWrapper p : Arrays.asList(patient1, patient2, patient3)) {
             CollectionEventWrapper cevent = CollectionEventHelper
                 .addCollectionEvent(site, p, 1, SpecimenHelper

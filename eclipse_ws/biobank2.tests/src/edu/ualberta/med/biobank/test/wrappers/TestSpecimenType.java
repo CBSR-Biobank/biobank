@@ -36,6 +36,7 @@ import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
+@Deprecated
 public class TestSpecimenType extends TestDatabase {
 
     @Test
@@ -51,7 +52,8 @@ public class TestSpecimenType extends TestDatabase {
         String name = "testGetContainerTypeCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         SpecimenTypeWrapper type = SpecimenTypeHelper.addSpecimenType(name);
-        List<SpecimenTypeWrapper> sampleTypes = new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> sampleTypes =
+            new ArrayList<SpecimenTypeWrapper>();
         sampleTypes.add(type);
         int containerTypeNber = 10;
         ContainerTypeHelper.addContainerTypesRandom(site, name,
@@ -75,7 +77,8 @@ public class TestSpecimenType extends TestDatabase {
         String name = "testGetContainerTypeCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         SpecimenTypeWrapper type = SpecimenTypeHelper.addSpecimenType(name);
-        List<SpecimenTypeWrapper> sampleTypes = new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> sampleTypes =
+            new ArrayList<SpecimenTypeWrapper>();
         sampleTypes.add(type);
         int containerTypeNber = 10;
         ContainerTypeHelper.addContainerTypesRandom(site, name,
@@ -110,8 +113,10 @@ public class TestSpecimenType extends TestDatabase {
         ContainerTypeWrapper containerType2 = ContainerTypeHelper
             .addContainerTypeRandom(site, "TYPE2");
 
-        List<SpecimenTypeWrapper> sampleTypes1 = new ArrayList<SpecimenTypeWrapper>();
-        List<SpecimenTypeWrapper> sampleTypes2 = new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> sampleTypes1 =
+            new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> sampleTypes2 =
+            new ArrayList<SpecimenTypeWrapper>();
         SpecimenTypeWrapper sampleType1 = SpecimenTypeHelper
             .addSpecimenType("ST1");
         sampleTypes1.add(sampleType1);

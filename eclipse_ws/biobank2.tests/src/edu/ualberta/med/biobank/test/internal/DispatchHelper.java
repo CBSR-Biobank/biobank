@@ -14,9 +14,11 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
+@Deprecated
 public class DispatchHelper extends DbHelper {
 
-    public static List<DispatchWrapper> createdDispatches = new ArrayList<DispatchWrapper>();
+    public static List<DispatchWrapper> createdDispatches =
+        new ArrayList<DispatchWrapper>();
 
     public static DispatchWrapper newDispatch(CenterWrapper<?> sender,
         CenterWrapper<?> receiver, ShippingMethodWrapper method,

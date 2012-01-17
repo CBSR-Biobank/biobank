@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.test.internal;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 
+@Deprecated
 public class OriginInfoHelper extends DbHelper {
 
     public static OriginInfoWrapper newOriginInfo(CenterWrapper<?> center)

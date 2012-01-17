@@ -48,6 +48,7 @@ import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@Deprecated
 public class TestDispatch extends TestDatabase {
 
     @Test

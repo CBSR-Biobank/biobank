@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@Deprecated
 public class TestModelWrapper extends TestDatabase {
 
     class TestWrapper extends ModelWrapper<Object> {

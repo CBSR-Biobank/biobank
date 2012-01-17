@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
+@Deprecated
 public class CollectionEventHelper extends DbHelper {
 
     public static CollectionEventWrapper newCollectionEvent(
@@ -73,7 +74,8 @@ public class CollectionEventHelper extends DbHelper {
     public static List<CollectionEventWrapper> addCollectionEvents(
         CenterWrapper<?> center, PatientWrapper patient, String name)
         throws Exception {
-        List<CollectionEventWrapper> cevents = new ArrayList<CollectionEventWrapper>();
+        List<CollectionEventWrapper> cevents =
+            new ArrayList<CollectionEventWrapper>();
         List<SpecimenTypeWrapper> spcTypes = SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, false);
         int num = r.nextInt(15) + 1;
@@ -89,7 +91,8 @@ public class CollectionEventHelper extends DbHelper {
     public static List<CollectionEventWrapper> addCollectionEvents(
         CenterWrapper<?> center, StudyWrapper study, String name)
         throws Exception {
-        List<CollectionEventWrapper> cevents = new ArrayList<CollectionEventWrapper>();
+        List<CollectionEventWrapper> cevents =
+            new ArrayList<CollectionEventWrapper>();
         List<SpecimenTypeWrapper> spcTypes = SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, false);
         int num = r.nextInt(15) + 1;

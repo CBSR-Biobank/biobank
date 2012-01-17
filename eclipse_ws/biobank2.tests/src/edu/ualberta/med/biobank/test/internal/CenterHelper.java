@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+@Deprecated
 public class CenterHelper extends DbHelper {
 
     private static final String ALIQUOTED_SPEC_HQL = "select spec from "

@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.util.Assert;
 
+@Deprecated
 public class ModelUtils {
 
     public static <E> E getObjectWithId(WritableApplicationService appService,

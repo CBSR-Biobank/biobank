@@ -29,6 +29,7 @@ import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
+@Deprecated
 public class TestUser extends TestDatabase {
 
     @Test

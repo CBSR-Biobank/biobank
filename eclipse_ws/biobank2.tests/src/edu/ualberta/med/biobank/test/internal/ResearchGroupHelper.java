@@ -7,9 +7,11 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
+@Deprecated
 public class ResearchGroupHelper extends CenterHelper {
 
-    private static List<ResearchGroupWrapper> createdResearchGroups = new ArrayList<ResearchGroupWrapper>();
+    private static List<ResearchGroupWrapper> createdResearchGroups =
+        new ArrayList<ResearchGroupWrapper>();
 
     public static ResearchGroupWrapper newResearchGroup(String name,
         boolean addToCreatedList) throws Exception {
@@ -53,7 +55,8 @@ public class ResearchGroupHelper extends CenterHelper {
 
     public static List<ResearchGroupWrapper> addResearchGroups(String name,
         int count) throws Exception {
-        List<ResearchGroupWrapper> researchGroups = new ArrayList<ResearchGroupWrapper>();
+        List<ResearchGroupWrapper> researchGroups =
+            new ArrayList<ResearchGroupWrapper>();
         for (int i = 0; i < count; i++) {
             researchGroups.add(addResearchGroup(name + i, true));
         }

@@ -9,12 +9,14 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
+@Deprecated
 public class AliquotedSpecimenHelper extends DbHelper {
 
     public static AliquotedSpecimenWrapper newAliquotedSpecimen(
         StudyWrapper study, SpecimenTypeWrapper type) throws Exception {
-        AliquotedSpecimenWrapper aliquotedSpecimen = new AliquotedSpecimenWrapper(
-            appService);
+        AliquotedSpecimenWrapper aliquotedSpecimen =
+            new AliquotedSpecimenWrapper(
+                appService);
         aliquotedSpecimen.setStudy(study);
         aliquotedSpecimen.setSpecimenType(type);
         aliquotedSpecimen.setQuantity(r.nextInt(10));
@@ -36,7 +38,8 @@ public class AliquotedSpecimenHelper extends DbHelper {
     public static List<AliquotedSpecimenWrapper> addRandAliquotedSpecimens(
         StudyWrapper study, SiteWrapper site, String name) throws Exception {
         int nber = r.nextInt(15) + 1;
-        List<AliquotedSpecimenWrapper> list = new ArrayList<AliquotedSpecimenWrapper>();
+        List<AliquotedSpecimenWrapper> list =
+            new ArrayList<AliquotedSpecimenWrapper>();
         for (int i = 0; i < nber; i++) {
             SpecimenTypeWrapper type = SpecimenTypeHelper.addSpecimenType(name
                 + i);

@@ -52,6 +52,7 @@ import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
+@Deprecated
 public class TestContainer extends TestDatabase {
 
     // the methods to skip in the getters and setters test

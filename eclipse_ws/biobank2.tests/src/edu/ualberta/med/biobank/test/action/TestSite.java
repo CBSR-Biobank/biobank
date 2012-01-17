@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -388,7 +389,8 @@ public class TestSite extends TestAction {
             SiteHelper.provisionProcessingConfiguration(actionExecutor, name);
 
         Integer dispatchId1 =
-            DispatchHelper.createDispatch(actionExecutor, provisioning.clinicId,
+            DispatchHelper.createDispatch(actionExecutor,
+                provisioning.clinicId,
                 provisioning.siteId,
                 provisioning.patientIds.get(0));
 
@@ -430,8 +432,13 @@ public class TestSite extends TestAction {
         actionExecutor.exec(new DispatchDeleteAction(dispatchId1));
 
         for (Specimen specimen : specimens) {
+            Collection<Specimen> ceAllSpc =
+                specimen.getCollectionEvent().getAllSpecimenCollection();
+            ceAllSpc.remove(specimen);
+            specimen.getCollectionEvent().setAllSpecimenCollection(ceAllSpc);
             actionExecutor.exec(new SpecimenDeleteAction(specimen.getId()));
         }
+
         deleteOriginInfos(provisioning.siteId);
         actionExecutor.exec(new SiteDeleteAction(provisioning.siteId));
     }
@@ -442,7 +449,8 @@ public class TestSite extends TestAction {
             SiteHelper.provisionProcessingConfiguration(actionExecutor, name);
 
         Integer dispatchId =
-            DispatchHelper.createDispatch(actionExecutor, provisioning.clinicId,
+            DispatchHelper.createDispatch(actionExecutor,
+                provisioning.clinicId,
                 provisioning.siteId,
                 provisioning.patientIds.get(0));
 

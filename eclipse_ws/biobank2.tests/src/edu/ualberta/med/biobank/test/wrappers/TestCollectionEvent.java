@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+@Deprecated
 public class TestCollectionEvent extends TestDatabase {
 
     private StudyWrapper study;
@@ -549,13 +550,14 @@ public class TestCollectionEvent extends TestDatabase {
         cevent.reload();
 
         // make sure only one value in database
-        HQLCriteria c = new HQLCriteria(
-            "select eattr from "
-                + CollectionEvent.class.getName()
-                + " as ce "
-                + "join ce.eventAttrCollection as eattr "
-                + "join eattr.studyEventAttr as seattr where ce.id = ? and seattr.label= ?",
-            Arrays.asList(new Object[] { cevent.getId(), "Worksheet" }));
+        HQLCriteria c =
+            new HQLCriteria(
+                "select eattr from "
+                    + CollectionEvent.class.getName()
+                    + " as ce "
+                    + "join ce.eventAttrCollection as eattr "
+                    + "join eattr.studyEventAttr as seattr where ce.id = ? and seattr.label= ?",
+                Arrays.asList(new Object[] { cevent.getId(), "Worksheet" }));
         List<EventAttr> results = appService.query(c);
         Assert.assertEquals(1, results.size());
     }

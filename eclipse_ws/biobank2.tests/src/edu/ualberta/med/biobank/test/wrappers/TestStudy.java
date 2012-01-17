@@ -39,6 +39,7 @@ import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceSpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
+@Deprecated
 public class TestStudy extends TestDatabase {
     @Test
     public void testGetSiteCollection() throws Exception {
@@ -620,7 +621,8 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
         StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
 
-        Map<StudyWrapper, List<PatientWrapper>> studyPatientsMap = new HashMap<StudyWrapper, List<PatientWrapper>>();
+        Map<StudyWrapper, List<PatientWrapper>> studyPatientsMap =
+            new HashMap<StudyWrapper, List<PatientWrapper>>();
         studyPatientsMap.put(study1, new ArrayList<PatientWrapper>());
         studyPatientsMap.put(study2, new ArrayList<PatientWrapper>());
 

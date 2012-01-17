@@ -36,6 +36,7 @@ import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
+@Deprecated
 public class TestShippingMethod extends TestDatabase {
     @Test
     public void testGettersAndSetters() throws Exception {
@@ -124,7 +125,8 @@ public class TestShippingMethod extends TestDatabase {
         // add 5 shipping methods that will eventually be deleted
         int before = ShippingMethodWrapper.getShippingMethods(appService)
             .size();
-        List<ShippingMethodWrapper> toDelete = new ArrayList<ShippingMethodWrapper>();
+        List<ShippingMethodWrapper> toDelete =
+            new ArrayList<ShippingMethodWrapper>();
         for (int i = 0; i < 5; ++i) {
             name = "testPersist" + i + r.nextInt();
             sm = new ShippingMethodWrapper(appService);
@@ -142,7 +144,8 @@ public class TestShippingMethod extends TestDatabase {
 
         // create 3 new shipping methods
         before = after;
-        List<ShippingMethodWrapper> toAdd = new ArrayList<ShippingMethodWrapper>();
+        List<ShippingMethodWrapper> toAdd =
+            new ArrayList<ShippingMethodWrapper>();
         for (int i = 0; i < 3; ++i) {
             name = "testPersist" + i + r.nextInt();
             sm = new ShippingMethodWrapper(appService);

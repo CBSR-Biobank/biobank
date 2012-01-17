@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
+@Deprecated
 public class TestingDispatcher implements Dispatcher {
     @Override
     public <T extends ActionResult> T exec(Action<T> action) {

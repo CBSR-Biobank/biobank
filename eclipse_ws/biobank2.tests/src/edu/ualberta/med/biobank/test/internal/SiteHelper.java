@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 
+@Deprecated
 public class SiteHelper extends CenterHelper {
 
     public static List<SiteWrapper> createdSites = new ArrayList<SiteWrapper>();

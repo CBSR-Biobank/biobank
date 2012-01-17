@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
+@Deprecated
 public class ContactHelper extends DbHelper {
 
     public static ContactWrapper newContact(ClinicWrapper clinic, String name) {
