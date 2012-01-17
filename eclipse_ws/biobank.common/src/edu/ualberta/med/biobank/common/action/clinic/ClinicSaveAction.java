@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
 
 public class ClinicSaveAction extends CenterSaveAction {
     private static final long serialVersionUID = 1L;
@@ -82,33 +81,31 @@ public class ClinicSaveAction extends CenterSaveAction {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         Permission permission;
         if (centerId == null)
             permission = new ClinicCreatePermission();
         else
             permission = new ClinicUpdatePermission(centerId);
-        return permission.isAllowed(user, session);
+        return permission.isAllowed(null);
     }
 
     /**
      * Contacts cannot be deleted if it is still associated with a study.
      */
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
+    public IdResult run(ActionContext context) throws ActionException {
         if (contactSaveInfos == null) {
             throw new NullPropertyException(Clinic.class,
                 ClinicPeer.CONTACT_COLLECTION);
         }
 
-        this.session = session;
-        context = new ActionContext(user, session);
         clinic = context.load(Clinic.class, centerId, new Clinic());
         clinic.setSendsShipments(sendsShipments);
 
         saveContacts();
 
-        return run(user, session, context, clinic);
+        return run(context, clinic);
     }
 
     // TODO: do not allow delete of a contact linked to a study

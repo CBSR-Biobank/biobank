@@ -2,9 +2,8 @@ package edu.ualberta.med.biobank.common.action.processingEvent;
 
 import java.text.MessageFormat;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.NotUsedCheck;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -13,7 +12,6 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventDeletePermission;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.User;
 
 public class ProcessingEventDeleteAction implements Action<IdResult> {
 
@@ -29,14 +27,13 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        return new ProcessingEventDeletePermission(peventId).isAllowed(user,
-            session);
+    public boolean isAllowed(ActionContext context) {
+        return new ProcessingEventDeletePermission(peventId).isAllowed(null);
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
-        ProcessingEvent pevent = (ProcessingEvent) session.load(
+    public IdResult run(ActionContext context) throws ActionException {
+        ProcessingEvent pevent = (ProcessingEvent) context.load(
             ProcessingEvent.class, peventId);
 
         String hasDerivedSpecimensMsg = MessageFormat.format(
@@ -46,17 +43,17 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
         new NotUsedCheck<ProcessingEvent>(pevent,
             SpecimenPeer.PARENT_SPECIMEN
                 .to(SpecimenPeer.PROCESSING_EVENT),
-            Specimen.class, pevent.getWorksheet(), hasDerivedSpecimensMsg).run(
-            user, session);
+            Specimen.class, pevent.getWorksheet(), hasDerivedSpecimensMsg)
+            .run(null);
 
         // if no aliquoted specimen, then ok to remove the specimens and to
         // delete the processing event
         for (Specimen sp : pevent.getSpecimenCollection()) {
             sp.setProcessingEvent(null);
-            session.saveOrUpdate(sp);
+            context.getSession().saveOrUpdate(sp);
         }
 
-        session.delete(pevent);
+        context.getSession().delete(pevent);
 
         return new IdResult(peventId);
     }

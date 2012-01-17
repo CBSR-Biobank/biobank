@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.specimen;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
@@ -12,7 +10,6 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.User;
 
 public class SpecimenUpdateAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
@@ -44,14 +41,12 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         return true; // TODO: inappropriate!
     }
 
     @Override
-    public EmptyResult run(User user, Session session) throws ActionException {
-        ActionContext context = new ActionContext(user, session);
-
+    public EmptyResult run(ActionContext context) throws ActionException {
         Specimen specimen = context.load(Specimen.class, specimenId);
 
         SpecimenType specimenType =

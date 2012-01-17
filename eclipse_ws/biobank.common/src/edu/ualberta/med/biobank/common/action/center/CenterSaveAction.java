@@ -3,8 +3,6 @@ package edu.ualberta.med.biobank.common.action.center;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -16,7 +14,6 @@ import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.User;
 
 public abstract class CenterSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
@@ -54,13 +51,13 @@ public abstract class CenterSaveAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         // TODO Auto-generated method stub
         return false;
     }
 
-    protected IdResult run(User user, Session session,
-        ActionContext context, Center center) throws ActionException {
+    protected IdResult run(ActionContext context, Center center)
+        throws ActionException {
         if (name == null) {
             throw new NullPropertyException(Center.class, CenterPeer.NAME);
         }
@@ -80,14 +77,14 @@ public abstract class CenterSaveAction implements Action<IdResult> {
             new ArrayList<ValueProperty<Center>>();
         uniqueValProps.add(new ValueProperty<Center>(CenterPeer.NAME, name));
         new UniquePreCheck<Center>(Center.class, centerId, uniqueValProps).run(
-            user, session);
+            context);
 
         // check for duplicate name short
         uniqueValProps = new ArrayList<ValueProperty<Center>>();
         uniqueValProps.add(new ValueProperty<Center>(CenterPeer.NAME_SHORT,
             nameShort));
         new UniquePreCheck<Center>(Center.class, centerId, uniqueValProps).run(
-            user, session);
+            context);
 
         // TODO: check permission? (can edit site?)
 
@@ -105,8 +102,8 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         // TODO: remember to check the address
         center.setAddress(address);
 
-        session.saveOrUpdate(center);
-        session.flush();
+        context.getSession().saveOrUpdate(center);
+        context.getSession().flush();
 
         // TODO: SHOULD NOT require a flush so that we can get the inserted id
         // if this was an insert, try using a callback that sets the response

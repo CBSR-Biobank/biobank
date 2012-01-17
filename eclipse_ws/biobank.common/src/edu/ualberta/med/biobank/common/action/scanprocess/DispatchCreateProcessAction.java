@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.common.util.ItemState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.User;
 
 public class DispatchCreateProcessAction extends ServerProcessAction {
     private static final long serialVersionUID = 1L;
@@ -218,7 +217,7 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
                     "DispatchProcess.create.specimen.alreadyAdded", locale), //$NON-NLS-1$
                     specimen.getInventoryId()));
             } else if (new SpecimenIsUsedInDispatchAction(specimen.getId())
-                .run(null, session).isTrue()) {
+                .run(null).isTrue()) {
                 cell.setStatus(CellInfoStatus.ERROR);
                 cell.setInformation(MessageFormat.format(
                     Messages
@@ -238,7 +237,7 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         // FIXME add dispatch create permission
         return true;
     }

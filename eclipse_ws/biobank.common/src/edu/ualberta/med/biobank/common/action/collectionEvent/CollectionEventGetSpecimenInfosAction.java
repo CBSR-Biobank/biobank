@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.User;
 
 public class CollectionEventGetSpecimenInfosAction implements
     Action<ListResult<SpecimenInfo>> {
@@ -64,16 +63,16 @@ public class CollectionEventGetSpecimenInfosAction implements
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         return true;
     }
 
     @Override
-    public ListResult<SpecimenInfo> run(User user, Session session)
+    public ListResult<SpecimenInfo> run(ActionContext context)
         throws ActionException {
         ArrayList<SpecimenInfo> specs = new ArrayList<SpecimenInfo>();
 
-        Query query = session
+        Query query = context.getSession()
             .createQuery(aliquotedSpecimens ? ALIQUOTED_SPEC_QRY
                 : SOURCE_SPEC_QRY);
         query.setParameter(0, ceventId);

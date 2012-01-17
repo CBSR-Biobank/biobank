@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank.common.action.clinic;
 import java.text.MessageFormat;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -26,10 +26,10 @@ public class ClinicPreDeleteChecks {
         this.clinic = clinic;
     }
 
-    public void run(Session session) {
+    public void run(ActionContext context) {
         // this HQL query is faster than using multiple instantiations of
         // CollectionIsEmptyCheck
-        Query query = session.createQuery(COUNT_STUDIES_HQL);
+        Query query = context.getSession().createQuery(COUNT_STUDIES_HQL);
         query.setParameter(0, clinic.getId());
 
         Long studyCount = HibernateUtil.getCountFromQuery(query);

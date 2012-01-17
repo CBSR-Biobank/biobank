@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -20,7 +18,6 @@ import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeCreat
 import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.User;
 
 public class SpecimenTypeSaveAction implements Action<IdResult> {
 
@@ -57,35 +54,31 @@ public class SpecimenTypeSaveAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         Permission permission;
         if (specimenTypeId == null)
             permission = new SpecimenTypeCreatePermission();
         else
             permission = new SpecimenTypeUpdatePermission(specimenTypeId);
-        return permission.isAllowed(user, session);
+        return permission.isAllowed(null);
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
-        context = new ActionContext(user, session);
-
+    public IdResult run(ActionContext context) throws ActionException {
         // check for duplicate name
         List<ValueProperty<SpecimenType>> uniqueValProps =
             new ArrayList<ValueProperty<SpecimenType>>();
         uniqueValProps.add(new ValueProperty<SpecimenType>(
             SpecimenTypePeer.NAME, name));
         new UniquePreCheck<SpecimenType>(SpecimenType.class, specimenTypeId,
-            uniqueValProps).run(user,
-            session);
+            uniqueValProps).run(null);
 
         // check for duplicate name short
         uniqueValProps = new ArrayList<ValueProperty<SpecimenType>>();
         uniqueValProps.add(new ValueProperty<SpecimenType>(
             SpecimenTypePeer.NAME_SHORT, nameShort));
         new UniquePreCheck<SpecimenType>(SpecimenType.class, specimenTypeId,
-            uniqueValProps).run(user,
-            session);
+            uniqueValProps).run(null);
 
         specimenType =
             context.get(SpecimenType.class, specimenTypeId, new SpecimenType());
@@ -94,8 +87,8 @@ public class SpecimenTypeSaveAction implements Action<IdResult> {
 
         saveChildSpecimenTypes();
 
-        session.saveOrUpdate(specimenType);
-        session.flush();
+        context.getSession().saveOrUpdate(specimenType);
+        context.getSession().flush();
 
         return new IdResult(specimenType.getId());
     }

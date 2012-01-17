@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
@@ -67,7 +65,7 @@ public class UserSaveAction extends PrincipalSaveAction {
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
+    public IdResult run(ActionContext context) throws ActionException {
         if (login == null) {
             throw new NullPropertyException(User.class, UserPeer.LOGIN);
         }
@@ -95,31 +93,28 @@ public class UserSaveAction extends PrincipalSaveAction {
             throw new NullPropertyException(User.class, "group ids");
         }
 
-        actionContext = new ActionContext(user, session);
-
         // check for duplicate login
         List<ValueProperty<User>> uniqueValProps =
             new ArrayList<ValueProperty<User>>();
         uniqueValProps.add(new ValueProperty<User>(UserPeer.LOGIN, login));
         new UniquePreCheck<User>(User.class, principalId, uniqueValProps).run(
-            user, session);
+            null);
 
         // check for duplicate csmUserId
         uniqueValProps = new ArrayList<ValueProperty<User>>();
         uniqueValProps.add(
             new ValueProperty<User>(UserPeer.CSM_USER_ID, csmUserId));
         new UniquePreCheck<User>(User.class, principalId, uniqueValProps).run(
-            user, session);
+            null);
 
         // check for duplicate fullname
         uniqueValProps = new ArrayList<ValueProperty<User>>();
         uniqueValProps.add(
             new ValueProperty<User>(UserPeer.FULL_NAME, fullName));
         new UniquePreCheck<User>(User.class, principalId, uniqueValProps).run(
-            user, session);
+            null);
 
-        newUser =
-            actionContext.get(User.class, principalId, new User());
+        newUser = context.get(User.class, principalId, new User());
 
         newUser.setLogin(login);
         newUser.setCsmUserId(csmUserId);
@@ -129,17 +124,17 @@ public class UserSaveAction extends PrincipalSaveAction {
         newUser.setNeedPwdChange(needPwdChange);
 
         ActivityStatus aStatus =
-            actionContext.load(ActivityStatus.class, aStatusId);
+            context.load(ActivityStatus.class, aStatusId);
         newUser.setActivityStatus(aStatus);
 
-        saveGroups();
+        saveGroups(context);
 
-        return run(user, session, newUser);
+        return run(context, newUser);
     }
 
-    private void saveGroups() {
+    private void saveGroups(ActionContext context) {
         Map<Integer, BbGroup> groups =
-            actionContext.load(BbGroup.class, groupIds);
+            context.load(BbGroup.class, groupIds);
 
         SetDifference<BbGroup> groupsDiff =
             new SetDifference<BbGroup>(newUser.getGroupCollection(),

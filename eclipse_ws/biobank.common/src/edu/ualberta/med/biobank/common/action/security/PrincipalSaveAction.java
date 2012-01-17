@@ -3,8 +3,6 @@ package edu.ualberta.med.biobank.common.action.security;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -14,7 +12,6 @@ import edu.ualberta.med.biobank.common.permission.security.UserManagementPermiss
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Principal;
-import edu.ualberta.med.biobank.model.User;
 
 public abstract class PrincipalSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
@@ -22,8 +19,6 @@ public abstract class PrincipalSaveAction implements Action<IdResult> {
     protected Integer principalId = null;
 
     private Set<Integer> membershipIds;
-
-    protected ActionContext actionContext;
 
     public void setId(Integer id) {
         this.principalId = id;
@@ -34,11 +29,11 @@ public abstract class PrincipalSaveAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return new UserManagementPermission().isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return new UserManagementPermission().isAllowed(null);
     }
 
-    public IdResult run(User user, Session session, Principal principal)
+    public IdResult run(ActionContext context, Principal principal)
         throws ActionException {
         if (membershipIds == null) {
             throw new NullPropertyException(Principal.class,
@@ -47,12 +42,8 @@ public abstract class PrincipalSaveAction implements Action<IdResult> {
 
         principal.setId(principalId);
 
-        if (actionContext == null) {
-            actionContext = new ActionContext(user, session);
-        }
-
         Map<Integer, Membership> memberships =
-            actionContext.load(Membership.class, membershipIds);
+            context.load(Membership.class, membershipIds);
 
         SetDifference<Membership> sitesDiff =
             new SetDifference<Membership>(principal.getMembershipCollection(),
@@ -61,11 +52,11 @@ public abstract class PrincipalSaveAction implements Action<IdResult> {
 
         // remove memberships no longer used
         for (Membership membership : sitesDiff.getRemoveSet()) {
-            session.delete(membership);
+            context.getSession().delete(membership);
         }
 
-        session.saveOrUpdate(principal);
-        session.flush();
+        context.getSession().saveOrUpdate(principal);
+        context.getSession().flush();
 
         return new IdResult(principal.getId());
     }

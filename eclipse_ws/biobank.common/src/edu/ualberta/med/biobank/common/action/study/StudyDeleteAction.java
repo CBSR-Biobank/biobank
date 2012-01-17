@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.study;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
@@ -10,7 +8,6 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
 
 public class StudyDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
@@ -22,23 +19,22 @@ public class StudyDeleteAction implements Action<EmptyResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        return new StudyDeletePermission(studyId).isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) {
+        return new StudyDeletePermission(studyId).isAllowed(null);
     }
 
     @Override
-    public EmptyResult run(User user, Session session) throws ActionException {
-        Study study =
-            new ActionContext(user, session).load(Study.class, studyId);
+    public EmptyResult run(ActionContext context) throws ActionException {
+        Study study = context.load(Study.class, studyId);
 
         new CollectionIsEmptyCheck<Study>(
             Study.class, study, StudyPeer.PATIENT_COLLECTION,
-            study.getNameShort(), null).run(user, session);
+            study.getNameShort(), null).run(null);
 
         // cascades delete all source specimens, aliquoted specimens and
         // study event attributes
 
-        session.delete(study);
+        context.getSession().delete(study);
         return new EmptyResult();
     }
 }

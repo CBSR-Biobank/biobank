@@ -1,18 +1,15 @@
 package edu.ualberta.med.biobank.common.action.dispatch;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchChangeStatePermission;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
-import edu.ualberta.med.biobank.model.User;
 
 public class DispatchChangeStateAction implements Action<IdResult> {
 
@@ -32,23 +29,21 @@ public class DispatchChangeStateAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return new DispatchChangeStatePermission(id).isAllowed(user,
-            session);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return new DispatchChangeStatePermission(id).isAllowed(null);
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
-        SessionUtil sessionUtil = new SessionUtil(session);
+    public IdResult run(ActionContext context) throws ActionException {
         Dispatch disp =
-            sessionUtil.load(Dispatch.class, id);
+            context.load(Dispatch.class, id);
 
         disp.setState(newState.getId());
 
         if (shipInfo != null) {
 
             ShipmentInfo si =
-                sessionUtil
+                context
                     .get(ShipmentInfo.class, shipInfo.siId, new ShipmentInfo());
             si.boxNumber = shipInfo.boxNumber;
             si.packedAt = shipInfo.packedAt;
@@ -56,7 +51,7 @@ public class DispatchChangeStateAction implements Action<IdResult> {
             si.waybill = shipInfo.waybill;
 
             ShippingMethod sm =
-                sessionUtil
+                context
                     .get(ShippingMethod.class, shipInfo.method.id,
                         new ShippingMethod());
 
@@ -64,8 +59,8 @@ public class DispatchChangeStateAction implements Action<IdResult> {
             disp.setShipmentInfo(si);
         }
 
-        session.saveOrUpdate(disp);
-        session.flush();
+        context.getSession().saveOrUpdate(disp);
+        context.getSession().flush();
 
         return new IdResult(disp.getId());
     }

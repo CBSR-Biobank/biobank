@@ -4,12 +4,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.Session;
-
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.peer.BbGroupPeer;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.BbGroup;
@@ -28,23 +26,22 @@ public class GroupSaveAction extends PrincipalSaveAction {
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
+    public IdResult run(ActionContext context) throws ActionException {
         if (description == null) {
             throw new NullPropertyException(BbGroup.class,
                 BbGroupPeer.DESCRIPTION);
         }
 
-        SessionUtil sessionUtil = new SessionUtil(session);
-        group = sessionUtil.get(BbGroup.class, principalId, new BbGroup());
+        group = context.get(BbGroup.class, principalId, new BbGroup());
 
         group.setDescription(description);
-        saveUsers();
+        saveUsers(context);
 
-        return run(user, session, group);
+        return run(context, group);
     }
 
-    private void saveUsers() {
-        Map<Integer, User> users = actionContext.load(User.class, userIds);
+    private void saveUsers(ActionContext context) {
+        Map<Integer, User> users = context.load(User.class, userIds);
 
         SetDifference<User> usersDiff =
             new SetDifference<User>(group.getUserCollection(),

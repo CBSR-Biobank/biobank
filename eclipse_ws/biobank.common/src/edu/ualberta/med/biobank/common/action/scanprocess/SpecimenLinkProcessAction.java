@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
@@ -15,7 +16,6 @@ import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermissio
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.User;
 
 public class SpecimenLinkProcessAction extends ServerProcessAction {
 
@@ -159,9 +159,9 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         return new SpecimenLinkPermission(currentWorkingCenterId, studyId)
-            .isAllowed(user, session);
+            .isAllowed(null);
     }
 
 }

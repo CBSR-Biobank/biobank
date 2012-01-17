@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.model.User;
 
 public class DispatchGetSpecimenInfosAction implements
     Action<ListResult<DispatchSpecimen>> {
@@ -37,17 +36,18 @@ public class DispatchGetSpecimenInfosAction implements
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return new DispatchReadPermission(dispatchId).isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return new DispatchReadPermission(dispatchId).isAllowed(null);
     }
 
     @Override
-    public ListResult<DispatchSpecimen> run(User user, Session session)
+    public ListResult<DispatchSpecimen> run(ActionContext context)
         throws ActionException {
         ArrayList<DispatchSpecimen> specInfos =
             new ArrayList<DispatchSpecimen>();
 
-        Query query = session.createQuery(DISPATCH_SPECIMEN_INFO_HQL);
+        Query query =
+            context.getSession().createQuery(DISPATCH_SPECIMEN_INFO_HQL);
         query.setParameter(0, dispatchId);
 
         @SuppressWarnings("unchecked")

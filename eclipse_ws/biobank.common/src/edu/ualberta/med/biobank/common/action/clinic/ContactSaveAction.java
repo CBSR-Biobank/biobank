@@ -1,14 +1,11 @@
 package edu.ualberta.med.biobank.common.action.clinic;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.User;
 
 public class ContactSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
@@ -60,19 +57,18 @@ public class ContactSaveAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         // FIXME get correct permissions
         return true;
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
+    public IdResult run(ActionContext context) throws ActionException {
         if (clinicId == null) {
             throw new NullPointerException("clinic id cannot be null");
         }
 
-        SessionUtil sessionUtil = new SessionUtil(session);
-        Contact contact = sessionUtil.get(Contact.class, id, new Contact());
+        Contact contact = context.get(Contact.class, id, new Contact());
 
         contact.setName(name);
         contact.setTitle(title);
@@ -82,11 +78,11 @@ public class ContactSaveAction implements Action<IdResult> {
         contact.setFaxNumber(faxNumber);
         contact.setEmailAddress(emailAddress);
 
-        Clinic clinic = sessionUtil.get(Clinic.class, clinicId);
+        Clinic clinic = context.get(Clinic.class, clinicId);
         contact.setClinic(clinic);
 
-        session.saveOrUpdate(contact);
-        session.flush();
+        context.getSession().saveOrUpdate(contact);
+        context.getSession().flush();
 
         return new IdResult(contact.getId());
     }

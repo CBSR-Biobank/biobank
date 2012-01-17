@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
@@ -25,7 +23,6 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.User;
 
 public class ProcessingEventSaveAction implements Action<IdResult> {
 
@@ -58,26 +55,25 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         Permission permission;
         if (peventId == null) {
             permission = new ProcessingEventCreatePermission();
         } else {
             permission = new ProcessingEventUpdatePermission(peventId);
         }
-        return permission.isAllowed(user, session);
+        return permission.isAllowed(null);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
+    public IdResult run(ActionContext context) throws ActionException {
         ProcessingEvent peventToSave;
-        ActionContext actionContext = new ActionContext(user, session);
 
         if (peventId == null) {
             peventToSave = new ProcessingEvent();
         } else {
-            peventToSave = actionContext.load(ProcessingEvent.class, peventId);
+            peventToSave = context.load(ProcessingEvent.class, peventId);
         }
 
         // FIXME Version check?
@@ -86,12 +82,12 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         // since imported pevent can have a null worksheet:
         new UniquePreCheck<ProcessingEvent>(ProcessingEvent.class, peventId,
             Arrays.asList(new ValueProperty<ProcessingEvent>(
-                ProcessingEventPeer.WORKSHEET, worksheet))).run(user, session);
+                ProcessingEventPeer.WORKSHEET, worksheet))).run(null);
 
-        peventToSave.setActivityStatus(actionContext.load(ActivityStatus.class,
+        peventToSave.setActivityStatus(context.load(ActivityStatus.class,
             statusId));
-        peventToSave.setCenter(actionContext.load(Center.class, centerId));
-        setComments(actionContext, peventToSave);
+        peventToSave.setCenter(context.load(Center.class, centerId));
+        setComments(context, peventToSave);
         peventToSave.setCreatedAt(createdAt);
         peventToSave.setWorksheet(worksheet);
 
@@ -100,7 +96,7 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
                 ProcessingEventPeer.SPECIMEN_COLLECTION));
         if (specimenIds != null)
             for (Integer spcId : specimenIds) {
-                Specimen spc = actionContext.load(Specimen.class, spcId);
+                Specimen spc = context.load(Specimen.class, spcId);
                 spc.setProcessingEvent(peventToSave);
                 specUtil.add(spc);
             }
@@ -108,7 +104,7 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
             spc.setProcessingEvent(null);
         }
 
-        session.saveOrUpdate(peventToSave);
+        context.getSession().saveOrUpdate(peventToSave);
 
         return new IdResult(peventToSave.getId());
     }

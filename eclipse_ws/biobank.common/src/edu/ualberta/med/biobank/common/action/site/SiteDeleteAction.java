@@ -1,14 +1,11 @@
 package edu.ualberta.med.biobank.common.action.site;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.center.CenterDeleteAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.site.SiteDeletePermission;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.User;
 
 public class SiteDeleteAction extends CenterDeleteAction {
     private static final long serialVersionUID = 1L;
@@ -18,14 +15,14 @@ public class SiteDeleteAction extends CenterDeleteAction {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        return new SiteDeletePermission(centerId).isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) {
+        return new SiteDeletePermission(centerId).isAllowed(null);
     }
 
     @Override
-    public EmptyResult run(User user, Session session) throws ActionException {
-        Site site = new ActionContext(user, session).load(Site.class, centerId);
-        new SitePreDeleteChecks(site).run(user, session);
-        return super.run(user, session, site);
+    public EmptyResult run(ActionContext context) throws ActionException {
+        Site site = context.load(Site.class, centerId);
+        new SitePreDeleteChecks(site).run(null);
+        return super.run(context, site);
     }
 }

@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
-import edu.ualberta.med.biobank.model.User;
 
 public class StudyGetStudyEventAttrsAction implements
     Action<ListResult<StudyEventAttr>> {
@@ -35,16 +34,17 @@ public class StudyGetStudyEventAttrsAction implements
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         return true;
     }
 
     @Override
-    public ListResult<StudyEventAttr> run(User user, Session session)
+    public ListResult<StudyEventAttr> run(ActionContext context)
         throws ActionException {
         ArrayList<StudyEventAttr> result = new ArrayList<StudyEventAttr>();
 
-        Query query = session.createQuery(SELECT_STUDY_EVENT_ATTR_HQL);
+        Query query =
+            context.getSession().createQuery(SELECT_STUDY_EVENT_ATTR_HQL);
         query.setParameter(0, studyId);
 
         @SuppressWarnings("unchecked")

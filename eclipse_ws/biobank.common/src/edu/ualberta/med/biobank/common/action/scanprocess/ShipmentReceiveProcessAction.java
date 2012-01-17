@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
@@ -14,7 +15,6 @@ import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.ItemState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.User;
 
 /**
  * Used by dispatch and request
@@ -135,7 +135,7 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         // FIXME create Permission for shipment receive
         return true;
     }

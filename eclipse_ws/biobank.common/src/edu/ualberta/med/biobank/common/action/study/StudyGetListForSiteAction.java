@@ -1,15 +1,14 @@
 package edu.ualberta.med.biobank.common.action.study;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
 
 public class StudyGetListForSiteAction implements Action<ListResult<Study>> {
 
@@ -33,15 +32,15 @@ public class StudyGetListForSiteAction implements Action<ListResult<Study>> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         return true;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public ListResult<Study> run(User user, Session session)
+    public ListResult<Study> run(ActionContext context)
         throws ActionException {
-        Query query = session.createQuery(STUDIES_QRY);
+        Query query = context.getSession().createQuery(STUDIES_QRY);
         query.setParameter(0, siteId);
 
         return new ListResult<Study>(query.list());

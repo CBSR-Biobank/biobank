@@ -1,12 +1,9 @@
 package edu.ualberta.med.biobank.common.permission.researchGroup;
 
-import org.hibernate.Session;
-
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.ResearchGroup;
-import edu.ualberta.med.biobank.model.User;
 
 public class SubmitRequestPermission implements Permission {
 
@@ -19,10 +16,9 @@ public class SubmitRequestPermission implements Permission {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         ResearchGroup rg =
-            new SessionUtil(session).get(ResearchGroup.class, rgId,
-                new ResearchGroup());
-        return PermissionEnum.REQUEST_CREATE.isAllowed(user, rg);
+            context.get(ResearchGroup.class, rgId, new ResearchGroup());
+        return PermissionEnum.REQUEST_CREATE.isAllowed(context.getUser(), rg);
     }
 }

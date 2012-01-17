@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
@@ -32,7 +30,6 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
-import edu.ualberta.med.biobank.model.User;
 
 public class StudySaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
@@ -143,8 +140,6 @@ public class StudySaveAction implements Action<IdResult> {
     private Collection<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos;
     private Collection<AliquotedSpecimenSaveInfo> aliquotSpecimenSaveInfos;
     private Collection<StudyEventAttrSaveInfo> studyEventAttrSaveInfos;
-    private Session session = null;
-    private ActionContext actionContext;
     private Study study = null;
 
     public void setId(Integer id) {
@@ -187,17 +182,17 @@ public class StudySaveAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         Permission permission;
         if (id == null)
             permission = new StudyCreatePermission();
         else
             permission = new StudyUpdatePermission(id);
-        return permission.isAllowed(user, session);
+        return permission.isAllowed(null);
     }
 
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
+    public IdResult run(ActionContext context) throws ActionException {
         if (name == null) {
             throw new NullPropertyException(Study.class, StudyPeer.NAME);
         }
@@ -228,46 +223,41 @@ public class StudySaveAction implements Action<IdResult> {
                 "aliquot ids cannot be null");
         }
 
-        this.session = session;
-        actionContext = new ActionContext(user, session);
-        study = actionContext.get(Study.class, id, new Study());
+        study = context.get(Study.class, id, new Study());
 
         // check for duplicate name
         List<ValueProperty<Study>> uniqueValProps =
             new ArrayList<ValueProperty<Study>>();
         uniqueValProps.add(new ValueProperty<Study>(StudyPeer.NAME, name));
-        new UniquePreCheck<Study>(Study.class, id, uniqueValProps).run(user,
-            session);
+        new UniquePreCheck<Study>(Study.class, id, uniqueValProps).run(null);
 
         // check for duplicate name short
         uniqueValProps = new ArrayList<ValueProperty<Study>>();
         uniqueValProps.add(new ValueProperty<Study>(StudyPeer.NAME_SHORT,
             nameShort));
-        new UniquePreCheck<Study>(Study.class, id, uniqueValProps).run(user,
-            session);
+        new UniquePreCheck<Study>(Study.class, id, uniqueValProps).run(null);
 
         // TODO: version check?
 
         study.setId(id);
         study.setName(name);
         study.setNameShort(nameShort);
-        study.setActivityStatus(actionContext.load(ActivityStatus.class,
-            aStatusId));
+        study.setActivityStatus(context.load(ActivityStatus.class, aStatusId));
 
-        saveSites();
-        saveContacts();
-        saveSourceSpecimens();
-        saveAliquotedSpecimens();
-        saveEventAttributes();
+        saveSites(context);
+        saveContacts(context);
+        saveSourceSpecimens(context);
+        saveAliquotedSpecimens(context);
+        saveEventAttributes(context);
 
-        session.saveOrUpdate(study);
-        session.flush();
+        context.getSession().saveOrUpdate(study);
+        context.getSession().flush();
 
         return new IdResult(study.getId());
     }
 
-    private void saveSites() {
-        Map<Integer, Site> sites = actionContext.load(Site.class, siteIds);
+    private void saveSites(ActionContext context) {
+        Map<Integer, Site> sites = context.load(Site.class, siteIds);
 
         SetDifference<Site> sitesDiff =
             new SetDifference<Site>(study.getSiteCollection(), sites.values());
@@ -285,9 +275,9 @@ public class StudySaveAction implements Action<IdResult> {
         }
     }
 
-    private void saveContacts() {
+    private void saveContacts(ActionContext context) {
         Map<Integer, Contact> contacts =
-            actionContext.load(Contact.class, contactIds);
+            context.load(Contact.class, contactIds);
         study.setContactCollection(new HashSet<Contact>(contacts.values()));
         SetDifference<Contact> contactsDiff =
             new SetDifference<Contact>(study.getContactCollection(),
@@ -311,18 +301,18 @@ public class StudySaveAction implements Action<IdResult> {
         }
     }
 
-    private void saveSourceSpecimens() {
+    private void saveSourceSpecimens(ActionContext context) {
         Set<SourceSpecimen> newSsCollection = new HashSet<SourceSpecimen>();
         for (SourceSpecimenSaveInfo ssSaveInfo : sourceSpecimenSaveInfos) {
             SourceSpecimen ss;
             if (ssSaveInfo.id == null) {
                 ss = new SourceSpecimen();
             } else {
-                ss = actionContext.load(SourceSpecimen.class, ssSaveInfo.id);
+                ss = context.load(SourceSpecimen.class, ssSaveInfo.id);
             }
 
             newSsCollection.add(ssSaveInfo.populateSourceSpecimen(study, ss,
-                actionContext.load(SpecimenType.class,
+                context.load(SpecimenType.class,
                     ssSaveInfo.specimenTypeId)));
         }
 
@@ -332,11 +322,11 @@ public class StudySaveAction implements Action<IdResult> {
                 study.getSourceSpecimenCollection(), newSsCollection);
         study.setSourceSpecimenCollection(srcSpcsDiff.getAddSet());
         for (SourceSpecimen srcSpc : srcSpcsDiff.getRemoveSet()) {
-            session.delete(srcSpc);
+            context.getSession().delete(srcSpc);
         }
     }
 
-    private void saveAliquotedSpecimens() {
+    private void saveAliquotedSpecimens(ActionContext context) {
         Set<AliquotedSpecimen> newAsCollection =
             new HashSet<AliquotedSpecimen>();
         for (AliquotedSpecimenSaveInfo asSaveInfo : aliquotSpecimenSaveInfos) {
@@ -344,13 +334,13 @@ public class StudySaveAction implements Action<IdResult> {
             if (asSaveInfo.id == null) {
                 as = new AliquotedSpecimen();
             } else {
-                as = actionContext.load(AliquotedSpecimen.class,
+                as = context.load(AliquotedSpecimen.class,
                     asSaveInfo.id);
             }
             newAsCollection.add(asSaveInfo.populateAliquotedSpecimen(study, as,
-                actionContext.load(ActivityStatus.class,
+                context.load(ActivityStatus.class,
                     asSaveInfo.aStatusId),
-                actionContext.load(SpecimenType.class,
+                context.load(SpecimenType.class,
                     asSaveInfo.specimenTypeId)));
         }
 
@@ -361,11 +351,11 @@ public class StudySaveAction implements Action<IdResult> {
         // delete aliquoted specimens no longer in use
         study.setAliquotedSpecimenCollection(aqSpcsDiff.getAddSet());
         for (AliquotedSpecimen aqSpc : aqSpcsDiff.getRemoveSet()) {
-            session.delete(aqSpc);
+            context.getSession().delete(aqSpc);
         }
     }
 
-    private void saveEventAttributes() {
+    private void saveEventAttributes(ActionContext context) {
         Set<Integer> geAttrIdsUsed = new HashSet<Integer>();
         Set<StudyEventAttr> newEAttrCollection = new HashSet<StudyEventAttr>();
         for (StudyEventAttrSaveInfo eAttrSaveInfo : studyEventAttrSaveInfos) {
@@ -378,13 +368,13 @@ public class StudySaveAction implements Action<IdResult> {
             if (eAttrSaveInfo.id == null) {
                 seAttr = new StudyEventAttr();
             } else {
-                seAttr = actionContext.load(StudyEventAttr.class,
+                seAttr = context.load(StudyEventAttr.class,
                     eAttrSaveInfo.id);
             }
             newEAttrCollection.add(eAttrSaveInfo.populateStudyEventAttr(study,
-                seAttr, actionContext.load(GlobalEventAttr.class,
+                seAttr, context.load(GlobalEventAttr.class,
                     eAttrSaveInfo.globalEventAttrId),
-                actionContext.load(ActivityStatus.class,
+                context.load(ActivityStatus.class,
                     eAttrSaveInfo.aStatusId)));
             geAttrIdsUsed.add(eAttrSaveInfo.globalEventAttrId);
         }
@@ -395,7 +385,7 @@ public class StudySaveAction implements Action<IdResult> {
 
         study.setStudyEventAttrCollection(attrsDiff.getAddSet());
         for (StudyEventAttr attr : attrsDiff.getRemoveSet()) {
-            session.delete(attr);
+            context.getSession().delete(attr);
         }
     }
 }

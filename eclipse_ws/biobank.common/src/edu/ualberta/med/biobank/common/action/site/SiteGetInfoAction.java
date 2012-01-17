@@ -3,14 +3,13 @@ package edu.ualberta.med.biobank.common.action.site;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.permission.site.SiteReadPermission;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.User;
 
 public class SiteGetInfoAction implements Action<SiteInfo> {
     private static final long serialVersionUID = 1L;
@@ -43,15 +42,15 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        return new SiteReadPermission(siteId).isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) {
+        return new SiteReadPermission(siteId).isAllowed(null);
     }
 
     @Override
-    public SiteInfo run(User user, Session session) throws ActionException {
+    public SiteInfo run(ActionContext context) throws ActionException {
         SiteInfo.Builder builder = new SiteInfo.Builder();
 
-        Query query = session.createQuery(SITE_INFO_HQL);
+        Query query = context.getSession().createQuery(SITE_INFO_HQL);
         query.setParameter(0, siteId);
 
         @SuppressWarnings("unchecked")
@@ -65,14 +64,14 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
             builder.setAliquotedSpecimenCount((Long) row[3]);
 
             builder.setTopContainers(
-                new SiteGetTopContainersAction(siteId).run(user, session)
+                new SiteGetTopContainersAction(siteId).run(null)
                     .getTopContainers());
             builder.setContainerTypes(
-                new SiteGetContainerTypeInfoAction(siteId).run(user, session)
+                new SiteGetContainerTypeInfoAction(siteId).run(null)
                     .getContainerTypeInfoCollection());
             builder
                 .setStudies(
-                new SiteGetStudyInfoAction(siteId).run(user, session).getList());
+                new SiteGetStudyInfoAction(siteId).run(null).getList());
         } else {
             // TODO: throw exception?
         }

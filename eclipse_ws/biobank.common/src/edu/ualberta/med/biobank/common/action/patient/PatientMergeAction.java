@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.User;
 
 /**
  * Merge patient2 into patient1.
@@ -36,20 +35,18 @@ public class PatientMergeAction implements Action<BooleanResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         return new PatientMergePermission(patient1Id, patient2Id).isAllowed(
-            user,
-            session);
+            null);
     }
 
     @Override
-    public BooleanResult run(User user, Session session) throws ActionException {
+    public BooleanResult run(ActionContext context) throws ActionException {
         // FIXME add checks
         // FIXME logging?
-        ActionContext actionContext = new ActionContext(user, session);
 
-        Patient patient1 = actionContext.load(Patient.class, patient1Id);
-        Patient patient2 = actionContext.load(Patient.class, patient2Id);
+        Patient patient1 = context.load(Patient.class, patient1Id);
+        Patient patient2 = context.load(Patient.class, patient2Id);
         if (patient1.getStudy().equals(patient2.getStudy())) {
             Collection<CollectionEvent> c1events = CollectionUtils
                 .getCollection(patient1,
@@ -63,7 +60,7 @@ public class PatientMergeAction implements Action<BooleanResult> {
                 for (CollectionEvent c2event : new ArrayList<CollectionEvent>(
                     c2events)) {
                     for (CollectionEvent c1event : c1events) {
-                        merged = merge(session, c1event, c2event);
+                        merged = merge(context.getSession(), c1event, c2event);
                         if (merged)
                             break;
                     }
@@ -77,8 +74,8 @@ public class PatientMergeAction implements Action<BooleanResult> {
                     merged = false;
                 }
 
-                session.saveOrUpdate(patient1);
-                session.delete(patient2);
+                context.getSession().saveOrUpdate(patient1);
+                context.getSession().delete(patient2);
 
                 // FIXME see how logs should be done properly...
                 Log logP2 = new Log();
@@ -87,7 +84,7 @@ public class PatientMergeAction implements Action<BooleanResult> {
                 logP2.setDetails(patient2.getPnumber() + " --> " //$NON-NLS-1$
                     + patient1.getPnumber());
                 logP2.setType("Patient"); //$NON-NLS-1$
-                session.save(logP2);
+                context.getSession().save(logP2);
 
                 Log logP1 = new Log();
                 logP1.setAction("merge"); //$NON-NLS-1$
@@ -95,7 +92,7 @@ public class PatientMergeAction implements Action<BooleanResult> {
                 logP1.setDetails(patient1.getPnumber() + " <-- " //$NON-NLS-1$
                     + patient2.getPnumber());
                 logP1.setType("Patient"); //$NON-NLS-1$
-                session.save(logP1);
+                context.getSession().save(logP1);
             }
         } else {
             throw new PatientMergeException(

@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
 
 public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> {
     private static final long serialVersionUID = 1L;
@@ -59,19 +58,19 @@ public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> 
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
+    public boolean isAllowed(ActionContext context) throws ActionException {
         return true;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public ListResult<ClinicInfo> run(User user, Session session)
+    public ListResult<ClinicInfo> run(ActionContext context)
         throws ActionException {
 
         // first get contacts by clinic
         Map<Clinic, List<Contact>> contactsByClinic =
             new HashMap<Clinic, List<Contact>>();
-        Query query = session.createQuery(STUDY_CONTACTS_HQL);
+        Query query = context.getSession().createQuery(STUDY_CONTACTS_HQL);
         query.setParameter(0, studyId);
 
         List<Object[]> results = query.list();
@@ -89,7 +88,7 @@ public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> 
         }
 
         ArrayList<ClinicInfo> infos = new ArrayList<ClinicInfo>();
-        query = session.createQuery(STUDY_CLINIC_INFO_HQL);
+        query = context.getSession().createQuery(STUDY_CLINIC_INFO_HQL);
         query.setParameter(0, studyId);
 
         results = query.list();

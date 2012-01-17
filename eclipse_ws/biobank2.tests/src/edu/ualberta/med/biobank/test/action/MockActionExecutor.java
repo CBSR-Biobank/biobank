@@ -56,7 +56,7 @@ public class MockActionExecutor implements IActionExecutor {
         throws ActionException {
         session.beginTransaction();
 
-        T result = action.run(user, session);
+        T result = action.run(null);
 
         session.getTransaction().commit();
         session.flush();

@@ -4,14 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.EventAttr;
-import edu.ualberta.med.biobank.model.User;
 
 public class CollectionEventGetEventAttrInfoAction implements
     Action<MapResult<Integer, EventAttrInfo>> {
@@ -34,17 +33,17 @@ public class CollectionEventGetEventAttrInfoAction implements
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         return true;
     }
 
     @Override
-    public MapResult<Integer, EventAttrInfo> run(User user, Session session)
+    public MapResult<Integer, EventAttrInfo> run(ActionContext context)
         throws ActionException {
         HashMap<Integer, EventAttrInfo> attrInfos =
             new HashMap<Integer, EventAttrInfo>();
 
-        Query query = session.createQuery(EVENT_ATTR_QRY);
+        Query query = context.getSession().createQuery(EVENT_ATTR_QRY);
         query.setParameter(0, ceventId);
 
         @SuppressWarnings("unchecked")

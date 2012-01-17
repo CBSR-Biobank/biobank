@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.container;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -9,11 +7,10 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.User;
 
 public class ContainerActionHelper {
 
-    public static void setPosition(User user, Session session,
+    public static void setPosition(ActionContext context,
         Container container, RowColPos rcp, Integer parentId) {
         ContainerPosition pos = container.getPosition();
         if ((pos == null) && (rcp != null)) {
@@ -27,8 +24,6 @@ public class ContainerActionHelper {
             pos.setRow(rcp.getRow());
             pos.setCol(rcp.getCol());
 
-            ActionContext context = new ActionContext(user, session);
-
             parent = context.load(Container.class, parentId);
             pos.setParentContainer(parent);
             ContainerType parentType = parent.getContainerType();
@@ -39,7 +34,7 @@ public class ContainerActionHelper {
             pos.setPositionString(positionString);
         } else if ((parentId == null) && (rcp == null)) {
             if ((pos != null) && (pos.getId() != null)) {
-                session.delete(pos);
+                context.getSession().delete(pos);
             }
         } else {
             throw new ActionException(

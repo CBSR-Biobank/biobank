@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -14,7 +13,6 @@ import edu.ualberta.med.biobank.common.i18n.Messages;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.User;
 
 /**
  * 
@@ -48,16 +46,13 @@ public class PatientGetProcessingEventsByPNumberAction implements
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         return true; // TODO: permission check
     }
 
     @Override
-    public PatientGetProcessingEventsByPNumberResult run(User user,
-        Session session)
+    public PatientGetProcessingEventsByPNumberResult run(ActionContext context)
         throws ActionException {
-        ActionContext context = new ActionContext(user, session);
-
         if (pNumber == null || pNumber.isEmpty()) {
             throw new LocalizedActionException(Messages.Greeting, "one", "two");
 
@@ -78,23 +73,24 @@ public class PatientGetProcessingEventsByPNumberAction implements
 
         context.load(Center.class, centerId); // ensure Center exists
 
-        boolean exists = isPatientExists(session);
-        List<ProcessingEvent> pEvents = getProcessingEvents(session);
+        boolean exists = isPatientExists(context);
+        List<ProcessingEvent> pEvents = getProcessingEvents(context);
 
         return new PatientGetProcessingEventsByPNumberResult(exists, pEvents);
     }
 
-    private boolean isPatientExists(Session session) {
-        Query query = session.createQuery(PATIENT_EXISTS_HQL);
+    private boolean isPatientExists(ActionContext context) {
+        Query query = context.getSession().createQuery(PATIENT_EXISTS_HQL);
         query.setParameter(0, pNumber);
 
         return !query.list().isEmpty();
     }
 
-    private List<ProcessingEvent> getProcessingEvents(Session session) {
+    private List<ProcessingEvent> getProcessingEvents(ActionContext context) {
         List<ProcessingEvent> pEvents = new ArrayList<ProcessingEvent>();
 
-        Query query = session.createQuery(PROCESSING_EVENTS_GET_HQL);
+        Query query =
+            context.getSession().createQuery(PROCESSING_EVENTS_GET_HQL);
         query.setParameter(0, pNumber);
         query.setParameter(1, centerId);
 

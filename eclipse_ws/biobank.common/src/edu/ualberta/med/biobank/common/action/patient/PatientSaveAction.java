@@ -3,8 +3,6 @@ package edu.ualberta.med.biobank.common.action.patient;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -17,7 +15,6 @@ import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermissio
 import edu.ualberta.med.biobank.common.permission.patient.PatientUpdatePermission;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
 
 public class PatientSaveAction implements Action<IdResult> {
 
@@ -37,38 +34,37 @@ public class PatientSaveAction implements Action<IdResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         Permission permission;
         if (patientId == null) {
             permission = new PatientCreatePermission(studyId);
         } else {
             permission = new PatientUpdatePermission(patientId);
         }
-        return permission.isAllowed(user, session);
+        return permission.isAllowed(null);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public IdResult run(User user, Session session) throws ActionException {
+    public IdResult run(ActionContext context) throws ActionException {
         // checks pnumber unique to send a proper message:
         new UniquePreCheck<Patient>(Patient.class, patientId,
             Arrays.asList(new ValueProperty<Patient>(PatientPeer.PNUMBER,
-                pnumber))).run(user, session);
+                pnumber))).run(null);
 
         Patient patientToSave;
-        ActionContext actionContext = new ActionContext(user, session);
 
         if (patientId == null) {
             patientToSave = new Patient();
         } else {
-            patientToSave = actionContext.load(Patient.class, patientId);
+            patientToSave = context.load(Patient.class, patientId);
         }
 
         patientToSave.setPnumber(pnumber);
         patientToSave.setCreatedAt(createdAt);
-        patientToSave.setStudy((Study) session.load(Study.class, studyId));
+        patientToSave.setStudy(context.load(Study.class, studyId));
 
-        session.saveOrUpdate(patientToSave);
+        context.getSession().saveOrUpdate(patientToSave);
 
         return new IdResult(patientToSave.getId());
     }

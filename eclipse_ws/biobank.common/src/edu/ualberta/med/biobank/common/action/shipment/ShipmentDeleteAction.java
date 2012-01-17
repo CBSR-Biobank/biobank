@@ -1,16 +1,13 @@
 package edu.ualberta.med.biobank.common.action.shipment;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.util.SessionUtil;
 import edu.ualberta.med.biobank.common.permission.shipment.ShipmentDeletePermission;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.User;
 
 public class ShipmentDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
@@ -22,14 +19,13 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        return new ShipmentDeletePermission(shipId).isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) {
+        return new ShipmentDeletePermission(shipId).isAllowed(null);
     }
 
     @Override
-    public EmptyResult run(User user, Session session) throws ActionException {
-        OriginInfo ship =
-            new SessionUtil(session).get(OriginInfo.class, shipId);
+    public EmptyResult run(ActionContext context) throws ActionException {
+        OriginInfo ship = context.get(OriginInfo.class, shipId);
 
         OriginInfo oi = new OriginInfo();
         Center currentCenter = null;
@@ -42,7 +38,7 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
             spc.setOriginInfo(oi);
         }
         oi.setCenter(currentCenter);
-        session.delete(ship);
+        context.getSession().delete(ship);
         return new EmptyResult();
     }
 }

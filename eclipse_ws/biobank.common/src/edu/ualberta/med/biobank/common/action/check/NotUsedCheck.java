@@ -2,13 +2,11 @@ package edu.ualberta.med.biobank.common.action.check;
 
 import java.text.MessageFormat;
 
-import org.hibernate.Session;
-
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.IBiobankModel;
-import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 
 /**
@@ -43,9 +41,9 @@ public class NotUsedCheck<E extends IBiobankModel> extends ActionCheck<E> {
         this.exceptionMessage = errorMessage;
     }
 
-    public void run(User user, Session session) throws ActionException {
+    public void run(ActionContext context) throws ActionException {
         // TODO Auto-generated method stub
-        Long count = countAction.run(user, session).getCount();
+        Long count = countAction.run(null).getCount();
 
         if (count > 0) {
             String message = getExceptionMessage();

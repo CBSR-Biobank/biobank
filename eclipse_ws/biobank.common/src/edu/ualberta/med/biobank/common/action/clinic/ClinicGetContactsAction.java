@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.User;
 
 public class ClinicGetContactsAction implements Action<ListResult<Contact>> {
 
@@ -30,16 +29,16 @@ public class ClinicGetContactsAction implements Action<ListResult<Contact>> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         return true;
     }
 
     @Override
-    public ListResult<Contact> run(User user, Session session)
+    public ListResult<Contact> run(ActionContext context)
         throws ActionException {
         ArrayList<Contact> result = new ArrayList<Contact>();
 
-        Query query = session.createQuery(HQL);
+        Query query = context.getSession().createQuery(HQL);
         query.setParameter(0, clinicId);
 
         @SuppressWarnings("unchecked")

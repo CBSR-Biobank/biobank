@@ -3,14 +3,13 @@ package edu.ualberta.med.biobank.common.action.dispatch;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.User;
 
 public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
     private static final long serialVersionUID = 1L;
@@ -34,16 +33,16 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return new DispatchReadPermission(id).isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return new DispatchReadPermission(id).isAllowed(null);
     }
 
     @Override
-    public DispatchReadInfo run(User user, Session session)
+    public DispatchReadInfo run(ActionContext context)
         throws ActionException {
         DispatchReadInfo sInfo = new DispatchReadInfo();
 
-        Query query = session.createQuery(DISPATCH_HQL);
+        Query query = context.getSession().createQuery(DISPATCH_HQL);
         query.setParameter(0, id);
 
         @SuppressWarnings("unchecked")
@@ -53,7 +52,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
 
             sInfo.dispatch = (Dispatch) row;
             sInfo.specimens =
-                new DispatchGetSpecimenInfosAction(id).run(user, session)
+                new DispatchGetSpecimenInfosAction(id).run(null)
                     .getList();
 
         } else {

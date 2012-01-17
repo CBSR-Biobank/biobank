@@ -3,14 +3,13 @@ package edu.ualberta.med.biobank.common.action.study;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
 
 public class StudyGetInfoAction implements Action<StudyInfo> {
     private static final long serialVersionUID = 1L;
@@ -46,14 +45,14 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) throws ActionException {
-        return new StudyReadPermission(studyId).isAllowed(user, session);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return new StudyReadPermission(studyId).isAllowed(null);
     }
 
     @Override
     public StudyInfo run(
-        User user, Session session) throws ActionException {
-        Query query = session.createQuery(STUDY_INFO_HQL);
+        ActionContext context) throws ActionException {
+        Query query = context.getSession().createQuery(STUDY_INFO_HQL);
         query.setParameter(0, studyId);
 
         @SuppressWarnings("unchecked")
@@ -63,10 +62,10 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
 
             StudyInfo info = new StudyInfo(
                 (Study) row[0], (Long) row[1], (Long) row[2],
-                getClinicInfo.run(user, session).getList(),
-                getSourceSpecimens.run(user, session).getList(),
-                getAliquotedSpecimens.run(user, session).getList(),
-                getStudyEventAttrs.run(user, session).getList());
+                getClinicInfo.run(null).getList(),
+                getSourceSpecimens.run(null).getList(),
+                getAliquotedSpecimens.run(null).getList(),
+                getStudyEventAttrs.run(null).getList());
 
             return info;
         }

@@ -5,12 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.User;
 
 public class CheckNoDuplicateAction implements Action<BooleanResult> {
 
@@ -33,13 +32,13 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
+    public boolean isAllowed(ActionContext context) {
         // TODO Auto-generated method stub
         return true;
     }
 
     @Override
-    public BooleanResult run(User user, Session session) throws ActionException {
+    public BooleanResult run(ActionContext context) throws ActionException {
         final List<Object> params = new ArrayList<Object>();
         params.add(value);
         String equalsTest = ""; //$NON-NLS-1$
@@ -51,7 +50,7 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
         final String qryString = MessageFormat.format(CHECK_NO_DUPLICATES,
             objectClass.getName(), propertyName, equalsTest);
 
-        Query query = session.createQuery(qryString);
+        Query query = context.getSession().createQuery(qryString);
         query.setParameter(0, value);
         @SuppressWarnings("unchecked")
         List<Long> res = query.list();

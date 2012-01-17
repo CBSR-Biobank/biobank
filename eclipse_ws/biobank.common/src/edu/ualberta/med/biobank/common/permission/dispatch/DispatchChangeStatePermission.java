@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.permission.dispatch;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
@@ -20,9 +18,9 @@ public class DispatchChangeStatePermission implements Permission {
     }
 
     @Override
-    public boolean isAllowed(User user, Session session) {
-        Dispatch dispatch =
-            new ActionContext(user, session).load(Dispatch.class, dispatchId);
+    public boolean isAllowed(ActionContext context) {
+        Dispatch dispatch = context.load(Dispatch.class, dispatchId);
+        User user = context.getUser();
         return (!DispatchState.getState(dispatch.getState()).equals(
             DispatchState.CREATION)
             && PermissionEnum.DISPATCH_CHANGE_STATE.isAllowed(user,
