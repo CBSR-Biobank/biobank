@@ -156,12 +156,13 @@ public class TestAction {
 
     protected void deleteOriginInfos(Integer centerId) {
         // delete origin infos
-        Query q =
-            getSession().createQuery("DELETE FROM "
-                + OriginInfo.class.getName() + " oi WHERE oi.center.id=?"
-                + " AND oi.specimenCollection.size = 0");
+        getSession().getTransaction().begin();
+        Query q = getSession().createQuery("DELETE FROM "
+            + OriginInfo.class.getName() + " oi WHERE oi.center.id=?");
         q.setParameter(0, centerId);
+        System.out.println("center id is " + centerId);
         q.executeUpdate();
+        getSession().getTransaction().commit();
     }
 
     public Session getSession() {

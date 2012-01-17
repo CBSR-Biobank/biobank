@@ -214,15 +214,10 @@ public class CollectionEventSaveAction implements Action<IdResult> {
             originalSpecimens, newSsCollection);
         newAllSpecCollection.removeAll(origSpecDiff.getRemoveSet());
         ceventToSave.setAllSpecimenCollection(newAllSpecCollection);
-
-        System.out.println("final cevent id " + ceventToSave.getId()
-            + " original specimens size " + origSpecDiff.getNewSet().size());
-
         ceventToSave.setOriginalSpecimenCollection(origSpecDiff.getNewSet());
         for (Specimen srcSpc : origSpecDiff.getRemoveSet()) {
             context.getSession().delete(srcSpc);
         }
-
     }
 
     public void setEventAttrs(ActionContext context, Study study,
