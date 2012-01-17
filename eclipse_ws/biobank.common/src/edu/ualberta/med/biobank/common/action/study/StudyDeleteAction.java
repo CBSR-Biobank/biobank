@@ -29,7 +29,7 @@ public class StudyDeleteAction implements Action<EmptyResult> {
 
         new CollectionIsEmptyCheck<Study>(
             Study.class, study, StudyPeer.PATIENT_COLLECTION,
-            study.getNameShort(), null).run(null);
+            study.getNameShort(), null).run(context);
 
         // cascades delete all source specimens, aliquoted specimens and
         // study event attributes

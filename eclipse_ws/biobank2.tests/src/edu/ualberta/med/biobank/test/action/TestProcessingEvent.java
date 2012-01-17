@@ -84,28 +84,29 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void saveWithoutSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(20, 50);
-        List<CommentInfo> comments = Utils.getRandomCommentInfos(actionExecutor.getUser()
-            .getId());
+        List<CommentInfo> comments =
+            Utils.getRandomCommentInfos(actionExecutor.getUser()
+                .getId());
         Date date = Utils.getRandomDate();
         Integer pEventId = actionExecutor.exec(new ProcessingEventSaveAction(
             null, siteId, date, worksheet, 1, comments, null)).getId();
 
-        
         // Check ProcessingEvent is in database with correct values
         ProcessingEvent pevent = (ProcessingEvent) session.get(
             ProcessingEvent.class, pEventId);
         Assert.assertEquals(worksheet, pevent.getWorksheet());
         Assert.assertEquals(comments.size(), pevent.getCommentCollection()
             .size());
-        Assert.assertTrue(compareDateInHibernate(date, pevent.getCreatedAt()));
+        Assert.assertEquals(date, pevent.getCreatedAt());
         Assert.assertEquals(0, pevent.getSpecimenCollection().size());
     }
 
     @Test
     public void sveWithSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(50);
-        List<CommentInfo> comments = Utils.getRandomCommentInfos(actionExecutor.getUser()
-            .getId());
+        List<CommentInfo> comments =
+            Utils.getRandomCommentInfos(actionExecutor.getUser()
+                .getId());
         Date date = Utils.getRandomDate();
 
         Integer ceventId = CollectionEventHelper
@@ -123,14 +124,13 @@ public class TestProcessingEvent extends TestAction {
 
         // FIXME should test to add specimens that can't add ???
 
-        
         // Check ProcessingEvent is in database with correct values
         ProcessingEvent pevent = (ProcessingEvent) session.get(
             ProcessingEvent.class, pEventId);
         Assert.assertEquals(worksheet, pevent.getWorksheet());
         Assert.assertEquals(comments.size(), pevent.getCommentCollection()
             .size());
-        Assert.assertTrue(compareDateInHibernate(date, pevent.getCreatedAt()));
+        Assert.assertEquals(date, pevent.getCreatedAt());
         Assert.assertEquals(1, pevent.getSpecimenCollection().size());
     }
 
@@ -160,8 +160,9 @@ public class TestProcessingEvent extends TestAction {
 
         actionExecutor.exec(new ProcessingEventDeleteAction(pEventId));
 
-        ProcessingEvent pe = new ActionContext(actionExecutor.getUser(), session).load(
-            ProcessingEvent.class, pEventId);
+        ProcessingEvent pe =
+            new ActionContext(actionExecutor.getUser(), session).get(
+                ProcessingEvent.class, pEventId);
         Assert.assertNull(pe);
     }
 
@@ -184,19 +185,18 @@ public class TestProcessingEvent extends TestAction {
             Arrays
                 .asList(spcId))).getId();
 
-        ActionContext actionContext = new ActionContext(actionExecutor.getUser(), session);
+        ActionContext actionContext =
+            new ActionContext(actionExecutor.getUser(), session);
         Specimen spc = actionContext.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);
         Assert.assertNotNull(spc.getProcessingEvent());
         Assert.assertEquals(pEventId, spc.getProcessingEvent().getId());
-        
 
         // delete this processing event. Can do it since the specimen has no
         // children
         actionExecutor.exec(new ProcessingEventDeleteAction(pEventId));
 
-        ProcessingEvent pe =
-            actionContext.load(ProcessingEvent.class, pEventId);
+        ProcessingEvent pe = actionContext.get(ProcessingEvent.class, pEventId);
         Assert.assertNull(pe);
         spc = actionContext.load(Specimen.class, spcId);
         session.refresh(spc);
@@ -229,13 +229,13 @@ public class TestProcessingEvent extends TestAction {
                 Utils.getRandomString(50), 1, null,
                 Arrays.asList(spcId))).getId();
 
-        ActionContext actionContext = new ActionContext(actionExecutor.getUser(), session);
+        ActionContext actionContext =
+            new ActionContext(actionExecutor.getUser(), session);
 
         Specimen spc = actionContext.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);
         Assert.assertNotNull(spc.getProcessingEvent());
         Assert.assertEquals(pEventId, spc.getProcessingEvent().getId());
-        
 
         // delete this processing event. Can do it since the specimen has no
         // children
@@ -249,7 +249,8 @@ public class TestProcessingEvent extends TestAction {
         }
 
         ProcessingEvent pe =
-            new ActionContext(actionExecutor.getUser(), session).load(ProcessingEvent.class,
+            new ActionContext(actionExecutor.getUser(), session).load(
+                ProcessingEvent.class,
                 pEventId);
         Assert.assertNotNull(pe);
     }

@@ -54,6 +54,7 @@ public class TestAction {
      */
     @Before
     public void setUp() throws Exception {
+        session.beginTransaction();
     }
 
     /**
@@ -61,6 +62,7 @@ public class TestAction {
      */
     @After
     public void tearDown() throws Exception {
+        session.getTransaction().commit();
     }
 
     public void setUser(User user) {
@@ -156,13 +158,10 @@ public class TestAction {
 
     protected void deleteOriginInfos(Integer centerId) {
         // delete origin infos
-        getSession().getTransaction().begin();
         Query q = getSession().createQuery("DELETE FROM "
             + OriginInfo.class.getName() + " oi WHERE oi.center.id=?");
         q.setParameter(0, centerId);
-        System.out.println("center id is " + centerId);
         q.executeUpdate();
-        getSession().getTransaction().commit();
     }
 
     public Session getSession() {

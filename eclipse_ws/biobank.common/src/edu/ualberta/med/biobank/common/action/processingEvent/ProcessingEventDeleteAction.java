@@ -44,7 +44,7 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
             SpecimenPeer.PARENT_SPECIMEN
                 .to(SpecimenPeer.PROCESSING_EVENT),
             Specimen.class, pevent.getWorksheet(), hasDerivedSpecimensMsg)
-            .run(null);
+            .run(context);
 
         // if no aliquoted specimen, then ok to remove the specimens and to
         // delete the processing event
