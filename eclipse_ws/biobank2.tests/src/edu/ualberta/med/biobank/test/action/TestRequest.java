@@ -47,7 +47,8 @@ public class TestRequest extends TestAction {
             StudyHelper
                 .createStudy(EXECUTOR, name, ActivityStatusEnum.ACTIVE);
         rgId =
-            ResearchGroupHelper.createResearchGroup(EXECUTOR, name + "rg",
+            ResearchGroupHelper.createResearchGroup(actionExecutor,
+                name + "rg",
                 name + "rg",
                 studyId);
     }
@@ -140,6 +141,17 @@ public class TestRequest extends TestAction {
         for (RequestSpecimen spec : rInfo.specimens)
             Assert.assertTrue(RequestSpecimenState.getState(spec.getState())
                 .equals(RequestSpecimenState.DISPATCHED_STATE));
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        Integer rId = RequestHelper.createRequest(actionExecutor, rgId);
+
+        RequestGetInfoAction requestGetInfoAction =
+            new RequestGetInfoAction(rId);
+        RequestReadInfo rInfo = actionExecutor.exec(requestGetInfoAction);
+
+        session.delete(rInfo.request);
     }
 
 }

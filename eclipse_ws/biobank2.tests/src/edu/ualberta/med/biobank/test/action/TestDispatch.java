@@ -62,6 +62,7 @@ public class TestDispatch extends TestAction {
 
     @Test
     public void saveWithSpecs() throws Exception {
+
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
                 centerId, DispatchState.CREATION.getId(),

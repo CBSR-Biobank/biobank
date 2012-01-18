@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Assert;
@@ -19,14 +19,13 @@ import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
+import edu.ualberta.med.biobank.test.action.helper.RequestHelper;
 import edu.ualberta.med.biobank.test.action.helper.ResearchGroupHelper;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
-import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 
 public class TestResearchGroup extends TestAction {
 
@@ -53,6 +52,7 @@ public class TestResearchGroup extends TestAction {
             ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
                 name,
                 studyId);
+
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
         ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
@@ -60,7 +60,7 @@ public class TestResearchGroup extends TestAction {
         Assert.assertTrue(rg.rg.name.equals(name + "rg"));
         Assert.assertTrue(rg.rg.nameShort.equals(name + "rg"));
         Assert.assertTrue(rg.rg.getStudy().getId().equals(studyId));
-        Assert.assertTrue(rg.rg.getActivityStatus().id
+        Assert.assertTrue(rg.rg.getActivityStatus().getId()
             .equals(ActivityStatusEnum.ACTIVE.getId()));
 
     }
@@ -69,6 +69,7 @@ public class TestResearchGroup extends TestAction {
     public void testUpload() throws Exception {
         Integer rgId =
             ResearchGroupHelper.createResearchGroup(EXECUTOR, name + "rg",
+                name + "rg",
                 name + "rg",
                 studyId);
         ResearchGroupGetInfoAction reader =
@@ -109,27 +110,31 @@ public class TestResearchGroup extends TestAction {
                 .getInventoryId()));
         }
     }
-    
+
     @Test
     public void testDelete() throws Exception {
-    	// only one failure case specific to rg, rest are in center
-    	
-    	Integer rgId =
-                ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
-                    name,
-                    studyId);
+        // only one failure case specific to rg, rest are in center
+
+        Integer rgId =
+            ResearchGroupHelper.createResearchGroup(actionExecutor, name,
+                name,
+                studyId);
         ResearchGroupGetInfoAction reader =
-        new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
-        try {
-        	rg.rg.setRequestCollection(Arrays.asList(new Request()));
-        	Assert.fail();
-        } catch (Exception e) { 
-        	
-        }
-        
-        session.delete(rg);
+            new ResearchGroupGetInfoAction(rgId);
+        ResearchGroupReadInfo rg = actionExecutor.exec(reader);
+        Request r = (Request) session.load(Request.class,
+            RequestHelper.createRequest(actionExecutor, rgId));
+        HashSet<Request> set = new HashSet<Request>();
+        set.add(r);
+        rg.rg.setRequestCollection(set);
+        session.saveOrUpdate(rg.rg);
         session.flush();
+        try {
+            session.delete(rg);
+            Assert.fail();
+        } catch (Exception e) {
+            // wat?
+        }
+
     }
-    
 }
