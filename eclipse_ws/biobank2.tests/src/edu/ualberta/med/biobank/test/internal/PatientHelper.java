@@ -6,6 +6,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
+@Deprecated
 public class PatientHelper extends DbHelper {
 
     public static PatientWrapper newPatient(String number) {

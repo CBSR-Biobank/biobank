@@ -5,9 +5,11 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
 
+@Deprecated
 public class GroupHelper extends PrincipalHelper {
 
-    private static List<BbGroupWrapper> createdGroups = new ArrayList<BbGroupWrapper>();
+    private static List<BbGroupWrapper> createdGroups =
+        new ArrayList<BbGroupWrapper>();
 
     public static BbGroupWrapper newGroup(String name) {
         BbGroupWrapper group = new BbGroupWrapper(appService);

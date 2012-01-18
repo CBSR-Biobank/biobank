@@ -14,8 +14,8 @@ public class CommentInfo implements ActionResult {
 
     public Integer id;
     public String message;
-    public Integer userId;
     public Date createdAt;
+    public Integer userId;
 
     public CommentInfo(String message, Date createdAt, Integer userId) {
         this.message = message;

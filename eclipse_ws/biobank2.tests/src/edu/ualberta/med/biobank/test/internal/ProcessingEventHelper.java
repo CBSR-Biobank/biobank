@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
+@Deprecated
 public class ProcessingEventHelper extends DbHelper {
 
     /**
@@ -51,7 +52,8 @@ public class ProcessingEventHelper extends DbHelper {
         CenterWrapper<?> center, Date dateProcessed, SpecimenWrapper parentSpc,
         List<SpecimenTypeWrapper> spcTypes, int maxProcEvent,
         int spcPerProcEvent) throws Exception {
-        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        List<ProcessingEventWrapper> pevents =
+            new ArrayList<ProcessingEventWrapper>();
         for (int i = 0; i < maxProcEvent; ++i) {
             for (int j = 0; j < spcPerProcEvent; ++j) {
                 ProcessingEventWrapper pe = ProcessingEventHelper

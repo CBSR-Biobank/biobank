@@ -33,7 +33,7 @@ public class PatientDeleteAction implements Action<IdResult> {
 
         new CollectionIsEmptyCheck<Patient>(Patient.class, patient,
             PatientPeer.COLLECTION_EVENT_COLLECTION, patient.getPnumber(),
-            HAS_COLLECTION_EVENTS_MSG).run(null);
+            HAS_COLLECTION_EVENTS_MSG).run(context);
 
         context.getSession().delete(patient);
 

@@ -41,6 +41,7 @@ import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
+@Deprecated
 public class TestProcessingEvent extends TestDatabase {
 
     private Map<String, ContainerWrapper> containerMap;

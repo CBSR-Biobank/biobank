@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
 import edu.ualberta.med.biobank.test.TestDatabase;
 
+@Deprecated
 public class TestChecks extends TestDatabase {
     @Test
     public void testTransactions() throws Exception {

@@ -5,6 +5,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 
+@Deprecated
 public class RoleHelper extends DbHelper {
 
     public static List<RoleWrapper> createdRoles = new ArrayList<RoleWrapper>();

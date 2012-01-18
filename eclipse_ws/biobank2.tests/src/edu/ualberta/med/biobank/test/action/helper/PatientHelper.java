@@ -9,11 +9,11 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientHelper extends Helper {
 
-    public static Integer createPatient(IActionExecutor appService,
+    public static Integer createPatient(IActionExecutor actionExecutor,
         String s, Integer studyId) throws ApplicationException {
         String pnumber = s + r.nextInt();
         Date date = Utils.getRandomDate();
-        Integer patientId = appService.exec(new PatientSaveAction(null,
+        Integer patientId = actionExecutor.exec(new PatientSaveAction(null,
             studyId, pnumber, date)).getId();
         return patientId;
     }

@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.test.internal.GroupHelper;
 import edu.ualberta.med.biobank.test.internal.RoleHelper;
 import edu.ualberta.med.biobank.test.internal.UserHelper;
 
+@Deprecated
 public class TestGroup extends TestDatabase {
 
     @Test

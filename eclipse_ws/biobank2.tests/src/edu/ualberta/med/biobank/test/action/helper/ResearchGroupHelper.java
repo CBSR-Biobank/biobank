@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.test.action.IActionExecutor;
 public class ResearchGroupHelper extends Helper {
 
     public static Integer createResearchGroup(
-        IActionExecutor appService,
+        IActionExecutor actionExecutor,
         String name, String nameShort, Integer studyId) throws Exception {
         AddressSaveInfo addressSaveInfo =
             new AddressSaveInfo(null, "test", "test", "test", "test", "test",
@@ -20,6 +20,6 @@ public class ResearchGroupHelper extends Helper {
                 ActivityStatusEnum.ACTIVE.getId());
         ResearchGroupSaveAction rgSave = new ResearchGroupSaveAction(save);
 
-        return appService.exec(rgSave).getId();
+        return actionExecutor.exec(rgSave).getId();
     }
 }

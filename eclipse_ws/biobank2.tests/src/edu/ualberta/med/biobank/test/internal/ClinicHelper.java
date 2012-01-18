@@ -6,9 +6,11 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 
+@Deprecated
 public class ClinicHelper extends CenterHelper {
 
-    private static List<ClinicWrapper> createdClinics = new ArrayList<ClinicWrapper>();
+    private static List<ClinicWrapper> createdClinics =
+        new ArrayList<ClinicWrapper>();
 
     public static ClinicWrapper newClinic(String name) throws Exception {
         ClinicWrapper clinic = new ClinicWrapper(appService);

@@ -19,6 +19,7 @@ import java.util.Random;
 
 import org.junit.Assert;
 
+@Deprecated
 public class DbHelper {
 
     protected static WritableApplicationService appService;

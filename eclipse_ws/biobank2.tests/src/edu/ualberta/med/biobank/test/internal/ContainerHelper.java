@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
+@Deprecated
 public class ContainerHelper extends DbHelper {
 
     /**

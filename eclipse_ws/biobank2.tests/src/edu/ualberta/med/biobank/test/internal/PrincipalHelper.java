@@ -5,6 +5,7 @@ import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
+@Deprecated
 public class PrincipalHelper extends DbHelper {
 
     public static MembershipWrapper addMembership(

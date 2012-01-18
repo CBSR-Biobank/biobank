@@ -103,13 +103,13 @@ public class ClinicSaveAction extends CenterSaveAction {
         clinic = context.load(Clinic.class, centerId, new Clinic());
         clinic.setSendsShipments(sendsShipments);
 
-        saveContacts();
+        saveContacts(context);
 
         return run(context, clinic);
     }
 
     // TODO: do not allow delete of a contact linked to a study
-    private void saveContacts() {
+    private void saveContacts(ActionContext context) {
         Set<Contact> newContactCollection = new HashSet<Contact>();
         for (ContactSaveInfo contactSaveInfo : contactSaveInfos) {
             Contact contact;
@@ -126,14 +126,14 @@ public class ClinicSaveAction extends CenterSaveAction {
         SetDifference<Contact> contactsDiff =
             new SetDifference<Contact>(
                 clinic.getContactCollection(), newContactCollection);
-        clinic.setContactCollection(contactsDiff.getAddSet());
+        clinic.setContactCollection(contactsDiff.getNewSet());
         for (Contact contact : contactsDiff.getRemoveSet()) {
             Collection<Study> studyCollection = contact.getStudyCollection();
             if ((studyCollection != null) && !studyCollection.isEmpty()) {
                 throw new ActionException("canot delete contact "
                     + contact.getName());
             }
-            session.delete(contact);
+            context.getSession().delete(contact);
         }
     }
 

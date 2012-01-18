@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.test.internal.ShipmentInfoHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 
+@Deprecated
 public class TestShipmentInfo extends TestDatabase {
 
     @Test

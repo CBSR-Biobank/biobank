@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@Deprecated
 public class TestSourceSpecimen extends TestDatabase {
 
     @Test

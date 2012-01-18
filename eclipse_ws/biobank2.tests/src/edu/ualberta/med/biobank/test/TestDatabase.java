@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import edu.ualberta.med.biobank.test.internal.UserHelper;
 
+@Deprecated
 public class TestDatabase {
     protected static BiobankApplicationService appService;
 

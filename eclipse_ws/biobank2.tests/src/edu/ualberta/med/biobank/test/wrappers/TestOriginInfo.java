@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
+@Deprecated
 public class TestOriginInfo extends TestDatabase {
 
     @Test

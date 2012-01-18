@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
+@Deprecated
 public class SpecimenHelper extends DbHelper {
 
     public static SpecimenWrapper newSpecimen(SpecimenTypeWrapper specimenType,

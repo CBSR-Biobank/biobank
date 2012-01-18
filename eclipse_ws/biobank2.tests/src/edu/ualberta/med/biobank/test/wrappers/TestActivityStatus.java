@@ -45,9 +45,11 @@ import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
+@Deprecated
 public class TestActivityStatus extends TestDatabase {
 
-    private List<ActivityStatusWrapper> addedstatus = new ArrayList<ActivityStatusWrapper>();
+    private List<ActivityStatusWrapper> addedstatus =
+        new ArrayList<ActivityStatusWrapper>();
 
     @Override
     public void tearDown() throws Exception {
@@ -119,9 +121,10 @@ public class TestActivityStatus extends TestDatabase {
         StudyEventAttrWrapper studyEventAttr = StudyEventAttrWrapper
             .getStudyEventAttrCollection(study).get(0);
         // AliquotedSpecimen
-        AliquotedSpecimenWrapper aliquotedSpecimenType = AliquotedSpecimenHelper
-            .addAliquotedSpecimen(study, SpecimenTypeWrapper
-                .getAllSpecimenTypes(appService, false).get(0));
+        AliquotedSpecimenWrapper aliquotedSpecimenType =
+            AliquotedSpecimenHelper
+                .addAliquotedSpecimen(study, SpecimenTypeWrapper
+                    .getAllSpecimenTypes(appService, false).get(0));
 
         PatientWrapper patient = PatientHelper.addPatient(name, study);
         // Specimen
@@ -218,7 +221,8 @@ public class TestActivityStatus extends TestDatabase {
         // add 5 activity status that will eventually be deleted
         before = ActivityStatusWrapper.getAllActivityStatuses(appService)
             .size();
-        List<ActivityStatusWrapper> toDelete = new ArrayList<ActivityStatusWrapper>();
+        List<ActivityStatusWrapper> toDelete =
+            new ArrayList<ActivityStatusWrapper>();
         for (int i = 0; i < 5; ++i) {
             name = "testPersist" + i + r.nextInt();
             as = new ActivityStatusWrapper(appService);
@@ -235,7 +239,8 @@ public class TestActivityStatus extends TestDatabase {
 
         // create 3 new activity statuses
         before = after;
-        List<ActivityStatusWrapper> toAdd = new ArrayList<ActivityStatusWrapper>();
+        List<ActivityStatusWrapper> toAdd =
+            new ArrayList<ActivityStatusWrapper>();
         for (int i = 0; i < 3; ++i) {
             name = "testPersist" + i + r.nextInt();
             as = new ActivityStatusWrapper(appService);

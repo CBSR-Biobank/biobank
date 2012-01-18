@@ -49,6 +49,7 @@ public class TestPatient extends TestAction {
     private String name;
 
     private Integer studyId;
+
     private Integer siteId;
 
     @Override
@@ -144,8 +145,7 @@ public class TestPatient extends TestAction {
             null, studyId, pnumber, date)).getId();
         // add a cevent to the patient:
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId, R
-            .nextInt(20), 1, null, siteId, null,
-            null));
+            .nextInt(20), 1, null, null, null));
 
         // delete the patient
         try {
@@ -247,11 +247,13 @@ public class TestPatient extends TestAction {
     private void createCEventWithSpecimens(Integer patientId,
         Integer visitNber, Integer specType, int specNber)
         throws ApplicationException {
-        final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
-            .createSaveCEventSpecimenInfoRandomList(specNber, specType);
+        final Map<String, SaveCEventSpecimenInfo> specs =
+            CollectionEventHelper
+                .createSaveCEventSpecimenInfoRandomList(specNber, specType,
+                    EXECUTOR.getUserId(), siteId);
         // Save a new cevent
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
-            visitNber, 1, null, siteId,
+            visitNber, 1, null,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
     }
 
@@ -265,16 +267,15 @@ public class TestPatient extends TestAction {
             EXECUTOR.exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
-            .createSaveCEventSpecimenInfoRandomList(5, typeId);
+            .createSaveCEventSpecimenInfoRandomList(5, typeId,
+                EXECUTOR.getUserId(), siteId);
 
         // Save a new cevent with specimens
-        final Integer ceventId =
-            EXECUTOR
-                .exec(
-                    new CollectionEventSaveAction(null, patientId, R
-                        .nextInt(20), 1, null, siteId,
-                        new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
-                        null)).getId();
+        final Integer ceventId = EXECUTOR.exec(
+            new CollectionEventSaveAction(null, patientId, R
+                .nextInt(20), 1, null,
+                new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
+                null)).getId();
 
         Map<Integer, SimpleCEventInfo> ceventInfos =
             EXECUTOR
@@ -287,9 +288,9 @@ public class TestPatient extends TestAction {
         Date minDate = null;
         for (SaveCEventSpecimenInfo sp : specs.values()) {
             if (minDate == null)
-                minDate = sp.timeDrawn;
-            else if (sp.timeDrawn.compareTo(minDate) < 0) {
-                minDate = sp.timeDrawn;
+                minDate = sp.createdAt;
+            else if (sp.createdAt.compareTo(minDate) < 0) {
+                minDate = sp.createdAt;
             }
         }
         Assert.assertEquals(minDate, info.minSourceSpecimenDate);
@@ -305,11 +306,12 @@ public class TestPatient extends TestAction {
             EXECUTOR.exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
-            .createSaveCEventSpecimenInfoRandomList(5, typeId);
+            .createSaveCEventSpecimenInfoRandomList(5, typeId,
+                EXECUTOR.getUserId(), siteId);
 
         // Save a new cevent with specimens
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId, R
-            .nextInt(20), 1, null, siteId,
+            .nextInt(20), 1, null,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
         ArrayList<PatientCEventInfo> infos =
@@ -323,9 +325,9 @@ public class TestPatient extends TestAction {
         Date minDate = null;
         for (SaveCEventSpecimenInfo sp : specs.values()) {
             if (minDate == null)
-                minDate = sp.timeDrawn;
-            else if (sp.timeDrawn.compareTo(minDate) < 0) {
-                minDate = sp.timeDrawn;
+                minDate = sp.createdAt;
+            else if (sp.createdAt.compareTo(minDate) < 0) {
+                minDate = sp.createdAt;
             }
         }
         Assert.assertEquals(minDate, info.minSourceSpecimenDate);
@@ -345,17 +347,17 @@ public class TestPatient extends TestAction {
             EXECUTOR.exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
-            .createSaveCEventSpecimenInfoRandomList(5, typeId);
+            .createSaveCEventSpecimenInfoRandomList(5, typeId,
+                EXECUTOR.getUserId(), siteId);
 
         // Save a new cevent with specimens
         Integer visitNumber = R.nextInt(20);
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
-            visitNumber, 1, null, siteId,
+            visitNumber, 1, null,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
         // Save a second new cevent without specimens
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
-            visitNumber + 1, 1, null, siteId,
-            null, null));
+            visitNumber + 1, 1, null, null, null));
 
         // method to test:
         PatientInfo pinfo = EXECUTOR.exec(new PatientGetInfoAction(
@@ -378,8 +380,7 @@ public class TestPatient extends TestAction {
 
         Integer visitNumber = R.nextInt(20);
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
-            visitNumber, 1, null, siteId, null,
-            null));
+            visitNumber, 1, null, null, null));
 
         Integer next = EXECUTOR.exec(new PatientNextVisitNumberAction(
             patientId)).getNextVisitNumber();
@@ -396,10 +397,9 @@ public class TestPatient extends TestAction {
         // add 2 cevents to this patient:
         int vnber = R.nextInt(20);
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
-            vnber, 1, null, siteId, null, null));
+            vnber, 1, null, null, null));
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
-            vnber + 1, 1, null, siteId, null,
-            null));
+            vnber + 1, 1, null, null, null));
 
         // Check patient is in database
         Patient p = (Patient) session.get(Patient.class, patientId);

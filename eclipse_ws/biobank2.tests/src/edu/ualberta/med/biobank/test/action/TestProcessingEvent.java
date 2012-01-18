@@ -95,7 +95,7 @@ public class TestProcessingEvent extends TestAction {
         Assert.assertEquals(worksheet, pevent.getWorksheet());
         Assert.assertEquals(comments.size(), pevent.getCommentCollection()
             .size());
-        Assert.assertTrue(compareDateInHibernate(date, pevent.getCreatedAt()));
+        Assert.assertEquals(date, pevent.getCreatedAt());
         Assert.assertEquals(0, pevent.getSpecimenCollection().size());
     }
 
@@ -127,7 +127,7 @@ public class TestProcessingEvent extends TestAction {
         Assert.assertEquals(worksheet, pevent.getWorksheet());
         Assert.assertEquals(comments.size(), pevent.getCommentCollection()
             .size());
-        Assert.assertTrue(compareDateInHibernate(date, pevent.getCreatedAt()));
+        Assert.assertEquals(date, pevent.getCreatedAt());
         Assert.assertEquals(1, pevent.getSpecimenCollection().size());
     }
 

@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
+@Deprecated
 public class TestAliquotedSpecimen extends TestDatabase {
 
     @Test

@@ -161,9 +161,8 @@ public class TestAction {
 
     protected void deleteOriginInfos(Integer centerId) {
         // delete origin infos
-        Query q =
-            session.createQuery("DELETE FROM "
-                + OriginInfo.class.getName() + " oi WHERE oi.center.id=?");
+        Query q = session.createQuery("DELETE FROM "
+            + OriginInfo.class.getName() + " oi WHERE oi.center.id=?");
         q.setParameter(0, centerId);
         q.executeUpdate();
     }

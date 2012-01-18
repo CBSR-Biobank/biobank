@@ -432,6 +432,7 @@ public class TestSite extends TestAction {
         for (Specimen specimen : specimens) {
             EXECUTOR.exec(new SpecimenDeleteAction(specimen.getId()));
         }
+
         deleteOriginInfos(provisioning.siteId);
         EXECUTOR.exec(new SiteDeleteAction(provisioning.siteId));
     }

@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
+@Deprecated
 public class TestContainerLabelingScheme extends TestDatabase {
 
     private static final Map<Integer, String> ALPHA;

@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.test.internal.RoleHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import edu.ualberta.med.biobank.test.internal.UserHelper;
 
+@Deprecated
 public class TestMembership extends TestDatabase {
 
     @Test

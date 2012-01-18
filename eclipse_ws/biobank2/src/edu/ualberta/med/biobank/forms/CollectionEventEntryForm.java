@@ -399,7 +399,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             ceSpecInfo.specimenTypeId =
                 specInfo.specimen.getSpecimenType().getId();
             ceSpecInfo.statusId = specInfo.specimen.getActivityStatus().getId();
-            ceSpecInfo.timeDrawn = specInfo.specimen.getCreatedAt();
+            ceSpecInfo.createdAt = specInfo.specimen.getCreatedAt();
             cevents.add(ceSpecInfo);
         }
 
@@ -425,7 +425,6 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 new CollectionEventSaveAction(ceventCopy.getId(), ceventCopy
                     .getPatient().getId(), ceventCopy.getVisitNumber(),
                     ceventCopy.getActivityStatus().getId(), commentList,
-                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
                     cevents, ceventAttrList)).getId();
         ((CollectionEventAdapter) adapter).setId(savedCeventId);
     }

@@ -41,6 +41,7 @@ import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
+@Deprecated
 public class TestPatient extends TestDatabase {
 
     private Map<String, ContainerWrapper> containerMap;
@@ -182,7 +183,8 @@ public class TestPatient extends TestDatabase {
             .getContainerType().getSpecimenTypeCollection();
 
         int count = containerMap.get("ChildL1").getColCapacity();
-        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        List<ProcessingEventWrapper> pevents =
+            new ArrayList<ProcessingEventWrapper>();
         for (int i = 0; i < count; i++) {
             ProcessingEventWrapper pe = ProcessingEventHelper
                 .addProcessingEvent(site, Utils.getRandomDate());
@@ -289,7 +291,8 @@ public class TestPatient extends TestDatabase {
 
         // delete random pevents, ensure at least one left
         int numToDelete = r.nextInt(pevents.size() - 1);
-        List<ProcessingEventWrapper> deletePevents = new ArrayList<ProcessingEventWrapper>();
+        List<ProcessingEventWrapper> deletePevents =
+            new ArrayList<ProcessingEventWrapper>();
         for (int i = 0; i < numToDelete; ++i) {
             ProcessingEventWrapper pevent = DbHelper
                 .chooseRandomlyInList(origPevents);
@@ -377,7 +380,8 @@ public class TestPatient extends TestDatabase {
             Assert.assertNotNull(parentSpc.getCollectionEvent());
         }
 
-        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        List<ProcessingEventWrapper> pevents =
+            new ArrayList<ProcessingEventWrapper>();
         pevents.add(ProcessingEventHelper.addProcessingEvent(site,
             Utils.getRandomDate()));
         parentSpcs[0].setProcessingEvent(pevents.get(0));
@@ -392,7 +396,8 @@ public class TestPatient extends TestDatabase {
             .getSpecimenTypeCollection();
 
         List<SpecimenWrapper> samples = new ArrayList<SpecimenWrapper>();
-        Map<PatientWrapper, Integer> patientSampleCount = new HashMap<PatientWrapper, Integer>();
+        Map<PatientWrapper, Integer> patientSampleCount =
+            new HashMap<PatientWrapper, Integer>();
         for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
             patientSampleCount.put(patient, 0);
         }
@@ -458,11 +463,13 @@ public class TestPatient extends TestDatabase {
                 .getContainerType().getSpecimenTypeCollection();
             int colCapacity = childL1.getColCapacity();
 
-            List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+            List<ProcessingEventWrapper> pevents =
+                new ArrayList<ProcessingEventWrapper>();
             for (SpecimenWrapper parentSpc : parentSpcs) {
-                List<ProcessingEventWrapper> patientPevents = ProcessingEventHelper
-                    .addProcessingEvents(site, Utils.getRandomDate(),
-                        parentSpc, contSampleTypes, 5, 2);
+                List<ProcessingEventWrapper> patientPevents =
+                    ProcessingEventHelper
+                        .addProcessingEvents(site, Utils.getRandomDate(),
+                            parentSpc, contSampleTypes, 5, 2);
 
                 // store the first specimen from each pevent in a childL1
                 for (ProcessingEventWrapper pevent : patientPevents) {

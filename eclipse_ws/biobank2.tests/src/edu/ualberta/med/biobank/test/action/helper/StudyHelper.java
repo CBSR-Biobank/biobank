@@ -40,15 +40,15 @@ public class StudyHelper extends Helper {
         return saveAction;
     }
 
-    public static Integer createStudy(IActionExecutor appService,
+    public static Integer createStudy(IActionExecutor actionExecutor,
         String name, ActivityStatusEnum activityStatus)
         throws ApplicationException {
         StudySaveAction saveStudy = getSaveAction(name, name, activityStatus);
-        return appService.exec(saveStudy).getId();
+        return actionExecutor.exec(saveStudy).getId();
     }
 
     public static StudySaveAction getSaveAction(
-        IActionExecutor appService, StudyInfo studyInfo) {
+        IActionExecutor actionExecutor, StudyInfo studyInfo) {
         StudySaveAction saveStudy = new StudySaveAction();
         saveStudy.setId(studyInfo.study.getId());
         saveStudy.setName(studyInfo.study.getName());

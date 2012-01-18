@@ -8,9 +8,11 @@ import org.junit.Assert;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
+@Deprecated
 public class StudyHelper extends DbHelper {
 
-    public static List<StudyWrapper> createdStudies = new ArrayList<StudyWrapper>();
+    public static List<StudyWrapper> createdStudies =
+        new ArrayList<StudyWrapper>();
 
     public static StudyWrapper newStudy(String name) throws Exception {
         StudyWrapper study = new StudyWrapper(appService);

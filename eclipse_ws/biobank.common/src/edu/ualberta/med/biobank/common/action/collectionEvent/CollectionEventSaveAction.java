@@ -59,9 +59,10 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
         public Integer id;
         public String inventoryId;
-        public Date timeDrawn;
+        public Date createdAt;
         public Integer statusId;
         public Integer specimenTypeId;
+        public Integer centerId;
         public Collection<CommentInfo> comments;
         public Double quantity;
     }
@@ -77,13 +78,11 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
     private Collection<SaveCEventSpecimenInfo> sourceSpecimenInfos;
 
-    private Integer centerId;
-
     private List<CEventAttrSaveInfo> ceAttrList;
 
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
         Integer visitNumber, Integer statusId,
-        Collection<CommentInfo> comments, Integer centerId,
+        Collection<CommentInfo> comments,
         Collection<SaveCEventSpecimenInfo> sourceSpecs,
         List<CEventAttrSaveInfo> ceAttrList) {
         this.ceventId = ceventId;
@@ -91,7 +90,6 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         this.visitNumber = visitNumber;
         this.statusId = statusId;
         this.comments = comments;
-        this.centerId = centerId;
         this.sourceSpecimenInfos = sourceSpecs;
         this.ceAttrList = ceAttrList;
     }
@@ -165,6 +163,9 @@ public class CollectionEventSaveAction implements Action<IdResult> {
             newAllSpecCollection.addAll(allSpecimenCollection);
         }
 
+        Collection<Specimen> originalSpecimens =
+            ceventToSave.getOriginalSpecimenCollection();
+
         if (sourceSpecimenInfos != null) {
             OriginInfo oi = null;
 
@@ -173,7 +174,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 if (specInfo.id == null) {
                     if (oi == null) {
                         oi = new OriginInfo();
-                        oi.setCenter(context.load(Center.class, centerId));
+                        oi.setCenter(context.load(Center.class,
+                            specInfo.centerId));
                         context.getSession().saveOrUpdate(oi);
                     }
                     specimen = new Specimen();
@@ -199,7 +201,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                         SpecimenPeer.COMMENT_COLLECTION);
                 CommentInfo.setCommentModelCollection(context,
                     commentsToSave, specInfo.comments);
-                specimen.setCreatedAt(specInfo.timeDrawn);
+                specimen.setCreatedAt(specInfo.createdAt);
                 specimen.setInventoryId(specInfo.inventoryId);
                 specimen.setQuantity(specInfo.quantity);
                 specimen.setSpecimenType(context.load(SpecimenType.class,
@@ -209,14 +211,13 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         }
 
         SetDifference<Specimen> origSpecDiff = new SetDifference<Specimen>(
-            ceventToSave.getOriginalSpecimenCollection(), newSsCollection);
+            originalSpecimens, newSsCollection);
         newAllSpecCollection.removeAll(origSpecDiff.getRemoveSet());
         ceventToSave.setAllSpecimenCollection(newAllSpecCollection);
-        ceventToSave.setOriginalSpecimenCollection(origSpecDiff.getAddSet());
+        ceventToSave.setOriginalSpecimenCollection(origSpecDiff.getNewSet());
         for (Specimen srcSpc : origSpecDiff.getRemoveSet()) {
             context.getSession().delete(srcSpc);
         }
-
     }
 
     public void setEventAttrs(ActionContext context, Study study,

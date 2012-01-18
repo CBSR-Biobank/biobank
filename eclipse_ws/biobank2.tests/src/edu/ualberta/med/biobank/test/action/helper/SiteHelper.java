@@ -35,7 +35,7 @@ public class SiteHelper extends Helper {
         return siteSaveAction;
     }
 
-    public static Integer createSite(IActionExecutor appService,
+    public static Integer createSite(IActionExecutor actionExecutor,
         String name, String city, ActivityStatusEnum activityStatus,
         Set<Integer> studyIds) throws ApplicationException {
 
@@ -49,23 +49,23 @@ public class SiteHelper extends Helper {
         saveSite.setActivityStatusId(activityStatus.getId());
         saveSite.setStudyIds(studyIds);
 
-        return appService.exec(saveSite).getId();
+        return actionExecutor.exec(saveSite).getId();
     }
 
     public static List<Integer> createSites(
-        IActionExecutor appService,
+        IActionExecutor actionExecutor,
         String name, ActivityStatusEnum activityStatus, int numToCreate)
         throws ApplicationException {
         List<Integer> result = new ArrayList<Integer>();
         for (int i = 0; i < numToCreate; ++i) {
-            result.add(createSite(appService, name, Utils.getRandomString(15),
+            result.add(createSite(actionExecutor, name, Utils.getRandomString(15),
                 activityStatus, new HashSet<Integer>()));
         }
         return result;
     }
 
     public static SiteSaveAction getSaveAction(
-        IActionExecutor appService, SiteInfo siteInfo) {
+        IActionExecutor actionExecutor, SiteInfo siteInfo) {
         SiteSaveAction siteSaveAction = new SiteSaveAction();
 
         siteSaveAction.setId(siteInfo.site.getId());

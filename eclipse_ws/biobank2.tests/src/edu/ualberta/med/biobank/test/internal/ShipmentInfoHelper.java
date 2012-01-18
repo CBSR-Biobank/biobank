@@ -12,9 +12,11 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
+@Deprecated
 public class ShipmentInfoHelper extends DbHelper {
 
-    private static List<ShipmentInfoWrapper> createdShipInfos = new ArrayList<ShipmentInfoWrapper>();
+    private static List<ShipmentInfoWrapper> createdShipInfos =
+        new ArrayList<ShipmentInfoWrapper>();
 
     public static ShipmentInfoWrapper newShipmentInfo(CenterWrapper<?> center,
         ShippingMethodWrapper method, String waybill, Date dateReceived,
