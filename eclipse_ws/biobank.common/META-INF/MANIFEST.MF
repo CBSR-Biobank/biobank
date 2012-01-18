@@ -39,7 +39,8 @@ Bundle-ClassPath: conf/,
  conf/,
  lib/client/mysql-connector-java-5.1.15-bin.jar,
  lib/client/javassist-3.12.0.GA.jar,
- lib/client/slf4j-api-1.6.1.jar
+ lib/client/slf4j-api-1.6.1.jar,
+ lib/client/slf4j-nop-1.6.4.jar
 Bundle-Vendor: AICML
 Export-Package: antlr;
   uses:="antlr.collections.impl,

@@ -56,7 +56,7 @@
   <property name="biobank.jar.files"
             value="gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
   <property name="biobank.common.jar.files"
-            value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar,hibernate3.jar,slf4j-api-1.6.1.jar,jta-1.1.jar,dom4j-1.6.1.jar,javassist-3.12.0.GA.jar,hibernate-jpa-2.0-api-1.0.1.Final.jar" />
+            value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar,hibernate3.jar,slf4j-api-1.6.1.jar,slf4j-nop-1.6.4.jar,jta-1.1.jar,dom4j-1.6.1.jar,javassist-3.12.0.GA.jar,hibernate-jpa-2.0-api-1.0.1.Final.jar" />
   <property name="biobank.tools.jar.files"
             value="commons-io-1.4.jar, jargs.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar,mysql-connector-java-5.1.15-bin.jar" />
   <property name="biobank.test.jar.files"
@@ -193,6 +193,8 @@
     <!-- also bring over other files the updated hibernate3.jar requires -->
     <copy file="${req.jars.dir}/slf4j-api-1.6.1.jar"
           tofile="${cacore.sdk.dir}/system/lib/slf4j-api-1.6.1.jar" />
+    <copy file="${req.jars.dir}/slf4j-nop-1.6.4.jar"
+          tofile="${cacore.sdk.dir}/system/lib/slf4j-nop-1.6.4.jar" />
     <copy file="${req.jars.dir}/jta-1.1.jar"
           tofile="${cacore.sdk.dir}/system/lib/jta-1.1.jar" />
     <copy file="${req.jars.dir}/dom4j-1.6.1.jar"
