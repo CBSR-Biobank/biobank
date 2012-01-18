@@ -33,6 +33,11 @@
 			<key column="SPECIMEN_ID" not-null="false" />
 			<one-to-many class="edu.ualberta.med.biobank.model.RequestSpecimen"/>
 		</set>
+                <set name="specimenAttrCollection" lazy="true" cascade="none" inverse="true">
+			<cache usage="read-write" />
+			<key column="SPECIMEN_ID" not-null="false" />
+			<one-to-many class="edu.ualberta.med.biobank.model.SpecimenAttr"/>
+		</set>
 			<many-to-one name="originInfo" class="edu.ualberta.med.biobank.model.OriginInfo" column="ORIGIN_INFO_ID" lazy="proxy" not-null="true" cascade="none"/>
 			<many-to-one name="activityStatus" class="edu.ualberta.med.biobank.model.ActivityStatus" column="ACTIVITY_STATUS_ID" lazy="proxy" not-null="true" cascade="none"/>
 			<many-to-one name="processingEvent" class="edu.ualberta.med.biobank.model.ProcessingEvent" column="PROCESSING_EVENT_ID" lazy="proxy" not-null="false" cascade="none"/>
