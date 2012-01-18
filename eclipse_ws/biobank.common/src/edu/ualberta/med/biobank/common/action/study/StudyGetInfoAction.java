@@ -46,7 +46,7 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new StudyReadPermission(studyId).isAllowed(null);
+        return new StudyReadPermission(studyId).isAllowed(context);
     }
 
     @Override

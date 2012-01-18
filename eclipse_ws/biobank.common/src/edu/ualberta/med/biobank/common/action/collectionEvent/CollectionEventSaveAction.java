@@ -102,7 +102,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         } else {
             permission = new CollectionEventUpdatePermission(ceventId);
         }
-        return permission.isAllowed(null);
+        return permission.isAllowed(context);
     }
 
     @Override

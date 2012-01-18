@@ -66,7 +66,7 @@ public class ContainerSaveAction implements Action<IdResult> {
             permission = new ContainerCreatePermission();
         else
             permission = new ContainerUpdatePermission(containerId);
-        return permission.isAllowed(null);
+        return permission.isAllowed(context);
     }
 
     @Override

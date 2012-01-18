@@ -20,7 +20,7 @@ public class ContainerTypeDeleteAction implements Action<EmptyResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new ContainerTypeDeletePermission(typeId).isAllowed(null);
+        return new ContainerTypeDeletePermission(typeId).isAllowed(context);
     }
 
     @Override

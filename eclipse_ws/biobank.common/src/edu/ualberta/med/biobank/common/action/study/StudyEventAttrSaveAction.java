@@ -53,7 +53,7 @@ public class StudyEventAttrSaveAction implements Action<IdResult> {
             permission = new StudyCreatePermission();
         else
             permission = new StudyUpdatePermission(studyId);
-        return permission.isAllowed(null);
+        return permission.isAllowed(context);
     }
 
     @Override

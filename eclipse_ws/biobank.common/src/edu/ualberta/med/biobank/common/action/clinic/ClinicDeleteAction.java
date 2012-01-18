@@ -16,7 +16,7 @@ public class ClinicDeleteAction extends CenterDeleteAction {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new ClinicDeletePermission(centerId).isAllowed(null);
+        return new ClinicDeletePermission(centerId).isAllowed(context);
     }
 
     @Override

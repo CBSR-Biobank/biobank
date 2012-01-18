@@ -161,7 +161,7 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         return new SpecimenLinkPermission(currentWorkingCenterId, studyId)
-            .isAllowed(null);
+            .isAllowed(context);
     }
 
 }

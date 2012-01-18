@@ -20,7 +20,7 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new ShipmentDeletePermission(shipId).isAllowed(null);
+        return new ShipmentDeletePermission(shipId).isAllowed(context);
     }
 
     @Override

@@ -41,7 +41,7 @@ public class PatientSaveAction implements Action<IdResult> {
         } else {
             permission = new PatientUpdatePermission(patientId);
         }
-        return permission.isAllowed(null);
+        return permission.isAllowed(context);
     }
 
     @SuppressWarnings("unchecked")

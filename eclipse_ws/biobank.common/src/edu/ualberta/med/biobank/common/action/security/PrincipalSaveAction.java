@@ -30,7 +30,7 @@ public abstract class PrincipalSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new UserManagementPermission().isAllowed(null);
+        return new UserManagementPermission().isAllowed(context);
     }
 
     public IdResult run(ActionContext context, Principal principal)

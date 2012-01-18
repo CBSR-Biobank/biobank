@@ -37,7 +37,7 @@ public class DispatchGetSpecimenInfosAction implements
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new DispatchReadPermission(dispatchId).isAllowed(null);
+        return new DispatchReadPermission(dispatchId).isAllowed(context);
     }
 
     @Override

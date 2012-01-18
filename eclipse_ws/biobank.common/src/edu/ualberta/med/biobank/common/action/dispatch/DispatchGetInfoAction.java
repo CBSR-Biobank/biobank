@@ -34,7 +34,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new DispatchReadPermission(id).isAllowed(null);
+        return new DispatchReadPermission(id).isAllowed(context);
     }
 
     @Override

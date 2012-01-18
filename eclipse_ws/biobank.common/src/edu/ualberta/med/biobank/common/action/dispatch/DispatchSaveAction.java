@@ -41,7 +41,7 @@ public class DispatchSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new DispatchSavePermission(dInfo.id).isAllowed(null);
+        return new DispatchSavePermission(dInfo.id).isAllowed(context);
     }
 
     @Override

@@ -30,7 +30,7 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ResearchGroupSavePermission(rgInfo.id).isAllowed(null);
+        return new ResearchGroupSavePermission(rgInfo.id).isAllowed(context);
     }
 
     @Override

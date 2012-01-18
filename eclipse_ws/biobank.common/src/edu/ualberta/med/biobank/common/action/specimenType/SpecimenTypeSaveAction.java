@@ -59,7 +59,7 @@ public class SpecimenTypeSaveAction implements Action<IdResult> {
             permission = new SpecimenTypeCreatePermission();
         else
             permission = new SpecimenTypeUpdatePermission(specimenTypeId);
-        return permission.isAllowed(null);
+        return permission.isAllowed(context);
     }
 
     @Override

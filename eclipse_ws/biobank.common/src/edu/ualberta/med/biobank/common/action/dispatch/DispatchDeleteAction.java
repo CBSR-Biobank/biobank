@@ -19,7 +19,7 @@ public class DispatchDeleteAction implements Action<EmptyResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new DispatchDeletePermission(shipId).isAllowed(null);
+        return new DispatchDeletePermission(shipId).isAllowed(context);
     }
 
     @Override

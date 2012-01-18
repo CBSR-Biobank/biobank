@@ -43,7 +43,7 @@ public class ShipmentGetSpecimenInfosAction implements
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new OriginInfoReadPermission(oiId).isAllowed(null);
+        return new OriginInfoReadPermission(oiId).isAllowed(context);
     }
 
     @Override

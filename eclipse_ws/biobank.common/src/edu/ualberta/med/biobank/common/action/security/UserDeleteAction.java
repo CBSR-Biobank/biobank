@@ -18,7 +18,7 @@ public class UserDeleteAction implements Action<EmptyResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new UserManagementPermission().isAllowed(null);
+        return new UserManagementPermission().isAllowed(context);
     }
 
     @Override

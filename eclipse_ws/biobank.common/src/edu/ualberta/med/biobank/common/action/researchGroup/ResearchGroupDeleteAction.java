@@ -18,7 +18,7 @@ public class ResearchGroupDeleteAction implements Action<EmptyResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new ResearchGroupDeletePermission(rgId).isAllowed(null);
+        return new ResearchGroupDeletePermission(rgId).isAllowed(context);
     }
 
     @Override

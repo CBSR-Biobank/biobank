@@ -31,7 +31,7 @@ public class SubmitRequestAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new SubmitRequestPermission(rgId).isAllowed(null);
+        return new SubmitRequestPermission(rgId).isAllowed(context);
     }
 
     @Override

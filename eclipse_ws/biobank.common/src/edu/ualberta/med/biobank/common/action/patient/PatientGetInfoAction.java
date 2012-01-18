@@ -65,7 +65,7 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new PatientReadPermission(patientId).isAllowed(null);
+        return new PatientReadPermission(patientId).isAllowed(context);
     }
 
     @Override

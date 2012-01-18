@@ -23,6 +23,7 @@ public class SpecimenLinkPermission implements Permission {
         Study study = context.load(Study.class, studyId);
         return PermissionEnum.SPECIMEN_LINK.isAllowed(context.getUser(),
             center, study)
-            && new SpecimenCreatePermission(centerId, studyId).isAllowed(null);
+            && new SpecimenCreatePermission(centerId, studyId)
+                .isAllowed(context);
     }
 }

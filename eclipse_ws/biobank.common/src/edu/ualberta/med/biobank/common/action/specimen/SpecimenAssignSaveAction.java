@@ -59,7 +59,7 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
     public boolean isAllowed(ActionContext context) {
         Container container = context.load(Container.class, containerId);
         Integer centerId = container.getSite().getId();
-        return new SpecimenAssignPermission(centerId).isAllowed(null);
+        return new SpecimenAssignPermission(centerId).isAllowed(context);
     }
 
     @Override

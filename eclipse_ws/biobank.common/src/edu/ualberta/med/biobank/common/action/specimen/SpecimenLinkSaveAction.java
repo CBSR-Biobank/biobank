@@ -64,7 +64,7 @@ public class SpecimenLinkSaveAction implements
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new SpecimenLinkPermission(centerId, studyId).isAllowed(null);
+        return new SpecimenLinkPermission(centerId, studyId).isAllowed(context);
     }
 
     /**

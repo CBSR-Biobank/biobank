@@ -52,7 +52,7 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new CollectionEventReadPermission(ceventId).isAllowed(null);
+        return new CollectionEventReadPermission(ceventId).isAllowed(context);
     }
 
     @Override
