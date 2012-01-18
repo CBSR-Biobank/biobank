@@ -51,7 +51,7 @@ public class TestAction {
      */
     @Before
     public void setUp() throws Exception {
-        session = SESSION_PROVIDER.openAutoCommitSession();
+        session = SESSION_PROVIDER.openSession();
     }
 
     /**
@@ -63,7 +63,7 @@ public class TestAction {
     }
 
     public static User getSuperAdminUser() {
-        Session session = SESSION_PROVIDER.openAutoCommitSession();
+        Session session = SESSION_PROVIDER.openSession();
 
         // check if user already exists
         @SuppressWarnings("unchecked")
@@ -72,6 +72,8 @@ public class TestAction {
             .list();
 
         if (users.size() >= 1) return users.get(0);
+
+        session.beginTransaction();
 
         ActivityStatus active = (ActivityStatus) session
             .createCriteria(ActivityStatus.class)
@@ -84,6 +86,7 @@ public class TestAction {
         superAdmin.setRecvBulkEmails(false);
         superAdmin.setFullName("super admin");
         superAdmin.setEmail(randString());
+        superAdmin.setNeedPwdChange(false);
         superAdmin.setNeedPwdChange(false);
         superAdmin.setActivityStatus(active);
 
@@ -100,6 +103,7 @@ public class TestAction {
 
         session.save(membership);
 
+        session.getTransaction().commit();
         session.close();
 
         return superAdmin;

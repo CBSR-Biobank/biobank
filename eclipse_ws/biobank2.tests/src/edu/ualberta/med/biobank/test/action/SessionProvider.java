@@ -1,13 +1,8 @@
 package edu.ualberta.med.biobank.test.action;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.jdbc.Work;
 
 public class SessionProvider {
     public enum Mode {
@@ -37,23 +32,5 @@ public class SessionProvider {
 
     public Session openSession() {
         return sessionFactory.openSession();
-    }
-
-    public Session openAutoCommitSession() {
-        Session session = sessionFactory.openSession();
-        session.setFlushMode(FlushMode.COMMIT);
-
-        setAutoCommit(session, true);
-
-        return session;
-    }
-
-    public void setAutoCommit(Session session, final boolean autoCommit) {
-        session.doWork(new Work() {
-            @Override
-            public void execute(Connection connection) throws SQLException {
-                connection.setAutoCommit(autoCommit);
-            }
-        });
     }
 }
