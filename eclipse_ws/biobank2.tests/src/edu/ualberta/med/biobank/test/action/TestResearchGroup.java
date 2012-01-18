@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -13,20 +12,20 @@ import org.junit.rules.TestName;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
+import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupDeleteAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
+import edu.ualberta.med.biobank.test.action.helper.RequestHelper;
 import edu.ualberta.med.biobank.test.action.helper.ResearchGroupHelper;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
-import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 
 public class TestResearchGroup extends TestAction {
 
@@ -53,6 +52,7 @@ public class TestResearchGroup extends TestAction {
             ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
                 name,
                 studyId);
+
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
         ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
@@ -60,7 +60,7 @@ public class TestResearchGroup extends TestAction {
         Assert.assertTrue(rg.rg.name.equals(name + "rg"));
         Assert.assertTrue(rg.rg.nameShort.equals(name + "rg"));
         Assert.assertTrue(rg.rg.getStudy().getId().equals(studyId));
-        Assert.assertTrue(rg.rg.getActivityStatus().id
+        Assert.assertTrue(rg.rg.getActivityStatus().getId()
             .equals(ActivityStatusEnum.ACTIVE.getId()));
 
     }
@@ -109,27 +109,28 @@ public class TestResearchGroup extends TestAction {
                 .getInventoryId()));
         }
     }
-    
+
     @Test
     public void testDelete() throws Exception {
-    	// only one failure case specific to rg, rest are in center
-    	
-    	Integer rgId =
-                ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
-                    name,
-                    studyId);
+        // only one failure case specific to rg, rest are in center
+
+        Integer rgId =
+            ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
+                name,
+                studyId);
         ResearchGroupGetInfoAction reader =
-        new ResearchGroupGetInfoAction(rgId);
+            new ResearchGroupGetInfoAction(rgId);
         ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
+
+        RequestHelper.createRequest(EXECUTOR, rgId);
+
         try {
-        	rg.rg.setRequestCollection(Arrays.asList(new Request()));
-        	Assert.fail();
-        } catch (Exception e) { 
-        	
+            ResearchGroupDeleteAction delete =
+                new ResearchGroupDeleteAction(rgId);
+            EXECUTOR.exec(delete);
+            Assert.fail();
+        } catch (ActionException e) {
+            System.out.println(e);
         }
-        
-        session.delete(rg);
-        session.flush();
     }
-    
 }

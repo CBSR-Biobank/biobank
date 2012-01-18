@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.hibernate.PropertyValueException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -61,6 +62,7 @@ public class TestDispatch extends TestAction {
 
     @Test
     public void saveWithSpecs() throws Exception {
+
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
                 centerId, DispatchState.CREATION.getId(),
@@ -113,7 +115,7 @@ public class TestDispatch extends TestAction {
                 EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
                     .getId();
             Assert.fail("test should fail");
-        } catch (ActionException e) {
+        } catch (PropertyValueException e) {
             Assert.assertTrue(true);
         }
 
@@ -194,6 +196,7 @@ public class TestDispatch extends TestAction {
             EXECUTOR.exec(delete);
             Assert.fail();
         } catch (ActionException e) {
+            System.out.println(e);
         }
 
         DispatchChangeStateAction stateChange =
