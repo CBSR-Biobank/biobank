@@ -1,12 +1,16 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.hibernate.criterion.Restrictions;
 import org.junit.Test;
+import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.security.RoleSaveAction;
+import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 
@@ -18,7 +22,7 @@ public class TestRole extends TestAction {
 
         IdResult result = EXECUTOR.exec(action);
 
-        // session.get(Role.class, id)
+        Assert.notNull(session.get(Role.class, result.getId()));
     }
 
     @Test
@@ -26,13 +30,44 @@ public class TestRole extends TestAction {
         RoleSaveAction action = new RoleSaveAction();
         action.setName(getMethodNameR());
 
-        Set<PermissionEnum> permissions = new HashSet<PermissionEnum>();
-        permissions.add(PermissionEnum.ADMINISTRATION);
-        permissions.add(PermissionEnum.CLINIC_CREATE);
+        Set<PermissionEnum> permissionEnums = new HashSet<PermissionEnum>();
+        permissionEnums.add(PermissionEnum.ADMINISTRATION);
+        permissionEnums.add(PermissionEnum.CLINIC_CREATE);
 
-        action.setPermissions(permissions);
+        action.setPermissions(permissionEnums);
 
         IdResult result = EXECUTOR.exec(action);
+
+        Role role = (Role) session.get(Role.class, result.getId());
+
+        @SuppressWarnings("unchecked")
+        List<Permission> permissions = session.createCriteria(Permission.class)
+            .add(Restrictions.in("id", PermissionEnum.getIds(permissionEnums)))
+            .list();
+
+        Assert.notNull(role);
+        Assert.isTrue(role.getPermissionCollection().containsAll(permissions),
+            "Permissions not saved.");
+    }
+
+    @Test
+    public void testRoleUpdate() {
+        RoleSaveAction action = new RoleSaveAction();
+        action.setName(getMethodNameR());
+
+        Set<PermissionEnum> permissionEnums = new HashSet<PermissionEnum>();
+        permissionEnums.add(PermissionEnum.ADMINISTRATION);
+        permissionEnums.add(PermissionEnum.CLINIC_READ);
+
+        action.setPermissions(permissionEnums);
+
+        IdResult result = EXECUTOR.exec(action);
+        Integer roleId = result.getId();
+
+        action.setId(roleId);
+        action.setPermissions(permissionEnums);
+
+        EXECUTOR.exec(action);
     }
 
     @Test
