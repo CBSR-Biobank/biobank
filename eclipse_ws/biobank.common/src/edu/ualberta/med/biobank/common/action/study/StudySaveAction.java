@@ -188,7 +188,7 @@ public class StudySaveAction implements Action<IdResult> {
             permission = new StudyCreatePermission();
         else
             permission = new StudyUpdatePermission(id);
-        return permission.isAllowed(null);
+        return permission.isAllowed(context);
     }
 
     @Override

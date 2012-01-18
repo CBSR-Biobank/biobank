@@ -18,7 +18,7 @@ public class RequestDeleteAction implements Action<EmptyResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new RequestDeletePermission(rId).isAllowed(null);
+        return new RequestDeletePermission(rId).isAllowed(context);
     }
 
     @Override

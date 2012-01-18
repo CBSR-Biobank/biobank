@@ -198,7 +198,8 @@ public class TestProcessingEvent extends TestAction {
 
         session.clear();
         ProcessingEvent pe =
-            (ProcessingEvent) session.get(ProcessingEvent.class, pEventId);
+            (ProcessingEvent) session.get(
+                ProcessingEvent.class, pEventId);
         Assert.assertNull(pe);
         spc = (Specimen) session.load(Specimen.class, spcId);
         session.refresh(spc);

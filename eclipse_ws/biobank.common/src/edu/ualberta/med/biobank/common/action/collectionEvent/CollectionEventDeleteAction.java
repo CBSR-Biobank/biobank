@@ -24,7 +24,7 @@ public class CollectionEventDeleteAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new CollectionEventDeletePermission(ceventId).isAllowed(null);
+        return new CollectionEventDeletePermission(ceventId).isAllowed(context);
     }
 
     @Override

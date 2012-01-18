@@ -37,7 +37,7 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new RequestReadPermission().isAllowed(null);
+        return new RequestReadPermission().isAllowed(context);
     }
 
     @Override

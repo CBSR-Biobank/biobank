@@ -34,7 +34,7 @@ public class SiteSaveAction extends CenterSaveAction {
             permission = new SiteCreatePermission();
         else
             permission = new SiteUpdatePermission(centerId);
-        return permission.isAllowed(null);
+        return permission.isAllowed(context);
     }
 
     @Override

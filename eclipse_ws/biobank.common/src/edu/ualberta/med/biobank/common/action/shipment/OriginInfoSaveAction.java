@@ -36,7 +36,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new OriginInfoSavePermission(oiInfo.oiId).isAllowed(null);
+        return new OriginInfoSavePermission(oiInfo.oiId).isAllowed(context);
     }
 
     @Override

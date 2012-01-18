@@ -24,7 +24,7 @@ public class PatientDeleteAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new PatientDeletePermission(patientId).isAllowed(null);
+        return new PatientDeletePermission(patientId).isAllowed(context);
     }
 
     @Override

@@ -43,7 +43,7 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new SiteReadPermission(siteId).isAllowed(null);
+        return new SiteReadPermission(siteId).isAllowed(context);
     }
 
     @Override

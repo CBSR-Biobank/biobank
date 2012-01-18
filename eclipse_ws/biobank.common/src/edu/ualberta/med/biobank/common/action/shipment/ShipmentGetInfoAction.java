@@ -40,7 +40,7 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new OriginInfoReadPermission(oiId).isAllowed(null);
+        return new OriginInfoReadPermission(oiId).isAllowed(context);
     }
 
     @Override

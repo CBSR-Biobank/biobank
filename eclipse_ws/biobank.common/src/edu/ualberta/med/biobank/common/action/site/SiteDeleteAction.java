@@ -16,7 +16,7 @@ public class SiteDeleteAction extends CenterDeleteAction {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new SiteDeletePermission(centerId).isAllowed(null);
+        return new SiteDeletePermission(centerId).isAllowed(context);
     }
 
     @Override

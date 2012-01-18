@@ -34,7 +34,7 @@ public class ResearchGroupGetInfoAction implements
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new ResearchGroupReadPermission(rgId).isAllowed(null);
+        return new ResearchGroupReadPermission(rgId).isAllowed(context);
     }
 
     @Override

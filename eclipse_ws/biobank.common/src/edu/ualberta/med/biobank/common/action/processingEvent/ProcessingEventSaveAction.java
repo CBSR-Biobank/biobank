@@ -64,7 +64,7 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         } else {
             permission = new ProcessingEventUpdatePermission(peventId);
         }
-        return permission.isAllowed(null);
+        return permission.isAllowed(context);
     }
 
     @SuppressWarnings("unchecked")

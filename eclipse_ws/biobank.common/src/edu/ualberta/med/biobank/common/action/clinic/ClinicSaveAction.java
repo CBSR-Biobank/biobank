@@ -87,7 +87,7 @@ public class ClinicSaveAction extends CenterSaveAction {
             permission = new ClinicCreatePermission();
         else
             permission = new ClinicUpdatePermission(centerId);
-        return permission.isAllowed(null);
+        return permission.isAllowed(context);
     }
 
     /**

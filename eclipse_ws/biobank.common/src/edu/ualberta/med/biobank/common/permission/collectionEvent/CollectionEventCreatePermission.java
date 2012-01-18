@@ -20,6 +20,6 @@ public class CollectionEventCreatePermission implements Permission {
         Patient patient = context.load(Patient.class, patientId);
         return PermissionEnum.COLLECTION_EVENT_CREATE
             .isAllowed(context.getUser(), patient.getStudy())
-            && new PatientUpdatePermission(patientId).isAllowed(null);
+            && new PatientUpdatePermission(patientId).isAllowed(context);
     }
 }

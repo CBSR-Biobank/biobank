@@ -41,7 +41,7 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ClinicReadPermission(clinicId).isAllowed(null);
+        return new ClinicReadPermission(clinicId).isAllowed(context);
     }
 
     @Override

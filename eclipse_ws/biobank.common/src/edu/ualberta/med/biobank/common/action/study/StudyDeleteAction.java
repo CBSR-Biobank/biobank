@@ -20,7 +20,7 @@ public class StudyDeleteAction implements Action<EmptyResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new StudyDeletePermission(studyId).isAllowed(null);
+        return new StudyDeletePermission(studyId).isAllowed(context);
     }
 
     @Override

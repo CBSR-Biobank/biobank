@@ -25,7 +25,7 @@ public class PatientMergePermission implements Permission {
         // both patients are supposed to be in the same study for the merge
         return PermissionEnum.PATIENT_MERGE
             .isAllowed(context.getUser(), patient1.getStudy())
-            && new PatientUpdatePermission(patientId1).isAllowed(null)
-            && new PatientDeletePermission(patientId2).isAllowed(null);
+            && new PatientUpdatePermission(patientId1).isAllowed(context)
+            && new PatientDeletePermission(patientId2).isAllowed(context);
     }
 }

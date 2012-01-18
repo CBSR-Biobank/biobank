@@ -20,7 +20,7 @@ public class SpecimenDeleteAction implements Action<EmptyResult> {
     @Override
     public boolean isAllowed(ActionContext context) {
         return new SpecimenDeletePermission(specimenId)
-            .isAllowed(null);
+            .isAllowed(context);
     }
 
     @Override

@@ -54,7 +54,7 @@ public class MembershipSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new UserManagementPermission().isAllowed(null);
+        return new UserManagementPermission().isAllowed(context);
     }
 
     @Override

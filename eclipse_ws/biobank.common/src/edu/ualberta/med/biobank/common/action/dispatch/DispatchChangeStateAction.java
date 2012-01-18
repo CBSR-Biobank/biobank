@@ -30,7 +30,7 @@ public class DispatchChangeStateAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new DispatchChangeStatePermission(id).isAllowed(null);
+        return new DispatchChangeStatePermission(id).isAllowed(context);
     }
 
     @Override
