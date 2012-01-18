@@ -57,17 +57,33 @@ public class TestRole extends TestAction {
 
         Set<PermissionEnum> permissionEnums = new HashSet<PermissionEnum>();
         permissionEnums.add(PermissionEnum.ADMINISTRATION);
-        permissionEnums.add(PermissionEnum.CLINIC_READ);
 
         action.setPermissions(permissionEnums);
 
         IdResult result = EXECUTOR.exec(action);
         Integer roleId = result.getId();
 
+        // update
         action.setId(roleId);
+
+        permissionEnums.clear();
+        permissionEnums.add(PermissionEnum.CLINIC_CREATE);
+
         action.setPermissions(permissionEnums);
 
         EXECUTOR.exec(action);
+
+        // check
+        Role role = (Role) session.get(Role.class, result.getId());
+
+        @SuppressWarnings("unchecked")
+        List<Permission> permissions = session.createCriteria(Permission.class)
+            .add(Restrictions.in("id", PermissionEnum.getIds(permissionEnums)))
+            .list();
+
+        Assert.notNull(role);
+        Assert.isTrue(role.getPermissionCollection().containsAll(permissions),
+            "Permissions not saved.");
     }
 
     @Test
