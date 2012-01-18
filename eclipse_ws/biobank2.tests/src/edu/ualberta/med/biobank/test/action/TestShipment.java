@@ -40,34 +40,34 @@ public class TestShipment extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + r.nextInt();
+        name = testname.getMethodName() + R.nextInt();
         studyId =
             StudyHelper
-                .createStudy(actionExecutor, name, ActivityStatusEnum.ACTIVE);
+                .createStudy(EXECUTOR, name, ActivityStatusEnum.ACTIVE);
         siteId =
-            SiteHelper.createSite(actionExecutor, name + "1", "Edmonton",
+            SiteHelper.createSite(EXECUTOR, name + "1", "Edmonton",
                 ActivityStatusEnum.ACTIVE, new HashSet<Integer>(studyId));
         centerId =
-            SiteHelper.createSite(actionExecutor, name + "2", "Calgary",
+            SiteHelper.createSite(EXECUTOR, name + "2", "Calgary",
                 ActivityStatusEnum.ACTIVE, new HashSet<Integer>(studyId));
         patientId =
-            actionExecutor.exec(new PatientSaveAction(null, studyId, name,
+            EXECUTOR.exec(new PatientSaveAction(null, studyId, name,
                 Utils.getRandomDate())).getId();
     }
 
     @Test
     public void saveWithSpecs() throws Exception {
         OriginInfoSaveInfo oisave =
-            OriginInfoHelper.createSaveOriginInfoSpecimenInfoRandom(actionExecutor,
+            OriginInfoHelper.createSaveOriginInfoSpecimenInfoRandom(EXECUTOR,
                 patientId, siteId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(actionExecutor);
+            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
         Integer id =
-            actionExecutor.exec(new OriginInfoSaveAction(oisave, shipsave))
+            EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
 
         ShipmentReadInfo info =
-            actionExecutor.exec(new ShipmentGetInfoAction(id));
+            EXECUTOR.exec(new ShipmentGetInfoAction(id));
 
         Assert.assertTrue(info.oi.getCenter().getId().equals(oisave.centerId));
         Assert.assertTrue(info.oi.getReceiverSite().getId()
@@ -80,11 +80,11 @@ public class TestShipment extends TestAction {
         oisave.removedSpecIds = oisave.addedSpecIds;
         oisave.addedSpecIds = null;
         id =
-            actionExecutor.exec(new OriginInfoSaveAction(oisave, shipsave))
+            EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
 
         info =
-            actionExecutor.exec(new ShipmentGetInfoAction(id));
+            EXECUTOR.exec(new ShipmentGetInfoAction(id));
 
         Assert.assertTrue(info.specimens.size() == 0);
 
@@ -92,23 +92,23 @@ public class TestShipment extends TestAction {
 
         // Empty
         oisave.addedSpecIds = mut.getEmpty();
-        actionExecutor.exec(new OriginInfoSaveAction(oisave, shipsave))
+        EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
             .getId();
 
         // Null
         oisave.addedSpecIds = mut.getNull();
-        actionExecutor.exec(new OriginInfoSaveAction(oisave, shipsave))
+        EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
             .getId();
 
         // Set of null
         oisave.addedSpecIds = mut.getSetWithNull();
-        actionExecutor.exec(new OriginInfoSaveAction(oisave, shipsave))
+        EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
             .getId();
 
         // Out of Bounds
         try {
             oisave.addedSpecIds = mut.getOutOfBounds();
-            actionExecutor.exec(new OriginInfoSaveAction(oisave, shipsave))
+            EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
             Assert.fail();
         } catch (ModelNotFoundException e) {
@@ -118,15 +118,15 @@ public class TestShipment extends TestAction {
     @Test
     public void testDelete() throws Exception {
         OriginInfoSaveInfo oisave =
-            OriginInfoHelper.createSaveOriginInfoSpecimenInfoRandom(actionExecutor,
+            OriginInfoHelper.createSaveOriginInfoSpecimenInfoRandom(EXECUTOR,
                 patientId, siteId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(actionExecutor);
+            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
         Integer id =
-            actionExecutor.exec(new OriginInfoSaveAction(oisave, shipsave))
+            EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
 
         ShipmentDeleteAction action = new ShipmentDeleteAction(id);
-        actionExecutor.exec(action);
+        EXECUTOR.exec(action);
     }
 }
