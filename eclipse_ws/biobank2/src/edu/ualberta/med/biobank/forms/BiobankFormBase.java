@@ -106,6 +106,7 @@ public abstract class BiobankFormBase extends BgcFormBase {
         super.init(editorSite, formInput);
     }
 
+    @Deprecated
     protected Object getModelObject() throws Exception {
         if (adapter instanceof AdapterBase) {
             AdapterBase ab = (AdapterBase) adapter;

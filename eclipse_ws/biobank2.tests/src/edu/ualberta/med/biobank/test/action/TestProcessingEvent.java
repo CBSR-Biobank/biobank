@@ -17,14 +17,15 @@ import org.junit.rules.TestName;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSpecimenInfosAction;
+import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
@@ -45,7 +46,7 @@ public class TestProcessingEvent extends TestAction {
 
     private Integer siteId;
     private Integer studyId;
-    private ClinicWrapper clinic;
+    // private ClinicWrapper clinic;
     private Integer patientId;
 
     @Override
@@ -196,11 +197,14 @@ public class TestProcessingEvent extends TestAction {
         // children
         EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
 
+        try {
+            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
+            Assert.fail("processing event still exists");
+        } catch (ModelNotFoundException e) {
+            Assert.assertTrue(true);
+        }
+
         session.clear();
-        ProcessingEvent pe =
-            (ProcessingEvent) session.get(
-                ProcessingEvent.class, pEventId);
-        Assert.assertNull(pe);
         spc = (Specimen) session.load(Specimen.class, spcId);
         session.refresh(spc);
         Assert.assertNotNull(spc);

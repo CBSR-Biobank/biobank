@@ -7,19 +7,22 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
+import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 
 public class ProcessingEventViewForm extends BiobankViewForm {
 
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ProcessingEventViewForm"; //$NON-NLS-1$
-
-    private ProcessingEventWrapper pEvent;
 
     private BgcBaseText centerLabel;
 
@@ -27,27 +30,35 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     private BgcBaseText dateCreationLabel;
 
-    private SpecimenInfoTable sourceSpecimenTable;
+    private NewSpecimenInfoTable sourceSpecimenTable;
 
     private BgcBaseText activityLabel;
 
     private CommentCollectionInfoTable commentTable;
+
+    private PEventInfo peventInfo;
 
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ProcessingEventAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
+        updatePEventInfo();
 
-        pEvent = (ProcessingEventWrapper) getModelObject();
         setPartName(NLS.bind(Messages.ProcessingEventViewForm_title,
-            pEvent.getFormattedCreatedAt()));
+            DateFormatter.formatAsDateTime(peventInfo.pevent.getCreatedAt())));
+    }
+
+    private void updatePEventInfo() throws Exception {
+        peventInfo =
+            SessionManager.getAppService().doAction(
+                new ProcessingEventGetInfoAction(adapter.getId()));
     }
 
     @Override
     protected void createFormContent() throws Exception {
         form.setText(NLS.bind(Messages.ProcessingEventViewForm_title,
-            pEvent.getFormattedCreatedAt()));
+            DateFormatter.formatAsDateTime(peventInfo.pevent.getCreatedAt())));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
@@ -82,26 +93,30 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
-        commentTable =
-            new CommentCollectionInfoTable(client,
-                pEvent.getCommentCollection(false));
+        commentTable = new CommentCollectionInfoTable(client,
+            ModelWrapper.wrapModelCollection(
+                SessionManager.getAppService(),
+                peventInfo.pevent.getCommentCollection(),
+                CommentWrapper.class));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
     }
 
     private void setValues() {
-        setTextValue(centerLabel, pEvent.getCenter().getName());
-        setTextValue(worksheetLabel, pEvent.getWorksheet());
-        setTextValue(dateCreationLabel, pEvent.getFormattedCreatedAt());
-        setTextValue(activityLabel, pEvent.getActivityStatus().getName());
+        setTextValue(centerLabel, peventInfo.pevent.getCenter().getName());
+        setTextValue(worksheetLabel, peventInfo.pevent.getWorksheet());
+        setTextValue(dateCreationLabel,
+            DateFormatter.formatAsDateTime(peventInfo.pevent.getCreatedAt()));
+        setTextValue(activityLabel, peventInfo.pevent.getActivityStatus()
+            .getName());
     }
 
     private void createSourceSpecimensSection() {
         Composite client =
             createSectionWithClient(Messages.ProcessingEventViewForm_specimens_title);
         sourceSpecimenTable =
-            new SpecimenInfoTable(client, pEvent.getSpecimenCollection(true),
-                ColumnsShown.SOURCE_SPECIMENS, 10);
+            new NewSpecimenInfoTable(client, peventInfo.sourceSpecimenInfos,
+                ColumnsShown.PEVENT_SOURCE_SPECIMENS, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
         sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
         sourceSpecimenTable.createDefaultEditItem();
@@ -109,14 +124,15 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     @Override
     public void reload() throws Exception {
-        pEvent.reload();
+        updatePEventInfo();
         setPartName(NLS.bind(Messages.ProcessingEventViewForm_title,
-            pEvent.getFormattedCreatedAt()));
+            DateFormatter.formatAsDateTime(peventInfo.pevent.getCreatedAt())));
         form.setText(NLS.bind(Messages.ProcessingEventViewForm_title,
-            pEvent.getFormattedCreatedAt()));
+            DateFormatter.formatAsDateTime(peventInfo.pevent.getCreatedAt())));
         setValues();
-        sourceSpecimenTable.setList(pEvent.getSpecimenCollection(true));
-        commentTable.setList(pEvent.getCommentCollection(false));
+        sourceSpecimenTable.setList(peventInfo.sourceSpecimenInfos);
+
+        // TODO: reload comment table
     }
 
 }
