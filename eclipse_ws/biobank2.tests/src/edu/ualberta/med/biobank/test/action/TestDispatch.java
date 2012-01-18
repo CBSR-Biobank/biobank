@@ -196,6 +196,7 @@ public class TestDispatch extends TestAction {
             EXECUTOR.exec(delete);
             Assert.fail();
         } catch (ActionException e) {
+            System.out.println(e);
         }
 
         DispatchChangeStateAction stateChange =

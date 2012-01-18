@@ -47,7 +47,7 @@ public class TestRequest extends TestAction {
             StudyHelper
                 .createStudy(EXECUTOR, name, ActivityStatusEnum.ACTIVE);
         rgId =
-            ResearchGroupHelper.createResearchGroup(actionExecutor,
+            ResearchGroupHelper.createResearchGroup(EXECUTOR,
                 name + "rg",
                 name + "rg",
                 studyId);
@@ -145,11 +145,11 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testDelete() throws Exception {
-        Integer rId = RequestHelper.createRequest(actionExecutor, rgId);
+        Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
 
         RequestGetInfoAction requestGetInfoAction =
             new RequestGetInfoAction(rId);
-        RequestReadInfo rInfo = actionExecutor.exec(requestGetInfoAction);
+        RequestReadInfo rInfo = EXECUTOR.exec(requestGetInfoAction);
 
         session.delete(rInfo.request);
     }

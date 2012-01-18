@@ -25,8 +25,9 @@ public class ResearchGroupDeleteAction implements Action<EmptyResult> {
     public EmptyResult run(ActionContext context) throws ActionException {
         ResearchGroup rg = context.get(ResearchGroup.class, rgId);
 
-        // / ??? what checks???
-
+        if (rg.getRequestCollection().size() > 0)
+            throw new ActionException(
+                "ResearchGroups with requests may not be deleted.");
         context.getSession().delete(rg);
         return new EmptyResult();
     }

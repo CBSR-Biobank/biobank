@@ -4,12 +4,12 @@ import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.info.AddressSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
-import edu.ualberta.med.biobank.test.action.IActionExecutor;
+import edu.ualberta.med.biobank.test.action.LocalActionExecutor;
 
 public class ResearchGroupHelper extends Helper {
 
     public static Integer createResearchGroup(
-        IActionExecutor actionExecutor,
+        LocalActionExecutor actionExecutor,
         String name, String nameShort, Integer studyId) throws Exception {
         AddressSaveInfo addressSaveInfo =
             new AddressSaveInfo(null, "test", "test", "test", "test", "test",

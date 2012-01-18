@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Assert;
@@ -13,13 +12,14 @@ import org.junit.rules.TestName;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
+import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupDeleteAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
@@ -70,7 +70,6 @@ public class TestResearchGroup extends TestAction {
         Integer rgId =
             ResearchGroupHelper.createResearchGroup(EXECUTOR, name + "rg",
                 name + "rg",
-                name + "rg",
                 studyId);
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
@@ -116,25 +115,22 @@ public class TestResearchGroup extends TestAction {
         // only one failure case specific to rg, rest are in center
 
         Integer rgId =
-            ResearchGroupHelper.createResearchGroup(actionExecutor, name,
+            ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
                 name,
                 studyId);
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = actionExecutor.exec(reader);
-        Request r = (Request) session.load(Request.class,
-            RequestHelper.createRequest(actionExecutor, rgId));
-        HashSet<Request> set = new HashSet<Request>();
-        set.add(r);
-        rg.rg.setRequestCollection(set);
-        session.saveOrUpdate(rg.rg);
-        session.flush();
-        try {
-            session.delete(rg);
-            Assert.fail();
-        } catch (Exception e) {
-            // wat?
-        }
+        ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
 
+        RequestHelper.createRequest(EXECUTOR, rgId);
+
+        try {
+            ResearchGroupDeleteAction delete =
+                new ResearchGroupDeleteAction(rgId);
+            EXECUTOR.exec(delete);
+            Assert.fail();
+        } catch (ActionException e) {
+            System.out.println(e);
+        }
     }
 }
