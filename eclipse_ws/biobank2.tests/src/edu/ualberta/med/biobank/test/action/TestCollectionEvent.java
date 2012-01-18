@@ -146,7 +146,7 @@ public class TestCollectionEvent extends TestAction {
             }
         }
 
-        // Save a same cevent with only one kept from previous list (and
+        // Save the same cevent with only one kept from previous list (and
         // modified) and with a new one
         List<SaveCEventSpecimenInfo> newSpecList =
             new ArrayList<SaveCEventSpecimenInfo>();
@@ -163,6 +163,7 @@ public class TestCollectionEvent extends TestAction {
             visitNumber + 1, statusId, comments, newSpecList, null));
 
         // Check CollectionEvent is modified
+        session.clear();
         cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         session.refresh(cevent);
@@ -257,6 +258,7 @@ public class TestCollectionEvent extends TestAction {
         EXECUTOR.exec(new CollectionEventSaveAction(ceventId, patientId,
             visitNumber, statusId, comments, null, attrs));
 
+        session.clear();
         cevent = (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         session.refresh(cevent);
         Assert.assertEquals(1, cevent.getEventAttrCollection().size());

@@ -3,21 +3,23 @@ package edu.ualberta.med.biobank.common.action.processingEvent;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
-import edu.ualberta.med.biobank.common.action.DiffUtils;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventCreatePermission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventUpdatePermission;
+import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
@@ -40,11 +42,11 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
 
     private Collection<CommentInfo> comments;
 
-    private List<Integer> specimenIds;
+    private Set<Integer> specimenIds;
 
     public ProcessingEventSaveAction(Integer peventId, Integer centerId,
         Date createdAt, String worksheet, Integer statusId,
-        Collection<CommentInfo> comments, List<Integer> specimenIds) {
+        Collection<CommentInfo> comments, Set<Integer> specimenIds) {
         this.peventId = peventId;
         this.centerId = centerId;
         this.createdAt = createdAt;
@@ -68,6 +70,11 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
     @SuppressWarnings("unchecked")
     @Override
     public IdResult run(ActionContext context) throws ActionException {
+        if (specimenIds == null) {
+            throw new NullPropertyException(ProcessingEvent.class,
+                ProcessingEventPeer.SPECIMEN_COLLECTION);
+        }
+
         ProcessingEvent peventToSave;
 
         if (peventId == null) {
@@ -91,21 +98,23 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         peventToSave.setCreatedAt(createdAt);
         peventToSave.setWorksheet(worksheet);
 
-        DiffUtils<Specimen> specUtil = new DiffUtils<Specimen>(
-            CollectionUtils.getCollection(peventToSave,
-                ProcessingEventPeer.SPECIMEN_COLLECTION));
-        if (specimenIds != null)
-            for (Integer spcId : specimenIds) {
-                Specimen spc = context.load(Specimen.class, spcId);
-                spc.setProcessingEvent(peventToSave);
-                specUtil.add(spc);
-            }
-        for (Specimen spc : specUtil.pullRemoved()) {
-            spc.setProcessingEvent(null);
+        Map<Integer, Specimen> specimens =
+            context.load(Specimen.class, specimenIds);
+        SetDifference<Specimen> specimensDiff = new SetDifference<Specimen>(
+            peventToSave.getSpecimenCollection(), specimens.values());
+        peventToSave.setSpecimenCollection(specimensDiff.getNewSet());
+
+        // set processing event on added specimens
+        for (Specimen specimen : specimensDiff.getAddSet()) {
+            specimen.setProcessingEvent(peventToSave);
+        }
+
+        // remove processing event on removed specimens
+        for (Specimen specimen : specimensDiff.getRemoveSet()) {
+            specimen.setProcessingEvent(null);
         }
 
         context.getSession().saveOrUpdate(peventToSave);
-
         return new IdResult(peventToSave.getId());
     }
 

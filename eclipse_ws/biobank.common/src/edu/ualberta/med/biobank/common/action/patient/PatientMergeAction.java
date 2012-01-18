@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
-import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.patient.PatientMergePermission;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
@@ -47,57 +46,56 @@ public class PatientMergeAction implements Action<BooleanResult> {
 
         Patient patient1 = context.load(Patient.class, patient1Id);
         Patient patient2 = context.load(Patient.class, patient2Id);
-        if (patient1.getStudy().equals(patient2.getStudy())) {
-            Collection<CollectionEvent> c1events = CollectionUtils
-                .getCollection(patient1,
-                    PatientPeer.COLLECTION_EVENT_COLLECTION);
-            Collection<CollectionEvent> c2events = CollectionUtils
-                .getCollection(patient2,
-                    PatientPeer.COLLECTION_EVENT_COLLECTION);
-            if (!c2events.isEmpty()) {
-                boolean merged = false;
-                // for loop on a different list.
-                for (CollectionEvent c2event : new ArrayList<CollectionEvent>(
-                    c2events)) {
-                    for (CollectionEvent c1event : c1events) {
-                        merged = merge(context.getSession(), c1event, c2event);
-                        if (merged)
-                            break;
-                    }
-                    if (!merged) {
-                        // the collection has not been merged, so we can add it
-                        // as a new collection event in patient1
-                        c1events.add(c2event);
-                        c2events.remove(c2event);
-                        c2event.setPatient(patient1);
-                    }
-                    merged = false;
-                }
-
-                context.getSession().saveOrUpdate(patient1);
-                context.getSession().delete(patient2);
-
-                // FIXME see how logs should be done properly...
-                Log logP2 = new Log();
-                logP2.setAction("merge"); //$NON-NLS-1$
-                logP2.setPatientNumber(patient2.getPnumber());
-                logP2.setDetails(patient2.getPnumber() + " --> " //$NON-NLS-1$
-                    + patient1.getPnumber());
-                logP2.setType("Patient"); //$NON-NLS-1$
-                context.getSession().save(logP2);
-
-                Log logP1 = new Log();
-                logP1.setAction("merge"); //$NON-NLS-1$
-                logP1.setPatientNumber(patient1.getPnumber());
-                logP1.setDetails(patient1.getPnumber() + " <-- " //$NON-NLS-1$
-                    + patient2.getPnumber());
-                logP1.setType("Patient"); //$NON-NLS-1$
-                context.getSession().save(logP1);
-            }
-        } else {
+        if (!patient1.getStudy().equals(patient2.getStudy())) {
             throw new PatientMergeException(
                 PatientMergeException.ExceptionTypeEnum.STUDY);
         }
+
+        Collection<CollectionEvent> c1events =
+            patient1.getCollectionEventCollection();
+        Collection<CollectionEvent> c2events =
+            patient2.getCollectionEventCollection();
+        if (!c2events.isEmpty()) {
+            boolean merged = false;
+            // for loop on a different list.
+            for (CollectionEvent c2event : new ArrayList<CollectionEvent>(
+                c2events)) {
+                for (CollectionEvent c1event : c1events) {
+                    merged = merge(context.getSession(), c1event, c2event);
+                    if (merged)
+                        break;
+                }
+                if (!merged) {
+                    // the collection has not been merged, so we can add it
+                    // as a new collection event in patient1
+                    c1events.add(c2event);
+                    c2events.remove(c2event);
+                    c2event.setPatient(patient1);
+                }
+                merged = false;
+            }
+
+            context.getSession().saveOrUpdate(patient1);
+            context.getSession().delete(patient2);
+
+            // FIXME see how logs should be done properly...
+            Log logP2 = new Log();
+            logP2.setAction("merge"); //$NON-NLS-1$
+            logP2.setPatientNumber(patient2.getPnumber());
+            logP2.setDetails(patient2.getPnumber() + " --> " //$NON-NLS-1$
+                + patient1.getPnumber());
+            logP2.setType("Patient"); //$NON-NLS-1$
+            context.getSession().save(logP2);
+
+            Log logP1 = new Log();
+            logP1.setAction("merge"); //$NON-NLS-1$
+            logP1.setPatientNumber(patient1.getPnumber());
+            logP1.setDetails(patient1.getPnumber() + " <-- " //$NON-NLS-1$
+                + patient2.getPnumber());
+            logP1.setType("Patient"); //$NON-NLS-1$
+            context.getSession().save(logP1);
+        }
+
         return new BooleanResult(true);
     }
 

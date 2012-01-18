@@ -155,13 +155,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         CollectionEvent ceventToSave) {
         Set<Specimen> newSsCollection = new HashSet<Specimen>();
 
-        Set<Specimen> newAllSpecCollection =
-            new HashSet<Specimen>();
-        Collection<Specimen> allSpecimenCollection =
-            ceventToSave.getAllSpecimenCollection();
-        if (allSpecimenCollection != null) {
-            newAllSpecCollection.addAll(allSpecimenCollection);
-        }
+        Set<Specimen> newAllSpecCollection = new HashSet<Specimen>();
+        newAllSpecCollection.addAll(ceventToSave.getAllSpecimenCollection());
 
         Collection<Specimen> originalSpecimens =
             ceventToSave.getOriginalSpecimenCollection();
@@ -210,11 +205,11 @@ public class CollectionEventSaveAction implements Action<IdResult> {
             }
         }
 
+        ceventToSave.setOriginalSpecimenCollection(newSsCollection);
         SetDifference<Specimen> origSpecDiff = new SetDifference<Specimen>(
             originalSpecimens, newSsCollection);
         newAllSpecCollection.removeAll(origSpecDiff.getRemoveSet());
         ceventToSave.setAllSpecimenCollection(newAllSpecCollection);
-        ceventToSave.setOriginalSpecimenCollection(origSpecDiff.getNewSet());
         for (Specimen srcSpc : origSpecDiff.getRemoveSet()) {
             context.getSession().delete(srcSpc);
         }

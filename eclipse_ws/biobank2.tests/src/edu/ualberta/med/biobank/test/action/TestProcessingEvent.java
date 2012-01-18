@@ -87,7 +87,8 @@ public class TestProcessingEvent extends TestAction {
             Utils.getRandomCommentInfos(EXECUTOR.getUserId());
         Date date = Utils.getRandomDate();
         Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
-            null, siteId, date, worksheet, 1, comments, null)).getId();
+            null, siteId, date, worksheet, 1, comments,
+            new HashSet<Integer>())).getId();
 
         // Check ProcessingEvent is in database with correct values
         ProcessingEvent pevent = (ProcessingEvent) session.get(
@@ -100,7 +101,7 @@ public class TestProcessingEvent extends TestAction {
     }
 
     @Test
-    public void sveWithSpecimens() throws Exception {
+    public void saveWithSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(50);
         List<CommentInfo> comments =
             Utils.getRandomCommentInfos(EXECUTOR.getUserId());
@@ -115,13 +116,17 @@ public class TestProcessingEvent extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimen
-        Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
-            null, siteId, date, worksheet, 1, comments, Arrays
-                .asList(sourceSpecs.get(0).specimen.getId()))).getId();
+        Integer pEventId = EXECUTOR.exec(
+            new ProcessingEventSaveAction(
+                null, siteId, date, worksheet, 1, comments,
+                new HashSet<Integer>(
+                    Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
+            .getId();
 
         // FIXME should test to add specimens that can't add ???
 
         // Check ProcessingEvent is in database with correct values
+        session.clear();
         ProcessingEvent pevent = (ProcessingEvent) session.get(
             ProcessingEvent.class, pEventId);
         Assert.assertEquals(worksheet, pevent.getWorksheet());
@@ -136,12 +141,13 @@ public class TestProcessingEvent extends TestAction {
         String worksheet = Utils.getRandomString(50);
         Date date = Utils.getRandomDate();
         EXECUTOR.exec(new ProcessingEventSaveAction(
-            null, siteId, date, worksheet, 1, null, null));
+            null, siteId, date, worksheet, 1, null,
+            new HashSet<Integer>()));
 
         // try to save another pevent with the same worksheet
         try {
             EXECUTOR.exec(new ProcessingEventSaveAction(null, siteId,
-                new Date(), worksheet, 1, null, null));
+                new Date(), worksheet, 1, null, new HashSet<Integer>()));
             Assert
                 .fail("should not be able to use the same worksheet to 2 different pevents");
         } catch (DuplicatePropertySetException e) {
@@ -153,11 +159,12 @@ public class TestProcessingEvent extends TestAction {
     public void delete() throws Exception {
         Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
             null, siteId, Utils.getRandomDate(), Utils
-                .getRandomString(50), 1, null, null)).getId();
+                .getRandomString(50), 1, null,
+            new HashSet<Integer>())).getId();
 
         EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
 
-        ProcessingEvent pe = (ProcessingEvent) session.load(
+        ProcessingEvent pe = (ProcessingEvent) session.get(
             ProcessingEvent.class, pEventId);
         Assert.assertNull(pe);
     }
@@ -178,8 +185,7 @@ public class TestProcessingEvent extends TestAction {
         Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
             null, siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), 1, null,
-            Arrays
-                .asList(spcId))).getId();
+            new HashSet<Integer>(Arrays.asList(spcId)))).getId();
 
         Specimen spc = (Specimen) session.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);
@@ -190,8 +196,9 @@ public class TestProcessingEvent extends TestAction {
         // children
         EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
 
+        session.clear();
         ProcessingEvent pe =
-            (ProcessingEvent) session.load(ProcessingEvent.class, pEventId);
+            (ProcessingEvent) session.get(ProcessingEvent.class, pEventId);
         Assert.assertNull(pe);
         spc = (Specimen) session.load(Specimen.class, spcId);
         session.refresh(spc);
@@ -222,7 +229,7 @@ public class TestProcessingEvent extends TestAction {
             new ProcessingEventSaveAction(
                 null, siteId, Utils.getRandomDate(),
                 Utils.getRandomString(50), 1, null,
-                Arrays.asList(spcId))).getId();
+                new HashSet<Integer>(Arrays.asList(spcId)))).getId();
 
         Specimen spc = (Specimen) session.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);

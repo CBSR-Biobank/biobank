@@ -29,7 +29,7 @@ public class SpecimenDeleteAction implements Action<EmptyResult> {
 
         new CollectionIsEmptyCheck<Specimen>(
             Specimen.class, specimen, SpecimenPeer.CHILD_SPECIMEN_COLLECTION,
-            specimen.getInventoryId(), null).run(null);
+            specimen.getInventoryId(), null).run(context);
 
         context.getSession().delete(specimen);
         return new EmptyResult();

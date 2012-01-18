@@ -1,11 +1,12 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -321,7 +322,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        List<Integer> specimens = new ArrayList<Integer>();
+        Set<Integer> specimens = new HashSet<Integer>();
         for (SpecimenWrapper spc : pEvent.getSpecimenCollection(false)) {
             specimens.add(spc.getId());
         }

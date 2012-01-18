@@ -365,8 +365,10 @@ public class TestSite extends TestAction {
         Integer pEventId = EXECUTOR.exec(
             new ProcessingEventSaveAction(
                 null, provisioning.siteId, Utils.getRandomDate(), Utils
-                    .getRandomString(5, 8), 1, null, Arrays
-                    .asList(sourceSpecs.get(0).specimen.getId()))).getId();
+                    .getRandomString(5, 8), 1, null,
+                new HashSet<Integer>(
+                    Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
+            .getId();
 
         try {
             EXECUTOR.exec(new SiteDeleteAction(provisioning.siteId));
