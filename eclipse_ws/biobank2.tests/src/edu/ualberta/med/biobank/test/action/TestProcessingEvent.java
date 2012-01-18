@@ -14,7 +14,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSpecimenInfosAction;
@@ -53,30 +52,30 @@ public class TestProcessingEvent extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + r.nextInt();
+        name = testname.getMethodName() + R.nextInt();
 
-        studyId = StudyHelper.createStudy(actionExecutor, name,
+        studyId = StudyHelper.createStudy(EXECUTOR, name,
             ActivityStatusEnum.ACTIVE);
 
         Integer clinicId =
-            ClinicHelper.createClinic(actionExecutor, name + "_clinic",
+            ClinicHelper.createClinic(EXECUTOR, name + "_clinic",
                 ActivityStatusEnum.ACTIVE);
         ContactSaveAction contactSave = new ContactSaveAction();
         contactSave.setName(name + "_contact");
         contactSave.setClinicId(clinicId);
-        Integer contactId = actionExecutor.exec(contactSave).getId();
+        Integer contactId = EXECUTOR.exec(contactSave).getId();
 
         StudyInfo studyInfo =
-            actionExecutor.exec(new StudyGetInfoAction(studyId));
+            EXECUTOR.exec(new StudyGetInfoAction(studyId));
         StudySaveAction studySaveAction =
-            StudyHelper.getSaveAction(actionExecutor, studyInfo);
+            StudyHelper.getSaveAction(EXECUTOR, studyInfo);
         studySaveAction.setContactIds(new HashSet<Integer>(contactId));
-        actionExecutor.exec(studySaveAction);
+        EXECUTOR.exec(studySaveAction);
 
-        patientId = PatientHelper.createPatient(actionExecutor,
+        patientId = PatientHelper.createPatient(EXECUTOR,
             name, studyId);
 
-        siteId = SiteHelper.createSite(actionExecutor, name, "Edmonton",
+        siteId = SiteHelper.createSite(EXECUTOR, name, "Edmonton",
             ActivityStatusEnum.ACTIVE,
             new HashSet<Integer>(studyId));
     }
@@ -84,13 +83,12 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void saveWithoutSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(20, 50);
-        List<CommentInfo> comments = Utils.getRandomCommentInfos(actionExecutor.getUser()
-            .getId());
+        List<CommentInfo> comments =
+            Utils.getRandomCommentInfos(EXECUTOR.getUserId());
         Date date = Utils.getRandomDate();
-        Integer pEventId = actionExecutor.exec(new ProcessingEventSaveAction(
+        Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
             null, siteId, date, worksheet, 1, comments, null)).getId();
 
-        
         // Check ProcessingEvent is in database with correct values
         ProcessingEvent pevent = (ProcessingEvent) session.get(
             ProcessingEvent.class, pEventId);
@@ -104,26 +102,25 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void sveWithSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(50);
-        List<CommentInfo> comments = Utils.getRandomCommentInfos(actionExecutor.getUser()
-            .getId());
+        List<CommentInfo> comments =
+            Utils.getRandomCommentInfos(EXECUTOR.getUserId());
         Date date = Utils.getRandomDate();
 
         Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(actionExecutor,
+            .createCEventWithSourceSpecimens(EXECUTOR,
                 patientId, siteId);
-        ArrayList<SpecimenInfo> sourceSpecs = actionExecutor
+        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR
             .exec(new CollectionEventGetSpecimenInfosAction(ceventId,
                 false)).getList();
 
         // create a processing event with one of the collection event source
         // specimen
-        Integer pEventId = actionExecutor.exec(new ProcessingEventSaveAction(
+        Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
             null, siteId, date, worksheet, 1, comments, Arrays
                 .asList(sourceSpecs.get(0).specimen.getId()))).getId();
 
         // FIXME should test to add specimens that can't add ???
 
-        
         // Check ProcessingEvent is in database with correct values
         ProcessingEvent pevent = (ProcessingEvent) session.get(
             ProcessingEvent.class, pEventId);
@@ -138,12 +135,12 @@ public class TestProcessingEvent extends TestAction {
     public void saveSameWorksheet() throws Exception {
         String worksheet = Utils.getRandomString(50);
         Date date = Utils.getRandomDate();
-        actionExecutor.exec(new ProcessingEventSaveAction(
+        EXECUTOR.exec(new ProcessingEventSaveAction(
             null, siteId, date, worksheet, 1, null, null));
 
         // try to save another pevent with the same worksheet
         try {
-            actionExecutor.exec(new ProcessingEventSaveAction(null, siteId,
+            EXECUTOR.exec(new ProcessingEventSaveAction(null, siteId,
                 new Date(), worksheet, 1, null, null));
             Assert
                 .fail("should not be able to use the same worksheet to 2 different pevents");
@@ -154,13 +151,13 @@ public class TestProcessingEvent extends TestAction {
 
     @Test
     public void delete() throws Exception {
-        Integer pEventId = actionExecutor.exec(new ProcessingEventSaveAction(
+        Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
             null, siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), 1, null, null)).getId();
 
-        actionExecutor.exec(new ProcessingEventDeleteAction(pEventId));
+        EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
 
-        ProcessingEvent pe = new ActionContext(actionExecutor.getUser(), session).load(
+        ProcessingEvent pe = (ProcessingEvent) session.load(
             ProcessingEvent.class, pEventId);
         Assert.assertNull(pe);
     }
@@ -169,36 +166,34 @@ public class TestProcessingEvent extends TestAction {
     public void deleteWithSourcesSpecimens() throws Exception {
         // add cevent and source specimens
         Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(actionExecutor,
+            .createCEventWithSourceSpecimens(EXECUTOR,
                 patientId, siteId);
-        ArrayList<SpecimenInfo> sourceSpecs = actionExecutor
+        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR
             .exec(new CollectionEventGetSpecimenInfosAction(ceventId,
                 false)).getList();
         Integer spcId = sourceSpecs.get(0).specimen.getId();
 
         // create a processing event with one of the collection event source
         // specimen.
-        Integer pEventId = actionExecutor.exec(new ProcessingEventSaveAction(
+        Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
             null, siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), 1, null,
             Arrays
                 .asList(spcId))).getId();
 
-        ActionContext actionContext = new ActionContext(actionExecutor.getUser(), session);
-        Specimen spc = actionContext.load(Specimen.class, spcId);
+        Specimen spc = (Specimen) session.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);
         Assert.assertNotNull(spc.getProcessingEvent());
         Assert.assertEquals(pEventId, spc.getProcessingEvent().getId());
-        
 
         // delete this processing event. Can do it since the specimen has no
         // children
-        actionExecutor.exec(new ProcessingEventDeleteAction(pEventId));
+        EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
 
         ProcessingEvent pe =
-            actionContext.load(ProcessingEvent.class, pEventId);
+            (ProcessingEvent) session.load(ProcessingEvent.class, pEventId);
         Assert.assertNull(pe);
-        spc = actionContext.load(Specimen.class, spcId);
+        spc = (Specimen) session.load(Specimen.class, spcId);
         session.refresh(spc);
         Assert.assertNotNull(spc);
         Assert.assertNull(spc.getProcessingEvent());
@@ -212,9 +207,9 @@ public class TestProcessingEvent extends TestAction {
     public void deleteWithAliquotedSpecimens() throws Exception {
         // add cevent and source specimens
         Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(actionExecutor,
+            .createCEventWithSourceSpecimens(EXECUTOR,
                 patientId, siteId);
-        ArrayList<SpecimenInfo> sourceSpecs = actionExecutor
+        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR
             .exec(new CollectionEventGetSpecimenInfosAction(ceventId,
                 false)).getList();
         Integer spcId = sourceSpecs.get(0).specimen.getId();
@@ -223,24 +218,21 @@ public class TestProcessingEvent extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimen.
-        Integer pEventId = actionExecutor.exec(
+        Integer pEventId = EXECUTOR.exec(
             new ProcessingEventSaveAction(
                 null, siteId, Utils.getRandomDate(),
                 Utils.getRandomString(50), 1, null,
                 Arrays.asList(spcId))).getId();
 
-        ActionContext actionContext = new ActionContext(actionExecutor.getUser(), session);
-
-        Specimen spc = actionContext.load(Specimen.class, spcId);
+        Specimen spc = (Specimen) session.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);
         Assert.assertNotNull(spc.getProcessingEvent());
         Assert.assertEquals(pEventId, spc.getProcessingEvent().getId());
-        
 
         // delete this processing event. Can do it since the specimen has no
         // children
         try {
-            actionExecutor.exec(new ProcessingEventDeleteAction(pEventId));
+            EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
             Assert
                 .fail("one of the source specimen of this pevent has children. "
                     + "Can't delete the processing event");
@@ -249,7 +241,7 @@ public class TestProcessingEvent extends TestAction {
         }
 
         ProcessingEvent pe =
-            new ActionContext(actionExecutor.getUser(), session).load(ProcessingEvent.class,
+            (ProcessingEvent) session.load(ProcessingEvent.class,
                 pEventId);
         Assert.assertNotNull(pe);
     }

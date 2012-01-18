@@ -1,47 +1,49 @@
 package edu.ualberta.med.biobank.test.action;
 
-import java.util.Arrays;
+import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
-import edu.ualberta.med.biobank.common.action.security.MembershipSaveAction;
-import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.model.Permission;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.test.action.SessionProvider.Mode;
 import edu.ualberta.med.biobank.test.action.helper.SpecimenTypeHelper;
 
 public class TestAction {
     @Rule
     public final TestName testName = new TestName();
-    protected static final String SUPER_ADMIN_LOGIN = "superadmin";
 
-    protected static final Random r = new Random();
-    protected static final MockActionExecutor actionExecutor;
-    protected static final Session session;
+    protected static final String SUPER_ADMIN_LOGIN = "superadmin";
+    protected static final Random R = new Random();
+    protected static final SessionProvider SESSION_PROVIDER;
+    protected static final LocalActionExecutor EXECUTOR;
+
+    protected Session session;
 
     static {
-        actionExecutor = new MockActionExecutor(false);
-        session = actionExecutor.getSession();
+        SESSION_PROVIDER = new SessionProvider(Mode.RUN);
+        EXECUTOR = new LocalActionExecutor(SESSION_PROVIDER);
 
-        User user = createSuperAdminUser();
-        actionExecutor.setUser(user);
+        User user = getSuperAdminUser();
+        EXECUTOR.setUserId(user.getId());
     }
 
     /**
@@ -49,7 +51,7 @@ public class TestAction {
      */
     @Before
     public void setUp() throws Exception {
-        session.beginTransaction();
+        session = SESSION_PROVIDER.openAutoCommitSession();
     }
 
     /**
@@ -57,43 +59,50 @@ public class TestAction {
      */
     @After
     public void tearDown() throws Exception {
-        Transaction tx = session.getTransaction();
-        if (tx.isActive()) {
-            tx.commit();
-        }
+        session.close();
     }
 
-    public static User createSuperAdminUser() {
+    public static User getSuperAdminUser() {
+        Session session = SESSION_PROVIDER.openAutoCommitSession();
+
         // check if user already exists
-        Query q = actionExecutor.getSession().createQuery("FROM "
-            + User.class.getName() + " WHERE login=?");
-        q.setParameter(0, SUPER_ADMIN_LOGIN);
         @SuppressWarnings("unchecked")
-        List<User> users = q.list();
+        List<User> users = session.createCriteria(User.class)
+            .add(Restrictions.eq("login", SUPER_ADMIN_LOGIN))
+            .list();
 
         if (users.size() >= 1) return users.get(0);
 
-        UserSaveAction userSaveAction = new UserSaveAction();
-        userSaveAction.setLogin(SUPER_ADMIN_LOGIN);
-        userSaveAction.setCsmUserId(0L);
-        userSaveAction.setRecvBulkEmails(false);
-        userSaveAction.setFullName("super admin");
-        userSaveAction.setEmail("");
-        userSaveAction.setNeedPwdChange(false);
-        userSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
-        userSaveAction.setGroupIds(new HashSet<Integer>());
-        userSaveAction.setMembershipIds(new HashSet<Integer>());
-        Integer userId = actionExecutor.exec(userSaveAction).getId();
+        ActivityStatus active = (ActivityStatus) session
+            .createCriteria(ActivityStatus.class)
+            .add(Restrictions.eq("name", "Active"))
+            .list().iterator().next();
 
-        // set up a super admin user
-        MembershipSaveAction membershipSaveAction = new MembershipSaveAction();
-        membershipSaveAction.setPermissionIds(new HashSet<Integer>(Arrays
-            .asList(PermissionEnum.ADMINISTRATION.getId())));
-        membershipSaveAction.setRoleIds(new HashSet<Integer>());
-        membershipSaveAction.setPrincipalId(userId);
-        actionExecutor.exec(membershipSaveAction).getId();
+        User superAdmin = new User();
+        superAdmin.setLogin(SUPER_ADMIN_LOGIN);
+        superAdmin.setCsmUserId(0L);
+        superAdmin.setRecvBulkEmails(false);
+        superAdmin.setFullName("super admin");
+        superAdmin.setEmail(randString());
+        superAdmin.setNeedPwdChange(false);
+        superAdmin.setActivityStatus(active);
 
-        return (User) session.load(User.class, userId);
+        session.save(superAdmin);
+
+        Permission administration = (Permission) session
+            .createCriteria(Permission.class)
+            .add(Restrictions.eq("id", PermissionEnum.ADMINISTRATION.getId()))
+            .list().iterator().next();
+
+        Membership membership = new Membership();
+        membership.setPrincipal(superAdmin);
+        membership.getPermissionCollection().add(administration);
+
+        session.save(membership);
+
+        session.close();
+
+        return superAdmin;
     }
 
     private static Date convertToGmt(Date localDate) {
@@ -131,13 +140,13 @@ public class TestAction {
 
     protected List<SpecimenType> getSpecimenTypes() {
         List<SpecimenType> spcTypes =
-            SpecimenTypeHelper.getSpecimenTypes(getSession());
+            SpecimenTypeHelper.getSpecimenTypes(session);
         return spcTypes;
     }
 
     protected List<ContainerLabelingScheme> getContainerLabelingSchemes() {
         Query q =
-            getSession().createQuery("from "
+            session.createQuery("from "
                 + ContainerLabelingScheme.class.getName());
         @SuppressWarnings("unchecked")
         List<ContainerLabelingScheme> labelingSchemes = q.list();
@@ -149,14 +158,10 @@ public class TestAction {
     protected void deleteOriginInfos(Integer centerId) {
         // delete origin infos
         Query q =
-            getSession().createQuery("DELETE FROM "
+            session.createQuery("DELETE FROM "
                 + OriginInfo.class.getName() + " oi WHERE oi.center.id=?");
         q.setParameter(0, centerId);
         q.executeUpdate();
-    }
-
-    public Session getSession() {
-        return actionExecutor.getSession();
     }
 
     protected String getMethodName() {
@@ -164,6 +169,10 @@ public class TestAction {
     }
 
     protected String getMethodNameR() {
-        return testName.getMethodName() + r.nextInt();
+        return testName.getMethodName() + R.nextInt();
+    }
+
+    protected static String randString() {
+        return new BigInteger(130, R).toString(32);
     }
 }

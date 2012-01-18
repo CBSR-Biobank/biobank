@@ -16,7 +16,7 @@ public class TestRole extends TestAction {
         RoleSaveAction action = new RoleSaveAction();
         action.setName(getMethodNameR());
 
-        IdResult result = actionExecutor.exec(action);
+        IdResult result = EXECUTOR.exec(action);
 
         // session.get(Role.class, id)
     }
@@ -32,7 +32,7 @@ public class TestRole extends TestAction {
 
         action.setPermissions(permissions);
 
-        IdResult result = actionExecutor.exec(action);
+        IdResult result = EXECUTOR.exec(action);
     }
 
     @Test
@@ -40,8 +40,8 @@ public class TestRole extends TestAction {
         RoleSaveAction action = new RoleSaveAction();
         action.setName(getMethodNameR());
 
-        actionExecutor.exec(action);
-        actionExecutor.exec(action);
+        EXECUTOR.exec(action);
+        EXECUTOR.exec(action);
     }
 
     @Test

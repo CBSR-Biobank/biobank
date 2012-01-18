@@ -40,22 +40,22 @@ public class TestResearchGroup extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + r.nextInt();
+        name = testname.getMethodName() + R.nextInt();
         studyId =
             StudyHelper
-                .createStudy(actionExecutor, name, ActivityStatusEnum.ACTIVE);
+                .createStudy(EXECUTOR, name, ActivityStatusEnum.ACTIVE);
     }
 
     @Test
     public void saveResearchGroup() throws Exception {
 
         Integer rgId =
-            ResearchGroupHelper.createResearchGroup(actionExecutor, name,
+            ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
                 name,
                 studyId);
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = actionExecutor.exec(reader);
+        ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
 
         Assert.assertTrue(rg.rg.name.equals(name + "rg"));
         Assert.assertTrue(rg.rg.nameShort.equals(name + "rg"));
@@ -68,41 +68,41 @@ public class TestResearchGroup extends TestAction {
     @Test
     public void testUpload() throws Exception {
         Integer rgId =
-            ResearchGroupHelper.createResearchGroup(actionExecutor, name + "rg",
+            ResearchGroupHelper.createResearchGroup(EXECUTOR, name + "rg",
                 name + "rg",
                 studyId);
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = actionExecutor.exec(reader);
+        ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
 
         // create specs
         Integer p =
-            PatientHelper.createPatient(actionExecutor, name + "_patient",
+            PatientHelper.createPatient(EXECUTOR, name + "_patient",
                 rg.rg.getStudy().getId());
         Integer ceId =
-            CollectionEventHelper.createCEventWithSourceSpecimens(actionExecutor,
+            CollectionEventHelper.createCEventWithSourceSpecimens(EXECUTOR,
                 p, rgId);
 
         CollectionEventGetInfoAction ceReader =
             new CollectionEventGetInfoAction(ceId);
-        CEventInfo ceInfo = actionExecutor.exec(ceReader);
+        CEventInfo ceInfo = EXECUTOR.exec(ceReader);
         List<String> specs = new ArrayList<String>();
         for (SpecimenInfo specInfo : ceInfo.sourceSpecimenInfos)
             specs.add(specInfo.specimen.getInventoryId());
 
         Assert.assertTrue(ceInfo.sourceSpecimenInfos.size() >= 2);
-        specs.remove(Math.abs(r.nextInt()) % specs.size());
-        specs.remove(Math.abs(r.nextInt()) % specs.size());
+        specs.remove(Math.abs(R.nextInt()) % specs.size());
+        specs.remove(Math.abs(R.nextInt()) % specs.size());
 
         // request specs
         SubmitRequestAction action =
             new SubmitRequestAction(rgId, specs);
-        Integer rId = actionExecutor.exec(action).getId();
+        Integer rId = EXECUTOR.exec(action).getId();
 
         // make sure you got what was requested
         RequestGetInfoAction requestGetInfoAction =
             new RequestGetInfoAction(rId);
-        RequestReadInfo rInfo = actionExecutor.exec(requestGetInfoAction);
+        RequestReadInfo rInfo = EXECUTOR.exec(requestGetInfoAction);
 
         for (RequestSpecimen spec : rInfo.specimens) {
             Assert.assertTrue(specs.contains(spec.getSpecimen()
@@ -115,12 +115,12 @@ public class TestResearchGroup extends TestAction {
     	// only one failure case specific to rg, rest are in center
     	
     	Integer rgId =
-                ResearchGroupHelper.createResearchGroup(actionExecutor, name,
+                ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
                     name,
                     studyId);
         ResearchGroupGetInfoAction reader =
         new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = actionExecutor.exec(reader);
+        ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
         try {
         	rg.rg.setRequestCollection(Arrays.asList(new Request()));
         	Assert.fail();
