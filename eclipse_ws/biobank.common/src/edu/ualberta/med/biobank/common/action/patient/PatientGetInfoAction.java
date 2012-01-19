@@ -10,8 +10,6 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
-import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
-import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.model.Patient;
 
@@ -23,29 +21,19 @@ import edu.ualberta.med.biobank.model.Patient;
  */
 public class PatientGetInfoAction implements Action<PatientInfo> {
     private static final long serialVersionUID = 1L;
-    // @formatter:off
+
     @SuppressWarnings("nls")
-    private static final String PATIENT_INFO_HQL = "SELECT patient, COUNT(DISTINCT sourceSpecs), COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourceSpecs)"
-        + " FROM "
-        + Patient.class.getName()
-        + " patient"
-        + " INNER JOIN FETCH patient."
-        + PatientPeer.STUDY.getName()
-        + " study"
-        + " LEFT JOIN patient."
-        + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
-        + " AS cevents"
-        + " LEFT JOIN FETCH patient."
-        + PatientPeer.COMMENT_COLLECTION.getName()
-        + " AS comments LEFT JOIN cevents."
-        + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
-        + " AS sourceSpecs"
-        + " LEFT JOIN cevents."
-        + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
-        + " AS allSpecs"
-        + " WHERE patient.id = ?"
-        + " GROUP BY patient";
-    // @formatter:on
+    private static final String PATIENT_INFO_HQL =
+        "SELECT patient,COUNT(DISTINCT sourceSpecs),"
+            + "COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourceSpecs)"
+            + " FROM " + Patient.class.getName() + " patient"
+            + " INNER JOIN FETCH patient.study study"
+            + " LEFT JOIN patient.collectionEventCollection cevents"
+            + " LEFT JOIN FETCH patient.commentCollection comments"
+            + " LEFT JOIN cevents.originalSpecimenCollection sourceSpecs"
+            + " LEFT JOIN cevents.allSpecimenCollection allSpecs"
+            + " WHERE patient.id = ?"
+            + " GROUP BY patient";
 
     private final Integer patientId;
 

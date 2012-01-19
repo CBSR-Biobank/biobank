@@ -17,10 +17,14 @@ import org.junit.rules.TestName;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.CommentInfo;
+import edu.ualberta.med.biobank.common.action.info.SiteInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -82,11 +86,9 @@ public class TestProcessingEvent extends TestAction {
 
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
-                provisioning.patientIds.get(0), provisioning.siteId);
-        ArrayList<SpecimenInfo> sourceSpecs =
-            EXECUTOR
-                .exec(new CollectionEventGetSourceSpecimenInfoAction(ceventId))
-                .getList();
+                provisioning.patientIds.get(0), provisioning.clinicId);
+        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
+            new CollectionEventGetSourceSpecimenInfoAction(ceventId)).getList();
 
         // create a processing event with one of the collection event source
         // specimen
@@ -97,7 +99,8 @@ public class TestProcessingEvent extends TestAction {
                     Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
             .getId();
 
-        // FIXME should test to add specimens that can't add ???
+        // FIXME should test adding specimens that with invalid types (according
+        // to the study)
 
         // Check ProcessingEvent is in database with correct values
         PEventInfo peventInfo =
@@ -109,6 +112,38 @@ public class TestProcessingEvent extends TestAction {
         Assert.assertEquals(date, peventInfo.pevent.getCreatedAt());
         Assert
             .assertEquals(1, peventInfo.sourceSpecimenInfos.size());
+
+        SiteInfo siteInfo =
+            EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
+        PatientInfo patientInfo =
+            EXECUTOR.exec(new PatientGetInfoAction(provisioning.patientIds
+                .get(0)));
+
+        // check eager loaded associations
+        for (SpecimenInfo specimenInfo : peventInfo.sourceSpecimenInfos) {
+            Assert.assertEquals(sourceSpecs.get(0).specimen.getSpecimenType()
+                .getName(), specimenInfo.specimen.getSpecimenType().getName());
+
+            Assert.assertEquals(sourceSpecs.get(0).specimen.getActivityStatus()
+                .getName(), specimenInfo.specimen.getActivityStatus()
+                .getName());
+
+            Assert.assertEquals(sourceSpecs.get(0).specimen.getOriginInfo()
+                .getCenter().getName(), specimenInfo.specimen
+                .getOriginInfo().getCenter().getName());
+
+            Assert.assertEquals(siteInfo.site.getName(),
+                specimenInfo.specimen.getCurrentCenter().getName());
+
+            Assert.assertEquals(patientInfo.patient.getPnumber(),
+                specimenInfo.specimen.getCollectionEvent().getPatient()
+                    .getPnumber());
+
+            Assert.assertEquals(patientInfo.patient.getStudy().getName(),
+                specimenInfo.specimen.getCollectionEvent().getPatient()
+                    .getStudy().getName());
+
+        }
     }
 
     @Test

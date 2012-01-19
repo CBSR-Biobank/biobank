@@ -36,6 +36,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenDeleteAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -133,8 +134,7 @@ public class TestSite extends TestAction {
         Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
 
         // ensure we can change name on existing clinic
-        SiteInfo siteInfo =
-            EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
         siteInfo.site.setName(name + "_2");
         siteSaveAction = SiteHelper.getSaveAction(EXECUTOR, siteInfo);
         EXECUTOR.exec(siteSaveAction);
@@ -146,9 +146,8 @@ public class TestSite extends TestAction {
         EXECUTOR.exec(siteSaveAction);
 
         // test for duplicate name
-        SiteSaveAction saveSite =
-            SiteHelper.getSaveAction(name + "_2", name,
-                ActivityStatusEnum.ACTIVE);
+        SiteSaveAction saveSite = SiteHelper.getSaveAction(name + "_2", name,
+            ActivityStatusEnum.ACTIVE);
         try {
             EXECUTOR.exec(saveSite);
             Assert.fail("should not be allowed to add site with same name");
@@ -262,6 +261,42 @@ public class TestSite extends TestAction {
         } catch (ModelNotFoundException e) {
             Assert.assertTrue(true);
         }
+    }
+
+    @Test
+    public void containerTypes() {
+        Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
+
+        List<ContainerLabelingScheme> labelingSchemes =
+            getContainerLabelingSchemes();
+
+        String ctName = name + "FREEZER01";
+
+        ContainerTypeSaveAction ctSaveAction =
+            ContainerTypeHelper.getSaveAction(ctName, ctName, siteId, true, 6,
+                10, labelingSchemes.get(0).getId());
+        Integer ctId = EXECUTOR.exec(ctSaveAction).getId();
+
+        SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        Assert.assertEquals(1, siteInfo.containerTypes.size());
+        Assert.assertEquals(ctId, siteInfo.containerTypes.get(0)
+            .getContainerType().getId());
+        Assert.assertEquals(ctName, siteInfo.containerTypes.get(0)
+            .getContainerType().getName());
+
+        // add another container
+        ctName += "_2";
+        ctSaveAction =
+            ContainerTypeHelper.getSaveAction(ctName, ctName, siteId, true, 3,
+                8, labelingSchemes.get(1).getId());
+        ctId = EXECUTOR.exec(ctSaveAction).getId();
+
+        siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        Assert.assertEquals(2, siteInfo.containerTypes.size());
+        Assert.assertEquals(ctId, siteInfo.containerTypes.get(1)
+            .getContainerType().getId());
+        Assert.assertEquals(ctName, siteInfo.containerTypes.get(1)
+            .getContainerType().getName());
     }
 
     private Set<Integer> getStudyIds(List<StudyCountInfo> studyCountInfo) {

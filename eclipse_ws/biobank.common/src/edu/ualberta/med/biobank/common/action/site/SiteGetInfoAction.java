@@ -7,6 +7,7 @@ import org.hibernate.Query;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.permission.site.SiteReadPermission;
 import edu.ualberta.med.biobank.model.Site;
@@ -55,26 +56,26 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
 
         @SuppressWarnings("unchecked")
         List<Object[]> rows = query.list();
-        if (rows.size() == 1) {
-            Object[] row = rows.get(0);
-
-            builder.setSite((Site) row[0]);
-            builder.setPatientCount((Long) row[1]);
-            builder.setCollectionEventCount((Long) row[2]);
-            builder.setAliquotedSpecimenCount((Long) row[3]);
-
-            builder.setTopContainers(
-                new SiteGetTopContainersAction(siteId).run(context)
-                    .getTopContainers());
-            builder.setContainerTypes(
-                new SiteGetContainerTypeInfoAction(siteId).run(context)
-                    .getContainerTypeInfoCollection());
-            builder
-                .setStudies(
-                new SiteGetStudyInfoAction(siteId).run(context).getList());
-        } else {
-            // TODO: throw exception?
+        if (rows.size() != 1) {
+            throw new ModelNotFoundException(Site.class, siteId);
         }
+
+        Object[] row = rows.get(0);
+
+        builder.setSite((Site) row[0]);
+        builder.setPatientCount((Long) row[1]);
+        builder.setCollectionEventCount((Long) row[2]);
+        builder.setAliquotedSpecimenCount((Long) row[3]);
+
+        builder.setTopContainers(
+            new SiteGetTopContainersAction(siteId).run(context)
+                .getTopContainers());
+        builder.setContainerTypes(
+            new SiteGetContainerTypeInfoAction(siteId).run(context)
+                .getContainerTypeInfoCollection());
+        builder
+            .setStudies(
+            new SiteGetStudyInfoAction(siteId).run(context).getList());
 
         return builder.build();
     }
