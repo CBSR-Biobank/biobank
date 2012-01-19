@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.collectionEvent;
+package edu.ualberta.med.biobank.common.action.specimen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,18 +9,18 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.Specimen;
 
-public class CollectionEventGetSpecimenInfosAction implements
+public abstract class SpecimenGetInfoAction implements
     Action<ListResult<SpecimenInfo>> {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
-    private static final String SPEC_BASE_QRY =
+    protected static final String SPEC_BASE_QRY =
         "SELECT spec,parent.label,pos.positionString,toptype.nameShort"
             + " FROM " + Specimen.class.getName() + " spec"
             + " INNER JOIN FETCH spec.specimenType"
+            + " INNER JOIN FETCH spec.currentCenter"
             + " LEFT JOIN spec.specimenPosition pos"
             + " LEFT JOIN pos.container parent"
             + " LEFT JOIN parent.topContainer topparent"
@@ -29,53 +29,24 @@ public class CollectionEventGetSpecimenInfosAction implements
             + " INNER JOIN FETCH spec.collectionEvent cevent"
             + " INNER JOIN FETCH spec.originInfo originInfo"
             + " INNER JOIN FETCH originInfo.center"
-            + " INNER JOIN FETCH spec.currentCenter"
             + " LEFT JOIN FETCH spec.commentCollection"
             + " INNER JOIN FETCH cevent.patient patient"
             + " INNER JOIN FETCH patient.study study";
 
     @SuppressWarnings("nls")
-    private static final String SPEC_END_QRY = " GROUP BY spec";
-
-    @SuppressWarnings("nls")
-    private static final String SOURCE_SPEC_QRY =
-        SPEC_BASE_QRY
-            + " LEFT JOIN FETCH spec.processingEvent"
-            + " WHERE spec.originalCollectionEvent.id=?"
-            + SPEC_END_QRY;
-
-    @SuppressWarnings("nls")
-    private static final String ALIQUOTED_SPEC_QRY =
-        SPEC_BASE_QRY
-            + " LEFT JOIN FETCH spec.parentSpecimen parentSpec"
-            + " LEFT JOIN FETCH parentSpec.processingEvent"
-            + " WHERE spec.collectionEvent.id=?"
-            + " AND spec.parentSpecimen IS NOT null"
-            + SPEC_END_QRY;
-
-    private Integer ceventId;
-    private boolean aliquotedSpecimens = false;
-
-    public CollectionEventGetSpecimenInfosAction(Integer cevenId,
-        boolean aliquotedSpecimens) {
-        this.ceventId = cevenId;
-        this.aliquotedSpecimens = aliquotedSpecimens;
-    }
+    protected static final String SPEC_END_QRY = " GROUP BY spec";
 
     @Override
     public boolean isAllowed(ActionContext context) {
         return true;
     }
 
-    @Override
-    public ListResult<SpecimenInfo> run(ActionContext context)
-        throws ActionException {
+    public ListResult<SpecimenInfo> run(ActionContext context, String queryStr,
+        Integer idParameter) throws ActionException {
         ArrayList<SpecimenInfo> specs = new ArrayList<SpecimenInfo>();
 
-        Query query = context.getSession()
-            .createQuery(aliquotedSpecimens ? ALIQUOTED_SPEC_QRY
-                : SOURCE_SPEC_QRY);
-        query.setParameter(0, ceventId);
+        Query query = context.getSession().createQuery(queryStr);
+        query.setParameter(0, idParameter);
 
         @SuppressWarnings("unchecked")
         List<Object[]> rows = query.list();
@@ -90,4 +61,5 @@ public class CollectionEventGetSpecimenInfosAction implements
 
         return new ListResult<SpecimenInfo>(specs);
     }
+
 }

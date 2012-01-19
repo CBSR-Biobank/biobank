@@ -46,7 +46,7 @@ public class Utils {
     public static List<CommentInfo> getRandomCommentInfos(Integer userId) {
         final List<CommentInfo> comments = new ArrayList<CommentInfo>();
 
-        for (int i = 0, n = r.nextInt(5); i < n; ++i) {
+        for (int i = 0, n = r.nextInt(5) + 3; i < n; ++i) {
             CommentInfo c = new CommentInfo("comment " + r.nextInt(),
                 getRandomDate(), userId);
             comments.add(c);

@@ -7,7 +7,6 @@ import org.hibernate.Query;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
@@ -20,14 +19,13 @@ public class ProcessingEventGetInfoAction implements Action<PEventInfo> {
 
     @SuppressWarnings("nls")
     private static final String PEVENT_INFO_QRY =
-        "SELECT pevent"
+        "SELECT distinct pevent"
             + " FROM " + ProcessingEvent.class.getName() + " pevent"
             + " INNER JOIN FETCH pevent.center"
             + " INNER JOIN FETCH pevent.activityStatus"
             + " LEFT JOIN FETCH pevent.commentCollection comments"
             + " LEFT JOIN FETCH comments.user"
-            + " WHERE pevent.id=?"
-            + " GROUP BY pevent";
+            + " WHERE pevent.id=?";
 
     public static class PEventInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
@@ -62,8 +60,8 @@ public class ProcessingEventGetInfoAction implements Action<PEventInfo> {
 
         peventInfo.pevent = rows.get(0);
         peventInfo.sourceSpecimenInfos =
-            new CollectionEventGetSpecimenInfosAction(
-                peventId, false).run(context).getList();
+            new ProcessingEventGetSourceSpecimenInfoAction(peventId).run(
+                context).getList();
 
         return peventInfo;
     }

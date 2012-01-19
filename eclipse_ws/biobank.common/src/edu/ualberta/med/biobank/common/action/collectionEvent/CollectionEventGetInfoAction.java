@@ -20,15 +20,14 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
 
     @SuppressWarnings("nls")
     private static final String CEVENT_INFO_QRY =
-        "SELECT cevent"
+        "SELECT distinct cevent"
             + " FROM " + CollectionEvent.class.getName() + " cevent"
             + " INNER JOIN FETCH cevent.patient patient"
             + " INNER JOIN FETCH cevent.activityStatus status"
             + " LEFT JOIN FETCH cevent.commentCollection comments"
             + " LEFT JOIN FETCH comments.user commentsUser"
             + " INNER JOIN FETCH patient.study study"
-            + " WHERE cevent.id=?"
-            + " GROUP BY cevent";
+            + " WHERE cevent.id=?";
 
     private final Integer ceventId;
 
@@ -69,11 +68,11 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
 
         ceventInfo.cevent = rows.get(0);
         ceventInfo.sourceSpecimenInfos =
-            new CollectionEventGetSpecimenInfosAction(
-                ceventId, false).run(context).getList();
+            new CollectionEventGetSourceSpecimenInfoAction(ceventId).run(
+                context).getList();
         ceventInfo.aliquotedSpecimenInfos =
-            new CollectionEventGetSpecimenInfosAction(
-                ceventId, true).run(context).getList();
+            new CollectionEventGetAliquotedSpecimenInfoAction(ceventId).run(
+                context).getList();
         ceventInfo.eventAttrs = new CollectionEventGetEventAttrInfoAction(
             ceventId).run(context).getMap();
 
