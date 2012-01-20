@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.Assert;
@@ -14,8 +15,12 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
@@ -29,7 +34,9 @@ import edu.ualberta.med.biobank.common.action.patient.PatientNextVisitNumberActi
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
@@ -38,6 +45,7 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
+import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -81,7 +89,7 @@ public class TestPatient extends TestAction {
     }
 
     @Test
-    public void uppdate() throws Exception {
+    public void update() throws Exception {
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
         // create a new patient
@@ -98,6 +106,50 @@ public class TestPatient extends TestAction {
         Patient p = (Patient) session.get(Patient.class, id);
         Assert.assertEquals(newPNumber, p.getPnumber());
         Assert.assertEquals(newDate, p.getCreatedAt());
+    }
+
+    @Test
+    public void checkGetAction() throws Exception {
+        Provisioning provisioning =
+            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+
+        Integer ceventId = CollectionEventHelper
+            .createCEventWithSourceSpecimens(EXECUTOR,
+                provisioning.patientIds.get(0), provisioning.clinicId);
+        List<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
+            new CollectionEventGetSourceSpecimenInfoAction(ceventId)).getList();
+
+        // save some comments on the colection event
+        CEventInfo ceventInfo =
+            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+        CollectionEventSaveAction ceventSaveAction =
+            CollectionEventHelper.getSaveAction(ceventInfo);
+        ceventSaveAction.setCommentInfos(Utils.getRandomCommentInfos(EXECUTOR
+            .getUserId()));
+        EXECUTOR.exec(ceventSaveAction);
+        ceventInfo = EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+
+        StudyInfo studyInfo =
+            EXECUTOR.exec(new StudyGetInfoAction(provisioning.studyId));
+        PatientInfo patientInfo =
+            EXECUTOR.exec(new PatientGetInfoAction(provisioning.patientIds
+                .get(0)));
+
+        Assert.assertEquals(studyInfo.study.getName(), patientInfo.patient
+            .getStudy().getName());
+        Assert.assertEquals(1, patientInfo.ceventInfos.size());
+        Assert.assertEquals(new Long(sourceSpecs.size()),
+            patientInfo.sourceSpecimenCount);
+        Assert.assertEquals(new Long(0), patientInfo.aliquotedSpecimenCount);
+
+        PatientCEventInfo patientCeventInfo = patientInfo.ceventInfos.get(0);
+
+        Assert.assertEquals(new Long(sourceSpecs.size()),
+            patientCeventInfo.sourceSpecimenCount);
+        Assert.assertEquals(new Long(0),
+            patientCeventInfo.aliquotedSpecimenCount);
+        Assert.assertEquals(ceventInfo.cevent.getCommentCollection().size(),
+            patientCeventInfo.cevent.getCommentCollection().size());
     }
 
     @Test
@@ -367,7 +419,7 @@ public class TestPatient extends TestAction {
         Assert.assertEquals(date, pinfo.patient.getCreatedAt());
         // no aliquoted specimens added:
         Assert.assertEquals(0, pinfo.aliquotedSpecimenCount.intValue());
-        Assert.assertEquals(2, pinfo.cevents.size());
+        Assert.assertEquals(2, pinfo.ceventInfos.size());
         Assert.assertEquals(specs.size(), pinfo.sourceSpecimenCount.intValue());
 
         // FIXME test also with aliquoted specimens

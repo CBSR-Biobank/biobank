@@ -121,7 +121,7 @@ public class PatientViewForm extends BiobankViewForm {
         Section section = createSection(Messages.PatientViewForm_visits_title);
 
         collectionEventTable =
-            new NewCollectionEventInfoTable(section, patientInfo.cevents);
+            new NewCollectionEventInfoTable(section, patientInfo.ceventInfos);
         section.setClient(collectionEventTable);
         collectionEventTable.adaptToToolkit(toolkit, true);
         collectionEventTable.addClickListener(collectionDoubleClickListener);
@@ -132,7 +132,7 @@ public class PatientViewForm extends BiobankViewForm {
         setTextValue(studyLabel, patientInfo.patient.getStudy().getName());
         setTextValue(createdAtLabel,
             DateFormatter.formatAsDateTime(patientInfo.patient.getCreatedAt()));
-        setTextValue(visitCountLabel, patientInfo.cevents.size());
+        setTextValue(visitCountLabel, patientInfo.ceventInfos.size());
         setTextValue(sourceSpecimenCountLabel, patientInfo.sourceSpecimenCount);
         setTextValue(aliquotedSpecimenCountLabel,
             patientInfo.aliquotedSpecimenCount);
@@ -147,7 +147,7 @@ public class PatientViewForm extends BiobankViewForm {
             patientInfo.patient.getPnumber()));
         form.setText(NLS.bind(Messages.PatientViewForm_title,
             patientInfo.patient.getPnumber()));
-        collectionEventTable.setList(patientInfo.cevents);
+        collectionEventTable.setList(patientInfo.ceventInfos);
     }
 
 }

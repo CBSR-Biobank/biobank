@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.common.action.patient;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -12,28 +12,31 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
-import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
-import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
-import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 
 public class PatientGetCollectionEventInfosAction implements
     Action<ListResult<PatientCEventInfo>> {
     private static final long serialVersionUID = 1L;
-    // @formatter:off
+
     @SuppressWarnings("nls")
     private static final String CEVENT_INFO_QRY =
-        "select cevent, COUNT(DISTINCT sourcesSpecs), COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourcesSpecs)," 
-            + " min(sourcesSpecs." + SpecimenPeer.CREATED_AT.getName() + ")" 
-            + " from " + CollectionEvent.class.getName() + " as cevent" 
-            + " left join cevent." + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName() + " as sourcesSpecs"
-            + " left join cevent." + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName() + " as allSpecs"
-            + " left join fetch cevent." + CollectionEventPeer.COMMENT_COLLECTION.getName()
-            + " where cevent." + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID) + "=?"
+        "SELECT distinct cevent"
+            + " FROM " + CollectionEvent.class.getName() + " as cevent"
+            + " LEFT JOIN FETCH cevent.commentCollection"
+            + " WHERE cevent.patient.id=?";
+
+    @SuppressWarnings("nls")
+    private static final String CEVENT_COUNT_INFO_QRY =
+        "SELECT cevent, COUNT(DISTINCT sourcesSpecs), "
+            + "COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourcesSpecs),"
+            + " MIN(sourcesSpecs." + SpecimenPeer.CREATED_AT.getName() + ")"
+            + " FROM " + CollectionEvent.class.getName() + " as cevent"
+            + " LEFT JOIN cevent.originalSpecimenCollection as sourcesSpecs"
+            + " LEFT JOIN cevent.allSpecimenCollection as allSpecs"
+            + " WHERE cevent.patient.id=?"
             + " GROUP BY cevent";
-    // @formatter:on
 
     private final Integer patientId;
 
@@ -54,25 +57,37 @@ public class PatientGetCollectionEventInfosAction implements
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ListResult<PatientCEventInfo> run(ActionContext context)
         throws ActionException {
-        ArrayList<PatientCEventInfo> ceventInfos =
-            new ArrayList<PatientCEventInfo>();
+        HashMap<Integer, PatientCEventInfo> ceventInfoMap =
+            new HashMap<Integer, PatientCEventInfo>();
 
         Query query = context.getSession().createQuery(CEVENT_INFO_QRY);
         query.setParameter(0, patientId);
 
-        @SuppressWarnings("unchecked")
-        List<Object[]> rows = query.list();
-        for (Object[] row : rows) {
+        List<CollectionEvent> rows = query.list();
+        for (CollectionEvent cevent : rows) {
             PatientCEventInfo ceventInfo = new PatientCEventInfo();
-            ceventInfo.cevent = (CollectionEvent) row[0];
+            ceventInfo.cevent = cevent;
+            ceventInfoMap.put(ceventInfo.cevent.getId(), ceventInfo);
+        }
+
+        query = context.getSession().createQuery(CEVENT_COUNT_INFO_QRY);
+        query.setParameter(0, patientId);
+
+        List<Object[]> rows2 = query.list();
+        for (Object[] row : rows2) {
+            PatientCEventInfo ceventInfo =
+                ceventInfoMap.get(((CollectionEvent) row[0]).getId());
             ceventInfo.sourceSpecimenCount = (Long) row[1];
             ceventInfo.aliquotedSpecimenCount = (Long) row[2];
             ceventInfo.minSourceSpecimenDate = (Date) row[3];
-            ceventInfos.add(ceventInfo);
+
+            ceventInfoMap.put(ceventInfo.cevent.getId(), ceventInfo);
         }
-        return new ListResult<PatientCEventInfo>(ceventInfos);
+
+        return new ListResult<PatientCEventInfo>(ceventInfoMap.values());
     }
 }

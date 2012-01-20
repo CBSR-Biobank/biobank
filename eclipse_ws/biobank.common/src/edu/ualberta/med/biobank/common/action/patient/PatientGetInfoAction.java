@@ -41,7 +41,7 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
         private static final long serialVersionUID = 1L;
 
         public Patient patient;
-        public List<PatientCEventInfo> cevents;
+        public List<PatientCEventInfo> ceventInfos;
         public Long sourceSpecimenCount;
         public Long aliquotedSpecimenCount;
 
@@ -71,7 +71,7 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
             pInfo.patient = (Patient) row[0];
             pInfo.sourceSpecimenCount = (Long) row[1];
             pInfo.aliquotedSpecimenCount = (Long) row[2];
-            pInfo.cevents = new PatientGetCollectionEventInfosAction(patientId)
+            pInfo.ceventInfos = new PatientGetCollectionEventInfosAction(patientId)
                 .run(context).getList();
 
         } else {

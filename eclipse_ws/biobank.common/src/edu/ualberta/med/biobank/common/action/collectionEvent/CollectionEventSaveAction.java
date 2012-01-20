@@ -52,7 +52,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
     private Integer patientId;
     private Integer visitNumber;
     private Integer statusId;
-    private Collection<CommentInfo> comments;
+    private Collection<CommentInfo> commentInfos;
 
     public static class SaveCEventSpecimenInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
@@ -82,15 +82,44 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
         Integer visitNumber, Integer statusId,
-        Collection<CommentInfo> comments,
+        Collection<CommentInfo> commentInfos,
         Collection<SaveCEventSpecimenInfo> sourceSpecs,
         List<CEventAttrSaveInfo> ceAttrList) {
         this.ceventId = ceventId;
         this.patientId = patientId;
         this.visitNumber = visitNumber;
         this.statusId = statusId;
-        this.comments = comments;
+        this.commentInfos = commentInfos;
         this.sourceSpecimenInfos = sourceSpecs;
+        this.ceAttrList = ceAttrList;
+    }
+
+    public void setCeventId(Integer ceventId) {
+        this.ceventId = ceventId;
+    }
+
+    public void setPatientId(Integer patientId) {
+        this.patientId = patientId;
+    }
+
+    public void setVisitNumber(Integer visitNumber) {
+        this.visitNumber = visitNumber;
+    }
+
+    public void setStatusId(Integer statusId) {
+        this.statusId = statusId;
+    }
+
+    public void setCommentInfos(Collection<CommentInfo> commentInfos) {
+        this.commentInfos = commentInfos;
+    }
+
+    public void setSourceSpecimenInfos(
+        Collection<SaveCEventSpecimenInfo> sourceSpecimenInfos) {
+        this.sourceSpecimenInfos = sourceSpecimenInfos;
+    }
+
+    public void setCeAttrList(List<CEventAttrSaveInfo> ceAttrList) {
         this.ceAttrList = ceAttrList;
     }
 
@@ -128,7 +157,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         Collection<Comment> commentsToSave = CollectionUtils.getCollection(
             ceventToSave, CollectionEventPeer.COMMENT_COLLECTION);
         CommentInfo
-            .setCommentModelCollection(context, commentsToSave, comments);
+            .setCommentModelCollection(context, commentsToSave, commentInfos);
 
         setSourceSpecimens(context, ceventToSave);
 
