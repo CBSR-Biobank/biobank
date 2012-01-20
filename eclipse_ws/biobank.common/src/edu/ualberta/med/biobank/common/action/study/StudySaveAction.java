@@ -317,10 +317,10 @@ public class StudySaveAction implements Action<IdResult> {
         }
 
         // delete source specimens no longer in use
+        study.setSourceSpecimenCollection(newSsCollection);
         SetDifference<SourceSpecimen> srcSpcsDiff =
             new SetDifference<SourceSpecimen>(
                 study.getSourceSpecimenCollection(), newSsCollection);
-        study.setSourceSpecimenCollection(srcSpcsDiff.getNewSet());
         for (SourceSpecimen srcSpc : srcSpcsDiff.getRemoveSet()) {
             context.getSession().delete(srcSpc);
         }

@@ -21,12 +21,14 @@ import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicDeleteAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyDeleteAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
@@ -45,6 +47,9 @@ import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
+import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
+import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
+import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -67,7 +72,7 @@ public class TestStudy extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + R.nextInt();
+        name = getMethodNameR();
         studySaveAction =
             StudyHelper.getSaveAction(name, name, ActivityStatusEnum.ACTIVE);
     }
@@ -160,6 +165,46 @@ public class TestStudy extends TestAction {
         studySaveAction
             .setStudyEventAttrSaveInfo(new HashSet<StudyEventAttrSaveInfo>());
         EXECUTOR.exec(studySaveAction);
+    }
+
+    @Test
+    public void checkGetAction() throws Exception {
+        Provisioning provisioning =
+            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+
+        Integer ceventId = CollectionEventHelper
+            .createCEventWithSourceSpecimens(EXECUTOR,
+                provisioning.patientIds.get(0), provisioning.clinicId);
+        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
+            new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+            .getList();
+
+        Set<SourceSpecimenSaveInfo> ssSaveInfosAll =
+            getSourceSpecimens(R.nextInt(5) + 1, getSpecimenTypes());
+        Set<AliquotedSpecimenSaveInfo> asSaveInfosAll =
+            addAliquotedSpecimens(R.nextInt(5) + 1, getSpecimenTypes());
+        Set<StudyEventAttrSaveInfo> studyEventAttrSaveInfos =
+            getStudyEventAttrSaveInfosAll();
+
+        StudyInfo studyInfo =
+            EXECUTOR.exec(new StudyGetInfoAction(provisioning.studyId));
+        studySaveAction = StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+        studySaveAction.setSourceSpecimenSaveInfo(ssSaveInfosAll);
+        studySaveAction.setAliquotSpecimenSaveInfo(asSaveInfosAll);
+        studySaveAction.setStudyEventAttrSaveInfo(studyEventAttrSaveInfos);
+        EXECUTOR.exec(studySaveAction);
+
+        studyInfo = EXECUTOR.exec(new StudyGetInfoAction(provisioning.studyId));
+
+        Assert.assertEquals("Active", studyInfo.study.getActivityStatus()
+            .getName());
+        Assert.assertEquals(new Long(1), studyInfo.patientCount);
+        Assert.assertEquals(new Long(1), studyInfo.collectionEventCount);
+        Assert.assertEquals(ssSaveInfosAll.size(), studyInfo.sourceSpcs.size());
+        Assert.assertEquals(asSaveInfosAll.size(),
+            studyInfo.aliquotedSpcs.size());
+        Assert.assertEquals(studyEventAttrSaveInfos.size(),
+            studyInfo.studyEventAttrs.size());
     }
 
     @Test
@@ -416,8 +461,7 @@ public class TestStudy extends TestAction {
         studySaveAction.setSourceSpecimenSaveInfo(set1);
         EXECUTOR.exec(studySaveAction);
 
-        studyInfo =
-            EXECUTOR.exec(new StudyGetInfoAction(studyId));
+        studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
         Assert.assertEquals(
             getSourceSpecimenSpecimenTypesFromSaveInfo(set1),
             getSourceSpecimenSpecimenTypes(studyInfo.sourceSpcs));
