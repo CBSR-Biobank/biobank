@@ -23,7 +23,7 @@ public class SiteHelper extends Helper {
     public static SiteSaveAction getSaveAction(String name,
         String nameShort, ActivityStatusEnum active) {
         Address address = new Address();
-        address.setCity(Utils.getRandomString(5, 10));
+        address.setCity(name + "_city");
 
         SiteSaveAction siteSaveAction = new SiteSaveAction();
         siteSaveAction.setName(name);
@@ -58,7 +58,8 @@ public class SiteHelper extends Helper {
         throws ApplicationException {
         List<Integer> result = new ArrayList<Integer>();
         for (int i = 0; i < numToCreate; ++i) {
-            result.add(createSite(actionExecutor, name, Utils.getRandomString(15),
+            result.add(createSite(actionExecutor, name,
+                Utils.getRandomString(15),
                 activityStatus, new HashSet<Integer>()));
         }
         return result;

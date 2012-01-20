@@ -130,6 +130,30 @@ public class TestSite extends TestAction {
     }
 
     @Test
+    public void checkGetAction() throws Exception {
+        Provisioning provisioning =
+            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+
+        Integer ceventId = CollectionEventHelper
+            .createCEventWithSourceSpecimens(EXECUTOR,
+                provisioning.patientIds.get(0), provisioning.clinicId);
+        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
+            new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+            .getList();
+
+        SiteInfo siteInfo =
+            EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
+
+        Assert.assertEquals(name + "_site_city", siteInfo.site.getAddress()
+            .getCity());
+        Assert.assertEquals("Active", siteInfo.site.getActivityStatus()
+            .getName());
+        Assert.assertEquals(new Long(1), siteInfo.patientCount);
+        Assert.assertEquals(new Long(1), siteInfo.collectionEventCount);
+        Assert.assertEquals(new Long(0), siteInfo.aliquotedSpecimenCount);
+    }
+
+    @Test
     public void nameChecks() throws Exception {
         Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
 
