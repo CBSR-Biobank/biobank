@@ -15,7 +15,6 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
-import edu.ualberta.med.biobank.common.action.info.ShippingMethodInfo;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -217,13 +216,11 @@ public class DispatchAdapter extends AdapterBase {
 
     private ShipmentInfoSaveInfo prepareShipInfo(
         ShipmentInfoWrapper shipmentInfo) {
-        ShippingMethodInfo methodInfo =
-            new ShippingMethodInfo(shipmentInfo.getShippingMethod().getId());
         ShipmentInfoSaveInfo si =
             new ShipmentInfoSaveInfo(shipmentInfo.getId(),
                 shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(),
                 shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),
-                methodInfo);
+                shipmentInfo.getShippingMethod().getId());
         return si;
     }
 

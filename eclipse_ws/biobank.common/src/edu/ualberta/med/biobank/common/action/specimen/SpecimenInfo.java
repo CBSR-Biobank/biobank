@@ -1,5 +1,9 @@
 package edu.ualberta.med.biobank.common.action.specimen;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.util.InfoUtil;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -37,6 +41,14 @@ public class SpecimenInfo implements ActionResult {
             return InfoUtil.equals(specimen, sInfo.specimen);
         }
         return false;
+    }
+
+    public static Set<Integer> getSpecimenIds(List<SpecimenInfo> specimenInfos) {
+        HashSet<Integer> result = new HashSet<Integer>();
+        for (SpecimenInfo specimenInfo : specimenInfos) {
+            result.add(specimenInfo.specimen.getId());
+        }
+        return result;
     }
 
 }

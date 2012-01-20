@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
-import edu.ualberta.med.biobank.common.action.info.ShippingMethodInfo;
 import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodSaveAction;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.IActionExecutor;
@@ -15,11 +14,10 @@ public class ShipmentInfoHelper extends Helper {
             Utils.getRandomString(10), createNewShippingMethod(actionExecutor));
     }
 
-    public static ShippingMethodInfo createNewShippingMethod(
+    public static Integer createNewShippingMethod(
         IActionExecutor actionExecutor) throws Exception {
         ShippingMethodSaveAction action =
             new ShippingMethodSaveAction(null, Utils.getRandomString(5));
-        Integer id = actionExecutor.exec(action).getId();
-        return new ShippingMethodInfo(id);
+        return actionExecutor.exec(action).getId();
     }
 }

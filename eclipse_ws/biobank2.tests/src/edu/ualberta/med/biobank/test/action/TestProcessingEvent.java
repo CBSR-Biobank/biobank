@@ -14,9 +14,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.CommentInfo;
+import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
@@ -24,6 +28,7 @@ import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDel
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
+import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
@@ -84,11 +89,22 @@ public class TestProcessingEvent extends TestAction {
             Utils.getRandomCommentInfos(EXECUTOR.getUserId());
         Date date = Utils.getRandomDate();
 
+        // create a collection event from a clinic
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
         ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
             new CollectionEventGetSourceSpecimenInfoAction(ceventId)).getList();
+
+        // ship the specimens to the site
+        OriginInfoSaveInfo oiSaveInfo = new OriginInfoSaveInfo(
+            null, provisioning.siteId, provisioning.clinicId, null,
+            SpecimenInfo.getSpecimenIds(sourceSpecs), null);
+        ShipmentInfoSaveInfo shipSaveInfo = new ShipmentInfoSaveInfo(
+            null, Utils.getRandomString(2, 5), Utils.getRandomDate(),
+            Utils.getRandomDate(), Utils.getRandomString(2, 5),
+            getShippingMethods().get(0).getId());
+        EXECUTOR.exec(new OriginInfoSaveAction(oiSaveInfo, shipSaveInfo));
 
         // create a processing event with one of the collection event source
         // specimen
@@ -113,6 +129,8 @@ public class TestProcessingEvent extends TestAction {
         Assert
             .assertEquals(1, peventInfo.sourceSpecimenInfos.size());
 
+        ClinicInfo clinicInfo =
+            EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
         SiteInfo siteInfo =
             EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
         PatientInfo patientInfo =
@@ -128,9 +146,8 @@ public class TestProcessingEvent extends TestAction {
                 .getName(), specimenInfo.specimen.getActivityStatus()
                 .getName());
 
-            Assert.assertEquals(sourceSpecs.get(0).specimen.getOriginInfo()
-                .getCenter().getName(), specimenInfo.specimen
-                .getOriginInfo().getCenter().getName());
+            Assert.assertEquals(clinicInfo.clinic.getName(),
+                specimenInfo.specimen.getOriginInfo().getCenter().getName());
 
             Assert.assertEquals(siteInfo.site.getName(),
                 specimenInfo.specimen.getCurrentCenter().getName());

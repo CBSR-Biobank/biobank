@@ -52,14 +52,12 @@ public class OriginInfoSaveAction implements Action<IdResult> {
 
         if (oiInfo.removedSpecIds != null)
             for (Integer specId : oiInfo.removedSpecIds) {
-                Specimen spec =
-                    context.load(Specimen.class, specId);
+                Specimen spec = context.load(Specimen.class, specId);
                 oiSpecimens.remove(spec);
             }
         if (oiInfo.addedSpecIds != null)
             for (Integer specId : oiInfo.addedSpecIds) {
-                Specimen spec =
-                    context.load(Specimen.class, specId);
+                Specimen spec = context.load(Specimen.class, specId);
                 oiSpecimens.add(spec);
             }
 
@@ -73,14 +71,14 @@ public class OriginInfoSaveAction implements Action<IdResult> {
         si.receivedAt = siInfo.receivedAt;
         si.waybill = siInfo.waybill;
 
-        ShippingMethod sm = context
-            .get(ShippingMethod.class, siInfo.method.id, new ShippingMethod());
+        ShippingMethod sm = context.load(ShippingMethod.class,
+            siInfo.shippingMethodId);
 
         si.setShippingMethod(sm);
 
         // This stuff could be extracted to a util method. need to think about
         // how
-        if (!oiInfo.comment.trim().equals("")) {
+        if ((oiInfo.comment != null) && !oiInfo.comment.trim().equals("")) {
             Collection<Comment> comments = oi.getCommentCollection();
             if (comments == null) comments = new HashSet<Comment>();
             Comment newComment = new Comment();

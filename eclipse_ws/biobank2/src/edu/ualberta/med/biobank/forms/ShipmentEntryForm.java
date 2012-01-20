@@ -21,9 +21,8 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
-import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
-import edu.ualberta.med.biobank.common.action.info.ShippingMethodInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
@@ -488,8 +487,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             WrapperUtil.getCollectionIds(specimenEntryWidget
                 .getRemovedSpecimens());
 
-        ShippingMethodInfo methodInfo =
-            new ShippingMethodInfo(shipmentInfo.getShippingMethod().getId());
         OriginInfoSaveInfo oiInfo =
             new OriginInfoSaveInfo(originInfo.getId(), originInfo
                 .getReceiverSite().getId(), originInfo.getCenter().getId(),
@@ -500,7 +497,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             new ShipmentInfoSaveInfo(shipmentInfo.getId(),
                 shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(),
                 shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),
-                methodInfo);
+                shipmentInfo.getShippingMethod().getId());
         OriginInfoSaveAction save = new OriginInfoSaveAction(oiInfo, siInfo);
         SessionManager.getAppService().doAction(save);
 

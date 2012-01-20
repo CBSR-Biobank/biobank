@@ -14,23 +14,18 @@ public class OriginInfoHelper extends Helper {
 
     public static OriginInfoSaveInfo createSaveOriginInfoSpecimenInfoRandom(
         IActionExecutor actionExecutor, Integer patientId, Integer siteId,
-        Integer centerId) {
+        Integer centerId) throws Exception {
         Set<Integer> ids = new HashSet<Integer>();
-        Integer id = null;
-        try {
-            id = CollectionEventHelper.createCEventWithSourceSpecimens(
-                actionExecutor, patientId, centerId);
+        Integer id = CollectionEventHelper.createCEventWithSourceSpecimens(
+            actionExecutor, patientId, centerId);
 
-            CEventInfo ceventInfo =
-                actionExecutor.exec(new CollectionEventGetInfoAction(id));
+        CEventInfo ceventInfo =
+            actionExecutor.exec(new CollectionEventGetInfoAction(id));
 
-            for (SpecimenInfo specInfo : ceventInfo.sourceSpecimenInfos) {
-                ids.add(specInfo.specimen.getId());
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        for (SpecimenInfo specInfo : ceventInfo.sourceSpecimenInfos) {
+            ids.add(specInfo.specimen.getId());
         }
+
         return new OriginInfoSaveInfo(r.nextInt(), siteId, id,
             Utils.getRandomString(10),
             ids, null);

@@ -69,10 +69,8 @@ public class DispatchSaveAction implements Action<IdResult> {
             si.receivedAt = siInfo.receivedAt;
             si.waybill = siInfo.waybill;
 
-            ShippingMethod sm =
-                context
-                    .get(ShippingMethod.class, siInfo.method.id,
-                        new ShippingMethod());
+            ShippingMethod sm = context.load(ShippingMethod.class,
+                siInfo.shippingMethodId);
 
             si.setShippingMethod(sm);
             disp.setShipmentInfo(si);

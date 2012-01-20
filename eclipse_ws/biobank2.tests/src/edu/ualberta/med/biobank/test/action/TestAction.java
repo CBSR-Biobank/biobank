@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Permission;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.action.SessionProvider.Mode;
@@ -155,6 +156,16 @@ public class TestAction {
         @SuppressWarnings("unchecked")
         List<ContainerLabelingScheme> labelingSchemes = q.list();
         Assert.assertTrue("container labeling schemes not found in database",
+            !labelingSchemes.isEmpty());
+        return labelingSchemes;
+    }
+
+    protected List<ShippingMethod> getShippingMethods() {
+        Query q =
+            session.createQuery("from " + ShippingMethod.class.getName());
+        @SuppressWarnings("unchecked")
+        List<ShippingMethod> labelingSchemes = q.list();
+        Assert.assertTrue("shipping methods not found in database",
             !labelingSchemes.isEmpty());
         return labelingSchemes;
     }
