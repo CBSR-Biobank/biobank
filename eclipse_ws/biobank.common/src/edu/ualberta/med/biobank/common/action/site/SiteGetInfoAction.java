@@ -14,8 +14,11 @@ import edu.ualberta.med.biobank.model.Site;
 
 public class SiteGetInfoAction implements Action<SiteInfo> {
     private static final long serialVersionUID = 1L;
+
     // @formatter:off
     @SuppressWarnings("nls")
+    // FIXME: this query does not return anything if the count of aliquoted
+    // specimens is zero
     private static final String SITE_INFO_HQL = 
         "SELECT site, COUNT(DISTINCT patients), " 
         + "COUNT(DISTINCT collectionEvents), " 
@@ -28,7 +31,7 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
         + " LEFT JOIN patients.collectionEventCollection AS collectionEvents"
         + " LEFT JOIN collectionEvents.allSpecimenCollection AS aliquotedSpecimens"
         + " WHERE site.id = ?"
-        + " AND aliquotedSpecimens.parentSpecimen IS NULL" // count only aliquoted Specimen-s
+        + " AND aliquotedSpecimens.originalCollectionEvent IS NULL" // count only aliquoted Specimen-s
         + " GROUP BY site";
     // @formatter:on
 
