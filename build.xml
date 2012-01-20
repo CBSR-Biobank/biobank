@@ -740,6 +740,7 @@
            source="1.6"
            target="1.6"
            includeantruntime="false">
+      <include name="**/edu/ualberta/med/biobank/model/*.java" />
       <include name="**/tools/hbmpostproc/*.java" />
       <include name="**/tools/modelumlparser/*.java" />
       <include name="**/tools/utils/*.java" />
@@ -1106,6 +1107,7 @@
     <exclude name="**/TestFunctionalities.java" />
     <exclude name="**/TestReportsOnExistingData.java" />
     <exclude name="**/AllTests.java" />
+    <exclude name="**/wrappers/**" />
   </fileset>
 
   <target name="test" depends="tests-compile" description="executes test cases">
