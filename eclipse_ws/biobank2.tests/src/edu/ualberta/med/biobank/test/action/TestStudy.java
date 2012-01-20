@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyDeleteAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
@@ -175,8 +174,7 @@ public class TestStudy extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
-        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
-            new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+        EXECUTOR.exec(new CollectionEventGetSourceSpecimenInfoAction(ceventId))
             .getList();
 
         Set<SourceSpecimenSaveInfo> ssSaveInfosAll =

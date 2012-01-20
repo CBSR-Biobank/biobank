@@ -137,8 +137,7 @@ public class TestSite extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
-        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
-            new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+        EXECUTOR.exec(new CollectionEventGetSourceSpecimenInfoAction(ceventId))
             .getList();
 
         SiteInfo siteInfo =

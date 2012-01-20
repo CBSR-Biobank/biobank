@@ -17,17 +17,16 @@ import edu.ualberta.med.biobank.model.Contact;
 public class ClinicGetInfoAction implements Action<ClinicInfo> {
     private static final long serialVersionUID = 1L;
 
-    // @formatter:off
     @SuppressWarnings("nls")
-    private static final String CLINIC_INFO_HQL = 
+    private static final String CLINIC_INFO_HQL =
         "SELECT clinic,COUNT(DISTINCT patients),COUNT(DISTINCT cevents)"
-        + " FROM "+ Clinic.class.getName() + " clinic"
-        + " LEFT JOIN clinic.originInfoCollection oi"
-        + " LEFT JOIN oi.specimenCollection spcs"
-        + " LEFT JOIN spcs.collectionEvent cevents"
-        + " LEFT JOIN cevents.patient patients"
-        + " WHERE clinic.id=?";
-    // @formatter:on
+            + " FROM " + Clinic.class.getName() + " clinic"
+            + " INNER JOIN FETCH clinic.activityStatus"
+            + " LEFT JOIN clinic.originInfoCollection oi"
+            + " LEFT JOIN oi.specimenCollection spcs"
+            + " LEFT JOIN spcs.collectionEvent cevents"
+            + " LEFT JOIN cevents.patient patients"
+            + " WHERE clinic.id=?";
 
     private final Integer clinicId;
     private final ClinicGetContactsAction getContacts;
@@ -58,7 +57,7 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
 
             info.clinic = (Clinic) row[0];
             info.patientCount = (Long) row[1];
-            info.ceventCount = (Long) row[2];
+            info.collectionEventCount = (Long) row[2];
             info.contacts = getContacts.run(context).getList();
             info.studyInfos = getStudyInfo.run(context).getList();
         }
@@ -71,7 +70,7 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
 
         public Clinic clinic;
         public Long patientCount;
-        public Long ceventCount;
+        public Long collectionEventCount;
         public List<Contact> contacts;
         public List<StudyCountInfo> studyInfos;
 
@@ -84,7 +83,7 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
         }
 
         public Long getCeventCount() {
-            return ceventCount;
+            return collectionEventCount;
         }
 
         public List<StudyCountInfo> getStudyInfos() {

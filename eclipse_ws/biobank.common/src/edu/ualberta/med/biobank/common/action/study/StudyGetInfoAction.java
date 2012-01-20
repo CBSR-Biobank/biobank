@@ -14,16 +14,14 @@ import edu.ualberta.med.biobank.model.Study;
 public class StudyGetInfoAction implements Action<StudyInfo> {
     private static final long serialVersionUID = 1L;
 
-    // @formatter:off
     @SuppressWarnings("nls")
-    private static final String STUDY_INFO_HQL = 
+    private static final String STUDY_INFO_HQL =
         "SELECT study,COUNT(DISTINCT patients),COUNT(DISTINCT cevents)"
-        + " FROM "+ Study.class.getName() + " study"
-        + " INNER JOIN FETCH study.activityStatus"
-        + " LEFT JOIN study.patientCollection as patients"
-        + " LEFT JOIN patients.collectionEventCollection AS cevents"
-        + " WHERE study.id = ?";
-    // @formatter:on
+            + " FROM " + Study.class.getName() + " study"
+            + " INNER JOIN FETCH study.activityStatus"
+            + " LEFT JOIN study.patientCollection as patients"
+            + " LEFT JOIN patients.collectionEventCollection AS cevents"
+            + " WHERE study.id = ?";
 
     private final Integer studyId;
     private final StudyGetClinicInfoAction getClinicInfo;

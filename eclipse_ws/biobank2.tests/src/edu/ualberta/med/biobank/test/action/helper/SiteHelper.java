@@ -110,7 +110,7 @@ public class SiteHelper extends Helper {
         Provisioning provisioning = new Provisioning();
         provisioning.clinicId =
             ClinicHelper.createClinicWithContacts(actionExecutor, basename
-                + "_clinic", 10);
+                + "_clinic", 1);
         ClinicInfo clinicInfo =
             actionExecutor.exec(new ClinicGetInfoAction(
                 provisioning.clinicId));

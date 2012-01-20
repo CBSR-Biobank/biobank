@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
@@ -25,6 +26,7 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
+import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
@@ -105,6 +107,28 @@ public class TestClinic extends TestAction {
         clinicSaveAction
             .setContactSaveInfos(new HashSet<ContactSaveInfo>());
         EXECUTOR.exec(clinicSaveAction);
+    }
+
+    @Test
+    public void checkGetAction() throws Exception {
+        Provisioning provisioning =
+            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+
+        Integer ceventId = CollectionEventHelper
+            .createCEventWithSourceSpecimens(EXECUTOR,
+                provisioning.patientIds.get(0), provisioning.clinicId);
+        EXECUTOR.exec(new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+            .getList();
+
+        ClinicInfo clinicInfo =
+            EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
+
+        Assert.assertEquals("Active", clinicInfo.clinic.getActivityStatus()
+            .getName());
+        Assert.assertEquals(new Long(1), clinicInfo.patientCount);
+        Assert.assertEquals(new Long(1), clinicInfo.collectionEventCount);
+        Assert.assertEquals(1, clinicInfo.contacts.size());
+        Assert.assertEquals(1, clinicInfo.studyInfos.size());
     }
 
     @Test

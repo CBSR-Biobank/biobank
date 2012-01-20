@@ -76,7 +76,7 @@ public class ClinicHelper extends Helper {
         throws ApplicationException {
         Set<ContactSaveInfo> contactsAll = new HashSet<ContactSaveInfo>();
 
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < numContacts; ++i) {
             ContactSaveInfo contactSaveInfo = new ContactSaveInfo();
             contactSaveInfo.name = name + "_contact" + i;
             contactsAll.add(contactSaveInfo);
