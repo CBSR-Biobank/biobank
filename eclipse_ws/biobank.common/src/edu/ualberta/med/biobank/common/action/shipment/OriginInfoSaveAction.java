@@ -27,16 +27,19 @@ public class OriginInfoSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
     private OriginInfoSaveInfo oiInfo;
     private ShipmentInfoSaveInfo siInfo;
+    private Integer workingCenter;
 
     public OriginInfoSaveAction(OriginInfoSaveInfo oiInfo,
-        ShipmentInfoSaveInfo siInfo) {
+        ShipmentInfoSaveInfo siInfo, Integer workingCenter) {
         this.oiInfo = oiInfo;
         this.siInfo = siInfo;
+        this.workingCenter = workingCenter;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new OriginInfoSavePermission(oiInfo.oiId).isAllowed(context);
+        return new OriginInfoSavePermission(oiInfo.oiId).isAllowed(context)
+            && CenterSavePermission(workingCenter).isAllowede();
     }
 
     @Override
@@ -46,22 +49,6 @@ public class OriginInfoSaveAction implements Action<IdResult> {
 
         oi.setReceiverSite(context.get(Site.class, oiInfo.siteId));
         oi.setCenter(context.get(Center.class, oiInfo.centerId));
-
-        Collection<Specimen> oiSpecimens = oi.getSpecimenCollection();
-        if (oiSpecimens == null) oiSpecimens = new HashSet<Specimen>();
-
-        if (oiInfo.removedSpecIds != null)
-            for (Integer specId : oiInfo.removedSpecIds) {
-                Specimen spec = context.load(Specimen.class, specId);
-                oiSpecimens.remove(spec);
-            }
-        if (oiInfo.addedSpecIds != null)
-            for (Integer specId : oiInfo.addedSpecIds) {
-                Specimen spec = context.load(Specimen.class, specId);
-                oiSpecimens.add(spec);
-            }
-
-        oi.setSpecimenCollection(oiSpecimens);
 
         ShipmentInfo si =
             context
@@ -95,6 +82,25 @@ public class OriginInfoSaveAction implements Action<IdResult> {
 
         context.getSession().saveOrUpdate(oi);
         context.getSession().flush();
+
+        if (oiInfo.removedSpecIds != null)
+            for (Integer specId : oiInfo.removedSpecIds) {
+                if (specId == null)
+                    throw new ActionException("Specimen id can not be null");
+                Specimen spec =
+                    context.load(Specimen.class, specId);
+                // FIXME: spec.setOriginInfo(????);
+            context.getSession().saveOrUpdate(spec);
+        }
+        if (oiInfo.addedSpecIds != null)
+            for (Integer specId : oiInfo.addedSpecIds) {
+                if (specId == null)
+                    throw new ActionException("Specimen id can not be null");
+                Specimen spec =
+                    context.load(Specimen.class, specId);
+                spec.setOriginInfo(oi);
+                context.getSession().saveOrUpdate(spec);
+            }
 
         return new IdResult(oi.getId());
     }

@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
@@ -78,7 +79,7 @@ public class TestShipment extends TestAction {
             Assert.assertTrue(!oisave.removedSpecIds.contains(spec.getId()));
 
         oisave.removedSpecIds = oisave.addedSpecIds;
-        oisave.addedSpecIds = null;
+        oisave.addedSpecIds = new HashSet<Integer>();
         id =
             EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
@@ -101,9 +102,14 @@ public class TestShipment extends TestAction {
             .getId();
 
         // Set of null
-        oisave.addedSpecIds = mut.getSetWithNull();
-        EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
-            .getId();
+        try {
+            oisave.addedSpecIds = mut.getSetWithNull();
+            EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+                .getId();
+            Assert.fail();
+        } catch (ActionException e) {
+            // cool
+        }
 
         // Out of Bounds
         try {

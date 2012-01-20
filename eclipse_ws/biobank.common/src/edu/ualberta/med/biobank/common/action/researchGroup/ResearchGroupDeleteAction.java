@@ -23,8 +23,8 @@ public class ResearchGroupDeleteAction implements Action<EmptyResult> {
 
     @Override
     public EmptyResult run(ActionContext context) throws ActionException {
+        // FIXME: this should work but doesn't
         ResearchGroup rg = context.get(ResearchGroup.class, rgId);
-
         if (rg.getRequestCollection().size() > 0)
             throw new ActionException(
                 "ResearchGroups with requests may not be deleted.");

@@ -26,8 +26,8 @@ public class OriginInfoHelper extends Helper {
             ids.add(specInfo.specimen.getId());
         }
 
-        return new OriginInfoSaveInfo(r.nextInt(), siteId, id,
+        return new OriginInfoSaveInfo(null, siteId, centerId,
             Utils.getRandomString(10),
-            ids, null);
+            ids, new HashSet<Integer>());
     }
 }

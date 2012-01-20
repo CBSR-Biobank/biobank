@@ -28,6 +28,7 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
         OriginInfo ship = context.get(OriginInfo.class, shipId);
 
         OriginInfo oi = new OriginInfo();
+
         Center currentCenter = null;
         for (Specimen spc : ship.getSpecimenCollection()) {
             if (currentCenter == null)
@@ -38,6 +39,7 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
             spc.setOriginInfo(oi);
         }
         oi.setCenter(currentCenter);
+        context.getSession().saveOrUpdate(oi);
         context.getSession().delete(ship);
         return new EmptyResult();
     }

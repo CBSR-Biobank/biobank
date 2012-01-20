@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupDeleteA
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
@@ -118,19 +119,22 @@ public class TestResearchGroup extends TestAction {
             ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
                 name,
                 studyId);
-        ResearchGroupGetInfoAction reader =
-            new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
-
-        RequestHelper.createRequest(EXECUTOR, rgId);
-
+        Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
+        ResearchGroupDeleteAction delete =
+            new ResearchGroupDeleteAction(rgId);
         try {
-            ResearchGroupDeleteAction delete =
-                new ResearchGroupDeleteAction(rgId);
             EXECUTOR.exec(delete);
             Assert.fail();
         } catch (ActionException e) {
             System.out.println(e);
         }
+
+        session.beginTransaction();
+        Request r = (Request) session.load(Request.class, rId);
+        session.delete(r);
+        session.getTransaction().commit();
+
+        EXECUTOR.exec(delete);
+        // should be fine
     }
 }

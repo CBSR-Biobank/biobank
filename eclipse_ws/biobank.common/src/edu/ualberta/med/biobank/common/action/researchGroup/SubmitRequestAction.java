@@ -37,6 +37,14 @@ public class SubmitRequestAction implements Action<IdResult> {
     @Override
     public IdResult run(ActionContext context) throws ActionException {
         Request request = new Request();
+        request.setResearchGroup(context.get(ResearchGroup.class, rgId));
+        request.setCreated(new Date());
+        request.setAddress(context.get(ResearchGroup.class,
+            rgId).getAddress());
+
+        context.getSession().saveOrUpdate(request);
+        context.getSession().flush();
+
         for (String id : specs) {
             Query q = context.getSession().createQuery("from "
                 + Specimen.class.getName() + " where inventoryId=?");
@@ -49,16 +57,8 @@ public class SubmitRequestAction implements Action<IdResult> {
             r.setRequest(request);
             r.setState(RequestSpecimenState.AVAILABLE_STATE.getId());
             r.setSpecimen(spec);
+            context.getSession().saveOrUpdate(r);
         }
-
-        request.setResearchGroup(context.get(ResearchGroup.class, rgId));
-        request.setCreated(new Date());
-        request.setSubmitted(new Date());
-        request.setAddress(context.get(ResearchGroup.class,
-            rgId).getAddress());
-
-        context.getSession().saveOrUpdate(request);
-        context.getSession().flush();
 
         return new IdResult(request.getId());
     }

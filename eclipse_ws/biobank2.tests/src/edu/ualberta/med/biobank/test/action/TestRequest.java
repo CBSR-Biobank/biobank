@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Assert;
@@ -12,15 +13,18 @@ import org.junit.rules.TestName;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestClaimAction;
+import edu.ualberta.med.biobank.common.action.request.RequestDeleteAction;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.action.request.RequestStateChangeAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
+import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
@@ -147,11 +151,21 @@ public class TestRequest extends TestAction {
     public void testDelete() throws Exception {
         Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
 
-        RequestGetInfoAction requestGetInfoAction =
-            new RequestGetInfoAction(rId);
-        RequestReadInfo rInfo = EXECUTOR.exec(requestGetInfoAction);
+        RequestDeleteAction delete = new RequestDeleteAction(rId);
+        EXECUTOR.exec(delete);
 
-        session.delete(rInfo.request);
+        rId = RequestHelper.createRequest(EXECUTOR, rgId);
+        session.beginTransaction();
+        Request r = (Request) session.get(Request.class, rId);
+        r.setSubmitted(new Date());
+        session.saveOrUpdate(r);
+        session.getTransaction().commit();
+        delete = new RequestDeleteAction(rId);
+        try {
+            EXECUTOR.exec(delete);
+            Assert.fail();
+        } catch (ActionException e) {
+            // good
+        }
     }
-
 }
