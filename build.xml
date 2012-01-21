@@ -726,6 +726,7 @@
     <include name="**/tools/utils/*.class" />
   </fileset>
 
+  <!-- TODO: remove all postproc stuff? -->
   <target name="build-hbmpostproc" depends="sdk" unless="hmbstrings.uptodate">
     <mkdir dir="${eclipse.proj.dir.tools}/output" />
     <dependset>
@@ -1002,6 +1003,7 @@
 
   <target name="clean-jars" description="deletes jars from eclipse projects">
     <delete>
+      <!-- TODO: add lib folders from other projects? -->
       <fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.mvp}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.gui.common}/lib" includes="**/*.jar" />
@@ -1011,12 +1013,14 @@
   </target>
 
   <target name="clean"
-          depends="clean-tests,clean-jars,clean-caCore"
+          depends="clean-tests,clean-jars"
           description="cleans caCORE SDK and deletes jars from eclipse projects">
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output-validators" />
     <delete dir="${eclipse.proj.dir.tools}/output" />
     <delete file="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
+    <!-- Don't delete peers or base wrappers anymore since they aren't regen'd -->
+    <!--
     <delete>
       <fileset dir="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer"
       includes="*Peer.java"/>
@@ -1025,14 +1029,11 @@
       <fileset dir="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/wrappers/base"
       includes="*BaseWrapper.java"/>
     </delete>
-  </target>
-
-  <target name="clean-caCore" if="cacore.sdk.available">
-    <ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
+    -->
   </target>
 
   <target name="clean-all"
-          depends="clean-tests,clean-jars,clean"
+          depends="clean"
           description="deletes caCORE SDK directory and deletes jars from eclipse projects">
     <delete dir="${cacore.sdk.dir}" />
     <delete dir="${buildDirectory}" />
