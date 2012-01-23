@@ -5,6 +5,7 @@ import java.util.HashSet;
 
 import edu.ualberta.med.biobank.common.wrappers.Property;
 
+@Deprecated
 public class CollectionUtils {
 
     public static <T, R> Collection<T> getCollection(R model,

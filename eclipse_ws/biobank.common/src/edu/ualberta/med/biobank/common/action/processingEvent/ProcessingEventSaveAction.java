@@ -40,19 +40,19 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
 
     private Integer statusId;
 
-    private Collection<CommentInfo> comments;
+    private Collection<CommentInfo> commentInfos;
 
     private Set<Integer> specimenIds;
 
     public ProcessingEventSaveAction(Integer peventId, Integer centerId,
         Date createdAt, String worksheet, Integer statusId,
-        Collection<CommentInfo> comments, Set<Integer> specimenIds) {
+        Collection<CommentInfo> commentInfos, Set<Integer> specimenIds) {
         this.peventId = peventId;
         this.centerId = centerId;
         this.createdAt = createdAt;
         this.worksheet = worksheet;
         this.statusId = statusId;
-        this.comments = comments;
+        this.commentInfos = commentInfos;
         this.specimenIds = specimenIds;
     }
 
@@ -120,10 +120,10 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
 
     protected void setComments(ActionContext actionContext,
         ProcessingEvent peventToSave) {
-        if (comments != null) {
+        if (commentInfos != null) {
             Collection<Comment> dbComments = CollectionUtils.getCollection(
                 peventToSave, ProcessingEventPeer.COMMENT_COLLECTION);
-            for (CommentInfo info : comments) {
+            for (CommentInfo info : commentInfos) {
                 Comment commentModel = info.getCommentModel(actionContext);
                 dbComments.add(commentModel);
                 actionContext.getSession().saveOrUpdate(commentModel);

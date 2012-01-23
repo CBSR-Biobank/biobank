@@ -24,7 +24,8 @@ public class PatientGetCollectionEventInfosAction implements
     private static final String CEVENT_INFO_QRY =
         "SELECT distinct cevent"
             + " FROM " + CollectionEvent.class.getName() + " as cevent"
-            + " LEFT JOIN FETCH cevent.commentCollection"
+            + " LEFT JOIN FETCH cevent.commentCollection comments"
+            + " LEFT JOIN FETCH comments.user"
             + " WHERE cevent.patient.id=?";
 
     @SuppressWarnings("nls")

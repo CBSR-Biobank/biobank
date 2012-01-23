@@ -12,7 +12,6 @@ import java.util.Set;
 import org.hibernate.Query;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -25,6 +24,7 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGet
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
+import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
@@ -678,10 +678,27 @@ public class TestStudy extends TestAction {
         return result;
     }
 
-    @Ignore("needs implementation")
     @Test
     public void comments() {
-        // TODO: requires implementation
+        // save with no comments
+        Integer studyId = EXECUTOR.exec(studySaveAction).getId();
+        StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
+        Assert.assertEquals(0, studyInfo.study.getCommentCollection().size());
+
+        List<CommentInfo> commentInfos =
+            Utils.getRandomCommentInfos(EXECUTOR.getUserId());
+        studySaveAction = StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+        studySaveAction.setCommentInfos(commentInfos);
+        studyId = EXECUTOR.exec(studySaveAction).getId();
+        studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
+        Assert.assertEquals(commentInfos.size(), studyInfo.study
+            .getCommentCollection().size());
+
+        // TODO: check full name on each comment's user
+        // for (Comment comment : studyInfo.study.getCommentCollection()) {
+        //
+        // }
+
     }
 
     @Test

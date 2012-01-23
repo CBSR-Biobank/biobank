@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.action.center;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -10,10 +11,12 @@ import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
+import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Comment;
 
 public abstract class CenterSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
@@ -29,6 +32,7 @@ public abstract class CenterSaveAction implements Action<IdResult> {
     private String nameShort;
     private Address address;
     private Integer aStatusId;
+    private Collection<CommentInfo> commentInfos;
 
     public void setId(Integer id) {
         this.centerId = id;
@@ -48,6 +52,10 @@ public abstract class CenterSaveAction implements Action<IdResult> {
 
     public void setActivityStatusId(Integer activityStatusId) {
         this.aStatusId = activityStatusId;
+    }
+
+    public void setCommentInfos(Collection<CommentInfo> commentInfos) {
+        this.commentInfos = commentInfos;
     }
 
     @Override
@@ -101,6 +109,7 @@ public abstract class CenterSaveAction implements Action<IdResult> {
 
         // TODO: remember to check the address
         center.setAddress(address);
+        saveComments(context, center);
 
         context.getSession().saveOrUpdate(center);
         context.getSession().flush();
@@ -110,5 +119,16 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         // value instead?
 
         return new IdResult(center.getId());
+    }
+
+    protected void saveComments(ActionContext context, Center center) {
+        if (commentInfos != null) {
+            Collection<Comment> dbComments = center.getCommentCollection();
+            for (CommentInfo info : commentInfos) {
+                Comment commentModel = info.getCommentModel(context);
+                dbComments.add(commentModel);
+                context.getSession().saveOrUpdate(commentModel);
+            }
+        }
     }
 }

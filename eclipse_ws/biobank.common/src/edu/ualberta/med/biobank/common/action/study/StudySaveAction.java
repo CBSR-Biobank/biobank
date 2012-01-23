@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
+import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
@@ -23,6 +24,7 @@ import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.Site;
@@ -140,6 +142,7 @@ public class StudySaveAction implements Action<IdResult> {
     private Collection<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos;
     private Collection<AliquotedSpecimenSaveInfo> aliquotSpecimenSaveInfos;
     private Collection<StudyEventAttrSaveInfo> studyEventAttrSaveInfos;
+    private Collection<CommentInfo> commentInfos;
     private Study study = null;
 
     public void setId(Integer id) {
@@ -179,6 +182,10 @@ public class StudySaveAction implements Action<IdResult> {
     public void setStudyEventAttrSaveInfo(
         Collection<StudyEventAttrSaveInfo> studyEventAttrSaveInfos) {
         this.studyEventAttrSaveInfos = studyEventAttrSaveInfos;
+    }
+
+    public void setCommentInfos(Collection<CommentInfo> commentInfos) {
+        this.commentInfos = commentInfos;
     }
 
     @Override
@@ -249,6 +256,7 @@ public class StudySaveAction implements Action<IdResult> {
         saveSourceSpecimens(context);
         saveAliquotedSpecimens(context);
         saveEventAttributes(context);
+        saveComments(context);
 
         context.getSession().saveOrUpdate(study);
         context.getSession().flush();
@@ -386,6 +394,17 @@ public class StudySaveAction implements Action<IdResult> {
         study.setStudyEventAttrCollection(attrsDiff.getNewSet());
         for (StudyEventAttr attr : attrsDiff.getRemoveSet()) {
             context.getSession().delete(attr);
+        }
+    }
+
+    protected void saveComments(ActionContext context) {
+        if (commentInfos != null) {
+            Collection<Comment> dbComments = study.getCommentCollection();
+            for (CommentInfo info : commentInfos) {
+                Comment commentModel = info.getCommentModel(context);
+                dbComments.add(commentModel);
+                context.getSession().saveOrUpdate(commentModel);
+            }
         }
     }
 }

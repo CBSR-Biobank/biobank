@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetSpecimenInfosA
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
+import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
@@ -189,6 +190,28 @@ public class TestSite extends TestAction {
         } catch (ActionCheckException e) {
             Assert.assertTrue(true);
         }
+    }
+
+    @Test
+    public void comments() {
+        // save with no comments
+        Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
+        SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        Assert.assertEquals(0, siteInfo.site.getCommentCollection().size());
+
+        List<CommentInfo> commentInfos =
+            Utils.getRandomCommentInfos(EXECUTOR.getUserId());
+        siteSaveAction = SiteHelper.getSaveAction(EXECUTOR, siteInfo);
+        siteSaveAction.setCommentInfos(commentInfos);
+        siteId = EXECUTOR.exec(siteSaveAction).getId();
+        siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        Assert.assertEquals(commentInfos.size(), siteInfo.site
+            .getCommentCollection().size());
+
+        // TODO: check full name on each comment's user
+        // for (Comment comment : siteInfo.site.getCommentCollection()) {
+        //
+        // }
 
     }
 

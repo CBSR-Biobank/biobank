@@ -60,11 +60,11 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void saveWithoutSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(20, 50);
-        List<CommentInfo> comments =
+        List<CommentInfo> commentInfos =
             Utils.getRandomCommentInfos(EXECUTOR.getUserId());
         Date date = Utils.getRandomDate();
         Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
-            null, provisioning.siteId, date, worksheet, 1, comments,
+            null, provisioning.siteId, date, worksheet, 1, commentInfos,
             new HashSet<Integer>())).getId();
 
         // Check ProcessingEvent is in database with correct values
@@ -72,7 +72,7 @@ public class TestProcessingEvent extends TestAction {
             EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
 
         Assert.assertEquals(worksheet, peventInfo.pevent.getWorksheet());
-        Assert.assertEquals(comments.size(), peventInfo.pevent
+        Assert.assertEquals(commentInfos.size(), peventInfo.pevent
             .getCommentCollection().size());
         Assert.assertEquals(date, peventInfo.pevent.getCreatedAt());
         Assert

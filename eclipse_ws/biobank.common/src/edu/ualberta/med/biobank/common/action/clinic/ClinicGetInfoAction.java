@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicReadPermission;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -19,6 +20,14 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
 
     @SuppressWarnings("nls")
     private static final String CLINIC_INFO_HQL =
+        "SELECT DISTINCT clinic"
+            + " FROM " + Clinic.class.getName() + " clinic"
+            + " LEFT JOIN FETCH clinic.commentCollection comments"
+            + " LEFT JOIN FETCH comments.user"
+            + " WHERE clinic.id = ?";
+
+    @SuppressWarnings("nls")
+    private static final String CLINIC_COUNT_INFO_HQL =
         "SELECT clinic,COUNT(DISTINCT patients),COUNT(DISTINCT cevents)"
             + " FROM " + Clinic.class.getName() + " clinic"
             + " INNER JOIN FETCH clinic.activityStatus"
@@ -45,24 +54,34 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
 
     @Override
     public ClinicInfo run(ActionContext context) throws ActionException {
-        ClinicInfo info = new ClinicInfo();
-
         Query query = context.getSession().createQuery(CLINIC_INFO_HQL);
+        query.setParameter(0, clinicId);
+
+        List<Clinic> clinics = query.list();
+
+        if (clinics.size() != 1) {
+            throw new ModelNotFoundException(Clinic.class, clinicId);
+        }
+
+        ClinicInfo clinicInfo = new ClinicInfo();
+        clinicInfo.clinic = clinics.get(0);
+
+        query = context.getSession().createQuery(CLINIC_COUNT_INFO_HQL);
         query.setParameter(0, clinicId);
 
         @SuppressWarnings("unchecked")
         List<Object[]> rows = query.list();
-        if (rows.size() == 1) {
-            Object[] row = rows.get(0);
-
-            info.clinic = (Clinic) row[0];
-            info.patientCount = (Long) row[1];
-            info.collectionEventCount = (Long) row[2];
-            info.contacts = getContacts.run(context).getList();
-            info.studyInfos = getStudyInfo.run(context).getList();
+        if (rows.size() != 1) {
+            throw new ModelNotFoundException(Clinic.class, clinicId);
         }
+        Object[] row = rows.get(0);
 
-        return info;
+        clinicInfo.patientCount = (Long) row[1];
+        clinicInfo.collectionEventCount = (Long) row[2];
+        clinicInfo.contacts = getContacts.run(context).getList();
+        clinicInfo.studyInfos = getStudyInfo.run(context).getList();
+
+        return clinicInfo;
     }
 
     public static class ClinicInfo implements ActionResult {

@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.action;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Query;
@@ -20,6 +21,7 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
+import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -170,6 +172,30 @@ public class TestClinic extends TestAction {
         } catch (ActionCheckException e) {
             Assert.assertTrue(true);
         }
+
+    }
+
+    @Test
+    public void comments() {
+        // save with no comments
+        Integer clinicId = EXECUTOR.exec(clinicSaveAction).getId();
+        ClinicInfo clinicInfo =
+            EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
+        Assert.assertEquals(0, clinicInfo.clinic.getCommentCollection().size());
+
+        List<CommentInfo> commentInfos =
+            Utils.getRandomCommentInfos(EXECUTOR.getUserId());
+        clinicSaveAction = ClinicHelper.getSaveAction(clinicInfo);
+        clinicSaveAction.setCommentInfos(commentInfos);
+        clinicId = EXECUTOR.exec(clinicSaveAction).getId();
+        clinicInfo = EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
+        Assert.assertEquals(commentInfos.size(), clinicInfo.clinic
+            .getCommentCollection().size());
+
+        // TODO: check full name on each comment's user
+        // for (Comment comment : clinicInfo.clinic.getCommentCollection()) {
+        //
+        // }
 
     }
 
