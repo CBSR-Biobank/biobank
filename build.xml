@@ -67,6 +67,7 @@
   <condition property="LOG4J_LEVEL_DEBUG" value="debug" else="error">
 	<equals arg1="${log-debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
+  <!-- TODO: someday, does client need all keystores? -->
   <condition property="isHostAicmlMed">
     <equals arg1="${host.name}"
             arg2="aicml-med"
@@ -101,6 +102,7 @@
   </condition>
 
   <path id="biobank.common.build.classpath">
+    <!-- TODO: these jars should be movied into the req.jars.dir -->
     <fileset dir="${cacore.sdk.dir}/output/biobank/package/remote-client/lib">
       <include name="*.jar" />
     </fileset>
@@ -113,17 +115,20 @@
     <fileset dir="${cacore.sdk.dir}/system/security/dist">
       <include name="*.jar" />
     </fileset>
+   <!-- end -->
     <fileset dir="${req.jars.dir}">
       <include name="*.jar" />
     </fileset>
   </path>
 
+  <!-- for tests -->
   <path id="biobank.common.run.classpath">
     <path refid="biobank.common.build.classpath" />
     <pathelement location="${eclipse.proj.dir.common}/output" />
     <pathelement location="${eclipse.proj.dir.common}/conf" />
   </path>
 
+  <!-- for in the war file -->
   <target name="log4j-conf">
     <copy file="security-logs/log4j.xml"
           tofile="${cacore.sdk.dir}/output/biobank/conf/system/web/WEB-INF/classes/log4j.xml"
@@ -226,69 +231,6 @@
   <target name="deploy-eclipse"
           depends="sdk-files,java-client-manifest,biobank-version-modify"
           description="deploys the caCORE SDK beans to the eclipse project">
-    <!-- if any source file has been modified more recently than any target file
-         then all the target files are deleted. Maybe the point is to remove files
-	 that were removed, since they're copied over at the end of the target
-	 anyway? 
-	 
-	 Will delete files copied into project libs folder if the jar in the jars/
-	 folder was modified more recently.
-	 
-	 -->
-    <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/system/lib"
-                   files="${cacore.system.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir.common}/lib"
-                      files="${cacore.system.jar.files}" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${req.jars.dir}" files="${biobank.common.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir.common}/lib"
-                      files="${biobank.common.jar.files}" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${req.jars.dir}" files="${biobank.gui.common.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir.gui.common}/lib"
-                      files="${biobank.gui.commmon.jar.files}" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${req.jars.dir}" files="${biobank.mvp.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir.mvp}/lib"
-                      files="${biobank.mvp.jar.files}" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${req.jars.dir}" files="${biobank.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir}/lib"
-                      files="${biobank.jar.files}" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir.tools}/lib"
-                      files="${biobank.tools.jar.files}" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${req.jars.dir}" files="${biobank.test.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir.tests}/lib"
-                      files="${biobank.tools.jar.files}" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/writable-api/dist"
-                   files="sdk-writable-client-framework.jar" />
-      <targetfilelist dir="${eclipse.proj.dir.common}/lib"
-                      files="sdk-writable-client-framework.jar" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/system/security/dist"
-                   files="sdk-security.jar" />
-      <targetfilelist dir="${eclipse.proj.dir.common}/lib"
-                      files="sdk-security.jar" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/output/biobank/package/remote-client/lib"
-                   files="${sdk.jar.files.basename}" />
-      <targetfilelist dir="${eclipse.proj.dir.common}/lib"
-                      files="${sdk.jar.files.basename}" />
-    </dependset>
     <copy todir="${eclipse.proj.dir.common}/lib/client" overwrite="true">
       <fileset dir="${cacore.sdk.dir}/output/biobank/package/remote-client/lib" />
       <fileset dir="${cacore.sdk.dir}/output/biobank/package/ws-client/lib" />
@@ -390,6 +332,7 @@
           overwrite="true" />
   </target>
 
+  <!-- version number on server side -->
   <target name="server-manifest">
     <manifest file="${eclipse.proj.dir.common}/META-INF/MANIFEST.MF"
               mode="update">
@@ -521,6 +464,7 @@
     </exec>
   </target>
 
+  <!-- TODO: build through eclipse IDE ant task? -->
   <target name="build-common-project"
           depends="sdk-files">
     <echo message="Building common project" />
