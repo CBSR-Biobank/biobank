@@ -205,4 +205,35 @@ public class TestDispatch extends TestAction {
         EXECUTOR.exec(delete);
     }
 
+    @Test
+    public void testComment() throws Exception {
+
+        DispatchSaveInfo d =
+            DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
+                centerId, DispatchState.IN_TRANSIT.getId(),
+                Utils.getRandomString(5));
+        Set<DispatchSpecimenInfo> specs =
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
+                patientId, centerId);
+        ShipmentInfoSaveInfo shipsave =
+            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
+        Integer id =
+            EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+                .getId();
+        d.id = id;
+
+        DispatchReadInfo info =
+            EXECUTOR.exec(new DispatchGetInfoAction(id));
+        Assert.assertEquals(1, info.dispatch.getCommentCollection().size());
+        EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+            .getId();
+        info =
+            EXECUTOR.exec(new DispatchGetInfoAction(id));
+        Assert.assertEquals(2, info.dispatch.getCommentCollection().size());
+        EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+            .getId();
+        info =
+            EXECUTOR.exec(new DispatchGetInfoAction(id));
+        Assert.assertEquals(3, info.dispatch.getCommentCollection().size());
+    }
 }

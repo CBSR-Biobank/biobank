@@ -17,7 +17,7 @@ public class OriginInfoHelper extends Helper {
         Integer centerId) throws Exception {
         Set<Integer> ids = new HashSet<Integer>();
         Integer id = CollectionEventHelper.createCEventWithSourceSpecimens(
-            actionExecutor, patientId, centerId);
+                actionExecutor, patientId, siteId);
 
         CEventInfo ceventInfo =
             actionExecutor.exec(new CollectionEventGetInfoAction(id));

@@ -23,13 +23,13 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String ORIGIN_INFO_HQL = "select oi from "
+    private static final String ORIGIN_INFO_HQL = "select distinct oi from "
     + OriginInfo.class.getName() 
     + " oi join fetch oi." + OriginInfoPeer.SHIPMENT_INFO.getName()
     + " si join fetch si." + ShipmentInfoPeer.SHIPPING_METHOD.getName()
     + " join fetch oi." + OriginInfoPeer.CENTER.getName() 
     + " left join fetch oi." + OriginInfoPeer.COMMENT_COLLECTION.getName()
-    + " where oi." + OriginInfoPeer.ID.getName()+"=? group by oi";
+    + " where oi." + OriginInfoPeer.ID.getName()+"=?";
     // @formatter:on
 
     private final Integer oiId;

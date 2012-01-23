@@ -14,8 +14,11 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
 
     protected Integer shipId = null;
 
-    public ShipmentDeleteAction(Integer id) {
+    private Integer workingCenter;
+
+    public ShipmentDeleteAction(Integer id, Integer workingCenter) {
         this.shipId = id;
+        this.workingCenter = workingCenter;
     }
 
     @Override
@@ -38,8 +41,12 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
                     "Specimens do not come from the same place.");
             spc.setOriginInfo(oi);
         }
-        oi.setCenter(currentCenter);
+        oi.setCenter(context.load(Center.class, workingCenter));
         context.getSession().saveOrUpdate(oi);
+        for (Specimen spc : ship.getSpecimenCollection()) {
+            context.getSession().saveOrUpdate(spc);
+        }
+
         context.getSession().delete(ship);
         return new EmptyResult();
     }

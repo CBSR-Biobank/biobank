@@ -16,15 +16,14 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
 
     @SuppressWarnings("nls")
     private static final String DISPATCH_HQL =
-        "select dispatch from "
+        "select distinct dispatch from "
             + Dispatch.class.getName()
             + " dispatch left join fetch dispatch.shipmentInfo"
             + " si left join fetch si.shippingMethod"
             + " join fetch dispatch.receiverCenter"
             + " join fetch dispatch.senderCenter"
             + " left join fetch dispatch.commentCollection"
-            + " commentCollection where dispatch.id=?"
-            + " group by dispatch";
+            + " commentCollection where dispatch.id=?";
 
     private Integer id;
 

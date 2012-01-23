@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
+import edu.ualberta.med.biobank.common.permission.security.CenterAdminPermission;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoSavePermission;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
@@ -39,7 +40,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         return new OriginInfoSavePermission(oiInfo.oiId).isAllowed(context)
-            && CenterSavePermission(workingCenter).isAllowede();
+            && new CenterAdminPermission(workingCenter).isAllowed(context);
     }
 
     @Override
@@ -89,9 +90,13 @@ public class OriginInfoSaveAction implements Action<IdResult> {
                     throw new ActionException("Specimen id can not be null");
                 Specimen spec =
                     context.load(Specimen.class, specId);
-                // FIXME: spec.setOriginInfo(????);
-            context.getSession().saveOrUpdate(spec);
-        }
+                Center center = context.load(Center.class, workingCenter);
+                OriginInfo newOriginInfo = new OriginInfo();
+                newOriginInfo.setCenter(center);
+                spec.setOriginInfo(newOriginInfo);
+                context.getSession().saveOrUpdate(newOriginInfo);
+                context.getSession().saveOrUpdate(spec);
+            }
         if (oiInfo.addedSpecIds != null)
             for (Integer specId : oiInfo.addedSpecIds) {
                 if (specId == null)

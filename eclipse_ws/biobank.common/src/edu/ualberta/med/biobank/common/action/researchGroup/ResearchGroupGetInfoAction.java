@@ -22,7 +22,7 @@ public class ResearchGroupGetInfoAction implements
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String RESEARCH_INFO_HQL = "select rg from "
+    private static final String RESEARCH_INFO_HQL = "select distinct rg from "
     + ResearchGroup.class.getName() +" rg inner join fetch rg.activityStatus left join fetch rg.commentCollection inner join fetch rg.study inner join fetch rg.address where rg.id=?";
     // @formatter:on
 
@@ -53,7 +53,7 @@ public class ResearchGroupGetInfoAction implements
             sInfo.rg = (ResearchGroup) row;
 
         } else {
-            throw new ActionException("No patient found with id:" + rgId); //$NON-NLS-1$
+            throw new ActionException("No research group found with id:" + rgId); //$NON-NLS-1$
         }
 
         return sInfo;

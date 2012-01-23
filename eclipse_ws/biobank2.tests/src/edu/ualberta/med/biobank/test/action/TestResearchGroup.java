@@ -13,11 +13,14 @@ import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.info.AddressSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
+import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupDeleteAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
+import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.Request;
@@ -136,5 +139,32 @@ public class TestResearchGroup extends TestAction {
 
         EXECUTOR.exec(delete);
         // should be fine
+    }
+
+    @Test
+    public void testComment() throws Exception {
+        AddressSaveInfo addressSaveInfo =
+            new AddressSaveInfo(null, "test", "test", "test", "test", "test",
+                "test", "test", "test", "test", "test");
+        ResearchGroupSaveInfo save =
+            new ResearchGroupSaveInfo(null, name + "rg", name + "rg",
+                studyId, "comment", addressSaveInfo,
+                ActivityStatusEnum.ACTIVE.getId());
+        ResearchGroupSaveAction rgSave = new ResearchGroupSaveAction(save);
+
+        Integer rgId = EXECUTOR.exec(rgSave).getId();
+        ResearchGroupGetInfoAction reader =
+            new ResearchGroupGetInfoAction(rgId);
+        ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
+
+        save.id = rgId;
+
+        Assert.assertEquals(1, rg.rg.getCommentCollection().size());
+        EXECUTOR.exec(rgSave);
+        rg = EXECUTOR.exec(reader);
+        Assert.assertEquals(2, rg.rg.getCommentCollection().size());
+        EXECUTOR.exec(rgSave);
+        rg = EXECUTOR.exec(reader);
+        Assert.assertEquals(3, rg.rg.getCommentCollection().size());
     }
 }
