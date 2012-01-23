@@ -66,7 +66,7 @@ public class TestDispatch extends TestAction {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
                 centerId, DispatchState.CREATION.getId(),
-                Utils.getRandomString(5));
+                name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
                 patientId, centerId);
@@ -138,7 +138,7 @@ public class TestDispatch extends TestAction {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
                 centerId, DispatchState.CREATION.getId(),
-                Utils.getRandomString(5));
+                name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
                 patientId, centerId);
@@ -179,7 +179,7 @@ public class TestDispatch extends TestAction {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
                 centerId, DispatchState.IN_TRANSIT.getId(),
-                Utils.getRandomString(5));
+                name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
                 patientId, centerId);
@@ -211,7 +211,7 @@ public class TestDispatch extends TestAction {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
                 centerId, DispatchState.IN_TRANSIT.getId(),
-                Utils.getRandomString(5));
+                name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
                 patientId, centerId);

@@ -7,6 +7,7 @@ import org.hibernate.criterion.Restrictions;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.User;
 
@@ -43,6 +44,9 @@ public class LocalActionExecutor implements IActionExecutor {
                 .list().iterator().next();
 
             ActionContext context = new ActionContext(user, session);
+
+            if (!action.isAllowed(context))
+                throw new AccessDeniedException();
 
             T result = action.run(context);
 

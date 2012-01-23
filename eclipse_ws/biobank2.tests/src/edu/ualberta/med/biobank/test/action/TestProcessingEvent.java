@@ -104,7 +104,9 @@ public class TestProcessingEvent extends TestAction {
             null, Utils.getRandomString(2, 5), Utils.getRandomDate(),
             Utils.getRandomDate(), Utils.getRandomString(2, 5),
             getShippingMethods().get(0).getId());
-        EXECUTOR.exec(new OriginInfoSaveAction(oiSaveInfo, shipSaveInfo));
+        EXECUTOR
+            .exec(new OriginInfoSaveAction(oiSaveInfo, shipSaveInfo,
+                provisioning.siteId));
 
         // create a processing event with one of the collection event source
         // specimen
