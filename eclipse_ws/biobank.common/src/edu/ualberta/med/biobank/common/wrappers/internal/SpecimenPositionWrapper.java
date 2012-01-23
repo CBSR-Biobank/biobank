@@ -36,6 +36,7 @@ public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
         setContainer(parent);
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(SpecimenPositionPeer.CONTAINER));

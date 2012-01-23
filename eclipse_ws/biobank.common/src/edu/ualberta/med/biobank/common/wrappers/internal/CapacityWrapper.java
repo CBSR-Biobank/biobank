@@ -46,6 +46,7 @@ public class CapacityWrapper extends CapacityBaseWrapper {
         return 0;
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(CapacityPeer.ROW_CAPACITY));

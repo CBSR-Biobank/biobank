@@ -98,6 +98,7 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
             && !name.equals(DROP_OFF_NAME);
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(ShippingMethodPeer.NAME));
@@ -106,6 +107,7 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
         super.addPersistTasks(tasks);
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         tasks.add(check().notUsedBy(ShipmentInfo.class,

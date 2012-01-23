@@ -25,11 +25,15 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
-    private static final String HAS_SPECIMENS_MSG = Messages.getString("SpecimenTypeWrapper.has.specimens.msg"); //$NON-NLS-1$
-    private static final String HAS_SOURCE_SPECIMENS_MSG = Messages.getString("SpecimenTypeWrapper.has.source.specimens.msg"); //$NON-NLS-1$
-    private static final String HAS_ALIQUOTED_SPECIMENS_MSG = Messages.getString("SpecimenTypeWrapper.has.aliquoted.specimens.msg"); //$NON-NLS-1$
+    private static final String HAS_SPECIMENS_MSG = Messages
+        .getString("SpecimenTypeWrapper.has.specimens.msg"); //$NON-NLS-1$
+    private static final String HAS_SOURCE_SPECIMENS_MSG = Messages
+        .getString("SpecimenTypeWrapper.has.source.specimens.msg"); //$NON-NLS-1$
+    private static final String HAS_ALIQUOTED_SPECIMENS_MSG = Messages
+        .getString("SpecimenTypeWrapper.has.aliquoted.specimens.msg"); //$NON-NLS-1$
 
-    private static final String UNKNOWN_IMPORT_NAME = Messages.getString("SpecimenTypeWrapper.unknow.import.label"); //$NON-NLS-1$
+    private static final String UNKNOWN_IMPORT_NAME = Messages
+        .getString("SpecimenTypeWrapper.unknow.import.label"); //$NON-NLS-1$
 
     public SpecimenTypeWrapper(WritableApplicationService appService,
         SpecimenType wrappedObject) {
@@ -50,7 +54,8 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         List<ContainerTypeWrapper> containerTypes = ContainerTypeWrapper
             .getContainerTypesInSite(appService, siteWrapper, typeNameContains,
                 false);
-        Set<SpecimenTypeWrapper> SpecimenTypes = new HashSet<SpecimenTypeWrapper>();
+        Set<SpecimenTypeWrapper> SpecimenTypes =
+            new HashSet<SpecimenTypeWrapper>();
         for (ContainerTypeWrapper containerType : containerTypes) {
             SpecimenTypes.addAll(containerType.getSpecimenTypesRecursively());
         }
@@ -66,7 +71,8 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         throws ApplicationException {
         List<ContainerTypeWrapper> containerTypes = ContainerTypeWrapper
             .getContainerTypesPallet96(appService, siteWrapper);
-        Set<SpecimenTypeWrapper> SpecimenTypes = new HashSet<SpecimenTypeWrapper>();
+        Set<SpecimenTypeWrapper> SpecimenTypes =
+            new HashSet<SpecimenTypeWrapper>();
         for (ContainerTypeWrapper containerType : containerTypes) {
             SpecimenTypes.addAll(containerType.getSpecimenTypesRecursively());
         }
@@ -129,7 +135,8 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     }
 
     private static final String IS_USED_QRY_START = "select count(x) from "; //$NON-NLS-1$
-    private static final String IS_USED_QRY_END = " as x where x.specimenType.id=?"; //$NON-NLS-1$
+    private static final String IS_USED_QRY_END =
+        " as x where x.specimenType.id=?"; //$NON-NLS-1$
     private static final Class<?>[] isUsedCheckClasses = new Class[] {
         Specimen.class, SourceSpecimen.class, AliquotedSpecimen.class };
 
@@ -147,6 +154,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return usedCount > 0;
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(SpecimenTypePeer.NAME));
@@ -158,6 +166,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         super.addPersistTasks(tasks);
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         String isUsedBySpecimensMsg = MessageFormat.format(HAS_SPECIMENS_MSG,
@@ -192,10 +201,12 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     public void checkNameAndShortNameUnique() throws ApplicationException,
         BiobankException {
         checkNoDuplicates(SpecimenType.class, SpecimenTypePeer.NAME.getName(),
-            getName(), Messages.getString("SpecimenTypeWrapper.specimen.with.name.text")); //$NON-NLS-1$
+            getName(),
+            Messages.getString("SpecimenTypeWrapper.specimen.with.name.text")); //$NON-NLS-1$
         checkNoDuplicates(SpecimenType.class,
             SpecimenTypePeer.NAME_SHORT.getName(), getNameShort(),
-            Messages.getString("SpecimenTypeWrapper.specimen.with.name.short.text")); //$NON-NLS-1$
+            Messages
+                .getString("SpecimenTypeWrapper.specimen.with.name.short.text")); //$NON-NLS-1$
     }
 
     public boolean isUnknownImport() {

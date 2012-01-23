@@ -465,6 +465,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         }
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(SpecimenPeer.SPECIMEN_TYPE));
@@ -485,6 +486,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         tasks.add(new SpecimenPostPersistChecks(this));
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         tasks.add(check().empty(SpecimenPeer.CHILD_SPECIMEN_COLLECTION));

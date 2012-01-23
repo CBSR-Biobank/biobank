@@ -43,7 +43,8 @@ public class GlobalEventAttrWrapper extends GlobalEventAttrBaseWrapper {
     public static List<GlobalEventAttrWrapper> getAllGlobalEventAttrs(
         WritableApplicationService appService) throws ApplicationException {
 
-        List<GlobalEventAttrWrapper> EventAttrs = new ArrayList<GlobalEventAttrWrapper>();
+        List<GlobalEventAttrWrapper> EventAttrs =
+            new ArrayList<GlobalEventAttrWrapper>();
 
         HQLCriteria c = new HQLCriteria(ALL_GLOBAL_EVENT_ATTRS_QRY);
         List<GlobalEventAttr> result = appService.query(c);
@@ -55,6 +56,7 @@ public class GlobalEventAttrWrapper extends GlobalEventAttrBaseWrapper {
         return EventAttrs;
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         // FIXME if used by any study then it cannot be deleted

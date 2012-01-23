@@ -17,12 +17,14 @@ import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SiteWrapper extends SiteBaseWrapper {
-    private static final String TOP_CONTAINER_COLLECTION_CACHE_KEY = "topContainerCollection"; //$NON-NLS-1$
+    private static final String TOP_CONTAINER_COLLECTION_CACHE_KEY =
+        "topContainerCollection"; //$NON-NLS-1$
     private static final String EXISTING_CHILDREN_MSG = Messages
         .getString("SiteWrapper.existing.children.msg"); //$NON-NLS-1$
 
     @SuppressWarnings("unused")
-    private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();
+    private Map<RequestState, List<RequestWrapper>> requestCollectionMap =
+        new HashMap<RequestState, List<RequestWrapper>>();
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
@@ -43,8 +45,9 @@ public class SiteWrapper extends SiteBaseWrapper {
     @SuppressWarnings("unchecked")
     public List<ContainerWrapper> getTopContainerCollection(boolean sort)
         throws Exception {
-        List<ContainerWrapper> topContainerCollection = (List<ContainerWrapper>) cache
-            .get(TOP_CONTAINER_COLLECTION_CACHE_KEY);
+        List<ContainerWrapper> topContainerCollection =
+            (List<ContainerWrapper>) cache
+                .get(TOP_CONTAINER_COLLECTION_CACHE_KEY);
 
         if (topContainerCollection == null) {
             topContainerCollection = SiteQuery.getTopContainerCollection(this);
@@ -78,6 +81,7 @@ public class SiteWrapper extends SiteBaseWrapper {
         return getStudyCollection(true);
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         String errMsg = MessageFormat.format(EXISTING_CHILDREN_MSG, getName());
