@@ -23,7 +23,11 @@ public class SiteHelper extends Helper {
     public static SiteSaveAction getSaveAction(String name,
         String nameShort, ActivityStatusEnum active) {
         Address address = new Address();
-        address.setCity(name + "_city");
+        String city = name + "_city";
+        if (city.length() > 50) {
+            city = city.substring(city.length() - 50);
+        }
+        address.setCity(city);
 
         SiteSaveAction siteSaveAction = new SiteSaveAction();
         siteSaveAction.setName(name);

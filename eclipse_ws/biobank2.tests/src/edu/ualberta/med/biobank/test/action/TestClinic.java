@@ -45,7 +45,7 @@ public class TestClinic extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + R.nextInt();
+        name = getMethodNameR();
 
         clinicSaveAction = ClinicHelper.getSaveAction(name, name,
             ActivityStatusEnum.ACTIVE, R.nextBoolean());

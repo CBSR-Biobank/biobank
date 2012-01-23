@@ -46,19 +46,19 @@ public class TestProcessingEvent extends TestAction {
     public TestName testname = new TestName();
 
     private String name;
+    private Provisioning provisioning;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + R.nextInt();
+        name = getMethodNameR();
+        provisioning =
+            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
     }
 
     @Test
     public void saveWithoutSpecimens() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
-
         String worksheet = Utils.getRandomString(20, 50);
         List<CommentInfo> comments =
             Utils.getRandomCommentInfos(EXECUTOR.getUserId());
@@ -81,9 +81,6 @@ public class TestProcessingEvent extends TestAction {
 
     @Test
     public void saveWithSpecimens() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
-
         String worksheet = Utils.getRandomString(50);
         List<CommentInfo> comments =
             Utils.getRandomCommentInfos(EXECUTOR.getUserId());
@@ -167,9 +164,6 @@ public class TestProcessingEvent extends TestAction {
 
     @Test
     public void saveSameWorksheet() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
-
         String worksheet = Utils.getRandomString(50);
         Date date = Utils.getRandomDate();
         EXECUTOR.exec(new ProcessingEventSaveAction(
@@ -190,9 +184,6 @@ public class TestProcessingEvent extends TestAction {
 
     @Test
     public void delete() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
-
         Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
             null, provisioning.siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), 1, null,
@@ -212,9 +203,6 @@ public class TestProcessingEvent extends TestAction {
 
     @Test
     public void deleteWithSourcesSpecimens() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
-
         // add cevent and source specimens
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
@@ -261,9 +249,6 @@ public class TestProcessingEvent extends TestAction {
      * Need way to create aliquoted specimens
      */
     public void deleteWithAliquotedSpecimens() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
-
         // add cevent and source specimens
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
