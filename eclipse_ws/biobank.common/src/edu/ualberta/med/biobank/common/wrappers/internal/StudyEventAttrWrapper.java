@@ -56,6 +56,7 @@ public class StudyEventAttrWrapper extends StudyEventAttrBaseWrapper {
         return study.getStudyEventAttrCollection(false);
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
 

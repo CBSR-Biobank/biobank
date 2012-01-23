@@ -373,6 +373,7 @@ public class StudyWrapper extends StudyBaseWrapper {
             && user.isInSuperAdminMode();
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(StudyPeer.NAME));
@@ -392,6 +393,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         tasks.persistAdded(this, StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION);
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         tasks.add(check().empty(StudyPeer.PATIENT_COLLECTION));

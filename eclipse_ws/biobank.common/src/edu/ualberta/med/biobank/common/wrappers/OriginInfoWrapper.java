@@ -19,7 +19,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class OriginInfoWrapper extends OriginInfoBaseWrapper {
-    private static final OriginInfoLogProvider LOG_PROVIDER = new OriginInfoLogProvider();
+    private static final OriginInfoLogProvider LOG_PROVIDER =
+        new OriginInfoLogProvider();
     private static final String SHIPMENT_HQL_STRING = "from " //$NON-NLS-1$
         + OriginInfo.class.getName() + " as o inner join fetch o." //$NON-NLS-1$
         + OriginInfoPeer.SHIPMENT_INFO.getName() + " as s "; //$NON-NLS-1$
@@ -89,16 +90,17 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
     // Don't run this on the server unless you take into account timezones in
     // your inputs
-    private static final String SHIPMENTS_BY_DATE_RECEIVED_QRY = SHIPMENT_HQL_STRING
-        + " where s." //$NON-NLS-1$
-        + ShipmentInfoPeer.RECEIVED_AT.getName()
-        + " >= ? and s." //$NON-NLS-1$
-        + ShipmentInfoPeer.RECEIVED_AT.getName()
-        + " < ? and (o." //$NON-NLS-1$
-        + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
-        + "= ? or o." //$NON-NLS-1$
-        + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
-        + " = ?)"; //$NON-NLS-1$
+    private static final String SHIPMENTS_BY_DATE_RECEIVED_QRY =
+        SHIPMENT_HQL_STRING
+            + " where s." //$NON-NLS-1$
+            + ShipmentInfoPeer.RECEIVED_AT.getName()
+            + " >= ? and s." //$NON-NLS-1$
+            + ShipmentInfoPeer.RECEIVED_AT.getName()
+            + " < ? and (o." //$NON-NLS-1$
+            + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
+            + "= ? or o." //$NON-NLS-1$
+            + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
+            + " = ?)"; //$NON-NLS-1$
 
     /**
      * Search for shipments in the site with the given date received. Don't use
@@ -123,16 +125,17 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
     // Don't run this on the server unless you take into account timezones in
     // your inputs
-    private static final String SHIPMENTS_BY_DATE_SENT_QRY = SHIPMENT_HQL_STRING
-        + " where s." //$NON-NLS-1$
-        + ShipmentInfoPeer.PACKED_AT.getName()
-        + " >= ? and s." //$NON-NLS-1$
-        + ShipmentInfoPeer.PACKED_AT.getName()
-        + " < ? and (o." //$NON-NLS-1$
-        + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
-        + "= ? or o." //$NON-NLS-1$
-        + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
-        + " = ?)"; //$NON-NLS-1$
+    private static final String SHIPMENTS_BY_DATE_SENT_QRY =
+        SHIPMENT_HQL_STRING
+            + " where s." //$NON-NLS-1$
+            + ShipmentInfoPeer.PACKED_AT.getName()
+            + " >= ? and s." //$NON-NLS-1$
+            + ShipmentInfoPeer.PACKED_AT.getName()
+            + " < ? and (o." //$NON-NLS-1$
+            + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
+            + "= ? or o." //$NON-NLS-1$
+            + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
+            + " = ?)"; //$NON-NLS-1$
 
     public static List<OriginInfoWrapper> getShipmentsByDateSent(
         WritableApplicationService appService, Date dateSent,
@@ -166,6 +169,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return LOG_PROVIDER;
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(OriginInfoPeer.CENTER));
@@ -175,6 +179,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         tasks.add(new OriginInfoFromClinicCheck(this));
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         // TODO: this SHOULD NOT be done in the wrappers. It should be done in

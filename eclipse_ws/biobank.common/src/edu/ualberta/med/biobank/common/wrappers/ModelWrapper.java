@@ -136,6 +136,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return appService;
     }
 
+    @Deprecated
     public void persist() throws Exception {
         WrapperTransaction.persist(this, appService);
     }
@@ -181,6 +182,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * 
      * @param tasks where to add the tasks
      */
+    @Deprecated
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(new PersistModelWrapperQueryTask<E>(this));
         tasks.add(check().stringLengths());
@@ -196,6 +198,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * 
      * @param tasks where to add the tasks
      */
+    @Deprecated
     protected void addDeleteTasks(TaskList tasks) {
         tasks.add(new DeleteModelWrapperQueryTask<E>(this));
     }
@@ -205,6 +208,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * 
      * @param tasks
      */
+    @Deprecated
     protected final void addPersistAndLogTasks(TaskList tasks) {
         addPersistTasks(tasks);
         log(LogAction.Type.PERSIST, tasks);
@@ -215,6 +219,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * 
      * @param tasks
      */
+    @Deprecated
     protected final void addDeleteAndLogTasks(TaskList tasks) {
         log(LogAction.Type.DELETE, tasks);
         addDeleteTasks(tasks);

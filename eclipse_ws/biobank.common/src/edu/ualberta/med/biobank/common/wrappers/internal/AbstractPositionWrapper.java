@@ -86,6 +86,7 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
                 AbstractPositionPeer.PROPERTIES));
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(AbstractPositionPeer.ROW));

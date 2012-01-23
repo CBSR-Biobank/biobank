@@ -383,6 +383,7 @@ public abstract class CenterWrapper<E extends Center> extends
 
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(CenterPeer.NAME));
@@ -394,6 +395,7 @@ public abstract class CenterWrapper<E extends Center> extends
         super.addPersistTasks(tasks);
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         super.addDeleteTasks(tasks);

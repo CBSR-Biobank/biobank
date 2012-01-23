@@ -50,13 +50,14 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     }
 
     @SuppressWarnings("nls")
-    private static final String STUDY_COLLECTION_QUERY = "select distinct studies from "
-        + Contact.class.getName()
-        + " as contacts inner join contacts."
-        + ContactPeer.STUDY_COLLECTION.getName()
-        + " as studies where contacts."
-        + Property.concatNames(ContactPeer.CLINIC, ClinicPeer.ID)
-        + " = ? order by studies.nameShort";
+    private static final String STUDY_COLLECTION_QUERY =
+        "select distinct studies from "
+            + Contact.class.getName()
+            + " as contacts inner join contacts."
+            + ContactPeer.STUDY_COLLECTION.getName()
+            + " as studies where contacts."
+            + Property.concatNames(ContactPeer.CLINIC, ClinicPeer.ID)
+            + " = ? order by studies.nameShort";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -93,18 +94,19 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     }
 
     @SuppressWarnings("nls")
-    public static final String PATIENT_COUNT_QRY = "select count(distinct patients) from "
-        + Clinic.class.getName()
-        + " as clinic join clinic."
-        + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
-        + " as oi join oi."
-        + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
-        + " as spcs join spcs."
-        + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevents join cevents."
-        + CollectionEventPeer.PATIENT.getName()
-        + " as patients where clinic."
-        + ClinicPeer.ID.getName() + "=?";
+    public static final String PATIENT_COUNT_QRY =
+        "select count(distinct patients) from "
+            + Clinic.class.getName()
+            + " as clinic join clinic."
+            + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
+            + " as oi join oi."
+            + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
+            + " as spcs join spcs."
+            + SpecimenPeer.COLLECTION_EVENT.getName()
+            + " as cevents join cevents."
+            + CollectionEventPeer.PATIENT.getName()
+            + " as patients where clinic."
+            + ClinicPeer.ID.getName() + "=?";
 
     /**
      * return number of patients that came for a visit in this clinic
@@ -116,20 +118,21 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     }
 
     @SuppressWarnings("nls")
-    public static final String PATIENT_COUNT_FOR_STUDY_QRY = "select count(distinct patients) from "
-        + Clinic.class.getName()
-        + " as clinic join clinic."
-        + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
-        + " as oi join oi."
-        + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
-        + " as spcs join spcs."
-        + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevents join cevents."
-        + CollectionEventPeer.PATIENT.getName()
-        + " as patients where clinic."
-        + ClinicPeer.ID.getName()
-        + "=? and patients."
-        + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
+    public static final String PATIENT_COUNT_FOR_STUDY_QRY =
+        "select count(distinct patients) from "
+            + Clinic.class.getName()
+            + " as clinic join clinic."
+            + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
+            + " as oi join oi."
+            + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
+            + " as spcs join spcs."
+            + SpecimenPeer.COLLECTION_EVENT.getName()
+            + " as cevents join cevents."
+            + CollectionEventPeer.PATIENT.getName()
+            + " as patients where clinic."
+            + ClinicPeer.ID.getName()
+            + "=? and patients."
+            + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
 
     public long getPatientCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException {
@@ -162,16 +165,17 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     }
 
     @SuppressWarnings("nls")
-    public static final String COLLECTION_EVENT_COUNT_QRY = "select count(cevent) from "
-        + Clinic.class.getName()
-        + " as clinic join clinic."
-        + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
-        + " as origins join origins."
-        + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
-        + " as spcs join spcs."
-        + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevent where clinic."
-        + CenterPeer.ID.getName() + "=?";
+    public static final String COLLECTION_EVENT_COUNT_QRY =
+        "select count(cevent) from "
+            + Clinic.class.getName()
+            + " as clinic join clinic."
+            + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
+            + " as origins join origins."
+            + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
+            + " as spcs join spcs."
+            + SpecimenPeer.COLLECTION_EVENT.getName()
+            + " as cevent where clinic."
+            + CenterPeer.ID.getName() + "=?";
 
     @Override
     public long getCollectionEventCount() throws ApplicationException,
@@ -182,20 +186,22 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     }
 
     @SuppressWarnings("nls")
-    private static final String COLLECTION_EVENT_COUNT_FOR_STUDY_QRY = "select count(distinct cEvent) from "
-        + Clinic.class.getName()
-        + " as clinic join clinic."
-        + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
-        + " as origins join origins."
-        + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
-        + " as specimens join specimens."
-        + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cEvent where clinic."
-        + ClinicPeer.ID.getName()
-        + "=? and "
-        + "cEvent."
-        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.STUDY,
-            StudyPeer.ID) + "=?";
+    private static final String COLLECTION_EVENT_COUNT_FOR_STUDY_QRY =
+        "select count(distinct cEvent) from "
+            + Clinic.class.getName()
+            + " as clinic join clinic."
+            + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
+            + " as origins join origins."
+            + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
+            + " as specimens join specimens."
+            + SpecimenPeer.COLLECTION_EVENT.getName()
+            + " as cEvent where clinic."
+            + ClinicPeer.ID.getName()
+            + "=? and "
+            + "cEvent."
+            + Property.concatNames(CollectionEventPeer.PATIENT,
+                PatientPeer.STUDY,
+                StudyPeer.ID) + "=?";
 
     /**
      * Count events for specimen that are been drawn at this clinic
@@ -207,6 +213,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         return getCountResult(appService, c);
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.deleteRemoved(this, ClinicPeer.CONTACT_COLLECTION);
@@ -214,6 +221,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         super.addPersistTasks(tasks);
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         tasks.add(new ClinicPreDeleteChecks(this));

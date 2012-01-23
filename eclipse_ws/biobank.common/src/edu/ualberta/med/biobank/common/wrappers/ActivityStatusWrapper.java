@@ -69,9 +69,10 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
 
         long usedCount = 0;
         for (Class<?> clazz : classes) {
-            StringBuilder sb = new StringBuilder("select count(x) from ") //$NON-NLS-1$
-                .append(clazz.getName()).append(
-                    " as x where x.activityStatus=?"); //$NON-NLS-1$
+            StringBuilder sb =
+                new StringBuilder("select count(x) from ") //$NON-NLS-1$
+                    .append(clazz.getName()).append(
+                        " as x where x.activityStatus=?"); //$NON-NLS-1$
             HQLCriteria c = new HQLCriteria(sb.toString(),
                 Arrays.asList(new Object[] { wrappedObject }));
             usedCount += getCountResult(appService, c);
@@ -107,7 +108,8 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
     public static List<ActivityStatusWrapper> getAllActivityStatuses(
         WritableApplicationService appService) throws ApplicationException {
 
-        List<ActivityStatusWrapper> activities = new ArrayList<ActivityStatusWrapper>();
+        List<ActivityStatusWrapper> activities =
+            new ArrayList<ActivityStatusWrapper>();
 
         HQLCriteria c = new HQLCriteria(ALL_ACTIVITY_STATUSES_QRY);
         List<ActivityStatus> result = appService.query(c);
@@ -190,6 +192,7 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
         return getName();
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(ActivityStatusPeer.NAME));
@@ -198,6 +201,7 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
         super.addPersistTasks(tasks);
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
 

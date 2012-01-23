@@ -17,7 +17,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * contact
  */
 public class ContactWrapper extends ContactBaseWrapper {
-    private static final String HAS_STUDIES_MSG = Messages.getString("ContactWrapper.delete.error.msg"); //$NON-NLS-1$
+    private static final String HAS_STUDIES_MSG = Messages
+        .getString("ContactWrapper.delete.error.msg"); //$NON-NLS-1$
 
     public ContactWrapper(WritableApplicationService appService,
         Contact wrappedObject) {
@@ -68,6 +69,7 @@ public class ContactWrapper extends ContactBaseWrapper {
         return wrappers;
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         String hasStudiesMsg = MessageFormat.format(HAS_STUDIES_MSG, getName());

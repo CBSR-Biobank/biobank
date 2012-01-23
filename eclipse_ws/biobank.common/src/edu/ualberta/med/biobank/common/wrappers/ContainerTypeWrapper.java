@@ -29,17 +29,21 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
-    public static final Property<Integer, ContainerType> ROW_CAPACITY = ContainerTypePeer.CAPACITY
-        .wrap(CapacityPeer.ROW_CAPACITY);
-    public static final Property<Integer, ContainerType> COL_CAPACITY = ContainerTypePeer.CAPACITY
-        .wrap(CapacityPeer.COL_CAPACITY);
+    public static final Property<Integer, ContainerType> ROW_CAPACITY =
+        ContainerTypePeer.CAPACITY
+            .wrap(CapacityPeer.ROW_CAPACITY);
+    public static final Property<Integer, ContainerType> COL_CAPACITY =
+        ContainerTypePeer.CAPACITY
+            .wrap(CapacityPeer.COL_CAPACITY);
     private static final Collection<Property<?, ? super ContainerType>> UNIQUE_NAME_PROPS,
         UNIQUE_NAME_SHORT_PROPS;
-    private static final String CONTAINER_TYPE_IS_USED_MSG = Messages.getString("ContainerTypeWrapper.container.type.isused.msg"); //$NON-NLS-1$
+    private static final String CONTAINER_TYPE_IS_USED_MSG = Messages
+        .getString("ContainerTypeWrapper.container.type.isused.msg"); //$NON-NLS-1$
 
     public static final List<Property<?, ? super ContainerType>> PROPERTIES;
     static {
-        List<Property<?, ? super ContainerType>> aList = new ArrayList<Property<?, ? super ContainerType>>();
+        List<Property<?, ? super ContainerType>> aList =
+            new ArrayList<Property<?, ? super ContainerType>>();
         aList.addAll(ContainerTypePeer.PROPERTIES);
         aList.add(ROW_CAPACITY);
         aList.add(COL_CAPACITY);
@@ -51,7 +55,8 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         UNIQUE_NAME_PROPS.add(ContainerTypePeer.SITE.to(SitePeer.ID));
         UNIQUE_NAME_PROPS.add(ContainerTypePeer.NAME);
 
-        UNIQUE_NAME_SHORT_PROPS = new ArrayList<Property<?, ? super ContainerType>>();
+        UNIQUE_NAME_SHORT_PROPS =
+            new ArrayList<Property<?, ? super ContainerType>>();
         UNIQUE_NAME_SHORT_PROPS.add(ContainerTypePeer.SITE.to(SitePeer.ID));
         UNIQUE_NAME_SHORT_PROPS.add(ContainerTypePeer.NAME_SHORT);
     };
@@ -72,7 +77,8 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     public Collection<ContainerTypeWrapper> getChildrenRecursively()
         throws ApplicationException {
-        List<ContainerTypeWrapper> allChildren = new ArrayList<ContainerTypeWrapper>();
+        List<ContainerTypeWrapper> allChildren =
+            new ArrayList<ContainerTypeWrapper>();
         List<ContainerTypeWrapper> children = getChildContainerTypeCollection();
         if (children != null) {
             for (ContainerTypeWrapper type : children) {
@@ -83,10 +89,11 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         return allChildren;
     }
 
-    private static final String IS_USED_BY_CONTAINERS_QRY = "select count(c) from " //$NON-NLS-1$
-        + Container.class.getName()
-        + " as c where c." //$NON-NLS-1$
-        + ContainerPeer.CONTAINER_TYPE.getName() + "=?"; //$NON-NLS-1$
+    private static final String IS_USED_BY_CONTAINERS_QRY =
+        "select count(c) from " //$NON-NLS-1$
+            + Container.class.getName()
+            + " as c where c." //$NON-NLS-1$
+            + ContainerPeer.CONTAINER_TYPE.getName() + "=?"; //$NON-NLS-1$
 
     public boolean isUsedByContainers() throws ApplicationException,
         BiobankQueryResultSizeException {
@@ -105,8 +112,10 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     public Set<SpecimenTypeWrapper> getSpecimenTypesRecursively()
         throws ApplicationException {
-        Set<SpecimenTypeWrapper> SpecimenTypes = new HashSet<SpecimenTypeWrapper>();
-        List<SpecimenTypeWrapper> sampleSubSet = getSpecimenTypeCollection(false);
+        Set<SpecimenTypeWrapper> SpecimenTypes =
+            new HashSet<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> sampleSubSet =
+            getSpecimenTypeCollection(false);
         if (sampleSubSet != null)
             SpecimenTypes.addAll(sampleSubSet);
         for (ContainerTypeWrapper type : getChildContainerTypeCollection()) {
@@ -217,21 +226,22 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
             ContainerTypeWrapper.class);
     }
 
-    private static final String CONTAINER_TYPES_BY_CAPACITY_QRY = "select ct from " //$NON-NLS-1$
-        + ContainerType.class.getName()
-        + " as ct join ct." //$NON-NLS-1$
-        + ContainerTypePeer.CAPACITY.getName()
-        + " as cap where ct." //$NON-NLS-1$
-        + ContainerTypePeer.SITE.getName()
-        + "=? and cap." //$NON-NLS-1$
-        + CapacityPeer.ROW_CAPACITY.getName()
-        + "=? and cap." //$NON-NLS-1$
-        + CapacityPeer.COL_CAPACITY.getName()
-        + "=? and ct." //$NON-NLS-1$
-        + ContainerTypePeer.SPECIMEN_TYPE_COLLECTION.getName()
-        + " is not empty and ct." //$NON-NLS-1$
-        + ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION.getName()
-        + " is empty"; //$NON-NLS-1$
+    private static final String CONTAINER_TYPES_BY_CAPACITY_QRY =
+        "select ct from " //$NON-NLS-1$
+            + ContainerType.class.getName()
+            + " as ct join ct." //$NON-NLS-1$
+            + ContainerTypePeer.CAPACITY.getName()
+            + " as cap where ct." //$NON-NLS-1$
+            + ContainerTypePeer.SITE.getName()
+            + "=? and cap." //$NON-NLS-1$
+            + CapacityPeer.ROW_CAPACITY.getName()
+            + "=? and cap." //$NON-NLS-1$
+            + CapacityPeer.COL_CAPACITY.getName()
+            + "=? and ct." //$NON-NLS-1$
+            + ContainerTypePeer.SPECIMEN_TYPE_COLLECTION.getName()
+            + " is not empty and ct." //$NON-NLS-1$
+            + ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION.getName()
+            + " is empty"; //$NON-NLS-1$
 
     /**
      * Get containers types with the given capacity in the given site. The
@@ -301,6 +311,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
             && RowColPos.PALLET_96_COL_MAX.equals(getColCapacity());
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(ContainerTypePeer.SITE));
@@ -323,6 +334,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         tasks.add(new ContainerTypePostPersistChecks(this));
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         String isUsedMsg = MessageFormat.format(CONTAINER_TYPE_IS_USED_MSG,
