@@ -37,11 +37,13 @@ public class CommentInfo implements ActionResult {
 
     public static void setCommentModelCollection(ActionContext actionContext,
         Collection<Comment> modelCommentList, Collection<CommentInfo> newList) {
-        if (newList != null) for (CommentInfo info : newList) {
-            Comment commentModel = info.getCommentModel(actionContext);
-            modelCommentList.add(commentModel);
-            // FIXME add a hibernate cascade?
-            actionContext.getSession().saveOrUpdate(commentModel);
+        if (newList != null) {
+            for (CommentInfo info : newList) {
+                Comment commentModel = info.getCommentModel(actionContext);
+                modelCommentList.add(commentModel);
+                // FIXME add a hibernate cascade?
+                actionContext.getSession().saveOrUpdate(commentModel);
+            }
         }
     }
 

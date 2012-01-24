@@ -8,7 +8,6 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
@@ -121,8 +120,8 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
     protected void setComments(ActionContext actionContext,
         ProcessingEvent peventToSave) {
         if (commentInfos != null) {
-            Collection<Comment> dbComments = CollectionUtils.getCollection(
-                peventToSave, ProcessingEventPeer.COMMENT_COLLECTION);
+            Collection<Comment> dbComments =
+                peventToSave.getCommentCollection();
             for (CommentInfo info : commentInfos) {
                 Comment commentModel = info.getCommentModel(actionContext);
                 dbComments.add(commentModel);

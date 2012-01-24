@@ -13,7 +13,6 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
-import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
@@ -26,7 +25,6 @@ import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventCreatePermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
@@ -35,7 +33,6 @@ import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
@@ -154,10 +151,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         ceventToSave.setActivityStatus(context.load(ActivityStatus.class,
             statusId));
 
-        Collection<Comment> commentsToSave = CollectionUtils.getCollection(
-            ceventToSave, CollectionEventPeer.COMMENT_COLLECTION);
-        CommentInfo
-            .setCommentModelCollection(context, commentsToSave, commentInfos);
+        CommentInfo.setCommentModelCollection(context,
+            ceventToSave.getCommentCollection(), commentInfos);
 
         setSourceSpecimens(context, ceventToSave);
 
@@ -220,11 +215,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 specimen.setCollectionEvent(ceventToSave);
                 // cascade will save-update the specimens from this list:
                 specimen.setOriginalCollectionEvent(ceventToSave);
-                Collection<Comment> commentsToSave = CollectionUtils
-                    .getCollection(specimen,
-                        SpecimenPeer.COMMENT_COLLECTION);
                 CommentInfo.setCommentModelCollection(context,
-                    commentsToSave, specInfo.comments);
+                    specimen.getCommentCollection(), specInfo.comments);
                 specimen.setCreatedAt(specInfo.createdAt);
                 specimen.setInventoryId(specInfo.inventoryId);
                 specimen.setQuantity(specInfo.quantity);
@@ -334,9 +326,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 EventAttr eventAttr;
                 if (ceventAttrInfo == null) {
                     eventAttr = new EventAttr();
-                    CollectionUtils.getCollection(cevent,
-                        CollectionEventPeer.EVENT_ATTR_COLLECTION).add(
-                        eventAttr);
+                    cevent.getEventAttrCollection().add(eventAttr);
                     eventAttr.setCollectionEvent(cevent);
                     eventAttr.setStudyEventAttr(sAttr);
                 } else {
