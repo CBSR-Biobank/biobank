@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="edu.ualberta.med.biobank.model" auto-import="false" default-cascade="none">
+	<class name="Principal" table="PRINCIPAL" lazy="true" polymorphism="explicit" abstract="false" >
+		<cache usage="read-write" />
+		<id name="id" type="integer" column="ID">
+			<generator class="increment"/>			
+		</id>
+          <version name="version" column="VERSION" access="field" />
+		<!-- Attributes mapping for the Principal class -->
+		<!-- Associations mapping for the Principal class -->
+		<set name="membershipCollection" lazy="true" cascade="all" inverse="true">
+			<cache usage="read-write" />
+			<key column="PRINCIPAL_ID" not-null="false" />
+			<one-to-many class="edu.ualberta.med.biobank.model.Membership"/>
+		</set>
+		<joined-subclass name="edu.ualberta.med.biobank.model.User" table="USER" lazy="true">
+			<key column="PRINCIPAL_ID" />
+			<!-- Attributes mapping for the User class -->
+			<property name="login" type="string" column="LOGIN"/>
+			<property name="csmUserId" type="long" column="CSM_USER_ID"/>
+			<property name="recvBulkEmails" type="boolean" column="RECV_BULK_EMAILS"/>
+			<property name="fullName" type="string" column="FULL_NAME"/>
+			<property name="email" type="string" column="EMAIL"/>
+			<property name="needPwdChange" type="boolean" column="NEED_PWD_CHANGE"/>
+			<!-- Associations mapping for the User class -->
+				<many-to-one name="activityStatus" class="edu.ualberta.med.biobank.model.ActivityStatus" column="ACTIVITY_STATUS_ID" lazy="proxy" not-null="true" cascade="none"/>
+			<set name="commentCollection" lazy="true" cascade="none" inverse="false">
+				<cache usage="read-write" />
+				<key column="USER_ID" not-null="false" />
+				<one-to-many class="edu.ualberta.med.biobank.model.Comment"/>
+			</set>
+			<set name="groupCollection" table="GROUP_USER" lazy="true" inverse="true">
+				<cache usage="read-write" />
+				<key column="USER_ID" />
+				<many-to-many class="edu.ualberta.med.biobank.model.BbGroup" column="GROUP_ID" />
+			</set>
+		</joined-subclass>
+		<joined-subclass name="edu.ualberta.med.biobank.model.BbGroup" table="BB_GROUP" lazy="true">
+			<key column="PRINCIPAL_ID" />
+			<!-- Attributes mapping for the BbGroup class -->
+			<property name="name" type="string" column="NAME"/>
+			<property name="description" type="string" column="DESCRIPTION"/>
+			<!-- Associations mapping for the BbGroup class -->
+			<set name="userCollection" table="GROUP_USER" lazy="true" inverse="false">
+				<cache usage="read-write" />
+				<key column="GROUP_ID" />
+				<many-to-many class="edu.ualberta.med.biobank.model.User" column="USER_ID" />
+			</set>
+		</joined-subclass>
+	</class>
+</hibernate-mapping>

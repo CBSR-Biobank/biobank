@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="edu.ualberta.med.biobank.model" auto-import="false" default-cascade="none">
+	<class name="Comment" table="COMMENT" lazy="true" polymorphism="explicit" abstract="false" >
+		<cache usage="read-write" />
+		<id name="id" type="integer" column="ID">
+			<generator class="increment"/>			
+		</id>
+          <version name="version" column="VERSION" access="field" />
+		<!-- Attributes mapping for the Comment class -->
+		<property name="message" type="text" column="MESSAGE"/>
+		<property name="createdAt" type="java.util.Date" column="CREATED_AT"/>
+		<!-- Associations mapping for the Comment class -->
+			<many-to-one name="user" class="edu.ualberta.med.biobank.model.User" column="USER_ID" lazy="proxy" not-null="true" cascade="none"/>
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="edu.ualberta.med.biobank.model" auto-import="false" default-cascade="none">
+	<class name="StudyEventAttr" table="STUDY_EVENT_ATTR" lazy="true" polymorphism="explicit" abstract="false" >
+		<cache usage="read-write" />
+		<id name="id" type="integer" column="ID">
+			<generator class="increment"/>			
+		</id>
+          <version name="version" column="VERSION" access="field" />
+		<!-- Attributes mapping for the StudyEventAttr class -->
+		<property name="permissible" type="text" column="PERMISSIBLE"/>
+		<property name="required" type="boolean" column="REQUIRED"/>
+		<!-- Associations mapping for the StudyEventAttr class -->
+			<many-to-one name="globalEventAttr" class="edu.ualberta.med.biobank.model.GlobalEventAttr" column="GLOBAL_EVENT_ATTR_ID" lazy="proxy" not-null="true" cascade="none"/>
+			<many-to-one name="study" class="edu.ualberta.med.biobank.model.Study" column="STUDY_ID" lazy="proxy" not-null="true" cascade="none"/>
+			<many-to-one name="activityStatus" class="edu.ualberta.med.biobank.model.ActivityStatus" column="ACTIVITY_STATUS_ID" lazy="proxy" not-null="true" cascade="none"/>
+	</class>
+</hibernate-mapping>

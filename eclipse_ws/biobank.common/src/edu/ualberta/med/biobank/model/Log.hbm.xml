@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="edu.ualberta.med.biobank.model" auto-import="false" default-cascade="none">
+	<class name="Log" table="LOG" lazy="true" polymorphism="explicit" abstract="false" >
+		<cache usage="read-write" />
+		<id name="id" type="integer" column="ID">
+			<generator class="identity"/>			
+		</id>
+		<!-- Attributes mapping for the Log class -->
+		<property name="username" type="string" length="100" column="USERNAME"/>
+		<property name="createdAt" type="java.util.Date" column="CREATED_AT"/>
+		<property name="center" type="string" length="50" column="CENTER"/>
+		<property name="action" type="string" length="100" column="ACTION"/>
+		<property name="patientNumber" type="string" length="100" column="PATIENT_NUMBER"/>
+		<property name="inventoryId" type="string" length="100" column="INVENTORY_ID"/>
+		<property name="locationLabel" type="string" length="255" column="LOCATION_LABEL"/>
+		<property name="details" type="text" column="DETAILS"/>
+		<property name="type" type="string" length="100" column="TYPE"/>
+	</class>
+</hibernate-mapping>

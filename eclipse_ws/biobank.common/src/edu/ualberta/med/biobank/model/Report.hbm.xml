@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="edu.ualberta.med.biobank.model" auto-import="false" default-cascade="none">
+	<class name="Report" table="REPORT" lazy="true" polymorphism="explicit" abstract="false" >
+		<cache usage="read-write" />
+		<id name="id" type="integer" column="ID">
+			<generator class="increment"/>			
+		</id>
+          <version name="version" column="VERSION" access="field" />
+		<!-- Attributes mapping for the Report class -->
+		<property name="name" type="string" length="255" column="NAME"/>
+		<property name="description" type="text" column="DESCRIPTION"/>
+		<property name="userId" type="integer" column="USER_ID"/>
+		<property name="isPublic" type="boolean" column="IS_PUBLIC"/>
+		<property name="isCount" type="boolean" column="IS_COUNT"/>
+		<!-- Associations mapping for the Report class -->
+		<set name="reportColumnCollection" lazy="true" cascade="all" inverse="false">
+			<cache usage="read-write" />
+			<key column="REPORT_ID" not-null="false" />
+			<one-to-many class="edu.ualberta.med.biobank.model.ReportColumn"/>
+		</set>
+			<many-to-one name="entity" class="edu.ualberta.med.biobank.model.Entity" column="ENTITY_ID" lazy="false" not-null="true" cascade="none"/>
+		<set name="reportFilterCollection" lazy="true" cascade="all" inverse="false">
+			<cache usage="read-write" />
+			<key column="REPORT_ID" not-null="false" />
+			<one-to-many class="edu.ualberta.med.biobank.model.ReportFilter"/>
+		</set>
+	</class>
+</hibernate-mapping>

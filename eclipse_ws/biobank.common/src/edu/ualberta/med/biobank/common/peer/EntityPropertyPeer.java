@@ -1,0 +1,100 @@
+package edu.ualberta.med.biobank.common.peer;
+
+import edu.ualberta.med.biobank.common.util.TypeReference;
+import java.util.Collections;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import java.util.List;
+import java.util.ArrayList;
+import edu.ualberta.med.biobank.model.EntityFilter;
+import edu.ualberta.med.biobank.model.PropertyType;
+import edu.ualberta.med.biobank.model.EntityColumn;
+import java.util.Collection;
+import edu.ualberta.med.biobank.model.EntityProperty;
+
+public class EntityPropertyPeer {
+	public static final Property<Integer, EntityProperty> ID = Property.create(
+		"id" //$NON-NLS-1$
+		, EntityProperty.class
+		, new TypeReference<Integer>() {}
+		, new Property.Accessor<Integer, EntityProperty>() { private static final long serialVersionUID = 1L;
+			@Override
+			public Integer get(EntityProperty model) {
+				return model.getId();
+			}
+			@Override
+			public void set(EntityProperty model, Integer value) {
+				model.setId(value);
+			}
+		});
+
+	public static final Property<String, EntityProperty> PROPERTY = Property.create(
+		"property" //$NON-NLS-1$
+		, EntityProperty.class
+		, new TypeReference<String>() {}
+		, new Property.Accessor<String, EntityProperty>() { private static final long serialVersionUID = 1L;
+			@Override
+			public String get(EntityProperty model) {
+				return model.getProperty();
+			}
+			@Override
+			public void set(EntityProperty model, String value) {
+				model.setProperty(value);
+			}
+		});
+
+	public static final Property<Collection<EntityFilter>, EntityProperty> ENTITY_FILTER_COLLECTION = Property.create(
+		"entityFilterCollection" //$NON-NLS-1$
+		, EntityProperty.class
+		, new TypeReference<Collection<EntityFilter>>() {}
+		, new Property.Accessor<Collection<EntityFilter>, EntityProperty>() { private static final long serialVersionUID = 1L;
+			@Override
+			public Collection<EntityFilter> get(EntityProperty model) {
+				return model.getEntityFilterCollection();
+			}
+			@Override
+			public void set(EntityProperty model, Collection<EntityFilter> value) {
+				model.setEntityFilterCollection(value);
+			}
+		});
+
+	public static final Property<PropertyType, EntityProperty> PROPERTY_TYPE = Property.create(
+		"propertyType" //$NON-NLS-1$
+		, EntityProperty.class
+		, new TypeReference<PropertyType>() {}
+		, new Property.Accessor<PropertyType, EntityProperty>() { private static final long serialVersionUID = 1L;
+			@Override
+			public PropertyType get(EntityProperty model) {
+				return model.getPropertyType();
+			}
+			@Override
+			public void set(EntityProperty model, PropertyType value) {
+				model.setPropertyType(value);
+			}
+		});
+
+	public static final Property<Collection<EntityColumn>, EntityProperty> ENTITY_COLUMN_COLLECTION = Property.create(
+		"entityColumnCollection" //$NON-NLS-1$
+		, EntityProperty.class
+		, new TypeReference<Collection<EntityColumn>>() {}
+		, new Property.Accessor<Collection<EntityColumn>, EntityProperty>() { private static final long serialVersionUID = 1L;
+			@Override
+			public Collection<EntityColumn> get(EntityProperty model) {
+				return model.getEntityColumnCollection();
+			}
+			@Override
+			public void set(EntityProperty model, Collection<EntityColumn> value) {
+				model.setEntityColumnCollection(value);
+			}
+		});
+
+   public static final List<Property<?, ? super EntityProperty>> PROPERTIES;
+   static {
+      List<Property<?, ? super EntityProperty>> aList = new ArrayList<Property<?, ? super EntityProperty>>();
+      aList.add(ID);
+      aList.add(PROPERTY);
+      aList.add(ENTITY_FILTER_COLLECTION);
+      aList.add(PROPERTY_TYPE);
+      aList.add(ENTITY_COLUMN_COLLECTION);
+      PROPERTIES = Collections.unmodifiableList(aList);
+   };
+}

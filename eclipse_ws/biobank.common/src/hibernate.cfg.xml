@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+	
+		<!-- Properties for the session factory -->
+		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="connection.url">jdbc:mysql://localhost:3306/biobank</property>
+		<property name="connection.username">dummy</property>
+		<property name="connection.password">ozzy498</property>
+		<property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
+		<property name="c3p0.max_size">10</property>
+		<property name="c3p0.min_size">2</property>
+		<property name="c3p0.timeout">5000</property>
+		<property name="c3p0.max_statements">100</property>
+		<property name="c3p0.idle_test_period">3000</property>
+		<property name="c3p0.acquire_increment">2</property>
+		<property name="c3p0.validate">false</property>
+		<property name="show_sql">false</property>
+		<property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
+		<property name="max_fetch_depth">1</property>
+		<property name="bytecode.use_reflection_optimizer">false</property>
+		<property name="jdbc.batch_versioned_data">true</property>
+		<property name="jdbc.use_streams_for_binary">true</property>
+		<property name="cache.use_query_cache">false</property>
+		<property name="cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
+
+		<!-- Mapped Resources -->
+		<mapping resource="edu/ualberta/med/biobank/model/StudyEventAttr.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/EventAttrType.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Study.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/ContainerType.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/EventAttr.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/AbstractPosition.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Address.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Capacity.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Patient.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Specimen.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/SpecimenType.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/GlobalEventAttr.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/AliquotedSpecimen.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/ContainerLabelingScheme.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Contact.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/ShippingMethod.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/ActivityStatus.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/SourceSpecimen.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Log.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/CollectionEvent.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Dispatch.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Container.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/DispatchSpecimen.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Report.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/ReportFilter.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/EntityFilter.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/ReportFilterValue.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Entity.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/EntityColumn.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/PropertyType.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/ReportColumn.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/PropertyModifier.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/EntityProperty.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Request.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/RequestSpecimen.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Center.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/ShipmentInfo.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/OriginInfo.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/ProcessingEvent.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/PrintedSsInvItem.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/PrinterLabelTemplate.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/JasperTemplate.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Role.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Permission.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Membership.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Principal.hbm.xml" />
+		<mapping resource="edu/ualberta/med/biobank/model/Comment.hbm.xml" />
+	</session-factory>
+</hibernate-configuration>
+
+        
