@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd">
+      <diskStore path="java.io.tmpdir"/>
+ 
+      <defaultCache
+            maxElementsInMemory="500"
+            eternal="false"
+            timeToIdleSeconds="1800"
+            timeToLiveSeconds="100000"
+            overflowToDisk="false"/>
+
+      <cache name="gov.nih.nci.security.attributelevel.ClassAttributeMap"
+            maxElementsInMemory="500"
+            eternal="false"
+            timeToIdleSeconds="1800"
+            timeToLiveSeconds="100000"
+            overflowToDisk="false"/>
+</ehcache>
