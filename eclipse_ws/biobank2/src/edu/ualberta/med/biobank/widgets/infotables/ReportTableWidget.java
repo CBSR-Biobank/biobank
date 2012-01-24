@@ -168,12 +168,11 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
             int size;
             if (list instanceof AbstractBiobankListProxy) {
                 size = ((AbstractBiobankListProxy<?>) list).getRealSize();
-            } else {
+            } else if (list != null) {
                 size = list.size();
-            }
-
-            if (size > 0) {
-                paginationWidget.setTableMaxRows(size);
+                if (size > 0) {
+                    paginationWidget.setTableMaxRows(size);
+                }
             }
         }
     }

@@ -105,6 +105,10 @@ public class LogQueryAction implements Action<ListResult<Log>> {
         ShipmentReadInfo sInfo = new ShipmentReadInfo();
 
         Query query = context.getSession().createQuery(qry.toString());
+        int i = 0;
+        for (Object o : parametersArgs) {
+            query.setParameter(i, parametersArgs.get(i++));
+        }
 
         List<Log> rows = query.list();
 
