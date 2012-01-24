@@ -8,16 +8,21 @@ import java.util.List;
 import org.eclipse.osgi.util.NLS;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.ListResult;
+import edu.ualberta.med.biobank.common.action.logging.LogQueryAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.LogPeer;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Log;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class LogQuery {
 
     private static LogQuery instance = null;
 
     private HashMap<String, String> searchQuery = new HashMap<String, String>();
-    private List<LogWrapper> dbResults = new ArrayList<LogWrapper>();
+    private ListResult<Log> dbResults;
 
     public static final String START_DATE_KEY = "startDate"; //$NON-NLS-1$
     public static final String END_DATE_KEY = "endDate"; //$NON-NLS-1$
@@ -53,7 +58,11 @@ public class LogQuery {
     }
 
     public List<LogWrapper> getDatabaseResults() {
-        return dbResults;
+        List<LogWrapper> logs = new ArrayList<LogWrapper>();
+        for (Log log : dbResults.getList()) {
+            logs.add(new LogWrapper(SessionManager.getAppService(), log));
+        }
+        return logs;
     }
 
     public void queryDatabase() {
@@ -90,9 +99,16 @@ public class LogQuery {
         endDateText = setValueIfEmpty(endDateText);
         Date endDate = formatDate(endDateText, DEFAULT_END_TIME);
 
-        dbResults = LogWrapper.getLogs(SessionManager.getAppService(), center,
-            user, startDate, endDate, action, patientNumber, inventoryId,
-            location, details, type);
+        try {
+            dbResults =
+                SessionManager.getAppService().doAction(
+                    new LogQueryAction(center,
+                        user, startDate, endDate, action, patientNumber,
+                        inventoryId,
+                        location, details, type));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Unable to retrieve logs", e);
+        }
     }
 
     private Date formatDate(String dateText, String time) {

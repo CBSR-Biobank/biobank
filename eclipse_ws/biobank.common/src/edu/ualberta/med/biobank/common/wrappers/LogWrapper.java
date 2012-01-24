@@ -28,6 +28,7 @@ public class LogWrapper extends LogBaseWrapper {
         super(appService, log);
     }
 
+    @Deprecated
     public static List<LogWrapper> getLogs(
         final WritableApplicationService appService, String center,
         String username, Date startDate, Date endDate, String action,
