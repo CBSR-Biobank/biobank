@@ -12,9 +12,7 @@ import java.util.Set;
 import org.hibernate.Query;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicDeleteAction;
@@ -58,9 +56,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * 
  */
 public class TestStudy extends TestAction {
-
-    @Rule
-    public TestName testname = new TestName();
 
     private String name;
     private StudySaveAction studySaveAction;

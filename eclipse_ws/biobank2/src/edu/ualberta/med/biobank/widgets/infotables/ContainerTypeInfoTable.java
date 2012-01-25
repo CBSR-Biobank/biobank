@@ -11,7 +11,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 
-import edu.ualberta.med.biobank.common.action.info.ContainerTypeInfo;
+import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
-public class ContainerTypeInfoTable extends InfoTableWidget<ContainerTypeInfo> {
+public class ContainerTypeInfoTable extends InfoTableWidget<SiteContainerTypeInfo> {
 
     private static class TableRowData {
         ContainerTypeWrapper containerType;
@@ -51,7 +51,7 @@ public class ContainerTypeInfoTable extends InfoTableWidget<ContainerTypeInfo> {
     private SiteAdapter siteAdapter;
 
     public ContainerTypeInfoTable(Composite parent, SiteAdapter site,
-        List<ContainerTypeInfo> containerTypeInfo) {
+        List<SiteContainerTypeInfo> containerTypeInfo) {
         super(parent, containerTypeInfo, HEADINGS, 10,
             ContainerTypeWrapper.class);
         siteAdapter = site;
@@ -94,7 +94,7 @@ public class ContainerTypeInfoTable extends InfoTableWidget<ContainerTypeInfo> {
     public Object getCollectionModelObject(Object type) throws Exception {
         TableRowData info = new TableRowData();
 
-        ContainerTypeInfo containerTypeInfo = (ContainerTypeInfo) type;
+        SiteContainerTypeInfo containerTypeInfo = (SiteContainerTypeInfo) type;
 
         info.containerType = new ContainerTypeWrapper(
             siteAdapter.getAppService(), containerTypeInfo.getContainerType());

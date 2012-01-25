@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -14,6 +15,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
+import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
@@ -31,6 +33,8 @@ import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSav
 import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
@@ -114,8 +118,24 @@ public class TestProcessingEvent extends TestAction {
                     Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
             .getId();
 
-        // FIXME should test adding specimens that with invalid types (according
-        // to the study)
+        // create aliquoted specimens by doing a scan link
+        Set<AliquotedSpecimenInfo> aliquotedSpecimenInfos =
+            new HashSet<AliquotedSpecimenInfo>();
+        for (int i = 0, n = R.nextInt(5) + 1; i < n; i++) {
+            AliquotedSpecimenInfo aliquotedSpecimenInfo =
+                new AliquotedSpecimenInfo();
+            aliquotedSpecimenInfo.inventoryId = Utils.getRandomString(10, 15);
+            aliquotedSpecimenInfo.typeId = getSpecimenTypes().get(0).getId();
+            aliquotedSpecimenInfo.statusId = ActivityStatusEnum.ACTIVE.getId();
+            aliquotedSpecimenInfo.parentSpecimenId =
+                sourceSpecs.get(0).specimen.getId();
+            aliquotedSpecimenInfo.containerId = null;
+            aliquotedSpecimenInfo.position = null;
+            aliquotedSpecimenInfos.add(aliquotedSpecimenInfo);
+        }
+
+        EXECUTOR.exec(new SpecimenLinkSaveAction(provisioning.siteId,
+            provisioning.studyId, aliquotedSpecimenInfos));
 
         // Check ProcessingEvent is in database with correct values
         PEventInfo peventInfo =

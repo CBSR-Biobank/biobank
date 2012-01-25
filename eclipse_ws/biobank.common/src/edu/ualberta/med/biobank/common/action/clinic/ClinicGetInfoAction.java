@@ -92,23 +92,6 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
         public Long collectionEventCount;
         public List<Contact> contacts;
         public List<StudyCountInfo> studyInfos;
-
-        public Clinic getClinic() {
-            return clinic;
-        }
-
-        public Long getPatientCount() {
-            return patientCount;
-        }
-
-        public Long getCeventCount() {
-            return collectionEventCount;
-        }
-
-        public List<StudyCountInfo> getStudyInfos() {
-            return studyInfos;
-        }
-
     }
 
 }

@@ -3,13 +3,13 @@ package edu.ualberta.med.biobank.common.action.info;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.model.ContainerType;
 
-public class ContainerTypeInfo implements ActionResult {
+public class SiteContainerTypeInfo implements ActionResult {
     private static final long serialVersionUID = 1L;
 
     private final ContainerType containerType;
     private final Long containerCount;
 
-    public ContainerTypeInfo(ContainerType containerType,
+    public SiteContainerTypeInfo(ContainerType containerType,
         Long containerCount) {
         this.containerType = containerType;
         this.containerCount = containerCount;
@@ -38,7 +38,7 @@ public class ContainerTypeInfo implements ActionResult {
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        ContainerTypeInfo other = (ContainerTypeInfo) obj;
+        SiteContainerTypeInfo other = (SiteContainerTypeInfo) obj;
         if (containerType == null) {
             if (other.containerType != null) return false;
         } else if (!containerType.equals(other.containerType)) return false;

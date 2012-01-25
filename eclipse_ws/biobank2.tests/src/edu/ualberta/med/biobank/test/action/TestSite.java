@@ -9,9 +9,7 @@ import java.util.Set;
 import org.hibernate.Query;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
@@ -52,9 +50,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestSite extends TestAction {
 
-    @Rule
-    public TestName testname = new TestName();
-
     private String name;
 
     private SiteSaveAction siteSaveAction;
@@ -63,7 +58,7 @@ public class TestSite extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + R.nextInt();
+        name = getMethodNameR();
 
         siteSaveAction =
             SiteHelper.getSaveAction(name, name, ActivityStatusEnum.ACTIVE);
@@ -75,8 +70,7 @@ public class TestSite extends TestAction {
         siteSaveAction.setName(null);
         try {
             EXECUTOR.exec(siteSaveAction);
-            Assert.fail(
-                "should not be allowed to add site with no name");
+            Assert.fail("should not be allowed to add site with no name");
         } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
@@ -314,7 +308,8 @@ public class TestSite extends TestAction {
         Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
 
         List<ContainerLabelingScheme> labelingSchemes =
-            getContainerLabelingSchemes();
+            new ArrayList<ContainerLabelingScheme>(
+                getContainerLabelingSchemes().values());
 
         String ctName = name + "FREEZER01";
 
