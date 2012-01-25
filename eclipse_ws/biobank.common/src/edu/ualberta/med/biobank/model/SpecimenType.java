@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.model;
 
 import org.hibernate.validator.NotEmpty;
 import java.util.Collection;
-import java.util.HashSet;
 
 import java.io.Serializable;
 /**
@@ -10,14 +9,12 @@ import java.io.Serializable;
 	**/
 	
 
-public class SpecimenType  implements IBiobankModel
+public class SpecimenType  implements Serializable
 {
 	/**
 	* An attribute to allow serialization of the domain objects
 	*/
 	private static final long serialVersionUID = 1234567890L;
-
-        private Integer version;
 
 	
 	/**
@@ -92,8 +89,7 @@ public class SpecimenType  implements IBiobankModel
 	* An associated edu.ualberta.med.biobank.model.ContainerType object's collection 
 	**/
 			
-	private Collection<ContainerType> containerTypeCollection = new HashSet<ContainerType>();
-
+	private Collection<ContainerType> containerTypeCollection;
 	/**
 	* Retrieves the value of the containerTypeCollection attribute
 	* @return containerTypeCollection
@@ -115,8 +111,7 @@ public class SpecimenType  implements IBiobankModel
 	* An associated edu.ualberta.med.biobank.model.SpecimenType object's collection 
 	**/
 			
-	private Collection<SpecimenType> parentSpecimenTypeCollection = new HashSet<SpecimenType>();
-
+	private Collection<SpecimenType> parentSpecimenTypeCollection;
 	/**
 	* Retrieves the value of the parentSpecimenTypeCollection attribute
 	* @return parentSpecimenTypeCollection
@@ -160,8 +155,7 @@ public class SpecimenType  implements IBiobankModel
 		return 0;
 	}
 	
-	private Collection<SpecimenType> childSpecimenTypeCollection = new HashSet<SpecimenType>();
-
+	private Collection<SpecimenType> childSpecimenTypeCollection;
 	public Collection<SpecimenType> getChildSpecimenTypeCollection(){
 		return childSpecimenTypeCollection;
 	}

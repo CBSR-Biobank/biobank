@@ -6,10 +6,9 @@
 		<id name="id" type="integer" column="ID">
 			<generator class="increment"/>			
 		</id>
-          <version name="version" column="VERSION" access="field" />
 		<!-- Attributes mapping for the SpecimenType class -->
-		<property name="name" type="string" length="100" column="NAME" unique="true" not-null="true"/>
-		<property name="nameShort" type="string" length="50" column="NAME_SHORT" unique="true" not-null="true"/>
+		<property name="name" type="string" column="NAME"/>
+		<property name="nameShort" type="string" column="NAME_SHORT"/>
 		<!-- Associations mapping for the SpecimenType class -->
 		<set name="containerTypeCollection" table="CONTAINER_TYPE_SPECIMEN_TYPE" lazy="true" inverse="true">
 			<cache usage="read-write" />
