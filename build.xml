@@ -15,33 +15,14 @@
 
   <property environment="env" />
 
-  <property name="server.version.num" value="3.2.0.rc1" />
-  <property name="java.client.version.num" value="3.2.0.rc1" />
+  <!-- TODO: move as many properties as possible into build.properties -->
+  <!-- TODO: add tasks to push database properties to various files -->
+  <!-- TODO: create a cacore directory with all the cacore stuff in it
+  that we can throw into the war file and use to create the database --> 
+  <property file="build.properties" />
 
-  <property name="database.host" value="localhost" />
-  <property name="database.name" value="biobank" />
-  <property name="database.username" value="dummy" />
-  <property name="database.password" value="ozzy498" />
+  <import file="build-db.xml"/>
 
-  <property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
-
-  <property name="eclipse.workspace.dir" location="eclipse_ws" />
-  <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
-  <property name="eclipse.proj.dir.mvp" location="eclipse_ws/biobank.mvp" />
-  <property name="eclipse.proj.dir.gui.common" location="eclipse_ws/biobank.gui.common" />
-  <property name="eclipse.proj.dir.common" location="eclipse_ws/biobank.common" />
-  <property name="eclipse.proj.dir.tools" location="eclipse_ws/biobank2.tools" />
-  <property name="eclipse.proj.dir.tests" location="eclipse_ws/biobank2.tests" />
-  <property name="eclipse.proj.dir.server" location="eclipse_ws/server" />
-  <property name="scripts.proj.dir" location="scripts" />
-  <property name="data.dir" location="data" />
-  <property name="data.sql.dir" location="${data.dir}/sql" />
-  <property name="schema.dir" location="schema" />
-  <property name="secu-log.dir" location="security-logs" />
-  <property name="product.dir" location="${basedir}/product" />
-
-  <property name="req.jars.dir" value="jars" />
-  <property name="converage.output" location="coverage" />
   <condition property="perl" value="perl" else="/usr/bin/perl">
     <os family="windows" />
   </condition>
@@ -101,7 +82,6 @@
   </path>
 
   <!-- Eclipse -->
-  <!-- updates version property for eclipse product file -->
   <target name="biobank-product-version-modify">
     <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
       prefix="biobank2.product" />
@@ -113,7 +93,6 @@
       overwrite="true"/>
   </target>
 
-  <!-- updates version property for eclipse feature.xml file -->
   <target name="biobank-feature-core-version-modify">
     <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
       prefix="biobank2.feature.core" />
@@ -125,7 +104,6 @@
       overwrite="true"/>
   </target>
 
-  <!-- updates version property for eclipse feature.xml file -->
   <target name="biobank-feature-platform-version-modify">
     <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
     prefix="biobank2.feature.platform" />
@@ -143,7 +121,6 @@
     <antcall target="biobank-feature-platform-version-modify" />
   </target>
 
-  <!-- update version numbers in manifest and about.mappings -->
   <target name="java-client-manifest">
     <manifest file="${eclipse.proj.dir}/META-INF/MANIFEST.MF" mode="update">
       <attribute name="Bundle-Version" value="${java.client.version.num}" />
@@ -366,82 +343,6 @@
     <!-- the order these are called in is important for now -->
     <antcall target="deploy-jboss" />
     <antcall target="deploy-eclipse" />
-  </target>
-
-  <target name="schema"
-          depends="sdk"
-          description="generates the database schema for the caCORE SDK data model">
-    <ant dir="${schema.dir}" target="schemaexport" inheritRefs="false" />
-  </target>
-
-  <target name="dbcreate-add-tables" depends="sdk,package-webapp-orm">
-    <sql driver="${DB_DRIVER}"
-         url="${DB_CONNECTION_URL}"
-         userid="${DB_USERNAME}"
-         password="${DB_PASSWORD}">
-      DROP DATABASE IF EXISTS ${PROJECT_NAME};
-      CREATE DATABASE ${PROJECT_NAME};
-      ALTER DATABASE `${PROJECT_NAME}` DEFAULT CHARACTER SET latin1 COLLATE latin1_general_cs;
-      <classpath>
-        <fileset dir="${cacore.sdk.dir}/system/lib">
-          <include name="*.jar" />
-        </fileset>
-      </classpath>
-    </sql>
-    <antcall target="schema" />
-    <sql driver="${DB_DRIVER}"
-         url="${DB_CONNECTION_URL}"
-         userid="${DB_USERNAME}"
-         password="${DB_PASSWORD}">
-      <transaction src="${data.sql.dir}/createIndices.sql" />
-      <transaction src="${data.sql.dir}/uniqueConstraints.sql" />
-      <transaction src="${data.sql.dir}/activityStatus.sql" />
-      <transaction src="${data.sql.dir}/eventAttrType.sql" />
-      <transaction src="${data.sql.dir}/globalEventAttr.sql" />
-      <transaction src="${data.sql.dir}/specimenTypes.sql" />
-      <transaction src="${data.sql.dir}/containerLabelingScheme.sql" />
-      <transaction src="${data.sql.dir}/shippingMethod.sql" />
-      <transaction src="${data.sql.dir}/patientLabels.sql" />
-      <transaction src="${data.sql.dir}/advancedReportsData.sql" />
-      <transaction src="${data.sql.dir}/permissions.sql" />
-      <transaction src="${data.sql.dir}/groups.sql" />
-      <transaction src="${secu-log.dir}/schemaSecurity.sql" />
-      <transaction>commit;</transaction>
-      <classpath>
-        <fileset dir="${cacore.sdk.dir}/system/lib">
-          <include name="*.jar" />
-        </fileset>
-      </classpath>
-    </sql>
-  </target>
-
-  <target name="dbcreate-add-testuser" if="debug">
-    <sql driver="${DB_DRIVER}"
-         url="${DB_CONNECTION_URL}"
-         userid="${DB_USERNAME}"
-         password="${DB_PASSWORD}">
-      <transaction src="${secu-log.dir}/addTestUser.sql" />
-      <classpath>
-        <fileset dir="${cacore.sdk.dir}/system/lib">
-          <include name="*.jar" />
-        </fileset>
-      </classpath>
-    </sql>
-  </target>
-
-  <target name="dbcreate"
-          depends="dbcreate-add-tables,dbcreate-add-testuser"
-          description="creates the default tables">
-  </target>
-  
-  <target name="dbbackup"
-          description="makes a copy of the current biobank database">
-    <echo message="running scripts/dbbackup..." />
-    <exec executable="scripts/dbbackup"
-          failonerror="true"
-          output="biobank.sql">
-      <arg line="${database.host} ${database.username} ${database.password} ${database.name}" />
-    </exec>
   </target>
 
   <target name="build-common-project">
