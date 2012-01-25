@@ -148,10 +148,9 @@ public class TestContainerType extends TestAction {
             .getCommentCollection().size());
 
         containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
-            "HOTEL13", "H13", siteId, true, 13, 1,
+            "HOTEL13", "H13", siteId, false, 13, 1,
             getContainerLabelingSchemes().get("2 char numeric").getId());
-        Integer hotelCntainerTypeId =
-            EXECUTOR.exec(containerTypeSaveAction).getId();
+        EXECUTOR.exec(containerTypeSaveAction).getId();
         topContainerTypeInfo =
             EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
 

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
 
 public class ContainerTypeHelper {
@@ -20,5 +21,15 @@ public class ContainerTypeHelper {
         ctSaveAction.setChildLabelingSchemeId(childLabelingSchemeId);
 
         return ctSaveAction;
+    }
+
+    public static ContainerTypeSaveAction getSaveAction(
+        ContainerTypeInfo containerTypeInfo) {
+        ContainerTypeSaveAction containerTypeSaveAction =
+            new ContainerTypeSaveAction();
+        containerTypeSaveAction
+            .setId(containerTypeInfo.containerType.getId());
+        // TODO: requires implementation
+        return containerTypeSaveAction;
     }
 }

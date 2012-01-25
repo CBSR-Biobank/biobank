@@ -1,22 +1,27 @@
 package edu.ualberta.med.biobank.common.action.containerType;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
+import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCreatePermission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeUpdatePermission;
+import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SpecimenType;
 
 public class ContainerTypeSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
@@ -35,7 +40,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
     private String commentMessage;
 
     private Set<Integer> specimenTypeIds;
-    private Set<Integer> containerTypeIds;
+    private Set<Integer> childContainerTypeIds;
 
     public void setId(Integer containerTypeId) {
         this.containerTypeId = containerTypeId;
@@ -85,8 +90,8 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         this.specimenTypeIds = specimenTypeIds;
     }
 
-    public void setContainerTypeIds(Set<Integer> containerTypeIds) {
-        this.containerTypeIds = containerTypeIds;
+    public void setChildContainerTypeIds(Set<Integer> childContainerTypeIds) {
+        this.childContainerTypeIds = childContainerTypeIds;
     }
 
     @Override
@@ -158,6 +163,64 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
     }
 
     private void setContents(ActionContext context, ContainerType containerType) {
-        // TODO: this
+        if ((specimenTypeIds.size() > 0) &&
+            (childContainerTypeIds.size() > 0)) {
+            throw new ActionCheckException(
+                "container type cannot have both specimen types and child container types");
+        } else if (specimenTypeIds.size() > 0) {
+            setSpecimenTypes(context, containerType);
+        } else {
+            setChildContainerTypes(context, containerType);
+        }
+    }
+
+    private void setSpecimenTypes(ActionContext context,
+        ContainerType containerType) {
+        Map<Integer, SpecimenType> specimenTypes =
+            context.load(SpecimenType.class, specimenTypeIds);
+        containerType.setSpecimenTypeCollection(specimenTypes.values());
+        SetDifference<SpecimenType> specimenTypeDiff =
+            new SetDifference<SpecimenType>(
+                containerType.getSpecimenTypeCollection(),
+                specimenTypes.values());
+
+        // remove this container type from specimen types in removed list
+        for (SpecimenType specimenType : specimenTypeDiff.getRemoveSet()) {
+            Collection<ContainerType> containerTypes =
+                specimenType.getContainerTypeCollection();
+            if (containerTypes.remove(containerTypes)) {
+                specimenType.setContainerTypeCollection(containerTypes);
+            } else {
+                throw new ActionException(
+                    "container type not found in removed specimen type's collection");
+            }
+        }
+    }
+
+    private void setChildContainerTypes(ActionContext context,
+        ContainerType containerType) {
+        Map<Integer, ContainerType> childContainerTypes =
+            context.load(ContainerType.class, childContainerTypeIds);
+        containerType.setChildContainerTypeCollection(childContainerTypes
+            .values());
+        SetDifference<ContainerType> childContainerTypeDiff =
+            new SetDifference<ContainerType>(
+                containerType.getChildContainerTypeCollection(),
+                childContainerTypes.values());
+
+        // remove this parent container type from children container types in
+        // removed list
+        for (ContainerType childContainerType : childContainerTypeDiff
+            .getRemoveSet()) {
+            Collection<ContainerType> parentContainerTypes =
+                childContainerType.getParentContainerTypeCollection();
+            if (parentContainerTypes.remove(parentContainerTypes)) {
+                childContainerType
+                    .setChildContainerTypeCollection(parentContainerTypes);
+            } else {
+                throw new ActionException(
+                    "parent container type not found in removed child container type's collection");
+            }
+        }
     }
 }

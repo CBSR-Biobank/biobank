@@ -286,10 +286,10 @@ public class StudySaveAction implements Action<IdResult> {
     private void saveContacts(ActionContext context) {
         Map<Integer, Contact> contacts =
             context.load(Contact.class, contactIds);
-        study.setContactCollection(new HashSet<Contact>(contacts.values()));
         SetDifference<Contact> contactsDiff =
             new SetDifference<Contact>(study.getContactCollection(),
                 contacts.values());
+        study.setContactCollection(contactsDiff.getNewSet());
 
         for (Contact contact : contactsDiff.getAddSet()) {
             Collection<Study> contactStudies = contact.getStudyCollection();
@@ -325,10 +325,10 @@ public class StudySaveAction implements Action<IdResult> {
         }
 
         // delete source specimens no longer in use
-        study.setSourceSpecimenCollection(newSsCollection);
         SetDifference<SourceSpecimen> srcSpcsDiff =
             new SetDifference<SourceSpecimen>(
                 study.getSourceSpecimenCollection(), newSsCollection);
+        study.setSourceSpecimenCollection(newSsCollection);
         for (SourceSpecimen srcSpc : srcSpcsDiff.getRemoveSet()) {
             context.getSession().delete(srcSpc);
         }
@@ -355,9 +355,9 @@ public class StudySaveAction implements Action<IdResult> {
         SetDifference<AliquotedSpecimen> aqSpcsDiff =
             new SetDifference<AliquotedSpecimen>(
                 study.getAliquotedSpecimenCollection(), newAsCollection);
+        study.setAliquotedSpecimenCollection(aqSpcsDiff.getNewSet());
 
         // delete aliquoted specimens no longer in use
-        study.setAliquotedSpecimenCollection(aqSpcsDiff.getNewSet());
         for (AliquotedSpecimen aqSpc : aqSpcsDiff.getRemoveSet()) {
             context.getSession().delete(aqSpc);
         }
@@ -390,7 +390,6 @@ public class StudySaveAction implements Action<IdResult> {
         SetDifference<StudyEventAttr> attrsDiff =
             new SetDifference<StudyEventAttr>(
                 study.getStudyEventAttrCollection(), newEAttrCollection);
-
         study.setStudyEventAttrCollection(attrsDiff.getNewSet());
         for (StudyEventAttr attr : attrsDiff.getRemoveSet()) {
             context.getSession().delete(attr);
