@@ -33,6 +33,7 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
         OriginInfo oi = new OriginInfo();
 
         Center currentCenter = null;
+        Center wCenter = context.load(Center.class, workingCenter);
         for (Specimen spc : ship.getSpecimenCollection()) {
             if (currentCenter == null)
                 currentCenter = spc.getCurrentCenter();
@@ -40,8 +41,9 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
                 throw new ActionException(
                     "Specimens do not come from the same place.");
             spc.setOriginInfo(oi);
+            spc.setCurrentCenter(wCenter);
         }
-        oi.setCenter(context.load(Center.class, workingCenter));
+        oi.setCenter(wCenter);
         context.getSession().saveOrUpdate(oi);
         for (Specimen spc : ship.getSpecimenCollection()) {
             context.getSession().saveOrUpdate(spc);

@@ -11,14 +11,17 @@ public class OriginInfoSavePermission implements Permission {
 
     private Integer oiId;
 
-    public OriginInfoSavePermission(Integer oiId) {
+	private Integer workingCenterId;
+
+    public OriginInfoSavePermission(Integer oiId, Integer workingCenterId) {
         this.oiId = oiId;
+        this.workingCenterId=workingCenterId;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) {
         OriginInfo oi = context.get(OriginInfo.class, oiId, new OriginInfo());
-        return PermissionEnum.ORIGIN_INFO_UPDATE.isAllowed(context.getUser(),
+        return workingCenterId.equals(oi.getReceiverSite().getId()) && PermissionEnum.ORIGIN_INFO_UPDATE.isAllowed(context.getUser(),
             oi.getReceiverSite());
     }
 

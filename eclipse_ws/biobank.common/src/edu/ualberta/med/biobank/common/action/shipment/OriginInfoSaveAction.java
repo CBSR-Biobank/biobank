@@ -39,8 +39,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new OriginInfoSavePermission(oiInfo.oiId).isAllowed(context)
-            && new CenterAdminPermission(workingCenter).isAllowed(context);
+        return new OriginInfoSavePermission(oiInfo.oiId, workingCenter).isAllowed(context);
     }
 
     @Override
@@ -94,6 +93,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
                 OriginInfo newOriginInfo = new OriginInfo();
                 newOriginInfo.setCenter(center);
                 spec.setOriginInfo(newOriginInfo);
+                spec.setCurrentCenter(center);
                 context.getSession().saveOrUpdate(newOriginInfo);
                 context.getSession().saveOrUpdate(spec);
             }
@@ -104,6 +104,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
                 Specimen spec =
                     context.load(Specimen.class, specId);
                 spec.setOriginInfo(oi);
+                spec.setCurrentCenter(oi.getReceiverSite());
                 context.getSession().saveOrUpdate(spec);
             }
 

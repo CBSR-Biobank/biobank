@@ -86,6 +86,7 @@ public class TestShipment extends TestAction {
                 .equals(centerId));
             Assert.assertTrue(spec.getOriginInfo().getReceiverSite().getId()
                 .equals(siteId));
+            Assert.assertTrue(spec.getCurrentCenter().getId().equals(siteId));
         }
         for (Specimen spec : info.specimens)
             Assert.assertTrue(!oisave.removedSpecIds.contains(spec.getId()));
@@ -152,6 +153,9 @@ public class TestShipment extends TestAction {
             Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
                 .getOriginInfo().getReceiverSite().getId()
                 .equals(siteId));
+            Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
+                .getCurrentCenter().getId()
+                .equals(siteId));
         }
 
         ShipmentDeleteAction action = new ShipmentDeleteAction(id, siteId);
@@ -165,6 +169,9 @@ public class TestShipment extends TestAction {
                 .getOriginInfo()
                 .getCenter().getId()
                 .equals(siteId));
+            Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
+                    .getCurrentCenter().getId()
+                    .equals(siteId));
         }
 
     }
