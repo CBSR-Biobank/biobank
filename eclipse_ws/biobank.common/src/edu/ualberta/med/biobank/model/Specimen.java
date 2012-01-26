@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.model;
 import org.hibernate.validator.NotNull;
 import org.hibernate.validator.NotEmpty;
 import java.util.Collection;
+import java.util.HashSet;
 
 import java.io.Serializable;
 /**
@@ -17,6 +18,7 @@ public class Specimen  implements IBiobankModel
 	*/
 	private static final long serialVersionUID = 1234567890L;
 
+	private Integer version;
 	
 	/**
 	* 
@@ -67,7 +69,7 @@ public class Specimen  implements IBiobankModel
 	* 
 	**/
 	
-	public Collection<Comment> commentCollection;
+	public Collection<Comment> commentCollection = new HashSet<Comment>();
 	/**
 	* Retrieves the value of the comment attribute
 	* @return comment
@@ -134,7 +136,7 @@ public class Specimen  implements IBiobankModel
 	* An associated edu.ualberta.med.biobank.model.RequestSpecimen object's collection 
 	**/
 			
-	private Collection<RequestSpecimen> requestSpecimenCollection;
+	private Collection<RequestSpecimen> requestSpecimenCollection = new HashSet<RequestSpecimen>();
 	/**
 	* Retrieves the value of the requestSpecimenCollection attribute
 	* @return requestSpecimenCollection
@@ -177,7 +179,8 @@ public class Specimen  implements IBiobankModel
 	* An associated edu.ualberta.med.biobank.model.Specimen object's collection 
 	**/
 			
-	private Collection<Specimen> childSpecimenCollection;
+	public Collection<Specimen> childSpecimenCollection = new HashSet<Specimen>();
+	
 	/**
 	* Retrieves the value of the childSpecimenCollection attribute
 	* @return childSpecimenCollection
@@ -220,7 +223,7 @@ public class Specimen  implements IBiobankModel
 	* An associated edu.ualberta.med.biobank.model.DispatchSpecimen object's collection 
 	**/
 			
-	private Collection<DispatchSpecimen> dispatchSpecimenCollection;
+	private Collection<DispatchSpecimen> dispatchSpecimenCollection = new HashSet<DispatchSpecimen>();
 	/**
 	* Retrieves the value of the dispatchSpecimenCollection attribute
 	* @return dispatchSpecimenCollection

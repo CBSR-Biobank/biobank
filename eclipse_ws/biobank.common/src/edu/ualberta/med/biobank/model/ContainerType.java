@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.model;
 
 import org.hibernate.validator.NotEmpty;
 import java.util.Collection;
+import java.util.HashSet;
 
 import java.io.Serializable;
 /**
@@ -16,6 +17,7 @@ public class ContainerType  implements IBiobankModel
 	*/
 	private static final long serialVersionUID = 1234567890L;
 
+	private Integer version;
 	
 	/**
 	* 
@@ -133,7 +135,7 @@ public class ContainerType  implements IBiobankModel
 	* 
 	**/
 	
-	public Collection<Comment> commentCollection;
+	public Collection<Comment> commentCollection = new HashSet<Comment>();
 	/**
 	* Retrieves the value of the comment attribute
 	* @return comment
@@ -155,7 +157,7 @@ public class ContainerType  implements IBiobankModel
 	* An associated edu.ualberta.med.biobank.model.SpecimenType object's collection 
 	**/
 			
-	private Collection<SpecimenType> specimenTypeCollection;
+	private Collection<SpecimenType> specimenTypeCollection = new HashSet<SpecimenType>();
 	/**
 	* Retrieves the value of the specimenTypeCollection attribute
 	* @return specimenTypeCollection
@@ -177,7 +179,7 @@ public class ContainerType  implements IBiobankModel
 	* An associated edu.ualberta.med.biobank.model.ContainerType object's collection 
 	**/
 			
-	private Collection<ContainerType> childContainerTypeCollection;
+	private Collection<ContainerType> childContainerTypeCollection = new HashSet<ContainerType>();
 	/**
 	* Retrieves the value of the childContainerTypeCollection attribute
 	* @return childContainerTypeCollection
@@ -306,7 +308,7 @@ public class ContainerType  implements IBiobankModel
 	}
 	
 
-	private Collection<ContainerType> parentContainerTypeCollection;
+	private Collection<ContainerType> parentContainerTypeCollection = new HashSet<ContainerType>();
 	public Collection<ContainerType> getParentContainerTypeCollection(){
 		return parentContainerTypeCollection;
 	}

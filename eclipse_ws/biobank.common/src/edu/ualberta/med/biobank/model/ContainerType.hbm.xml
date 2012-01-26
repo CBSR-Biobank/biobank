@@ -6,6 +6,7 @@
 		<id name="id" type="integer" column="ID">
 			<generator class="increment"/>			
 		</id>
+          <version name="version" column="VERSION" access="field" />
 		<!-- Attributes mapping for the ContainerType class -->
 		<property name="name" type="string" column="NAME"/>
 		<property name="nameShort" type="string" column="NAME_SHORT"/>
