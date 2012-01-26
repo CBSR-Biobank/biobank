@@ -1221,6 +1221,9 @@
     <copy todir="${buildDirectory}/plugins/biobank.gui.common">
       <fileset dir="${eclipse.workspace.dir}/biobank.gui.common" />
     </copy>
+    <copy todir="${buildDirectory}/plugins/biobank.mvp">
+      <fileset dir="${eclipse.workspace.dir}/biobank.mvp" />
+    </copy>
     <copy todir="${buildDirectory}/features/biobank2.feature.core">
       <fileset dir="${eclipse.workspace.dir}/biobank2.feature.core" />
     </copy>

@@ -31,7 +31,7 @@ public class TestContainerType extends TestAction {
             name, name, ActivityStatusEnum.ACTIVE)).getId();
 
         containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
-            "FREEZER01", "FR01", siteId, true, 3, 10,
+            "FREEZER_3x10", "FR3x10", siteId, true, 3, 10,
             getContainerLabelingSchemes().get("CBSR 2 char alphabetic")
                 .getId());
     }
@@ -134,7 +134,7 @@ public class TestContainerType extends TestAction {
         ContainerTypeInfo topContainerTypeInfo =
             EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
 
-        Assert.assertEquals("FREEZER01",
+        Assert.assertEquals("FREEZER_3x10",
             topContainerTypeInfo.containerType.getName());
         Assert.assertEquals("Active", topContainerTypeInfo.containerType
             .getActivityStatus().getName());
@@ -159,5 +159,14 @@ public class TestContainerType extends TestAction {
     @Test
     public void nameChecks() throws Exception {
         // ensure we can change name on existing container type
+        Integer containerTypeId =
+            EXECUTOR.exec(containerTypeSaveAction).getId();
+        ContainerTypeInfo containerTypeInfo =
+            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+        containerTypeSaveAction =
+            ContainerTypeHelper.getSaveAction(containerTypeInfo);
+
+        containerTypeSaveAction.setName("FREEZER_4x12");
+        EXECUTOR.exec(containerTypeSaveAction).getId();
     }
 }

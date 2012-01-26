@@ -5,6 +5,7 @@ import java.util.HashSet;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenType;
 
 public class ContainerTypeHelper {
@@ -46,22 +47,28 @@ public class ContainerTypeHelper {
         containerTypeSaveAction.setColCapacity(containerTypeInfo.containerType
             .getCapacity().getColCapacity());
 
-        containerTypeSaveAction
-            .setDefaultTemperature(containerTypeInfo.containerType
-                .getDefaultTemperature());
-        containerTypeSaveAction
-            .setChildLabelingSchemeId(containerTypeInfo.containerType
-                .getChildLabelingScheme().getId());
+        containerTypeSaveAction.setDefaultTemperature(
+            containerTypeInfo.containerType.getDefaultTemperature());
+        containerTypeSaveAction.setChildLabelingSchemeId(
+            containerTypeInfo.containerType.getChildLabelingScheme().getId());
 
-        containerTypeSaveAction
-            .setActivityStatusId(containerTypeInfo.containerType
-                .getActivityStatus().getId());
+        containerTypeSaveAction.setActivityStatusId(
+            containerTypeInfo.containerType.getActivityStatus().getId());
 
         HashSet<Integer> ids = new HashSet<Integer>();
         for (SpecimenType specimenType : containerTypeInfo.containerType
             .getSpecimenTypeCollection()) {
-
+            ids.add(specimenType.getId());
         }
+        containerTypeSaveAction.setSpecimenTypeIds(ids);
+
+        ids = new HashSet<Integer>();
+        for (ContainerType childContainerType : containerTypeInfo.containerType
+            .getChildContainerTypeCollection()) {
+            ids.add(childContainerType.getId());
+        }
+        containerTypeSaveAction.setChildContainerTypeIds(ids);
+
         return containerTypeSaveAction;
     }
 }

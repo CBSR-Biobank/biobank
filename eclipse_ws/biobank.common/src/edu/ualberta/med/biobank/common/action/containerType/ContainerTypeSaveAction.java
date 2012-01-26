@@ -39,8 +39,8 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
 
     private String commentMessage;
 
-    private Set<Integer> specimenTypeIds;
-    private Set<Integer> childContainerTypeIds;
+    private Set<Integer> specimenTypeIds = new HashSet<Integer>();
+    private Set<Integer> childContainerTypeIds = new HashSet<Integer>();
 
     public void setId(Integer containerTypeId) {
         this.containerTypeId = containerTypeId;
