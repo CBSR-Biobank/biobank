@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.CapacityPostProcess;
 import edu.ualberta.med.biobank.model.Container;
 
-public class ContainerCapacityImpl extends AbstractReport {
+public class ContainerReport1 extends AbstractReport {
 
     private CapacityPostProcess rowPostProcess;
 
@@ -22,7 +22,7 @@ public class ContainerCapacityImpl extends AbstractReport {
         + " group by substr(c2.path, 1, locate('/', c2.path)-1)"; //$NON-NLS-1$
     // @formatter:on
 
-    public ContainerCapacityImpl(BiobankReport report) {
+    public ContainerReport1(BiobankReport report) {
         super(QUERY, report);
         rowPostProcess = new CapacityPostProcess(1, 2);
     }

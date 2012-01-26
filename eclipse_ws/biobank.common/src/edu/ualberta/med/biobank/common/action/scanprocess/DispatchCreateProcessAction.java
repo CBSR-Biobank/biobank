@@ -81,11 +81,10 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
         CellInfoStatus currentScanState = CellInfoStatus.EMPTY;
         ShipmentProcessInfo dispatchData = data;
         Center sender = null;
-        ActionContext actionContext = new ActionContext(user, session);
 
         if (dispatchData.getSenderId() != null) {
             sender =
-                actionContext.load(Center.class, dispatchData.getSenderId());
+                (Center) session.load(Center.class, dispatchData.getSenderId());
         }
         if (dispatchData.getPallet(session) == null) {
             for (CellInfo cell : cells.values()) {

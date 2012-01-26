@@ -4,7 +4,7 @@ public class ReportTreeNode extends AbstractReportTreeNode {
     private BiobankReport report;
 
     public ReportTreeNode(BiobankReport report) {
-        super(report.getName());
+        super(report.getClassName());
         this.report = report;
     }
 

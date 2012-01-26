@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * POJO used for Aliquot Request by CSV report.
  */
-public class SpecimenRequest implements Serializable {
+public class RequestData implements Serializable {
 
     /**
      * An attribute to allow serialization of the domain objects

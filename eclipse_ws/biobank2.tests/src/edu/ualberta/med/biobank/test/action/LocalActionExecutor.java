@@ -43,7 +43,7 @@ public class LocalActionExecutor implements IActionExecutor {
                 .add(Restrictions.eq("id", userId))
                 .list().iterator().next();
 
-            ActionContext context = new ActionContext(user, session);
+            ActionContext context = new ActionContext(user, session, null);
 
             if (!action.isAllowed(context))
                 throw new AccessDeniedException();

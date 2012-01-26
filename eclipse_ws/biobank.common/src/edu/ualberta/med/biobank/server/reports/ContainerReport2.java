@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class ContainerEmptyLocationsImpl extends AbstractReport {
+public class ContainerReport2 extends AbstractReport {
 
     // @formatter:off 
     private static final String QUERY = "SELECT c" //$NON-NLS-1$
@@ -29,7 +29,7 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
         + "        > c.specimenPositionCollection.size"; //$NON-NLS-1$
     // @formatter:on 
 
-    public ContainerEmptyLocationsImpl(BiobankReport report) {
+    public ContainerReport2(BiobankReport report) {
         super(QUERY, report);
     }
 

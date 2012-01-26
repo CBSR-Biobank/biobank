@@ -65,7 +65,7 @@ public abstract class ServerProcessAction implements Action<ProcessResult> {
 
         this.user = user;
         this.session = session;
-        this.actionContext = new ActionContext(user, session);
+        this.actionContext = new ActionContext(user, session, null);
 
         if (processOneCell)
             res = getCellProcessResult(cell);

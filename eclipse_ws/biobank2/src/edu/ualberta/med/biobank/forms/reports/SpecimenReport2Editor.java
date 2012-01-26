@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class QaSpecimensEditor extends ReportsEditor {
+public class SpecimenReport2Editor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.QAAliquotsEditor"; //$NON-NLS-1$
 

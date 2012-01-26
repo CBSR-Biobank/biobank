@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class FTAReportEditor extends ReportsEditor {
+public class SpecimenReport1Editor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.FTAReportEditor"; //$NON-NLS-1$
 

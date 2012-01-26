@@ -20,9 +20,9 @@ import org.supercsv.prefs.CsvPreference;
 
 import edu.ualberta.med.biobank.gui.common.widgets.BgcFileBrowser;
 import edu.ualberta.med.biobank.gui.common.widgets.IBgcFileBrowserListener;
-import edu.ualberta.med.biobank.server.reports.SpecimenRequest;
+import edu.ualberta.med.biobank.server.reports.RequestData;
 
-public class SpecimenRequestEditor extends ReportsEditor implements
+public class SpecimenReport3Editor extends ReportsEditor implements
     IBgcFileBrowserListener {
 
     public static String ID = "edu.ualberta.med.biobank.editors.AliquotRequestEditor"; //$NON-NLS-1$
@@ -71,8 +71,8 @@ public class SpecimenRequestEditor extends ReportsEditor implements
         try {
             String[] header = new String[] { "pnumber", "dateDrawn", //$NON-NLS-1$ //$NON-NLS-2$
                 "specimenTypeNameShort", "maxAliquots" }; //$NON-NLS-1$ //$NON-NLS-2$
-            SpecimenRequest request;
-            while ((request = reader.read(SpecimenRequest.class, header,
+            RequestData request;
+            while ((request = reader.read(RequestData.class, header,
                 processors)) != null) {
                 requests.add(request);
             }

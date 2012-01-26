@@ -292,7 +292,8 @@ public class BiobankApplicationServiceImpl extends
     @Override
     public <T extends ActionResult> T doAction(Action<T> action)
         throws ApplicationException {
-        Request request = new Request(action);
+        Request request =
+            new Request(new AppServiceAction<T>(action, this));
         request.setDomainObjectName(Site.class.getName());
 
         Response response = query(request);
@@ -307,5 +308,17 @@ public class BiobankApplicationServiceImpl extends
     public boolean isAllowed(Permission permission) throws ApplicationException {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    public class AppServiceAction<T extends ActionResult> {
+
+        public Action<T> action;
+        public BiobankApplicationService appService;
+
+        public AppServiceAction(Action<T> action,
+            BiobankApplicationService appService) {
+            this.action = action;
+            this.appService = appService;
+        }
     }
 }

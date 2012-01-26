@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class FTAReportImpl extends AbstractReport {
+public class SpecimenReport1 extends AbstractReport {
     private static final String QUERY = "SELECT s2" //$NON-NLS-1$
         + (" FROM " + Specimen.class.getName() + " s2") //$NON-NLS-1$ //$NON-NLS-2$
         + ("    inner join fetch s2.collectionEvent ce") //$NON-NLS-1$
@@ -30,7 +30,7 @@ public class FTAReportImpl extends AbstractReport {
             + SENT_SAMPLES_FREEZER_NAME + "'") + ")" //$NON-NLS-1$ //$NON-NLS-2$
         + " ORDER BY s2.collectionEvent.patient.pnumber"; //$NON-NLS-1$
 
-    public FTAReportImpl(BiobankReport report) {
+    public SpecimenReport1(BiobankReport report) {
         super(QUERY, report);
     }
 

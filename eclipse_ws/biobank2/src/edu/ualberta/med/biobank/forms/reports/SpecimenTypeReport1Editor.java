@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class SpecimenTypePvCountEditor extends ReportsEditor {
+public class SpecimenTypeReport1Editor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.AliquotCountEditor"; //$NON-NLS-1$
 

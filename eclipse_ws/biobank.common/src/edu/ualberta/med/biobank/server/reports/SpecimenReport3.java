@@ -12,7 +12,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SpecimenRequestImpl extends AbstractReport {
+public class SpecimenReport3 extends AbstractReport {
 
     // TODO: switch to CollectionEvent.visitNumber?
 
@@ -31,7 +31,7 @@ public class SpecimenRequestImpl extends AbstractReport {
         + "     and s.activityStatus.name != 'Closed'" //$NON-NLS-1$
         + " ORDER BY s.activityStatus.name, RAND()"; //$NON-NLS-1$
 
-    public SpecimenRequestImpl(BiobankReport report) {
+    public SpecimenReport3(BiobankReport report) {
         super(QUERY, report);
     }
 
@@ -42,7 +42,7 @@ public class SpecimenRequestImpl extends AbstractReport {
         List<Object> results = new ArrayList<Object>();
         HQLCriteria c;
         for (Object o : parameters) {
-            SpecimenRequest request = (SpecimenRequest) o;
+            RequestData request = (RequestData) o;
 
             c = new HQLCriteria(queryString);
             c.setParameters(Arrays.asList(new Object[] { request.getPnumber(),

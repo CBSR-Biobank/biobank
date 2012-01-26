@@ -101,7 +101,8 @@ public enum PermissionEnum implements Serializable {
     SPECIMEN_TYPE_UPDATE(62),
     SPECIMEN_TYPE_DELETE(63),
 
-    LOGGING(64);
+    LOGGING(64),
+    REPORTS(65);
 
     private final Integer permissionId;
 

@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class PatientVisitSummaryImpl extends AbstractReport {
+public class PatientReport1 extends AbstractReport {
 
     public static String QUERY_STRING = "SELECT study_name, clinic_name, sum(pvCount=1), sum(pvCount=2)," //$NON-NLS-1$
         + " sum(pvCount=3), sum(pvCount=4), sum(pvCount >=5), sum(pvCount), count(patient_number)" //$NON-NLS-1$
@@ -33,7 +33,7 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         + " GROUP BY study_name, clinic_name" //$NON-NLS-1$
         + " ORDER BY study_name, clinic_name"; //$NON-NLS-1$
 
-    public PatientVisitSummaryImpl(BiobankReport report) {
+    public PatientReport1(BiobankReport report) {
         super(QUERY_STRING, report);
         List<Object> parameters = report.getParams();
         this.queryString = queryString.replaceFirst("\\?", //$NON-NLS-1$

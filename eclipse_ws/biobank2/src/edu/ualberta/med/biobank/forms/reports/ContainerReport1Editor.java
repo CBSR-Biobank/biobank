@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
-public class ContainerCapacityEditor extends ReportsEditor {
+public class ContainerReport1Editor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.ContainerCapacityEditor"; //$NON-NLS-1$
 

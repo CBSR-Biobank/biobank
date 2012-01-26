@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 
-public class PatientVisitSummaryEditor extends ReportsEditor {
+public class PatientReport1Editor extends ReportsEditor {
 
     protected DateTimeWidget start;
     protected DateTimeWidget end;

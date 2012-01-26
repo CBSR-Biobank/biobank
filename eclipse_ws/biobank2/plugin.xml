@@ -1828,7 +1828,7 @@
             default="false"
             icon="icons/specimen.png"
             id="edu.ualberta.med.biobank.forms.SpecimenListViewForm"
-            name="%SpecimenList.editor">
+            name="SpecimenList.editor">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.PeListViewForm"
@@ -1852,46 +1852,46 @@
             name="%Logging.editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.SpecimenRequestEditor"
+            class="edu.ualberta.med.biobank.forms.reports.SpecimenReport3Editor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.SpecimenRequestEditor"
-            name="%ReportSpecimenRequest.editor">
+            id="edu.ualberta.med.biobank.editors.SpecimenReport3Editor"
+            name="SpecimenReport3Editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.FvLPatientVisitsEditor"
+            class="edu.ualberta.med.biobank.forms.reports.ClinicReport1Editor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.FvLPatientVisitsEditor"
-            name="Clinic Activity">
+            id="edu.ualberta.med.biobank.editors.ClinicReport1Editor"
+            name="ClinicReport1Editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.SpecimenTypePvCountEditor"
+            class="edu.ualberta.med.biobank.forms.reports.SpecimenTypeReport1Editor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.SpecimenTypePvCountEditor"
-            name="%ReportSpecimenTypeTotals.editor">            
+            id="edu.ualberta.med.biobank.editors.SpecimenTypeReport1Editor"
+            name="SpecimenTypeReport1Editor">            
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.QaSpecimensEditor"
+            class="edu.ualberta.med.biobank.forms.reports.SpecimenReport2Editor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.QaSpecimensEditor"
-            name="%ReportSpecimenQA.editor">
+            id="edu.ualberta.med.biobank.editors.SpecimenReport2Editor"
+            name="SpecimenReport2Editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.SpecimenTypeSUsageEditor"
+            class="edu.ualberta.med.biobank.forms.reports.SpecimenTypeReport2Editor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.SpecimenTypeSUsageEditor"
-            name="%ReportSpecimenTypeUsage.editor">
+            id="edu.ualberta.med.biobank.editors.SpecimenTypeReport2Editor"
+            name="SpecimenTypeReport2Editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.PatientVisitSummaryEditor"
+            class="edu.ualberta.med.biobank.forms.reports.PatientReport1Editor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.PatientVisitSummaryEditor"
-            name="%ReportPatientVisitSummary.editor">
+            id="edu.ualberta.med.biobank.editors.PatientReport1Editor"
+            name="PatientReport1Editor">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ActivityStatusViewForm"
@@ -1900,25 +1900,25 @@
             name="%ActivityStatusEntry.editor">
       </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.reports.ContainerCapacityEditor"
+      class="edu.ualberta.med.biobank.forms.reports.ContainerReport1Editor"
       default="false"
       icon="icons/reportsPerspective.png"
-      id="edu.ualberta.med.biobank.editors.ContainerCapacityEditor"
-      name="%ReportContainerCapacity.editor">
+      id="edu.ualberta.med.biobank.editors.ContainerReport1Editor"
+      name="ContainerReport1Editor">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.reports.ContainerEmptyLocationsEditor"
+      class="edu.ualberta.med.biobank.forms.reports.ContainerReport2Editor"
       default="false"
       icon="icons/reportsPerspective.png"
-      id="edu.ualberta.med.biobank.editors.ContainerEmptyLocationsEditor"
-      name="%ReportContainerEmptyLocations.editor">
+      id="edu.ualberta.med.biobank.editors.ContainerReport2Editor"
+      name="ContainerReport2Editor">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.reports.FTAReportEditor"
+      class="edu.ualberta.med.biobank.forms.reports.SpecimenReport1Editor"
       default="false"
       icon="icons/reportsPerspective.png"
-      id="edu.ualberta.med.biobank.editors.FTAReportEditor"
-      name="%ReportFTA.editor">
+      id="edu.ualberta.med.biobank.editors.SpecimenReport1Editor"
+      name="SpecimenReport1Editor">
 </editor>
 <editor
       class="edu.ualberta.med.biobank.forms.DispatchViewForm"

@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ContainerEmptyLocationsEditor extends ReportsEditor {
+public class ContainerReport2Editor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.ContainerEmptyLocationsEditor"; //$NON-NLS-1$
 
