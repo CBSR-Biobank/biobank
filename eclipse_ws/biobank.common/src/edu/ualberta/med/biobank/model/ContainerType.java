@@ -9,7 +9,7 @@ import java.io.Serializable;
 	**/
 	
 
-public class ContainerType  implements Serializable
+public class ContainerType  implements IBiobankModel
 {
 	/**
 	* An attribute to allow serialization of the domain objects

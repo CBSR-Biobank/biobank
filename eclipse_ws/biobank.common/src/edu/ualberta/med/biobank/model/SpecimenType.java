@@ -9,7 +9,7 @@ import java.io.Serializable;
 	**/
 	
 
-public class SpecimenType  implements Serializable
+public class SpecimenType  implements IBiobankModel
 {
 	/**
 	* An attribute to allow serialization of the domain objects
