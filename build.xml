@@ -20,6 +20,11 @@
   <!-- TODO: create a cacore directory with all the cacore stuff in it
   that we can throw into the war file and use to create the database --> 
   <property file="build.properties" />
+ 
+  <!-- must use a property with a LOCATION attribute because it is converted
+       to be an absolute value, which the product builder seems to require in
+       order to load its build.properties in product/build.properties -->
+  <property name="product.dir" location="product" />
 
   <import file="build-db.xml"/>
 
@@ -667,6 +672,19 @@
     <last id="pde.build.id" count="1">
       <fileset refid="pde.build.id.all" />
     </last>
+
+      <echo message="-application org.eclipse.ant.core.antRunner" />
+      <echo message="-buildfile ${toString:pde.build.id}" />
+      <echo message="-Dbuilder=${product.dir}" />
+      <!-- product.dir is used in product/customTarget.xml -->
+      <echo message="-Dproduct.dir=${product.dir}" />
+      <!-- instead of fixed paths in product/build.properties: -->
+      <echo message="-Dproduct=${eclipse.proj.dir}/biobank2.product" />
+      <echo message="-DbuildDirectory=${product.dir}/buildDirectory" />
+      <echo message="-DbaseLocation=${env.ECLIPSE_HOME}" />
+      <echo message="-Djava.client.version.num=${java.client.version.num}" />
+
+
     <!-- launch product creation -->
     <java classpath="${toString:launcher.id}"
           classname="org.eclipse.equinox.launcher.Main"
@@ -674,6 +692,7 @@
           fork="true">
       <arg line="-application org.eclipse.ant.core.antRunner" />
       <arg line="-buildfile ${toString:pde.build.id}" />
+      <arg line="-debug" />
       <arg line="-Dbuilder=${product.dir}" />
       <!-- product.dir is used in product/customTarget.xml -->
       <arg line="-Dproduct.dir=${product.dir}" />
