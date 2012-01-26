@@ -37,20 +37,6 @@
            classname="org.hibernate.tool.ant.HibernateToolTask" 
            classpathref="hibernatetool.lib" />
 
-  <!-- TODO: caCORE schema export? -->
-
-  <target name="delta"
-          description="exports delta to delta.sql">
-    <hibernatetool destdir="." classpath="${model.classpath}">
-      <configuration configurationfile="${eclipse.proj.dir.common}/src/hibernate.cfg.xml"/>
-      <hbm2ddl export="false"
-               create="false"
-               update="true"
-               outputfilename="delta.sql"
-               format="true" />
-    </hibernatetool>
-  </target>
-
   <target name="schemaupdate">
     <hibernatetool destdir="." classpath="${model.classpath}">
       <configuration configurationfile="${eclipse.proj.dir.common}/src/hibernate.cfg.xml"/>

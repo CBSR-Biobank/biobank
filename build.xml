@@ -377,8 +377,6 @@
            includes="*.jar">
         <exclude name="${read-api-exclude-list}" />
       </lib>
-      <lib dir="${cacore.sdk.dir}/${build.jar.dir}" includes="${bean.file}" />
-      <lib dir="${cacore.sdk.dir}/${build.jar.dir}" includes="${orm.file}" />
       <lib dir="${cacore.sdk.dir}/${system.dir}/${system.lib.dir}"
            includes="*.jar">
         <exclude name="${server-exclude-commons-logging}" />
@@ -428,19 +426,11 @@
 
   <target name="clean"
           depends="clean-tests,clean-jars"
-          description="cleans caCORE SDK and deletes jars from eclipse projects">
+          description="cleans project output, tests, and jars">
+    <delete dir="${buildDirectory}" />
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output-validators" />
     <delete dir="${eclipse.proj.dir.tools}/output" />
-    <delete file="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
-    <!-- Don't delete peers or base wrappers anymore since they aren't regen'd -->
-  </target>
-
-  <target name="clean-all"
-          depends="clean"
-          description="deletes caCORE SDK directory and deletes jars from eclipse projects">
-    <delete dir="${cacore.sdk.dir}" />
-    <delete dir="${buildDirectory}" />
   </target>
 
   <!-- JUnit -->
