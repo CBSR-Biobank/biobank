@@ -63,8 +63,8 @@ public abstract class ServerProcessAction implements Action<ProcessResult> {
         throws ActionException {
         ProcessResult res;
 
-        this.user = user;
-        this.session = session;
+        this.user = context.getUser();
+        this.session = context.getSession();
         this.actionContext = new ActionContext(user, session, null);
 
         if (processOneCell)

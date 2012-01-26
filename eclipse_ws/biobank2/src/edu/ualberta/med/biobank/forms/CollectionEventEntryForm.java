@@ -400,6 +400,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 specInfo.specimen.getSpecimenType().getId();
             ceSpecInfo.statusId = specInfo.specimen.getActivityStatus().getId();
             ceSpecInfo.createdAt = specInfo.specimen.getCreatedAt();
+            ceSpecInfo.centerId =
+                SessionManager.getUser().getCurrentWorkingCenter().getId();
             cevents.add(ceSpecInfo);
         }
 
