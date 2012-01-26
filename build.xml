@@ -29,12 +29,7 @@
   <condition property="debugFileExtension" value="-debug" else="">
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
-  <condition property="LOG4J_LEVEL_WARN" value="warn" else="error">
-    <equals arg1="${log-debug}" arg2="true" casesensitive="false" trim="true" />
-  </condition>
-  <condition property="LOG4J_LEVEL_DEBUG" value="debug" else="error">
-	<equals arg1="${log-debug}" arg2="true" casesensitive="false" trim="true" />
-  </condition>
+
   <!-- TODO: someday, does client need all keystores? -->
   <condition property="isHostAicmlMed">
     <equals arg1="${host.name}"
@@ -254,7 +249,7 @@
   <target name="check-jboss-uptodate">
     <uptodate property="jboss.uptodate"
               targetfile="${env.JBOSS_HOME}/server/default/deploy/biobank.war"
-              srcfile="${cacore.sdk.dir}/output/biobank/package/webapp/biobank.war" />
+              srcfile="${war.file}" />
   </target>
 
   <!-- TODO: require as a single target to update the keyfile -->
@@ -334,7 +329,7 @@
         <include name="biobank*.war"/>
       </fileset>
     </delete>
-    <copy file="${cacore.sdk.dir}/output/biobank/package/webapp/biobank.war"
+    <copy file="${war.file}"
           tofile="${env.JBOSS_HOME}/server/default/deploy/biobank.war"
           overwrite="true" />
   </target>
@@ -368,7 +363,8 @@
   <!-- TODO: rename to package-webapp? -->
   <target name="package-webapp-orm"
           depends="build-common-project">
-    <war destfile="${cacore.sdk.dir}/${package.system.dir}/${PROJECT_NAME}.war"
+    <mkdir dir="${output.dir}" />
+    <war destfile="${war.file}"
          webxml="${cacore.sdk.dir}/${build.conf.web-inf.dir}/web.xml">
       <manifest>
         <attribute name="Generated-By"

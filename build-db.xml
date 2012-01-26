@@ -56,8 +56,7 @@
       <configuration configurationfile="${eclipse.proj.dir.common}/src/hibernate.cfg.xml"/>
       <hbm2ddl export="true"
                drop="true"
-               create="true"
-               outputfilename="tmp.sql" />
+               create="true" />
     </hibernatetool>
   </target>
 
