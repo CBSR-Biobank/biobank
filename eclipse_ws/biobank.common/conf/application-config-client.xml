@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	
+	<!-- Import the files for each remote service -->
+	<import resource="application-config-client-info.xml"/>
+	
+	<!-- Make an entry for ServiceInfo for each remote service. The default service bean must be called "ServiceInfo" -->
+	<alias alias="ServiceInfo" name="biobankServiceInfo"/>
+	
+</beans>
