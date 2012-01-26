@@ -178,7 +178,8 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         ContainerType containerType) {
         Map<Integer, SpecimenType> specimenTypes =
             context.load(SpecimenType.class, specimenTypeIds);
-        containerType.setSpecimenTypeCollection(specimenTypes.values());
+        containerType.setSpecimenTypeCollection(new HashSet<SpecimenType>(
+            specimenTypes.values()));
         SetDifference<SpecimenType> specimenTypeDiff =
             new SetDifference<SpecimenType>(
                 containerType.getSpecimenTypeCollection(),
@@ -201,8 +202,8 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         ContainerType containerType) {
         Map<Integer, ContainerType> childContainerTypes =
             context.load(ContainerType.class, childContainerTypeIds);
-        containerType.setChildContainerTypeCollection(childContainerTypes
-            .values());
+        containerType.setChildContainerTypeCollection(
+            new HashSet<ContainerType>(childContainerTypes.values()));
         SetDifference<ContainerType> childContainerTypeDiff =
             new SetDifference<ContainerType>(
                 containerType.getChildContainerTypeCollection(),

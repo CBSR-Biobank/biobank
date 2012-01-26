@@ -161,12 +161,17 @@ public class TestContainerType extends TestAction {
         // ensure we can change name on existing container type
         Integer containerTypeId =
             EXECUTOR.exec(containerTypeSaveAction).getId();
-        ContainerTypeInfo containerTypeInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
-        containerTypeSaveAction =
-            ContainerTypeHelper.getSaveAction(containerTypeInfo);
 
+        containerTypeSaveAction =
+            ContainerTypeHelper.getSaveAction(EXECUTOR
+                .exec(new ContainerTypeGetInfoAction(containerTypeId)));
         containerTypeSaveAction.setName("FREEZER_4x12");
-        EXECUTOR.exec(containerTypeSaveAction).getId();
+        EXECUTOR.exec(containerTypeSaveAction);
+
+        containerTypeSaveAction =
+            ContainerTypeHelper.getSaveAction(EXECUTOR
+                .exec(new ContainerTypeGetInfoAction(containerTypeId)));
+        containerTypeSaveAction.setNameShort("FR4x12");
+        EXECUTOR.exec(containerTypeSaveAction);
     }
 }

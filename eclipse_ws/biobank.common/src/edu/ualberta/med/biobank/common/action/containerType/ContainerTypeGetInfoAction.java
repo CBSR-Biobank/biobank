@@ -23,6 +23,7 @@ public class ContainerTypeGetInfoAction implements Action<ContainerTypeInfo> {
             + " INNER JOIN FETCH ctype.activityStatus"
             + " INNER JOIN FETCH ctype.capacity"
             + " LEFT JOIN FETCH ctype.childContainerTypeCollection"
+            + " LEFT JOIN FETCH ctype.specimenTypeCollection"
             + " LEFT JOIN FETCH ctype.commentCollection comments"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE ctype.id = ?";
