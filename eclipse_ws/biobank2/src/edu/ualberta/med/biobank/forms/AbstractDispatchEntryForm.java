@@ -188,6 +188,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
                 dispatch.getState(), comment.getMessage() == null ? ""
                     : comment.getMessage());
         DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
-        SessionManager.getAppService().doAction(save);
+
+        SpecimenTransitView.reloadCurrent();
     }
 }

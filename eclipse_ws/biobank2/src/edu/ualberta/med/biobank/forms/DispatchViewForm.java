@@ -69,8 +69,6 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private DispatchSpecimenListInfoTable specimensNonProcessedTable;
 
-    private boolean canSeeEverything;
-
     private CommentCollectionInfoTable commentTable;
 
     private DispatchReadInfo dispatchInfo;
@@ -91,22 +89,11 @@ public class DispatchViewForm extends BiobankViewForm {
         } else
             dispatch = new DispatchWrapper(SessionManager.getAppService());
         SessionManager.logLookup(dispatch);
-        retrieveDispatch();
         setPartName(Messages.DispatchViewForm_title);
-    }
-
-    private void retrieveDispatch() {
-        try {
-            dispatch.reload();
-        } catch (Exception ex) {
-            logger.error(Messages.DispatchViewForm_retrieve_ship_error_msg
-                + dispatch.getShipmentInfo().getWaybill(), ex);
-        }
     }
 
     @Override
     public void reload() throws Exception {
-        retrieveDispatch();
         commentTable.setList(dispatch.getCommentCollection(false));
         setPartName(Messages.DispatchViewForm_fulltitle
             + dispatch.getShipmentInfo().getPackedAt());
@@ -121,58 +108,38 @@ public class DispatchViewForm extends BiobankViewForm {
             && dispatch.getShipmentInfo().getPackedAt() != null) {
             dateString = dispatch.getFormattedPackedAt();
         }
-        canSeeEverything = true;
-        if (dispatch.getSenderCenter() == null) {
-            canSeeEverything = false;
-            BgcPlugin.openAsyncError(
-                Messages.DispatchViewForm_access_denied_error_title,
-                Messages.DispatchViewForm_access_denied_sender_error_msg);
-        } else {
-            if (dateString == null)
-                form.setText(NLS.bind(
-                    Messages.DispatchViewForm_preparation_title, dateString,
-                    dispatch.getSenderCenter().getNameShort()));
-            else
-                form.setText(NLS.bind(Messages.DispatchViewForm_sent_title,
-                    dateString, dispatch.getSenderCenter().getNameShort()));
-        }
-        if (dispatch.getReceiverCenter() == null) {
-            canSeeEverything = false;
-            BgcPlugin.openAsyncError(
-                Messages.DispatchViewForm_access_denied_error_title,
-                Messages.DispatchViewForm_access_denied_receiver_error_msg);
-        }
+        if (dateString == null)
+            form.setText(NLS.bind(
+                Messages.DispatchViewForm_preparation_title, dateString,
+                dispatch.getSenderCenter().getNameShort()));
+        else
+            form.setText(NLS.bind(Messages.DispatchViewForm_sent_title,
+                dateString, dispatch.getSenderCenter().getNameShort()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createMainSection();
 
-        if (canSeeEverything) {
-            createTreeTableSection();
-        }
+        createTreeTableSection();
 
         setDispatchValues();
 
-        if (canSeeEverything) {
-            UserWrapper user = SessionManager.getUser();
-            if (dispatch.canBeSentBy(user))
-                createSendButton();
-            else if (dispatch.canBeReceivedBy(user))
-                createReceiveButtons();
-            else if (dispatch.canBeClosedBy(user)
-                && dispatch.isInReceivedState()
-                && dispatch.getNonProcessedDispatchSpecimenCollection().size() == 0)
-                createCloseButton();
-        }
+        UserWrapper user = SessionManager.getUser();
+        if (dispatch.canBeSentBy(user))
+            createSendButton();
+        else if (dispatch.canBeReceivedBy(user))
+            createReceiveButtons();
+        else if (dispatch.canBeClosedBy(user)
+            && dispatch.isInReceivedState()
+            && dispatch.getNonProcessedDispatchSpecimenCollection().size() == 0)
+            createCloseButton();
 
         commentTable.setList(dispatch.getCommentCollection(false));
     }
 
     @Override
     protected void addEditAction() {
-        if (canSeeEverything) {
-            super.addEditAction();
-        }
+        // super.addEditAction();
     }
 
     private void createTreeTableSection() {
@@ -377,12 +344,10 @@ public class DispatchViewForm extends BiobankViewForm {
     private void setDispatchValues() {
         setTextValue(
             senderLabel,
-            dispatch.getSenderCenter() == null ? Messages.DispatchViewForm_access_denied_value
-                : dispatch.getSenderCenter().getName());
+            dispatch.getSenderCenter().getName());
         setTextValue(
             receiverLabel,
-            dispatch.getReceiverCenter() == null ? Messages.DispatchViewForm_access_denied_value
-                : dispatch.getReceiverCenter().getName());
+            dispatch.getReceiverCenter().getName());
         if (departedLabel != null)
             setTextValue(departedLabel, dispatch.getFormattedPackedAt());
 
