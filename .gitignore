@@ -60,3 +60,4 @@ docs/javaClientUserGuide/*.d
 docs/javaClientUserGuide/*.fls
 docs/javaClientUserGuide/*.lof
 docs/javaClientUserGuide/*.tdo
+output/
