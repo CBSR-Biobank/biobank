@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
+import edu.ualberta.med.biobank.server.orm.BiobankORMDAOImpl;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
@@ -306,8 +307,8 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public boolean isAllowed(Permission permission) throws ApplicationException {
-        // TODO Auto-generated method stub
-        return false;
+        return ((BiobankORMDAOImpl) this.getWritableDAO(Site.class.getName()))
+            .isAllowed(permission);
     }
 
     public class AppServiceAction<T extends ActionResult> {

@@ -106,6 +106,7 @@ public class WrapperTransaction {
         tx.commit();
     }
 
+    @Deprecated
     public static void delete(ModelWrapper<?> wrapper,
         WritableApplicationService appService) throws BiobankException,
         ApplicationException {

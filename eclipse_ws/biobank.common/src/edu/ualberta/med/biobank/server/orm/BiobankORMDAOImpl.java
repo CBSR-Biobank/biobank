@@ -6,6 +6,7 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
+import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
@@ -170,6 +171,13 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         }
 
         return null;
+    }
+
+    public Boolean isAllowed(Permission permission) {
+        return permission.isAllowed(new ActionContext(
+            getCurrentUser(getSession()),
+            getSession(),
+            null));
     }
 
     protected Response query(Request request, BiobankSQLCriteria sqlCriteria) {
