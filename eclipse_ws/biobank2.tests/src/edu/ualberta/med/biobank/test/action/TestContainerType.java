@@ -298,8 +298,6 @@ public class TestContainerType extends TestAction {
             ctContainerTypeIds.add(allContainerTypes.get(i).getId());
             set1.add(allContainerTypes.get(i).getId());
 
-            System.out.println(allContainerTypes.get(i).getNameShort());
-
             containerTypeSaveAction
                 .setChildContainerTypeIds(ctContainerTypeIds);
             containerTypeId = EXECUTOR.exec(containerTypeSaveAction).getId();
@@ -314,7 +312,7 @@ public class TestContainerType extends TestAction {
         // add another 2 container types all at once
         for (int i = 0; i < 2; ++i) {
             ctContainerTypeIds.add(allContainerTypes.get(i + 2).getId());
-            set2.add(allContainerTypes.get(i + 10).getId());
+            set2.add(allContainerTypes.get(i + 2).getId());
         }
 
         containerTypeSaveAction.setChildContainerTypeIds(ctContainerTypeIds);
@@ -362,32 +360,33 @@ public class TestContainerType extends TestAction {
     private List<ContainerType> createChildContainerTypes() {
         List<ContainerType> result = new ArrayList<ContainerType>();
 
-        containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
-            "HOTEL12", "H12", siteId, false, 12, 1,
-            getContainerLabelingSchemes().get("2 char numeric").getId());
-        Integer ctId = EXECUTOR.exec(containerTypeSaveAction).getId();
+        ContainerTypeSaveAction hotelCtSaveAction =
+            ContainerTypeHelper.getSaveAction(
+                "HOTEL12", "H12", siteId, false, 12, 1,
+                getContainerLabelingSchemes().get("2 char numeric").getId());
+        Integer ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
         ContainerTypeInfo containerTypeInfo =
             EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
         result.add(containerTypeInfo.containerType);
 
-        containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
+        hotelCtSaveAction = ContainerTypeHelper.getSaveAction(
             "HOTEL13", "H13", siteId, false, 13, 1,
             getContainerLabelingSchemes().get("2 char numeric").getId());
-        ctId = EXECUTOR.exec(containerTypeSaveAction).getId();
+        ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
         containerTypeInfo = EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
         result.add(containerTypeInfo.containerType);
 
-        containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
+        hotelCtSaveAction = ContainerTypeHelper.getSaveAction(
             "HOTEL18", "H18", siteId, false, 18, 1,
             getContainerLabelingSchemes().get("2 char numeric").getId());
-        ctId = EXECUTOR.exec(containerTypeSaveAction).getId();
+        ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
         containerTypeInfo = EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
         result.add(containerTypeInfo.containerType);
 
-        containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
+        hotelCtSaveAction = ContainerTypeHelper.getSaveAction(
             "HOTEL19", "H19", siteId, false, 19, 1,
             getContainerLabelingSchemes().get("2 char numeric").getId());
-        ctId = EXECUTOR.exec(containerTypeSaveAction).getId();
+        ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
         containerTypeInfo = EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
         result.add(containerTypeInfo.containerType);
 

@@ -215,7 +215,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
             .getRemoveSet()) {
             Collection<ContainerType> parentContainerTypes =
                 childContainerType.getParentContainerTypeCollection();
-            if (parentContainerTypes.remove(parentContainerTypes)) {
+            if (parentContainerTypes.remove(containerType)) {
                 childContainerType
                     .setChildContainerTypeCollection(parentContainerTypes);
             } else {
