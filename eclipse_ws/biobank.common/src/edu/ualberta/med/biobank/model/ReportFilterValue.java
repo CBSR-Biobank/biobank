@@ -1,5 +1,11 @@
 package edu.ualberta.med.biobank.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "REPORT_FILTER_VALUE")
 public class ReportFilterValue extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -7,24 +13,27 @@ public class ReportFilterValue extends AbstractBiobankModel {
     private String value;
     private String secondValue;
 
+    @Column(name = "POSITION")
     public Integer getPosition() {
-        return position;
+        return this.position;
     }
 
     public void setPosition(Integer position) {
         this.position = position;
     }
 
+    @Column(name = "VALUE", columnDefinition="TEXT")
     public String getValue() {
-        return value;
+        return this.value;
     }
 
     public void setValue(String value) {
         this.value = value;
     }
 
+    @Column(name = "SECOND_VALUE", columnDefinition="TEXT")
     public String getSecondValue() {
-        return secondValue;
+        return this.secondValue;
     }
 
     public void setSecondValue(String secondValue) {

@@ -1,5 +1,14 @@
 package edu.ualberta.med.biobank.model;
 
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Version;
+
+import org.hibernate.annotations.GenericGenerator;
+
+@MappedSuperclass
 public abstract class AbstractBiobankModel implements IBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -7,27 +16,34 @@ public abstract class AbstractBiobankModel implements IBiobankModel {
     private Integer id;
 
     @Override
-    public final Integer getId() {
-        return id;
+    @GenericGenerator(name = "generator", strategy = "increment")
+    @Id
+    @GeneratedValue(generator = "generator")
+    @Column(name = "ID", nullable = false)
+    public Integer getId() {
+        return this.id;
     }
 
     @Override
-    public final void setId(Integer id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+    @Version
+    @Column(name = "VERSION", nullable = false)
+    public Integer getVersion() {
+        return this.version;
     }
-    
+
     /**
-     * Set by Hibernate via field access.
+     * DO NOT CALL this method unless, maybe, for tests. Hibernate manages
+     * setting this value.
      * 
-     * @return version
+     * @param version
      */
-    public final Integer getVersion() {
-        return version;
+    @Deprecated
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 
     // TODO: does this actually work? Test (especially with hibernate proxies)

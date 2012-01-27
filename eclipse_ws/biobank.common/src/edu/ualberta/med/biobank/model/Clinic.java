@@ -1,27 +1,35 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Collection;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 
-import org.hibernate.validator.NotNull;
-
+@Entity
+@DiscriminatorValue("Clinic")
 public class Clinic extends Center {
     private static final long serialVersionUID = 1L;
+    
+    private boolean sendsShipments;
+    private Collection<Contact> contactCollection = new HashSet<Contact>(0);
 
-    private Boolean sendsShipments = false;
-    private Collection<Contact> contactCollection = new HashSet<Contact>();
-
-    @NotNull
-    public Boolean getSendsShipments() {
-        return sendsShipments;
+    @Column(name = "SENDS_SHIPMENTS")
+    // TODO: rename to isSendsShipments
+    public boolean getSendsShipments() {
+        return this.sendsShipments;
     }
 
-    public void setSendsShipments(Boolean sendsShipments) {
+    public void setSendsShipments(boolean sendsShipments) {
         this.sendsShipments = sendsShipments;
     }
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "clinic")
     public Collection<Contact> getContactCollection() {
-        return contactCollection;
+        return this.contactCollection;
     }
 
     public void setContactCollection(Collection<Contact> contactCollection) {

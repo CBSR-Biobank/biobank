@@ -1,19 +1,22 @@
 package edu.ualberta.med.biobank.model;
 
-import org.hibernate.validator.NotEmpty;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "PERMISSION")
 public class Permission extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
-    public String className;
+    private String className;
 
-    @NotEmpty
+    @Column(name = "CLASS_NAME", unique = true, nullable = false)
     public String getClassName() {
-        return className;
+        return this.className;
     }
 
     public void setClassName(String className) {
         this.className = className;
     }
-
 }

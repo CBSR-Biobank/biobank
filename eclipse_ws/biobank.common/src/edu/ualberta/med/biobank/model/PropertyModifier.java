@@ -1,21 +1,29 @@
 package edu.ualberta.med.biobank.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "PROPERTY_MODIFIER")
 public class PropertyModifier extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
-    public String name;
-    public String propertyModifier;
+    private String name;
+    private String propertyModifier;
 
+    @Column(name = "NAME")
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+    @Column(name = "PROPERTY_MODIFIER", columnDefinition="TEXT")
     public String getPropertyModifier() {
-        return propertyModifier;
+        return this.propertyModifier;
     }
 
     public void setPropertyModifier(String propertyModifier) {

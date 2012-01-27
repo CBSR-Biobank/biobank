@@ -1,39 +1,52 @@
 package edu.ualberta.med.biobank.model;
 
-import org.hibernate.validator.NotEmpty;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Collection;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "PATIENT")
 public class Patient extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String pnumber;
     private Date createdAt;
     private Collection<CollectionEvent> collectionEventCollection =
-        new HashSet<CollectionEvent>();
+        new HashSet<CollectionEvent>(0);
     private Study study;
-    private Collection<Comment> commentCollection = new HashSet<Comment>();
+    private Collection<Comment> commentCollection = new HashSet<Comment>(0);
 
-    @NotEmpty
+    @Column(name = "PNUMBER", unique = true, nullable = false, length = 100)
     public String getPnumber() {
-        return pnumber;
+        return this.pnumber;
     }
 
     public void setPnumber(String pnumber) {
         this.pnumber = pnumber;
     }
 
+    @Column(name = "CREATED_AT")
     public Date getCreatedAt() {
-        return createdAt;
+        return this.createdAt;
     }
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "patient")
     public Collection<CollectionEvent> getCollectionEventCollection() {
-        return collectionEventCollection;
+        return this.collectionEventCollection;
     }
 
     public void setCollectionEventCollection(
@@ -41,16 +54,22 @@ public class Patient extends AbstractBiobankModel {
         this.collectionEventCollection = collectionEventCollection;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "STUDY_ID", nullable = false)
     public Study getStudy() {
-        return study;
+        return this.study;
     }
 
     public void setStudy(Study study) {
         this.study = study;
     }
 
+    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JoinTable(name = "PATIENT_COMMENT",
+        joinColumns = { @JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
     public Collection<Comment> getCommentCollection() {
-        return commentCollection;
+        return this.commentCollection;
     }
 
     public void setCommentCollection(Collection<Comment> commentCollection) {

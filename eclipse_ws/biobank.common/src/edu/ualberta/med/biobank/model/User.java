@@ -1,92 +1,110 @@
 package edu.ualberta.med.biobank.model;
 
-import org.hibernate.validator.NotNull;
-import org.hibernate.validator.NotEmpty;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Collection;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
+@Entity
+@DiscriminatorValue("User")
 public class User extends Principal {
     private static final long serialVersionUID = 1L;
 
     private String login;
     private Long csmUserId;
-    private Boolean recvBulkEmails;
+    private boolean recvBulkEmails;
+    private String fullName;
     private String email;
-    private Boolean needPwdChange;
+    private boolean needPwdChange;
     private ActivityStatus activityStatus;
-    private Collection<Comment> commentCollection = new HashSet<Comment>();
-    private Collection<BbGroup> groupCollection = new HashSet<BbGroup>();
+    private Collection<Comment> commentCollection = new HashSet<Comment>(0);
+    private Collection<BbGroup> groupCollection = new HashSet<BbGroup>(0);
 
-    @NotEmpty
+    @Column(name = "LOGIN")
     public String getLogin() {
-        return login;
+        return this.login;
     }
 
     public void setLogin(String login) {
         this.login = login;
     }
 
-    @NotNull
+    @Column(name = "CSM_USER_ID")
     public Long getCsmUserId() {
-        return csmUserId;
+        return this.csmUserId;
     }
 
     public void setCsmUserId(Long csmUserId) {
         this.csmUserId = csmUserId;
     }
 
-    public Boolean getRecvBulkEmails() {
-        return recvBulkEmails;
+    @Column(name = "RECV_BULK_EMAILS")
+    // TODO: rename to isRecvBulkEmails
+    public boolean getRecvBulkEmails() {
+        return this.recvBulkEmails;
     }
 
-    public void setRecvBulkEmails(Boolean recvBulkEmails) {
+    public void setRecvBulkEmails(boolean recvBulkEmails) {
         this.recvBulkEmails = recvBulkEmails;
     }
 
-    public String fullName;
-
+    @Column(name = "FULL_NAME")
     public String getFullName() {
-        return fullName;
+        return this.fullName;
     }
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
 
+    @Column(name = "EMAIL")
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public Boolean getNeedPwdChange() {
-        return needPwdChange;
+    @Column(name = "NEED_PWD_CHANGE")
+    // TODO: rename to isRecvBulkEmails
+    public boolean getNeedPwdChange() {
+        return this.needPwdChange;
     }
 
-    public void setNeedPwdChange(Boolean needPwdChange) {
+    public void setNeedPwdChange(boolean needPwdChange) {
         this.needPwdChange = needPwdChange;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {
-        return activityStatus;
+        return this.activityStatus;
     }
 
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }
 
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID", updatable = false)
     public Collection<Comment> getCommentCollection() {
-        return commentCollection;
+        return this.commentCollection;
     }
 
     public void setCommentCollection(Collection<Comment> commentCollection) {
         this.commentCollection = commentCollection;
     }
 
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "userCollection")
     public Collection<BbGroup> getGroupCollection() {
-        return groupCollection;
+        return this.groupCollection;
     }
 
     public void setGroupCollection(Collection<BbGroup> groupCollection) {

@@ -1,30 +1,45 @@
 package edu.ualberta.med.biobank.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "SOURCE_SPECIMEN")
 public class SourceSpecimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
-    private Boolean needOriginalVolume;
+    private boolean needOriginalVolume;
     private SpecimenType specimenType;
     private Study study;
 
-    public Boolean getNeedOriginalVolume() {
-        return needOriginalVolume;
+    @Column(name = "NEED_ORIGINAL_VOLUME")
+    // TODO: rename to isNeedOriginalVolume
+    public boolean getNeedOriginalVolume() {
+        return this.needOriginalVolume;
     }
 
-    public void setNeedOriginalVolume(Boolean needOriginalVolume) {
+    public void setNeedOriginalVolume(boolean needOriginalVolume) {
         this.needOriginalVolume = needOriginalVolume;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
     public SpecimenType getSpecimenType() {
-        return specimenType;
+        return this.specimenType;
     }
 
     public void setSpecimenType(SpecimenType specimenType) {
         this.specimenType = specimenType;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "STUDY_ID", nullable = false)
     public Study getStudy() {
-        return study;
+        return this.study;
     }
 
     public void setStudy(Study study) {

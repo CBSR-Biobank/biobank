@@ -58,7 +58,7 @@ public class ContainerTypePrePersistChecks extends LoadModelAction<ContainerType
 
     private void checkTopLevelNotChanged(ContainerType oldContainerType)
         throws BiobankSessionException {
-        if (!getModel().getTopLevel().equals(oldContainerType.getTopLevel())) {
+        if (getModel().getTopLevel() != oldContainerType.getTopLevel()) {
             throw new BiobankSessionException(CANNOT_CHANGE_TOP_LEVEL_MSG);
         }
     }

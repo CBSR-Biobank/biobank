@@ -1,64 +1,82 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Collection;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
+@javax.persistence.Entity
+@Table(name = "REPORT")
 public class Report extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String name;
     private String description;
     private Integer userId;
-    private Boolean isPublic = false;
-    private Boolean isCount = false;
+    private boolean isPublic;
+    private boolean isCount;
     private Collection<ReportColumn> reportColumnCollection =
-        new HashSet<ReportColumn>();
+        new HashSet<ReportColumn>(0);
     private Entity entity;
     private Collection<ReportFilter> reportFilterCollection =
-        new HashSet<ReportFilter>();
+        new HashSet<ReportFilter>(0);
 
+    @Column(name = "NAME")
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+    @Column(name = "DESCRIPTION", columnDefinition="TEXT")
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
+    @Column(name = "USER_ID")
     public Integer getUserId() {
-        return userId;
+        return this.userId;
     }
 
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public Boolean getIsPublic() {
-        return isPublic;
+    @Column(name = "IS_PUBLIC")
+    // TODO: rename to isPublic
+    public boolean getIsPublic() {
+        return this.isPublic;
     }
 
-    public void setIsPublic(Boolean isPublic) {
+    public void setIsPublic(boolean isPublic) {
         this.isPublic = isPublic;
     }
 
-    public Boolean getIsCount() {
-        return isCount;
+    @Column(name = "IS_COUNT")
+    // TODO: rename to isCount
+    public boolean getIsCount() {
+        return this.isCount;
     }
 
-    public void setIsCount(Boolean isCount) {
+    public void setIsCount(boolean isCount) {
         this.isCount = isCount;
     }
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "REPORT_ID", updatable = false)
     public Collection<ReportColumn> getReportColumnCollection() {
-        return reportColumnCollection;
+        return this.reportColumnCollection;
     }
 
     public void setReportColumnCollection(
@@ -66,16 +84,20 @@ public class Report extends AbstractBiobankModel {
         this.reportColumnCollection = reportColumnCollection;
     }
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ENTITY_ID", nullable = false)
     public Entity getEntity() {
-        return entity;
+        return this.entity;
     }
 
     public void setEntity(Entity entity) {
         this.entity = entity;
     }
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "REPORT_ID", updatable = false)
     public Collection<ReportFilter> getReportFilterCollection() {
-        return reportFilterCollection;
+        return this.reportFilterCollection;
     }
 
     public void setReportFilterCollection(

@@ -1,5 +1,14 @@
 package edu.ualberta.med.biobank.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "REQUEST_SPECIMEN")
 public class RequestSpecimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -8,32 +17,38 @@ public class RequestSpecimen extends AbstractBiobankModel {
     private Specimen specimen;
     private Request request;
 
+    @Column(name = "STATE")
     public Integer getState() {
-        return state;
+        return this.state;
     }
 
     public void setState(Integer state) {
         this.state = state;
     }
 
+    @Column(name = "CLAIMED_BY", length = 50)
     public String getClaimedBy() {
-        return claimedBy;
+        return this.claimedBy;
     }
 
     public void setClaimedBy(String claimedBy) {
         this.claimedBy = claimedBy;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SPECIMEN_ID", nullable = false)
     public Specimen getSpecimen() {
-        return specimen;
+        return this.specimen;
     }
 
     public void setSpecimen(Specimen specimen) {
         this.specimen = specimen;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "REQUEST_ID", nullable = false)
     public Request getRequest() {
-        return request;
+        return this.request;
     }
 
     public void setRequest(Request request) {

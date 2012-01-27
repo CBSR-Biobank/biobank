@@ -1,10 +1,15 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
-import org.hibernate.validator.NotEmpty;
-import org.hibernate.validator.NotNull;
-
+@Entity
+@Table(name = "COMMENT")
 public class Comment extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -12,27 +17,28 @@ public class Comment extends AbstractBiobankModel {
     private Date createdAt;
     private User user;
 
-    @NotEmpty
+    @Column(name = "MESSAGE", columnDefinition="TEXT")
     public String getMessage() {
-        return message;
+        return this.message;
     }
 
     public void setMessage(String message) {
         this.message = message;
     }
 
-    @NotNull
+    @Column(name = "CREATED_AT")
     public Date getCreatedAt() {
-        return createdAt;
+        return this.createdAt;
     }
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID", nullable = false)
     public User getUser() {
-        return user;
+        return this.user;
     }
 
     public void setUser(User user) {

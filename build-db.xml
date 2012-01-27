@@ -10,7 +10,7 @@
       </fileset>
   </path>
 
-  <property name="model.classpath" value="${eclipse.proj.dir.common}/src" />
+  <property name="model.classpath" value="${eclipse.proj.dir.common}/output" />
 
   <path id="sql.classpath">
     <fileset dir="${req.jars.dir}">
@@ -37,9 +37,21 @@
            classname="org.hibernate.tool.ant.HibernateToolTask" 
            classpathref="hibernatetool.lib" />
 
-  <target name="schemaupdate">
-    <hibernatetool destdir="." classpath="${model.classpath}">
+<!-- was to generate java files from hbm.xml files
+  <target name="hbm2java">
+    <mkdir dir="gen" />
+    <hibernatetool destdir="gen" classpath="${model.classpath}">
       <configuration configurationfile="${eclipse.proj.dir.common}/src/hibernate.cfg.xml"/>
+      <hbm2java jdk5="true" ejb3="true" />
+    </hibernatetool>
+  </target>
+-->
+
+  <target name="schemaupdate"
+          depends="build-common-project">
+    <echo message="classpath:${model.classpath}" />
+    <hibernatetool destdir="." classpath="${model.classpath}">
+      <annotationconfiguration configurationfile="${eclipse.proj.dir.common}/output/hibernate.cfg.xml"/>
       <hbm2ddl export="true"
                drop="true"
                create="true" />

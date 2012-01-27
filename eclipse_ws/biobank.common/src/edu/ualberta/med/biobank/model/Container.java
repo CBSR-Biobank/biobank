@@ -1,72 +1,89 @@
 package edu.ualberta.med.biobank.model;
 
-import org.hibernate.validator.NotEmpty;
-import org.hibernate.validator.NotNull;
-
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Collection;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "CONTAINER")
 public class Container extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String productBarcode;
     private String label;
-    private Double temperature;
+    private double temperature;
     private String path;
-    private Collection<Comment> commentCollection = new HashSet<Comment>();
+    private Collection<Comment> commentCollection = new HashSet<Comment>(0);
     private Collection<ContainerPosition> childPositionCollection =
-        new HashSet<ContainerPosition>();
+        new HashSet<ContainerPosition>(0);
     private Container topContainer;
     private Collection<SpecimenPosition> specimenPositionCollection =
-        new HashSet<SpecimenPosition>();
+        new HashSet<SpecimenPosition>(0);
     private ContainerType containerType;
     private ContainerPosition position;
     private Site site;
     private ActivityStatus activityStatus;
 
+    @Column(name = "PRODUCT_BARCODE")
     public String getProductBarcode() {
-        return productBarcode;
+        return this.productBarcode;
     }
 
     public void setProductBarcode(String productBarcode) {
         this.productBarcode = productBarcode;
     }
 
-    @NotEmpty
+    @Column(name = "LABEL", nullable = false)
     public String getLabel() {
-        return label;
+        return this.label;
     }
 
     public void setLabel(String label) {
         this.label = label;
     }
 
-    public Double getTemperature() {
-        return temperature;
+    @Column(name = "TEMPERATURE")
+    public double getTemperature() {
+        return this.temperature;
     }
 
-    public void setTemperature(Double temperature) {
+    public void setTemperature(double temperature) {
         this.temperature = temperature;
     }
 
+    @Column(name = "PATH")
     public String getPath() {
-        return path;
+        return this.path;
     }
 
     public void setPath(String path) {
         this.path = path;
     }
 
+    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JoinTable(name = "CONTAINER_COMMENT",
+        joinColumns = { @JoinColumn(name = "CONTAINER_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
     public Collection<Comment> getCommentCollection() {
-        return commentCollection;
+        return this.commentCollection;
     }
 
     public void setCommentCollection(Collection<Comment> commentCollection) {
         this.commentCollection = commentCollection;
     }
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "parentContainer")
     public Collection<ContainerPosition> getChildPositionCollection() {
-        return childPositionCollection;
+        return this.childPositionCollection;
     }
 
     public void setChildPositionCollection(
@@ -74,16 +91,19 @@ public class Container extends AbstractBiobankModel {
         this.childPositionCollection = childPositionCollection;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TOP_CONTAINER_ID")
     public Container getTopContainer() {
-        return topContainer;
+        return this.topContainer;
     }
 
     public void setTopContainer(Container topContainer) {
         this.topContainer = topContainer;
     }
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "container")
     public Collection<SpecimenPosition> getSpecimenPositionCollection() {
-        return specimenPositionCollection;
+        return this.specimenPositionCollection;
     }
 
     public void setSpecimenPositionCollection(
@@ -91,36 +111,40 @@ public class Container extends AbstractBiobankModel {
         this.specimenPositionCollection = specimenPositionCollection;
     }
 
-    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false)
     public ContainerType getContainerType() {
-        return containerType;
+        return this.containerType;
     }
 
     public void setContainerType(ContainerType containerType) {
         this.containerType = containerType;
     }
 
-    @NotNull
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "POSITION_ID", unique = true)
     public ContainerPosition getPosition() {
-        return position;
+        return this.position;
     }
 
     public void setPosition(ContainerPosition position) {
         this.position = position;
     }
 
-    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SITE_ID", nullable = false)
     public Site getSite() {
-        return site;
+        return this.site;
     }
 
     public void setSite(Site site) {
         this.site = site;
     }
 
-    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {
-        return activityStatus;
+        return this.activityStatus;
     }
 
     public void setActivityStatus(ActivityStatus activityStatus) {

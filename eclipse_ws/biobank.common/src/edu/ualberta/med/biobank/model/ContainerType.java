@@ -1,75 +1,81 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Collection;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
-import org.hibernate.validator.NotEmpty;
-import org.hibernate.validator.NotNull;
-
+@Entity
+@Table(name = "CONTAINER_TYPE")
 public class ContainerType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String name;
     private String nameShort;
-    private Boolean topLevel = false;
-    private Double defaultTemperature;
-    private Collection<Comment> commentCollection = new HashSet<Comment>();
+    private boolean topLevel;
+    private double defaultTemperature;
     private Collection<SpecimenType> specimenTypeCollection =
-        new HashSet<SpecimenType>();
+        new HashSet<SpecimenType>(0);
     private Collection<ContainerType> childContainerTypeCollection =
-        new HashSet<ContainerType>();
+        new HashSet<ContainerType>(0);
     private ActivityStatus activityStatus;
+    private Collection<Comment> commentCollection = new HashSet<Comment>(0);
     private Capacity capacity;
     private Site site;
     private ContainerLabelingScheme childLabelingScheme;
     private Collection<ContainerType> parentContainerTypeCollection =
-        new HashSet<ContainerType>();
+        new HashSet<ContainerType>(0);
 
-    @NotEmpty
+    @Column(name = "NAME")
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    @NotEmpty
+    @Column(name = "NAME_SHORT")
     public String getNameShort() {
-        return nameShort;
+        return this.nameShort;
     }
 
     public void setNameShort(String nameShort) {
         this.nameShort = nameShort;
     }
 
-    @NotNull
-    public Boolean getTopLevel() {
-        return topLevel;
+    @Column(name = "TOP_LEVEL")
+    // TODO: rename to isTopLevel
+    public boolean getTopLevel() {
+        return this.topLevel;
     }
 
-    public void setTopLevel(Boolean topLevel) {
+    public void setTopLevel(boolean topLevel) {
         this.topLevel = topLevel;
     }
 
-    public Double getDefaultTemperature() {
-        return defaultTemperature;
+    @Column(name = "DEFAULT_TEMPERATURE")
+    public double getDefaultTemperature() {
+        return this.defaultTemperature;
     }
 
-    public void setDefaultTemperature(Double defaultTemperature) {
+    public void setDefaultTemperature(double defaultTemperature) {
         this.defaultTemperature = defaultTemperature;
     }
 
-    public Collection<Comment> getCommentCollection() {
-        return commentCollection;
-    }
-
-    public void setCommentCollection(Collection<Comment> comments) {
-        this.commentCollection = comments;
-    }
-
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "CONTAINER_TYPE_SPECIMEN_TYPE",
+        joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false, updatable = false) })
     public Collection<SpecimenType> getSpecimenTypeCollection() {
-        return specimenTypeCollection;
+        return this.specimenTypeCollection;
     }
 
     public void setSpecimenTypeCollection(
@@ -77,8 +83,12 @@ public class ContainerType extends AbstractBiobankModel {
         this.specimenTypeCollection = specimenTypeCollection;
     }
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
+        joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false, updatable = false) })
     public Collection<ContainerType> getChildContainerTypeCollection() {
-        return childContainerTypeCollection;
+        return this.childContainerTypeCollection;
     }
 
     public void setChildContainerTypeCollection(
@@ -86,32 +96,52 @@ public class ContainerType extends AbstractBiobankModel {
         this.childContainerTypeCollection = childContainerTypeCollection;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {
-        return activityStatus;
+        return this.activityStatus;
     }
 
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "CONTAINER_TYPE_COMMENT",
+        joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
+    public Collection<Comment> getCommentCollection() {
+        return this.commentCollection;
+    }
+
+    public void setCommentCollection(Collection<Comment> commentCollection) {
+        this.commentCollection = commentCollection;
+    }
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "CAPACITY_ID", unique = true, nullable = false)
     public Capacity getCapacity() {
-        return capacity;
+        return this.capacity;
     }
 
     public void setCapacity(Capacity capacity) {
         this.capacity = capacity;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SITE_ID", nullable = false)
     public Site getSite() {
-        return site;
+        return this.site;
     }
 
     public void setSite(Site site) {
         this.site = site;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CHILD_LABELING_SCHEME_ID", nullable = false)
     public ContainerLabelingScheme getChildLabelingScheme() {
-        return childLabelingScheme;
+        return this.childLabelingScheme;
     }
 
     public void setChildLabelingScheme(
@@ -119,8 +149,9 @@ public class ContainerType extends AbstractBiobankModel {
         this.childLabelingScheme = childLabelingScheme;
     }
 
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "childContainerTypeCollection")
     public Collection<ContainerType> getParentContainerTypeCollection() {
-        return parentContainerTypeCollection;
+        return this.parentContainerTypeCollection;
     }
 
     public void setParentContainerTypeCollection(

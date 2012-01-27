@@ -1,11 +1,17 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Collection;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
-import org.hibernate.validator.NotEmpty;
-import org.hibernate.validator.NotNull;
-
+@Entity
+@Table(name = "CONTACT")
 public class Contact extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -16,77 +22,85 @@ public class Contact extends AbstractBiobankModel {
     private String emailAddress;
     private String pagerNumber;
     private String officeNumber;
-    private Collection<Study> studyCollection = new HashSet<Study>();
+    private Collection<Study> studyCollection = new HashSet<Study>(0);
     private Clinic clinic;
 
-    @NotEmpty
+    @Column(name = "NAME", length = 100)
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+    @Column(name = "TITLE", length = 100)
     public String getTitle() {
-        return title;
+        return this.title;
     }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
+    @Column(name = "MOBILE_NUMBER", length = 50)
     public String getMobileNumber() {
-        return mobileNumber;
+        return this.mobileNumber;
     }
 
     public void setMobileNumber(String mobileNumber) {
         this.mobileNumber = mobileNumber;
     }
 
+    @Column(name = "FAX_NUMBER", length = 50)
     public String getFaxNumber() {
-        return faxNumber;
+        return this.faxNumber;
     }
 
     public void setFaxNumber(String faxNumber) {
         this.faxNumber = faxNumber;
     }
 
+    @Column(name = "EMAIL_ADDRESS", length = 50)
     public String getEmailAddress() {
-        return emailAddress;
+        return this.emailAddress;
     }
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
     }
 
+    @Column(name = "PAGER_NUMBER", length = 50)
     public String getPagerNumber() {
-        return pagerNumber;
+        return this.pagerNumber;
     }
 
     public void setPagerNumber(String pagerNumber) {
         this.pagerNumber = pagerNumber;
     }
 
+    @Column(name = "OFFICE_NUMBER", length = 50)
     public String getOfficeNumber() {
-        return officeNumber;
+        return this.officeNumber;
     }
 
     public void setOfficeNumber(String officeNumber) {
         this.officeNumber = officeNumber;
     }
 
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "contactCollection")
     public Collection<Study> getStudyCollection() {
-        return studyCollection;
+        return this.studyCollection;
     }
 
     public void setStudyCollection(Collection<Study> studyCollection) {
         this.studyCollection = studyCollection;
     }
 
-    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CLINIC_ID", nullable = false)
     public Clinic getClinic() {
-        return clinic;
+        return this.clinic;
     }
 
     public void setClinic(Clinic clinic) {
