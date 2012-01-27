@@ -8,6 +8,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name = "COMMENT")
 public class Comment extends AbstractBiobankModel {
@@ -17,6 +20,7 @@ public class Comment extends AbstractBiobankModel {
     private Date createdAt;
     private User user;
 
+    @NotEmpty
     @Column(name = "MESSAGE", columnDefinition="TEXT")
     public String getMessage() {
         return this.message;
@@ -35,6 +39,7 @@ public class Comment extends AbstractBiobankModel {
         this.createdAt = createdAt;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID", nullable = false)
     public User getUser() {

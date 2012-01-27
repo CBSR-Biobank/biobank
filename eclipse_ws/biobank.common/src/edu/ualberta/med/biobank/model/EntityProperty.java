@@ -10,6 +10,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name = "ENTITY_PROPERTY")
 public class EntityProperty extends AbstractBiobankModel {
@@ -22,6 +25,7 @@ public class EntityProperty extends AbstractBiobankModel {
     private Collection<EntityFilter> entityFilterCollection =
         new HashSet<EntityFilter>(0);
 
+    @NotEmpty
     @Column(name = "PROPERTY")
     public String getProperty() {
         return this.property;
@@ -42,6 +46,7 @@ public class EntityProperty extends AbstractBiobankModel {
         this.entityColumnCollection = entityColumnCollection;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "PROPERTY_TYPE_ID", nullable = false)
     public PropertyType getPropertyType() {

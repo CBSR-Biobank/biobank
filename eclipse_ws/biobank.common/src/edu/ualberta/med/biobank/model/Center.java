@@ -17,6 +17,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name = "CENTER")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -41,6 +44,7 @@ public class Center extends AbstractBiobankModel {
     private ActivityStatus activityStatus;
     private Collection<Comment> commentCollection = new HashSet<Comment>(0);
 
+    @NotEmpty
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
         return this.name;
@@ -50,6 +54,7 @@ public class Center extends AbstractBiobankModel {
         this.name = name;
     }
 
+    @NotEmpty
     @Column(name = "NAME_SHORT", unique = true, nullable = false, length = 50)
     public String getNameShort() {
         return this.nameShort;
@@ -59,6 +64,7 @@ public class Center extends AbstractBiobankModel {
         this.nameShort = nameShort;
     }
 
+    @NotNull
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "ADDRESS_ID", unique = true, nullable = false)
     public Address getAddress() {
@@ -121,6 +127,7 @@ public class Center extends AbstractBiobankModel {
         this.originInfoCollection = originInfoCollection;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {

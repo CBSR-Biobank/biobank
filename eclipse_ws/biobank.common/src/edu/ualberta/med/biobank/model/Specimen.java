@@ -15,6 +15,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.validator.Min;
+import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.NotNull;
 
 @Entity
 @Table(name = "SPECIMEN")
@@ -42,6 +45,7 @@ public class Specimen extends AbstractBiobankModel {
     private ProcessingEvent processingEvent;
     private Specimen parentSpecimen;
 
+    @NotEmpty
     @Column(name = "INVENTORY_ID", unique = true, nullable = false, length = 100)
     public String getInventoryId() {
         return this.inventoryId;
@@ -51,6 +55,7 @@ public class Specimen extends AbstractBiobankModel {
         this.inventoryId = inventoryId;
     }
 
+    @Min(value = 0)
     @Column(name = "QUANTITY")
     public Double getQuantity() {
         return this.quantity;
@@ -79,6 +84,7 @@ public class Specimen extends AbstractBiobankModel {
         this.topSpecimen = topSpecimen;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false)
     public CollectionEvent getCollectionEvent() {
@@ -89,8 +95,9 @@ public class Specimen extends AbstractBiobankModel {
         this.collectionEvent = collectionEvent;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CURRENT_CENTER_ID")
+    @JoinColumn(name = "CURRENT_CENTER_ID", nullable = false)
     public Center getCurrentCenter() {
         return this.currentCenter;
     }
@@ -119,7 +126,8 @@ public class Specimen extends AbstractBiobankModel {
         CollectionEvent originalCollectionEvent) {
         this.originalCollectionEvent = originalCollectionEvent;
     }
-
+    
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
     public SpecimenType getSpecimenType() {
@@ -173,6 +181,7 @@ public class Specimen extends AbstractBiobankModel {
         this.requestSpecimenCollection = requestSpecimenCollection;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ORIGIN_INFO_ID", nullable = false)
     public OriginInfo getOriginInfo() {
@@ -182,7 +191,8 @@ public class Specimen extends AbstractBiobankModel {
     public void setOriginInfo(OriginInfo originInfo) {
         this.originInfo = originInfo;
     }
-
+    
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {

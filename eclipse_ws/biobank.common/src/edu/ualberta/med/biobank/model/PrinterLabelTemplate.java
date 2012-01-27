@@ -7,6 +7,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name = "PRINTER_LABEL_TEMPLATE")
 public class PrinterLabelTemplate extends AbstractBiobankModel {
@@ -17,6 +20,8 @@ public class PrinterLabelTemplate extends AbstractBiobankModel {
     private String configData;
     private JasperTemplate jasperTemplate;
 
+
+    @NotEmpty
     @Column(name = "NAME", unique = true, length = 50)
     public String getName() {
         return this.name;
@@ -44,6 +49,7 @@ public class PrinterLabelTemplate extends AbstractBiobankModel {
         this.configData = configData;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "JASPER_TEMPLATE_ID", nullable = false)
     public JasperTemplate getJasperTemplate() {

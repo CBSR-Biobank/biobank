@@ -10,6 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
+import org.hibernate.validator.NotEmpty;
+
 @Entity
 @DiscriminatorValue("BbGroup")
 public class BbGroup extends Principal {
@@ -19,6 +21,7 @@ public class BbGroup extends Principal {
     private String description;
     private Collection<User> userCollection = new HashSet<User>(0);
 
+    @NotEmpty
     @Column(name = "NAME")
     public String getName() {
         return this.name;

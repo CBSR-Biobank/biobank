@@ -7,6 +7,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name = "ENTITY_FILTER")
 public class EntityFilter extends AbstractBiobankModel {
@@ -25,6 +28,7 @@ public class EntityFilter extends AbstractBiobankModel {
         this.filterType = filterType;
     }
 
+    @NotEmpty
     @Column(name = "NAME")
     public String getName() {
         return this.name;
@@ -34,6 +38,7 @@ public class EntityFilter extends AbstractBiobankModel {
         this.name = name;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ENTITY_PROPERTY_ID", nullable = false)
     public EntityProperty getEntityProperty() {

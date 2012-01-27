@@ -4,6 +4,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+
+// TODO: make enum?
 @Entity
 @Table(name = "EVENT_ATTR_TYPE")
 public class EventAttrType extends AbstractBiobankModel {
@@ -11,6 +14,8 @@ public class EventAttrType extends AbstractBiobankModel {
 
     private String name;
 
+    // TODO: unique
+    @NotEmpty
     @Column(name = "NAME", unique = true, nullable = false, length = 50)
     public String getName() {
         return this.name;

@@ -7,6 +7,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name = "EVENT_ATTR")
 public class EventAttr extends AbstractBiobankModel {
@@ -25,6 +27,7 @@ public class EventAttr extends AbstractBiobankModel {
         this.value = value;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false)
     public CollectionEvent getCollectionEvent() {
@@ -35,6 +38,7 @@ public class EventAttr extends AbstractBiobankModel {
         this.collectionEvent = collectionEvent;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_EVENT_ATTR_ID", nullable = false)
     public StudyEventAttr getStudyEventAttr() {

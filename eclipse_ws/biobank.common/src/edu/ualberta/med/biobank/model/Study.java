@@ -14,6 +14,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.NotNull;
 
 @Entity
 @Table(name = "STUDY")
@@ -37,6 +39,7 @@ public class Study extends AbstractBiobankModel {
     private Collection<SourceSpecimen> sourceSpecimenCollection =
         new HashSet<SourceSpecimen>(0);
 
+    @NotEmpty
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
         return this.name;
@@ -46,6 +49,7 @@ public class Study extends AbstractBiobankModel {
         this.name = name;
     }
 
+    @NotEmpty
     @Column(name = "NAME_SHORT", unique = true, nullable = false, length = 50)
     public String getNameShort() {
         return this.nameShort;
@@ -97,6 +101,7 @@ public class Study extends AbstractBiobankModel {
         this.commentCollection = commentCollection;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {

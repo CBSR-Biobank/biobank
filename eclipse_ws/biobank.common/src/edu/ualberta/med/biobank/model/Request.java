@@ -12,6 +12,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name = "REQUEST")
 public class Request extends AbstractBiobankModel {
@@ -34,7 +36,8 @@ public class Request extends AbstractBiobankModel {
         this.submitted = submitted;
     }
 
-    @Column(name = "CREATED")
+    @NotNull
+    @Column(name = "CREATED", nullable = false)
     public Date getCreated() {
         return this.created;
     }
@@ -63,6 +66,7 @@ public class Request extends AbstractBiobankModel {
         this.requestSpecimenCollection = requestSpecimenCollection;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ADDRESS_ID", nullable = false)
     public Address getAddress() {
@@ -73,6 +77,7 @@ public class Request extends AbstractBiobankModel {
         this.address = address;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RESEARCH_GROUP_ID", nullable = false)
     public ResearchGroup getResearchGroup() {

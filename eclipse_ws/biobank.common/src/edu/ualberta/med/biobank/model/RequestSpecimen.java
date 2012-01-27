@@ -7,6 +7,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name = "REQUEST_SPECIMEN")
 public class RequestSpecimen extends AbstractBiobankModel {
@@ -17,7 +19,9 @@ public class RequestSpecimen extends AbstractBiobankModel {
     private Specimen specimen;
     private Request request;
 
-    @Column(name = "STATE")
+    // TODO: switch to enum?
+    @NotNull
+    @Column(name = "STATE", nullable = false)
     public Integer getState() {
         return this.state;
     }
@@ -35,6 +39,7 @@ public class RequestSpecimen extends AbstractBiobankModel {
         this.claimedBy = claimedBy;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_ID", nullable = false)
     public Specimen getSpecimen() {
@@ -45,6 +50,7 @@ public class RequestSpecimen extends AbstractBiobankModel {
         this.specimen = specimen;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "REQUEST_ID", nullable = false)
     public Request getRequest() {

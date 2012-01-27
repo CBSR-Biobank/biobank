@@ -27,6 +27,7 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
         this.quantity = quantity;
     }
 
+    // TODO: change to decimal
     @Column(name = "VOLUME")
     public double getVolume() {
         return this.volume;

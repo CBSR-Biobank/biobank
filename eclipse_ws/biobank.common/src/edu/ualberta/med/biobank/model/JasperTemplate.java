@@ -4,6 +4,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+
 @Entity
 @Table(name = "JASPER_TEMPLATE")
 public class JasperTemplate extends AbstractBiobankModel {
@@ -12,6 +14,8 @@ public class JasperTemplate extends AbstractBiobankModel {
     private String name;
     private String xml;
 
+    // TODO: unique
+    @NotEmpty
     @Column(name = "NAME", unique = true, length = 50)
     public String getName() {
         return this.name;
@@ -21,6 +25,7 @@ public class JasperTemplate extends AbstractBiobankModel {
         this.name = name;
     }
 
+    @NotEmpty
     @Column(name = "XML", columnDefinition="TEXT")
     public String getXml() {
         return this.xml;

@@ -4,6 +4,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.hibernate.validator.Min;
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name = "CAPACITY")
 public class Capacity extends AbstractBiobankModel {
@@ -12,6 +15,8 @@ public class Capacity extends AbstractBiobankModel {
     private Integer rowCapacity;
     private Integer colCapacity;
 
+    @NotNull
+    @Min(value = 0)
     @Column(name = "ROW_CAPACITY", nullable = false)
     public Integer getRowCapacity() {
         return this.rowCapacity;
@@ -21,6 +26,8 @@ public class Capacity extends AbstractBiobankModel {
         this.rowCapacity = rowCapacity;
     }
 
+    @NotNull
+    @Min(value = 0)
     @Column(name = "COL_CAPACITY", nullable = false)
     public Integer getColCapacity() {
         return this.colCapacity;

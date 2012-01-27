@@ -8,6 +8,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+
 @javax.persistence.Entity
 @Table(name = "ENTITY")
 public class Entity extends AbstractBiobankModel {
@@ -19,6 +21,7 @@ public class Entity extends AbstractBiobankModel {
     private Collection<EntityProperty> entityPropertyCollection =
         new HashSet<EntityProperty>(0);
 
+    @NotEmpty
     @Column(name = "CLASS_NAME")
     public String getClassName() {
         return this.className;
@@ -28,6 +31,7 @@ public class Entity extends AbstractBiobankModel {
         this.className = className;
     }
 
+    @NotEmpty
     @Column(name = "NAME")
     public String getName() {
         return this.name;

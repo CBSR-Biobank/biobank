@@ -6,6 +6,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name="SPECIMEN_POSITION")
 public class SpecimenPosition extends AbstractPosition {
@@ -14,8 +16,9 @@ public class SpecimenPosition extends AbstractPosition {
     private Container container;
     private Specimen specimen;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CONTAINER_ID")
+    @JoinColumn(name = "CONTAINER_ID", nullable = false)
     public Container getContainer() {
         return this.container;
     }
@@ -24,8 +27,9 @@ public class SpecimenPosition extends AbstractPosition {
         this.container = container;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "SPECIMEN_ID", unique = true)
+    @JoinColumn(name = "SPECIMEN_ID", nullable = false, unique = true)
     public Specimen getSpecimen() {
         return this.specimen;
     }

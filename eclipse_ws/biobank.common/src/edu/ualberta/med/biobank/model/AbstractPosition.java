@@ -3,6 +3,9 @@ package edu.ualberta.med.biobank.model;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
+import org.hibernate.validator.Min;
+import org.hibernate.validator.NotNull;
+
 @MappedSuperclass
 public class AbstractPosition extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
@@ -11,6 +14,8 @@ public class AbstractPosition extends AbstractBiobankModel {
     private Integer col;
     private String positionString;
 
+    @NotNull
+    @Min(value = 0)
     @Column(name = "ROW", nullable = false)
     public Integer getRow() {
         return this.row;
@@ -20,6 +25,8 @@ public class AbstractPosition extends AbstractBiobankModel {
         this.row = row;
     }
 
+    @NotNull
+    @Min(value = 0)
     @Column(name = "COL", nullable = false)
     public Integer getCol() {
         return this.col;
@@ -29,6 +36,7 @@ public class AbstractPosition extends AbstractBiobankModel {
         this.col = col;
     }
 
+    @NotNull
     @Column(name = "POSITION_STRING", length = 255, nullable = false)
     public String getPositionString() {
         return this.positionString;

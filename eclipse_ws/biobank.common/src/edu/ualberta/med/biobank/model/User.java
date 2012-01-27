@@ -11,6 +11,10 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.hibernate.validator.Email;
+import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.NotNull;
+
 @Entity
 @DiscriminatorValue("User")
 public class User extends Principal {
@@ -18,14 +22,15 @@ public class User extends Principal {
 
     private String login;
     private Long csmUserId;
-    private boolean recvBulkEmails;
+    private boolean recvBulkEmails = true;
     private String fullName;
     private String email;
-    private boolean needPwdChange;
+    private boolean needPwdChange = true;
     private ActivityStatus activityStatus;
     private Collection<Comment> commentCollection = new HashSet<Comment>(0);
     private Collection<BbGroup> groupCollection = new HashSet<BbGroup>(0);
 
+    @NotEmpty
     @Column(name = "LOGIN")
     public String getLogin() {
         return this.login;
@@ -35,6 +40,7 @@ public class User extends Principal {
         this.login = login;
     }
 
+    @NotNull
     @Column(name = "CSM_USER_ID")
     public Long getCsmUserId() {
         return this.csmUserId;
@@ -63,6 +69,7 @@ public class User extends Principal {
         this.fullName = fullName;
     }
 
+    @Email
     @Column(name = "EMAIL")
     public String getEmail() {
         return this.email;

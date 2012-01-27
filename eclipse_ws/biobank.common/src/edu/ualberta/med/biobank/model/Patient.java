@@ -14,6 +14,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name = "PATIENT")
 public class Patient extends AbstractBiobankModel {
@@ -26,6 +29,7 @@ public class Patient extends AbstractBiobankModel {
     private Study study;
     private Collection<Comment> commentCollection = new HashSet<Comment>(0);
 
+    @NotEmpty
     @Column(name = "PNUMBER", unique = true, nullable = false, length = 100)
     public String getPnumber() {
         return this.pnumber;
@@ -35,6 +39,7 @@ public class Patient extends AbstractBiobankModel {
         this.pnumber = pnumber;
     }
 
+    @NotNull
     @Column(name = "CREATED_AT")
     public Date getCreatedAt() {
         return this.createdAt;
@@ -54,6 +59,7 @@ public class Patient extends AbstractBiobankModel {
         this.collectionEventCollection = collectionEventCollection;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_ID", nullable = false)
     public Study getStudy() {

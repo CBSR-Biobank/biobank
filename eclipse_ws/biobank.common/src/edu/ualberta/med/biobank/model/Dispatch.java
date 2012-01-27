@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name = "DISPATCH")
 public class Dispatch extends AbstractBiobankModel {
@@ -26,6 +28,8 @@ public class Dispatch extends AbstractBiobankModel {
     private Center receiverCenter;
     private Collection<Comment> commentCollection = new HashSet<Comment>(0);
 
+    // TODO: convert to enum
+    @NotNull
     @Column(name = "STATE")
     public Integer getState() {
         return this.state;
@@ -45,6 +49,7 @@ public class Dispatch extends AbstractBiobankModel {
         this.dispatchSpecimenCollection = dispatchSpecimenCollection;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SENDER_CENTER_ID", nullable = false)
     public Center getSenderCenter() {
@@ -65,6 +70,7 @@ public class Dispatch extends AbstractBiobankModel {
         this.shipmentInfo = shipmentInfo;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RECEIVER_CENTER_ID", nullable = false)
     public Center getReceiverCenter() {

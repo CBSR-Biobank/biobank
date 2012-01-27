@@ -7,6 +7,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name="CONTAINER_POSITION")
 public class ContainerPosition extends AbstractPosition {
@@ -15,8 +17,9 @@ public class ContainerPosition extends AbstractPosition {
     private Container parentContainer;
     private Container container;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PARENT_CONTAINER_ID")
+    @JoinColumn(name = "PARENT_CONTAINER_ID", nullable = false)
     public Container getParentContainer() {
         return this.parentContainer;
     }
@@ -25,6 +28,7 @@ public class ContainerPosition extends AbstractPosition {
         this.parentContainer = parentContainer;
     }
 
+    @NotNull
     @OneToOne(fetch = FetchType.EAGER, mappedBy = "position")
     public Container getContainer() {
         return this.container;

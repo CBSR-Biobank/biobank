@@ -9,6 +9,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+
 @Entity
 @Table(name = "PROPERTY_TYPE")
 public class PropertyType extends AbstractBiobankModel {
@@ -18,6 +20,7 @@ public class PropertyType extends AbstractBiobankModel {
     private Collection<PropertyModifier> propertyModifierCollection =
         new HashSet<PropertyModifier>(0);
 
+    @NotEmpty
     @Column(name = "NAME")
     public String getName() {
         return this.name;

@@ -13,6 +13,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name = "CONTAINER")
 public class Container extends AbstractBiobankModel {
@@ -20,7 +23,7 @@ public class Container extends AbstractBiobankModel {
 
     private String productBarcode;
     private String label;
-    private double temperature;
+    private Double temperature;
     private String path;
     private Collection<Comment> commentCollection = new HashSet<Comment>(0);
     private Collection<ContainerPosition> childPositionCollection =
@@ -33,6 +36,8 @@ public class Container extends AbstractBiobankModel {
     private Site site;
     private ActivityStatus activityStatus;
 
+    // TODO: unique
+    @NotEmpty
     @Column(name = "PRODUCT_BARCODE")
     public String getProductBarcode() {
         return this.productBarcode;
@@ -42,6 +47,7 @@ public class Container extends AbstractBiobankModel {
         this.productBarcode = productBarcode;
     }
 
+    @NotNull
     @Column(name = "LABEL", nullable = false)
     public String getLabel() {
         return this.label;
@@ -51,16 +57,18 @@ public class Container extends AbstractBiobankModel {
         this.label = label;
     }
 
+    // TODO: should be decimal?
     @Column(name = "TEMPERATURE")
-    public double getTemperature() {
+    public Double getTemperature() {
         return this.temperature;
     }
 
-    public void setTemperature(double temperature) {
+    public void setTemperature(Double temperature) {
         this.temperature = temperature;
     }
 
-    @Column(name = "PATH")
+    @NotNull
+    @Column(name = "PATH", nullable = false)
     public String getPath() {
         return this.path;
     }
@@ -111,6 +119,7 @@ public class Container extends AbstractBiobankModel {
         this.specimenPositionCollection = specimenPositionCollection;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false)
     public ContainerType getContainerType() {
@@ -131,6 +140,7 @@ public class Container extends AbstractBiobankModel {
         this.position = position;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SITE_ID", nullable = false)
     public Site getSite() {
@@ -141,6 +151,7 @@ public class Container extends AbstractBiobankModel {
         this.site = site;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {

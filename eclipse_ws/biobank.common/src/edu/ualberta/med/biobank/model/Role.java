@@ -10,6 +10,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+
 @Entity
 @Table(name = "ROLE")
 public class Role extends AbstractBiobankModel {
@@ -19,6 +21,7 @@ public class Role extends AbstractBiobankModel {
     private Collection<Permission> permissionCollection =
         new HashSet<Permission>(0);
 
+    @NotEmpty
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
         return this.name;

@@ -10,6 +10,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.validator.Email;
+import org.hibernate.validator.NotEmpty;
+
 @Entity
 @Table(name = "CONTACT")
 public class Contact extends AbstractBiobankModel {
@@ -25,6 +28,7 @@ public class Contact extends AbstractBiobankModel {
     private Collection<Study> studyCollection = new HashSet<Study>(0);
     private Clinic clinic;
 
+    @NotEmpty
     @Column(name = "NAME", length = 100)
     public String getName() {
         return this.name;
@@ -61,6 +65,7 @@ public class Contact extends AbstractBiobankModel {
         this.faxNumber = faxNumber;
     }
 
+    @Email
     @Column(name = "EMAIL_ADDRESS", length = 50)
     public String getEmailAddress() {
         return this.emailAddress;

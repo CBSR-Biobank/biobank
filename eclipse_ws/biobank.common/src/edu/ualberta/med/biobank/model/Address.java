@@ -4,6 +4,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+
 @Entity
 @Table(name = "ADDRESS")
 public class Address extends AbstractBiobankModel {
@@ -37,6 +39,7 @@ public class Address extends AbstractBiobankModel {
         this.street2 = street2;
     }
 
+    @NotEmpty
     @Column(name = "CITY", length = 50)
     public String getCity() {
         return this.city;

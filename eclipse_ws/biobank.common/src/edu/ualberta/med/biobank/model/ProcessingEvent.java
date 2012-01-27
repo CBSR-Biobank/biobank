@@ -14,6 +14,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.NotNull;
 
 @Entity
 @Table(name = "PROCESSING_EVENT")
@@ -27,6 +29,8 @@ public class ProcessingEvent extends AbstractBiobankModel {
     private ActivityStatus activityStatus;
     private Collection<Comment> commentCollection = new HashSet<Comment>(0);
 
+    // TODO: unique
+    @NotEmpty
     @Column(name = "WORKSHEET", length = 100)
     public String getWorksheet() {
         return this.worksheet;
@@ -36,6 +40,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
         this.worksheet = worksheet;
     }
 
+    @NotNull
     @Column(name = "CREATED_AT", nullable = false)
     public Date getCreatedAt() {
         return this.createdAt;
@@ -45,6 +50,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
         this.createdAt = createdAt;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CENTER_ID", nullable = false)
     public Center getCenter() {
@@ -65,6 +71,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
         this.specimenCollection = specimenCollection;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {

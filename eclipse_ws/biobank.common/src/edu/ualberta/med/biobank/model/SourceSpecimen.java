@@ -7,12 +7,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name = "SOURCE_SPECIMEN")
 public class SourceSpecimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
-    private boolean needOriginalVolume;
+    private boolean needOriginalVolume = false;
     private SpecimenType specimenType;
     private Study study;
 
@@ -26,6 +28,7 @@ public class SourceSpecimen extends AbstractBiobankModel {
         this.needOriginalVolume = needOriginalVolume;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
     public SpecimenType getSpecimenType() {
@@ -36,6 +39,7 @@ public class SourceSpecimen extends AbstractBiobankModel {
         this.specimenType = specimenType;
     }
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_ID", nullable = false)
     public Study getStudy() {

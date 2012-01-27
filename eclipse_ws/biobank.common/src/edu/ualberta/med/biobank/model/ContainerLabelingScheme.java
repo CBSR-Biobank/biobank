@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+// TODO: should be an enum?
 @Entity
 @Table(name = "CONTAINER_LABELING_SCHEME")
 public class ContainerLabelingScheme extends AbstractBiobankModel {

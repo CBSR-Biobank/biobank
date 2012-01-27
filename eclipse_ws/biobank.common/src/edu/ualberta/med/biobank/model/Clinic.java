@@ -14,7 +14,7 @@ import javax.persistence.OneToMany;
 public class Clinic extends Center {
     private static final long serialVersionUID = 1L;
     
-    private boolean sendsShipments;
+    private boolean sendsShipments = false;
     private Collection<Contact> contactCollection = new HashSet<Contact>(0);
 
     @Column(name = "SENDS_SHIPMENTS")

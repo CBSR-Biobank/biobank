@@ -10,6 +10,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+
 @Entity
 @Table(name = "SPECIMEN_TYPE")
 public class SpecimenType extends AbstractBiobankModel {
@@ -24,6 +26,7 @@ public class SpecimenType extends AbstractBiobankModel {
     private Collection<SpecimenType> childSpecimenTypeCollection =
         new HashSet<SpecimenType>(0);
 
+    @NotEmpty
     @Column(name = "NAME")
     public String getName() {
         return this.name;
@@ -33,6 +36,7 @@ public class SpecimenType extends AbstractBiobankModel {
         this.name = name;
     }
 
+    @NotEmpty
     @Column(name = "NAME_SHORT")
     public String getNameShort() {
         return this.nameShort;
@@ -74,5 +78,4 @@ public class SpecimenType extends AbstractBiobankModel {
         Collection<SpecimenType> childSpecimenTypeCollection) {
         this.childSpecimenTypeCollection = childSpecimenTypeCollection;
     }
-
 }

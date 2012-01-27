@@ -4,6 +4,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.hibernate.validator.NotEmpty;
+
 @Entity
 @Table(name = "PROPERTY_MODIFIER")
 public class PropertyModifier extends AbstractBiobankModel {
@@ -12,6 +14,7 @@ public class PropertyModifier extends AbstractBiobankModel {
     private String name;
     private String propertyModifier;
 
+    @NotEmpty
     @Column(name = "NAME")
     public String getName() {
         return this.name;
