@@ -56,7 +56,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
 
         } else {
             throw new ActionException(
-                "No dispatch specimens found for id:" + id); //$NON-NLS-1$
+                "No dispatch found for id:" + id); //$NON-NLS-1$
         }
 
         return sInfo;

@@ -128,7 +128,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return getIdProperty().get(wrappedObject);
     }
 
-    protected void setId(Integer id) {
+    public void setId(Integer id) {
         getIdProperty().set(wrappedObject, id);
     }
 

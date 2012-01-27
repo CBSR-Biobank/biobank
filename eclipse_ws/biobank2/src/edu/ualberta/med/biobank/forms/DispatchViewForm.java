@@ -80,14 +80,11 @@ public class DispatchViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         dispatchAdapter = (DispatchAdapter) adapter;
-        if (adapter.getId() != null) {
-            dispatchInfo = SessionManager.getAppService().doAction(
-                new DispatchGetInfoAction(adapter.getId()));
-            dispatch =
-                new DispatchWrapper(SessionManager.getAppService(),
-                    dispatchInfo.dispatch);
-        } else
-            dispatch = new DispatchWrapper(SessionManager.getAppService());
+        dispatchInfo = SessionManager.getAppService().doAction(
+            new DispatchGetInfoAction(adapter.getId()));
+        dispatch =
+            new DispatchWrapper(SessionManager.getAppService(),
+                dispatchInfo.dispatch);
         SessionManager.logLookup(dispatch);
         setPartName(Messages.DispatchViewForm_title);
     }

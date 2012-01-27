@@ -239,7 +239,7 @@ public abstract class AbstractAdapterBase implements
             return null;
 
         for (AbstractAdapterBase child : children) {
-            if ((child.getId().equals(item.getId()))
+            if ((child.getId() != null && child.getId().equals(item.getId()))
                 && child.getLabel().equals(item.getLabel()))
                 return child;
         }

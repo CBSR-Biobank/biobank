@@ -80,6 +80,10 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         this.parent = parent;
     }
 
+    public void setModelObject(ModelWrapper<?> object) {
+        this.modelObject = object;
+    }
+
     @Override
     public Integer getId() {
         if (getModelObject() != null) {
