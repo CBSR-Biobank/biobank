@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.containerType;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -14,7 +13,6 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCreatePermission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeUpdatePermission;
-import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Comment;
@@ -176,52 +174,15 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         ContainerType containerType) {
         Map<Integer, SpecimenType> specimenTypes =
             context.load(SpecimenType.class, specimenTypeIds);
-        SetDifference<SpecimenType> specimenTypeDiff =
-            new SetDifference<SpecimenType>(
-                containerType.getSpecimenTypeCollection(),
-                specimenTypes.values());
-
         containerType.setSpecimenTypeCollection(new HashSet<SpecimenType>(
             specimenTypes.values()));
-
-        // remove this container type from specimen types in removed list
-        for (SpecimenType specimenType : specimenTypeDiff.getRemoveSet()) {
-            Collection<ContainerType> containerTypes =
-                specimenType.getContainerTypeCollection();
-            if (containerTypes.remove(containerTypes)) {
-                specimenType.setContainerTypeCollection(containerTypes);
-            } else {
-                throw new ActionException(
-                    "container type not found in removed specimen type's collection");
-            }
-        }
     }
 
     private void setChildContainerTypes(ActionContext context,
         ContainerType containerType) {
         Map<Integer, ContainerType> childContainerTypes =
             context.load(ContainerType.class, childContainerTypeIds);
-        SetDifference<ContainerType> childContainerTypeDiff =
-            new SetDifference<ContainerType>(
-                containerType.getChildContainerTypeCollection(),
-                childContainerTypes.values());
-
         containerType.setChildContainerTypeCollection(
             new HashSet<ContainerType>(childContainerTypes.values()));
-
-        // remove this parent container type from children container types in
-        // removed list
-        for (ContainerType childContainerType : childContainerTypeDiff
-            .getRemoveSet()) {
-            Collection<ContainerType> parentContainerTypes =
-                childContainerType.getParentContainerTypeCollection();
-            if (parentContainerTypes.remove(containerType)) {
-                childContainerType
-                    .setChildContainerTypeCollection(parentContainerTypes);
-            } else {
-                throw new ActionException(
-                    "parent container type not found in removed child container type's collection");
-            }
-        }
     }
 }
