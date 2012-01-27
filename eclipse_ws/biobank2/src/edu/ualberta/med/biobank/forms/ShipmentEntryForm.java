@@ -43,6 +43,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
@@ -172,12 +173,14 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             oiCopy.setReceiverSite(null);
             oiCopy.setShipmentInfo(null);
             oiCopy.setSpecimenCollection(new ArrayList<Specimen>());
+            oiCopy.setCommentCollection(new ArrayList<Comment>());
         } else {
             oiCopy.setId(oiInfo.oi.getId());
             oiCopy.setCenter(oiInfo.oi.getCenter());
             oiCopy.setReceiverSite(oiInfo.oi.getReceiverSite());
             oiCopy.setShipmentInfo(oiInfo.oi.getShipmentInfo());
             oiCopy.setSpecimenCollection(oiInfo.specimens);
+            oiCopy.setCommentCollection(oiInfo.oi.getCommentCollection());
         }
     }
 

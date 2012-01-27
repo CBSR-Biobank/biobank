@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -14,7 +17,9 @@ import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
@@ -82,8 +87,17 @@ public class ShipmentViewForm extends BiobankViewForm {
         specimenWidget =
             new SpecimenEntryWidget(client, SWT.NONE, toolkit,
                 SessionManager.getAppService(), false);
-        specimenWidget.setSpecimens(originInfo.getSpecimenCollection());
+        specimenWidget.setSpecimens(getSpecs());
         specimenWidget.addDoubleClickListener(collectionDoubleClickListener);
+    }
+
+    private List<SpecimenWrapper> getSpecs() {
+        List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>();
+        for (Specimen spec : oiInfo.specimens) {
+            specs
+                .add(new SpecimenWrapper(SessionManager.getAppService(), spec));
+        }
+        return specs;
     }
 
     private void createMainSection() {
@@ -167,7 +181,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         setShipmentValues();
 
         commentEntryTable.setList(originInfo.getCommentCollection(false));
-        specimenWidget.setSpecimens(originInfo.getSpecimenCollection());
+        specimenWidget.setSpecimens(getSpecs());
     }
 
     private void setPartName() {
