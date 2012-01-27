@@ -22,7 +22,6 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGet
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
@@ -181,7 +180,7 @@ public class TestStudy extends TestAction {
 
         StudyInfo studyInfo =
             EXECUTOR.exec(new StudyGetInfoAction(provisioning.studyId));
-        studySaveAction = StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+        studySaveAction = StudyHelper.getSaveAction(studyInfo);
         studySaveAction.setSourceSpecimenSaveInfo(ssSaveInfosAll);
         studySaveAction.setAliquotSpecimenSaveInfo(asSaveInfosAll);
         studySaveAction.setStudyEventAttrSaveInfo(studyEventAttrSaveInfos);
@@ -207,13 +206,13 @@ public class TestStudy extends TestAction {
         StudyInfo studyInfo =
             EXECUTOR.exec(new StudyGetInfoAction(studyId));
         studyInfo.study.setName(name + "_2");
-        studySaveAction = StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+        studySaveAction = StudyHelper.getSaveAction(studyInfo);
         EXECUTOR.exec(studySaveAction);
 
         // ensure we can change short name on existing study
         studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
         studyInfo.study.setNameShort(name + "_2");
-        studySaveAction = StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+        studySaveAction = StudyHelper.getSaveAction(studyInfo);
         EXECUTOR.exec(studySaveAction);
 
         // test for duplicate name
@@ -316,7 +315,7 @@ public class TestStudy extends TestAction {
         StudyInfo studyInfo =
             EXECUTOR.exec(new StudyGetInfoAction(studyId));
         StudySaveAction studySave =
-            StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+            StudyHelper.getSaveAction(studyInfo);
         studySave.setContactIds(new HashSet<Integer>(Arrays.asList(-1)));
         try {
             EXECUTOR.exec(studySave);
@@ -337,7 +336,7 @@ public class TestStudy extends TestAction {
             studyInfo.clinicInfos.add(clinicInfo);
         }
         StudySaveAction studySave =
-            StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+            StudyHelper.getSaveAction(studyInfo);
         EXECUTOR.exec(studySave);
     }
 
@@ -361,7 +360,7 @@ public class TestStudy extends TestAction {
         studyContactIds.removeAll(idsToRemove);
 
         StudySaveAction studySave =
-            StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+            StudyHelper.getSaveAction(studyInfo);
         studySave.setContactIds(studyContactIds);
         EXECUTOR.exec(studySave);
     }
@@ -450,7 +449,7 @@ public class TestStudy extends TestAction {
             getSourceSpecimenSpecimenTypes(studyInfo.sourceSpcs));
 
         // remove Set 2 from the study, Set 1 should be left
-        studySaveAction = StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+        studySaveAction = StudyHelper.getSaveAction(studyInfo);
         studySaveAction.setSourceSpecimenSaveInfo(set1);
         EXECUTOR.exec(studySaveAction);
 
@@ -460,7 +459,7 @@ public class TestStudy extends TestAction {
             getSourceSpecimenSpecimenTypes(studyInfo.sourceSpcs));
 
         // remove all
-        studySaveAction = StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+        studySaveAction = StudyHelper.getSaveAction(studyInfo);
         studySaveAction
             .setSourceSpecimenSaveInfo(new HashSet<SourceSpecimenSaveInfo>());
         EXECUTOR.exec(studySaveAction);
@@ -550,7 +549,7 @@ public class TestStudy extends TestAction {
                 getAliquotedSpecimenSpecimenTypes(studyInfo.aliquotedSpcs));
 
         // remove Set 2 from the study, Set 1 should be left
-        studySaveAction = StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+        studySaveAction = StudyHelper.getSaveAction(studyInfo);
         studySaveAction.setAliquotSpecimenSaveInfo(set1);
         EXECUTOR.exec(studySaveAction);
 
@@ -560,7 +559,7 @@ public class TestStudy extends TestAction {
             getAliquotedSpecimenSpecimenTypes(studyInfo.aliquotedSpcs));
 
         // remove all
-        studySaveAction = StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+        studySaveAction = StudyHelper.getSaveAction(studyInfo);
         studySaveAction
             .setAliquotSpecimenSaveInfo(new HashSet<AliquotedSpecimenSaveInfo>());
         EXECUTOR.exec(studySaveAction);
@@ -632,7 +631,7 @@ public class TestStudy extends TestAction {
             getStudyEventAttrGlobalIds(studyInfo.studyEventAttrs));
 
         // attempt to add 1 of each global type again -> should not be allowed
-        studySaveAction = StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+        studySaveAction = StudyHelper.getSaveAction(studyInfo);
         studyEventAttrSaveInfos.addAll(getStudyEventAttrSaveInfosAll());
         studySaveAction.setStudyEventAttrSaveInfo(studyEventAttrSaveInfos);
         try {
@@ -643,7 +642,7 @@ public class TestStudy extends TestAction {
         }
 
         // remove each study event attr
-        studySaveAction = StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+        studySaveAction = StudyHelper.getSaveAction(studyInfo);
         studySaveAction
             .setStudyEventAttrSaveInfo(new HashSet<StudyEventAttrSaveInfo>());
         EXECUTOR.exec(studySaveAction);
@@ -680,20 +679,24 @@ public class TestStudy extends TestAction {
         StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
         Assert.assertEquals(0, studyInfo.study.getCommentCollection().size());
 
-        List<CommentInfo> commentInfos =
-            Utils.getRandomCommentInfos(EXECUTOR.getUserId());
-        studySaveAction = StudyHelper.getSaveAction(EXECUTOR, studyInfo);
-        studySaveAction.setCommentInfos(commentInfos);
-        studyId = EXECUTOR.exec(studySaveAction).getId();
-        studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        Assert.assertEquals(commentInfos.size(), studyInfo.study
-            .getCommentCollection().size());
+        studyInfo = addComment(studyId);
+        Assert.assertEquals(1, studyInfo.study.getCommentCollection().size());
+
+        studyInfo = addComment(studyId);
+        Assert.assertEquals(2, studyInfo.study.getCommentCollection().size());
 
         // TODO: check full name on each comment's user
         // for (Comment comment : studyInfo.study.getCommentCollection()) {
         //
         // }
+    }
 
+    private StudyInfo addComment(Integer studyId) {
+        StudySaveAction studySaveAction = StudyHelper.getSaveAction(
+            EXECUTOR.exec(new StudyGetInfoAction(studyId)));
+        studySaveAction.setCommentText(Utils.getRandomString(20, 30));
+        EXECUTOR.exec(studySaveAction).getId();
+        return EXECUTOR.exec(new StudyGetInfoAction(studyId));
     }
 
     @Test
@@ -740,15 +743,14 @@ public class TestStudy extends TestAction {
         Integer studyId = EXECUTOR.exec(studySaveAction).getId();
         StudyInfo studyInfo =
             EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        Integer clinicId =
-            ClinicHelper.createClinic(EXECUTOR, name + "_clinic",
-                ActivityStatusEnum.ACTIVE);
+        Integer clinicId = ClinicHelper.createClinic(EXECUTOR,
+            name + "_clinic", ActivityStatusEnum.ACTIVE);
         ContactSaveAction contactSave = new ContactSaveAction();
         contactSave.setName(name + "_contact");
         contactSave.setClinicId(clinicId);
         Integer contactId = EXECUTOR.exec(contactSave).getId();
         StudySaveAction studySaveAction =
-            StudyHelper.getSaveAction(EXECUTOR, studyInfo);
+            StudyHelper.getSaveAction(studyInfo);
         studySaveAction.setContactIds(new HashSet<Integer>(contactId));
         EXECUTOR.exec(studySaveAction);
         EXECUTOR.exec(new StudyDeleteAction(studyId));

@@ -1,12 +1,9 @@
 package edu.ualberta.med.biobank.test;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-
-import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 
 public class Utils {
 
@@ -41,17 +38,6 @@ public class Utils {
         cal.set(Calendar.SECOND, r.nextInt(60));
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
-    }
-
-    public static List<CommentInfo> getRandomCommentInfos(Integer userId) {
-        final List<CommentInfo> comments = new ArrayList<CommentInfo>();
-
-        for (int i = 0, n = r.nextInt(5) + 3; i < n; ++i) {
-            CommentInfo c = new CommentInfo("comment " + r.nextInt(),
-                getRandomDate(), userId);
-            comments.add(c);
-        }
-        return comments;
     }
 
     public static <T> T listChooseOne(List<T> list) {

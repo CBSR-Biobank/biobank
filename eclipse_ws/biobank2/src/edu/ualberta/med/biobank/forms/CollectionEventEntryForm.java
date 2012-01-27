@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
-import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientNextVisitNumberAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetInfosAction;
@@ -49,7 +48,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
@@ -103,11 +101,16 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private CommentCollectionInfoTable commentEntryTable;
 
+    private BgcBaseText commentWidget;
+    private CommentWrapper comment;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof CollectionEventAdapter,
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
+
+        comment = new CommentWrapper(SessionManager.getAppService());
 
         ceventCopy = new CollectionEvent();
         if (adapter.getId() == null) {
@@ -186,8 +189,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add);
+        commentWidget =
+            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
+                SWT.MULTI,
+                Messages.Comments_add, null, comment, "message", null);
 
     }
 
@@ -415,19 +420,12 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             ceventAttrList.add(ceventAttr);
         }
 
-        List<CommentInfo> commentList = new ArrayList<CommentInfo>();
-        if (ceventCopy.getCommentCollection() != null)
-            for (Comment c : ceventCopy.getCommentCollection()) {
-                commentList.add(CommentInfo.createFromModel(c));
-            }
-
         // save the collection event
-        Integer savedCeventId =
-            SessionManager.getAppService().doAction(
-                new CollectionEventSaveAction(ceventCopy.getId(), ceventCopy
-                    .getPatient().getId(), ceventCopy.getVisitNumber(),
-                    ceventCopy.getActivityStatus().getId(), commentList,
-                    cevents, ceventAttrList)).getId();
+        Integer savedCeventId = SessionManager.getAppService().doAction(
+            new CollectionEventSaveAction(ceventCopy.getId(),
+                ceventCopy.getPatient().getId(), ceventCopy.getVisitNumber(),
+                ceventCopy.getActivityStatus().getId(), comment.getMessage(),
+                cevents, ceventAttrList)).getId();
         ((CollectionEventAdapter) adapter).setId(savedCeventId);
     }
 

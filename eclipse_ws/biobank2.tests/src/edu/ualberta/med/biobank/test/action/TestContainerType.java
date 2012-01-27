@@ -392,4 +392,9 @@ public class TestContainerType extends TestAction {
 
         return result;
     }
+
+    @Test
+    public void comments() {
+
+    }
 }

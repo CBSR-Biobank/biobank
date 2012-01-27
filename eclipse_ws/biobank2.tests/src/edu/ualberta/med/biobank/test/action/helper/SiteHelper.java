@@ -69,8 +69,7 @@ public class SiteHelper extends Helper {
         return result;
     }
 
-    public static SiteSaveAction getSaveAction(
-        IActionExecutor actionExecutor, SiteInfo siteInfo) {
+    public static SiteSaveAction getSaveAction(SiteInfo siteInfo) {
         SiteSaveAction siteSaveAction = new SiteSaveAction();
 
         siteSaveAction.setId(siteInfo.site.getId());

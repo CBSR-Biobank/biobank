@@ -13,10 +13,10 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
+import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
@@ -142,7 +142,7 @@ public class StudySaveAction implements Action<IdResult> {
     private Collection<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos;
     private Collection<AliquotedSpecimenSaveInfo> aliquotSpecimenSaveInfos;
     private Collection<StudyEventAttrSaveInfo> studyEventAttrSaveInfos;
-    private Collection<CommentInfo> commentInfos;
+    private String commentText;
     private Study study = null;
 
     public void setId(Integer id) {
@@ -184,8 +184,8 @@ public class StudySaveAction implements Action<IdResult> {
         this.studyEventAttrSaveInfos = studyEventAttrSaveInfos;
     }
 
-    public void setCommentInfos(Collection<CommentInfo> commentInfos) {
-        this.commentInfos = commentInfos;
+    public void setCommentText(String commentText) {
+        this.commentText = commentText;
     }
 
     @Override
@@ -256,7 +256,7 @@ public class StudySaveAction implements Action<IdResult> {
         saveSourceSpecimens(context);
         saveAliquotedSpecimens(context);
         saveEventAttributes(context);
-        saveComments(context);
+        saveComment(context);
 
         context.getSession().saveOrUpdate(study);
         context.getSession().flush();
@@ -396,14 +396,11 @@ public class StudySaveAction implements Action<IdResult> {
         }
     }
 
-    protected void saveComments(ActionContext context) {
-        if (commentInfos != null) {
-            Collection<Comment> dbComments = study.getCommentCollection();
-            for (CommentInfo info : commentInfos) {
-                Comment commentModel = info.getCommentModel(context);
-                dbComments.add(commentModel);
-                context.getSession().saveOrUpdate(commentModel);
-            }
+    private void saveComment(ActionContext context) {
+        Comment comment = CommentUtil.create(context.getUser(), commentText);
+        if (comment != null) {
+            context.getSession().save(comment);
+            study.getCommentCollection().add(comment);
         }
     }
 }

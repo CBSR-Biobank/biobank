@@ -30,7 +30,7 @@ public class CollectionEventHelper extends Helper {
         Integer specimenTypeId, Integer userId, Integer centerId) {
         SaveCEventSpecimenInfo info = new SaveCEventSpecimenInfo();
         if (userId != null)
-            info.comments = Utils.getRandomCommentInfos(userId);
+            info.commentText = Utils.getRandomString(20, 30);
         info.inventoryId = Utils.getRandomString(8, 12);
         info.quantity = r.nextDouble();
         info.specimenTypeId = specimenTypeId;
@@ -117,8 +117,6 @@ public class CollectionEventHelper extends Helper {
                 specimenInfo.specimen.getSpecimenType().getId();
             saveCEventSpecimenInfo.centerId =
                 specimenInfo.specimen.getOriginInfo().getCenter().getId();
-            saveCEventSpecimenInfo.comments =
-                getCommentInfos(specimenInfo.specimen.getCommentCollection());
             sourceSpecimens.add(saveCEventSpecimenInfo);
         }
 
@@ -135,8 +133,7 @@ public class CollectionEventHelper extends Helper {
             new CollectionEventSaveAction(ceventInfo.cevent.getId(),
                 ceventInfo.cevent.getPatient().getId(),
                 ceventInfo.cevent.getVisitNumber(),
-                ceventInfo.cevent.getActivityStatus().getId(),
-                getCommentInfos(ceventInfo.cevent.getCommentCollection()),
+                ceventInfo.cevent.getActivityStatus().getId(), null,
                 sourceSpecimens, ceAttrList);
 
         return saveAction;

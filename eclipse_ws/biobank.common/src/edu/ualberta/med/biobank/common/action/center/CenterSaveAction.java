@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.action.center;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -9,9 +8,9 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
+import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
@@ -32,7 +31,7 @@ public abstract class CenterSaveAction implements Action<IdResult> {
     private String nameShort;
     private Address address;
     private Integer aStatusId;
-    private Collection<CommentInfo> commentInfos;
+    private String commentText;
 
     public void setId(Integer id) {
         this.centerId = id;
@@ -54,8 +53,8 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         this.aStatusId = activityStatusId;
     }
 
-    public void setCommentInfos(Collection<CommentInfo> commentInfos) {
-        this.commentInfos = commentInfos;
+    public void setCommentText(String commentText) {
+        this.commentText = commentText;
     }
 
     @Override
@@ -122,13 +121,10 @@ public abstract class CenterSaveAction implements Action<IdResult> {
     }
 
     protected void saveComments(ActionContext context, Center center) {
-        if (commentInfos != null) {
-            Collection<Comment> dbComments = center.getCommentCollection();
-            for (CommentInfo info : commentInfos) {
-                Comment commentModel = info.getCommentModel(context);
-                dbComments.add(commentModel);
-                context.getSession().saveOrUpdate(commentModel);
-            }
+        Comment comment = CommentUtil.create(context.getUser(), commentText);
+        if (comment != null) {
+            context.getSession().save(comment);
+            center.getCommentCollection().add(comment);
         }
     }
 }
