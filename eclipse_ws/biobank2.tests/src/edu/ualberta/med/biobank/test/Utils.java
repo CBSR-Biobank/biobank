@@ -54,4 +54,14 @@ public class Utils {
         return comments;
     }
 
+    public static <T> T listChooseOne(List<T> list) {
+        if (list.size() == 1) {
+            return list.get(0);
+        }
+        if (list.size() > 1) {
+            return list.get(r.nextInt(list.size()));
+        }
+        return null;
+    }
+
 }

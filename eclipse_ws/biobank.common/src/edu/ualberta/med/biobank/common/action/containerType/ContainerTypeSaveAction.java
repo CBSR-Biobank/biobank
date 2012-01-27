@@ -167,23 +167,22 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
             (childContainerTypeIds.size() > 0)) {
             throw new ActionCheckException(
                 "container type cannot have both specimen types and child container types");
-        } else if (specimenTypeIds.size() > 0) {
-            setSpecimenTypes(context, containerType);
-        } else {
-            setChildContainerTypes(context, containerType);
         }
+        setSpecimenTypes(context, containerType);
+        setChildContainerTypes(context, containerType);
     }
 
     private void setSpecimenTypes(ActionContext context,
         ContainerType containerType) {
         Map<Integer, SpecimenType> specimenTypes =
             context.load(SpecimenType.class, specimenTypeIds);
-        containerType.setSpecimenTypeCollection(new HashSet<SpecimenType>(
-            specimenTypes.values()));
         SetDifference<SpecimenType> specimenTypeDiff =
             new SetDifference<SpecimenType>(
                 containerType.getSpecimenTypeCollection(),
                 specimenTypes.values());
+
+        containerType.setSpecimenTypeCollection(new HashSet<SpecimenType>(
+            specimenTypes.values()));
 
         // remove this container type from specimen types in removed list
         for (SpecimenType specimenType : specimenTypeDiff.getRemoveSet()) {
@@ -202,12 +201,13 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         ContainerType containerType) {
         Map<Integer, ContainerType> childContainerTypes =
             context.load(ContainerType.class, childContainerTypeIds);
-        containerType.setChildContainerTypeCollection(
-            new HashSet<ContainerType>(childContainerTypes.values()));
         SetDifference<ContainerType> childContainerTypeDiff =
             new SetDifference<ContainerType>(
                 containerType.getChildContainerTypeCollection(),
                 childContainerTypes.values());
+
+        containerType.setChildContainerTypeCollection(
+            new HashSet<ContainerType>(childContainerTypes.values()));
 
         // remove this parent container type from children container types in
         // removed list

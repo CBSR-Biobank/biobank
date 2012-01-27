@@ -131,9 +131,8 @@ public class TestAction {
     }
 
     /**
-     * NOT REQUIRED ANYMORE SINCE TESTS ARE RUN LOCALLY
+     * REQUIRED WHEN TESTS ARE RUN REMOTELY
      */
-    @Deprecated
     public static boolean compareDateInHibernate(Date localDate,
         Date hibernateDate) {
         Date convertdate = convertToGmt(localDate);
