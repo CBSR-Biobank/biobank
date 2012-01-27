@@ -115,7 +115,7 @@ public class TestPatient extends TestAction {
             EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
         CollectionEventSaveAction ceventSaveAction =
             CollectionEventHelper.getSaveAction(ceventInfo);
-        ceventSaveAction.setCommentInfos(Utils.getRandomCommentInfos(EXECUTOR
+        ceventSaveAction.setCommentText(Utils.getRandomCommentInfos(EXECUTOR
             .getUserId()));
         EXECUTOR.exec(ceventSaveAction);
         ceventInfo = EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));

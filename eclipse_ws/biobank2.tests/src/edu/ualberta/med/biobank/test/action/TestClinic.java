@@ -186,7 +186,7 @@ public class TestClinic extends TestAction {
         List<CommentInfo> commentInfos =
             Utils.getRandomCommentInfos(EXECUTOR.getUserId());
         clinicSaveAction = ClinicHelper.getSaveAction(clinicInfo);
-        clinicSaveAction.setCommentInfos(commentInfos);
+        clinicSaveAction.setCommentText(commentInfos);
         clinicId = EXECUTOR.exec(clinicSaveAction).getId();
         clinicInfo = EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
         Assert.assertEquals(commentInfos.size(), clinicInfo.clinic

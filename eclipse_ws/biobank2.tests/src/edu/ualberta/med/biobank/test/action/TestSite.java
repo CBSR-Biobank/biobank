@@ -196,7 +196,7 @@ public class TestSite extends TestAction {
         List<CommentInfo> commentInfos =
             Utils.getRandomCommentInfos(EXECUTOR.getUserId());
         siteSaveAction = SiteHelper.getSaveAction(EXECUTOR, siteInfo);
-        siteSaveAction.setCommentInfos(commentInfos);
+        siteSaveAction.setCommentText(commentInfos);
         siteId = EXECUTOR.exec(siteSaveAction).getId();
         siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
         Assert.assertEquals(commentInfos.size(), siteInfo.site

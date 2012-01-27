@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -20,7 +19,6 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
-import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
@@ -64,11 +62,10 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void saveWithoutSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(20, 50);
-        List<CommentInfo> commentInfos =
-            Utils.getRandomCommentInfos(EXECUTOR.getUserId());
+        String commentText = Utils.getRandomString(20, 30);
         Date date = Utils.getRandomDate();
         Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
-            null, provisioning.siteId, date, worksheet, 1, commentInfos,
+            null, provisioning.siteId, date, worksheet, 1, commentText,
             new HashSet<Integer>())).getId();
 
         // Check ProcessingEvent is in database with correct values
@@ -76,8 +73,7 @@ public class TestProcessingEvent extends TestAction {
             EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
 
         Assert.assertEquals(worksheet, peventInfo.pevent.getWorksheet());
-        Assert.assertEquals(commentInfos.size(), peventInfo.pevent
-            .getCommentCollection().size());
+        Assert.assertEquals(1, peventInfo.pevent.getCommentCollection().size());
         Assert.assertEquals(date, peventInfo.pevent.getCreatedAt());
         Assert
             .assertEquals(0, peventInfo.sourceSpecimenInfos.size());
@@ -86,8 +82,7 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void saveWithSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(50);
-        List<CommentInfo> comments =
-            Utils.getRandomCommentInfos(EXECUTOR.getUserId());
+        String commentText = Utils.getRandomString(20, 30);
         Date date = Utils.getRandomDate();
 
         // create a collection event from a clinic
@@ -111,11 +106,10 @@ public class TestProcessingEvent extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimen
-        Integer pEventId = EXECUTOR.exec(
-            new ProcessingEventSaveAction(
-                null, provisioning.siteId, date, worksheet, 1, comments,
-                new HashSet<Integer>(
-                    Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
+        Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
+            null, provisioning.siteId, date, worksheet, 1, commentText,
+            new HashSet<Integer>(
+                Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
             .getId();
 
         // create aliquoted specimens by doing a scan link
@@ -142,8 +136,7 @@ public class TestProcessingEvent extends TestAction {
             EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
 
         Assert.assertEquals(worksheet, peventInfo.pevent.getWorksheet());
-        Assert.assertEquals(comments.size(), peventInfo.pevent
-            .getCommentCollection().size());
+        Assert.assertEquals(1, peventInfo.pevent.getCommentCollection().size());
         Assert.assertEquals(date, peventInfo.pevent.getCreatedAt());
         Assert
             .assertEquals(1, peventInfo.sourceSpecimenInfos.size());

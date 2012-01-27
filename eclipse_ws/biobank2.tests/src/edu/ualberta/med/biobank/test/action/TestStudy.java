@@ -683,7 +683,7 @@ public class TestStudy extends TestAction {
         List<CommentInfo> commentInfos =
             Utils.getRandomCommentInfos(EXECUTOR.getUserId());
         studySaveAction = StudyHelper.getSaveAction(EXECUTOR, studyInfo);
-        studySaveAction.setCommentInfos(commentInfos);
+        studySaveAction.setCommentText(commentInfos);
         studyId = EXECUTOR.exec(studySaveAction).getId();
         studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
         Assert.assertEquals(commentInfos.size(), studyInfo.study
