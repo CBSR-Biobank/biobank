@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.test.action;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Query;
@@ -21,7 +20,6 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -183,20 +181,24 @@ public class TestClinic extends TestAction {
             EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
         Assert.assertEquals(0, clinicInfo.clinic.getCommentCollection().size());
 
-        List<CommentInfo> commentInfos =
-            Utils.getRandomCommentInfos(EXECUTOR.getUserId());
-        clinicSaveAction = ClinicHelper.getSaveAction(clinicInfo);
-        clinicSaveAction.setCommentText(commentInfos);
-        clinicId = EXECUTOR.exec(clinicSaveAction).getId();
-        clinicInfo = EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
-        Assert.assertEquals(commentInfos.size(), clinicInfo.clinic
-            .getCommentCollection().size());
+        clinicInfo = addComment(clinicId);
+        Assert.assertEquals(1, clinicInfo.clinic.getCommentCollection().size());
+
+        clinicInfo = addComment(clinicId);
+        Assert.assertEquals(2, clinicInfo.clinic.getCommentCollection().size());
 
         // TODO: check full name on each comment's user
         // for (Comment comment : clinicInfo.clinic.getCommentCollection()) {
         //
         // }
+    }
 
+    private ClinicInfo addComment(Integer clinicId) {
+        ClinicSaveAction clinicSaveAction = ClinicHelper.getSaveAction(
+            EXECUTOR.exec(new ClinicGetInfoAction(clinicId)));
+        clinicSaveAction.setCommentText(Utils.getRandomString(20, 30));
+        EXECUTOR.exec(clinicSaveAction).getId();
+        return EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
     }
 
     @Test
