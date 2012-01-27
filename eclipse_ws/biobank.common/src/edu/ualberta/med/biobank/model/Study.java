@@ -165,5 +165,4 @@ public class Study extends AbstractBiobankModel {
         Collection<SourceSpecimen> sourceSpecimenCollection) {
         this.sourceSpecimenCollection = sourceSpecimenCollection;
     }
-
 }

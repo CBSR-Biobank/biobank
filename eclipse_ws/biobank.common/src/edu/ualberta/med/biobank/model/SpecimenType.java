@@ -27,7 +27,7 @@ public class SpecimenType extends AbstractBiobankModel {
         new HashSet<SpecimenType>(0);
 
     @NotEmpty
-    @Column(name = "NAME")
+    @Column(name = "NAME", unique = true)
     public String getName() {
         return this.name;
     }
@@ -37,7 +37,7 @@ public class SpecimenType extends AbstractBiobankModel {
     }
 
     @NotEmpty
-    @Column(name = "NAME_SHORT")
+    @Column(name = "NAME_SHORT", unique = true)
     public String getNameShort() {
         return this.nameShort;
     }

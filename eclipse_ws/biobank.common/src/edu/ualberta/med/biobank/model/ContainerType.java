@@ -11,12 +11,16 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.validator.NotEmpty;
 import org.hibernate.validator.NotNull;
 
 @Entity
-@Table(name = "CONTAINER_TYPE")
+@Table(name = "CONTAINER_TYPE",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "SITE_ID", "NAME" }),
+        @UniqueConstraint(columnNames = { "SITE_ID", "NAME_SHORT" }) })
 public class ContainerType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

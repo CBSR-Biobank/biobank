@@ -22,7 +22,7 @@ public class BbGroup extends Principal {
     private Collection<User> userCollection = new HashSet<User>(0);
 
     @NotEmpty
-    @Column(name = "NAME")
+    @Column(name = "NAME", unique = true)
     public String getName() {
         return this.name;
     }

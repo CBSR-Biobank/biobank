@@ -17,7 +17,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
     private Integer maxCols;
     private Integer maxCapacity;
 
-    @Column(name = "NAME", length = 50)
+    @Column(name = "NAME", length = 50, unique = true)
     public String getName() {
         return this.name;
     }

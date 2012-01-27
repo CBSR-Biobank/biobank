@@ -31,7 +31,7 @@ public class User extends Principal {
     private Collection<BbGroup> groupCollection = new HashSet<BbGroup>(0);
 
     @NotEmpty
-    @Column(name = "LOGIN")
+    @Column(name = "LOGIN", unique = true)
     public String getLogin() {
         return this.login;
     }

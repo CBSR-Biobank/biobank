@@ -12,12 +12,17 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.validator.NotEmpty;
 import org.hibernate.validator.NotNull;
 
 @Entity
-@Table(name = "CONTAINER")
+@Table(name = "CONTAINER",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "SITE_ID", "CONTAINER_TYPE_ID",
+            "LABEL" }),
+        @UniqueConstraint(columnNames = { "SITE_ID", "PRODUCT_BARCODE" }) })
 public class Container extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -36,9 +41,8 @@ public class Container extends AbstractBiobankModel {
     private Site site;
     private ActivityStatus activityStatus;
 
-    // TODO: unique
     @NotEmpty
-    @Column(name = "PRODUCT_BARCODE")
+    @Column(name = "PRODUCT_BARCODE", unique = true)
     public String getProductBarcode() {
         return this.productBarcode;
     }

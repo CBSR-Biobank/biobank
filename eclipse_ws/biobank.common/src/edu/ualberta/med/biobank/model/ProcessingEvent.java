@@ -29,9 +29,8 @@ public class ProcessingEvent extends AbstractBiobankModel {
     private ActivityStatus activityStatus;
     private Collection<Comment> commentCollection = new HashSet<Comment>(0);
 
-    // TODO: unique
     @NotEmpty
-    @Column(name = "WORKSHEET", length = 100)
+    @Column(name = "WORKSHEET", unique = true, length = 100)
     public String getWorksheet() {
         return this.worksheet;
     }

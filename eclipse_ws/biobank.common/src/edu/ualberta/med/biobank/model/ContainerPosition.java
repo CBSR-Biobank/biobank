@@ -6,14 +6,17 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.validator.NotNull;
 
 @Entity
-@Table(name="CONTAINER_POSITION")
+@Table(name = "CONTAINER_POSITION",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "PARENT_CONTAINER_ID", "ROW", "COL" }) })
 public class ContainerPosition extends AbstractPosition {
     private static final long serialVersionUID = 1L;
-    
+
     private Container parentContainer;
     private Container container;
 

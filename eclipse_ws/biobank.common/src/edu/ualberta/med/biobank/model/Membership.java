@@ -9,11 +9,16 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.validator.NotNull;
 
 @Entity
-@Table(name = "MEMBERSHIP")
+@Table(name = "MEMBERSHIP",
+    uniqueConstraints = {
+        // this unique constraint only works when no value is null
+        @UniqueConstraint(columnNames = { "PRINCIPAL_ID", "CENTER_ID",
+            "STUDY_ID" }) })
 public class Membership extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
