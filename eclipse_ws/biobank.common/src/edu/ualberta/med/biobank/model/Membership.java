@@ -3,176 +3,55 @@ package edu.ualberta.med.biobank.model;
 import java.util.Collection;
 import java.util.HashSet;
 
-import java.io.Serializable;
-/**
-	* 
-	**/
 
-public class Membership  implements IBiobankModel
-{
-	/**
-	* An attribute to allow serialization of the domain objects
-	*/
-	private static final long serialVersionUID = 1234567890L;
+public class Membership extends AbstractBiobankModel {
+    private static final long serialVersionUID = 1L;
 
-        private Integer version;
+    private Collection<Permission> permissionCollection =
+        new HashSet<Permission>();
+    private Center center;
+    private Collection<Role> roleCollection = new HashSet<Role>();
+    private Study study;
+    private Principal principal;
 
-	
-	/**
-	* 
-	**/
-	
-	public Integer id;
-	/**
-	* Retrieves the value of the id attribute
-	* @return id
-	**/
+    public Collection<Permission> getPermissionCollection() {
+        return permissionCollection;
+    }
 
-	public Integer getId(){
-		return id;
-	}
+    public void setPermissionCollection(
+        Collection<Permission> permissionCollection) {
+        this.permissionCollection = permissionCollection;
+    }
 
-	/**
-	* Sets the value of id attribute
-	**/
+    public Center getCenter() {
+        return center;
+    }
 
-	public void setId(Integer id){
-		this.id = id;
-	}
-	
-	/**
-	* An associated edu.ualberta.med.biobank.model.Permission object's collection 
-	**/
-			
-	private Collection<Permission> permissionCollection = new HashSet<Permission>();
+    public void setCenter(Center center) {
+        this.center = center;
+    }
 
-	/**
-	* Retrieves the value of the permissionCollection attribute
-	* @return permissionCollection
-	**/
+    public Collection<Role> getRoleCollection() {
+        return roleCollection;
+    }
 
-	public Collection<Permission> getPermissionCollection(){
-		return permissionCollection;
-	}
+    public void setRoleCollection(Collection<Role> roleCollection) {
+        this.roleCollection = roleCollection;
+    }
 
-	/**
-	* Sets the value of permissionCollection attribute
-	**/
+    public Study getStudy() {
+        return study;
+    }
 
-	public void setPermissionCollection(Collection<Permission> permissionCollection){
-		this.permissionCollection = permissionCollection;
-	}
-		
-	/**
-	* An associated edu.ualberta.med.biobank.model.Center object
-	**/
-			
-	private Center center;
-	/**
-	* Retrieves the value of the center attribute
-	* @return center
-	**/
-	
-	public Center getCenter(){
-		return center;
-	}
-	/**
-	* Sets the value of center attribute
-	**/
+    public void setStudy(Study study) {
+        this.study = study;
+    }
 
-	public void setCenter(Center center){
-		this.center = center;
-	}
-			
-	/**
-	* An associated edu.ualberta.med.biobank.model.Role object's collection 
-	**/
-			
-	private Collection<Role> roleCollection = new HashSet<Role>();
+    public Principal getPrincipal() {
+        return principal;
+    }
 
-	/**
-	* Retrieves the value of the roleCollection attribute
-	* @return roleCollection
-	**/
-
-	public Collection<Role> getRoleCollection(){
-		return roleCollection;
-	}
-
-	/**
-	* Sets the value of roleCollection attribute
-	**/
-
-	public void setRoleCollection(Collection<Role> roleCollection){
-		this.roleCollection = roleCollection;
-	}
-		
-	/**
-	* An associated edu.ualberta.med.biobank.model.Study object
-	**/
-			
-	private Study study;
-	/**
-	* Retrieves the value of the study attribute
-	* @return study
-	**/
-	
-	public Study getStudy(){
-		return study;
-	}
-	/**
-	* Sets the value of study attribute
-	**/
-
-	public void setStudy(Study study){
-		this.study = study;
-	}
-			
-	/**
-	* An associated edu.ualberta.med.biobank.model.Principal object
-	**/
-			
-	private Principal principal;
-	/**
-	* Retrieves the value of the principal attribute
-	* @return principal
-	**/
-	
-	public Principal getPrincipal(){
-		return principal;
-	}
-	/**
-	* Sets the value of principal attribute
-	**/
-
-	public void setPrincipal(Principal principal){
-		this.principal = principal;
-	}
-			
-	/**
-	* Compares <code>obj</code> to it self and returns true if they both are same
-	*
-	* @param obj
-	**/
-	public boolean equals(Object obj)
-	{
-		if(obj instanceof Membership) 
-		{
-			Membership c =(Membership)obj; 			 
-			if(getId() != null && getId().equals(c.getId()))
-				return true;
-		}
-		return false;
-	}
-		
-	/**
-	* Returns hash code for the primary key of the object
-	**/
-	public int hashCode()
-	{
-		if(getId() != null)
-			return getId().hashCode();
-		return 0;
-	}
-	
+    public void setPrincipal(Principal principal) {
+        this.principal = principal;
+    }
 }

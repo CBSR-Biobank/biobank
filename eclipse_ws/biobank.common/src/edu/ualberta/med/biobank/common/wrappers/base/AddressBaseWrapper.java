@@ -82,15 +82,6 @@ public class AddressBaseWrapper extends ModelWrapper<Address> {
         setProperty(AddressPeer.PHONE_NUMBER, trimmed);
     }
 
-    public String getName() {
-        return getProperty(AddressPeer.NAME);
-    }
-
-    public void setName(String name) {
-        String trimmed = name == null ? null : name.trim();
-        setProperty(AddressPeer.NAME, trimmed);
-    }
-
     public String getProvince() {
         return getProperty(AddressPeer.PROVINCE);
     }

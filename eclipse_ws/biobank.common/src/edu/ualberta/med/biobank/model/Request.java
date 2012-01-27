@@ -1,201 +1,66 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 
-import java.io.Serializable;
-/**
-	* 
-	**/
+public class Request extends AbstractBiobankModel {
+    private static final long serialVersionUID = 1L;
 
-public class Request  implements IBiobankModel
-{
-	/**
-	* An attribute to allow serialization of the domain objects
-	*/
-	private static final long serialVersionUID = 1234567890L;
+    private Date submitted;
+    private Date created;
+    private Collection<Dispatch> dispatchCollection = new HashSet<Dispatch>();
+    private Collection<RequestSpecimen> requestSpecimenCollection =
+        new HashSet<RequestSpecimen>();
+    private Address address;
+    private ResearchGroup researchGroup;
 
-        private Integer version;
+    public java.util.Date getSubmitted() {
+        return submitted;
+    }
 
-	
-	/**
-	* 
-	**/
-	
-	public Integer id;
-	/**
-	* Retrieves the value of the id attribute
-	* @return id
-	**/
+    public void setSubmitted(java.util.Date submitted) {
+        this.submitted = submitted;
+    }
 
-	public Integer getId(){
-		return id;
-	}
+    public java.util.Date getCreated() {
+        return created;
+    }
 
-	/**
-	* Sets the value of id attribute
-	**/
+    public void setCreated(java.util.Date created) {
+        this.created = created;
+    }
 
-	public void setId(Integer id){
-		this.id = id;
-	}
-	
-	/**
-	* 
-	**/
-	
-	public java.util.Date submitted;
-	/**
-	* Retrieves the value of the submitted attribute
-	* @return submitted
-	**/
+    public Collection<Dispatch> getDispatchCollection() {
+        return dispatchCollection;
+    }
 
-	public java.util.Date getSubmitted(){
-		return submitted;
-	}
+    public void setDispatchCollection(Collection<Dispatch> dispatchCollection) {
+        this.dispatchCollection = dispatchCollection;
+    }
 
-	/**
-	* Sets the value of submitted attribute
-	**/
+    public Collection<RequestSpecimen> getRequestSpecimenCollection() {
+        return requestSpecimenCollection;
+    }
 
-	public void setSubmitted(java.util.Date submitted){
-		this.submitted = submitted;
-	}
-	
-	/**
-	* 
-	**/
-	
-	public java.util.Date created;
-	/**
-	* Retrieves the value of the created attribute
-	* @return created
-	**/
+    public void setRequestSpecimenCollection(
+        Collection<RequestSpecimen> requestSpecimenCollection) {
+        this.requestSpecimenCollection = requestSpecimenCollection;
+    }
 
-	public java.util.Date getCreated(){
-		return created;
-	}
+    public Address getAddress() {
+        return address;
+    }
 
-	/**
-	* Sets the value of created attribute
-	**/
+    public void setAddress(Address address) {
+        this.address = address;
+    }
 
-	public void setCreated(java.util.Date created){
-		this.created = created;
-	}
-	
-	/**
-	* An associated edu.ualberta.med.biobank.model.Dispatch object's collection 
-	**/
-			
-	private Collection<Dispatch> dispatchCollection = new HashSet<Dispatch>();
+    public ResearchGroup getResearchGroup() {
+        return researchGroup;
+    }
 
-	/**
-	* Retrieves the value of the dispatchCollection attribute
-	* @return dispatchCollection
-	**/
-
-	public Collection<Dispatch> getDispatchCollection(){
-		return dispatchCollection;
-	}
-
-	/**
-	* Sets the value of dispatchCollection attribute
-	**/
-
-	public void setDispatchCollection(Collection<Dispatch> dispatchCollection){
-		this.dispatchCollection = dispatchCollection;
-	}
-		
-	/**
-	* An associated edu.ualberta.med.biobank.model.RequestSpecimen object's collection 
-	**/
-			
-	private Collection<RequestSpecimen> requestSpecimenCollection = new HashSet<RequestSpecimen>();
-
-	/**
-	* Retrieves the value of the requestSpecimenCollection attribute
-	* @return requestSpecimenCollection
-	**/
-
-	public Collection<RequestSpecimen> getRequestSpecimenCollection(){
-		return requestSpecimenCollection;
-	}
-
-	/**
-	* Sets the value of requestSpecimenCollection attribute
-	**/
-
-	public void setRequestSpecimenCollection(Collection<RequestSpecimen> requestSpecimenCollection){
-		this.requestSpecimenCollection = requestSpecimenCollection;
-	}
-		
-	/**
-	* An associated edu.ualberta.med.biobank.model.Address object
-	**/
-			
-	private Address address;
-	/**
-	* Retrieves the value of the address attribute
-	* @return address
-	**/
-	
-	public Address getAddress(){
-		return address;
-	}
-	/**
-	* Sets the value of address attribute
-	**/
-
-	public void setAddress(Address address){
-		this.address = address;
-	}
-			
-	/**
-	* An associated edu.ualberta.med.biobank.model.ResearchGroup object
-	**/
-			
-	private ResearchGroup researchGroup;
-	/**
-	* Retrieves the value of the researchGroup attribute
-	* @return researchGroup
-	**/
-	
-	public ResearchGroup getResearchGroup(){
-		return researchGroup;
-	}
-	/**
-	* Sets the value of researchGroup attribute
-	**/
-
-	public void setResearchGroup(ResearchGroup researchGroup){
-		this.researchGroup = researchGroup;
-	}
-			
-	/**
-	* Compares <code>obj</code> to it self and returns true if they both are same
-	*
-	* @param obj
-	**/
-	public boolean equals(Object obj)
-	{
-		if(obj instanceof Request) 
-		{
-			Request c =(Request)obj; 			 
-			if(getId() != null && getId().equals(c.getId()))
-				return true;
-		}
-		return false;
-	}
-		
-	/**
-	* Returns hash code for the primary key of the object
-	**/
-	public int hashCode()
-	{
-		if(getId() != null)
-			return getId().hashCode();
-		return 0;
-	}
-	
+    public void setResearchGroup(ResearchGroup researchGroup) {
+        this.researchGroup = researchGroup;
+    }
 }

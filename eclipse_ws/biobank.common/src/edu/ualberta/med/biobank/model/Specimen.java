@@ -3,410 +3,172 @@ package edu.ualberta.med.biobank.model;
 import org.hibernate.validator.NotNull;
 import org.hibernate.validator.NotEmpty;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 
-import java.io.Serializable;
-/**
-	* 
-	**/
-	
+public class Specimen extends AbstractBiobankModel {
+    private static final long serialVersionUID = 1L;
 
-public class Specimen  implements IBiobankModel
-{
-	/**
-	* An attribute to allow serialization of the domain objects
-	*/
-	private static final long serialVersionUID = 1234567890L;
+    private String inventoryId;
+    private Collection<Comment> commentCollection = new HashSet<Comment>();
+    private Double quantity;
+    private Date createdAt;
+    private Collection<RequestSpecimen> requestSpecimenCollection =
+        new HashSet<RequestSpecimen>();
+    private ActivityStatus activityStatus;
+    private Collection<Specimen> childSpecimenCollection =
+        new HashSet<Specimen>();
+    private OriginInfo originInfo;
+    private Collection<DispatchSpecimen> dispatchSpecimenCollection =
+        new HashSet<DispatchSpecimen>();
+    private Center currentCenter;
+    private CollectionEvent originalCollectionEvent;
+    private ProcessingEvent processingEvent;
+    private SpecimenPosition specimenPosition;
+    private CollectionEvent collectionEvent;
+    private SpecimenType specimenType;
+    private Specimen parentSpecimen;
+    private Specimen topSpecimen;
 
-	private Integer version;
-	
-	/**
-	* 
-	**/
-	
-	private Integer id;
-	/**
-	* Retrieves the value of the id attribute
-	* @return id
-	**/
+    @NotEmpty
+    public String getInventoryId() {
+        return inventoryId;
+    }
 
-	public Integer getId(){
-		return id;
-	}
+    public void setInventoryId(String inventoryId) {
+        this.inventoryId = inventoryId;
+    }
 
-	/**
-	* Sets the value of id attribute
-	**/
+    public Collection<Comment> getCommentCollection() {
+        return commentCollection;
+    }
 
-	public void setId(Integer id){
-		this.id = id;
-	}
-	
-	/**
-	* 
-	**/
-	
-	@NotEmpty
-	private String inventoryId;
-	/**
-	* Retrieves the value of the inventoryId attribute
-	* @return inventoryId
-	**/
+    public void setCommentCollection(Collection<Comment> comments) {
+        this.commentCollection = comments;
+    }
 
-	public String getInventoryId(){
-		return inventoryId;
-	}
+    public Double getQuantity() {
+        return quantity;
+    }
 
-	/**
-	* Sets the value of inventoryId attribute
-	**/
+    public void setQuantity(Double quantity) {
+        this.quantity = quantity;
+    }
 
-	public void setInventoryId(String inventoryId){
-		this.inventoryId = inventoryId;
-	}
-	
-	/**
-	* 
-	**/
-	
-	public Collection<Comment> commentCollection = new HashSet<Comment>();
-	/**
-	* Retrieves the value of the comment attribute
-	* @return comment
-	**/
+    @NotNull
+    public Date getCreatedAt() {
+        return createdAt;
+    }
 
-	public Collection<Comment> getCommentCollection(){
-		return commentCollection;
-	}
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 
-	/**
-	* Sets the value of comment attribute
-	**/
+    public Collection<RequestSpecimen> getRequestSpecimenCollection() {
+        return requestSpecimenCollection;
+    }
 
-	public void setCommentCollection(Collection<Comment> comments){
-		this.commentCollection = comments;
-	}
-	
-	/**
-	* 
-	**/
-	
-	public Double quantity;
-	/**
-	* Retrieves the value of the quantity attribute
-	* @return quantity
-	**/
+    public void setRequestSpecimenCollection(
+        Collection<RequestSpecimen> requestSpecimenCollection) {
+        this.requestSpecimenCollection = requestSpecimenCollection;
+    }
 
-	public Double getQuantity(){
-		return quantity;
-	}
+    public ActivityStatus getActivityStatus() {
+        return activityStatus;
+    }
 
-	/**
-	* Sets the value of quantity attribute
-	**/
+    public void setActivityStatus(ActivityStatus activityStatus) {
+        this.activityStatus = activityStatus;
+    }
 
-	public void setQuantity(Double quantity){
-		this.quantity = quantity;
-	}
-	
-	/**
-	* 
-	**/
-	
-	@NotNull
-	public java.util.Date createdAt;
-	/**
-	* Retrieves the value of the createdAt attribute
-	* @return createdAt
-	**/
+    public Collection<Specimen> getChildSpecimenCollection() {
+        return childSpecimenCollection;
+    }
 
-	public java.util.Date getCreatedAt(){
-		return createdAt;
-	}
+    public void setChildSpecimenCollection(
+        Collection<Specimen> childSpecimenCollection) {
+        this.childSpecimenCollection = childSpecimenCollection;
+    }
 
-	/**
-	* Sets the value of createdAt attribute
-	**/
+    public OriginInfo getOriginInfo() {
+        return originInfo;
+    }
 
-	public void setCreatedAt(java.util.Date createdAt){
-		this.createdAt = createdAt;
-	}
-	
-	/**
-	* An associated edu.ualberta.med.biobank.model.RequestSpecimen object's collection 
-	**/
-			
-	private Collection<RequestSpecimen> requestSpecimenCollection = new HashSet<RequestSpecimen>();
-	/**
-	* Retrieves the value of the requestSpecimenCollection attribute
-	* @return requestSpecimenCollection
-	**/
+    public void setOriginInfo(OriginInfo originInfo) {
+        this.originInfo = originInfo;
+    }
 
-	public Collection<RequestSpecimen> getRequestSpecimenCollection(){
-		return requestSpecimenCollection;
-	}
+    public Collection<DispatchSpecimen> getDispatchSpecimenCollection() {
+        return dispatchSpecimenCollection;
+    }
 
-	/**
-	* Sets the value of requestSpecimenCollection attribute
-	**/
+    public void setDispatchSpecimenCollection(
+        Collection<DispatchSpecimen> dispatchSpecimenCollection) {
+        this.dispatchSpecimenCollection = dispatchSpecimenCollection;
+    }
 
-	public void setRequestSpecimenCollection(Collection<RequestSpecimen> requestSpecimenCollection){
-		this.requestSpecimenCollection = requestSpecimenCollection;
-	}
-		
-	/**
-	* An associated edu.ualberta.med.biobank.model.ActivityStatus object
-	**/
-			
-	private ActivityStatus activityStatus;
-	/**
-	* Retrieves the value of the activityStatus attribute
-	* @return activityStatus
-	**/
-	
-	public ActivityStatus getActivityStatus(){
-		return activityStatus;
-	}
-	/**
-	* Sets the value of activityStatus attribute
-	**/
+    public Center getCurrentCenter() {
+        return currentCenter;
+    }
 
-	public void setActivityStatus(ActivityStatus activityStatus){
-		this.activityStatus = activityStatus;
-	}
-			
-	/**
-	* An associated edu.ualberta.med.biobank.model.Specimen object's collection 
-	**/
-			
-	public Collection<Specimen> childSpecimenCollection = new HashSet<Specimen>();
-	
-	/**
-	* Retrieves the value of the childSpecimenCollection attribute
-	* @return childSpecimenCollection
-	**/
+    public void setCurrentCenter(Center currentCenter) {
+        this.currentCenter = currentCenter;
+    }
 
-	public Collection<Specimen> getChildSpecimenCollection(){
-		return childSpecimenCollection;
-	}
+    public CollectionEvent getOriginalCollectionEvent() {
+        return originalCollectionEvent;
+    }
 
-	/**
-	* Sets the value of childSpecimenCollection attribute
-	**/
+    public void setOriginalCollectionEvent(
+        CollectionEvent originalCollectionEvent) {
+        this.originalCollectionEvent = originalCollectionEvent;
+    }
 
-	public void setChildSpecimenCollection(Collection<Specimen> childSpecimenCollection){
-		this.childSpecimenCollection = childSpecimenCollection;
-	}
-		
-	/**
-	* An associated edu.ualberta.med.biobank.model.OriginInfo object
-	**/
-			
-	private OriginInfo originInfo;
-	/**
-	* Retrieves the value of the originInfo attribute
-	* @return originInfo
-	**/
-	
-	public OriginInfo getOriginInfo(){
-		return originInfo;
-	}
-	/**
-	* Sets the value of originInfo attribute
-	**/
+    public ProcessingEvent getProcessingEvent() {
+        return processingEvent;
+    }
 
-	public void setOriginInfo(OriginInfo originInfo){
-		this.originInfo = originInfo;
-	}
-			
-	/**
-	* An associated edu.ualberta.med.biobank.model.DispatchSpecimen object's collection 
-	**/
-			
-	private Collection<DispatchSpecimen> dispatchSpecimenCollection = new HashSet<DispatchSpecimen>();
-	/**
-	* Retrieves the value of the dispatchSpecimenCollection attribute
-	* @return dispatchSpecimenCollection
-	**/
+    public void setProcessingEvent(ProcessingEvent processingEvent) {
+        this.processingEvent = processingEvent;
+    }
 
-	public Collection<DispatchSpecimen> getDispatchSpecimenCollection(){
-		return dispatchSpecimenCollection;
-	}
+    public SpecimenPosition getSpecimenPosition() {
+        return specimenPosition;
+    }
 
-	/**
-	* Sets the value of dispatchSpecimenCollection attribute
-	**/
+    public void setSpecimenPosition(SpecimenPosition specimenPosition) {
+        this.specimenPosition = specimenPosition;
+    }
 
-	public void setDispatchSpecimenCollection(Collection<DispatchSpecimen> dispatchSpecimenCollection){
-		this.dispatchSpecimenCollection = dispatchSpecimenCollection;
-	}
-		
-	/**
-	* An associated edu.ualberta.med.biobank.model.Center object
-	**/
-			
-	private Center currentCenter;
-	/**
-	* Retrieves the value of the currentCenter attribute
-	* @return currentCenter
-	**/
-	
-	public Center getCurrentCenter(){
-		return currentCenter;
-	}
-	/**
-	* Sets the value of currentCenter attribute
-	**/
+    public CollectionEvent getCollectionEvent() {
+        return collectionEvent;
+    }
 
-	public void setCurrentCenter(Center currentCenter){
-		this.currentCenter = currentCenter;
-	}
-			
-	/**
-	* An associated edu.ualberta.med.biobank.model.CollectionEvent object
-	**/
-			
-	private CollectionEvent originalCollectionEvent;
-	/**
-	* Retrieves the value of the originalCollectionEvent attribute
-	* @return originalCollectionEvent
-	**/
-	
-	public CollectionEvent getOriginalCollectionEvent(){
-		return originalCollectionEvent;
-	}
-	/**
-	* Sets the value of originalCollectionEvent attribute
-	**/
+    public void setCollectionEvent(CollectionEvent collectionEvent) {
+        this.collectionEvent = collectionEvent;
+    }
 
-	public void setOriginalCollectionEvent(CollectionEvent originalCollectionEvent){
-		this.originalCollectionEvent = originalCollectionEvent;
-	}
-			
-	/**
-	* An associated edu.ualberta.med.biobank.model.ProcessingEvent object
-	**/
-			
-	private ProcessingEvent processingEvent;
-	/**
-	* Retrieves the value of the processingEvent attribute
-	* @return processingEvent
-	**/
-	
-	public ProcessingEvent getProcessingEvent(){
-		return processingEvent;
-	}
-	/**
-	* Sets the value of processingEvent attribute
-	**/
+    public SpecimenType getSpecimenType() {
+        return specimenType;
+    }
 
-	public void setProcessingEvent(ProcessingEvent processingEvent){
-		this.processingEvent = processingEvent;
-	}
-			
-	/**
-	* An associated edu.ualberta.med.biobank.model.SpecimenPosition object
-	**/
-			
-	private SpecimenPosition specimenPosition;
-	/**
-	* Retrieves the value of the specimenPosition attribute
-	* @return specimenPosition
-	**/
-	
-	public SpecimenPosition getSpecimenPosition(){
-		return specimenPosition;
-	}
-	/**
-	* Sets the value of specimenPosition attribute
-	**/
+    public void setSpecimenType(SpecimenType specimenType) {
+        this.specimenType = specimenType;
+    }
 
-	public void setSpecimenPosition(SpecimenPosition specimenPosition){
-		this.specimenPosition = specimenPosition;
-	}
-			
-	/**
-	* An associated edu.ualberta.med.biobank.model.CollectionEvent object
-	**/
-			
-	private CollectionEvent collectionEvent;
-	/**
-	* Retrieves the value of the collectionEvent attribute
-	* @return collectionEvent
-	**/
-	
-	public CollectionEvent getCollectionEvent(){
-		return collectionEvent;
-	}
-	/**
-	* Sets the value of collectionEvent attribute
-	**/
+    public Specimen getParentSpecimen() {
+        return parentSpecimen;
+    }
 
-	public void setCollectionEvent(CollectionEvent collectionEvent){
-		this.collectionEvent = collectionEvent;
-	}
-			
-	/**
-	* An associated edu.ualberta.med.biobank.model.SpecimenType object
-	**/
-			
-	private SpecimenType specimenType;
-	/**
-	* Retrieves the value of the specimenType attribute
-	* @return specimenType
-	**/
-	
-	public SpecimenType getSpecimenType(){
-		return specimenType;
-	}
-	/**
-	* Sets the value of specimenType attribute
-	**/
+    public void setParentSpecimen(Specimen parentSpecimen) {
+        this.parentSpecimen = parentSpecimen;
+    }
 
-	public void setSpecimenType(SpecimenType specimenType){
-		this.specimenType = specimenType;
-	}
-			
-	/**
-	* Compares <code>obj</code> to it self and returns true if they both are same
-	*
-	* @param obj
-	**/
-	public boolean equals(Object obj)
-	{
-		if(obj instanceof Specimen) 
-		{
-			Specimen c =(Specimen)obj; 			 
-			if(getId() != null && getId().equals(c.getId()))
-				return true;
-		}
-		return false;
-	}
-		
-	/**
-	* Returns hash code for the primary key of the object
-	**/
-	public int hashCode()
-	{
-		if(getId() != null)
-			return getId().hashCode();
-		return 0;
-	}
+    public Specimen getTopSpecimen() {
+        return topSpecimen;
+    }
 
-
-	private Specimen parentSpecimen;
-	public Specimen getParentSpecimen(){
-		return parentSpecimen;
-	}
-	public void setParentSpecimen(Specimen parentSpecimen){
-		this.parentSpecimen = parentSpecimen;
-	}
-	
-	private Specimen topSpecimen;
-	public Specimen getTopSpecimen(){
-		return topSpecimen;
-	}
-	public void setTopSpecimen(Specimen topSpecimen){
-		this.topSpecimen = topSpecimen;
-	}
+    public void setTopSpecimen(Specimen topSpecimen) {
+        this.topSpecimen = topSpecimen;
+    }
 }

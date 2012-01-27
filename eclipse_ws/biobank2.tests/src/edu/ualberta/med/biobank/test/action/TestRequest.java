@@ -105,7 +105,7 @@ public class TestRequest extends TestAction {
 
         List<Integer> ids = new ArrayList<Integer>();
         for (RequestSpecimen rs : rInfo.specimens) {
-            ids.add(rs.id);
+            ids.add(rs.getId());
         }
 
         RequestClaimAction claimAction =
@@ -114,8 +114,8 @@ public class TestRequest extends TestAction {
 
         rInfo = EXECUTOR.exec(requestGetInfoAction);
         for (RequestSpecimen spec : rInfo.specimens)
-            Assert.assertTrue(spec.claimedBy != null
-                && !spec.claimedBy.equals(""));
+            Assert.assertTrue(spec.getClaimedBy() != null
+                && !spec.getClaimedBy().equals(""));
 
     }
 
@@ -129,7 +129,7 @@ public class TestRequest extends TestAction {
 
         List<Integer> ids = new ArrayList<Integer>();
         for (RequestSpecimen rs : rInfo.specimens) {
-            ids.add(rs.id);
+            ids.add(rs.getId());
         }
 
         RequestStateChangeAction dispatchAction =

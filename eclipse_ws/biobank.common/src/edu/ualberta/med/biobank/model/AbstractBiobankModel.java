@@ -20,6 +20,21 @@ public abstract class AbstractBiobankModel implements IBiobankModel {
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
     }
+    
+    /**
+     * Set by Hibernate via field access.
+     * 
+     * @return version
+     */
+    public final Integer getVersion() {
+        return version;
+    }
+
+    // TODO: does this actually work? Test (especially with hibernate proxies)
+    @Override
+    public boolean equals(Object obj) {
+        return equals(obj, getClass());
+    }
 
     protected <T extends IBiobankModel> boolean equals(Object o, Class<T> klazz) {
         if (o == this) return true;

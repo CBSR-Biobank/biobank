@@ -98,21 +98,6 @@ public class AddressPeer {
 			}
 		});
 
-	public static final Property<String, Address> NAME = Property.create(
-		"name" //$NON-NLS-1$
-		, Address.class
-		, new TypeReference<String>() {}
-		, new Property.Accessor<String, Address>() { private static final long serialVersionUID = 1L;
-			@Override
-			public String get(Address model) {
-				return model.getName();
-			}
-			@Override
-			public void set(Address model, String value) {
-				model.setName(value);
-			}
-		});
-
 	public static final Property<String, Address> PROVINCE = Property.create(
 		"province" //$NON-NLS-1$
 		, Address.class
@@ -182,7 +167,6 @@ public class AddressPeer {
       aList.add(FAX_NUMBER);
       aList.add(POSTAL_CODE);
       aList.add(PHONE_NUMBER);
-      aList.add(NAME);
       aList.add(PROVINCE);
       aList.add(EMAIL_ADDRESS);
       aList.add(COUNTRY);

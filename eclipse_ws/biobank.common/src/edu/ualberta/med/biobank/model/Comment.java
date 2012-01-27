@@ -1,132 +1,41 @@
 package edu.ualberta.med.biobank.model;
 
+import java.util.Date;
 
-import java.io.Serializable;
-/**
-	* 
-	**/
+import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.NotNull;
 
-public class Comment  implements IBiobankModel
-{
-	/**
-	* An attribute to allow serialization of the domain objects
-	*/
-	private static final long serialVersionUID = 1234567890L;
+public class Comment extends AbstractBiobankModel {
+    private static final long serialVersionUID = 1L;
 
-        private Integer version;
+    private String message;
+    private Date createdAt;
+    private User user;
 
-	
-	/**
-	* 
-	**/
-	
-	public String message;
-	/**
-	* Retrieves the value of the message attribute
-	* @return message
-	**/
+    @NotEmpty
+    public String getMessage() {
+        return message;
+    }
 
-	public String getMessage(){
-		return message;
-	}
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
-	/**
-	* Sets the value of message attribute
-	**/
+    @NotNull
+    public Date getCreatedAt() {
+        return createdAt;
+    }
 
-	public void setMessage(String message){
-		this.message = message;
-	}
-	
-	/**
-	* 
-	**/
-	
-	public Integer id;
-	/**
-	* Retrieves the value of the id attribute
-	* @return id
-	**/
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 
-	public Integer getId(){
-		return id;
-	}
+    @NotNull
+    public User getUser() {
+        return user;
+    }
 
-	/**
-	* Sets the value of id attribute
-	**/
-
-	public void setId(Integer id){
-		this.id = id;
-	}
-	
-	/**
-	* 
-	**/
-	
-	public java.util.Date createdAt;
-	/**
-	* Retrieves the value of the createdAt attribute
-	* @return createdAt
-	**/
-
-	public java.util.Date getCreatedAt(){
-		return createdAt;
-	}
-
-	/**
-	* Sets the value of createdAt attribute
-	**/
-
-	public void setCreatedAt(java.util.Date createdAt){
-		this.createdAt = createdAt;
-	}
-	
-	/**
-	* An associated edu.ualberta.med.biobank.model.User object
-	**/
-			
-	private User user;
-	/**
-	* Retrieves the value of the user attribute
-	* @return user
-	**/
-	
-	public User getUser(){
-		return user;
-	}
-	/**
-	* Sets the value of user attribute
-	**/
-
-	public void setUser(User user){
-		this.user = user;
-	}
-			
-	/**
-	* Compares <code>obj</code> to it self and returns true if they both are same
-	*
-	* @param obj
-	**/
-	public boolean equals(Object obj)
-	{
-		if(obj instanceof Comment) 
-		{
-			Comment c =(Comment)obj; 			 
-			if(getId() != null && getId().equals(c.getId()))
-				return true;
-		}
-		return false;
-	}
-		
-	/**
-	* Returns hash code for the primary key of the object
-	**/
-	public int hashCode()
-	{
-		if(getId() != null)
-			return getId().hashCode();
-		return 0;
-	}
-	
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

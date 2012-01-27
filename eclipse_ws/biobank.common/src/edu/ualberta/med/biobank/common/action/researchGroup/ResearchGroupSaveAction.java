@@ -48,7 +48,6 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
 
         Address address = new Address();
         address.setId(rgInfo.address.id);
-        address.setName(rgInfo.address.name);
         address.setCity(rgInfo.address.city);
         address.setProvince(rgInfo.address.province);
         address.setCountry(rgInfo.address.country);

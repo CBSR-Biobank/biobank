@@ -20,11 +20,10 @@ public class AddressSaveInfo implements ActionResult{
     public String phone;
     public String fax;
     public String country;
-    public String name;
     
     public AddressSaveInfo(Integer id, String street1, String street2,
         String city, String province, String postalCode, String email,
-        String phone, String fax, String country, String name) {
+        String phone, String fax, String country) {
         this.id = id;
         this.street1 = street1;
         this.street2 = street2;
@@ -35,7 +34,6 @@ public class AddressSaveInfo implements ActionResult{
         this.phone = phone;
         this.fax = fax;
         this.country = country;
-        this.name = name;
     }
 
 }

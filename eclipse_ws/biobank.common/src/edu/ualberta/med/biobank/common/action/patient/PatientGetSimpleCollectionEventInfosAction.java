@@ -71,7 +71,7 @@ public class PatientGetSimpleCollectionEventInfosAction implements
             ceventInfo.cevent = (CollectionEvent) row[0];
             ceventInfo.sourceSpecimenCount = (Long) row[1];
             ceventInfo.minSourceSpecimenDate = (Date) row[2];
-            ceventInfos.put(ceventInfo.cevent.id, ceventInfo);
+            ceventInfos.put(ceventInfo.cevent.getId(), ceventInfo);
         }
 
         return new MapResult<Integer, SimpleCEventInfo>(ceventInfos);

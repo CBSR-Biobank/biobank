@@ -17,7 +17,6 @@
 		<property name="phoneNumber" type="string" length="50" column="PHONE_NUMBER"/>
 		<property name="faxNumber" type="string" length="50" column="FAX_NUMBER"/>
 		<property name="country" type="string" length="50" column="COUNTRY"/>
-		<property name="name" type="string" length="50" column="NAME"/>
 		<!-- Associations mapping for the Address class -->
 	</class>
 </hibernate-mapping>

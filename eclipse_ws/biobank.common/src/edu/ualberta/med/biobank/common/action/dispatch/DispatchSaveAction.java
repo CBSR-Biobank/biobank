@@ -64,10 +64,10 @@ public class DispatchSaveAction implements Action<IdResult> {
             ShipmentInfo si =
                 context
                     .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
-            si.boxNumber = siInfo.boxNumber;
-            si.packedAt = siInfo.packedAt;
-            si.receivedAt = siInfo.receivedAt;
-            si.waybill = siInfo.waybill;
+            si.setBoxNumber(siInfo.boxNumber);
+            si.setPackedAt(siInfo.packedAt);
+            si.setReceivedAt(siInfo.receivedAt);
+            si.setWaybill(siInfo.waybill);
 
             ShippingMethod sm =
                 context
