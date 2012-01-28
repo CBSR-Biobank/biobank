@@ -141,6 +141,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         WrapperTransaction.persist(this, appService);
     }
 
+    @Deprecated
     public void delete() throws Exception {
         WrapperTransaction.delete(this, appService);
     }

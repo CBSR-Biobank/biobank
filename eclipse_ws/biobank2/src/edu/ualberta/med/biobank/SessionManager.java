@@ -38,9 +38,11 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
 
-    public static final String BIOBANK2_CONTEXT_LOGGED_OUT = "biobank.context.loggedOut"; //$NON-NLS-1$
+    public static final String BIOBANK2_CONTEXT_LOGGED_OUT =
+        "biobank.context.loggedOut"; //$NON-NLS-1$
 
-    public static final String BIOBANK2_CONTEXT_LOGGED_IN = "biobank.context.loggedIn"; //$NON-NLS-1$
+    public static final String BIOBANK2_CONTEXT_LOGGED_IN =
+        "biobank.context.loggedIn"; //$NON-NLS-1$
 
     private static BgcLogger logger = BgcLogger.getLogger(SessionManager.class
         .getName());
@@ -158,14 +160,16 @@ public class SessionManager {
     }
 
     public static void updateAdapterTreeNode(final AbstractAdapterBase node) {
-        final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
+        final AbstractViewWithAdapterTree view =
+            getCurrentAdapterViewWithTree();
         if ((view != null) && (node != null)) {
             view.getTreeViewer().update(node, null);
         }
     }
 
     public static void refreshTreeNode(final AbstractAdapterBase node) {
-        final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
+        final AbstractViewWithAdapterTree view =
+            getCurrentAdapterViewWithTree();
         if (view != null && !view.getTreeViewer().getControl().isDisposed()) {
             view.getTreeViewer().refresh(node, true);
         }
@@ -334,7 +338,8 @@ public class SessionManager {
                         parent.addChild(adapter);
                     List<AbstractAdapterBase> res = searchNodes(
                         adapter.getClass(), adapter.getId());
-                    final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
+                    final AbstractViewWithAdapterTree view =
+                        getCurrentAdapterViewWithTree();
                     if (view != null) {
                         for (AbstractAdapterBase ab : res) {
                             if (canReset)
@@ -396,8 +401,9 @@ public class SessionManager {
                                 page.getWorkbenchWindow());
                     } catch (WorkbenchException e) {
                         logger.error("Error opening main perspective", e); //$NON-NLS-1$
-                    }
+                }
             }
         });
     }
+
 }
