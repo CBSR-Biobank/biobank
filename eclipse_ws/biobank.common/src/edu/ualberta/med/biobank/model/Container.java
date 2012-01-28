@@ -42,7 +42,7 @@ public class Container extends AbstractBiobankModel {
     private ActivityStatus activityStatus;
 
     @NotEmpty
-    @Column(name = "PRODUCT_BARCODE", unique = true)
+    @Column(name = "PRODUCT_BARCODE")
     public String getProductBarcode() {
         return this.productBarcode;
     }
