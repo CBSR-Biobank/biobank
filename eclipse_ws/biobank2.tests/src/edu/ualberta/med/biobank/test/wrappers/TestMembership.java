@@ -6,6 +6,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
@@ -29,12 +30,8 @@ public class TestMembership extends TestDatabase {
         String name = "testCanDeleteMembershipRoleUsingARole" + r.nextInt();
         UserWrapper user = UserHelper.addUser(name, null, true);
 
-        PermissionWrapper perm = new PermissionWrapper(appService);
-        perm.setClassName(name);
-        perm.persist();
-
         RoleWrapper role1 = RoleHelper.newRole(name + "_1");
-        role1.addToPermissionCollection(Arrays.asList(perm));
+        role1.addToPermissionCollection(Arrays.asList(PermissionEnum.ADMINISTRATION));
         role1.persist();
         RoleHelper.createdRoles.add(role1);
 

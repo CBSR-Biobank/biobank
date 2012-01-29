@@ -4,11 +4,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 
 public class PermissionRootNode implements IPermissionCheckTreeNode {
 
-    private Map<PermissionWrapper, PermissionNode> children = new HashMap<PermissionWrapper, PermissionNode>();
+    private Map<PermissionEnum, PermissionNode> children = new HashMap<PermissionEnum, PermissionNode>();
 
     @Override
     public String getText() {
@@ -25,11 +26,11 @@ public class PermissionRootNode implements IPermissionCheckTreeNode {
         return children.values();
     }
 
-    public void setChildren(Map<PermissionWrapper, PermissionNode> children) {
+    public void setChildren(Map<PermissionEnum, PermissionNode> children) {
         this.children = children;
     }
 
-    public PermissionNode getNode(PermissionWrapper right) {
+    public PermissionNode getNode(PermissionEnum right) {
         return children.get(right);
     }
 

@@ -13,8 +13,6 @@ import edu.ualberta.med.biobank.common.peer.MembershipPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.CenterBaseWrapper;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.PermissionBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.PrincipalBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -68,43 +66,6 @@ public class MembershipBaseWrapper extends ModelWrapper<Membership> {
 
     void setCenterInternal(CenterBaseWrapper<?> center) {
         setWrappedProperty(MembershipPeer.CENTER, center);
-    }
-
-    public List<PermissionWrapper> getPermissionCollection(boolean sort) {
-        List<PermissionWrapper> permissionCollection = getWrapperCollection(MembershipPeer.PERMISSION_COLLECTION, PermissionWrapper.class, sort);
-        return permissionCollection;
-    }
-
-    public void addToPermissionCollection(List<? extends PermissionBaseWrapper> permissionCollection) {
-        addToWrapperCollection(MembershipPeer.PERMISSION_COLLECTION, permissionCollection);
-    }
-
-    void addToPermissionCollectionInternal(List<? extends PermissionBaseWrapper> permissionCollection) {
-        if (isInitialized(MembershipPeer.PERMISSION_COLLECTION)) {
-            addToWrapperCollection(MembershipPeer.PERMISSION_COLLECTION, permissionCollection);
-        } else {
-            getElementQueue().add(MembershipPeer.PERMISSION_COLLECTION, permissionCollection);
-        }
-    }
-
-    public void removeFromPermissionCollection(List<? extends PermissionBaseWrapper> permissionCollection) {
-        removeFromWrapperCollection(MembershipPeer.PERMISSION_COLLECTION, permissionCollection);
-    }
-
-    void removeFromPermissionCollectionInternal(List<? extends PermissionBaseWrapper> permissionCollection) {
-        if (isPropertyCached(MembershipPeer.PERMISSION_COLLECTION)) {
-            removeFromWrapperCollection(MembershipPeer.PERMISSION_COLLECTION, permissionCollection);
-        } else {
-            getElementQueue().remove(MembershipPeer.PERMISSION_COLLECTION, permissionCollection);
-        }
-    }
-
-    public void removeFromPermissionCollectionWithCheck(List<? extends PermissionBaseWrapper> permissionCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(MembershipPeer.PERMISSION_COLLECTION, permissionCollection);
-    }
-
-    void removeFromPermissionCollectionWithCheckInternal(List<? extends PermissionBaseWrapper> permissionCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(MembershipPeer.PERMISSION_COLLECTION, permissionCollection);
     }
 
    @SuppressWarnings("unchecked")

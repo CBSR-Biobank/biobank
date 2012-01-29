@@ -1,21 +1,22 @@
 package edu.ualberta.med.biobank.common.permission;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collections;
+import java.util.List;
 
 import edu.ualberta.med.biobank.model.BbGroup;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.Permission;
 import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
 /**
- * Corresponds to rows in the database for {@link Permission} model objects
- * through the "id" property.
+ * The names of these enumerations are saved in the database. Therefore, DO NOT
+ * CHANGE THESE ENUM INSTANCE/ VARIABLE NAMES (unless you are prepared to write
+ * an upgrade script). However, order does not matter and can be changed.
  * 
  * @author jferland
  * 
@@ -101,10 +102,17 @@ public enum PermissionEnum implements Serializable {
     SPECIMEN_TYPE_UPDATE(62),
     SPECIMEN_TYPE_DELETE(63);
 
+    private static final List<PermissionEnum> VALUES_LIST = Collections
+        .unmodifiableList(Arrays.asList(values()));
+
     private final Integer permissionId;
 
     private PermissionEnum(Integer permissionId) {
         this.permissionId = permissionId;
+    }
+    
+    public static List<PermissionEnum> valuesList() {
+        return VALUES_LIST;
     }
 
     public Integer getId() {
@@ -141,16 +149,6 @@ public enum PermissionEnum implements Serializable {
         return false;
     }
 
-    public static Set<Integer> getIds(Set<PermissionEnum> permissions) {
-        Set<Integer> ids = new HashSet<Integer>();
-
-        for (PermissionEnum permission : permissions) {
-            ids.add(permission.getId());
-        }
-
-        return ids;
-    }
-
     private boolean isPrincipalAllowed(Principal principal, Center center,
         Study study) {
         Collection<Membership> membs = principal.getMembershipCollection();
@@ -175,7 +173,7 @@ public enum PermissionEnum implements Serializable {
             study == null || membership.getStudy() == null
                 || membership.getStudy().equals(study);
 
-        Collection<Permission> permissions =
+        Collection<PermissionEnum> permissions =
             membership.getPermissionCollection();
         boolean hasPermission =
             ((permissions != null) && isPermissionAllowed(permissions));
@@ -185,10 +183,9 @@ public enum PermissionEnum implements Serializable {
         return result;
     }
 
-    private boolean isPermissionAllowed(Collection<Permission> permissions) {
-        for (Permission permission : permissions) {
-            if (permission.getId().equals(getId())
-                || permission.getId().equals(ADMINISTRATION.getId())) {
+    private boolean isPermissionAllowed(Collection<PermissionEnum> permissions) {
+        for (PermissionEnum permission : permissions) {
+            if (equals(permission) || ADMINISTRATION.equals(permission)) {
                 return true;
             }
         }

@@ -92,14 +92,9 @@ public class TestAction {
 
         session.save(superAdmin);
 
-        Permission administration = (Permission) session
-            .createCriteria(Permission.class)
-            .add(Restrictions.eq("id", PermissionEnum.ADMINISTRATION.getId()))
-            .list().iterator().next();
-
         Membership membership = new Membership();
         membership.setPrincipal(superAdmin);
-        membership.getPermissionCollection().add(administration);
+        membership.getPermissionCollection().add(PermissionEnum.ADMINISTRATION);
 
         session.save(membership);
 

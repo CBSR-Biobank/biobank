@@ -20,6 +20,7 @@ public abstract class AbstractBiobankModel implements IBiobankModel {
     @Id
     @GeneratedValue(generator = "generator")
     @Column(name = "ID", nullable = false)
+    // TODO: override method with specific column name value (e.g. ROLE_ID)?
     public Integer getId() {
         return this.id;
     }

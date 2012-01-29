@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
+import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 
 public class PermissionCheckTreeWidget extends Composite {
@@ -29,10 +30,10 @@ public class PermissionCheckTreeWidget extends Composite {
 
     private PermissionRootNode rootNode;
 
-    private List<PermissionWrapper> allPossiblePermissions;
+    private List<PermissionEnum> allPossiblePermissions;
 
     public PermissionCheckTreeWidget(Composite parent, boolean title,
-        List<PermissionWrapper> permissions) {
+        List<PermissionEnum> permissions) {
         super(parent, SWT.NONE);
         this.allPossiblePermissions = permissions;
 
@@ -86,10 +87,10 @@ public class PermissionCheckTreeWidget extends Composite {
     }
 
     private List<PermissionRootNode> buildContent(
-        List<PermissionWrapper> allPermissions) {
+        List<PermissionEnum> allPermissions) {
         rootNode = new PermissionRootNode();
-        final Map<PermissionWrapper, PermissionNode> nodes = new HashMap<PermissionWrapper, PermissionNode>();
-        for (PermissionWrapper r : allPermissions) {
+        final Map<PermissionEnum, PermissionNode> nodes = new HashMap<PermissionEnum, PermissionNode>();
+        for (PermissionEnum r : allPermissions) {
             PermissionNode node = new PermissionNode(rootNode, r);
             nodes.put(r, node);
         }
@@ -97,9 +98,9 @@ public class PermissionCheckTreeWidget extends Composite {
         return Arrays.asList(rootNode);
     }
 
-    public void setSelections(List<PermissionWrapper> permissions) {
+    public void setSelections(Collection<PermissionEnum> permissions) {
         List<IPermissionCheckTreeNode> checkedNodes = new ArrayList<IPermissionCheckTreeNode>();
-        for (PermissionWrapper permission : permissions) {
+        for (PermissionEnum permission : permissions) {
             PermissionNode rNode = rootNode.getNode(permission);
             checkedNodes.add(rNode);
         }
@@ -113,8 +114,8 @@ public class PermissionCheckTreeWidget extends Composite {
     }
 
     public class PermissionTreeRes {
-        public List<PermissionWrapper> addedPermissions = new ArrayList<PermissionWrapper>();
-        public List<PermissionWrapper> removedPermissions = new ArrayList<PermissionWrapper>();
+        public List<PermissionEnum> addedPermissions = new ArrayList<PermissionEnum>();
+        public List<PermissionEnum> removedPermissions = new ArrayList<PermissionEnum>();
 
         public void buildRes() {
             removedPermissions.addAll(allPossiblePermissions);

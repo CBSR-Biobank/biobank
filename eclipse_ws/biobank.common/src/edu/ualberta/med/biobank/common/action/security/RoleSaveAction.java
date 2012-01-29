@@ -18,7 +18,7 @@ public class RoleSaveAction implements Action<IdResult> {
 
     private Integer roleId;
     private String name;
-    private Set<PermissionEnum> permissionEnums = new HashSet<PermissionEnum>();
+    private Set<PermissionEnum> permissions = new HashSet<PermissionEnum>();
 
     public void setId(Integer roleId) {
         this.roleId = roleId;
@@ -29,7 +29,7 @@ public class RoleSaveAction implements Action<IdResult> {
     }
 
     public void setPermissions(Set<PermissionEnum> permissions) {
-        this.permissionEnums = permissions;
+        this.permissions = permissions;
     }
 
     @Override
@@ -39,19 +39,10 @@ public class RoleSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        // TODO: should just use Hibernate to map a Role to a list of
-        // PermissionEnum-s, see
-        // https://community.jboss.org/wiki/UserTypeForPersistingAnEnumWithAVARCHARColumn
-        // but this is probably only possible once we have access to directly
-        // manipulate the beans/ pojos
-        Set<Integer> permissionIds = PermissionEnum.getIds(permissionEnums);
-        Map<Integer, Permission> permissions =
-            context.load(Permission.class, permissionIds);
-
         Role role = context.load(Role.class, roleId, new Role());
         role.setName(name);
         role.getPermissionCollection().clear();
-        role.getPermissionCollection().addAll(permissions.values());
+        role.getPermissionCollection().addAll(permissions);
 
         context.getSession().saveOrUpdate(role);
 

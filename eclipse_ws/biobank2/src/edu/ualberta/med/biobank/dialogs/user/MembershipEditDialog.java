@@ -29,10 +29,10 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -265,8 +265,8 @@ public class MembershipEditDialog extends BgcBaseDialog {
     private void createPermissionWidgets(Composite contents)
         throws ApplicationException {
         permissionsTree = new PermissionCheckTreeWidget(contents, false,
-            PermissionWrapper.getAllPermissions(SessionManager.getAppService()));
-        permissionsTree.setSelections(ms.getPermissionCollection(false));
+            PermissionEnum.valuesList());
+        permissionsTree.setSelections(ms.getPermissionCollection());
 
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.horizontalSpan = 2;

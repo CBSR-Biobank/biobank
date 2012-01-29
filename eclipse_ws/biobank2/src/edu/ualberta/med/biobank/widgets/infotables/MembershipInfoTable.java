@@ -7,6 +7,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
@@ -125,7 +126,7 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
     public String getPermissionsString(MembershipWrapper ms) {
         StringBuffer sb = new StringBuffer();
         boolean first = true;
-        for (PermissionWrapper perm : ms.getPermissionCollection(true)) {
+        for (PermissionEnum perm : ms.getPermissionCollection()) {
             if (sb.length() > 25) {
                 sb.setLength(25);
                 sb.append("..."); //$NON-NLS-1$
@@ -135,7 +136,7 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
                 first = false;
             else
                 sb.append(";"); //$NON-NLS-1$
-            sb.append(perm.getClassName());
+            sb.append(perm.name()); // TODO: localize
         }
         return sb.toString();
     }

@@ -48,42 +48,4 @@ public class RoleBaseWrapper extends ModelWrapper<Role> {
         String trimmed = name == null ? null : name.trim();
         setProperty(RolePeer.NAME, trimmed);
     }
-
-    public List<PermissionWrapper> getPermissionCollection(boolean sort) {
-        List<PermissionWrapper> permissionCollection = getWrapperCollection(RolePeer.PERMISSION_COLLECTION, PermissionWrapper.class, sort);
-        return permissionCollection;
-    }
-
-    public void addToPermissionCollection(List<? extends PermissionBaseWrapper> permissionCollection) {
-        addToWrapperCollection(RolePeer.PERMISSION_COLLECTION, permissionCollection);
-    }
-
-    void addToPermissionCollectionInternal(List<? extends PermissionBaseWrapper> permissionCollection) {
-        if (isInitialized(RolePeer.PERMISSION_COLLECTION)) {
-            addToWrapperCollection(RolePeer.PERMISSION_COLLECTION, permissionCollection);
-        } else {
-            getElementQueue().add(RolePeer.PERMISSION_COLLECTION, permissionCollection);
-        }
-    }
-
-    public void removeFromPermissionCollection(List<? extends PermissionBaseWrapper> permissionCollection) {
-        removeFromWrapperCollection(RolePeer.PERMISSION_COLLECTION, permissionCollection);
-    }
-
-    void removeFromPermissionCollectionInternal(List<? extends PermissionBaseWrapper> permissionCollection) {
-        if (isPropertyCached(RolePeer.PERMISSION_COLLECTION)) {
-            removeFromWrapperCollection(RolePeer.PERMISSION_COLLECTION, permissionCollection);
-        } else {
-            getElementQueue().remove(RolePeer.PERMISSION_COLLECTION, permissionCollection);
-        }
-    }
-
-    public void removeFromPermissionCollectionWithCheck(List<? extends PermissionBaseWrapper> permissionCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(RolePeer.PERMISSION_COLLECTION, permissionCollection);
-    }
-
-    void removeFromPermissionCollectionWithCheckInternal(List<? extends PermissionBaseWrapper> permissionCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(RolePeer.PERMISSION_COLLECTION, permissionCollection);
-    }
-
 }

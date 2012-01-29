@@ -2,7 +2,13 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
 import java.util.Collection;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -13,6 +19,9 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.validator.NotNull;
 
+import edu.ualberta.med.biobank.common.permission.PermissionEnum;
+
+
 @Entity
 @Table(name = "MEMBERSHIP",
     uniqueConstraints = {
@@ -22,23 +31,23 @@ import org.hibernate.validator.NotNull;
 public class Membership extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
-    private Collection<Permission> permissionCollection =
-        new HashSet<Permission>(0);
+    private Collection<PermissionEnum> permissionCollection =
+        new HashSet<PermissionEnum>(0);
     private Center center;
     private Collection<Role> roleCollection = new HashSet<Role>(0);
     private Study study;
     private Principal principal;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "MEMBERSHIP_PERMISSION",
-        joinColumns = { @JoinColumn(name = "MEMBERSHIP_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "PERMISSION_ID", nullable = false, updatable = false) })
-    public Collection<Permission> getPermissionCollection() {
+    @ElementCollection(targetClass = PermissionEnum.class, fetch = FetchType.EAGER) 
+    @CollectionTable(name = "MEMBERSHIP_PERMISSION",
+        joinColumns = @JoinColumn(name = "ID"))
+    @Column(name = "PERMISSION_NAME")
+    @Enumerated(EnumType.STRING)
+    public Collection<PermissionEnum> getPermissionCollection() {
         return this.permissionCollection;
     }
 
-    public void setPermissionCollection(
-        Collection<Permission> permissionCollection) {
+    public void setPermissionCollection(Collection<PermissionEnum> permissionCollection) {
         this.permissionCollection = permissionCollection;
     }
 

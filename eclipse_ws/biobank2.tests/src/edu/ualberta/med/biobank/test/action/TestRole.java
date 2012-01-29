@@ -30,20 +30,15 @@ public class TestRole extends TestAction {
         RoleSaveAction action = new RoleSaveAction();
         action.setName(getMethodNameR());
 
-        Set<PermissionEnum> permissionEnums = new HashSet<PermissionEnum>();
-        permissionEnums.add(PermissionEnum.ADMINISTRATION);
-        permissionEnums.add(PermissionEnum.CLINIC_CREATE);
+        Set<PermissionEnum> permissions = new HashSet<PermissionEnum>();
+        permissions.add(PermissionEnum.ADMINISTRATION);
+        permissions.add(PermissionEnum.CLINIC_CREATE);
 
-        action.setPermissions(permissionEnums);
+        action.setPermissions(permissions);
 
         IdResult result = EXECUTOR.exec(action);
 
         Role role = (Role) session.get(Role.class, result.getId());
-
-        @SuppressWarnings("unchecked")
-        List<Permission> permissions = session.createCriteria(Permission.class)
-            .add(Restrictions.in("id", PermissionEnum.getIds(permissionEnums)))
-            .list();
 
         Assert.notNull(role);
         Assert.isTrue(role.getPermissionCollection().containsAll(permissions),
@@ -55,10 +50,10 @@ public class TestRole extends TestAction {
         RoleSaveAction action = new RoleSaveAction();
         action.setName(getMethodNameR());
 
-        Set<PermissionEnum> permissionEnums = new HashSet<PermissionEnum>();
-        permissionEnums.add(PermissionEnum.ADMINISTRATION);
+        Set<PermissionEnum> permissions = new HashSet<PermissionEnum>();
+        permissions.add(PermissionEnum.ADMINISTRATION);
 
-        action.setPermissions(permissionEnums);
+        action.setPermissions(permissions);
 
         IdResult result = EXECUTOR.exec(action);
         Integer roleId = result.getId();
@@ -66,23 +61,18 @@ public class TestRole extends TestAction {
         // update
         action.setId(roleId);
 
-        permissionEnums.clear();
-        permissionEnums.add(PermissionEnum.CLINIC_CREATE);
+        permissions.clear();
+        permissions.add(PermissionEnum.CLINIC_CREATE);
 
-        action.setPermissions(permissionEnums);
+        action.setPermissions(permissions);
 
         EXECUTOR.exec(action);
 
         // check
         Role role = (Role) session.get(Role.class, result.getId());
 
-        @SuppressWarnings("unchecked")
-        List<Permission> permissions = session.createCriteria(Permission.class)
-            .add(Restrictions.in("id", PermissionEnum.getIds(permissionEnums)))
-            .list();
-
         Assert.notNull(role);
-        Assert.isTrue(role.getPermissionCollection().containsAll(permissions),
+        Assert.isTrue(role.getPermissionCollection().equals(permissions),
             "Permissions not saved.");
     }
 

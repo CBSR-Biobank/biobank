@@ -2,15 +2,20 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
 import java.util.Collection;
+
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import org.hibernate.validator.NotEmpty;
+
+import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 
 @Entity
 @Table(name = "ROLE")
@@ -18,8 +23,8 @@ public class Role extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private Collection<Permission> permissionCollection =
-        new HashSet<Permission>(0);
+    private Collection<PermissionEnum> permissionCollection =
+        new HashSet<PermissionEnum>(0);
 
     @NotEmpty
     @Column(name = "NAME", unique = true, nullable = false)
@@ -31,16 +36,17 @@ public class Role extends AbstractBiobankModel {
         this.name = name;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "ROLE_PERMISSION",
-        joinColumns = { @JoinColumn(name = "ROLE_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "PERMISSION_ID", nullable = false, updatable = false) })
-    public Collection<Permission> getPermissionCollection() {
+    @ElementCollection(targetClass = PermissionEnum.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "ROLE_PERMISSION",
+        joinColumns = @JoinColumn(name = "ID"))
+    @Column(name = "PERMISSION_NAME")
+    @Enumerated(EnumType.STRING)
+    public Collection<PermissionEnum> getPermissionCollection() {
         return this.permissionCollection;
     }
 
     public void setPermissionCollection(
-        Collection<Permission> permissionCollection) {
+        Collection<PermissionEnum> permissionCollection) {
         this.permissionCollection = permissionCollection;
     }
 }
