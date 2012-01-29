@@ -11,8 +11,6 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.peer.RolePeer;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.PermissionBaseWrapper;
 
 public class RoleBaseWrapper extends ModelWrapper<Role> {
 

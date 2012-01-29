@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
-import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 
 public class PermissionNode implements IPermissionCheckTreeNode {
 

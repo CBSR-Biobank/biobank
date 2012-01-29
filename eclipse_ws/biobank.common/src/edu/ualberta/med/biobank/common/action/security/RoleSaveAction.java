@@ -10,7 +10,6 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
-import edu.ualberta.med.biobank.model.Permission;
 import edu.ualberta.med.biobank.model.Role;
 
 public class RoleSaveAction implements Action<IdResult> {

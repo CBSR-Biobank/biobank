@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
-import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 
 public class PermissionRootNode implements IPermissionCheckTreeNode {
 

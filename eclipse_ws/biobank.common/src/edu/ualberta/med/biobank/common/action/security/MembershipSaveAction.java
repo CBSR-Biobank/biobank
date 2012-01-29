@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.common.permission.security.UserManagementPermiss
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.Permission;
 import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Study;

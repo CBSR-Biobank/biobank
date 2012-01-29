@@ -7,7 +7,6 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 import java.util.List;
 import java.util.ArrayList;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Permission;
 import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.Role;
