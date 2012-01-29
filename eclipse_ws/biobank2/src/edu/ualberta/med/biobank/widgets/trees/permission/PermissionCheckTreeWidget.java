@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
-import edu.ualberta.med.biobank.common.permission.PermissionEnum;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 
 public class PermissionCheckTreeWidget extends Composite {
 

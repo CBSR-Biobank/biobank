@@ -19,7 +19,6 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.validator.NotNull;
 
-import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 
 
 @Entity

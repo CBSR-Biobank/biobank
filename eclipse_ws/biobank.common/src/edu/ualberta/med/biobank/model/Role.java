@@ -15,7 +15,6 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.NotEmpty;
 
-import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 
 @Entity
 @Table(name = "ROLE")

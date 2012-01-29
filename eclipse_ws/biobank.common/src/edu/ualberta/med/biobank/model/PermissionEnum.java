@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.permission;
+package edu.ualberta.med.biobank.model;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -6,12 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import edu.ualberta.med.biobank.model.BbGroup;
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.Principal;
-import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
 
 /**
  * The names of these enumerations are saved in the database. Therefore, DO NOT

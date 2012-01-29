@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.common.permission.containerType;
 
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
-import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 
 public class ContainerTypeUpdatePermission implements Permission {
     private static final long serialVersionUID = 1L;

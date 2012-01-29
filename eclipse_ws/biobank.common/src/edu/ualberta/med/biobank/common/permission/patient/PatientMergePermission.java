@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.common.permission.patient;
 
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
-import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 
 public class PatientMergePermission implements Permission {
     private static final long serialVersionUID = 1L;

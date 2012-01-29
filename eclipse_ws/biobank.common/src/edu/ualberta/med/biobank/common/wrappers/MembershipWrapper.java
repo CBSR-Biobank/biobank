@@ -3,9 +3,9 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.Collection;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.common.wrappers.base.MembershipBaseWrapper;
 import edu.ualberta.med.biobank.model.Membership;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class MembershipWrapper extends MembershipBaseWrapper {

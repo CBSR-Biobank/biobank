@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.widgets.trees.permission;
 import java.util.Collection;
 import java.util.Collections;
 
-import edu.ualberta.med.biobank.common.permission.PermissionEnum;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 
 public class PermissionNode implements IPermissionCheckTreeNode {
 
