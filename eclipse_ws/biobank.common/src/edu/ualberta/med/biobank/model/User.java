@@ -69,7 +69,7 @@ public class User extends Principal {
         this.fullName = fullName;
     }
 
-    @Email
+    // TODO: write an email check that allows null @Email
     @Column(name = "EMAIL")
     public String getEmail() {
         return this.email;

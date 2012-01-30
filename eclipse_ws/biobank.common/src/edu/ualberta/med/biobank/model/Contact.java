@@ -65,7 +65,7 @@ public class Contact extends AbstractBiobankModel {
         this.faxNumber = faxNumber;
     }
 
-    @Email
+    // TODO: write an email check that allows null @Email
     @Column(name = "EMAIL_ADDRESS", length = 50)
     public String getEmailAddress() {
         return this.emailAddress;
