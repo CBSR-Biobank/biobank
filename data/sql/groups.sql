@@ -1,6 +1,6 @@
 -- Add a default super admin group.
 insert into principal (discriminator, id, version, name, activity_status_id)
-select 'BbGroup', coalesce(MAX(id), 0)+1, 0, 'Super Administrator', 1 from principal;
+select 'BbGroup', coalesce(MAX(id), 0)+1, 0, 'Super Administrators', 1 from principal;
 
 -- add a membership to this super admin role
 insert into membership(id, version, principal_id)
@@ -8,5 +8,5 @@ select 1, 0, max(id) from principal;
 
 -- add a 'AdministratorPersmission permission (id = 1 ) to this membership
 insert into membership_permission(id, permission_name) values
-((select max(id) from principal), 'ADMINISTRATOR');
+((select max(id) from principal), 'ADMINISTRATION');
 
