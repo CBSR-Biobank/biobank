@@ -25,6 +25,9 @@ public class ContainerTypeDeleteAction implements Action<EmptyResult> {
 
     @Override
     public EmptyResult run(ActionContext context) throws ActionException {
+        // TODO: remove this container type from all parent container types that
+        // have it as a child.
+
         ContainerType containerType = context.load(ContainerType.class, typeId);
 
         new CollectionIsEmptyCheck<ContainerType>(ContainerType.class,

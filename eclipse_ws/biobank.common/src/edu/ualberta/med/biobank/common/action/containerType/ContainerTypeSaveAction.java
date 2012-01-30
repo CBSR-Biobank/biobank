@@ -107,6 +107,14 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         throws ActionException {
         ContainerType containerType = getContainerType(context);
 
+        // TODO:
+        //
+        // 1) capacity, top-level, and labeling scheme cannot be changed after
+        // containers have been assigned this type.
+        // 2) ensure the labeling scheme can label the capacity
+        // 3) ensure removed child container types are not in use
+        // 4) ensure removed specimen types are not in use
+
         containerType.setName(name);
         containerType.setNameShort(nameShort);
         containerType.setSite(context.load(Site.class, siteId));

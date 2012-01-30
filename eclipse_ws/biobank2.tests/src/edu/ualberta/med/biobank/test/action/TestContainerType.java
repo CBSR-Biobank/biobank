@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.constraint.ConstraintViolationException;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
@@ -21,6 +22,7 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfo
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.test.Utils;
@@ -424,6 +426,42 @@ public class TestContainerType extends TestAction {
 
     }
 
+    private Container createTypeWithContainer() {
+        Integer containerTypeId =
+            EXECUTOR.exec(containerTypeSaveAction).getId();
+
+        ContainerSaveAction containerSaveAction = new ContainerSaveAction();
+        containerSaveAction.setStatusId(ActivityStatusEnum.ACTIVE.getId());
+        containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
+        containerSaveAction.setLabel("01");
+        containerSaveAction.setSiteId(siteId);
+        containerSaveAction.setTypeId(containerTypeId);
+        Integer containerId = EXECUTOR.exec(containerSaveAction).getId();
+        ContainerInfo containerInfo =
+            EXECUTOR.exec(new ContainerGetInfoAction(containerId));
+    }
+
+    @Test
+    public void changeCapacity() {
+        // capacity cannot be changed after on a container type once containers
+        // of this type have been created
+
+    }
+
+    @Test
+    public void changeTopLevel() {
+        // top level cannot be changed after on a container type once containers
+        // of this type have been created
+
+    }
+
+    @Test
+    public void changeLabellingScheme() {
+        // labeling scheme cannot be changed after on a container type once
+        // containers of this type have been created
+
+    }
+
     private ContainerTypeInfo addComment(Integer containerTypeId) {
         ContainerTypeSaveAction containerTypeSaveAction =
             ContainerTypeHelper.getSaveAction(
@@ -453,6 +491,7 @@ public class TestContainerType extends TestAction {
 
     @Test
     public void deleteWithParent() {
+        // create a top container type with children
         Set<Integer> childContainerTypeIds = new HashSet<Integer>();
         for (ContainerType childContainerType : createChildContainerTypes()) {
             childContainerTypeIds.add(childContainerType.getId());
@@ -477,17 +516,33 @@ public class TestContainerType extends TestAction {
     }
 
     @Test
-    public void deleteWithContainer() {
-        Integer containerTypeId =
-            EXECUTOR.exec(containerTypeSaveAction).getId();
+    public void deleteWithChildren() {
+        // create a top container type with children
+        Set<Integer> childContainerTypeIds = new HashSet<Integer>();
+        for (ContainerType childContainerType : createChildContainerTypes()) {
+            childContainerTypeIds.add(childContainerType.getId());
+        }
 
-        ContainerSaveAction containerSaveAction = new ContainerSaveAction();
-        containerSaveAction.setStatusId(ActivityStatusEnum.ACTIVE.getId());
-        containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
-        containerSaveAction.setLabel("01");
-        containerSaveAction.setSiteId(siteId);
-        containerSaveAction.setTypeId(containerTypeId);
-        EXECUTOR.exec(containerSaveAction);
+        containerTypeSaveAction.setChildContainerTypeIds(childContainerTypeIds);
+        Integer parentCtId = EXECUTOR.exec(containerTypeSaveAction).getId();
+        EXECUTOR.exec(new ContainerTypeGetInfoAction(parentCtId));
+
+        // FIXME: should this test pass or fail?
+
+        // delete parent type
+        try {
+            EXECUTOR.exec(new ContainerTypeDeleteAction(parentCtId));
+            Assert
+                .fail(
+                "should not be allowed to delete a parent container type and linked to a children types");
+        } catch (ActionCheckException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void deleteWithContainer() {
+        createTypeWithContainer();
 
         try {
             EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeId));
