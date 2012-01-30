@@ -55,7 +55,6 @@
 		<mapping class="edu.ualberta.med.biobank.model.Membership" /> 
 		<mapping class="edu.ualberta.med.biobank.model.OriginInfo" /> 
 		<mapping class="edu.ualberta.med.biobank.model.Patient" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Permission" /> 
 		<mapping class="edu.ualberta.med.biobank.model.Principal" /> 
 		<mapping class="edu.ualberta.med.biobank.model.PrintedSsInvItem" /> 
 		<mapping class="edu.ualberta.med.biobank.model.PrinterLabelTemplate" /> 

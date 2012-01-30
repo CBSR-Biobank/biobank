@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
 import java.util.Collection;
+import java.util.Set;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -15,14 +16,13 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.NotEmpty;
 
-
 @Entity
 @Table(name = "ROLE")
 public class Role extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private Collection<PermissionEnum> permissionCollection =
+    private Set<PermissionEnum> permissionCollection =
         new HashSet<PermissionEnum>(0);
 
     @NotEmpty
@@ -35,17 +35,17 @@ public class Role extends AbstractBiobankModel {
         this.name = name;
     }
 
-    @ElementCollection(targetClass = PermissionEnum.class, fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = PermissionEnum.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "ROLE_PERMISSION",
         joinColumns = @JoinColumn(name = "ID"))
     @Column(name = "PERMISSION_NAME")
     @Enumerated(EnumType.STRING)
-    public Collection<PermissionEnum> getPermissionCollection() {
+    public Set<PermissionEnum> getPermissionCollection() {
         return this.permissionCollection;
     }
 
     public void setPermissionCollection(
-        Collection<PermissionEnum> permissionCollection) {
+        Set<PermissionEnum> permissionCollection) {
         this.permissionCollection = permissionCollection;
     }
 }

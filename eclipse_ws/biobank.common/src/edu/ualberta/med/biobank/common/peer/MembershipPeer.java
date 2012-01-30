@@ -5,6 +5,8 @@ import java.util.Collections;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Principal;
@@ -44,17 +46,17 @@ public class MembershipPeer {
 			}
 		});
 
-	public static final Property<Collection<PermissionEnum>, Membership> PERMISSION_COLLECTION = Property.create(
+	public static final Property<Set<PermissionEnum>, Membership> PERMISSION_COLLECTION = Property.create(
 		"permissionCollection" //$NON-NLS-1$
 		, Membership.class
-		, new TypeReference<Collection<PermissionEnum>>() {}
-		, new Property.Accessor<Collection<PermissionEnum>, Membership>() { private static final long serialVersionUID = 1L;
+		, new TypeReference<Set<PermissionEnum>>() {}
+		, new Property.Accessor<Set<PermissionEnum>, Membership>() { private static final long serialVersionUID = 1L;
 			@Override
-			public Collection<PermissionEnum> get(Membership model) {
+			public Set<PermissionEnum> get(Membership model) {
 				return model.getPermissionCollection();
 			}
 			@Override
-			public void set(Membership model, Collection<PermissionEnum> value) {
+			public void set(Membership model, Set<PermissionEnum> value) {
 				model.setPermissionCollection(value);
 			}
 		});

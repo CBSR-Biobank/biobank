@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,10 +20,10 @@ public class EntityProperty extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String property;
-    private Collection<EntityColumn> entityColumnCollection =
+    private Set<EntityColumn> entityColumnCollection =
         new HashSet<EntityColumn>(0);
     private PropertyType propertyType;
-    private Collection<EntityFilter> entityFilterCollection =
+    private Set<EntityFilter> entityFilterCollection =
         new HashSet<EntityFilter>(0);
 
     @NotEmpty
@@ -37,12 +38,12 @@ public class EntityProperty extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "ENTITY_PROPERTY_ID", updatable = false)
-    public Collection<EntityColumn> getEntityColumnCollection() {
+    public Set<EntityColumn> getEntityColumnCollection() {
         return this.entityColumnCollection;
     }
 
     public void setEntityColumnCollection(
-        Collection<EntityColumn> entityColumnCollection) {
+        Set<EntityColumn> entityColumnCollection) {
         this.entityColumnCollection = entityColumnCollection;
     }
 
@@ -59,12 +60,12 @@ public class EntityProperty extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "ENTITY_PROPERTY_ID", updatable = false)
-    public Collection<EntityFilter> getEntityFilterCollection() {
+    public Set<EntityFilter> getEntityFilterCollection() {
         return this.entityFilterCollection;
     }
 
     public void setEntityFilterCollection(
-        Collection<EntityFilter> entityFilterCollection) {
+        Set<EntityFilter> entityFilterCollection) {
         this.entityFilterCollection = entityFilterCollection;
     }
 }

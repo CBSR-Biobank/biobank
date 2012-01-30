@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
 import java.util.Collection;
+import java.util.Set;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -19,8 +20,6 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.validator.NotNull;
 
-
-
 @Entity
 @Table(name = "MEMBERSHIP",
     uniqueConstraints = {
@@ -30,23 +29,23 @@ import org.hibernate.validator.NotNull;
 public class Membership extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
-    private Collection<PermissionEnum> permissionCollection =
+    private Set<PermissionEnum> permissionCollection =
         new HashSet<PermissionEnum>(0);
     private Center center;
     private Collection<Role> roleCollection = new HashSet<Role>(0);
     private Study study;
     private Principal principal;
 
-    @ElementCollection(targetClass = PermissionEnum.class, fetch = FetchType.EAGER) 
+    @ElementCollection(targetClass = PermissionEnum.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "MEMBERSHIP_PERMISSION",
         joinColumns = @JoinColumn(name = "ID"))
     @Column(name = "PERMISSION_NAME")
     @Enumerated(EnumType.STRING)
-    public Collection<PermissionEnum> getPermissionCollection() {
+    public Set<PermissionEnum> getPermissionCollection() {
         return this.permissionCollection;
     }
 
-    public void setPermissionCollection(Collection<PermissionEnum> permissionCollection) {
+    public void setPermissionCollection(Set<PermissionEnum> permissionCollection) {
         this.permissionCollection = permissionCollection;
     }
 

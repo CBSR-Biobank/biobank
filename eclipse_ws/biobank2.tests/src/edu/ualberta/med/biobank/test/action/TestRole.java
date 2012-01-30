@@ -1,16 +1,13 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.hibernate.criterion.Restrictions;
 import org.junit.Test;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.security.RoleSaveAction;
-import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 

@@ -5,6 +5,8 @@ import java.util.Collections;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.PropertyType;
 import edu.ualberta.med.biobank.model.EntityColumn;
@@ -42,17 +44,17 @@ public class EntityPropertyPeer {
 			}
 		});
 
-	public static final Property<Collection<EntityFilter>, EntityProperty> ENTITY_FILTER_COLLECTION = Property.create(
+	public static final Property<Set<EntityFilter>, EntityProperty> ENTITY_FILTER_COLLECTION = Property.create(
 		"entityFilterCollection" //$NON-NLS-1$
 		, EntityProperty.class
-		, new TypeReference<Collection<EntityFilter>>() {}
-		, new Property.Accessor<Collection<EntityFilter>, EntityProperty>() { private static final long serialVersionUID = 1L;
+		, new TypeReference<Set<EntityFilter>>() {}
+		, new Property.Accessor<Set<EntityFilter>, EntityProperty>() { private static final long serialVersionUID = 1L;
 			@Override
-			public Collection<EntityFilter> get(EntityProperty model) {
+			public Set<EntityFilter> get(EntityProperty model) {
 				return model.getEntityFilterCollection();
 			}
 			@Override
-			public void set(EntityProperty model, Collection<EntityFilter> value) {
+			public void set(EntityProperty model, Set<EntityFilter> value) {
 				model.setEntityFilterCollection(value);
 			}
 		});
@@ -72,17 +74,17 @@ public class EntityPropertyPeer {
 			}
 		});
 
-	public static final Property<Collection<EntityColumn>, EntityProperty> ENTITY_COLUMN_COLLECTION = Property.create(
+	public static final Property<Set<EntityColumn>, EntityProperty> ENTITY_COLUMN_COLLECTION = Property.create(
 		"entityColumnCollection" //$NON-NLS-1$
 		, EntityProperty.class
-		, new TypeReference<Collection<EntityColumn>>() {}
-		, new Property.Accessor<Collection<EntityColumn>, EntityProperty>() { private static final long serialVersionUID = 1L;
+		, new TypeReference<Set<EntityColumn>>() {}
+		, new Property.Accessor<Set<EntityColumn>, EntityProperty>() { private static final long serialVersionUID = 1L;
 			@Override
-			public Collection<EntityColumn> get(EntityProperty model) {
+			public Set<EntityColumn> get(EntityProperty model) {
 				return model.getEntityColumnCollection();
 			}
 			@Override
-			public void set(EntityProperty model, Collection<EntityColumn> value) {
+			public void set(EntityProperty model, Set<EntityColumn> value) {
 				model.setEntityColumnCollection(value);
 			}
 		});
