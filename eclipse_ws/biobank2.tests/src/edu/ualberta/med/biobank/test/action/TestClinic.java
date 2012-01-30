@@ -279,7 +279,7 @@ public class TestClinic extends TestAction {
         Integer clinicId = EXECUTOR.exec(clinicSaveAction).getId();
         EXECUTOR.exec(new ClinicDeleteAction(clinicId));
 
-        // hql query for site should return empty
+        // hql query for clinic should return empty
         Query q =
             session.createQuery("SELECT COUNT(*) FROM "
                 + Clinic.class.getName() + " WHERE id=?");

@@ -8,17 +8,22 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.hibernate.Query;
 import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.constraint.ConstraintViolationException;
+import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
+import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 
@@ -395,6 +400,102 @@ public class TestContainerType extends TestAction {
 
     @Test
     public void comments() {
+        // save with no comments
+        Integer containerTypeId =
+            EXECUTOR.exec(containerTypeSaveAction).getId();
+        ContainerTypeInfo containerTypeInfo =
+            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+        Assert.assertEquals(0, containerTypeInfo.containerType
+            .getCommentCollection().size());
 
+        containerTypeInfo = addComment(containerTypeId);
+        Assert.assertEquals(1, containerTypeInfo.containerType
+            .getCommentCollection().size());
+
+        containerTypeInfo = addComment(containerTypeId);
+        Assert.assertEquals(2, containerTypeInfo.containerType
+            .getCommentCollection().size());
+
+        // TODO: check full name on each comment's user
+        // for (Comment comment :
+        // containerTypeInfo.containerType.getCommentCollection()) {
+        //
+        // }
+
+    }
+
+    private ContainerTypeInfo addComment(Integer containerTypeId) {
+        ContainerTypeSaveAction containerTypeSaveAction =
+            ContainerTypeHelper.getSaveAction(
+                EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId)));
+        containerTypeSaveAction
+            .setCommentMessage(Utils.getRandomString(20, 30));
+        EXECUTOR.exec(containerTypeSaveAction).getId();
+        return EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+    }
+
+    @Test
+    public void delete() {
+        // save with no comments
+        Integer containerTypeId =
+            EXECUTOR.exec(containerTypeSaveAction).getId();
+        EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeId));
+
+        // hql query for container type should return empty
+        Query q =
+            session.createQuery("SELECT COUNT(*) FROM "
+                + ContainerType.class.getName() + " WHERE id=?");
+        q.setParameter(0, containerTypeId);
+        Long result = HibernateUtil.getCountFromQuery(q);
+
+        Assert.assertTrue(result.equals(0L));
+    }
+
+    @Test
+    public void deleteWithParent() {
+        Set<Integer> childContainerTypeIds = new HashSet<Integer>();
+        for (ContainerType childContainerType : createChildContainerTypes()) {
+            childContainerTypeIds.add(childContainerType.getId());
+        }
+
+        containerTypeSaveAction.setChildContainerTypeIds(childContainerTypeIds);
+        Integer parentCtId = EXECUTOR.exec(containerTypeSaveAction).getId();
+        ContainerTypeInfo containerTypeInfo =
+            EXECUTOR.exec(new ContainerTypeGetInfoAction(parentCtId));
+        Integer childCtId =
+            containerTypeInfo.containerType.getChildContainerTypeCollection()
+                .iterator().next().getId();
+
+        try {
+            EXECUTOR.exec(new ContainerTypeDeleteAction(childCtId));
+            Assert
+                .fail(
+                "should not be allowed to delete a child container type and linked to a parent type");
+        } catch (ActionCheckException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void deleteWithContainer() {
+        Integer containerTypeId =
+            EXECUTOR.exec(containerTypeSaveAction).getId();
+
+        ContainerSaveAction containerSaveAction = new ContainerSaveAction();
+        containerSaveAction.setStatusId(ActivityStatusEnum.ACTIVE.getId());
+        containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
+        containerSaveAction.setLabel("01");
+        containerSaveAction.setSiteId(siteId);
+        containerSaveAction.setTypeId(containerTypeId);
+        EXECUTOR.exec(containerSaveAction);
+
+        try {
+            EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeId));
+            Assert
+                .fail(
+                "should not be allowed to delete a container type in use by a container");
+        } catch (ActionCheckException e) {
+            Assert.assertTrue(true);
+        }
     }
 }
