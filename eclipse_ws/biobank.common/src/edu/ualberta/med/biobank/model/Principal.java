@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -25,6 +27,7 @@ public class Principal extends AbstractBiobankModel {
 
     private Collection<Membership> membershipCollection =
         new HashSet<Membership>(0);
+    private ActivityStatus activityStatus;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "principal")
     public Collection<Membership> getMembershipCollection() {
@@ -34,5 +37,15 @@ public class Principal extends AbstractBiobankModel {
     public void setMembershipCollection(
         Collection<Membership> membershipCollection) {
         this.membershipCollection = membershipCollection;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
+    public ActivityStatus getActivityStatus() {
+        return this.activityStatus;
+    }
+
+    public void setActivityStatus(ActivityStatus activityStatus) {
+        this.activityStatus = activityStatus;
     }
 }

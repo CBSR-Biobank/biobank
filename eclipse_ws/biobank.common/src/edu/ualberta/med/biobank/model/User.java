@@ -26,7 +26,6 @@ public class User extends Principal {
     private String fullName;
     private String email;
     private boolean needPwdChange = true;
-    private ActivityStatus activityStatus;
     private Collection<Comment> commentCollection = new HashSet<Comment>(0);
     private Collection<BbGroup> groupCollection = new HashSet<BbGroup>(0);
 
@@ -87,16 +86,6 @@ public class User extends Principal {
 
     public void setNeedPwdChange(boolean needPwdChange) {
         this.needPwdChange = needPwdChange;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
-    public ActivityStatus getActivityStatus() {
-        return this.activityStatus;
-    }
-
-    public void setActivityStatus(ActivityStatus activityStatus) {
-        this.activityStatus = activityStatus;
     }
 
     @OneToMany(fetch = FetchType.LAZY)
