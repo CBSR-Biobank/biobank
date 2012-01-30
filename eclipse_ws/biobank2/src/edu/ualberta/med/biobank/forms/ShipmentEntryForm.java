@@ -46,6 +46,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
@@ -504,32 +505,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         OriginInfoSaveAction save =
             new OriginInfoSaveAction(oiInfo, siInfo, SessionManager.getUser()
                 .getCurrentWorkingCenter().getId());
-        SessionManager.getAppService().doAction(save);
-
-        /*
-         * if (shipmentInfo.getWaybill() != null &&
-         * shipmentInfo.getWaybill().isEmpty()) { shipmentInfo.setWaybill(null);
-         * } try { originInfo.setShipmentInfo(shipmentInfo);
-         * originInfo.persist(); } catch (ModificationConcurrencyException mc) {
-         * if (isTryingAgain) { // already tried once throw mc; }
-         * 
-         * Display.getDefault().syncExec(new Runnable() {
-         * 
-         * @Override public void run() { tryAgain = BgcPlugin.openConfirm(
-         * Messages.ShipmentEntryForm_concurrency_title,
-         * Messages.ShipmentEntryForm_concurrency_msg); setDirty(true); try {
-         * doTrySettingAgain(); tryAgain = true; } catch (Exception e) {
-         * saveErrorCatch(e, null, true); } } }); }
-         * 
-         * if (!tryAgain) // persist those specimens only once we are sure the
-         * shipment // persist has succeeded. for (SpecimenWrapper s :
-         * removedSpecimensToPersist) { // when remove a specimen, ask for the
-         * origin center. Then // create a new origin info with this center and
-         * the deleted // specimen: OriginInfoWrapper origin =
-         * s.getOriginInfo(); origin.persist(); // then we set back the originfo
-         * to the specimen to be sure it // has the right modelObject:
-         * s.setOriginInfo(origin); // then we save the specimen s.persist(); }
-         */
+        originInfo.setId(SessionManager.getAppService().doAction(save).getId());
+        ((AdapterBase) adapter).setModelObject(originInfo);
     }
 
     /*

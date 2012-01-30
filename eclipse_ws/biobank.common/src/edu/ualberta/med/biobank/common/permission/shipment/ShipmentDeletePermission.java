@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.permission.shipment;
 
 import edu.ualberta.med.biobank.common.action.ActionContext;
+import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.OriginInfo;
@@ -16,8 +17,17 @@ public class ShipmentDeletePermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        OriginInfo ship = context.load(OriginInfo.class, shipmentId);
-        return PermissionEnum.ORIGIN_INFO_DELETE.isAllowed(context.getUser(),
-            ship.getCenter());
+        if (shipmentId != null) {
+            OriginInfo ship = null;
+            try {
+                ship = context.load(OriginInfo.class, shipmentId);
+                return PermissionEnum.ORIGIN_INFO_DELETE.isAllowed(
+                    context.getUser(),
+                    ship.getCenter());
+            } catch (ModelNotFoundException e) {
+                return false;
+            }
+        }
+        return false;
     }
 }
