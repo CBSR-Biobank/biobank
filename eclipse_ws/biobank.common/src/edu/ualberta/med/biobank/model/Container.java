@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -33,10 +32,10 @@ public class Container extends AbstractBiobankModel {
     private Double temperature;
     private String path;
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
-    private Collection<ContainerPosition> childPositionCollection =
+    private Set<ContainerPosition> childPositionCollection =
         new HashSet<ContainerPosition>(0);
     private Container topContainer;
-    private Collection<SpecimenPosition> specimenPositionCollection =
+    private Set<SpecimenPosition> specimenPositionCollection =
         new HashSet<SpecimenPosition>(0);
     private ContainerType containerType;
     private ContainerPosition position;
@@ -96,12 +95,12 @@ public class Container extends AbstractBiobankModel {
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "parentContainer")
-    public Collection<ContainerPosition> getChildPositionCollection() {
+    public Set<ContainerPosition> getChildPositionCollection() {
         return this.childPositionCollection;
     }
 
     public void setChildPositionCollection(
-        Collection<ContainerPosition> childPositionCollection) {
+        Set<ContainerPosition> childPositionCollection) {
         this.childPositionCollection = childPositionCollection;
     }
 
@@ -116,12 +115,12 @@ public class Container extends AbstractBiobankModel {
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "container")
-    public Collection<SpecimenPosition> getSpecimenPositionCollection() {
+    public Set<SpecimenPosition> getSpecimenPositionCollection() {
         return this.specimenPositionCollection;
     }
 
     public void setSpecimenPositionCollection(
-        Collection<SpecimenPosition> specimenPositionCollection) {
+        Set<SpecimenPosition> specimenPositionCollection) {
         this.specimenPositionCollection = specimenPositionCollection;
     }
 

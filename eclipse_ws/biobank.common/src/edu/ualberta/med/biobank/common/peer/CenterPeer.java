@@ -72,7 +72,8 @@ public class CenterPeer {
 			}
 			@Override
 			public void set(Center model, Collection<Dispatch> value) {
-				model.setDstDispatchCollection(value);
+				model.getDstDispatchCollection().clear();
+				model.getDstDispatchCollection().addAll(value);
 			}
 		});
 
@@ -87,7 +88,8 @@ public class CenterPeer {
 			}
 			@Override
 			public void set(Center model, Collection<Dispatch> value) {
-				model.setSrcDispatchCollection(value);
+				model.getSrcDispatchCollection().clear();
+				model.getSrcDispatchCollection().addAll(value);
 			}
 		});
 
@@ -133,7 +135,8 @@ public class CenterPeer {
 			}
 			@Override
 			public void set(Center model, Collection<ProcessingEvent> value) {
-				model.setProcessingEventCollection(value);
+				model.getProcessingEventCollection().clear();
+				model.getProcessingEventCollection().addAll(value);
 			}
 		});
 
@@ -148,7 +151,8 @@ public class CenterPeer {
 			}
 			@Override
 			public void set(Center model, Collection<Membership> value) {
-				model.setMembershipCollection(value);
+				model.getMembershipCollection().clear();
+				model.getMembershipCollection().addAll(value);
 			}
 		});
 
@@ -163,7 +167,8 @@ public class CenterPeer {
 			}
 			@Override
 			public void set(Center model, Collection<OriginInfo> value) {
-				model.setOriginInfoCollection(value);
+				model.getOriginInfoCollection().clear();
+				model.getOriginInfoCollection().addAll(value);
 			}
 		});
 

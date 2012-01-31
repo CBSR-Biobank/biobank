@@ -113,7 +113,8 @@ public class UserPeer  extends PrincipalPeer {
 			}
 			@Override
 			public void set(User model, Collection<Comment> value) {
-				model.setCommentCollection(value);
+				model.getCommentCollection().clear();
+				model.getCommentCollection().addAll(value);
 			}
 		});
 
@@ -143,7 +144,8 @@ public class UserPeer  extends PrincipalPeer {
 			}
 			@Override
 			public void set(User model, Collection<BbGroup> value) {
-				model.setGroupCollection(value);
+				model.getGroupCollection().clear();
+				model.getGroupCollection().addAll(value);
 			}
 		});
 

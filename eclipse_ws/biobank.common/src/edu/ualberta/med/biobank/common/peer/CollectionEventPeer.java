@@ -55,7 +55,8 @@ public class CollectionEventPeer {
 			}
 			@Override
 			public void set(CollectionEvent model, Collection<Specimen> value) {
-				model.setAllSpecimenCollection(value);
+				model.getAllSpecimenCollection().clear();
+				model.getAllSpecimenCollection().addAll(value);
 			}
 		});
 
@@ -85,7 +86,8 @@ public class CollectionEventPeer {
 			}
 			@Override
 			public void set(CollectionEvent model, Collection<EventAttr> value) {
-				model.setEventAttrCollection(value);
+				model.getEventAttrCollection().clear();
+				model.getEventAttrCollection().addAll(value);
 			}
 		});
 
@@ -131,7 +133,8 @@ public class CollectionEventPeer {
 			}
 			@Override
 			public void set(CollectionEvent model, Collection<Specimen> value) {
-				model.setOriginalSpecimenCollection(value);
+				model.getOriginalSpecimenCollection().clear();
+				model.getOriginalSpecimenCollection().addAll(value);
 			}
 		});
 

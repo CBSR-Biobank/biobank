@@ -67,7 +67,8 @@ public class ReportFilterPeer {
 			}
 			@Override
 			public void set(ReportFilter model, Collection<ReportFilterValue> value) {
-				model.setReportFilterValueCollection(value);
+				model.getReportFilterValueCollection().clear();
+				model.getReportFilterValueCollection().addAll(value);
 			}
 		});
 

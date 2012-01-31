@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -33,15 +32,15 @@ public class Center extends AbstractBiobankModel {
     private String name;
     private String nameShort;
     private Address address;
-    private Collection<ProcessingEvent> processingEventCollection =
+    private Set<ProcessingEvent> processingEventCollection =
         new HashSet<ProcessingEvent>(0);
-    private Collection<Membership> membershipCollection =
+    private Set<Membership> membershipCollection =
         new HashSet<Membership>(0);
-    private Collection<Dispatch> srcDispatchCollection = new HashSet<Dispatch>(
+    private Set<Dispatch> srcDispatchCollection = new HashSet<Dispatch>(
         0);
-    private Collection<Dispatch> dstDispatchCollection = new HashSet<Dispatch>(
+    private Set<Dispatch> dstDispatchCollection = new HashSet<Dispatch>(
         0);
-    private Collection<OriginInfo> originInfoCollection =
+    private Set<OriginInfo> originInfoCollection =
         new HashSet<OriginInfo>(0);
     private ActivityStatus activityStatus;
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
@@ -78,54 +77,54 @@ public class Center extends AbstractBiobankModel {
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "center")
-    public Collection<ProcessingEvent> getProcessingEventCollection() {
+    public Set<ProcessingEvent> getProcessingEventCollection() {
         return this.processingEventCollection;
     }
 
     public void setProcessingEventCollection(
-        Collection<ProcessingEvent> processingEventCollection) {
+        Set<ProcessingEvent> processingEventCollection) {
         this.processingEventCollection = processingEventCollection;
     }
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "CENTER_ID", updatable = false)
-    public Collection<Membership> getMembershipCollection() {
+    public Set<Membership> getMembershipCollection() {
         return this.membershipCollection;
     }
 
     public void setMembershipCollection(
-        Collection<Membership> membershipCollection) {
+        Set<Membership> membershipCollection) {
         this.membershipCollection = membershipCollection;
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "senderCenter")
-    public Collection<Dispatch> getSrcDispatchCollection() {
+    public Set<Dispatch> getSrcDispatchCollection() {
         return this.srcDispatchCollection;
     }
 
     public void setSrcDispatchCollection(
-        Collection<Dispatch> srcDispatchCollection) {
+        Set<Dispatch> srcDispatchCollection) {
         this.srcDispatchCollection = srcDispatchCollection;
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "receiverCenter")
-    public Collection<Dispatch> getDstDispatchCollection() {
+    public Set<Dispatch> getDstDispatchCollection() {
         return this.dstDispatchCollection;
     }
 
     public void setDstDispatchCollection(
-        Collection<Dispatch> dstDispatchCollection) {
+        Set<Dispatch> dstDispatchCollection) {
         this.dstDispatchCollection = dstDispatchCollection;
     }
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "CENTER_ID", updatable = false)
-    public Collection<OriginInfo> getOriginInfoCollection() {
+    public Set<OriginInfo> getOriginInfoCollection() {
         return this.originInfoCollection;
     }
 
     public void setOriginInfoCollection(
-        Collection<OriginInfo> originInfoCollection) {
+        Set<OriginInfo> originInfoCollection) {
         this.originInfoCollection = originInfoCollection;
     }
 

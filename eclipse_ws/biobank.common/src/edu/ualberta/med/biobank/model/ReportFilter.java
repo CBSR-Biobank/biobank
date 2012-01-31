@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,7 +19,7 @@ public class ReportFilter extends AbstractBiobankModel {
 
     private Integer position;
     private Integer operator;
-    private Collection<ReportFilterValue> reportFilterValueCollection =
+    private Set<ReportFilterValue> reportFilterValueCollection =
         new HashSet<ReportFilterValue>(0);
     private EntityFilter entityFilter;
 
@@ -42,12 +43,12 @@ public class ReportFilter extends AbstractBiobankModel {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "REPORT_FILTER_ID", updatable = false)
-    public Collection<ReportFilterValue> getReportFilterValueCollection() {
+    public Set<ReportFilterValue> getReportFilterValueCollection() {
         return this.reportFilterValueCollection;
     }
 
     public void setReportFilterValueCollection(
-        Collection<ReportFilterValue> reportFilterValueCollection) {
+        Set<ReportFilterValue> reportFilterValueCollection) {
         this.reportFilterValueCollection = reportFilterValueCollection;
     }
 

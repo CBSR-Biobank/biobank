@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -26,19 +25,19 @@ public class Study extends AbstractBiobankModel {
 
     private String name;
     private String nameShort;
-    private Collection<AliquotedSpecimen> aliquotedSpecimenCollection =
+    private Set<AliquotedSpecimen> aliquotedSpecimenCollection =
         new HashSet<AliquotedSpecimen>(0);
-    private Collection<Patient> patientCollection = new HashSet<Patient>(0);
-    private Collection<Site> siteCollection = new HashSet<Site>(0);
+    private Set<Patient> patientCollection = new HashSet<Patient>(0);
+    private Set<Site> siteCollection = new HashSet<Site>(0);
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
     private ActivityStatus activityStatus;
-    private Collection<Membership> membershipCollection =
+    private Set<Membership> membershipCollection =
         new HashSet<Membership>(0);
-    private Collection<StudyEventAttr> studyEventAttrCollection =
+    private Set<StudyEventAttr> studyEventAttrCollection =
         new HashSet<StudyEventAttr>(0);
     private Set<Contact> contactCollection = new HashSet<Contact>(0);
     private ResearchGroup researchGroup;
-    private Collection<SourceSpecimen> sourceSpecimenCollection =
+    private Set<SourceSpecimen> sourceSpecimenCollection =
         new HashSet<SourceSpecimen>(0);
 
     @NotEmpty
@@ -63,31 +62,31 @@ public class Study extends AbstractBiobankModel {
 
     @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "study")
     @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-    public Collection<AliquotedSpecimen> getAliquotedSpecimenCollection() {
+    public Set<AliquotedSpecimen> getAliquotedSpecimenCollection() {
         return this.aliquotedSpecimenCollection;
     }
 
     public void setAliquotedSpecimenCollection(
-        Collection<AliquotedSpecimen> aliquotedSpecimenCollection) {
+        Set<AliquotedSpecimen> aliquotedSpecimenCollection) {
         this.aliquotedSpecimenCollection = aliquotedSpecimenCollection;
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "study")
     @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-    public Collection<Patient> getPatientCollection() {
+    public Set<Patient> getPatientCollection() {
         return this.patientCollection;
     }
 
-    public void setPatientCollection(Collection<Patient> patientCollection) {
+    public void setPatientCollection(Set<Patient> patientCollection) {
         this.patientCollection = patientCollection;
     }
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "studyCollection")
-    public Collection<Site> getSiteCollection() {
+    public Set<Site> getSiteCollection() {
         return this.siteCollection;
     }
 
-    public void setSiteCollection(Collection<Site> siteCollection) {
+    public void setSiteCollection(Set<Site> siteCollection) {
         this.siteCollection = siteCollection;
     }
 
@@ -116,23 +115,23 @@ public class Study extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_ID", updatable = false)
-    public Collection<Membership> getMembershipCollection() {
+    public Set<Membership> getMembershipCollection() {
         return this.membershipCollection;
     }
 
     public void setMembershipCollection(
-        Collection<Membership> membershipCollection) {
+        Set<Membership> membershipCollection) {
         this.membershipCollection = membershipCollection;
     }
 
     @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "study")
     @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-    public Collection<StudyEventAttr> getStudyEventAttrCollection() {
+    public Set<StudyEventAttr> getStudyEventAttrCollection() {
         return this.studyEventAttrCollection;
     }
 
     public void setStudyEventAttrCollection(
-        Collection<StudyEventAttr> studyEventAttrCollection) {
+        Set<StudyEventAttr> studyEventAttrCollection) {
         this.studyEventAttrCollection = studyEventAttrCollection;
     }
 
@@ -159,12 +158,12 @@ public class Study extends AbstractBiobankModel {
 
     @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "study")
     @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-    public Collection<SourceSpecimen> getSourceSpecimenCollection() {
+    public Set<SourceSpecimen> getSourceSpecimenCollection() {
         return this.sourceSpecimenCollection;
     }
 
     public void setSourceSpecimenCollection(
-        Collection<SourceSpecimen> sourceSpecimenCollection) {
+        Set<SourceSpecimen> sourceSpecimenCollection) {
         this.sourceSpecimenCollection = sourceSpecimenCollection;
     }
 }

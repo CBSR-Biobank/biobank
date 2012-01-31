@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,7 +18,7 @@ public class PropertyType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private Collection<PropertyModifier> propertyModifierCollection =
+    private Set<PropertyModifier> propertyModifierCollection =
         new HashSet<PropertyModifier>(0);
 
     @NotEmpty
@@ -32,12 +33,12 @@ public class PropertyType extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "PROPERTY_TYPE_ID", updatable = false)
-    public Collection<PropertyModifier> getPropertyModifierCollection() {
+    public Set<PropertyModifier> getPropertyModifierCollection() {
         return this.propertyModifierCollection;
     }
 
     public void setPropertyModifierCollection(
-        Collection<PropertyModifier> propertyModifierCollection) {
+        Set<PropertyModifier> propertyModifierCollection) {
         this.propertyModifierCollection = propertyModifierCollection;
     }
 }

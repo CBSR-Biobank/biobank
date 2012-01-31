@@ -2,7 +2,8 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,8 +22,8 @@ public class Request extends AbstractBiobankModel {
 
     private Date submitted;
     private Date created;
-    private Collection<Dispatch> dispatchCollection = new HashSet<Dispatch>(0);
-    private Collection<RequestSpecimen> requestSpecimenCollection =
+    private Set<Dispatch> dispatchCollection = new HashSet<Dispatch>(0);
+    private Set<RequestSpecimen> requestSpecimenCollection =
         new HashSet<RequestSpecimen>(0);
     private Address address;
     private ResearchGroup researchGroup;
@@ -48,21 +49,21 @@ public class Request extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "REQUEST_ID", updatable = false)
-    public Collection<Dispatch> getDispatchCollection() {
+    public Set<Dispatch> getDispatchCollection() {
         return this.dispatchCollection;
     }
 
-    public void setDispatchCollection(Collection<Dispatch> dispatchCollection) {
+    public void setDispatchCollection(Set<Dispatch> dispatchCollection) {
         this.dispatchCollection = dispatchCollection;
     }
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "request")
-    public Collection<RequestSpecimen> getRequestSpecimenCollection() {
+    public Set<RequestSpecimen> getRequestSpecimenCollection() {
         return this.requestSpecimenCollection;
     }
 
     public void setRequestSpecimenCollection(
-        Collection<RequestSpecimen> requestSpecimenCollection) {
+        Set<RequestSpecimen> requestSpecimenCollection) {
         this.requestSpecimenCollection = requestSpecimenCollection;
     }
 

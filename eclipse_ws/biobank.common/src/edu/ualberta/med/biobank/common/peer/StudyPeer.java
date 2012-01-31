@@ -106,7 +106,8 @@ public class StudyPeer {
 			}
 			@Override
 			public void set(Study model, Collection<Patient> value) {
-				model.setPatientCollection(value);
+				model.getPatientCollection().clear();
+				model.getPatientCollection().addAll(value);
 			}
 		});
 
@@ -137,7 +138,8 @@ public class StudyPeer {
 			}
 			@Override
 			public void set(Study model, Collection<Membership> value) {
-				model.setMembershipCollection(value);
+				model.getMembershipCollection().clear();
+				model.getMembershipCollection().addAll(value);
 			}
 		});
 
@@ -152,7 +154,8 @@ public class StudyPeer {
 			}
 			@Override
 			public void set(Study model, Collection<Site> value) {
-				model.setSiteCollection(value);
+				model.getSiteCollection().clear();
+				model.getSiteCollection().addAll(value);
 			}
 		});
 
@@ -167,7 +170,8 @@ public class StudyPeer {
 			}
 			@Override
 			public void set(Study model, Collection<StudyEventAttr> value) {
-				model.setStudyEventAttrCollection(value);
+				model.getStudyEventAttrCollection().clear();
+				model.getStudyEventAttrCollection().addAll(value);
 			}
 		});
 
@@ -197,7 +201,8 @@ public class StudyPeer {
 			}
 			@Override
 			public void set(Study model, Collection<AliquotedSpecimen> value) {
-				model.setAliquotedSpecimenCollection(value);
+				model.getAliquotedSpecimenCollection().clear();
+				model.getAliquotedSpecimenCollection().addAll(value);
 			}
 		});
 
@@ -212,7 +217,8 @@ public class StudyPeer {
 			}
 			@Override
 			public void set(Study model, Collection<SourceSpecimen> value) {
-				model.setSourceSpecimenCollection(value);
+				model.getSourceSpecimenCollection().clear();
+				model.getSourceSpecimenCollection().addAll(value);
 			}
 		});
 

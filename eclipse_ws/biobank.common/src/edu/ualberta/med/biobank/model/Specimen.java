@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Collection;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -37,7 +36,7 @@ public class Specimen extends AbstractBiobankModel {
     private CollectionEvent originalCollectionEvent;
     private SpecimenType specimenType;
     private SpecimenPosition specimenPosition;
-    private Collection<Specimen> childSpecimenCollection =
+    private Set<Specimen> childSpecimenCollection =
         new HashSet<Specimen>(0);
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
     private Set<RequestSpecimen> requestSpecimenCollection =
@@ -151,12 +150,12 @@ public class Specimen extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "parentSpecimen")
     @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-    public Collection<Specimen> getChildSpecimenCollection() {
+    public Set<Specimen> getChildSpecimenCollection() {
         return this.childSpecimenCollection;
     }
 
     public void setChildSpecimenCollection(
-        Collection<Specimen> childSpecimenCollection) {
+        Set<Specimen> childSpecimenCollection) {
         this.childSpecimenCollection = childSpecimenCollection;
     }
 

@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
+import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -16,7 +16,7 @@ public class ResearchGroup extends Center {
     private static final long serialVersionUID = 1L;
 
     private Study study;
-    private Collection<Request> requestCollection = new HashSet<Request>(0);
+    private Set<Request> requestCollection = new HashSet<Request>(0);
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_ID", unique = true)
@@ -30,11 +30,11 @@ public class ResearchGroup extends Center {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "RESEARCH_GROUP_ID", updatable = false)
-    public Collection<Request> getRequestCollection() {
+    public Set<Request> getRequestCollection() {
         return this.requestCollection;
     }
 
-    public void setRequestCollection(Collection<Request> requestCollection) {
+    public void setRequestCollection(Set<Request> requestCollection) {
         this.requestCollection = requestCollection;
     }
 }

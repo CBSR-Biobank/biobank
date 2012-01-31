@@ -284,14 +284,14 @@ public class StudySaveAction implements Action<IdResult> {
                 contacts.values());
 
         for (Contact contact : contactsDiff.getAddSet()) {
-            Collection<Study> contactStudies = contact.getStudyCollection();
+            Set<Study> contactStudies = contact.getStudyCollection();
             contactStudies.add(study);
             contact.setStudyCollection(contactStudies);
         }
 
         // remove this study from contacts in removed list
         for (Contact contact : contactsDiff.getRemoveSet()) {
-            Collection<Study> contactStudies = contact.getStudyCollection();
+            Set<Study> contactStudies = contact.getStudyCollection();
             if (contactStudies.remove(study)) {
                 contact.setStudyCollection(contactStudies);
             } else {

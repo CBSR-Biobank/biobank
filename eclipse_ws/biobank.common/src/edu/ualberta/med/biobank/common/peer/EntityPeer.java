@@ -67,7 +67,8 @@ public class EntityPeer {
 			}
 			@Override
 			public void set(Entity model, Collection<EntityProperty> value) {
-				model.setEntityPropertyCollection(value);
+				model.getEntityPropertyCollection().clear();
+				model.getEntityPropertyCollection().addAll(value);
 			}
 		});
 
@@ -82,7 +83,8 @@ public class EntityPeer {
 			}
 			@Override
 			public void set(Entity model, Collection<Report> value) {
-				model.setReportCollection(value);
+				model.getReportCollection().clear();
+				model.getReportCollection().addAll(value);
 			}
 		});
 

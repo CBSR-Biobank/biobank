@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -24,8 +25,8 @@ public class User extends Principal {
     private String fullName;
     private String email;
     private boolean needPwdChange = true;
-    private Collection<Comment> commentCollection = new HashSet<Comment>(0);
-    private Collection<BbGroup> groupCollection = new HashSet<BbGroup>(0);
+    private Set<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<BbGroup> groupCollection = new HashSet<BbGroup>(0);
 
     @NotEmpty
     @Column(name = "LOGIN", unique = true)
@@ -88,20 +89,20 @@ public class User extends Principal {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID", updatable = false)
-    public Collection<Comment> getCommentCollection() {
+    public Set<Comment> getCommentCollection() {
         return this.commentCollection;
     }
 
-    public void setCommentCollection(Collection<Comment> commentCollection) {
+    public void setCommentCollection(Set<Comment> commentCollection) {
         this.commentCollection = commentCollection;
     }
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "userCollection")
-    public Collection<BbGroup> getGroupCollection() {
+    public Set<BbGroup> getGroupCollection() {
         return this.groupCollection;
     }
 
-    public void setGroupCollection(Collection<BbGroup> groupCollection) {
+    public void setGroupCollection(Set<BbGroup> groupCollection) {
         this.groupCollection = groupCollection;
     }
 }

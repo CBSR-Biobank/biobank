@@ -51,7 +51,8 @@ public class PropertyTypePeer {
 			}
 			@Override
 			public void set(PropertyType model, Collection<PropertyModifier> value) {
-				model.setPropertyModifierCollection(value);
+				model.getPropertyModifierCollection().clear();
+				model.getPropertyModifierCollection().addAll(value);
 			}
 		});
 

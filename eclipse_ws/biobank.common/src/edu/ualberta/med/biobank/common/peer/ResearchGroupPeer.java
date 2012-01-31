@@ -37,7 +37,8 @@ public class ResearchGroupPeer  extends CenterPeer {
 			}
 			@Override
 			public void set(ResearchGroup model, Collection<Request> value) {
-				model.setRequestCollection(value);
+				model.getRequestCollection().clear();
+				model.getRequestCollection().addAll(value);
 			}
 		});
 

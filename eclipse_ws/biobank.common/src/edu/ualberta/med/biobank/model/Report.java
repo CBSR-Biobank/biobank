@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.FetchType;
@@ -23,10 +24,10 @@ public class Report extends AbstractBiobankModel {
     private Integer userId;
     private boolean isPublic;
     private boolean isCount;
-    private Collection<ReportColumn> reportColumnCollection =
+    private Set<ReportColumn> reportColumnCollection =
         new HashSet<ReportColumn>(0);
     private Entity entity;
-    private Collection<ReportFilter> reportFilterCollection =
+    private Set<ReportFilter> reportFilterCollection =
         new HashSet<ReportFilter>(0);
 
     @NotEmpty
@@ -39,7 +40,7 @@ public class Report extends AbstractBiobankModel {
         this.name = name;
     }
 
-    @Column(name = "DESCRIPTION", columnDefinition="TEXT")
+    @Column(name = "DESCRIPTION", columnDefinition = "TEXT")
     public String getDescription() {
         return this.description;
     }
@@ -79,12 +80,12 @@ public class Report extends AbstractBiobankModel {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "REPORT_ID", updatable = false)
-    public Collection<ReportColumn> getReportColumnCollection() {
+    public Set<ReportColumn> getReportColumnCollection() {
         return this.reportColumnCollection;
     }
 
     public void setReportColumnCollection(
-        Collection<ReportColumn> reportColumnCollection) {
+        Set<ReportColumn> reportColumnCollection) {
         this.reportColumnCollection = reportColumnCollection;
     }
 
@@ -101,12 +102,12 @@ public class Report extends AbstractBiobankModel {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "REPORT_ID", updatable = false)
-    public Collection<ReportFilter> getReportFilterCollection() {
+    public Set<ReportFilter> getReportFilterCollection() {
         return this.reportFilterCollection;
     }
 
     public void setReportFilterCollection(
-        Collection<ReportFilter> reportFilterCollection) {
+        Set<ReportFilter> reportFilterCollection) {
         this.reportFilterCollection = reportFilterCollection;
     }
 }

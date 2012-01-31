@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
 import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -15,7 +17,7 @@ public class Clinic extends Center {
     private static final long serialVersionUID = 1L;
     
     private boolean sendsShipments = false;
-    private Collection<Contact> contactCollection = new HashSet<Contact>(0);
+    private Set<Contact> contactCollection = new HashSet<Contact>(0);
 
     @Column(name = "SENDS_SHIPMENTS")
     // TODO: rename to isSendsShipments
@@ -28,11 +30,11 @@ public class Clinic extends Center {
     }
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "clinic")
-    public Collection<Contact> getContactCollection() {
+    public Set<Contact> getContactCollection() {
         return this.contactCollection;
     }
 
-    public void setContactCollection(Collection<Contact> contactCollection) {
+    public void setContactCollection(Set<Contact> contactCollection) {
         this.contactCollection = contactCollection;
     }
 }

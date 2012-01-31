@@ -36,7 +36,8 @@ public class ClinicPeer  extends CenterPeer {
 			}
 			@Override
 			public void set(Clinic model, Collection<Contact> value) {
-				model.setContactCollection(value);
+				model.getContactCollection().clear();
+				model.getContactCollection().addAll(value);
 			}
 		});
 

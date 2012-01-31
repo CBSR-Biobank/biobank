@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -25,7 +26,7 @@ public class Contact extends AbstractBiobankModel {
     private String emailAddress;
     private String pagerNumber;
     private String officeNumber;
-    private Collection<Study> studyCollection = new HashSet<Study>(0);
+    private Set<Study> studyCollection = new HashSet<Study>(0);
     private Clinic clinic;
 
     @NotEmpty
@@ -94,11 +95,11 @@ public class Contact extends AbstractBiobankModel {
     }
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "contactCollection")
-    public Collection<Study> getStudyCollection() {
+    public Set<Study> getStudyCollection() {
         return this.studyCollection;
     }
 
-    public void setStudyCollection(Collection<Study> studyCollection) {
+    public void setStudyCollection(Set<Study> studyCollection) {
         this.studyCollection = studyCollection;
     }
 

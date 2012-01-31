@@ -23,7 +23,7 @@ public class Dispatch extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private Integer state;
-    private Collection<DispatchSpecimen> dispatchSpecimenCollection =
+    private Set<DispatchSpecimen> dispatchSpecimenCollection =
         new HashSet<DispatchSpecimen>(0);
     private Center senderCenter;
     private ShipmentInfo shipmentInfo;
@@ -42,12 +42,12 @@ public class Dispatch extends AbstractBiobankModel {
     }
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "dispatch")
-    public Collection<DispatchSpecimen> getDispatchSpecimenCollection() {
+    public Set<DispatchSpecimen> getDispatchSpecimenCollection() {
         return this.dispatchSpecimenCollection;
     }
 
     public void setDispatchSpecimenCollection(
-        Collection<DispatchSpecimen> dispatchSpecimenCollection) {
+        Set<DispatchSpecimen> dispatchSpecimenCollection) {
         this.dispatchSpecimenCollection = dispatchSpecimenCollection;
     }
 

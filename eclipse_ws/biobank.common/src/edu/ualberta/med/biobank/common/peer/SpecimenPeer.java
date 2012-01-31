@@ -197,7 +197,8 @@ public class SpecimenPeer {
 			}
 			@Override
 			public void set(Specimen model, Collection<Specimen> value) {
-				model.setChildSpecimenCollection(value);
+				model.getChildSpecimenCollection().clear();
+				model.getChildSpecimenCollection().addAll(value);
 			}
 		});
 

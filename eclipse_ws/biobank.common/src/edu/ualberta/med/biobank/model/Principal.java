@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -25,17 +26,17 @@ import javax.persistence.Table;
 public class Principal extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
-    private Collection<Membership> membershipCollection =
+    private Set<Membership> membershipCollection =
         new HashSet<Membership>(0);
     private ActivityStatus activityStatus;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "principal")
-    public Collection<Membership> getMembershipCollection() {
+    public Set<Membership> getMembershipCollection() {
         return this.membershipCollection;
     }
 
     public void setMembershipCollection(
-        Collection<Membership> membershipCollection) {
+        Set<Membership> membershipCollection) {
         this.membershipCollection = membershipCollection;
     }
 

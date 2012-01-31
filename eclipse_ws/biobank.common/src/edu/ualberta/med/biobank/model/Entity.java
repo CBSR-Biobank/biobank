@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -17,8 +18,8 @@ public class Entity extends AbstractBiobankModel {
 
     private String className;
     private String name;
-    private Collection<Report> reportCollection = new HashSet<Report>(0);
-    private Collection<EntityProperty> entityPropertyCollection =
+    private Set<Report> reportCollection = new HashSet<Report>(0);
+    private Set<EntityProperty> entityPropertyCollection =
         new HashSet<EntityProperty>(0);
 
     @NotEmpty
@@ -43,22 +44,22 @@ public class Entity extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "ENTITY_ID", updatable = false)
-    public Collection<Report> getReportCollection() {
+    public Set<Report> getReportCollection() {
         return this.reportCollection;
     }
 
-    public void setReportCollection(Collection<Report> reportCollection) {
+    public void setReportCollection(Set<Report> reportCollection) {
         this.reportCollection = reportCollection;
     }
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "ENTITY_ID", updatable = false)
-    public Collection<EntityProperty> getEntityPropertyCollection() {
+    public Set<EntityProperty> getEntityPropertyCollection() {
         return this.entityPropertyCollection;
     }
 
     public void setEntityPropertyCollection(
-        Collection<EntityProperty> entityPropertyCollection) {
+        Set<EntityProperty> entityPropertyCollection) {
         this.entityPropertyCollection = entityPropertyCollection;
     }
 }

@@ -100,7 +100,8 @@ public class DispatchPeer {
 			}
 			@Override
 			public void set(Dispatch model, Collection<DispatchSpecimen> value) {
-				model.setDispatchSpecimenCollection(value);
+				model.getDispatchSpecimenCollection().clear();
+				model.getDispatchSpecimenCollection().addAll(value);
 			}
 		});
 

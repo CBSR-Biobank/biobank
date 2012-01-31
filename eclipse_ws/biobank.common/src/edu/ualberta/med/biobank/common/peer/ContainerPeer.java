@@ -146,7 +146,8 @@ public class ContainerPeer {
 			}
 			@Override
 			public void set(Container model, Collection<SpecimenPosition> value) {
-				model.setSpecimenPositionCollection(value);
+				model.getSpecimenPositionCollection().clear();
+				model.getSpecimenPositionCollection().addAll(value);
 			}
 		});
 
@@ -161,7 +162,8 @@ public class ContainerPeer {
 			}
 			@Override
 			public void set(Container model, Collection<ContainerPosition> value) {
-				model.setChildPositionCollection(value);
+				model.getChildPositionCollection().clear();
+				model.getChildPositionCollection().addAll(value);
 			}
 		});
 

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -131,7 +132,7 @@ public enum PermissionEnum implements Serializable {
             return true;
         }
 
-        Collection<BbGroup> groups = user.getGroupCollection();
+        Set<BbGroup> groups = user.getGroupCollection();
         if (groups != null) {
             for (BbGroup group : groups) {
                 if (isPrincipalAllowed(group, center, study)) {
@@ -145,7 +146,7 @@ public enum PermissionEnum implements Serializable {
 
     private boolean isPrincipalAllowed(Principal principal, Center center,
         Study study) {
-        Collection<Membership> membs = principal.getMembershipCollection();
+        Set<Membership> membs = principal.getMembershipCollection();
         if (membs != null) {
             for (Membership memb : membs) {
                 boolean x = isMembershipAllowed(memb, center, study);
@@ -167,7 +168,7 @@ public enum PermissionEnum implements Serializable {
             study == null || membership.getStudy() == null
                 || membership.getStudy().equals(study);
 
-        Collection<PermissionEnum> permissions =
+        Set<PermissionEnum> permissions =
             membership.getPermissionCollection();
         boolean hasPermission =
             ((permissions != null) && isPermissionAllowed(permissions));
@@ -177,7 +178,7 @@ public enum PermissionEnum implements Serializable {
         return result;
     }
 
-    private boolean isPermissionAllowed(Collection<PermissionEnum> permissions) {
+    private boolean isPermissionAllowed(Set<PermissionEnum> permissions) {
         for (PermissionEnum permission : permissions) {
             if (equals(permission) || ADMINISTRATION.equals(permission)) {
                 return true;

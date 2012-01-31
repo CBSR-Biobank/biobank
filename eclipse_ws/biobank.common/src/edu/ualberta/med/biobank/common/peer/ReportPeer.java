@@ -113,7 +113,8 @@ public class ReportPeer {
 			}
 			@Override
 			public void set(Report model, Collection<ReportColumn> value) {
-				model.setReportColumnCollection(value);
+				model.getReportColumnCollection().clear();
+				model.getReportColumnCollection().addAll(value);
 			}
 		});
 
@@ -143,7 +144,8 @@ public class ReportPeer {
 			}
 			@Override
 			public void set(Report model, Collection<ReportFilter> value) {
-				model.setReportFilterCollection(value);
+				model.getReportFilterCollection().clear();
+				model.getReportFilterCollection().addAll(value);
 			}
 		});
 

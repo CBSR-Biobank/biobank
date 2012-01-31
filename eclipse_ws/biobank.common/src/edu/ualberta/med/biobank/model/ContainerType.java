@@ -86,7 +86,7 @@ public class ContainerType extends AbstractBiobankModel {
     @JoinTable(name = "CONTAINER_TYPE_SPECIMEN_TYPE",
         joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false, updatable = false) })
-    public Collection<SpecimenType> getSpecimenTypeCollection() {
+    public Set<SpecimenType> getSpecimenTypeCollection() {
         return this.specimenTypeCollection;
     }
 

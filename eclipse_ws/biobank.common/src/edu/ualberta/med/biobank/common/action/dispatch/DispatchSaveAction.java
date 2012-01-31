@@ -99,10 +99,10 @@ public class DispatchSaveAction implements Action<IdResult> {
         return new IdResult(disp.getId());
     }
 
-    private Collection<DispatchSpecimen> reassemble(ActionContext context,
+    private Set<DispatchSpecimen> reassemble(ActionContext context,
         Dispatch dispatch,
         Set<DispatchSpecimenInfo> dsInfos) {
-        Collection<DispatchSpecimen> dispSpecimens =
+        Set<DispatchSpecimen> dispSpecimens =
             new HashSet<DispatchSpecimen>();
         for (DispatchSpecimenInfo dsInfo : dsInfos) {
             DispatchSpecimen dspec =

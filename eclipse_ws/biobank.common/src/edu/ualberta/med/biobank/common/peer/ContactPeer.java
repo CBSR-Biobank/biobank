@@ -157,7 +157,8 @@ public class ContactPeer {
 			}
 			@Override
 			public void set(Contact model, Collection<Study> value) {
-				model.setStudyCollection(value);
+				model.getStudyCollection().clear();
+				model.getStudyCollection().addAll(value);
 			}
 		});
 

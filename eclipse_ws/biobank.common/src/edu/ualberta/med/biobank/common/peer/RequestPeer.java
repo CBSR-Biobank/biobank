@@ -100,7 +100,8 @@ public class RequestPeer {
 			}
 			@Override
 			public void set(Request model, Collection<Dispatch> value) {
-				model.setDispatchCollection(value);
+				model.getDispatchCollection().clear();
+				model.getDispatchCollection().addAll(value);
 			}
 		});
 
@@ -115,7 +116,8 @@ public class RequestPeer {
 			}
 			@Override
 			public void set(Request model, Collection<RequestSpecimen> value) {
-				model.setRequestSpecimenCollection(value);
+				model.getRequestSpecimenCollection().clear();
+				model.getRequestSpecimenCollection().addAll(value);
 			}
 		});
 

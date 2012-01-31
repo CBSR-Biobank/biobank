@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -30,14 +29,14 @@ public class CollectionEvent extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private Integer visitNumber;
-    private Collection<Specimen> allSpecimenCollection = new HashSet<Specimen>(
+    private Set<Specimen> allSpecimenCollection = new HashSet<Specimen>(
         0);
     private Patient patient;
     private ActivityStatus activityStatus;
-    private Collection<EventAttr> eventAttrCollection = new HashSet<EventAttr>(
+    private Set<EventAttr> eventAttrCollection = new HashSet<EventAttr>(
         0);
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
-    private Collection<Specimen> originalSpecimenCollection =
+    private Set<Specimen> originalSpecimenCollection =
         new HashSet<Specimen>(0);
 
     @NotNull
@@ -53,12 +52,12 @@ public class CollectionEvent extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "collectionEvent")
     @Cascade({ CascadeType.SAVE_UPDATE })
-    public Collection<Specimen> getAllSpecimenCollection() {
+    public Set<Specimen> getAllSpecimenCollection() {
         return this.allSpecimenCollection;
     }
 
     public void setAllSpecimenCollection(
-        Collection<Specimen> allSpecimenCollection) {
+        Set<Specimen> allSpecimenCollection) {
         this.allSpecimenCollection = allSpecimenCollection;
     }
 
@@ -86,11 +85,11 @@ public class CollectionEvent extends AbstractBiobankModel {
 
     @OneToMany(cascade = javax.persistence.CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "collectionEvent")
     @Cascade({ CascadeType.SAVE_UPDATE })
-    public Collection<EventAttr> getEventAttrCollection() {
+    public Set<EventAttr> getEventAttrCollection() {
         return this.eventAttrCollection;
     }
 
-    public void setEventAttrCollection(Collection<EventAttr> eventAttrCollection) {
+    public void setEventAttrCollection(Set<EventAttr> eventAttrCollection) {
         this.eventAttrCollection = eventAttrCollection;
     }
 
@@ -107,12 +106,12 @@ public class CollectionEvent extends AbstractBiobankModel {
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "originalCollectionEvent")
-    public Collection<Specimen> getOriginalSpecimenCollection() {
+    public Set<Specimen> getOriginalSpecimenCollection() {
         return this.originalSpecimenCollection;
     }
 
     public void setOriginalSpecimenCollection(
-        Collection<Specimen> originalSpecimenCollection) {
+        Set<Specimen> originalSpecimenCollection) {
         this.originalSpecimenCollection = originalSpecimenCollection;
     }
 }

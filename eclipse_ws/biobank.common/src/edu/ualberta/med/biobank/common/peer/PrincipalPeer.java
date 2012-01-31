@@ -36,7 +36,8 @@ public class PrincipalPeer {
 			}
 			@Override
 			public void set(Principal model, Collection<Membership> value) {
-				model.setMembershipCollection(value);
+				model.getMembershipCollection().clear();
+				model.getMembershipCollection().addAll(value);
 			}
 		});
 
