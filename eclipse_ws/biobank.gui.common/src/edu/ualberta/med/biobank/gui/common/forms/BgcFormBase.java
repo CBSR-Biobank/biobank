@@ -38,6 +38,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 import org.springframework.remoting.RemoteConnectFailureException;
 
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
@@ -69,12 +70,13 @@ public abstract class BgcFormBase extends EditorPart implements
 
     public List<BgcFormBase> linkedForms;
 
-    protected IDoubleClickListener collectionDoubleClickListener = new IDoubleClickListener() {
-        @Override
-        public void doubleClick(DoubleClickEvent event) {
-            performDoubleClick(event);
-        }
-    };
+    protected IDoubleClickListener collectionDoubleClickListener =
+        new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                performDoubleClick(event);
+            }
+        };
 
     public BgcFormBase() {
         widgets = new HashMap<String, Control>();
@@ -106,6 +108,8 @@ public abstract class BgcFormBase extends EditorPart implements
             init();
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
+        } catch (ActionException e) {
+            BgcPlugin.openAsyncError("Action Failed", e);
         } catch (Exception e) {
             logger.error("BgcFormBase.createPartControl Error", e); //$NON-NLS-1$
         }

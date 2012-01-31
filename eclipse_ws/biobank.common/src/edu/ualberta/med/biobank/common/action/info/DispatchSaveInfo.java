@@ -10,14 +10,16 @@ public class DispatchSaveInfo implements Serializable {
     public Integer receiverId;
     public Integer senderId;
     public String comment;
+    public Integer requestId;
 
     public DispatchSaveInfo(Integer id, Integer receiverId, Integer senderId,
-        Integer state, String comment) {
+        Integer state, String comment, Integer requestId) {
         this.id = id;
         this.receiverId = receiverId;
         this.senderId = senderId;
         this.state = state;
         this.comment = comment;
+        this.requestId = requestId;
     }
 
 }

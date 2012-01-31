@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.server.applicationservice;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionResult;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
@@ -293,16 +294,23 @@ public class BiobankApplicationServiceImpl extends
     @Override
     public <T extends ActionResult> T doAction(Action<T> action)
         throws ApplicationException {
-        Request request =
-            new Request(new AppServiceAction<T>(action, this));
-        request.setDomainObjectName(Site.class.getName());
+        try {
+            Request request =
+                new Request(new AppServiceAction<T>(action, this));
+            request.setDomainObjectName(Site.class.getName());
 
-        Response response = query(request);
+            Response response = query(request);
 
-        @SuppressWarnings("unchecked")
-        T tmp = (T) response.getResponse();
+            @SuppressWarnings("unchecked")
+            T tmp = (T) response.getResponse();
 
-        return tmp;
+            return tmp;
+
+        } catch (ApplicationException e) {
+            if (e.getCause() instanceof ActionException)
+                throw (ActionException) e.getCause();
+            throw e;
+        }
     }
 
     @Override

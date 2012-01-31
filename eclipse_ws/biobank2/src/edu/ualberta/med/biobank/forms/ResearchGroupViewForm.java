@@ -108,7 +108,8 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
                     saveRequest();
                 } catch (Exception e1) {
                     BgcPlugin.openAsyncError(
-                        Messages.ResearchGroupViewForm_error_title, e1);
+                        Messages.ResearchGroupViewForm_error_title,
+                        "There was an error creating the request.");
                 }
             }
         });
@@ -148,7 +149,8 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             RequestInput srequest;
             while ((srequest =
                 reader.read(RequestInput.class, header, processors)) != null) {
-                requests.add(srequest);
+                if (!srequest.getInventoryID().equals(""))
+                    requests.add(srequest);
             }
         } catch (SuperCSVException e) {
             throw new Exception(NLS.bind(

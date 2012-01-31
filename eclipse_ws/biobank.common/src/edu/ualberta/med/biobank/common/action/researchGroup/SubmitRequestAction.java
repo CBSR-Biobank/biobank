@@ -39,6 +39,7 @@ public class SubmitRequestAction implements Action<IdResult> {
         Request request = new Request();
         request.setResearchGroup(context.get(ResearchGroup.class, rgId));
         request.setCreated(new Date());
+        request.setSubmitted(new Date());
         request.setAddress(context.get(ResearchGroup.class,
             rgId).getAddress());
 
@@ -46,9 +47,14 @@ public class SubmitRequestAction implements Action<IdResult> {
         context.getSession().flush();
 
         for (String id : specs) {
+            if (id == null || id.equals(""))
+                throw new ActionException(
+                    "Blank specimen id, please check your your file for correct input.");
+
             Query q = context.getSession().createQuery("from "
                 + Specimen.class.getName() + " where inventoryId=?");
             q.setParameter(0, id);
+
             Specimen spec = (Specimen) q.list().get(0);
             if (spec == null)
                 continue;

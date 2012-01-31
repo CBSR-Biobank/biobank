@@ -22,13 +22,13 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
     private Integer id;
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String REQUEST_HQL = "select request from "
+    private static final String REQUEST_HQL = "select distinct request from "
     + Request.class.getName() 
     + " request join fetch request." + RequestPeer.RESEARCH_GROUP.getName()
-    + " rg left join fetch request." + RequestPeer.DISPATCH_COLLECTION.getName()
-    + " dispatchCollection join fetch request." + RequestPeer.ADDRESS.getName()
+    + " rg left join fetch request.dispatchCollection " 
+    + " dispatchCollection left join fetch dispatchCollection.dispatchSpecimenCollection ds join fetch request." + RequestPeer.ADDRESS.getName()
     + " where request." + DispatchPeer.ID.getName()
-    +"=? group by request";
+    +"=?";
     // @formatter:on
 
     public RequestGetInfoAction(Integer id) {
@@ -60,7 +60,7 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
 
         } else {
             throw new ActionException(
-                "No dispatch specimens found for id:" + id); //$NON-NLS-1$
+                "No request found with id:" + id); //$NON-NLS-1$
         }
 
         return sInfo;

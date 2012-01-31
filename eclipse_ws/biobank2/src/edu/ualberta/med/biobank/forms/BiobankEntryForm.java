@@ -47,7 +47,6 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.forms.BgcEntryFormActions;
 import edu.ualberta.med.biobank.gui.common.forms.BgcFormBase;
@@ -73,9 +72,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
 
     private static final String CONTEXT_ENTRY_FORM =
         "biobank.context.entryForm"; //$NON-NLS-1$
-
-    private static BgcLogger logger = BgcLogger
-        .getLogger(BiobankEntryForm.class.getName());
 
     protected String sessionName;
 
