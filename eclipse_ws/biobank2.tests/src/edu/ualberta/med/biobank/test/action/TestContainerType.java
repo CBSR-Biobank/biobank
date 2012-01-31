@@ -431,7 +431,7 @@ public class TestContainerType extends TestAction {
             EXECUTOR.exec(containerTypeSaveAction).getId();
 
         ContainerSaveAction containerSaveAction = new ContainerSaveAction();
-        containerSaveAction.setStatusId(ActivityStatusEnum.ACTIVE.getId());
+        containerSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
         containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
         containerSaveAction.setLabel("01");
         containerSaveAction.setSiteId(siteId);

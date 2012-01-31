@@ -18,7 +18,7 @@ public class ContainerSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
     public Integer containerId;
-    public Integer statusId;
+    public Integer activityStatusId;
     public String barcode;
     public String label;
     public Integer siteId;
@@ -30,8 +30,8 @@ public class ContainerSaveAction implements Action<IdResult> {
         this.containerId = containerId;
     }
 
-    public void setStatusId(Integer statusId) {
-        this.statusId = statusId;
+    public void setActivityStatusId(Integer activityStatusId) {
+        this.activityStatusId = activityStatusId;
     }
 
     public void setBarcode(String barcode) {
@@ -81,7 +81,7 @@ public class ContainerSaveAction implements Action<IdResult> {
             container = new Container();
         }
         container.setActivityStatus(context.load(ActivityStatus.class,
-            statusId));
+            activityStatusId));
         container.setSite(context.load(Site.class, siteId));
         container.setProductBarcode(barcode);
         container.setContainerType(context.load(ContainerType.class,

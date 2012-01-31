@@ -34,11 +34,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.container.ContainerCreateChildrenAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -48,8 +48,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
@@ -454,56 +454,6 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
-    /**
-     * Initialise children at given position with the given type. If the
-     * positions list is null, initialise all the children. <strong>If a
-     * position is already filled then it is skipped and no changes are made to
-     * it</strong>.
-     * 
-     * @return true if at least one children has been initialised
-     * @throws BiobankCheckException
-     * @throws WrapperException
-     * @throws ApplicationException
-     */
-    public void initChildrenWithType(ContainerTypeWrapper type,
-        Set<RowColPos> positions) throws Exception {
-        if (positions == null) {
-            Capacity capacity =
-                containerInfo.container.getContainerType().getCapacity();
-            for (int i = 0, n = capacity.getRowCapacity().intValue(); i < n; i++) {
-                for (int j = 0, m = capacity.getColCapacity().intValue(); j < m; j++) {
-                    initPositionIfEmpty(type, i, j);
-                }
-            }
-        } else {
-            for (RowColPos rcp : positions) {
-                initPositionIfEmpty(type, rcp.getRow(), rcp.getCol());
-            }
-        }
-        reload();
-    }
-
-    private void initPositionIfEmpty(ContainerTypeWrapper type, int i, int j)
-        throws Exception {
-        if (type == null) {
-            throw new Exception(
-                "Error initializing container. That is not a valid container type."); //$NON-NLS-1$
-        }
-        Boolean filled = (containerInfo.getChildContainer(i, j) != null);
-        if (!filled) {
-            // TODO: save new container
-
-            ContainerWrapper newContainer =
-                new ContainerWrapper(SessionManager.getAppService());
-            newContainer.setContainerType(type);
-            newContainer.setSite(getSite());
-            newContainer.setParent(this, new RowColPos(i, j));
-            newContainer.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
-            newContainer.persist();
-        }
-    }
-
     private void deleteSelection(final ContainerTypeWrapper type) {
         IRunnableContext context =
             new ProgressMonitorDialog(Display.getDefault().getActiveShell());
@@ -639,6 +589,17 @@ public class ContainerViewForm extends BiobankViewForm {
         specimensWidget.adaptToToolkit(toolkit, true);
         specimensWidget.addClickListener(collectionDoubleClickListener);
         specimensWidget.createDefaultEditItem();
+    }
+
+    public void initChildrenWithType(ContainerType type,
+        Set<RowColPos> positions) throws Exception {
+        ContainerCreateChildrenAction containerCreateChildrenAction =
+            new ContainerCreateChildrenAction();
+        containerCreateChildrenAction
+            .setParentContainer(containerInfo.container);
+        containerCreateChildrenAction.setContainerTypeId(type.getId());
+        containerCreateChildrenAction.setParentPositions(positions);
+        reload();
     }
 
     @Override
