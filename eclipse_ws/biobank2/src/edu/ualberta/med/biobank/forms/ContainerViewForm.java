@@ -34,7 +34,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.container.ContainerCreateChildrenAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerDeleteChildrenAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -49,7 +51,6 @@ import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ContainerPosition;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
@@ -107,12 +108,15 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ContainerInfo containerInfo;
 
+    private ContainerAdapter containerAdapter;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof ContainerAdapter,
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
+        containerAdapter = (ContainerAdapter) adapter;
         updateContainerInfo();
 
         setPartName(NLS.bind(Messages.ContainerViewForm_title,
@@ -178,8 +182,7 @@ public class ContainerViewForm extends BiobankViewForm {
         setContainerValues();
 
         if (containerInfo.container.getContainerType()
-            .getChildContainerTypeCollection()
-            .size() > 0) {
+            .getChildContainerTypeCollection().size() > 0) {
             createVisualizeContainer();
         }
     }
@@ -454,6 +457,21 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
+    public boolean initChildrenWithType(ContainerTypeWrapper type,
+        Set<RowColPos> positions) throws Exception {
+        ContainerCreateChildrenAction containerCreateChildrenAction =
+            new ContainerCreateChildrenAction();
+        containerCreateChildrenAction
+            .setParentContainerId(containerInfo.container.getId());
+        containerCreateChildrenAction.setContainerTypeId(type.getId());
+        containerCreateChildrenAction.setParentPositions(positions);
+        BooleanResult result =
+            SessionManager.getAppService().doAction(
+                containerCreateChildrenAction);
+        reload();
+        return result.isTrue();
+    }
+
     private void deleteSelection(final ContainerTypeWrapper type) {
         IRunnableContext context =
             new ProgressMonitorDialog(Display.getDefault().getActiveShell());
@@ -472,7 +490,7 @@ public class ContainerViewForm extends BiobankViewForm {
                             containerWidget.getMultiSelectionManager()
                                 .getSelectedPositions();
                         deleteDones =
-                            container.deleteChildrenWithType(type, positions);
+                            deleteChildrenWithType(type, positions);
                     } catch (Exception ex) {
                         BgcPlugin
                             .openAsyncError(
@@ -495,6 +513,21 @@ public class ContainerViewForm extends BiobankViewForm {
                 Messages.ContainerViewForm_visualization_delete_error_msg, e);
             refresh(false, false);
         }
+    }
+
+    protected boolean deleteChildrenWithType(ContainerTypeWrapper type,
+        Set<RowColPos> positions) throws Exception {
+        ContainerDeleteChildrenAction containerDeleteChildrenAction =
+            new ContainerDeleteChildrenAction();
+        containerDeleteChildrenAction
+            .setParentContainerId(containerInfo.container.getId());
+        containerDeleteChildrenAction.setContainerTypeId(type.getId());
+        containerDeleteChildrenAction.setParentPositions(positions);
+        BooleanResult result =
+            SessionManager.getAppService().doAction(
+                containerDeleteChildrenAction);
+        reload();
+        return result.isTrue();
     }
 
     private void refresh(boolean initDone, final boolean rebuild) {
@@ -532,7 +565,9 @@ public class ContainerViewForm extends BiobankViewForm {
                             .getParentFromClass(SiteAdapter.class)
                             .getModelObject());
                     RowColPos pos = new RowColPos(cell.getRow(), cell.getCol());
-                    containerToOpen.setParent(container, pos);
+                    containerToOpen.setParent(
+                        new ContainerWrapper(SessionManager.getAppService(),
+                            containerInfo.container), pos);
                     newAdapter =
                         new ContainerAdapter(containerAdapter, containerToOpen);
                     newAdapter.openEntryForm(true);
@@ -589,17 +624,6 @@ public class ContainerViewForm extends BiobankViewForm {
         specimensWidget.adaptToToolkit(toolkit, true);
         specimensWidget.addClickListener(collectionDoubleClickListener);
         specimensWidget.createDefaultEditItem();
-    }
-
-    public void initChildrenWithType(ContainerType type,
-        Set<RowColPos> positions) throws Exception {
-        ContainerCreateChildrenAction containerCreateChildrenAction =
-            new ContainerCreateChildrenAction();
-        containerCreateChildrenAction
-            .setParentContainer(containerInfo.container);
-        containerCreateChildrenAction.setContainerTypeId(type.getId());
-        containerCreateChildrenAction.setParentPositions(positions);
-        reload();
     }
 
     @Override

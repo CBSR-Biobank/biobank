@@ -10,6 +10,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -145,7 +146,12 @@ public class ContainerDisplayWidget extends Canvas {
     public void setContainer(ContainerWrapper container) {
         this.container = container;
         if (container != null) {
-            setContainerType(container.getContainerType());
+            ContainerTypeInfo containerTypeInfo = 
+            ContainerTypeGetInfoAction containerTypeGetInfoAction =
+                new ContainerTypeGetInfoAction(container.getContainerType()
+                    .getId());
+
+            setContainerType(containerTypeInfo.);
             containerDisplay.setContainer(container);
         }
     }
