@@ -59,8 +59,6 @@ echo "importing old database..."
 pv $DBDUMP | gzip -dc | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
 echo "upgrading database..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v310_v320.sql
-echo "setting permissions..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/permissions.sql
 echo "assigning groups..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/groups.sql
 echo "migrating security..."

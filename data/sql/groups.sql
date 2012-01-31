@@ -4,9 +4,10 @@ select 'BbGroup', coalesce(MAX(id), 0)+1, 0, 'Super Administrators', 1 from prin
 
 -- add a membership to this super admin role
 insert into membership(id, version, principal_id)
-select 1, 0, max(id) from principal;
+select (select coalesce(MAX(id), 0)+1 from membership),
+0, id from principal where name='Super Administrators';
 
 -- add a 'AdministratorPersmission permission (id = 1 ) to this membership
 insert into membership_permission(id, permission_name) values
-((select max(id) from principal), 'ADMINISTRATION');
+((select max(id) from membership), 'ADMINISTRATION');
 
