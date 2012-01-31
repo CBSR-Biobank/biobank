@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.model;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,15 +32,15 @@ public class Specimen extends AbstractBiobankModel {
     private Specimen topSpecimen;
     private CollectionEvent collectionEvent;
     private Center currentCenter;
-    private Collection<DispatchSpecimen> dispatchSpecimenCollection =
+    private Set<DispatchSpecimen> dispatchSpecimenCollection =
         new HashSet<DispatchSpecimen>(0);
     private CollectionEvent originalCollectionEvent;
     private SpecimenType specimenType;
     private SpecimenPosition specimenPosition;
     private Collection<Specimen> childSpecimenCollection =
         new HashSet<Specimen>(0);
-    private Collection<Comment> commentCollection = new HashSet<Comment>(0);
-    private Collection<RequestSpecimen> requestSpecimenCollection =
+    private Set<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<RequestSpecimen> requestSpecimenCollection =
         new HashSet<RequestSpecimen>(0);
     private OriginInfo originInfo;
     private ActivityStatus activityStatus;
@@ -107,12 +109,12 @@ public class Specimen extends AbstractBiobankModel {
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "specimen")
-    public Collection<DispatchSpecimen> getDispatchSpecimenCollection() {
+    public Set<DispatchSpecimen> getDispatchSpecimenCollection() {
         return this.dispatchSpecimenCollection;
     }
 
     public void setDispatchSpecimenCollection(
-        Collection<DispatchSpecimen> dispatchSpecimenCollection) {
+        Set<DispatchSpecimen> dispatchSpecimenCollection) {
         this.dispatchSpecimenCollection = dispatchSpecimenCollection;
     }
 
@@ -162,22 +164,22 @@ public class Specimen extends AbstractBiobankModel {
     @JoinTable(name = "SPECIMEN_COMMENT",
         joinColumns = { @JoinColumn(name = "SPECIMEN_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Collection<Comment> getCommentCollection() {
+    public Set<Comment> getCommentCollection() {
         return this.commentCollection;
     }
 
-    public void setCommentCollection(Collection<Comment> commentCollection) {
+    public void setCommentCollection(Set<Comment> commentCollection) {
         this.commentCollection = commentCollection;
     }
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_ID", updatable = false)
-    public Collection<RequestSpecimen> getRequestSpecimenCollection() {
+    public Set<RequestSpecimen> getRequestSpecimenCollection() {
         return this.requestSpecimenCollection;
     }
 
     public void setRequestSpecimenCollection(
-        Collection<RequestSpecimen> requestSpecimenCollection) {
+        Set<RequestSpecimen> requestSpecimenCollection) {
         this.requestSpecimenCollection = requestSpecimenCollection;
     }
 

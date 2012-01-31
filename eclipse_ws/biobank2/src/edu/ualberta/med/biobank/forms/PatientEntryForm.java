@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -82,7 +83,7 @@ public class PatientEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         patientCopy = new Patient();
-        patientCopy.setCommentCollection(new ArrayList<Comment>());
+        patientCopy.setCommentCollection(new HashSet<Comment>());
         if (adapter.getId() != null) {
             pInfo =
                 SessionManager.getAppService().doAction(

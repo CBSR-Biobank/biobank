@@ -85,7 +85,8 @@ public class ProcessingEventPeer {
 			}
 			@Override
 			public void set(ProcessingEvent model, Collection<Comment> value) {
-				model.setCommentCollection(value);
+				model.getCommentCollection().clear();
+				model.getCommentCollection().addAll(value);
 			}
 		});
 
@@ -115,7 +116,8 @@ public class ProcessingEventPeer {
 			}
 			@Override
 			public void set(ProcessingEvent model, Collection<Specimen> value) {
-				model.setSpecimenCollection(value);
+				model.getSpecimenCollection().clear();
+				model.getSpecimenCollection().addAll(value);
 			}
 		});
 

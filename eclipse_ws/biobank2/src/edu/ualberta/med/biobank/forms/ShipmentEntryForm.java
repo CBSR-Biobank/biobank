@@ -172,13 +172,13 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             oiCopy.setCenter(null);
             oiCopy.setReceiverSite(null);
             oiCopy.setShipmentInfo(null);
-            oiCopy.setSpecimenCollection(new ArrayList<Specimen>());
+            oiCopy.setSpecimenCollection(new HashSet<Specimen>());
         } else {
             oiCopy.setId(oiInfo.oi.getId());
             oiCopy.setCenter(oiInfo.oi.getCenter());
             oiCopy.setReceiverSite(oiInfo.oi.getReceiverSite());
             oiCopy.setShipmentInfo(oiInfo.oi.getShipmentInfo());
-            oiCopy.setSpecimenCollection(oiInfo.specimens);
+            oiCopy.setSpecimenCollection(new HashSet<Specimen>(oiInfo.specimens));
         }
     }
 

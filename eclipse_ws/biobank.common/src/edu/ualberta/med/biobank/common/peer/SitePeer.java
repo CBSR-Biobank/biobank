@@ -23,7 +23,8 @@ public class SitePeer  extends CenterPeer {
 			}
 			@Override
 			public void set(Site model, Collection<Container> value) {
-				model.setContainerCollection(value);
+				model.getContainerCollection().clear();
+				model.getContainerCollection().addAll(value);
 			}
 		});
 
@@ -38,7 +39,8 @@ public class SitePeer  extends CenterPeer {
 			}
 			@Override
 			public void set(Site model, Collection<ContainerType> value) {
-				model.setContainerTypeCollection(value);
+				model.getContainerTypeCollection().clear();
+				model.getContainerTypeCollection().addAll(value);
 			}
 		});
 
@@ -53,7 +55,8 @@ public class SitePeer  extends CenterPeer {
 			}
 			@Override
 			public void set(Site model, Collection<Study> value) {
-				model.setStudyCollection(value);
+				model.getStudyCollection().clear();
+				model.getStudyCollection().addAll(value);
 			}
 		});
 

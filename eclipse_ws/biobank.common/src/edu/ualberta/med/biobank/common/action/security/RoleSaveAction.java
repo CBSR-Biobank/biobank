@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.action.security;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;

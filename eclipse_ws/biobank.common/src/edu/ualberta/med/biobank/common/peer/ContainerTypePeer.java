@@ -131,7 +131,8 @@ public class ContainerTypePeer {
 			}
 			@Override
 			public void set(ContainerType model, Collection<SpecimenType> value) {
-				model.setSpecimenTypeCollection(value);
+				model.getSpecimenTypeCollection().clear();
+				model.getSpecimenTypeCollection().addAll(value);
 			}
 		});
 
@@ -146,7 +147,8 @@ public class ContainerTypePeer {
 			}
 			@Override
 			public void set(ContainerType model, Collection<Comment> value) {
-				model.setCommentCollection(value);
+				model.getCommentCollection().clear();
+				model.getCommentCollection().addAll(value);
 			}
 		});
 
@@ -191,7 +193,8 @@ public class ContainerTypePeer {
 			}
 			@Override
 			public void set(ContainerType model, Collection<ContainerType> value) {
-				model.setChildContainerTypeCollection(value);
+				model.getChildContainerTypeCollection().clear();
+				model.getChildContainerTypeCollection().addAll(value);
 			}
 		});
 
@@ -206,7 +209,8 @@ public class ContainerTypePeer {
 			}
 			@Override
 			public void set(ContainerType model, Collection<ContainerType> value) {
-				model.setParentContainerTypeCollection(value);
+				model.getParentContainerTypeCollection().clear();
+				model.getParentContainerTypeCollection().addAll(value);
 			}
 		});
 

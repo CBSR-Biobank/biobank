@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.Collection;
-import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.base.MembershipBaseWrapper;
 import edu.ualberta.med.biobank.model.Membership;

@@ -51,7 +51,8 @@ public class BbGroupPeer  extends PrincipalPeer {
 			}
 			@Override
 			public void set(BbGroup model, Collection<User> value) {
-				model.setUserCollection(value);
+				model.getUserCollection().clear();
+				model.getUserCollection().addAll(value);
 			}
 		});
 

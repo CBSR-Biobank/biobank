@@ -100,7 +100,8 @@ public class CollectionEventPeer {
 			}
 			@Override
 			public void set(CollectionEvent model, Collection<Comment> value) {
-				model.setCommentCollection(value);
+				model.getCommentCollection().clear();
+				model.getCommentCollection().addAll(value);
 			}
 		});
 

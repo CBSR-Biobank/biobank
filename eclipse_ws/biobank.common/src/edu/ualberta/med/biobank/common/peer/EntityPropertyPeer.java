@@ -10,7 +10,6 @@ import java.util.Set;
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.PropertyType;
 import edu.ualberta.med.biobank.model.EntityColumn;
-import java.util.Collection;
 import edu.ualberta.med.biobank.model.EntityProperty;
 
 public class EntityPropertyPeer {

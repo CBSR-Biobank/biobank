@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.action.security;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -143,7 +142,7 @@ public class UserSaveAction extends PrincipalSaveAction {
 
         // remove newUser from groups in removed list
         for (BbGroup group : groupsDiff.getRemoveSet()) {
-            Collection<User> groupUsers = group.getUserCollection();
+            Set<User> groupUsers = group.getUserCollection();
             if (groupUsers.remove(newUser)) {
                 group.setUserCollection(groupUsers);
             } else {

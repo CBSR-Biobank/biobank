@@ -69,7 +69,8 @@ public class PatientPeer {
 			}
 			@Override
 			public void set(Patient model, Collection<Comment> value) {
-				model.setCommentCollection(value);
+				model.getCommentCollection().clear();
+				model.getCommentCollection().addAll(value);
 			}
 		});
 
@@ -84,7 +85,8 @@ public class PatientPeer {
 			}
 			@Override
 			public void set(Patient model, Collection<CollectionEvent> value) {
-				model.setCollectionEventCollection(value);
+				model.getCollectionEventCollection().clear();
+				model.getCollectionEventCollection().addAll(value);
 			}
 		});
 

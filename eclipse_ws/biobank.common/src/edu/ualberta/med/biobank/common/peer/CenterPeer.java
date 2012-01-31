@@ -102,7 +102,8 @@ public class CenterPeer {
 			}
 			@Override
 			public void set(Center model, Collection<Comment> value) {
-				model.setCommentCollection(value);
+				model.getCommentCollection().clear();
+				model.getCommentCollection().addAll(value);
 			}
 		});
 

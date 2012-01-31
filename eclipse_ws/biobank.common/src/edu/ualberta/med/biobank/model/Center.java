@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
 import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -42,7 +44,7 @@ public class Center extends AbstractBiobankModel {
     private Collection<OriginInfo> originInfoCollection =
         new HashSet<OriginInfo>(0);
     private ActivityStatus activityStatus;
-    private Collection<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
     @NotEmpty
     @Column(name = "NAME", unique = true, nullable = false)
@@ -142,11 +144,11 @@ public class Center extends AbstractBiobankModel {
     @JoinTable(name = "CENTER_COMMENT",
         joinColumns = { @JoinColumn(name = "CENTER_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Collection<Comment> getCommentCollection() {
+    public Set<Comment> getCommentCollection() {
         return this.commentCollection;
     }
 
-    public void setCommentCollection(Collection<Comment> commentCollection) {
+    public void setCommentCollection(Set<Comment> commentCollection) {
         this.commentCollection = commentCollection;
     }
 }

@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
 import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,7 +32,7 @@ public class Container extends AbstractBiobankModel {
     private String label;
     private Double temperature;
     private String path;
-    private Collection<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<Comment> commentCollection = new HashSet<Comment>(0);
     private Collection<ContainerPosition> childPositionCollection =
         new HashSet<ContainerPosition>(0);
     private Container topContainer;
@@ -85,11 +87,11 @@ public class Container extends AbstractBiobankModel {
     @JoinTable(name = "CONTAINER_COMMENT",
         joinColumns = { @JoinColumn(name = "CONTAINER_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Collection<Comment> getCommentCollection() {
+    public Set<Comment> getCommentCollection() {
         return this.commentCollection;
     }
 
-    public void setCommentCollection(Collection<Comment> commentCollection) {
+    public void setCommentCollection(Set<Comment> commentCollection) {
         this.commentCollection = commentCollection;
     }
 

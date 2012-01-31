@@ -69,7 +69,8 @@ public class DispatchPeer {
 			}
 			@Override
 			public void set(Dispatch model, Collection<Comment> value) {
-				model.setCommentCollection(value);
+				model.getCommentCollection().clear();
+				model.getCommentCollection().addAll(value);
 			}
 		});
 

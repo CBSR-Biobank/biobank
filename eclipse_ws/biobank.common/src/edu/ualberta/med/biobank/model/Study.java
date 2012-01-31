@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
 import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,13 +30,13 @@ public class Study extends AbstractBiobankModel {
         new HashSet<AliquotedSpecimen>(0);
     private Collection<Patient> patientCollection = new HashSet<Patient>(0);
     private Collection<Site> siteCollection = new HashSet<Site>(0);
-    private Collection<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<Comment> commentCollection = new HashSet<Comment>(0);
     private ActivityStatus activityStatus;
     private Collection<Membership> membershipCollection =
         new HashSet<Membership>(0);
     private Collection<StudyEventAttr> studyEventAttrCollection =
         new HashSet<StudyEventAttr>(0);
-    private Collection<Contact> contactCollection = new HashSet<Contact>(0);
+    private Set<Contact> contactCollection = new HashSet<Contact>(0);
     private ResearchGroup researchGroup;
     private Collection<SourceSpecimen> sourceSpecimenCollection =
         new HashSet<SourceSpecimen>(0);
@@ -93,11 +95,11 @@ public class Study extends AbstractBiobankModel {
     @JoinTable(name = "STUDY_COMMENT",
         joinColumns = { @JoinColumn(name = "STUDY_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Collection<Comment> getCommentCollection() {
+    public Set<Comment> getCommentCollection() {
         return this.commentCollection;
     }
 
-    public void setCommentCollection(Collection<Comment> commentCollection) {
+    public void setCommentCollection(Set<Comment> commentCollection) {
         this.commentCollection = commentCollection;
     }
 
@@ -138,11 +140,11 @@ public class Study extends AbstractBiobankModel {
     @JoinTable(name = "STUDY_CONTACT",
         joinColumns = { @JoinColumn(name = "STUDY_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "CONTACT_ID", nullable = false, updatable = false) })
-    public Collection<Contact> getContactCollection() {
+    public Set<Contact> getContactCollection() {
         return this.contactCollection;
     }
 
-    public void setContactCollection(Collection<Contact> contactCollection) {
+    public void setContactCollection(Set<Contact> contactCollection) {
         this.contactCollection = contactCollection;
     }
 

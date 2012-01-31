@@ -53,7 +53,8 @@ public class DispatchSpecimenPeer {
 			}
 			@Override
 			public void set(DispatchSpecimen model, Collection<Comment> value) {
-				model.setCommentCollection(value);
+				model.getCommentCollection().clear();
+				model.getCommentCollection().addAll(value);
 			}
 		});
 

@@ -70,7 +70,8 @@ public class OriginInfoPeer {
 			}
 			@Override
 			public void set(OriginInfo model, Collection<Comment> value) {
-				model.setCommentCollection(value);
+				model.getCommentCollection().clear();
+				model.getCommentCollection().addAll(value);
 			}
 		});
 
@@ -100,7 +101,8 @@ public class OriginInfoPeer {
 			}
 			@Override
 			public void set(OriginInfo model, Collection<Specimen> value) {
-				model.setSpecimenCollection(value);
+				model.getSpecimenCollection().clear();
+				model.getSpecimenCollection().addAll(value);
 			}
 		});
 

@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
 import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,16 +30,16 @@ public class ContainerType extends AbstractBiobankModel {
     private String nameShort;
     private boolean topLevel = false;
     private double defaultTemperature;
-    private Collection<SpecimenType> specimenTypeCollection =
+    private Set<SpecimenType> specimenTypeCollection =
         new HashSet<SpecimenType>(0);
-    private Collection<ContainerType> childContainerTypeCollection =
+    private Set<ContainerType> childContainerTypeCollection =
         new HashSet<ContainerType>(0);
     private ActivityStatus activityStatus;
-    private Collection<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<Comment> commentCollection = new HashSet<Comment>(0);
     private Capacity capacity;
     private Site site;
     private ContainerLabelingScheme childLabelingScheme;
-    private Collection<ContainerType> parentContainerTypeCollection =
+    private Set<ContainerType> parentContainerTypeCollection =
         new HashSet<ContainerType>(0);
 
     @NotEmpty
@@ -89,7 +91,7 @@ public class ContainerType extends AbstractBiobankModel {
     }
 
     public void setSpecimenTypeCollection(
-        Collection<SpecimenType> specimenTypeCollection) {
+        Set<SpecimenType> specimenTypeCollection) {
         this.specimenTypeCollection = specimenTypeCollection;
     }
 
@@ -97,12 +99,12 @@ public class ContainerType extends AbstractBiobankModel {
     @JoinTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
         joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false, updatable = false) })
-    public Collection<ContainerType> getChildContainerTypeCollection() {
+    public Set<ContainerType> getChildContainerTypeCollection() {
         return this.childContainerTypeCollection;
     }
 
     public void setChildContainerTypeCollection(
-        Collection<ContainerType> childContainerTypeCollection) {
+        Set<ContainerType> childContainerTypeCollection) {
         this.childContainerTypeCollection = childContainerTypeCollection;
     }
 
@@ -121,11 +123,11 @@ public class ContainerType extends AbstractBiobankModel {
     @JoinTable(name = "CONTAINER_TYPE_COMMENT",
         joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Collection<Comment> getCommentCollection() {
+    public Set<Comment> getCommentCollection() {
         return this.commentCollection;
     }
 
-    public void setCommentCollection(Collection<Comment> commentCollection) {
+    public void setCommentCollection(Set<Comment> commentCollection) {
         this.commentCollection = commentCollection;
     }
 
@@ -164,12 +166,12 @@ public class ContainerType extends AbstractBiobankModel {
     }
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "childContainerTypeCollection")
-    public Collection<ContainerType> getParentContainerTypeCollection() {
+    public Set<ContainerType> getParentContainerTypeCollection() {
         return this.parentContainerTypeCollection;
     }
 
     public void setParentContainerTypeCollection(
-        Collection<ContainerType> parentContainerTypeCollection) {
+        Set<ContainerType> parentContainerTypeCollection) {
         this.parentContainerTypeCollection = parentContainerTypeCollection;
     }
 }

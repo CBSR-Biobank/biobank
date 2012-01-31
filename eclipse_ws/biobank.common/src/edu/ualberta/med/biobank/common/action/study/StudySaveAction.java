@@ -265,7 +265,7 @@ public class StudySaveAction implements Action<IdResult> {
 
         // remove this study from sites in removed list
         for (Site site : sitesDiff.getRemoveSet()) {
-            Collection<Study> siteStudies = site.getStudyCollection();
+            Set<Study> siteStudies = site.getStudyCollection();
             if (siteStudies.remove(study)) {
                 site.setStudyCollection(siteStudies);
             } else {

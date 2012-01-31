@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.model;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -25,9 +27,9 @@ public class ProcessingEvent extends AbstractBiobankModel {
     private String worksheet;
     private Date createdAt;
     private Center center;
-    private Collection<Specimen> specimenCollection = new HashSet<Specimen>(0);
+    private Set<Specimen> specimenCollection = new HashSet<Specimen>(0);
     private ActivityStatus activityStatus;
-    private Collection<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
     @NotEmpty
     @Column(name = "WORKSHEET", unique = true, length = 100)
@@ -62,11 +64,11 @@ public class ProcessingEvent extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "processingEvent")
     @Cascade({ CascadeType.SAVE_UPDATE })
-    public Collection<Specimen> getSpecimenCollection() {
+    public Set<Specimen> getSpecimenCollection() {
         return this.specimenCollection;
     }
 
-    public void setSpecimenCollection(Collection<Specimen> specimenCollection) {
+    public void setSpecimenCollection(Set<Specimen> specimenCollection) {
         this.specimenCollection = specimenCollection;
     }
 
@@ -85,11 +87,11 @@ public class ProcessingEvent extends AbstractBiobankModel {
     @JoinTable(name = "PROCESSING_EVENT_COMMENT",
         joinColumns = { @JoinColumn(name = "PROCESSING_EVENT_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Collection<Comment> getCommentCollection() {
+    public Set<Comment> getCommentCollection() {
         return this.commentCollection;
     }
 
-    public void setCommentCollection(Collection<Comment> commentCollection) {
+    public void setCommentCollection(Set<Comment> commentCollection) {
         this.commentCollection = commentCollection;
     }
 }

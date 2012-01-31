@@ -102,7 +102,8 @@ public class MembershipPeer {
 			}
 			@Override
 			public void set(Membership model, Collection<Role> value) {
-				model.setRoleCollection(value);
+				model.getRoleCollection().clear();
+				model.getRoleCollection().addAll(value);
 			}
 		});
 

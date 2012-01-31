@@ -90,7 +90,8 @@ public class StudyPeer {
 			}
 			@Override
 			public void set(Study model, Collection<Contact> value) {
-				model.setContactCollection(value);
+				model.getContactCollection().clear();
+				model.getContactCollection().addAll(value);
 			}
 		});
 
@@ -120,7 +121,8 @@ public class StudyPeer {
 			}
 			@Override
 			public void set(Study model, Collection<Comment> value) {
-				model.setCommentCollection(value);
+				model.getCommentCollection().clear();
+				model.getCommentCollection().addAll(value);
 			}
 		});
 

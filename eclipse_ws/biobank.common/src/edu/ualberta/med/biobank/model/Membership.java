@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
 import java.util.Set;
 
 import javax.persistence.CollectionTable;
@@ -32,7 +31,7 @@ public class Membership extends AbstractBiobankModel {
     private Set<PermissionEnum> permissionCollection =
         new HashSet<PermissionEnum>(0);
     private Center center;
-    private Collection<Role> roleCollection = new HashSet<Role>(0);
+    private Set<Role> roleCollection = new HashSet<Role>(0);
     private Study study;
     private Principal principal;
 
@@ -63,11 +62,11 @@ public class Membership extends AbstractBiobankModel {
     @JoinTable(name = "MEMBERSHIP_ROLE",
         joinColumns = { @JoinColumn(name = "MEMBERSHIP_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "ROLE_ID", nullable = false, updatable = false) })
-    public Collection<Role> getRoleCollection() {
+    public Set<Role> getRoleCollection() {
         return this.roleCollection;
     }
 
-    public void setRoleCollection(Collection<Role> roleCollection) {
+    public void setRoleCollection(Set<Role> roleCollection) {
         this.roleCollection = roleCollection;
     }
 

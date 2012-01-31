@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
 import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,11 +21,11 @@ public class SpecimenType extends AbstractBiobankModel {
 
     private String name;
     private String nameShort;
-    private Collection<ContainerType> containerTypeCollection =
+    private Set<ContainerType> containerTypeCollection =
         new HashSet<ContainerType>(0);
-    private Collection<SpecimenType> parentSpecimenTypeCollection =
+    private Set<SpecimenType> parentSpecimenTypeCollection =
         new HashSet<SpecimenType>(0);
-    private Collection<SpecimenType> childSpecimenTypeCollection =
+    private Set<SpecimenType> childSpecimenTypeCollection =
         new HashSet<SpecimenType>(0);
 
     @NotEmpty
@@ -47,22 +49,22 @@ public class SpecimenType extends AbstractBiobankModel {
     }
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "specimenTypeCollection")
-    public Collection<ContainerType> getContainerTypeCollection() {
+    public Set<ContainerType> getContainerTypeCollection() {
         return this.containerTypeCollection;
     }
 
     public void setContainerTypeCollection(
-        Collection<ContainerType> containerTypeCollection) {
+        Set<ContainerType> containerTypeCollection) {
         this.containerTypeCollection = containerTypeCollection;
     }
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "childSpecimenTypeCollection")
-    public Collection<SpecimenType> getParentSpecimenTypeCollection() {
+    public Set<SpecimenType> getParentSpecimenTypeCollection() {
         return this.parentSpecimenTypeCollection;
     }
 
     public void setParentSpecimenTypeCollection(
-        Collection<SpecimenType> parentSpecimenTypeCollection) {
+        Set<SpecimenType> parentSpecimenTypeCollection) {
         this.parentSpecimenTypeCollection = parentSpecimenTypeCollection;
     }
 
@@ -70,12 +72,12 @@ public class SpecimenType extends AbstractBiobankModel {
     @JoinTable(name = "SPECIMEN_TYPE_SPECIMEN_TYPE",
         joinColumns = { @JoinColumn(name = "PARENT_SPECIMEN_TYPE_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "CHILD_SPECIMEN_TYPE_ID", nullable = false, updatable = false) })
-    public Collection<SpecimenType> getChildSpecimenTypeCollection() {
+    public Set<SpecimenType> getChildSpecimenTypeCollection() {
         return this.childSpecimenTypeCollection;
     }
 
     public void setChildSpecimenTypeCollection(
-        Collection<SpecimenType> childSpecimenTypeCollection) {
+        Set<SpecimenType> childSpecimenTypeCollection) {
         this.childSpecimenTypeCollection = childSpecimenTypeCollection;
     }
 }

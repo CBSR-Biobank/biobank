@@ -191,7 +191,8 @@ public class ContainerPeer {
 			}
 			@Override
 			public void set(Container model, Collection<Comment> value) {
-				model.setCommentCollection(value);
+				model.getCommentCollection().clear();
+				model.getCommentCollection().addAll(value);
 			}
 		});
 

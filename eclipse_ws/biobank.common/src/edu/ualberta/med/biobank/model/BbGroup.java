@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -19,7 +20,7 @@ public class BbGroup extends Principal {
     
     private String name;
     private String description;
-    private Collection<User> userCollection = new HashSet<User>(0);
+    private Set<User> userCollection = new HashSet<User>(0);
 
     @NotEmpty
     @Column(name = "NAME", unique = true)
@@ -44,11 +45,11 @@ public class BbGroup extends Principal {
     @JoinTable(name = "GROUP_USER",
         joinColumns = { @JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "USER_ID", nullable = false, updatable = false) })
-    public Collection<User> getUserCollection() {
+    public Set<User> getUserCollection() {
         return this.userCollection;
     }
 
-    public void setUserCollection(Collection<User> userCollection) {
+    public void setUserCollection(Set<User> userCollection) {
         this.userCollection = userCollection;
     }
 }

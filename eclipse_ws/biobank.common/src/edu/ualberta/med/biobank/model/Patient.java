@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.model;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,10 +26,10 @@ public class Patient extends AbstractBiobankModel {
 
     private String pnumber;
     private Date createdAt;
-    private Collection<CollectionEvent> collectionEventCollection =
+    private Set<CollectionEvent> collectionEventCollection =
         new HashSet<CollectionEvent>(0);
     private Study study;
-    private Collection<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
     @NotEmpty
     @Column(name = "PNUMBER", unique = true, nullable = false, length = 100)
@@ -50,12 +52,12 @@ public class Patient extends AbstractBiobankModel {
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "patient")
-    public Collection<CollectionEvent> getCollectionEventCollection() {
+    public Set<CollectionEvent> getCollectionEventCollection() {
         return this.collectionEventCollection;
     }
 
     public void setCollectionEventCollection(
-        Collection<CollectionEvent> collectionEventCollection) {
+        Set<CollectionEvent> collectionEventCollection) {
         this.collectionEventCollection = collectionEventCollection;
     }
 
@@ -74,11 +76,11 @@ public class Patient extends AbstractBiobankModel {
     @JoinTable(name = "PATIENT_COMMENT",
         joinColumns = { @JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Collection<Comment> getCommentCollection() {
+    public Set<Comment> getCommentCollection() {
         return this.commentCollection;
     }
 
-    public void setCommentCollection(Collection<Comment> commentCollection) {
+    public void setCommentCollection(Set<Comment> commentCollection) {
         this.commentCollection = commentCollection;
     }
 }

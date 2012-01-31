@@ -106,7 +106,8 @@ public class SpecimenPeer {
 			}
 			@Override
 			public void set(Specimen model, Collection<Comment> value) {
-				model.setCommentCollection(value);
+				model.getCommentCollection().clear();
+				model.getCommentCollection().addAll(value);
 			}
 		});
 
@@ -211,7 +212,8 @@ public class SpecimenPeer {
 			}
 			@Override
 			public void set(Specimen model, Collection<DispatchSpecimen> value) {
-				model.setDispatchSpecimenCollection(value);
+				model.getDispatchSpecimenCollection().clear();
+				model.getDispatchSpecimenCollection().addAll(value);
 			}
 		});
 
@@ -271,7 +273,8 @@ public class SpecimenPeer {
 			}
 			@Override
 			public void set(Specimen model, Collection<RequestSpecimen> value) {
-				model.setRequestSpecimenCollection(value);
+				model.getRequestSpecimenCollection().clear();
+				model.getRequestSpecimenCollection().addAll(value);
 			}
 		});
 

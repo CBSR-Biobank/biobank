@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,8 +23,8 @@ import org.hibernate.validator.NotNull;
 public class OriginInfo extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
-    private Collection<Comment> commentCollection = new HashSet<Comment>(0);
-    private Collection<Specimen> specimenCollection = new HashSet<Specimen>(0);
+    private Set<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<Specimen> specimenCollection = new HashSet<Specimen>(0);
     private ShipmentInfo shipmentInfo;
     private Center center;
     private Site receiverSite;
@@ -32,21 +33,21 @@ public class OriginInfo extends AbstractBiobankModel {
     @JoinTable(name = "ORIGIN_INFO_COMMENT",
         joinColumns = { @JoinColumn(name = "ORIGIN_INFO_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Collection<Comment> getCommentCollection() {
+    public Set<Comment> getCommentCollection() {
         return this.commentCollection;
     }
 
-    public void setCommentCollection(Collection<Comment> commentCollection) {
+    public void setCommentCollection(Set<Comment> commentCollection) {
         this.commentCollection = commentCollection;
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "originInfo")
     @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-    public Collection<Specimen> getSpecimenCollection() {
+    public Set<Specimen> getSpecimenCollection() {
         return this.specimenCollection;
     }
 
-    public void setSpecimenCollection(Collection<Specimen> specimenCollection) {
+    public void setSpecimenCollection(Set<Specimen> specimenCollection) {
         this.specimenCollection = specimenCollection;
     }
 

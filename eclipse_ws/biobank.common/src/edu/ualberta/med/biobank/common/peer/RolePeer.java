@@ -5,7 +5,6 @@ import java.util.Collections;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.model.PermissionEnum;

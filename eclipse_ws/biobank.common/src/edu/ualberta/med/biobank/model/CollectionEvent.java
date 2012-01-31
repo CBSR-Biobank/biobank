@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
 import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -34,7 +36,7 @@ public class CollectionEvent extends AbstractBiobankModel {
     private ActivityStatus activityStatus;
     private Collection<EventAttr> eventAttrCollection = new HashSet<EventAttr>(
         0);
-    private Collection<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<Comment> commentCollection = new HashSet<Comment>(0);
     private Collection<Specimen> originalSpecimenCollection =
         new HashSet<Specimen>(0);
 
@@ -96,11 +98,11 @@ public class CollectionEvent extends AbstractBiobankModel {
     @JoinTable(name = "COLLECTION_EVENT_COMMENT",
         joinColumns = { @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Collection<Comment> getCommentCollection() {
+    public Set<Comment> getCommentCollection() {
         return this.commentCollection;
     }
 
-    public void setCommentCollection(Collection<Comment> commentCollection) {
+    public void setCommentCollection(Set<Comment> commentCollection) {
         this.commentCollection = commentCollection;
     }
 
