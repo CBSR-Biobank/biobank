@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Collection;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -32,7 +31,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
     @NotEmpty
-    @Column(name = "WORKSHEET", unique = true, length = 100)
+    @Column(name = "WORKSHEET", length = 100)
     public String getWorksheet() {
         return this.worksheet;
     }
