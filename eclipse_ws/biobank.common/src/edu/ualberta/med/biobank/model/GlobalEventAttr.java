@@ -6,9 +6,9 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.NotEmpty;
-import org.hibernate.validator.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name = "GLOBAL_EVENT_ATTR")
@@ -18,7 +18,6 @@ public class GlobalEventAttr extends AbstractBiobankModel {
     private String label;
     private EventAttrType eventAttrType;
 
-    // TODO: unique
     @NotEmpty
     @Column(name = "LABEL", unique = true, nullable = false, length = 50)
     public String getLabel() {

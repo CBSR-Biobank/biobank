@@ -3,9 +3,8 @@ package edu.ualberta.med.biobank.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-
-import org.hibernate.validator.Min;
-import org.hibernate.validator.NotNull;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "CAPACITY")

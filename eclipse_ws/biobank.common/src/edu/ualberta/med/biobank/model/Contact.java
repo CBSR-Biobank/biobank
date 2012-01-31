@@ -11,8 +11,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.validator.Email;
-import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name = "CONTACT")

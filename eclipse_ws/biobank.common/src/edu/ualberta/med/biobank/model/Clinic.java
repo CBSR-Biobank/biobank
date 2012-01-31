@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
 import java.util.Set;
 
 import javax.persistence.CascadeType;

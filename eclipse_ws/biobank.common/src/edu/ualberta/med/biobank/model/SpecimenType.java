@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.HashSet;
-import java.util.Collection;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -12,7 +11,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name = "SPECIMEN_TYPE")

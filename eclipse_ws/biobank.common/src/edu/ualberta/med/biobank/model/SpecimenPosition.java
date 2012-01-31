@@ -6,8 +6,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
-import org.hibernate.validator.NotNull;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "SPECIMEN_POSITION",

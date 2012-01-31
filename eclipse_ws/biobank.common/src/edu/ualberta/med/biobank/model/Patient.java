@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Collection;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -15,9 +14,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.NotEmpty;
-import org.hibernate.validator.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name = "PATIENT")

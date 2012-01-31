@@ -6,8 +6,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.validator.NotNull;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "SOURCE_SPECIMEN")

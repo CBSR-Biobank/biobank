@@ -10,12 +10,15 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.NotEmpty;
-import org.hibernate.validator.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import edu.ualberta.med.biobank.validator.constraint.Unique;
 
 @Entity
 @DiscriminatorValue("User")
+@Unique.List({ @Unique(properties = { "login" }) })
 public class User extends Principal {
     private static final long serialVersionUID = 1L;
 

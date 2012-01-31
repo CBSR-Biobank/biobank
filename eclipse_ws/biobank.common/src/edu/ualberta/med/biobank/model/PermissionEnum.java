@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.model;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.constraint;
+package edu.ualberta.med.biobank.validator;
 
 import org.hibernate.Session;
 import org.hibernate.event.PreUpdateEvent;
@@ -28,9 +28,5 @@ public class PreUpdateHandler implements PreUpdateEventListener {
         }
 
         return false;
-    }
-
-    private void reg(Property<?, ?> property, IConstraintValidator validator) {
-
     }
 }

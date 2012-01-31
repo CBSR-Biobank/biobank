@@ -15,10 +15,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.annotations.Cascade;
-import org.hibernate.validator.Min;
-import org.hibernate.validator.NotEmpty;
-import org.hibernate.validator.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name = "SPECIMEN")
@@ -127,7 +128,7 @@ public class Specimen extends AbstractBiobankModel {
         CollectionEvent originalCollectionEvent) {
         this.originalCollectionEvent = originalCollectionEvent;
     }
-    
+
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
@@ -192,7 +193,7 @@ public class Specimen extends AbstractBiobankModel {
     public void setOriginInfo(OriginInfo originInfo) {
         this.originInfo = originInfo;
     }
-    
+
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)

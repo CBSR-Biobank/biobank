@@ -2,9 +2,8 @@ package edu.ualberta.med.biobank.model;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
-
-import org.hibernate.validator.Min;
-import org.hibernate.validator.NotNull;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @MappedSuperclass
 public class AbstractPosition extends AbstractBiobankModel {

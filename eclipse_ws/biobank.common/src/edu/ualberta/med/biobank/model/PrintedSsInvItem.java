@@ -4,7 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name = "PRINTED_SS_INV_ITEM")
@@ -13,9 +13,8 @@ public class PrintedSsInvItem extends AbstractBiobankModel {
 
     private String txt;
 
-    // TODO: unique
     @NotEmpty
-    @Column(name = "TXT", length = 15)
+    @Column(name = "TXT", unique = true, length = 15)
     public String getTxt() {
         return this.txt;
     }

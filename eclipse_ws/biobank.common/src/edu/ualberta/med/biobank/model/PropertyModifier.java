@@ -4,7 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.hibernate.validator.NotEmpty;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name = "PROPERTY_MODIFIER")
@@ -24,7 +24,7 @@ public class PropertyModifier extends AbstractBiobankModel {
         this.name = name;
     }
 
-    @Column(name = "PROPERTY_MODIFIER", columnDefinition="TEXT")
+    @Column(name = "PROPERTY_MODIFIER", columnDefinition = "TEXT")
     public String getPropertyModifier() {
         return this.propertyModifier;
     }
