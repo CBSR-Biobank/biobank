@@ -64,13 +64,15 @@
 		</property>
 		<property name="eventListeners">
 			<map>
-				
+				<!-- 
+				removed because this class does not exist anymore in hibernate 3.6.9-Final
 				<entry key="pre-insert">
 					<bean class="org.hibernate.validator.event.ValidateEventListener" />
 				</entry>
 				<entry key="pre-update">
 					<bean class="org.hibernate.validator.event.ValidateEventListener" />
 				</entry>
+				-->
 				
 			</map>
 		</property>

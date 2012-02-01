@@ -338,7 +338,7 @@ End:
       </fileset>
     </delete>
     <copy file="${war.file}"
-          tofile="${env.JBOSS_HOME}/server/default/deploy/${war.file}"
+          tofile="${env.JBOSS_HOME}/server/default/deploy/biobank.war"
           overwrite="true" />
   </target>
 
