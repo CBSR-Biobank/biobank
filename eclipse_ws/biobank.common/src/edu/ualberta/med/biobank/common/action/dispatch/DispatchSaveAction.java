@@ -94,11 +94,13 @@ public class DispatchSaveAction implements Action<IdResult> {
         context.getSession().saveOrUpdate(disp);
 
         // spawned from a request?
-        Request request = context.get(Request.class, dInfo.requestId);
+        if (dInfo.requestId != null) {
+            Request request = context.get(Request.class, dInfo.requestId);
         Set<Dispatch> dispatches = request.getDispatchCollection();
-        dispatches.add(disp);
-        request.setDispatchCollection(dispatches);
-        context.getSession().saveOrUpdate(request);
+            dispatches.add(disp);
+            request.setDispatchCollection(dispatches);
+            context.getSession().saveOrUpdate(request);
+        }
 
         context.getSession().flush();
 
