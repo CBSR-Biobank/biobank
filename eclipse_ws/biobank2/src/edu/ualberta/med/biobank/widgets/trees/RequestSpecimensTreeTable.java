@@ -24,8 +24,8 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.info.RequestSpecimenInfo;
-import edu.ualberta.med.biobank.common.action.request.RequestUpdateSpecimensAction;
+import edu.ualberta.med.biobank.common.action.request.RequestClaimAction;
+import edu.ualberta.med.biobank.common.action.request.RequestStateChangeAction;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
@@ -211,15 +211,12 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
 
     protected void claim(List<RequestSpecimenWrapper> specs) {
         try {
-            List<RequestSpecimenInfo> rs = new ArrayList<RequestSpecimenInfo>();
+            List<Integer> rs = new ArrayList<Integer>();
             for (RequestSpecimenWrapper spec : specs) {
                 spec.setClaimedBy(SessionManager.getUser().getLogin());
-                rs.add(new RequestSpecimenInfo(spec.getId(), spec.getState(),
-                    SessionManager.getUser().getLogin()));
+                rs.add(spec.getId());
             }
-            SessionManager.getAppService().doAction(
-                new RequestUpdateSpecimensAction(rs, null, SessionManager
-                    .getUser().getCurrentWorkingCenter().getId()));
+            SessionManager.getAppService().doAction(new RequestClaimAction(rs));
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
                 Messages.RequestSpecimensTreeTable_claim_error_title, e);
@@ -233,20 +230,16 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                List<RequestSpecimenInfo> rs =
-                    new ArrayList<RequestSpecimenInfo>();
+                List<Integer> rs =
+                    new ArrayList<Integer>();
                 for (RequestSpecimenWrapper spec : getSelectionWrappers()) {
                     spec.setState(RequestSpecimenState.UNAVAILABLE_STATE
                         .getId());
-                    rs.add(new RequestSpecimenInfo(spec.getId(),
-                        RequestSpecimenState.UNAVAILABLE_STATE.getId(), spec
-                            .getClaimedBy()));
+                    rs.add(spec.getId());
                     try {
                         SessionManager.getAppService().doAction(
-                            new RequestUpdateSpecimensAction(rs, null,
-                                SessionManager
-                                    .getUser().getCurrentWorkingCenter()
-                                    .getId()));
+                            new RequestStateChangeAction(rs,
+                                RequestSpecimenState.UNAVAILABLE_STATE));
                     } catch (Exception e) {
                         BgcPlugin
                             .openAsyncError(
