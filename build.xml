@@ -314,7 +314,7 @@ End:
   </target>
 
   <target name="deploy-jboss"
-          depends="jboss.home.env,package-webapp,check-jboss-uptodate,hostAicmlMed,hostAicml5,hostCbsr,hostCbsrTraining,hostLocal,server-manifest"
+          depends="jboss.home.env,package-webapp,check-jboss-uptodate,hostAicmlMed,hostAicml5,hostCbsr,hostCbsrTraining,hostLocal"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
@@ -348,7 +348,8 @@ End:
     <antcall target="deploy-eclipse" />
   </target>
 
-  <target name="build-common-project">
+  <target name="build-common-project"
+          depends="server-manifest">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output" overwrite="true">
