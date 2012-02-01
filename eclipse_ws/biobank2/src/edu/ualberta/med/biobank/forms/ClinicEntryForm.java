@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -17,6 +19,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
@@ -29,6 +32,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
@@ -66,11 +70,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     private ComboViewer activityStatusComboViewer;
 
-    private CommentCollectionInfoTable commentTable;
-
     private CommentCollectionInfoTable commentEntryTable;
 
     private CommentWrapper comment;
+
+    private ClinicInfo clinicInfo;
+
+    private BgcBaseText commentWidget;
 
     @Override
     protected void init() throws Exception {
@@ -80,12 +86,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         clinicAdapter = (ClinicAdapter) adapter;
         comment = new CommentWrapper(SessionManager.getAppService());
 
-        if (adapter.getId() != null)
+        if (adapter.getId() != null) {
+            clinicInfo = SessionManager.getAppService().doAction(
+                new ClinicGetInfoAction(adapter.getId()));
             clinic =
                 new ClinicWrapper(SessionManager.getAppService(),
-                    SessionManager.getAppService().doAction(
-                        new ClinicGetInfoAction(adapter.getId())).clinic);
-        else
+                    clinicInfo.clinic);
+        } else
             clinic =
                 new ClinicWrapper(SessionManager.getAppService());
         String tabName;
@@ -172,15 +179,21 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add);
+        commentWidget =
+            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
+                SWT.MULTI,
+                Messages.Comments_add, null, comment, "message", null);
 
     }
 
     private void createContactSection() {
         Section section = createSection(Messages.clinic_contact_title);
 
-        contactEntryWidget = new ContactEntryInfoTable(section, clinic);
+        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
+        for (Contact c : clinicInfo.contacts)
+            contacts.add(new ContactWrapper(SessionManager.getAppService(), c));
+
+        contactEntryWidget = new ContactEntryInfoTable(section, contacts);
         contactEntryWidget.adaptToToolkit(toolkit, true);
         contactEntryWidget.addSelectionChangedListener(listener);
 
@@ -211,17 +224,19 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             .getDeletedContacts());
 
         ClinicSaveAction saveClinic = new ClinicSaveAction();
+        saveClinic.setId(clinic.getId());
         saveClinic.setName(clinic.getName());
         saveClinic.setNameShort(clinic.getNameShort());
         saveClinic.setActivityStatusId(clinic.getActivityStatus().getId());
         saveClinic.setSendsShipments(clinic.getSendsShipments());
         saveClinic.setContactSaveInfos(new HashSet<ContactSaveInfo>());
         saveClinic.setAddress(clinic.getAddress().getWrappedObject());
+        saveClinic.setCommentText(comment.getMessage());
         Integer id =
             SessionManager.getAppService().doAction(saveClinic).getId();
         clinic.setId(id);
         ((AdapterBase) adapter).setModelObject(clinic);
-        // SessionManager.updateAllSimilarNodes(clinicAdapter, true);
+        SessionManager.updateAllSimilarNodes(clinicAdapter, true);
         SessionManager.getUser().updateCurrentCenter(clinic);
     }
 

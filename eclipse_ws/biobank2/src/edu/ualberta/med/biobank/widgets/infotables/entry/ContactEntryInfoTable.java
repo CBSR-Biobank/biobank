@@ -30,10 +30,10 @@ public class ContactEntryInfoTable extends ContactInfoTable {
 
     private ClinicWrapper clinic;
 
-    public ContactEntryInfoTable(Composite parent, ClinicWrapper clinic) {
-        super(parent, clinic.getContactCollection(true));
-        this.clinic = clinic;
-        selectedContacts = clinic.getContactCollection(false);
+    public ContactEntryInfoTable(Composite parent,
+        List<ContactWrapper> contactCollection) {
+        super(parent, contactCollection);
+        selectedContacts = contactCollection;
         if (selectedContacts == null) {
             selectedContacts = new ArrayList<ContactWrapper>();
         }
