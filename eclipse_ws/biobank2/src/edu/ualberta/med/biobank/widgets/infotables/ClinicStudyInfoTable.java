@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
@@ -32,10 +34,9 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     private ClinicWrapper clinic;
 
-    public ClinicStudyInfoTable(Composite parent, ClinicWrapper clinic) {
+    public ClinicStudyInfoTable(Composite parent, List<StudyWrapper> studies) {
         super(parent, null, HEADINGS, 10, StudyWrapper.class);
-        this.clinic = clinic;
-        setList(clinic.getStudyCollection());
+        setList(studies);
     }
 
     @Override
@@ -43,7 +44,8 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;

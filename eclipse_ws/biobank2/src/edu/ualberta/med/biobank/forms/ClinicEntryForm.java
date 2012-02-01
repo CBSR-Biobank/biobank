@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.HashSet;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.osgi.util.NLS;
@@ -14,15 +16,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ContactEntryInfoTable;
@@ -30,13 +37,16 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicEntryForm extends AddressEntryFormCommon {
-    public static final String ID = "edu.ualberta.med.biobank.forms.ClinicEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ClinicEntryForm"; //$NON-NLS-1$
 
-    private static final String MSG_NEW_CLINIC_OK = Messages.ClinicEntryForm_creation_msg;
+    private static final String MSG_NEW_CLINIC_OK =
+        Messages.ClinicEntryForm_creation_msg;
 
     private static final String MSG_CLINIC_OK = Messages.ClinicEntryForm_msg_ok;
 
-    private static final String MSG_NO_CLINIC_NAME = Messages.ClinicEntryForm_msg_noClinicName;
+    private static final String MSG_NO_CLINIC_NAME =
+        Messages.ClinicEntryForm_msg_noClinicName;
 
     private ClinicAdapter clinicAdapter;
 
@@ -46,12 +56,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     protected Combo session;
 
-    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BgcEntryFormWidgetListener listener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     private ComboViewer activityStatusComboViewer;
 
@@ -59,14 +70,24 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     private CommentCollectionInfoTable commentEntryTable;
 
+    private CommentWrapper comment;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ClinicAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
         clinicAdapter = (ClinicAdapter) adapter;
-        clinic = (ClinicWrapper) getModelObject();
+        comment = new CommentWrapper(SessionManager.getAppService());
 
+        if (adapter.getId() != null)
+            clinic =
+                new ClinicWrapper(SessionManager.getAppService(),
+                    SessionManager.getAppService().doAction(
+                        new ClinicGetInfoAction(adapter.getId())).clinic);
+        else
+            clinic =
+                new ClinicWrapper(SessionManager.getAppService());
         String tabName;
         if (clinic.isNew()) {
             tabName = Messages.ClinicEntryForm_title_new;
@@ -188,8 +209,19 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             .getAddedOrModifedContacts());
         clinic.removeFromContactCollection(contactEntryWidget
             .getDeletedContacts());
-        clinic.persist();
-        SessionManager.updateAllSimilarNodes(clinicAdapter, true);
+
+        ClinicSaveAction saveClinic = new ClinicSaveAction();
+        saveClinic.setName(clinic.getName());
+        saveClinic.setNameShort(clinic.getNameShort());
+        saveClinic.setActivityStatusId(clinic.getActivityStatus().getId());
+        saveClinic.setSendsShipments(clinic.getSendsShipments());
+        saveClinic.setContactSaveInfos(new HashSet<ContactSaveInfo>());
+        saveClinic.setAddress(clinic.getAddress().getWrappedObject());
+        Integer id =
+            SessionManager.getAppService().doAction(saveClinic).getId();
+        clinic.setId(id);
+        ((AdapterBase) adapter).setModelObject(clinic);
+        // SessionManager.updateAllSimilarNodes(clinicAdapter, true);
         SessionManager.getUser().updateCurrentCenter(clinic);
     }
 

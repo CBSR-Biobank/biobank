@@ -24,6 +24,7 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
             + " FROM " + Clinic.class.getName() + " clinic"
             + " LEFT JOIN FETCH clinic.commentCollection comments"
             + " LEFT JOIN FETCH comments.user"
+            + " LEFT JOIN FETCH clinic.address"
             + " WHERE clinic.id = ?";
 
     @SuppressWarnings("nls")
