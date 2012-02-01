@@ -14,8 +14,6 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.constraint.ConstraintViolationException;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
-import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
@@ -430,15 +428,17 @@ public class TestContainerType extends TestAction {
         Integer containerTypeId =
             EXECUTOR.exec(containerTypeSaveAction).getId();
 
-        ContainerSaveAction containerSaveAction = new ContainerSaveAction();
-        containerSaveAction.setStatusId(ActivityStatusEnum.ACTIVE.getId());
-        containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
-        containerSaveAction.setLabel("01");
-        containerSaveAction.setSiteId(siteId);
-        containerSaveAction.setTypeId(containerTypeId);
-        Integer containerId = EXECUTOR.exec(containerSaveAction).getId();
-        ContainerInfo containerInfo =
-            EXECUTOR.exec(new ContainerGetInfoAction(containerId));
+        // ContainerSaveAction containerSaveAction = new ContainerSaveAction();
+        // containerSaveAction.setStatusId(ActivityStatusEnum.ACTIVE.getId());
+        // containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
+        // containerSaveAction.setLabel("01");
+        // containerSaveAction.setSiteId(siteId);
+        // containerSaveAction.setTypeId(containerTypeId);
+        // Integer containerId = EXECUTOR.exec(containerSaveAction).getId();
+        // ContainerInfo containerInfo =
+        // EXECUTOR.exec(new ContainerGetInfoAction(containerId));
+
+        return null;
     }
 
     @Test
@@ -542,7 +542,8 @@ public class TestContainerType extends TestAction {
 
     @Test
     public void deleteWithContainer() {
-        createTypeWithContainer();
+        Container container = createTypeWithContainer();
+        Integer containerTypeId = container.getContainerType().getId();
 
         try {
             EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeId));

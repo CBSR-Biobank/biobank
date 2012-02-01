@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.action.shipment;
 
+import java.util.HashSet;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -12,6 +13,7 @@ import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.model.Specimen;
 
 /**
  * Retrieve a patient information using a patient id
@@ -57,9 +59,9 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
             Object row = rows.get(0);
 
             sInfo.oi = (OriginInfo) row;
-            sInfo.specimens =
+            sInfo.specimens = new HashSet<Specimen>(
                 new ShipmentGetSpecimenInfosAction(oiId).run(context)
-                    .getList();
+                    .getList());
 
         } else {
             throw new ActionException("No patient found with id:" + oiId); //$NON-NLS-1$

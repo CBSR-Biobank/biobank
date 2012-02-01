@@ -145,7 +145,7 @@ public class TestResearchGroup extends TestAction {
     public void testComment() throws Exception {
         AddressSaveInfo addressSaveInfo =
             new AddressSaveInfo(null, "test", "test", "test", "test", "test",
-                "test", "test", "test", "test", "test");
+                "test", "test", "test", "test");
         ResearchGroupSaveInfo save =
             new ResearchGroupSaveInfo(null, name + "rg", name + "rg",
                 studyId, "comment", addressSaveInfo,

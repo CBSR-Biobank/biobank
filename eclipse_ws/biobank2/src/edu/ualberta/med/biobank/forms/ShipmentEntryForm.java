@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -173,8 +172,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             oiCopy.setCenter(null);
             oiCopy.setReceiverSite(null);
             oiCopy.setShipmentInfo(null);
-            oiCopy.setSpecimenCollection(new ArrayList<Specimen>());
-            oiCopy.setCommentCollection(new ArrayList<Comment>());
+            oiCopy.setSpecimenCollection(new HashSet<Specimen>());
+            oiCopy.setCommentCollection(new HashSet<Comment>());
         } else {
             oiCopy.setId(oiInfo.oi.getId());
             oiCopy.setCenter(oiInfo.oi.getCenter());
