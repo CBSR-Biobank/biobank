@@ -10,10 +10,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
@@ -26,9 +25,9 @@ public class ContainerDisplayWidget extends Canvas {
 
     protected Map<RowColPos, ? extends AbstractUICell> cells;
 
-    protected ContainerWrapper container;
+    protected Container container;
 
-    protected ContainerTypeWrapper containerType;
+    protected ContainerType containerType;
     /**
      * true if we want the container to display full info in each box displayed
      */
@@ -143,34 +142,29 @@ public class ContainerDisplayWidget extends Canvas {
         this.displayFullInfoString = display;
     }
 
-    public void setContainer(ContainerWrapper container) {
+    public void setContainer(Container container) {
         this.container = container;
         if (container != null) {
-            ContainerTypeInfo containerTypeInfo = 
-            ContainerTypeGetInfoAction containerTypeGetInfoAction =
-                new ContainerTypeGetInfoAction(container.getContainerType()
-                    .getId());
-
-            setContainerType(containerTypeInfo.);
+            setContainerType(container.getContainerType());
             containerDisplay.setContainer(container);
         }
     }
 
-    public void setContainerType(ContainerTypeWrapper type) {
+    public void setContainerType(ContainerType type) {
         setContainerType(type, null, false);
     }
 
-    public void setContainerType(ContainerTypeWrapper type, Integer cellSize) {
+    public void setContainerType(ContainerType type, Integer cellSize) {
         setContainerType(type, cellSize, false);
     }
 
-    public void setContainerType(ContainerTypeWrapper type, Integer cellSize,
+    public void setContainerType(ContainerType type, Integer cellSize,
         boolean createDefaultContainer) {
         this.containerType = type;
         initDisplayFromType(createDefaultContainer, cellSize);
     }
 
-    public void setContainerType(ContainerTypeWrapper type,
+    public void setContainerType(ContainerType type,
         boolean createDefaultContainer) {
         this.containerType = type;
         initDisplayFromType(createDefaultContainer);
