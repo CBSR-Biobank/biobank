@@ -373,13 +373,6 @@
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
-				
-	<cache name="edu.ualberta.med.biobank.model.Permission"
-		maxElementsInMemory="500"
-		eternal="false"
-		timeToIdleSeconds="1800"
-		timeToLiveSeconds="100000"
-		overflowToDisk="true"/>
 		
 	<cache name="edu.ualberta.med.biobank.model.Address"
 		maxElementsInMemory="500"
