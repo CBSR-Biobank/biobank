@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.permission.logging;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
-import edu.ualberta.med.biobank.common.permission.PermissionEnum;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 
 public class LoggingPermission implements Permission {
 

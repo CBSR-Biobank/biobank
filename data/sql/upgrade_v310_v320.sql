@@ -153,7 +153,7 @@ CREATE TABLE `user` (
   CONSTRAINT `FK27E3CBFF154DAF` FOREIGN KEY (`PRINCIPAL_ID`) REFERENCES `principal` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
--- add 'Unknown user' which is used in upgrade scripts
+-- add 'Unknown commenter' which is used in upgrade scripts
 insert into principal (id, version) values (1,0);
 
 set @asactive = null;
@@ -161,7 +161,7 @@ set @asactive = null;
 select id from activity_status where name='Active' into @asactive;
 
 insert into user (principal_id, login, csm_user_id, recv_bulk_emails, full_name, email, need_pwd_change,activity_status_id)
-values (1, 'Unknown user', -1, 0, '', '', 0, @asactive);
+values (1, 'Unknown commenter', -1, 0, 'Unknown commenter', '', 0, @asactive);
 
 -- -----------------------------------------------------------------------
 --
@@ -192,7 +192,7 @@ ALTER TABLE event_attr_type ADD CONSTRAINT NAME UNIQUE KEY(NAME);
 -- Comment field changes
 --
 -- Needs to run after User and Principal tables are created since
--- it uses the 'Unknown User' for comments.
+-- it uses the 'Unknown commenter' for comments.
 --
 -- -----------------------------------------------------------------------
 
@@ -524,10 +524,10 @@ ALTER TABLE container DROP FOREIGN KEY FK8D995C61AC528270;
 ALTER TABLE group_user DROP FOREIGN KEY FK6B1EC1AB691634EF, DROP FOREIGN KEY FK6B1EC1ABB9634A05;
 ALTER TABLE membership_permission DROP FOREIGN KEY FK1350F1D8D26ABDE5, DROP FOREIGN KEY FK1350F1D8F196CF45;
 ALTER TABLE role_permission DROP FOREIGN KEY FK9C6EC938F196CF45, DROP FOREIGN KEY FK9C6EC93814388625;
-DROP TABLE abstract_position;
 DROP TABLE bb_group;
-DROP TABLE permission;
 DROP TABLE user;
+DROP TABLE abstract_position;
+DROP TABLE permission;
 ALTER TABLE address DROP COLUMN NAME;
 ALTER TABLE collection_event DROP KEY uc_ce_visit_number;
 ALTER TABLE container DROP KEY uc_c_label, DROP KEY uc_c_productbarcode;
@@ -625,6 +625,11 @@ ALTER TABLE principal
 
 ALTER TABLE principal
       ADD CONSTRAINT FK3A16800EC449A4 FOREIGN KEY FK3A16800EC449A4 (ACTIVITY_STATUS_ID) REFERENCES activity_status (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+-- upgrade the unknown commenter user
+UPDATE principal
+       SET discriminator='User'
+       WHERE id=1;
 
 ALTER TABLE comment MODIFY COLUMN MESSAGE TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL;
 ALTER TABLE jasper_template MODIFY COLUMN XML TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL;

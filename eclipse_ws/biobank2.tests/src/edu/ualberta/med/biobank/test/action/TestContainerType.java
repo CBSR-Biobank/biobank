@@ -546,7 +546,8 @@ public class TestContainerType extends TestAction {
 
     @Test
     public void deleteWithContainer() {
-        createTypeWithContainer();
+        Container container = createTypeWithContainer();
+        Integer containerTypeId = container.getContainerType().getId();
 
         try {
             EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeId));

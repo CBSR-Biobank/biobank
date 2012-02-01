@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.common.action.info;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.model.OriginInfo;
@@ -11,6 +11,6 @@ public class ShipmentReadInfo implements ActionResult {
     private static final long serialVersionUID = 1L;
 
     public OriginInfo oi;
-    public Collection<Specimen> specimens = new HashSet<Specimen>();
+    public Set<Specimen> specimens = new HashSet<Specimen>();
 
 }

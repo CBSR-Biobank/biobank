@@ -5,8 +5,8 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.info.RequestSpecimenInfo;
 import edu.ualberta.med.biobank.common.permission.Permission;
-import edu.ualberta.med.biobank.common.permission.PermissionEnum;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 
 public class UpdateRequestPermission implements Permission {

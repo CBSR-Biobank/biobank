@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.dispatch;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -96,8 +95,7 @@ public class DispatchSaveAction implements Action<IdResult> {
 
         // spawned from a request?
         Request request = context.get(Request.class, dInfo.requestId);
-        Collection<Dispatch> dispatches =
-            request.getDispatchCollection();
+        Set<Dispatch> dispatches = request.getDispatchCollection();
         dispatches.add(disp);
         request.setDispatchCollection(dispatches);
         context.getSession().saveOrUpdate(request);
