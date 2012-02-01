@@ -142,8 +142,8 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     public int compareTo(AbstractAdapterBase o) {
         if (o instanceof CollectionEventAdapter) {
             CollectionEventAdapter ce2 = (CollectionEventAdapter) o;
-            return ceventInfo.cevent.visitNumber
-                .compareTo(ce2.ceventInfo.cevent.visitNumber);
+            return ceventInfo.cevent.getVisitNumber()
+                .compareTo(ce2.ceventInfo.cevent.getVisitNumber());
         }
         return 0;
     }

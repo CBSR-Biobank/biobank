@@ -234,8 +234,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
             if (obj instanceof AbstractBiobankListProxy)
                 ((AbstractBiobankListProxy<?>) obj).setAppService(as);
 
-            if (!field.getType().getName()
-                .equalsIgnoreCase("java.util.Collection")) { //$NON-NLS-1$
+            if (!Collection.class.isAssignableFrom(field.getType())) { //$NON-NLS-1$
                 Collection<?> results = (Collection<?>) obj;
                 if (results.size() == 1)
                     value = results.iterator().next();

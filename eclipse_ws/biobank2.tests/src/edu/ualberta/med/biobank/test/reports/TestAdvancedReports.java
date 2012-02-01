@@ -148,7 +148,7 @@ public class TestAdvancedReports extends TestDatabase {
         for (FilterOperator op : ops) {
             filter.setOperator(op.getId());
 
-            Collection<ReportFilterValue> values = new HashSet<ReportFilterValue>();
+            Set<ReportFilterValue> values = new HashSet<ReportFilterValue>();
             if (op.isValueRequired()) {
                 ReportFilterValue value = getReportFilterValue(op, propertyType);
                 values.add(value);

@@ -10,10 +10,10 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.model.Membership;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -195,18 +195,14 @@ public class TestUser extends TestDatabase {
         String name = "testAddMembershipsWithPermission" + r.nextInt();
         UserWrapper user = UserHelper.addUser(name, null, true);
 
-        PermissionWrapper perm = new PermissionWrapper(appService);
-        perm.setClassName(name);
-        perm.persist();
-
         MembershipWrapper ms = MembershipHelper.newMembership(user, null, null);
-        ms.addToPermissionCollection(Arrays.asList(perm));
+        ms.addToPermissionCollection(Arrays.asList(PermissionEnum.ADMINISTRATION));
         user.persist();
 
         user.reload();
         Assert.assertEquals(1, user.getMembershipCollection(false).size());
         ms = user.getMembershipCollection(false).get(0);
-        Assert.assertEquals(1, ms.getPermissionCollection(false).size());
+        Assert.assertEquals(1, ms.getPermissionCollection().size());
     }
 
     @Test

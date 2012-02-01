@@ -1,7 +1,10 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.Collection;
+
 import edu.ualberta.med.biobank.common.wrappers.base.MembershipBaseWrapper;
 import edu.ualberta.med.biobank.model.Membership;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class MembershipWrapper extends MembershipBaseWrapper {
@@ -45,7 +48,7 @@ public class MembershipWrapper extends MembershipBaseWrapper {
         newMs.setCenter(getCenter());
         newMs.setStudy(getStudy());
         newMs.addToRoleCollection(getRoleCollection(false));
-        newMs.addToPermissionCollection(getPermissionCollection(false));
+        newMs.addToPermissionCollection(getPermissionCollection());
         return newMs;
     }
 
@@ -61,5 +64,18 @@ public class MembershipWrapper extends MembershipBaseWrapper {
                 return true;
         }
         return false;
+    }
+
+    public void addToPermissionCollection(Collection<PermissionEnum> addedPermissions) {
+        wrappedObject.getPermissionCollection().addAll(addedPermissions);
+    }
+
+    public void removeFromPermissionCollection(
+        Collection<PermissionEnum> removedPermissions) {
+        wrappedObject.getPermissionCollection().removeAll(removedPermissions);
+    }
+
+    public Collection<PermissionEnum> getPermissionCollection() {
+        return wrappedObject.getPermissionCollection();
     }
 }

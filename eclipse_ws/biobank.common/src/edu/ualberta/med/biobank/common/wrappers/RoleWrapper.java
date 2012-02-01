@@ -1,11 +1,13 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.RoleBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.RolePreDeleteChecks;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -53,7 +55,7 @@ public class RoleWrapper extends RoleBaseWrapper {
     public RoleWrapper duplicate() {
         RoleWrapper newRole = new RoleWrapper(appService);
         newRole.setName(getName());
-        newRole.addToPermissionCollection(getPermissionCollection(false));
+        newRole.addToPermissionCollection(getPermissionCollection());
         return newRole;
     }
 
@@ -65,4 +67,16 @@ public class RoleWrapper extends RoleBaseWrapper {
         super.addDeleteTasks(tasks);
     }
 
+    public void addToPermissionCollection(Collection<PermissionEnum> addedPermissions) {
+        wrappedObject.getPermissionCollection().addAll(addedPermissions);
+    }
+
+    public void removeFromPermissionCollection(
+        List<PermissionEnum> removedPermissions) {
+        wrappedObject.getPermissionCollection().removeAll(removedPermissions);
+    }
+
+    public Collection<PermissionEnum> getPermissionCollection() {
+        return wrappedObject.getPermissionCollection();
+    }
 }

@@ -20,8 +20,8 @@ public class MessageGenerator {
     }
 
     public static String generateStringMessage(Log log) {
-        return generateStringMessage(log.action, log.center, log.patientNumber,
-            log.inventoryId, log.locationLabel, log.details, log.type);
+        return generateStringMessage(log.getAction(), log.getCenter(), log.getPatientNumber(),
+            log.getInventoryId(), log.getLocationLabel(), log.getDetails(), log.getType());
     }
 
     private static void append(StringBuffer sb, String property, String value) {

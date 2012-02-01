@@ -3,15 +3,15 @@ package edu.ualberta.med.biobank.widgets.trees.permission;
 import java.util.Collection;
 import java.util.Collections;
 
-import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 
 public class PermissionNode implements IPermissionCheckTreeNode {
 
-    private PermissionWrapper permission;
+    private PermissionEnum permission;
     private IPermissionCheckTreeNode parent;
 
     public PermissionNode(IPermissionCheckTreeNode parent,
-        PermissionWrapper permission) {
+        PermissionEnum permission) {
         this.parent = parent;
         this.permission = permission;
     }
@@ -21,13 +21,14 @@ public class PermissionNode implements IPermissionCheckTreeNode {
         return parent;
     }
 
-    public PermissionWrapper getPermission() {
+    public PermissionEnum getPermission() {
         return permission;
     }
 
     @Override
     public String getText() {
-        return permission.getClassName();
+        // TODO: localize
+        return permission.name();
     }
 
     @Override
@@ -39,7 +40,7 @@ public class PermissionNode implements IPermissionCheckTreeNode {
         return false;
     }
 
-    public void setPermission(PermissionWrapper p) {
+    public void setPermission(PermissionEnum p) {
         this.permission = p;
     }
 

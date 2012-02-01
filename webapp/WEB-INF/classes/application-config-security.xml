@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	
+	<bean id="authenticationManager" class="org.acegisecurity.providers.ProviderManager">
+		<property name="providers">
+			<list>
+				
+				<ref bean="csmAuthenticationProvider"/>
+				
+				<!--
+				<ref bean="gridAuthenticationProvider"/>
+				-->
+				<ref bean="x509AuthenticationProvider"/>
+				<bean class="gov.nih.nci.system.security.acegi.authentication.NullGroupNameAuthenticationProvider"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="x509AuthenticationProvider" class="org.acegisecurity.providers.x509.X509AuthenticationProvider">
+		<property name="x509AuthoritiesPopulator">
+			<bean class="gov.nih.nci.system.security.acegi.authentication.CSMX509AuthoritiesPopulator">
+				<property name="userDetailsService" ref="userDetailsService"/>
+			</bean>
+		</property>
+		<property name="x509UserCache">
+			<bean class="org.acegisecurity.providers.x509.cache.EhCacheBasedX509UserCache">
+				<property name="cache">
+					<bean class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+						<property name="cacheManager">
+							<bean class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" />
+						</property>
+						<property name="timeToLive" value="100000" />
+						<property name="timeToIdle" value="1800" />
+						<property name="cacheName" value="x509UserCache" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="gridAuthenticationProvider" class="gov.nih.nci.system.security.acegi.authentication.GridAuthenticationProvider">
+		<property name="loginModule" value="grid"/>
+		<property name="x509AuthenticationProvider">
+			<ref bean="x509AuthenticationProvider"/>
+		</property>
+		<property name="userCache">
+			<bean class="org.acegisecurity.providers.dao.cache.EhCacheBasedUserCache">
+				<property name="cache">
+					<bean class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+						<property name="cacheManager">
+							<bean class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" />
+						</property>
+						<property name="timeToLive" value="100000" />
+						<property name="timeToIdle" value="1800" />
+						<property name="cacheName" value="userCache" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="csmAuthenticationProvider" class="edu.ualberta.med.biobank.server.security.BiobankAuthenticationProvider">
+		<property name="userDetailsService">
+			<ref bean="userDetailsService"/>
+		</property>
+		<property name="userCache">
+			<bean class="org.acegisecurity.providers.dao.cache.EhCacheBasedUserCache">
+				<property name="cache">
+					<bean class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+						<property name="cacheManager">
+							<bean class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" />
+						</property>
+						<property name="timeToLive" value="100000" />
+						<property name="timeToIdle" value="1800" />
+						<property name="cacheName" value="userCache" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean name="userDetailsService" class="gov.nih.nci.system.security.acegi.authentication.CSMUserDetailsService">
+		<property name="csmApplicationContext" value="biobank" />
+		<property name="cacheProtectionElementsFlag" value="false" />
+	</bean>
+
+	<bean id="loggerListener" class="org.acegisecurity.event.authentication.LoggerListener"/>
+ 
+	<bean id='autoProxyCreator' class='org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator'>
+		<property name='interceptorNames'>
+			<list><value>securityInterceptor</value></list>
+		</property>
+		<property name='beanNames'>
+			<list><value>ApplicationServiceImpl</value></list>
+		</property>
+	</bean>
+	
+	<bean id='securityInterceptor' class="org.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">		
+		<property name='authenticationManager' ref='authenticationManager'/>
+		<property name='accessDecisionManager' ref='accessDecisionManager'/>
+		<property name='objectDefinitionSource'>
+			<value>
+				gov.nih.nci.system.applicationservice.ApplicationService.*=DUMMYVALUE
+				gov.nih.nci.system.applicationservice.WritableApplicationService.*=DUMMYVALUE
+				edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService.*=DUMMYVALUE
+			</value>
+		</property>
+	</bean>
+
+	<bean id='accessDecisionManager' class='org.acegisecurity.vote.AffirmativeBased'>
+		<property name='decisionVoters'>
+			<list>
+				<bean class='gov.nih.nci.system.security.acegi.authorization.CSMRoleVoter'>
+					<property name="userDetailsService" ref="userDetailsService"/>
+					<property name="applicationServiceMethodHelperClass" value="edu.ualberta.med.biobank.server.applicationservice.helper.BiobankApiApplicationServiceMethodHelper" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+</beans>

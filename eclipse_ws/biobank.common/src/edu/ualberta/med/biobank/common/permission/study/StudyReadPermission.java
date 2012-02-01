@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.permission.study;
 
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
-import edu.ualberta.med.biobank.common.permission.PermissionEnum;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Study;
 
 public class StudyReadPermission implements Permission {

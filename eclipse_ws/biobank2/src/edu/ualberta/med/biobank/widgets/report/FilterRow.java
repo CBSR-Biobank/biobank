@@ -10,6 +10,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
@@ -86,7 +87,7 @@ class FilterRow extends Composite {
         }
     }
 
-    public Collection<ReportFilterValue> getValues() {
+    public Set<ReportFilterValue> getValues() {
         if (filterValueWidget != null) {
             return new HashSet<ReportFilterValue>(filterValueWidget.getValues());
         }
@@ -406,7 +407,7 @@ class FilterRow extends Composite {
         Entity entity = filtersWidget.getReport().getEntity()
             .getWrappedObject();
 
-        Collection<ReportFilter> reportFilters = new HashSet<ReportFilter>();
+        Set<ReportFilter> reportFilters = new HashSet<ReportFilter>();
         for (ReportFilter filter : filtersWidget.getReportFilters()) {
             if (filter.getEntityFilter().equals(this.filter)) {
                 // do not include the filter we're finding suggestions for

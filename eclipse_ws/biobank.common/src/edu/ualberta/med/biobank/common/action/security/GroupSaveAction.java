@@ -50,7 +50,7 @@ public class GroupSaveAction extends PrincipalSaveAction {
 
         // remove this group from users in removed list
         for (User user : usersDiff.getRemoveSet()) {
-            Collection<BbGroup> userGroups = user.getGroupCollection();
+            Set<BbGroup> userGroups = user.getGroupCollection();
             if (userGroups.remove(user)) {
                 user.setGroupCollection(userGroups);
             } else {

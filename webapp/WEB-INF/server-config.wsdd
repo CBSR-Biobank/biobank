@@ -1,0 +1,91 @@
+<deployment xmlns="http://xml.apache.org/axis/wsdd/"
+	xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+<handler name="LocalResponder" type="java:org.apache.axis.transport.local.LocalResponder"/>
+<handler name="URLMapper" type="java:org.apache.axis.handlers.http.URLMapper"/>
+<handler name="Authenticate" type="java:org.apache.axis.handlers.SimpleAuthenticationHandler"/>
+<handler name="SecuritySOAPHandler" type="java:gov.nih.nci.system.webservice.interceptor.ACEGISOAPHandler"/>
+<service name="AdminService" provider="java:MSG">
+  <parameter name="allowedMethods" value="AdminService"/>
+  <parameter name="enableRemoteAdmin" value="false"/>
+  <parameter name="className" value="org.apache.axis.utils.Admin"/>
+  <namespace>http://xml.apache.org/axis/wsdd/</namespace>
+</service>
+<service name="Version" provider="java:RPC">
+  <parameter name="allowedMethods" value="getVersion"/>
+  <parameter name="className" value="org.apache.axis.Version"/>
+</service>
+<service name="biobankService" style="java:RPC" use="literal">
+	<requestFlow>
+		<handler type="SecuritySOAPHandler" />
+	</requestFlow>
+	<parameter name="className" value="gov.nih.nci.system.webservice.WSQueryImpl"/>
+	<parameter name="allowedMethods" value="*"/>
+	<parameter name="extraClasses"
+	value="edu.ualberta.med.biobank.model.PropertyModifier,edu.ualberta.med.biobank.model.ShipmentInfo,edu.ualberta.med.biobank.model.StudyEventAttr,edu.ualberta.med.biobank.model.Log,edu.ualberta.med.biobank.model.Contact,edu.ualberta.med.biobank.model.EntityFilter,edu.ualberta.med.biobank.model.ContainerPosition,edu.ualberta.med.biobank.model.OriginInfo,edu.ualberta.med.biobank.model.Membership,edu.ualberta.med.biobank.model.AbstractPosition,edu.ualberta.med.biobank.model.Entity,edu.ualberta.med.biobank.model.SpecimenType,edu.ualberta.med.biobank.model.EntityProperty,edu.ualberta.med.biobank.model.ActivityStatus,edu.ualberta.med.biobank.model.Study,edu.ualberta.med.biobank.model.ContainerType,edu.ualberta.med.biobank.model.ProcessingEvent,edu.ualberta.med.biobank.model.Capacity,edu.ualberta.med.biobank.model.ShippingMethod,edu.ualberta.med.biobank.model.DispatchSpecimen,edu.ualberta.med.biobank.model.RequestSpecimen,edu.ualberta.med.biobank.model.Site,edu.ualberta.med.biobank.model.Principal,edu.ualberta.med.biobank.model.Address,edu.ualberta.med.biobank.model.Patient,edu.ualberta.med.biobank.model.PrintedSsInvItem,edu.ualberta.med.biobank.model.Center,edu.ualberta.med.biobank.model.ReportFilterValue,edu.ualberta.med.biobank.model.GlobalEventAttr,edu.ualberta.med.biobank.model.EventAttr,edu.ualberta.med.biobank.model.Clinic,edu.ualberta.med.biobank.model.CollectionEvent,edu.ualberta.med.biobank.model.EntityColumn,edu.ualberta.med.biobank.model.ReportColumn,edu.ualberta.med.biobank.model.Role,edu.ualberta.med.biobank.model.SourceSpecimen,edu.ualberta.med.biobank.model.SpecimenPosition,edu.ualberta.med.biobank.model.Dispatch,edu.ualberta.med.biobank.model.PrinterLabelTemplate,edu.ualberta.med.biobank.model.AliquotedSpecimen,edu.ualberta.med.biobank.model.ReportFilter,edu.ualberta.med.biobank.model.Comment,edu.ualberta.med.biobank.model.EventAttrType,edu.ualberta.med.biobank.model.Request,edu.ualberta.med.biobank.model.Container,edu.ualberta.med.biobank.model.Report,edu.ualberta.med.biobank.model.BbGroup,edu.ualberta.med.biobank.model.Specimen,edu.ualberta.med.biobank.model.PropertyType,edu.ualberta.med.biobank.model.JasperTemplate,edu.ualberta.med.biobank.model.ContainerLabelingScheme,edu.ualberta.med.biobank.model.ResearchGroup,edu.ualberta.med.biobank.model.User"/>	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:PropertyModifier" languageSpecificType="java:edu.ualberta.med.biobank.model.PropertyModifier" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:ShipmentInfo" languageSpecificType="java:edu.ualberta.med.biobank.model.ShipmentInfo" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:StudyEventAttr" languageSpecificType="java:edu.ualberta.med.biobank.model.StudyEventAttr" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Log" languageSpecificType="java:edu.ualberta.med.biobank.model.Log" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Contact" languageSpecificType="java:edu.ualberta.med.biobank.model.Contact" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:EntityFilter" languageSpecificType="java:edu.ualberta.med.biobank.model.EntityFilter" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:ContainerPosition" languageSpecificType="java:edu.ualberta.med.biobank.model.ContainerPosition" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:OriginInfo" languageSpecificType="java:edu.ualberta.med.biobank.model.OriginInfo" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Membership" languageSpecificType="java:edu.ualberta.med.biobank.model.Membership" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:AbstractPosition" languageSpecificType="java:edu.ualberta.med.biobank.model.AbstractPosition" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Entity" languageSpecificType="java:edu.ualberta.med.biobank.model.Entity" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:SpecimenType" languageSpecificType="java:edu.ualberta.med.biobank.model.SpecimenType" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:EntityProperty" languageSpecificType="java:edu.ualberta.med.biobank.model.EntityProperty" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:ActivityStatus" languageSpecificType="java:edu.ualberta.med.biobank.model.ActivityStatus" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Study" languageSpecificType="java:edu.ualberta.med.biobank.model.Study" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:ContainerType" languageSpecificType="java:edu.ualberta.med.biobank.model.ContainerType" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:ProcessingEvent" languageSpecificType="java:edu.ualberta.med.biobank.model.ProcessingEvent" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Capacity" languageSpecificType="java:edu.ualberta.med.biobank.model.Capacity" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:ShippingMethod" languageSpecificType="java:edu.ualberta.med.biobank.model.ShippingMethod" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:DispatchSpecimen" languageSpecificType="java:edu.ualberta.med.biobank.model.DispatchSpecimen" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:RequestSpecimen" languageSpecificType="java:edu.ualberta.med.biobank.model.RequestSpecimen" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Site" languageSpecificType="java:edu.ualberta.med.biobank.model.Site" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Principal" languageSpecificType="java:edu.ualberta.med.biobank.model.Principal" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Address" languageSpecificType="java:edu.ualberta.med.biobank.model.Address" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Patient" languageSpecificType="java:edu.ualberta.med.biobank.model.Patient" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:PrintedSsInvItem" languageSpecificType="java:edu.ualberta.med.biobank.model.PrintedSsInvItem" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Center" languageSpecificType="java:edu.ualberta.med.biobank.model.Center" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:ReportFilterValue" languageSpecificType="java:edu.ualberta.med.biobank.model.ReportFilterValue" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:GlobalEventAttr" languageSpecificType="java:edu.ualberta.med.biobank.model.GlobalEventAttr" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:EventAttr" languageSpecificType="java:edu.ualberta.med.biobank.model.EventAttr" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Clinic" languageSpecificType="java:edu.ualberta.med.biobank.model.Clinic" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:CollectionEvent" languageSpecificType="java:edu.ualberta.med.biobank.model.CollectionEvent" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:EntityColumn" languageSpecificType="java:edu.ualberta.med.biobank.model.EntityColumn" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:ReportColumn" languageSpecificType="java:edu.ualberta.med.biobank.model.ReportColumn" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Role" languageSpecificType="java:edu.ualberta.med.biobank.model.Role" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:SourceSpecimen" languageSpecificType="java:edu.ualberta.med.biobank.model.SourceSpecimen" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:SpecimenPosition" languageSpecificType="java:edu.ualberta.med.biobank.model.SpecimenPosition" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Dispatch" languageSpecificType="java:edu.ualberta.med.biobank.model.Dispatch" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:PrinterLabelTemplate" languageSpecificType="java:edu.ualberta.med.biobank.model.PrinterLabelTemplate" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:AliquotedSpecimen" languageSpecificType="java:edu.ualberta.med.biobank.model.AliquotedSpecimen" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:ReportFilter" languageSpecificType="java:edu.ualberta.med.biobank.model.ReportFilter" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Comment" languageSpecificType="java:edu.ualberta.med.biobank.model.Comment" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:EventAttrType" languageSpecificType="java:edu.ualberta.med.biobank.model.EventAttrType" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Request" languageSpecificType="java:edu.ualberta.med.biobank.model.Request" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Container" languageSpecificType="java:edu.ualberta.med.biobank.model.Container" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Report" languageSpecificType="java:edu.ualberta.med.biobank.model.Report" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:BbGroup" languageSpecificType="java:edu.ualberta.med.biobank.model.BbGroup" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:Specimen" languageSpecificType="java:edu.ualberta.med.biobank.model.Specimen" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:PropertyType" languageSpecificType="java:edu.ualberta.med.biobank.model.PropertyType" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:JasperTemplate" languageSpecificType="java:edu.ualberta.med.biobank.model.JasperTemplate" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:ContainerLabelingScheme" languageSpecificType="java:edu.ualberta.med.biobank.model.ContainerLabelingScheme" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:ResearchGroup" languageSpecificType="java:edu.ualberta.med.biobank.model.ResearchGroup" />	
+	<beanMapping xmlns:myNS="urn:model.biobank.med.ualberta.edu"  qname="myNS:User" languageSpecificType="java:edu.ualberta.med.biobank.model.User" />		
+	<beanMapping xmlns:myNS="urn:Character.lang.java"  qname="myNS:Character" languageSpecificType="java:java.lang.Character" />		
+</service>
+<transport name="http">
+  <requestFlow>
+   <handler type="URLMapper"/>
+   <handler type="java:org.apache.axis.handlers.http.HTTPAuthHandler"/>
+  </requestFlow>
+</transport>
+<transport name="local">
+  <responseFlow>
+   <handler type="LocalResponder"/>
+  </responseFlow>
+</transport>
+</deployment>

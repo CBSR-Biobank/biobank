@@ -211,7 +211,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
                     .getAddress().getEmailAddress(),
                 researchGroup.getAddress().getPhoneNumber(), researchGroup
                     .getAddress().getFaxNumber(), researchGroup.getAddress()
-                    .getCountry(), researchGroup.getAddress().getName());
+                    .getCountry());
         ResearchGroupSaveInfo info =
             new ResearchGroupSaveInfo(researchGroup.getId(),
                 researchGroup.getName(), researchGroup.getNameShort(),

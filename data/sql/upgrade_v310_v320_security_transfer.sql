@@ -7,19 +7,20 @@ set @asactive = null;
 
 select id from activity_status where name='Active' into @asactive;
 
-insert into principal (id, version)
-select user_id + 10, 0 from csm_user where login_name != 'administrator' and login_name != 'bbadmin';
-
-insert into user (principal_id, login, csm_user_id, recv_bulk_emails, full_name, email, need_pwd_change, activity_status_id)
-       select user_id + 10, login_name, user_id, 1, concat(first_name, ' ', last_name), email_id, 0, @asactive
+insert into principal (id, version, discriminator, login, csm_user_id, recv_bulk_emails, full_name, email, need_pwd_change, activity_status_id)
+       select user_id + 10, 0, 'User', login_name, user_id, 1, concat(first_name, ' ', last_name), email_id, 0, @asactive
        from csm_user
        where login_name != 'administrator'
        and login_name != 'bbadmin';
 
+set @group_super_admin = null;
+
+select id from principal where name='Super Administrators' into @group_super_admin;
+
 -- Old super admin group_id was 5 in csm database. Add previous super admin users in new super admin group:
 insert into group_user(user_id, group_id)
-select u.principal_id, g.principal_id from user u, bb_group g, csm_user_group ug
-where ug.group_id = 5 and ug.user_id = u.csm_user_id and g.name='Super Administrators';
+select u.id, @group_super_admin from principal u, csm_user_group ug
+where ug.group_id = 5 and ug.user_id = u.csm_user_id and u.discriminator='User';
 
 -- give access to all object to all users (in csm):
 insert into csm_user_group_role_pg (user_id, role_id, protection_group_id, update_date)
