@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="biobank" basedir="." default="deploy">
   <!--
-  Overall build file
-  use command "ant -projecthelp" to display the targets.
+      Overall build file
+      use command "ant -projecthelp" to display the targets.
 
-  Local Variables:
-  compile-command: "export JBOSS_HOME=$HOME/apps/jboss-4.0.5.GA"
-  End:
+Local Variables:
+compile-command: "export JBOSS_HOME=$HOME/apps/jboss-4.0.5.GA"
+End:
   -->
 
   <exec executable="hostname" outputproperty="host.name">
@@ -18,13 +18,14 @@
   <!-- TODO: move as many properties as possible into build.properties -->
   <!-- TODO: add tasks to push database properties to various files -->
   <!-- TODO: create a cacore directory with all the cacore stuff in it
-  that we can throw into the war file and use to create the database --> 
+       that we can throw into the war file and use to create the database -->
   <property file="build.properties" />
- 
+
   <!-- must use a property with a LOCATION attribute because it is converted
        to be an absolute value, which the product builder seems to require in
        order to load its build.properties in product/build.properties -->
   <property name="product.dir" location="product" />
+  <property name="buildDirectory" value="${product.dir}/buildDirectory" />
 
   <import file="build-db.xml"/>
 
@@ -84,35 +85,35 @@
   <!-- Eclipse -->
   <target name="biobank-product-version-modify">
     <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
-      prefix="biobank2.product" />
+              prefix="biobank2.product" />
     <xslt in="${eclipse.proj.dir}/biobank2.product" out="${tmp.file}"
-      style="scripts/biobank-product.xsl">
+          style="scripts/biobank-product.xsl">
       <param name="version" expression="${java.client.version.num}" />
     </xslt>
     <copy file="${tmp.file}" tofile="${eclipse.proj.dir}/biobank2.product"
-      overwrite="true"/>
+          overwrite="true"/>
   </target>
 
   <target name="biobank-feature-core-version-modify">
     <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
-      prefix="biobank2.feature.core" />
+              prefix="biobank2.feature.core" />
     <xslt in="${eclipse.workspace.dir}/biobank2.feature.core/feature.xml" out="${tmp.file}"
-      style="scripts/biobank-feature.xsl">
+          style="scripts/biobank-feature.xsl">
       <param name="version" expression="${java.client.version.num}" />
     </xslt>
     <copy file="${tmp.file}" tofile="${eclipse.workspace.dir}/biobank2.feature.core/feature.xml"
-      overwrite="true"/>
+          overwrite="true"/>
   </target>
 
   <target name="biobank-feature-platform-version-modify">
     <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
-    prefix="biobank2.feature.platform" />
+              prefix="biobank2.feature.platform" />
     <xslt in="${eclipse.workspace.dir}/biobank2.feature.platform/feature.xml" out="${tmp.file}"
-      style="scripts/biobank-feature.xsl">
+          style="scripts/biobank-feature.xsl">
       <param name="version" expression="${java.client.version.num}" />
     </xslt>
     <copy file="${tmp.file}" tofile="${eclipse.workspace.dir}/biobank2.feature.platform/feature.xml"
-      overwrite="true"/>
+          overwrite="true"/>
   </target>
 
   <target name="biobank-version-modify">
@@ -139,8 +140,6 @@
   <target name="deploy-eclipse"
           depends="java-client-manifest,biobank-version-modify"
           description="deploys the caCORE SDK beans to the eclipse project">
-      <echo message="${req.jars.dir}/asm.jar" />
-      <echo message="${eclipse.proj.dir.common}/lib/client"/>
     <copy todir="${eclipse.proj.dir.common}/lib/client" overwrite="true">
       <fileset dir="${req.jars.dir}">
         <include name="acegi-security-1.0.4.jar" />
@@ -460,7 +459,7 @@
   </target>
 
   <target name="clean"
-          depends="clean-tests,clean-jars"
+          depends="clean-tests,clean-jars,clean-product"
           description="cleans project output, tests, and jars">
     <delete dir="${buildDirectory}" />
     <delete dir="${eclipse.proj.dir.common}/output" />
@@ -497,19 +496,19 @@
     <mkdir dir="${test.output.raw}" />
   </target>
 
-	<!---->
+  <!---->
   <target name="tests-compile" depends="build-common-project,prepare" >
     <copy includeemptydirs="false"
-  	      todir="${test.build.dir}" overwrite="true">
-  	  <fileset dir="${eclipse.proj.dir.tests}/src">
-  	    <exclude name="**/*.launch" />
-  	    <exclude name="**/*.java" />
-  	  </fileset>
+          todir="${test.build.dir}" overwrite="true">
+      <fileset dir="${eclipse.proj.dir.tests}/src">
+        <exclude name="**/*.launch" />
+        <exclude name="**/*.java" />
+      </fileset>
       <fileset dir="${eclipse.proj.dir.tools}/src">
     	<exclude name="**/*.launch" />
     	<exclude name="**/*.java" />
       </fileset>
-  	</copy>
+    </copy>
     <javac destdir="${test.build.dir}"
            debug="true"
            debuglevel="lines,source"
@@ -622,18 +621,21 @@
   </target>
 
 
-  <target name="product" depends="biobank-version-modify,eclipse.home.env,deploy" description="build the product">
-  	<!-- buildDirectory is the folder where the plugins and products are found and build -->
-    <property name="buildDirectory" value="${product.dir}/buildDirectory" />
+  <target name="clean-product">
     <delete dir="${buildDirectory}" />
-  	<!-- plugins and features are copied into the buildDirectory -->
+  </target>
+
+
+  <target name="product" depends="clean-product,biobank-version-modify,eclipse.home.env,deploy" description="build the product">
+    <!-- buildDirectory is the folder where the plugins and products are found and build -->
+    <!-- plugins and features are copied into the buildDirectory -->
     <copy todir="${buildDirectory}/plugins/biobank2">
       <fileset dir="${eclipse.workspace.dir}/biobank2" />
     </copy>
-  	<!-- TODO : copy all project containing .nl1. into the plugins folder -->
-  	<copy todir="${buildDirectory}/plugins/biobank.nl1.fr_CA">
-  	      <fileset dir="${eclipse.workspace.dir}/biobank.nl1.fr_CA" />
-  	</copy>
+    <!-- TODO : copy all project containing .nl1. into the plugins folder -->
+    <copy todir="${buildDirectory}/plugins/biobank.nl1.fr_CA">
+      <fileset dir="${eclipse.workspace.dir}/biobank.nl1.fr_CA" />
+    </copy>
     <copy todir="${buildDirectory}/plugins/biobank.mvp">
       <fileset dir="${eclipse.workspace.dir}/biobank.mvp" />
     </copy>
@@ -673,16 +675,16 @@
       <fileset refid="pde.build.id.all" />
     </last>
 
-      <echo message="-application org.eclipse.ant.core.antRunner" />
-      <echo message="-buildfile ${toString:pde.build.id}" />
-      <echo message="-Dbuilder=${product.dir}" />
-      <!-- product.dir is used in product/customTarget.xml -->
-      <echo message="-Dproduct.dir=${product.dir}" />
-      <!-- instead of fixed paths in product/build.properties: -->
-      <echo message="-Dproduct=${eclipse.proj.dir}/biobank2.product" />
-      <echo message="-DbuildDirectory=${product.dir}/buildDirectory" />
-      <echo message="-DbaseLocation=${env.ECLIPSE_HOME}" />
-      <echo message="-Djava.client.version.num=${java.client.version.num}" />
+    <echo message="-application org.eclipse.ant.core.antRunner" />
+    <echo message="-buildfile ${toString:pde.build.id}" />
+    <echo message="-Dbuilder=${product.dir}" />
+    <!-- product.dir is used in product/customTarget.xml -->
+    <echo message="-Dproduct.dir=${product.dir}" />
+    <!-- instead of fixed paths in product/build.properties: -->
+    <echo message="-Dproduct=${eclipse.proj.dir}/biobank2.product" />
+    <echo message="-DbuildDirectory=${product.dir}/buildDirectory" />
+    <echo message="-DbaseLocation=${env.ECLIPSE_HOME}" />
+    <echo message="-Djava.client.version.num=${java.client.version.num}" />
 
 
     <!-- launch product creation -->
