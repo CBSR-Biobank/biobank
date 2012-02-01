@@ -13,7 +13,7 @@ public class ResearchGroupHelper extends Helper {
         String name, String nameShort, Integer studyId) throws Exception {
         AddressSaveInfo addressSaveInfo =
             new AddressSaveInfo(null, "test", "test", "test", "test", "test",
-                "test", "test", "test", "test", "test");
+                "test", "test", "test", "test");
         ResearchGroupSaveInfo save =
             new ResearchGroupSaveInfo(null, name + "rg", name + "rg",
                 studyId, "comment", addressSaveInfo,

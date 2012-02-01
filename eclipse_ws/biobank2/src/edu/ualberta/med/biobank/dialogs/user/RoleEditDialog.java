@@ -9,12 +9,12 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.RolePeer;
-import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget;
 import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget.PermissionTreeRes;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -66,9 +66,8 @@ public class RoleEditDialog extends BgcBaseDialog {
             RolePeer.NAME.getName(), new NonEmptyStringValidator(
                 Messages.RoleEditDialog_msg_name_required));
 
-        tree = new PermissionCheckTreeWidget(contents, true,
-            PermissionWrapper.getAllPermissions(SessionManager.getAppService()));
-        tree.setSelections(role.getPermissionCollection(false));
+        tree = new PermissionCheckTreeWidget(contents, true, PermissionEnum.valuesList());
+        tree.setSelections(role.getPermissionCollection());
 
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.horizontalSpan = 2;

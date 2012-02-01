@@ -36,7 +36,6 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropertyException;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -558,9 +557,13 @@ public class TestContainer extends TestDatabase {
         try {
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");
-        } catch (ValidationException e) {
-            Assert.assertTrue(true);
-        } catch (ApplicationException e) {
+        }
+        // JMF: I removed this exception because of an upgrade to a new
+        // hibernate-validation jar
+        // catch (ValidationException e) {
+        // Assert.assertTrue(true);
+        // }
+        catch (ApplicationException e) {
             // TODO: figure out why this isn't being wrapped and thrown as
             // ValidationException
         }

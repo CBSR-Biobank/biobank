@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.permission.security.UserManagementPermiss
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.Permission;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Study;
@@ -23,7 +23,7 @@ public class MembershipSaveAction implements Action<IdResult> {
     private Integer membershipId;
     private Integer principalId;
     private Set<Integer> roleIds;
-    private Set<Integer> permissionIds;
+    private Set<PermissionEnum> permissions;
     private Integer centerId;
     private Integer studyId;
     private Membership membership = null;
@@ -40,8 +40,8 @@ public class MembershipSaveAction implements Action<IdResult> {
         this.roleIds = roleIds;
     }
 
-    public void setPermissionIds(Set<Integer> permissionIds) {
-        this.permissionIds = permissionIds;
+    public void setPermissionIds(Set<PermissionEnum> permissions) {
+        this.permissions = permissions;
     }
 
     public void setCenterId(Integer centerId) {
@@ -62,10 +62,6 @@ public class MembershipSaveAction implements Action<IdResult> {
         if (roleIds == null) {
             throw new NullPropertyException(Membership.class,
                 "role ids cannot be null");
-        }
-        if (permissionIds == null) {
-            throw new NullPropertyException(Membership.class,
-                "permission ids cannot be null");
         }
 
         membership =
@@ -98,12 +94,9 @@ public class MembershipSaveAction implements Action<IdResult> {
      * Membership to Permission association is unidirectional.
      */
     private void savePermissions(ActionContext context) {
-        Map<Integer, Permission> permissions =
-            context.load(Permission.class, permissionIds);
-
-        SetDifference<Permission> permissionsDiff =
-            new SetDifference<Permission>(
-                membership.getPermissionCollection(), permissions.values());
+        SetDifference<PermissionEnum> permissionsDiff =
+            new SetDifference<PermissionEnum>(
+                membership.getPermissionCollection(), permissions);
         membership.setPermissionCollection(permissionsDiff.getNewSet());
     }
 }

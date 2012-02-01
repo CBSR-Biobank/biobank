@@ -2,7 +2,9 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
@@ -21,15 +23,18 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
+import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
+import edu.ualberta.med.biobank.common.action.info.RequestSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
+import edu.ualberta.med.biobank.common.action.request.RequestUpdateSpecimensAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
-import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -42,6 +47,7 @@ import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.infotables.RequestDispatchInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.RequestSpecimensTreeTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RequestEntryForm extends BiobankViewForm {
 
@@ -53,7 +59,6 @@ public class RequestEntryForm extends BiobankViewForm {
     private BgcBaseText newSpecimenText;
     private Button addButton;
     private Button openScanButton;
-    private CommentWrapper comment;
     private RequestReadInfo requestInfo;
 
     @Override
@@ -63,7 +68,6 @@ public class RequestEntryForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        comment = new CommentWrapper(SessionManager.getAppService());
         if (adapter.getId() != null) {
             requestInfo = SessionManager.getAppService().doAction(
                 new RequestGetInfoAction(adapter.getId()));
@@ -113,8 +117,7 @@ public class RequestEntryForm extends BiobankViewForm {
             SWT.NONE, Messages.RequestEntryForm_submitted_label);
         setTextValue(submittedLabel,
             DateFormatter.formatAsDateTime(request.getSubmitted()));
-        createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.RequestEntryForm_comments_label);
+
         Section s = createSection(Messages.RequestEntryForm_specimens_section);
         Composite c = toolkit.createComposite(s);
         s.setClient(c);
@@ -309,48 +312,60 @@ public class RequestEntryForm extends BiobankViewForm {
     }
 
     protected void buildNewDispatch() {
-        DispatchWrapper dispatch = new DispatchWrapper(
-            SessionManager.getAppService());
 
-        // FIXME: SHOULD BE IN ONE TRANSACTION
+        Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
+        DispatchSaveInfo dInfo =
+            new DispatchSaveInfo(null, request.getResearchGroup().getId(),
+                SessionManager.getUser()
+                    .getCurrentWorkingCenter().getId(),
+                DispatchState.CREATION.getId(), "", request.getId());
+        DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
+
         try {
-
-            dispatch.setSenderCenter(SessionManager.getUser()
-                .getCurrentWorkingCenter());
-
-            dispatch.setState(DispatchState.CREATION);
-            dispatch.setReceiverCenter(request.getResearchGroup());
-            dispatch.persist();
-            request.reload();
-            request.addToDispatchCollection(Arrays.asList(dispatch));
-            request.persist();
-            dispatchTable.reloadCollection(
-                request.getDispatchCollection(false), getDispatchSelection());
-            SpecimenTransitView.reloadCurrent();
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError(
-                Messages.RequestEntryForm_creation_error_msg, e);
+            SessionManager.getAppService().doAction(save);
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error creating dispatch",
+                "Unable to create the dispatch");
         }
+
+        dispatchTable.reloadCollection(
+            request.getDispatchCollection(false), getDispatchSelection());
+        SpecimenTransitView.reloadCurrent();
     }
 
     protected void addToDispatch(DispatchWrapper dispatch,
         List<RequestSpecimenWrapper> specs) throws Exception {
-        // FIXME: SHOULD BE IN ONE TRANSACTION
-        List<SpecimenWrapper> dispatchSpecimens =
-            new ArrayList<SpecimenWrapper>();
-        for (ItemWrapper rspec : specs) {
-            if (rspec.getSpecimenState().equals(
+
+        Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
+        for (RequestSpecimenWrapper rs : specs)
+            if (rs.getSpecimenState().equals(
                 RequestSpecimenState.PULLED_STATE)) {
-                ((RequestSpecimenWrapper) rspec)
-                    .setState(RequestSpecimenState.DISPATCHED_STATE);
-                ((RequestSpecimenWrapper) rspec).persist();
-                dispatchSpecimens.add(rspec.getSpecimen());
+                dsInfos.add(new DispatchSpecimenInfo(null, rs.getSpecimen()
+                    .getId(), DispatchSpecimenState.NONE.getId()));
             } else
                 throw new Exception(Messages.RequestEntryForm_add_error_msg);
-        }
-        dispatch.addSpecimens(dispatchSpecimens, DispatchSpecimenState.NONE);
-        dispatch.persist();
+        DispatchSaveInfo dInfo =
+            new DispatchSaveInfo(dispatch.getId(), request.getResearchGroup()
+                .getId(),
+                SessionManager.getUser()
+                    .getCurrentWorkingCenter().getId(),
+                DispatchState.CREATION.getId(), "", request.getId());
+        DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
 
+        List<RequestSpecimenInfo> specStatePairs =
+            new ArrayList<RequestSpecimenInfo>();
+        for (RequestSpecimenWrapper rs : specs) {
+            RequestSpecimenInfo info =
+                new RequestSpecimenInfo(rs.getId(),
+                    RequestSpecimenState.DISPATCHED_STATE.getId(), null);
+            specStatePairs.add(info);
+        }
+        RequestUpdateSpecimensAction update =
+            new RequestUpdateSpecimensAction(specStatePairs,
+                save, SessionManager.getUser().getCurrentWorkingCenter()
+                    .getId());
+        SessionManager.getAppService().doAction(update);
+        reload();
     }
 
     @Override

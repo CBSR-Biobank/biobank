@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -64,10 +65,10 @@ public class DispatchSaveAction implements Action<IdResult> {
             ShipmentInfo si =
                 context
                     .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
-            si.boxNumber = siInfo.boxNumber;
-            si.packedAt = siInfo.packedAt;
-            si.receivedAt = siInfo.receivedAt;
-            si.waybill = siInfo.waybill;
+            si.setBoxNumber(siInfo.boxNumber);
+            si.setPackedAt(siInfo.packedAt);
+            si.setReceivedAt(siInfo.receivedAt);
+            si.setWaybill(siInfo.waybill);
 
             ShippingMethod sm = context.load(ShippingMethod.class,
                 siInfo.shippingMethodId);
@@ -79,7 +80,7 @@ public class DispatchSaveAction implements Action<IdResult> {
         // This stuff could be extracted to a util method. need to think about
         // how
         if (!dInfo.comment.trim().equals("")) {
-            Collection<Comment> comments = disp.getCommentCollection();
+            Set<Comment> comments = disp.getCommentCollection();
             if (comments == null) comments = new HashSet<Comment>();
             Comment newComment = new Comment();
             newComment.setCreatedAt(new Date());
@@ -92,15 +93,24 @@ public class DispatchSaveAction implements Action<IdResult> {
         }
 
         context.getSession().saveOrUpdate(disp);
+
+        // spawned from a request?
+        Request request = context.get(Request.class, dInfo.requestId);
+        Collection<Dispatch> dispatches =
+            request.getDispatchCollection();
+        dispatches.add(disp);
+        request.setDispatchCollection(dispatches);
+        context.getSession().saveOrUpdate(request);
+
         context.getSession().flush();
 
         return new IdResult(disp.getId());
     }
 
-    private Collection<DispatchSpecimen> reassemble(ActionContext context,
+    private Set<DispatchSpecimen> reassemble(ActionContext context,
         Dispatch dispatch,
         Set<DispatchSpecimenInfo> dsInfos) {
-        Collection<DispatchSpecimen> dispSpecimens =
+        Set<DispatchSpecimen> dispSpecimens =
             new HashSet<DispatchSpecimen>();
         for (DispatchSpecimenInfo dsInfo : dsInfos) {
             DispatchSpecimen dspec =

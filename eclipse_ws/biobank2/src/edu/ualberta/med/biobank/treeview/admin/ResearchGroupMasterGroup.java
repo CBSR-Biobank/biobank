@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -84,7 +85,12 @@ public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
 
     @Override
     protected Map<Integer, ?> getChildrenObjects() throws Exception {
-        return rgs;
+        HashMap<Integer, ResearchGroupAdapterInfo> map =
+            new HashMap<Integer, ResearchGroupAdapterInfo>();
+        for (Integer rgId : rgs.keySet())
+            map.put(rgId, new ResearchGroupAdapterInfo(rgId, rgs.get(rgId)
+                .getNameShort()));
+        return map;
     }
 
     @Override

@@ -23,13 +23,19 @@ public class ResearchGroupAdapter extends AbstractNewAdapterBase {
         this.rg = rg;
     }
 
+    @Override
     public void setValue(Object value) {
-
+        this.rg = (ResearchGroupAdapterInfo) value;
     }
 
     @Override
     protected String getLabelInternal() {
         return rg.nameShort;
+    }
+
+    @Override
+    public Integer getId() {
+        return rg.id;
     }
 
     @Override

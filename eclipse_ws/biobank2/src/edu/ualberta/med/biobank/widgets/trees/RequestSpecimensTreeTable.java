@@ -24,6 +24,8 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.info.RequestSpecimenInfo;
+import edu.ualberta.med.biobank.common.action.request.RequestUpdateSpecimensAction;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
@@ -209,10 +211,15 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
 
     protected void claim(List<RequestSpecimenWrapper> specs) {
         try {
+            List<RequestSpecimenInfo> rs = new ArrayList<RequestSpecimenInfo>();
             for (RequestSpecimenWrapper spec : specs) {
                 spec.setClaimedBy(SessionManager.getUser().getLogin());
-                spec.persist();
+                rs.add(new RequestSpecimenInfo(spec.getId(), spec.getState(),
+                    SessionManager.getUser().getLogin()));
             }
+            SessionManager.getAppService().doAction(
+                new RequestUpdateSpecimensAction(rs, null, SessionManager
+                    .getUser().getCurrentWorkingCenter().getId()));
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
                 Messages.RequestSpecimensTreeTable_claim_error_title, e);
@@ -226,12 +233,20 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
+                List<RequestSpecimenInfo> rs =
+                    new ArrayList<RequestSpecimenInfo>();
                 for (RequestSpecimenWrapper spec : getSelectionWrappers()) {
                     spec.setState(RequestSpecimenState.UNAVAILABLE_STATE
                         .getId());
+                    rs.add(new RequestSpecimenInfo(spec.getId(),
+                        RequestSpecimenState.UNAVAILABLE_STATE.getId(), spec
+                            .getClaimedBy()));
                     try {
-                        spec.persist();
-                        spec.reload();
+                        SessionManager.getAppService().doAction(
+                            new RequestUpdateSpecimensAction(rs, null,
+                                SessionManager
+                                    .getUser().getCurrentWorkingCenter()
+                                    .getId()));
                     } catch (Exception e) {
                         BgcPlugin
                             .openAsyncError(
@@ -289,8 +304,9 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
     public Node search(Node startNode, String text) {
         if (startNode instanceof TreeItemAdapter
             && ((RequestSpecimenWrapper) ((TreeItemAdapter) startNode)
-                .getSpecimen()).getSpecimen().getInventoryId().equals(text))
+                .getSpecimen()).getSpecimen().getInventoryId().equals(text)) {
             return startNode;
+        }
         Node found = null;
         List<Node> children = startNode.getChildren();
         for (Node child : children) {

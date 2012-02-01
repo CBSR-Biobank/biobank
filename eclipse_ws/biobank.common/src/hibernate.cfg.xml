@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+	
+		<!-- Properties for the session factory -->
+		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="connection.url">jdbc:mysql://localhost:3306/biobank</property>
+		<property name="connection.username">dummy</property>
+		<property name="connection.password">ozzy498</property>
+		<property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
+		<property name="c3p0.max_size">10</property>
+		<property name="c3p0.min_size">2</property>
+		<property name="c3p0.timeout">5000</property>
+		<property name="c3p0.max_statements">100</property>
+		<property name="c3p0.idle_test_period">3000</property>
+		<property name="c3p0.acquire_increment">2</property>
+		<property name="c3p0.validate">false</property>
+		<property name="show_sql">false</property>
+		<property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
+		<property name="max_fetch_depth">1</property>
+		<property name="bytecode.use_reflection_optimizer">false</property>
+		<property name="jdbc.batch_versioned_data">true</property>
+		<property name="jdbc.use_streams_for_binary">true</property>
+		<property name="cache.use_query_cache">false</property>
+		<property name="cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
+
+		<!-- Mapped classes -->
+		<mapping class="edu.ualberta.med.biobank.model.AbstractPosition" /> 
+		<mapping class="edu.ualberta.med.biobank.model.ActivityStatus" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Address" /> 
+		<mapping class="edu.ualberta.med.biobank.model.AliquotedSpecimen" /> 
+		<mapping class="edu.ualberta.med.biobank.model.BbGroup" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Capacity" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Center" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Clinic" /> 
+		<mapping class="edu.ualberta.med.biobank.model.CollectionEvent" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Comment" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Contact" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Container" /> 
+		<mapping class="edu.ualberta.med.biobank.model.ContainerLabelingScheme" /> 
+		<mapping class="edu.ualberta.med.biobank.model.ContainerPosition" /> 
+		<mapping class="edu.ualberta.med.biobank.model.ContainerType" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Dispatch" /> 
+		<mapping class="edu.ualberta.med.biobank.model.DispatchSpecimen" /> 
+		<mapping class="edu.ualberta.med.biobank.model.EntityColumn" /> 
+		<mapping class="edu.ualberta.med.biobank.model.EntityFilter" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Entity" /> 
+		<mapping class="edu.ualberta.med.biobank.model.EntityProperty" /> 
+		<mapping class="edu.ualberta.med.biobank.model.EventAttr" /> 
+		<mapping class="edu.ualberta.med.biobank.model.EventAttrType" /> 
+		<mapping class="edu.ualberta.med.biobank.model.GlobalEventAttr" /> 
+		<mapping class="edu.ualberta.med.biobank.model.JasperTemplate" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Log" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Membership" /> 
+		<mapping class="edu.ualberta.med.biobank.model.OriginInfo" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Patient" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Principal" /> 
+		<mapping class="edu.ualberta.med.biobank.model.PrintedSsInvItem" /> 
+		<mapping class="edu.ualberta.med.biobank.model.PrinterLabelTemplate" /> 
+		<mapping class="edu.ualberta.med.biobank.model.ProcessingEvent" /> 
+		<mapping class="edu.ualberta.med.biobank.model.PropertyModifier" /> 
+		<mapping class="edu.ualberta.med.biobank.model.PropertyType" /> 
+		<mapping class="edu.ualberta.med.biobank.model.ReportColumn" /> 
+		<mapping class="edu.ualberta.med.biobank.model.ReportFilter" /> 
+		<mapping class="edu.ualberta.med.biobank.model.ReportFilterValue" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Report" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Request" /> 
+		<mapping class="edu.ualberta.med.biobank.model.RequestSpecimen" /> 
+		<mapping class="edu.ualberta.med.biobank.model.ResearchGroup" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Role" /> 
+		<mapping class="edu.ualberta.med.biobank.model.ShipmentInfo" /> 
+		<mapping class="edu.ualberta.med.biobank.model.ShippingMethod" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Site" /> 
+		<mapping class="edu.ualberta.med.biobank.model.SourceSpecimen" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Specimen" /> 
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenPosition" /> 
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenType" /> 
+		<mapping class="edu.ualberta.med.biobank.model.StudyEventAttr" /> 
+		<mapping class="edu.ualberta.med.biobank.model.Study" /> 
+		<mapping class="edu.ualberta.med.biobank.model.User" /> 
+	</session-factory>
+</hibernate-configuration>
+
+        

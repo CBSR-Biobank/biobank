@@ -8,8 +8,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -375,12 +377,13 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     // fast... from db. should only call this once then use the cached value
     public List<DispatchSpecimenWrapper> getFastDispatchSpecimenCollection() {
         if (!isPropertyCached(DispatchPeer.DISPATCH_SPECIMEN_COLLECTION)) {
-            List<DispatchSpecimen> results;
+            Set<DispatchSpecimen> results = new HashSet<DispatchSpecimen>();
             // test hql
             HQLCriteria query = new HQLCriteria(FAST_DISPATCH_SPECIMEN_QRY,
                 Arrays.asList(new Object[] { getId() }));
             try {
-                results = appService.query(query);
+                List<DispatchSpecimen> list = appService.query(query);
+                results.addAll(list);
             } catch (ApplicationException e) {
                 throw new RuntimeException(e);
             }

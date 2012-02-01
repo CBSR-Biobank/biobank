@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
 import java.util.Arrays;
+import java.util.HashSet;
 
 import junit.framework.Assert;
 
@@ -30,10 +31,9 @@ public class TestCaCore extends TestDatabase {
         Specimen s2 = new Specimen();
         s2.setId(1);
         s1.setQuantity(0.2);
-        ;
 
-        ce.setAllSpecimenCollection(Arrays.asList(s1));
-        ce.setOriginalSpecimenCollection(Arrays.asList(s2));
+        ce.setAllSpecimenCollection(new HashSet<Specimen>(Arrays.asList(s1)));
+        ce.setOriginalSpecimenCollection(new HashSet<Specimen>(Arrays.asList(s2)));
 
         appService.search(CollectionEvent.class, ce);
 
