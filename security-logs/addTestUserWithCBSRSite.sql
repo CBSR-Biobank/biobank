@@ -6,8 +6,8 @@ set @asactive = null;
 
 select id from activity_status where name='Active' into @asactive;
 
-insert into principal (id, version, login, csm_user_id, recv_bulk_emails, full_name, email, need_pwd_change,activity_status_id)
-       select user_id, 0, login_name, user_id, 1, concat(first_name, ' ', last_name), email_id, 0, @asactive
+insert into principal (id, version, discriminator, login, csm_user_id, recv_bulk_emails, full_name, email, need_pwd_change,activity_status_id)
+       select user_id, 0, 'User', login_name, user_id, 1, concat(first_name, ' ', last_name), email_id, 0, @asactive
        from csm_user
        where login_name = 'testuser';
 

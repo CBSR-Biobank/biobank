@@ -129,6 +129,8 @@ public class TestClinic extends TestAction {
         Assert.assertEquals(new Long(1), clinicInfo.collectionEventCount);
         Assert.assertEquals(1, clinicInfo.contacts.size());
         Assert.assertEquals(1, clinicInfo.studyInfos.size());
+
+        // TODO: check eager load on address
     }
 
     @Test
