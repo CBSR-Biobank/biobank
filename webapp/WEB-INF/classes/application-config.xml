@@ -7,7 +7,7 @@
 	</bean>
 
 	<!-- Bean Definitions -->
-	<bean name="ClassCache" class="gov.nih.nci.system.util.ClassCache" singleton="true">
+	<bean name="ClassCache" class="edu.ualberta.med.biobank.server.system.util.BiobankClassCache" singleton="true">
 		<property name="daoList">
 			<list>
 				<!--  Add any DAO's here -->
