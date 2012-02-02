@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import org.eclipse.core.runtime.Assert;
@@ -13,10 +15,12 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
@@ -65,6 +69,13 @@ public class SpecimenViewForm extends BiobankViewForm {
     private BgcBaseText childrenLabel;
 
     private Button isSourceSpcButton;
+
+    // DFE
+    private List<FormPvCustomInfo> pvCustomInfoList;
+
+    private static class FormPvCustomInfo extends PvAttrCustom {
+        BgcBaseText widget;
+    }
 
     @Override
     public void init() throws Exception {
@@ -156,9 +167,55 @@ public class SpecimenViewForm extends BiobankViewForm {
             "Children #");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
+
+        // DFE
+        try {
+            createPvDataSection(client);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         commentLabel = createReadOnlyLabelledField(client,
             SWT.WRAP | SWT.MULTI, "Comment");
 
+    }
+
+    // DFE
+    private void createPvDataSection(Composite client) throws Exception {
+        specimen.getSpecimenAttrLabels();
+        // StudyWrapper study = cevent.getPatient().getStudy();
+        String[] labels = specimen.getSpecimenAttrLabels();
+        if (labels == null)
+            return;
+
+        pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
+
+        for (String label : labels) {
+            FormPvCustomInfo combinedPvInfo = new FormPvCustomInfo();
+            combinedPvInfo.setLabel(label);
+            combinedPvInfo.setType(specimen.getSpecimenAttrTypeName(label));// .getStudyEventAttrType(label));
+
+            int style = SWT.NONE;
+            if (combinedPvInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE) {
+                style |= SWT.WRAP;
+            }
+
+            String value = specimen.getSpecimenAttrValue(label);
+            if (combinedPvInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE
+                && (value != null)) {
+                combinedPvInfo.setValue(value.replace(';', '\n'));
+            } else {
+                combinedPvInfo.setValue(value);
+            }
+
+            combinedPvInfo.widget = createReadOnlyLabelledField(client, style,
+                label, combinedPvInfo.getValue());
+            GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+            combinedPvInfo.widget.setLayoutData(gd);
+
+            pvCustomInfoList.add(combinedPvInfo);
+        }
     }
 
     private void createContainersSection() {

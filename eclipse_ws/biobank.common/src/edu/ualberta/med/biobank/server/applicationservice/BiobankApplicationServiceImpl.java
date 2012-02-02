@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
@@ -23,6 +22,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenAttrWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.StudySpecimenAttrWrapper;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PrintedSsInvItem;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
@@ -74,7 +75,7 @@ import org.supercsv.prefs.CsvPreference;
 public class BiobankApplicationServiceImpl extends
     WritableApplicationServiceImpl implements BiobankApplicationService {
 
-    private List<String> processed;// = new ArrayList<String>();
+    private List<String> processed = new ArrayList<String>();
 
     public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
@@ -336,6 +337,7 @@ public class BiobankApplicationServiceImpl extends
     public String uploadFile(byte[] bytes, String deviceID)
         throws ApplicationException {
 
+        processed.add("Start Process");
         System.out.printf("Came From Client: %s", deviceID);
         String uploadDir = System.getProperty("upload.dir");
 
@@ -370,7 +372,7 @@ public class BiobankApplicationServiceImpl extends
         throws ApplicationException {
 
         String uploadDir = System.getProperty("upload.dir");
-
+        // List<String> processed = new ArrayList<String>();
         Calendar currentDate = Calendar.getInstance();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MMM_dd-HH_mm");
         String dateNow = formatter.format(currentDate.getTime());
@@ -399,37 +401,18 @@ public class BiobankApplicationServiceImpl extends
             processed = tecanProcessCVS(newFile, pStudy, pWorkSheet, pComment,
                 cCenter);
         } catch (Exception e) {
-            // TODO
             e.printStackTrace();
         }
-
         return processed;
     }
 
     public List<String> tecanProcessCVS(String myfile, int pStudy,
         String pWorkSheet, String pComment, int cCenter) throws Exception {
 
-        // User cUser = this.getCurrentUser();
-        // cUser.initCurrentWorkingCenter(this);
-        // SiteWrapper cSite = cUser.getCurrentWorkingSite();
-        // String GGG = cSite.getNameShort();
-        // System.out.println("SITE GGG: " + GGG);
         System.out.println("FILE: " + myfile);
 
         ICsvBeanReader inFile = new CsvBeanReader(new FileReader(myfile),
             CsvPreference.EXCEL_PREFERENCE);
-
-        // final CellProcessor[] userProcessors = new CellProcessor[] {
-        // new Unique(new StrMinMax(5, 20)), new StrMinMax(8, 35),
-        // new ParseDate("dd/MM/yyyy"), new Optional(new ParseInt()),
-        // new StrMinMax(1, 35) };
-        // private String orgSample;
-        // private String processId;
-        // private String aliquotId;
-        // private String aliquotType;
-        // private int volume;
-        // private Date startProcess;
-        // private Date endProcess;
 
         final CellProcessor[] userProcessors = new CellProcessor[] {
             new StrNotNullOrEmpty(), new StrNotNullOrEmpty(),
@@ -445,9 +428,6 @@ public class BiobankApplicationServiceImpl extends
             String tmpString = new String();
             TecanCSV tecanCsv;
 
-            System.out.println("Header Length: " + header.length);
-            System.out.println("Header: " + header);
-
             processed.add("Header Length: " + header.length);
             int i = 0;
             tmpString = "";
@@ -458,26 +438,18 @@ public class BiobankApplicationServiceImpl extends
             }
             processed.add("HEADER: " + tmpString);
 
-            System.out.println("LENGTH: " + inFile.length());
-            System.out.println("Line NUMBER: " + inFile.getLineNumber());
-            System.out.println("userProcessors.length: "
-                + userProcessors.length);
-
             while ((tecanCsv = inFile.read(TecanCSV.class, header,
                 userProcessors)) != null) {
 
                 persistData(tecanCsv, pStudy, pWorkSheet, pComment, cCenter);
-
                 processed.add(tecanCsv.getLine());
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            processed.add(e.toString());
+            // throw new ApplicationException("TestING: ", e);
         }
-
-        // ************************************
-
-        // ***********************************
 
         finally {
             inFile.close();
@@ -488,6 +460,7 @@ public class BiobankApplicationServiceImpl extends
     private void persistData(TecanCSV tecanCsv, int pStudy, String pWorkSheet,
         String pComment, int cCenter) {
         try {
+
             String sOriginalSample;
             String tWorkSheet;
 
@@ -505,13 +478,14 @@ public class BiobankApplicationServiceImpl extends
             } else {
                 pEvent.setWorksheet(pWorkSheet + "_" + tWorkSheet);
             }
+
             pEvent.setActivityStatus(active);
             pEvent.setComment(pComment.trim());
-            pEvent.persist();
+            // pEvent.persist();
 
             OriginInfoWrapper originInfo = new OriginInfoWrapper(this);
             originInfo.setCenter(currentWorkingCenter);
-            originInfo.persist();
+            // originInfo.persist();
 
             SpecimenWrapper aliquoteSpecimen = new SpecimenWrapper(this);
             sOriginalSample = tecanCsv.getOrgSample();
@@ -523,38 +497,15 @@ public class BiobankApplicationServiceImpl extends
             // Check to see if specimen can be aliquoted
             // List<AliquotedSpecimenWrapper> allowedAliquotedSpecimen = study
             // .getAliquotedSpecimenCollection(true);
-            List<StudyWrapper> studyList = StudyWrapper.getAllStudies(this);
-            ListIterator<StudyWrapper> swIterator = studyList.listIterator();
-            StudyWrapper currentStudy = null;
-            int currentStudyId = -1;
-            while (currentStudyId != pStudy && swIterator.hasNext()) {
-                currentStudy = swIterator.next();
-                currentStudyId = currentStudy.getId();
-            }
-
             CollectionEventWrapper collectionEvent = sourceSpecimen
                 .getCollectionEvent();
+            StudyWrapper currentStudy = collectionEvent.getPatient().getStudy();
+
             aliquoteSpecimen.setParentSpecimen(sourceSpecimen);
-            SpecimenTypeWrapper specimenType;
 
-            List<SpecimenTypeWrapper> specimenTypelist = SpecimenTypeWrapper
-                .getAllSpecimenTypes(this, false);
-
-            ListIterator<SpecimenTypeWrapper> stpIterator = specimenTypelist
-                .listIterator();
-            specimenType = null;
-            String specimenTypeName = "";
             String aAliquotType = tecanCsv.getAliquotType();
-            while (!specimenTypeName.equals(aAliquotType)
-                && stpIterator.hasNext()) {
-                specimenType = stpIterator.next();
-                specimenTypeName = specimenType.getName();
-            }
-            List<AliquotedSpecimenWrapper> allowedAliquotedSpecimen = currentStudy
-                .getAliquotedSpecimenCollection(true);
-            if (allowedAliquotedSpecimen.contains(specimenType)) {
-                // check to see if allowed to aliquot
-            }
+            SpecimenTypeWrapper specimenType = validAliquote(currentStudy,
+                aAliquotType);
 
             aliquoteSpecimen.setCurrentCenter(currentWorkingCenter);
             aliquoteSpecimen.setSpecimenType(specimenType);
@@ -565,14 +516,61 @@ public class BiobankApplicationServiceImpl extends
             aliquoteSpecimen.setCreatedAt(Calendar.getInstance().getTime());
             aliquoteSpecimen.setProcessingEvent(pEvent);
             aliquoteSpecimen.setOriginInfo(originInfo);
+
+            // aliquoteSpecimen.persist();
+
+            SpecimenAttrWrapper specimenAttr = new SpecimenAttrWrapper(this);
+            specimenAttr.setSpecimen(aliquoteSpecimen);
+            StudySpecimenAttrWrapper studySpecimenAttr = currentStudy
+                .getStudySpecimenAttr("Volume");
+            specimenAttr.setStudySpecimenAttr(studySpecimenAttr);
+            String dVolume = Double.toString(tecanCsv.getVolume());
+            specimenAttr.setValue(dVolume);
+
+            // TESTING DFE
+            pEvent.persist();
+            originInfo.persist();
             aliquoteSpecimen.persist();
+            specimenAttr.persist();
 
         } catch (Exception caught) {
             // transaction will be rollback if exception thrown
-            caught.printStackTrace();
+            processed.add(caught.toString());
             throw new RuntimeException(caught);
 
         }
+    }
+
+    public SpecimenTypeWrapper validAliquote(StudyWrapper currentStudy,
+        String aAliquotType) throws RuntimeException {
+
+        SpecimenTypeWrapper specimenType = null;
+        String specimenTypeName = "";
+        try {
+
+            List<SpecimenTypeWrapper> specimenTypelist = SpecimenTypeWrapper
+                .getAllSpecimenTypes(this, false);
+
+            ListIterator<SpecimenTypeWrapper> stpIterator = specimenTypelist
+                .listIterator();
+
+            while (!specimenTypeName.equals(aAliquotType)
+                && stpIterator.hasNext()) {
+                specimenType = stpIterator.next();
+                specimenTypeName = specimenType.getName();
+            }
+
+            List<SpecimenTypeWrapper> allowedAliquotedSpecimen = currentStudy
+                .getAuthorizedActiveAliquotedTypes(specimenTypelist);
+            if (!allowedAliquotedSpecimen.contains(specimenType)) {
+                throw new RuntimeException("Wrong Aliquote TYPE"
+                    + specimenType.getName());
+
+            }
+        } catch (Exception e) {
+
+        }
+        return specimenType;
     }
 
     @Override

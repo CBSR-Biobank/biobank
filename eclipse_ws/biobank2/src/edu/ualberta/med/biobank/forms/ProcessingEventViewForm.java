@@ -36,6 +36,8 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     private BgcBaseText activityLabel;
 
+    private SpecimenInfoTable aliquotedSpecimenTable;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ProcessingEventAdapter),
@@ -57,6 +59,8 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
         createSourceSpecimensSection();
+        createAliquotedSpecimensSection();
+
     }
 
     private void createMainSection() {
@@ -97,6 +101,17 @@ public class ProcessingEventViewForm extends BiobankViewForm {
             pEvent.getSpecimenCollection(true), ColumnsShown.SOURCE_SPECIMENS,
             10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
+    }
+
+    private void createAliquotedSpecimensSection() {
+        // FIXME should we show that to clinics ?
+        Composite client = createSectionWithClient(Messages
+            .getString("CollectionEventViewForm.aliquotedspecimens.title"));
+        aliquotedSpecimenTable = new SpecimenInfoTable(client,
+            pEvent.getDerivedSpecimenCollection(true), ColumnsShown.ALIQUOTS,
+            10);
+        aliquotedSpecimenTable.adaptToToolkit(toolkit, true);
+        aliquotedSpecimenTable.addClickListener(collectionDoubleClickListener);
     }
 
     @Override

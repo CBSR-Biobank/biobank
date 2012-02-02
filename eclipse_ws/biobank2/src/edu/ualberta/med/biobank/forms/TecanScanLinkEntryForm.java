@@ -71,7 +71,7 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
     protected void init() throws Exception {
         super.init();
         setPartName("Tecan Scan Link");
-        appendLog("Start Process");
+        appendLog("Initilization");
     }
 
     @Override
