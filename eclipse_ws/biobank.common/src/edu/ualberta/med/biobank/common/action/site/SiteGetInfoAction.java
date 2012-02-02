@@ -19,6 +19,8 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
     private static final String SITE_INFO_HQL =
         "SELECT DISTINCT site"
             + " FROM " + Site.class.getName() + " site"
+            + " INNER JOIN FETCH site.address address"
+            + " INNER JOIN FETCH site.activityStatus activityStatus"
             + " LEFT JOIN FETCH site.commentCollection comments"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE site.id = ?";
@@ -32,8 +34,6 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
             + " FROM "
             + Site.class.getName()
             + " site"
-            + " INNER JOIN FETCH site.address address"
-            + " INNER JOIN FETCH site.activityStatus activityStatus"
             + " LEFT JOIN site.studyCollection studies"
             + " LEFT JOIN studies.patientCollection patients"
             + " LEFT JOIN patients.collectionEventCollection collectionEvents"
