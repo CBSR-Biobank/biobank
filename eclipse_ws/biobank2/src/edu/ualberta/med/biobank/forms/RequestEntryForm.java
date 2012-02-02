@@ -27,8 +27,8 @@ import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
-import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.action.request.RequestDispatchAction;
+import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -317,7 +317,7 @@ public class RequestEntryForm extends BiobankViewForm {
             new DispatchSaveInfo(null, request.getResearchGroup().getId(),
                 SessionManager.getUser()
                     .getCurrentWorkingCenter().getId(),
-                DispatchState.CREATION.getId(), "", request.getId());
+                DispatchState.CREATION.getId(), "");
         DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
 
         try {
@@ -348,8 +348,7 @@ public class RequestEntryForm extends BiobankViewForm {
                 .getId(),
                 SessionManager.getUser()
                     .getCurrentWorkingCenter().getId(),
-                DispatchState.CREATION.getId(), "", request.getId());
-        DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
+                DispatchState.CREATION.getId(), "");
 
         List<Integer> ids =
             new ArrayList<Integer>();
@@ -357,8 +356,8 @@ public class RequestEntryForm extends BiobankViewForm {
             ids.add(rs.getId());
         }
         RequestDispatchAction update =
-            new RequestDispatchAction(ids,
-                RequestSpecimenState.DISPATCHED_STATE, save,
+            new RequestDispatchAction(request.getId(), ids,
+                RequestSpecimenState.DISPATCHED_STATE, dInfo, dsInfos,
                 SessionManager.getUser().getCurrentWorkingCenter()
                     .getId());
         SessionManager.getAppService().doAction(update);

@@ -54,9 +54,6 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
             Object row = rows.get(0);
 
             sInfo.request = (Request) row;
-            sInfo.specimens =
-                new RequestGetSpecimenInfosAction(id).run(context)
-                    .getList();
 
         } else {
             throw new ActionException(

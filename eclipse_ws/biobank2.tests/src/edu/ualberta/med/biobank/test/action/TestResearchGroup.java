@@ -14,10 +14,9 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGet
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.AddressSaveInfo;
-import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
-import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
+import edu.ualberta.med.biobank.common.action.request.RequestGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupDeleteAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
@@ -104,11 +103,12 @@ public class TestResearchGroup extends TestAction {
         Integer rId = EXECUTOR.exec(action).getId();
 
         // make sure you got what was requested
-        RequestGetInfoAction requestGetInfoAction =
-            new RequestGetInfoAction(rId);
-        RequestReadInfo rInfo = EXECUTOR.exec(requestGetInfoAction);
+        RequestGetSpecimenInfosAction specAction =
+            new RequestGetSpecimenInfosAction(rId);
+        List<Object[]> specInfo = EXECUTOR.exec(specAction).getList();
 
-        for (RequestSpecimen spec : rInfo.specimens) {
+        for (int i = 0; i < specInfo.size(); i++) {
+            RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
             Assert.assertTrue(specs.contains(spec.getSpecimen()
                 .getInventoryId()));
         }

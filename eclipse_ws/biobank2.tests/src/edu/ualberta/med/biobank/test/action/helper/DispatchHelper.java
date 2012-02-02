@@ -39,8 +39,7 @@ public class DispatchHelper extends Helper {
     public static DispatchSaveInfo createSaveDispatchInfoRandom(
         IActionExecutor actionExecutor, Integer siteId, Integer centerId,
         Integer state, String comment) {
-        return new DispatchSaveInfo(null, siteId, centerId, state, comment,
-            null);
+        return new DispatchSaveInfo(null, siteId, centerId, state, comment);
     }
 
     public static Integer createDispatch(IActionExecutor actionExecutor,

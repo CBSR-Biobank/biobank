@@ -56,7 +56,7 @@ public abstract class AbstractBiobankModel implements IBiobankModel {
     protected <T extends IBiobankModel> boolean equals(Object o, Class<T> klazz) {
         if (o == this) return true;
         if (o == null) return false;
-        if (klazz.isAssignableFrom(getClass())) {
+        if (klazz.isAssignableFrom(o.getClass())) {
             T t = klazz.cast(o);
             if (getId() != null && getId().equals(t.getId())) {
                 return true;

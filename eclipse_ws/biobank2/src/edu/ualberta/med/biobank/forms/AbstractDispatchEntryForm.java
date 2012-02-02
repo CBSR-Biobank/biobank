@@ -180,17 +180,13 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             .getDispatchSpecimenCollection(false))
             dsInfos.add(new DispatchSpecimenInfo(ds.getId(), ds.getSpecimen()
                 .getId(), ds.getState()));
-        // TODO: uncomment code below and fix java error
-        // DispatchSaveInfo dInfo =
-        // new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter()
-        // .getId(), dispatch.getSenderCenter().getId(),
-        // dispatch.getState(), comment.getMessage() == null ? ""
-        // : comment.getMessage(),
-        // dispatch.getRequest() != null ? dispatch.getRequest.getId()
-        // : null);
-        // DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos,
-        // null);
-        // dispatch.setId(SessionManager.getAppService().doAction(save).getId());
-        // ((AdapterBase) adapter).setModelObject(dispatch);
+        DispatchSaveInfo dInfo =
+            new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter()
+                .getId(), dispatch.getSenderCenter().getId(),
+                dispatch.getState(), comment.getMessage() == null ? ""
+                    : comment.getMessage());
+        DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
+        dispatch.setId(SessionManager.getAppService().doAction(save).getId());
+        ((AdapterBase) adapter).setModelObject(dispatch);
     }
 }

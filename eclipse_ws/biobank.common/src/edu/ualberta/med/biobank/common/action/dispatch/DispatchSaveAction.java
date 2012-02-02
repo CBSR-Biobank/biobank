@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -92,16 +91,6 @@ public class DispatchSaveAction implements Action<IdResult> {
         }
 
         context.getSession().saveOrUpdate(disp);
-
-        // spawned from a request?
-        if (dInfo.requestId != null) {
-            Request request = context.get(Request.class, dInfo.requestId);
-        Set<Dispatch> dispatches = request.getDispatchCollection();
-            dispatches.add(disp);
-            request.setDispatchCollection(dispatches);
-            context.getSession().saveOrUpdate(request);
-        }
-
         context.getSession().flush();
 
         return new IdResult(disp.getId());
