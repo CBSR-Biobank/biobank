@@ -5,6 +5,8 @@ import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import edu.ualberta.med.biobank.common.util.RowColPos;
+
 @MappedSuperclass
 public class AbstractPosition extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
@@ -43,5 +45,9 @@ public class AbstractPosition extends AbstractBiobankModel {
 
     public void setPositionString(String positionString) {
         this.positionString = positionString;
+    }
+
+    public RowColPos getPosition() {
+        return new RowColPos(getRow(), getCol());
     }
 }

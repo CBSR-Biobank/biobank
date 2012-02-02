@@ -18,6 +18,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.common.util.RowColPos;
+
 @Entity
 @Table(name = "CONTAINER",
     uniqueConstraints = {
@@ -165,5 +167,25 @@ public class Container extends AbstractBiobankModel {
 
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
+    }
+
+    public RowColPos getPositionAsRowCol() {
+        return this.position == null ? null : this.position.getPosition();
+    }
+
+    public Container getParentContainer() {
+        return this.position == null ? null : this.position
+            .getParentContainer();
+    }
+
+    public String getPositionString() {
+        Container parent = getParentContainer();
+        if (parent != null) {
+            RowColPos pos = getPositionAsRowCol();
+            if (pos != null) {
+                return parent.getContainerType().getPositionString(pos);
+            }
+        }
+        return null;
     }
 }

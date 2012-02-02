@@ -17,6 +17,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.common.util.RowColPos;
+
 @Entity
 @Table(name = "CONTAINER_TYPE",
     uniqueConstraints = {
@@ -172,5 +174,26 @@ public class ContainerType extends AbstractBiobankModel {
     public void setParentContainerTypeCollection(
         Set<ContainerType> parentContainerTypeCollection) {
         this.parentContainerTypeCollection = parentContainerTypeCollection;
+    }
+
+    public Integer getRowCapacity() {
+        return this.capacity.getRowCapacity();
+    }
+
+    public Integer getColCapacity() {
+        return this.capacity.getColCapacity();
+    }
+
+    public String getPositionString(RowColPos position) {
+        return ContainerLabelingScheme.getPositionString(position,
+            getChildLabelingScheme().getId(), getRowCapacity(),
+            getColCapacity());
+
+    }
+
+    public RowColPos getRowColFromPositionString(String position)
+        throws Exception {
+        return childLabelingScheme.getRowColFromPositionString(position,
+            getRowCapacity(), getColCapacity());
     }
 }

@@ -85,7 +85,7 @@ public abstract class AbstractContainerDisplay {
             parentLabel = container.getLabel();
         }
         if (containerType != null) {
-            return parentLabel + containerType.getContainerPosition(rowcol);
+            return parentLabel + containerType.getPositionString(rowcol);
         }
         return ""; //$NON-NLS-1$
     }
