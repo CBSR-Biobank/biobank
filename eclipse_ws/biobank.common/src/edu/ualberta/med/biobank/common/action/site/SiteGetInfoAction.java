@@ -19,15 +19,13 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
     private static final String SITE_INFO_HQL =
         "SELECT DISTINCT site"
             + " FROM " + Site.class.getName() + " site"
+            + " INNER JOIN FETCH site.address address"
+            + " INNER JOIN FETCH site.activityStatus activityStatus"
             + " LEFT JOIN FETCH site.commentCollection comments"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE site.id = ?";
 
-    // FIXME: this query does not return anything if the count of aliquoted
-    // specimens is zero
-    //
-    // count only aliquoted Specimen-s
-    //
+    // count only aliquoted specimens
     @SuppressWarnings("nls")
     private static final String SITE_COUNT_INFO_HQL =
         "SELECT site, COUNT(DISTINCT patients), "
@@ -36,14 +34,12 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
             + " FROM "
             + Site.class.getName()
             + " site"
-            + " INNER JOIN FETCH site.address address"
-            + " INNER JOIN FETCH site.activityStatus activityStatus"
-            + " LEFT JOIN site.studyCollection AS studies"
-            + " LEFT JOIN studies.patientCollection AS patients"
-            + " LEFT JOIN patients.collectionEventCollection AS collectionEvents"
-            + " LEFT JOIN collectionEvents.allSpecimenCollection AS aliquotedSpecimens"
+            + " LEFT JOIN site.studyCollection studies"
+            + " LEFT JOIN studies.patientCollection patients"
+            + " LEFT JOIN patients.collectionEventCollection collectionEvents"
+            + " LEFT JOIN collectionEvents.allSpecimenCollection aliquotedSpecimens"
+            + " WITH aliquotedSpecimens.originalCollectionEvent.id IS NULL"
             + " WHERE site.id = ?"
-            + " AND aliquotedSpecimens.originalCollectionEvent IS NULL"
             + " GROUP BY site";
 
     private final Integer siteId;

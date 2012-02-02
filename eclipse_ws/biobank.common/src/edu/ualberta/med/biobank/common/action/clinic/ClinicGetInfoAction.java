@@ -22,6 +22,8 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
     private static final String CLINIC_INFO_HQL =
         "SELECT DISTINCT clinic"
             + " FROM " + Clinic.class.getName() + " clinic"
+            + " INNER JOIN FETCH clinic.address"
+            + " INNER JOIN FETCH clinic.activityStatus"
             + " LEFT JOIN FETCH clinic.commentCollection comments"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE clinic.id = ?";
@@ -30,7 +32,6 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
     private static final String CLINIC_COUNT_INFO_HQL =
         "SELECT clinic,COUNT(DISTINCT patients),COUNT(DISTINCT cevents)"
             + " FROM " + Clinic.class.getName() + " clinic"
-            + " INNER JOIN FETCH clinic.activityStatus"
             + " LEFT JOIN clinic.originInfoCollection oi"
             + " LEFT JOIN oi.specimenCollection spcs"
             + " LEFT JOIN spcs.collectionEvent cevents"

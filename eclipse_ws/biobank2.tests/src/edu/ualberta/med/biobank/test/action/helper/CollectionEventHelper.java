@@ -80,7 +80,7 @@ public class CollectionEventHelper extends Helper {
 
         // Save a new cevent with specimens
         return actionExecutor.exec(new CollectionEventSaveAction(
-            null, patientId, r.nextInt(20), 1, null,
+            null, patientId, r.nextInt(20) + 1, 1, null,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
             .getId();
 

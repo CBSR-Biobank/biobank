@@ -7,25 +7,27 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.info.RequestSpecimenInfo;
 import edu.ualberta.med.biobank.common.permission.request.UpdateRequestPermission;
-import edu.ualberta.med.biobank.model.RequestSpecimen;
+import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 
-public class RequestUpdateSpecimensAction implements Action<EmptyResult> {
+public class RequestDispatchAction implements Action<EmptyResult> {
 
     /**
      * 
      */
     private static final long serialVersionUID = 89092566507468524L;
     private DispatchSaveAction dsave;
-    private List<RequestSpecimenInfo> specs;
+    private List<Integer> specs;
     private Integer workingCenter;
+    private RequestSpecimenState rsstate;
 
-    public RequestUpdateSpecimensAction(List<RequestSpecimenInfo> specs,
+    public RequestDispatchAction(List<Integer> specs,
+        RequestSpecimenState rsstate,
         DispatchSaveAction dsave,
         Integer workingCenter) {
         this.specs = specs;
         this.dsave = dsave;
+        this.rsstate = rsstate;
         this.workingCenter = workingCenter;
     }
 
@@ -38,15 +40,10 @@ public class RequestUpdateSpecimensAction implements Action<EmptyResult> {
     @Override
     public EmptyResult run(ActionContext context) throws ActionException {
         // Dispatch is saved here because it is all one transaction
-        for (RequestSpecimenInfo spec : specs) {
-            RequestSpecimen specimen =
-                context.load(RequestSpecimen.class, spec.requestSpecimenId);
-            specimen.setState(spec.requestSpecimenStateId);
-            if (spec.claimedBy != null) specimen.setClaimedBy(spec.claimedBy);
-            context.getSession().saveOrUpdate(specimen);
-        }
-        if (dsave != null) dsave.run(context);
+        RequestStateChangeAction stateaction =
+            new RequestStateChangeAction(specs, rsstate);
+        stateaction.run(context);
+        dsave.run(context);
         return new EmptyResult();
     }
-
 }

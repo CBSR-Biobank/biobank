@@ -20,7 +20,7 @@ public class ClinicHelper extends Helper {
         ActivityStatusEnum activityStatus, Boolean sendsShipments) {
 
         Address address = new Address();
-        address.setCity(Utils.getRandomString(5, 10));
+        address.setCity(name);
 
         ClinicSaveAction saveClinic = new ClinicSaveAction();
         saveClinic.setName(name);

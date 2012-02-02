@@ -27,9 +27,8 @@ import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
-import edu.ualberta.med.biobank.common.action.info.RequestSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
-import edu.ualberta.med.biobank.common.action.request.RequestUpdateSpecimensAction;
+import edu.ualberta.med.biobank.common.action.request.RequestDispatchAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -352,17 +351,15 @@ public class RequestEntryForm extends BiobankViewForm {
                 DispatchState.CREATION.getId(), "", request.getId());
         DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
 
-        List<RequestSpecimenInfo> specStatePairs =
-            new ArrayList<RequestSpecimenInfo>();
+        List<Integer> ids =
+            new ArrayList<Integer>();
         for (RequestSpecimenWrapper rs : specs) {
-            RequestSpecimenInfo info =
-                new RequestSpecimenInfo(rs.getId(),
-                    RequestSpecimenState.DISPATCHED_STATE.getId(), null);
-            specStatePairs.add(info);
+            ids.add(rs.getId());
         }
-        RequestUpdateSpecimensAction update =
-            new RequestUpdateSpecimensAction(specStatePairs,
-                save, SessionManager.getUser().getCurrentWorkingCenter()
+        RequestDispatchAction update =
+            new RequestDispatchAction(ids,
+                RequestSpecimenState.DISPATCHED_STATE, save,
+                SessionManager.getUser().getCurrentWorkingCenter()
                     .getId());
         SessionManager.getAppService().doAction(update);
         reload();
