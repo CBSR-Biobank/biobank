@@ -93,7 +93,9 @@ public class TestClinic extends TestAction {
             Assert.assertTrue(true);
         }
 
-        clinicSaveAction.setAddress(new Address());
+        Address address = new Address();
+        address.setCity(name);
+        clinicSaveAction.setAddress(address);
         clinicSaveAction.setContactSaveInfos(null);
         try {
             EXECUTOR.exec(clinicSaveAction);

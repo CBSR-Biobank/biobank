@@ -28,7 +28,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
     private String name;
     private String nameShort;
     private Integer siteId;
-    private Boolean topLevel;
+    private boolean topLevel = false;
     private Integer rowCapacity;
     private Integer colCapacity;
     private Double defaultTemperature;
@@ -56,7 +56,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         this.siteId = siteId;
     }
 
-    public void setTopLevel(Boolean topLevel) {
+    public void setTopLevel(boolean topLevel) {
         this.topLevel = topLevel;
     }
 
