@@ -2,7 +2,6 @@
 <!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
 	<session-factory>
-	
 		<!-- Properties for the session factory -->
 		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
 		<property name="connection.url">jdbc:mysql://localhost:3306/biobank</property>
@@ -25,60 +24,74 @@
 		<property name="cache.use_query_cache">false</property>
 		<property name="cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
 
+		<!-- Turn off default Hibernate Bean Validator, only apply constraints 
+			to the database schema when generated with Hibernate -->
+		<property name="javax.persistence.validation.mode">ddl</property>
+
 		<!-- Mapped classes -->
-		<mapping class="edu.ualberta.med.biobank.model.AbstractPosition" /> 
-		<mapping class="edu.ualberta.med.biobank.model.ActivityStatus" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Address" /> 
-		<mapping class="edu.ualberta.med.biobank.model.AliquotedSpecimen" /> 
-		<mapping class="edu.ualberta.med.biobank.model.BbGroup" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Capacity" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Center" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Clinic" /> 
-		<mapping class="edu.ualberta.med.biobank.model.CollectionEvent" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Comment" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Contact" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Container" /> 
-		<mapping class="edu.ualberta.med.biobank.model.ContainerLabelingScheme" /> 
-		<mapping class="edu.ualberta.med.biobank.model.ContainerPosition" /> 
-		<mapping class="edu.ualberta.med.biobank.model.ContainerType" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Dispatch" /> 
-		<mapping class="edu.ualberta.med.biobank.model.DispatchSpecimen" /> 
-		<mapping class="edu.ualberta.med.biobank.model.EntityColumn" /> 
-		<mapping class="edu.ualberta.med.biobank.model.EntityFilter" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Entity" /> 
-		<mapping class="edu.ualberta.med.biobank.model.EntityProperty" /> 
-		<mapping class="edu.ualberta.med.biobank.model.EventAttr" /> 
-		<mapping class="edu.ualberta.med.biobank.model.EventAttrType" /> 
-		<mapping class="edu.ualberta.med.biobank.model.GlobalEventAttr" /> 
-		<mapping class="edu.ualberta.med.biobank.model.JasperTemplate" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Log" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Membership" /> 
-		<mapping class="edu.ualberta.med.biobank.model.OriginInfo" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Patient" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Principal" /> 
-		<mapping class="edu.ualberta.med.biobank.model.PrintedSsInvItem" /> 
-		<mapping class="edu.ualberta.med.biobank.model.PrinterLabelTemplate" /> 
-		<mapping class="edu.ualberta.med.biobank.model.ProcessingEvent" /> 
-		<mapping class="edu.ualberta.med.biobank.model.PropertyModifier" /> 
-		<mapping class="edu.ualberta.med.biobank.model.PropertyType" /> 
-		<mapping class="edu.ualberta.med.biobank.model.ReportColumn" /> 
-		<mapping class="edu.ualberta.med.biobank.model.ReportFilter" /> 
-		<mapping class="edu.ualberta.med.biobank.model.ReportFilterValue" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Report" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Request" /> 
-		<mapping class="edu.ualberta.med.biobank.model.RequestSpecimen" /> 
-		<mapping class="edu.ualberta.med.biobank.model.ResearchGroup" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Role" /> 
-		<mapping class="edu.ualberta.med.biobank.model.ShipmentInfo" /> 
-		<mapping class="edu.ualberta.med.biobank.model.ShippingMethod" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Site" /> 
-		<mapping class="edu.ualberta.med.biobank.model.SourceSpecimen" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Specimen" /> 
-		<mapping class="edu.ualberta.med.biobank.model.SpecimenPosition" /> 
-		<mapping class="edu.ualberta.med.biobank.model.SpecimenType" /> 
-		<mapping class="edu.ualberta.med.biobank.model.StudyEventAttr" /> 
-		<mapping class="edu.ualberta.med.biobank.model.Study" /> 
-		<mapping class="edu.ualberta.med.biobank.model.User" /> 
+		<mapping class="edu.ualberta.med.biobank.model.AbstractPosition" />
+		<mapping class="edu.ualberta.med.biobank.model.ActivityStatus" />
+		<mapping class="edu.ualberta.med.biobank.model.Address" />
+		<mapping class="edu.ualberta.med.biobank.model.AliquotedSpecimen" />
+		<mapping class="edu.ualberta.med.biobank.model.BbGroup" />
+		<mapping class="edu.ualberta.med.biobank.model.Capacity" />
+		<mapping class="edu.ualberta.med.biobank.model.Center" />
+		<mapping class="edu.ualberta.med.biobank.model.Clinic" />
+		<mapping class="edu.ualberta.med.biobank.model.CollectionEvent" />
+		<mapping class="edu.ualberta.med.biobank.model.Comment" />
+		<mapping class="edu.ualberta.med.biobank.model.Contact" />
+		<mapping class="edu.ualberta.med.biobank.model.Container" />
+		<mapping class="edu.ualberta.med.biobank.model.ContainerLabelingScheme" />
+		<mapping class="edu.ualberta.med.biobank.model.ContainerPosition" />
+		<mapping class="edu.ualberta.med.biobank.model.ContainerType" />
+		<mapping class="edu.ualberta.med.biobank.model.Dispatch" />
+		<mapping class="edu.ualberta.med.biobank.model.DispatchSpecimen" />
+		<mapping class="edu.ualberta.med.biobank.model.EntityColumn" />
+		<mapping class="edu.ualberta.med.biobank.model.EntityFilter" />
+		<mapping class="edu.ualberta.med.biobank.model.Entity" />
+		<mapping class="edu.ualberta.med.biobank.model.EntityProperty" />
+		<mapping class="edu.ualberta.med.biobank.model.EventAttr" />
+		<mapping class="edu.ualberta.med.biobank.model.EventAttrType" />
+		<mapping class="edu.ualberta.med.biobank.model.GlobalEventAttr" />
+		<mapping class="edu.ualberta.med.biobank.model.JasperTemplate" />
+		<mapping class="edu.ualberta.med.biobank.model.Log" />
+		<mapping class="edu.ualberta.med.biobank.model.Membership" />
+		<mapping class="edu.ualberta.med.biobank.model.OriginInfo" />
+		<mapping class="edu.ualberta.med.biobank.model.Patient" />
+		<mapping class="edu.ualberta.med.biobank.model.Principal" />
+		<mapping class="edu.ualberta.med.biobank.model.PrintedSsInvItem" />
+		<mapping class="edu.ualberta.med.biobank.model.PrinterLabelTemplate" />
+		<mapping class="edu.ualberta.med.biobank.model.ProcessingEvent" />
+		<mapping class="edu.ualberta.med.biobank.model.PropertyModifier" />
+		<mapping class="edu.ualberta.med.biobank.model.PropertyType" />
+		<mapping class="edu.ualberta.med.biobank.model.ReportColumn" />
+		<mapping class="edu.ualberta.med.biobank.model.ReportFilter" />
+		<mapping class="edu.ualberta.med.biobank.model.ReportFilterValue" />
+		<mapping class="edu.ualberta.med.biobank.model.Report" />
+		<mapping class="edu.ualberta.med.biobank.model.Request" />
+		<mapping class="edu.ualberta.med.biobank.model.RequestSpecimen" />
+		<mapping class="edu.ualberta.med.biobank.model.ResearchGroup" />
+		<mapping class="edu.ualberta.med.biobank.model.Role" />
+		<mapping class="edu.ualberta.med.biobank.model.ShipmentInfo" />
+		<mapping class="edu.ualberta.med.biobank.model.ShippingMethod" />
+		<mapping class="edu.ualberta.med.biobank.model.Site" />
+		<mapping class="edu.ualberta.med.biobank.model.SourceSpecimen" />
+		<mapping class="edu.ualberta.med.biobank.model.Specimen" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenPosition" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenType" />
+		<mapping class="edu.ualberta.med.biobank.model.StudyEventAttr" />
+		<mapping class="edu.ualberta.med.biobank.model.Study" />
+		<mapping class="edu.ualberta.med.biobank.model.User" />
+		
+		<event type="pre-update">
+			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
+		</event>
+		<event type="pre-insert">
+			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
+		</event>
+		<event type="pre-delete">
+			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
+		</event>
 	</session-factory>
 </hibernate-configuration>
 

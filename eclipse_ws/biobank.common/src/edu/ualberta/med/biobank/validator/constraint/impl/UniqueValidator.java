@@ -35,11 +35,11 @@ public class UniqueValidator extends SessionAwareConstraintValidator<Object>
     }
 
     private int countRows(Object value) {
-        ClassMetadata meta =
-            getSessionFactory().getClassMetadata(value.getClass());
+        ClassMetadata meta = getSession().getSessionFactory()
+            .getClassMetadata(value.getClass());
         String idName = meta.getIdentifierPropertyName();
-        Serializable id =
-            meta.getIdentifier(value, (SessionImplementor) getTmpSession());
+        Serializable id = meta.getIdentifier(value,
+            (SessionImplementor) getSession());
 
         DetachedCriteria criteria = DetachedCriteria.forClass(value.getClass());
         for (String field : fields) {
@@ -48,9 +48,8 @@ public class UniqueValidator extends SessionAwareConstraintValidator<Object>
         }
         criteria.add(Restrictions.ne(idName, id)).setProjection(
             Projections.rowCount());
-
-        List<?> results =
-            criteria.getExecutableCriteria(getTmpSession()).list();
+        
+        List<?> results = criteria.getExecutableCriteria(getSession()).list();
         Number count = (Number) results.iterator().next();
         return count.intValue();
     }

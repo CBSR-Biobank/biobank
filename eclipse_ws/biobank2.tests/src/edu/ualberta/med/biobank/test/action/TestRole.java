@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.test.action;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.Transaction;
 import org.junit.Test;
 import org.springframework.util.Assert;
 
@@ -80,6 +81,38 @@ public class TestRole extends TestAction {
 
         EXECUTOR.exec(action);
         EXECUTOR.exec(action);
+    }
+
+    @Test
+    public void testANameSwap() {
+        Transaction tx = session.beginTransaction();
+
+        String nameA = getMethodNameR();
+        String nameB = getMethodNameR();
+
+        Role roleA = new Role();
+        roleA.setName(nameA);
+
+        session.save(roleA);
+
+        // Note that flush should be called. Inserts get queued up otherwise
+        // (like our two role insert statements). Then before we insert roleB,
+        // roleA was not actually flushed to the db, so it looks like there is
+        // not a name conflict. Could be fixed with FlushMode.ALWAYS, but that
+        // _could_ be inefficient. Either use ALWAYS, or have to be smart about
+        // things. Same problem could happen with two duplicate elements in a
+        // collection. You wouldn't know there's a problem until the db says so.
+        // session.flush();
+
+        Role roleB = new Role();
+        roleB.setName(nameA);
+
+        session.save(roleB);
+
+        tx.commit();
+
+        session.flush();
+        session.clear();
     }
 
     @Test

@@ -1,77 +1,44 @@
 package edu.ualberta.med.biobank.validator;
 
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.ValidationException;
 
-import org.hibernate.HibernateException;
+import org.hibernate.FlushMode;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 
 public abstract class SessionAwareConstraintValidator<T> {
-    private SessionFactory sessionFactory;
-    boolean openedNewTransaction;
-    private Session tmpSession;
+    private Session session;
 
     public SessionAwareConstraintValidator() {
     }
 
+    public void setSession(Session session) {
+        this.session = session;
+    }
+
+    protected Session getSession() {
+        return session;
+    }
+
     public boolean isValid(T value, ConstraintValidatorContext context) {
-        openTmpSession();
-        boolean result = isValidInSession(value, context);
-        closeTmpSession();
-        return result;
+        // TODO: may need to open a new Session or transaction? HRM?
+        // See:
+        // https://community.jboss.org/wiki/AccessingtheHibernateSessionwithinaConstraintValidator
+        // Problem: if the implementation of isValidInSession causes a flush,
+        // then we will be called again. But we cannot just set FlushMode.NEVER
+        // because certain changes must be flushed so that an SQL query does not
+        // return incorrect results from a select (e.g. renaming a unique
+        // field).
+        FlushMode oldMode = session.getFlushMode();
+        try {
+            session.setFlushMode(FlushMode.MANUAL);
+
+            boolean result = isValidInSession(value, context);
+            return result;
+        } finally {
+            session.setFlushMode(oldMode);
+        }
     }
 
     public abstract boolean isValidInSession(T value,
         ConstraintValidatorContext context);
-
-    public SessionFactory getSessionFactory() {
-        return sessionFactory;
-    }
-
-    public void setSessionFactory(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
-
-    public Session getTmpSession() {
-        return tmpSession;
-    }
-
-    private void openTmpSession() {
-        Session currentSession;
-        try {
-            currentSession = getSessionFactory().getCurrentSession();
-        } catch (HibernateException e) {
-            throw new ValidationException(
-                "Unable to determine current Hibernate session", e);
-        }
-        if (!currentSession.getTransaction().isActive()) {
-            currentSession.beginTransaction();
-            openedNewTransaction = true;
-        }
-        try {
-            tmpSession =
-                getSessionFactory().openSession(currentSession.connection());
-        } catch (HibernateException e) {
-            throw new ValidationException("Unable to open temporary session", e);
-        }
-    }
-
-    private void closeTmpSession() {
-        if (openedNewTransaction) {
-            try {
-                getSessionFactory().getCurrentSession().getTransaction()
-                    .commit();
-            } catch (HibernateException e) {
-                throw new ValidationException(
-                    "Unable to commit transaction for temporary session", e);
-            }
-        }
-        try {
-            tmpSession.close();
-        } catch (HibernateException e) {
-            throw new ValidationException(
-                "Unable to close temporary Hibernate session", e);
-        }
-    }
 }

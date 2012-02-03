@@ -15,8 +15,11 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+
 @Entity
 @Table(name = "ROLE")
+@Unique.List({ @Unique(properties = { "name" }) })
 public class Role extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
