@@ -31,7 +31,7 @@ public class Center extends AbstractBiobankModel {
 
     private String name;
     private String nameShort;
-    private Address address;
+    private Address address = new Address();
     private Set<ProcessingEvent> processingEventCollection =
         new HashSet<ProcessingEvent>(0);
     private Set<Membership> membershipCollection =
