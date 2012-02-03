@@ -31,6 +31,7 @@ import org.hibernate.persister.entity.EntityPersister;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PreInsert;
 import edu.ualberta.med.biobank.validator.group.PreUpdate;
+import edu.ualberta.med.biobank.validator.messageinterpolator.OgnlMessageInterpolator;
 
 public class BeanValidationHandler implements PreInsertEventListener,
     PreUpdateEventListener, PreDeleteEventListener {
@@ -93,6 +94,8 @@ public class BeanValidationHandler implements PreInsertEventListener,
         Validator validator = factory.usingContext()
             .traversableResolver(tr)
             .constraintValidatorFactory(validatorFactory)
+            // TODO: create a new one all the time? not sure...
+            .messageInterpolator(new OgnlMessageInterpolator())
             .getValidator();
 
         FlushMode oldMode = session.getFlushMode();

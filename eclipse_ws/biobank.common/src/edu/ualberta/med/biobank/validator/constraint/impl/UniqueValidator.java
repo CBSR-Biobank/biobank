@@ -31,6 +31,7 @@ public class UniqueValidator extends SessionAwareConstraintValidator<Object>
         if (value == null) {
             return true;
         }
+        
         return countRows(value) == 0;
     }
 

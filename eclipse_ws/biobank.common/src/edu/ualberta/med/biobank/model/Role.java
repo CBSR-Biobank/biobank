@@ -16,10 +16,15 @@ import javax.persistence.Table;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @Table(name = "ROLE")
-@Unique.List({ @Unique(properties = { "name" }) })
+
+@Unique.List({
+    @Unique(properties = { "name" },
+        message = "{edu.ualberta.med.biobank.model.Role.name.unique}")
+})
 public class Role extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
