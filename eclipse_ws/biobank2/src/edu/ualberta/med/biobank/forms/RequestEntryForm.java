@@ -357,9 +357,7 @@ public class RequestEntryForm extends BiobankViewForm {
         }
         RequestDispatchAction update =
             new RequestDispatchAction(request.getId(), ids,
-                RequestSpecimenState.DISPATCHED_STATE, dInfo, dsInfos,
-                SessionManager.getUser().getCurrentWorkingCenter()
-                    .getId());
+                RequestSpecimenState.DISPATCHED_STATE, dInfo, dsInfos);
         SessionManager.getAppService().doAction(update);
         reload();
     }

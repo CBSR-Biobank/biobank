@@ -502,8 +502,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),
                 shipmentInfo.getShippingMethod().getId());
         OriginInfoSaveAction save =
-            new OriginInfoSaveAction(oiInfo, siInfo, SessionManager.getUser()
-                .getCurrentWorkingCenter().getId());
+            new OriginInfoSaveAction(oiInfo, siInfo);
         originInfo.setId(SessionManager.getAppService().doAction(save).getId());
         ((AdapterBase) adapter).setModelObject(originInfo);
     }
