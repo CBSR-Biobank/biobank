@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
 import edu.ualberta.med.biobank.test.action.helper.RequestHelper;
@@ -133,7 +134,14 @@ public class TestResearchGroup extends TestAction {
         }
 
         session.beginTransaction();
+
         Request r = (Request) session.load(Request.class, rId);
+        for (RequestSpecimen rs : r.getRequestSpecimenCollection()) {
+            Specimen spec = rs.getSpecimen();
+            session.delete(rs);
+            session.delete(spec);
+        }
+        r = (Request) session.load(Request.class, rId);
         session.delete(r);
         session.getTransaction().commit();
 

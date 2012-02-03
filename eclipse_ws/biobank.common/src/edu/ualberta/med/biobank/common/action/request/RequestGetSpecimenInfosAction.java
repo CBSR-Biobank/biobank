@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
@@ -24,12 +25,17 @@ public class RequestGetSpecimenInfosAction implements
             + RequestSpecimen.class.getName()
             + " ra inner join fetch ra." //$NON-NLS-1$
             + RequestSpecimenPeer.SPECIMEN.getName()
-            + " a inner join fetch a." //$NON-NLS-1$
+            + " a inner join fetch a.collectionEvent" //$NON-NLS-1$
+            + " ce inner join fetch ce.patient inner join fetch a."
             + SpecimenPeer.SPECIMEN_TYPE.getName()
             + " st inner join fetch a." //$NON-NLS-1$
             + SpecimenPeer.SPECIMEN_POSITION.getName()
             + " sp inner join fetch sp." //$NON-NLS-1$
-            + SpecimenPositionPeer.CONTAINER.getName() + " c where ra." //$NON-NLS-1$
+            + SpecimenPositionPeer.CONTAINER.getName()
+            + " c inner join fetch c."
+            + ContainerPeer.POSITION.getName()
+            + " cp inner join fetch c.topContainer "
+            + "top inner join fetch top.containerType ct where ra." //$NON-NLS-1$
             + RequestSpecimenPeer.REQUEST.getName() + ".id=? order by ra." //$NON-NLS-1$
             + RequestSpecimenPeer.STATE.getName();
 

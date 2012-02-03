@@ -151,25 +151,29 @@ public class TestDispatch extends TestAction {
         EXECUTOR.exec(new DispatchChangeStateAction(id,
             DispatchState.IN_TRANSIT, shipsave));
         Assert
-            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch.getState()
+            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch
+                .getState()
                 .equals(DispatchState.IN_TRANSIT.getId()));
 
         EXECUTOR.exec(new DispatchChangeStateAction(id,
             DispatchState.LOST, shipsave));
         Assert
-            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch.getState()
+            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch
+                .getState()
                 .equals(DispatchState.LOST.getId()));
 
         EXECUTOR.exec(new DispatchChangeStateAction(id,
             DispatchState.CLOSED, shipsave));
         Assert
-            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch.getState()
+            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch
+                .getState()
                 .equals(DispatchState.CLOSED.getId()));
 
         EXECUTOR.exec(new DispatchChangeStateAction(id,
             DispatchState.RECEIVED, shipsave));
         Assert
-            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch.getState()
+            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch
+                .getState()
                 .equals(DispatchState.RECEIVED.getId()));
 
     }
@@ -196,7 +200,7 @@ public class TestDispatch extends TestAction {
             EXECUTOR.exec(delete);
             Assert.fail();
         } catch (ActionException e) {
-            System.out.println(e);
+            Assert.assertTrue(true);
         }
 
         DispatchChangeStateAction stateChange =
