@@ -5,7 +5,6 @@ import java.util.List;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.hibernate.EntityMode;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -13,16 +12,15 @@ import org.hibernate.engine.SessionImplementor;
 import org.hibernate.metadata.ClassMetadata;
 
 import edu.ualberta.med.biobank.validator.SessionAwareConstraintValidator;
-import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.constraint.Empty;
 
-public class UniqueValidator extends SessionAwareConstraintValidator<Object>
-    implements ConstraintValidator<Unique, Object> {
-
-    private String[] properties;
+public class EmptyValidator extends SessionAwareConstraintValidator<Object>
+    implements ConstraintValidator<Empty, Object> {
+    private String property;
 
     @Override
-    public void initialize(Unique annotation) {
-        this.properties = annotation.properties();
+    public void initialize(Empty annotation) {
+        this.property = annotation.property();
     }
 
     @Override
@@ -37,26 +35,31 @@ public class UniqueValidator extends SessionAwareConstraintValidator<Object>
     private int countRows(Object value) {
         ClassMetadata meta = getSession().getSessionFactory()
             .getClassMetadata(value.getClass());
+
+        // TODO: not sure if it's a good idea to check the property directly if
+        // it is initialized. If so, uncomment the following code:
+        // if (Hibernate.isPropertyInitialized(value, property)) {
+        // Object propertyValue =
+        // meta.getPropertyValue(value, property, EntityMode.POJO);
+        //
+        // if (propertyValue instanceof Collection) {
+        // int size = ((Collection<?>) propertyValue).size();
+        // return size;
+        // } else {
+        // // TODO: throw an exception or log a warning?
+        // }
+        // }
+
         String idName = meta.getIdentifierPropertyName();
         Serializable id = meta.getIdentifier(value,
             (SessionImplementor) getSession());
 
         DetachedCriteria criteria = DetachedCriteria.forClass(value.getClass());
-        for (String property : properties) {
-            criteria.add(Restrictions.eq(property,
-                meta.getPropertyValue(value, property, EntityMode.POJO)));
-        }
-        criteria.add(Restrictions.ne(idName, id)).setProjection(
-            Projections.rowCount());
+        criteria.add(Restrictions.eq(idName, id))
+            .setProjection(Projections.count(property));
 
         List<?> results = criteria.getExecutableCriteria(getSession()).list();
         Number count = (Number) results.iterator().next();
-        
-        // Because actions are queued, it is possible for two objects to have
-        // the same value for a unique field. The pre-insert/update validation
-        // will succeed because they query the database, but when both actions
-        // are flushed, then the database will raise an error.
-        // TODO: query cache for duplicates?
 
         return count.intValue();
     }

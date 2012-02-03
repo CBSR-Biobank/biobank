@@ -15,10 +15,15 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @DiscriminatorValue("User")
-@Unique.List({ @Unique(properties = { "login" }) })
+@Unique.List({
+    @Unique(properties = { "login" },
+        groups = PrePersist.class,
+        message = "{edu.ualberta.med.biobank.model.User.uniqueLogin}")
+})
 public class User extends Principal {
     private static final long serialVersionUID = 1L;
 

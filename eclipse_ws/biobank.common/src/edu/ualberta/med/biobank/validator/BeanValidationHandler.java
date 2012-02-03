@@ -15,6 +15,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
 
 import org.hibernate.EntityMode;
+import org.hibernate.FlushMode;
 import org.hibernate.cfg.beanvalidation.HibernateTraversableResolver;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.event.AbstractPreDatabaseOperationEvent;
@@ -27,9 +28,9 @@ import org.hibernate.event.PreUpdateEvent;
 import org.hibernate.event.PreUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 
-import edu.ualberta.med.biobank.model.group.Delete;
-import edu.ualberta.med.biobank.model.group.Insert;
-import edu.ualberta.med.biobank.model.group.Update;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
+import edu.ualberta.med.biobank.validator.group.PreInsert;
+import edu.ualberta.med.biobank.validator.group.PreUpdate;
 
 public class BeanValidationHandler implements PreInsertEventListener,
     PreUpdateEventListener, PreDeleteEventListener {
@@ -45,19 +46,19 @@ public class BeanValidationHandler implements PreInsertEventListener,
 
     @Override
     public boolean onPreInsert(PreInsertEvent event) {
-        validate(event, new Class<?>[] { Default.class });
+        validate(event, new Class<?>[] { PreInsert.class, Default.class });
         return false;
     }
 
     @Override
     public boolean onPreUpdate(PreUpdateEvent event) {
-        validate(event, new Class<?>[] { Default.class });
+        validate(event, new Class<?>[] { PreUpdate.class, Default.class });
         return false;
     }
 
     @Override
     public boolean onPreDelete(PreDeleteEvent event) {
-        validate(event, new Class<?>[] { Default.class });
+        validate(event, new Class<?>[] { PreDelete.class, Default.class });
         return false;
     }
 
@@ -94,33 +95,43 @@ public class BeanValidationHandler implements PreInsertEventListener,
             .constraintValidatorFactory(validatorFactory)
             .getValidator();
 
-        if (groups.length > 0) {
-            final Set<ConstraintViolation<T>> constraintViolations =
-                validator.validate(object, groups);
-            if (constraintViolations.size() > 0) {
-                //
-                // TODO: ensure translatable ConstraintViolation-s?
-                //
-                Set<ConstraintViolation<?>> propagatedViolations =
-                    new HashSet<ConstraintViolation<?>>(
-                        constraintViolations.size());
-                Set<String> classNames = new HashSet<String>();
-                for (ConstraintViolation<?> violation : constraintViolations) {
-                    // if (log.isTraceEnabled()) {
-                    // log.trace(violation.toString());
-                    // }
-                    propagatedViolations.add(violation);
-                    classNames
-                        .add(violation.getLeafBean().getClass().getName());
+        FlushMode oldMode = session.getFlushMode();
+        try {
+            // If the session is used to query data, then another flush could be
+            // triggered which will prompt validation (again) and throw us into
+            // an infinite loop. Avoid this.
+            session.setFlushMode(FlushMode.MANUAL);
+
+            if (groups.length > 0) {
+                final Set<ConstraintViolation<T>> constraintViolations =
+                    validator.validate(object, groups);
+                if (constraintViolations.size() > 0) {
+                    //
+                    // TODO: ensure translatable ConstraintViolation-s?
+                    //
+                    Set<ConstraintViolation<?>> propagatedViolations =
+                        new HashSet<ConstraintViolation<?>>(
+                            constraintViolations.size());
+                    Set<String> classNames = new HashSet<String>();
+                    for (ConstraintViolation<?> violation : constraintViolations) {
+                        // if (log.isTraceEnabled()) {
+                        // log.trace(violation.toString());
+                        // }
+                        propagatedViolations.add(violation);
+                        classNames
+                            .add(violation.getLeafBean().getClass().getName());
+                    }
+                    StringBuilder builder = new StringBuilder();
+                    builder.append("validation failed for classes ");
+                    builder.append(classNames);
+                    builder.append(" for groups ");
+                    builder.append(Arrays.toString(groups));
+                    throw new ConstraintViolationException(
+                        builder.toString(), propagatedViolations);
                 }
-                StringBuilder builder = new StringBuilder();
-                builder.append("validation failed for classes ");
-                builder.append(classNames);
-                builder.append(" for groups ");
-                builder.append(Arrays.toString(groups));
-                throw new ConstraintViolationException(
-                    builder.toString(), propagatedViolations);
             }
+        } finally {
+            session.setFlushMode(oldMode);
         }
     }
 }
