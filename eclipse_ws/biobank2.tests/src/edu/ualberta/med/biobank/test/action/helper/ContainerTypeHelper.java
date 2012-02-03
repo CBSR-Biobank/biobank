@@ -12,7 +12,8 @@ public class ContainerTypeHelper {
 
     public static ContainerTypeSaveAction getSaveAction(String name,
         String nameShort, Integer siteId, boolean isTopLevel,
-        Integer rowCapacity, Integer colCapacity, Integer childLabelingSchemeId) {
+        Integer rowCapacity, Integer colCapacity,
+        Integer childLabelingSchemeId, Double defaultTemp) {
 
         ContainerTypeSaveAction ctSaveAction = new ContainerTypeSaveAction();
         ctSaveAction.setName(name);
@@ -22,6 +23,7 @@ public class ContainerTypeHelper {
         ctSaveAction.setRowCapacity(rowCapacity);
         ctSaveAction.setColCapacity(colCapacity);
         ctSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        ctSaveAction.setDefaultTemperature(defaultTemp);
         ctSaveAction.setChildLabelingSchemeId(childLabelingSchemeId);
 
         return ctSaveAction;

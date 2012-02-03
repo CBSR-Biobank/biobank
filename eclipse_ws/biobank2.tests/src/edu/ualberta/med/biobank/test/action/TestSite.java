@@ -107,8 +107,9 @@ public class TestSite extends TestAction {
         }
 
         // test invalid act status: 5, -1
-
-        siteSaveAction.setAddress(new Address());
+        Address address = new Address();
+        address.setCity(name);
+        siteSaveAction.setAddress(address);
         siteSaveAction.setStudyIds(null);
         try {
             EXECUTOR.exec(siteSaveAction);
@@ -317,7 +318,7 @@ public class TestSite extends TestAction {
 
         ContainerTypeSaveAction ctSaveAction =
             ContainerTypeHelper.getSaveAction(ctName, ctName, siteId, true, 6,
-                10, labelingSchemes.get(0).getId());
+                10, labelingSchemes.get(0).getId(), R.nextDouble());
         Integer ctId = EXECUTOR.exec(ctSaveAction).getId();
 
         SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
@@ -331,7 +332,7 @@ public class TestSite extends TestAction {
         ctName += "_2";
         ctSaveAction =
             ContainerTypeHelper.getSaveAction(ctName, ctName, siteId, true, 3,
-                8, labelingSchemes.get(1).getId());
+                8, labelingSchemes.get(1).getId(), R.nextDouble());
         ctId = EXECUTOR.exec(ctSaveAction).getId();
 
         siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
@@ -373,7 +374,7 @@ public class TestSite extends TestAction {
             ContainerTypeHelper.getSaveAction(name, name, provisioning.siteId,
                 true, 3, 10,
                 getContainerLabelingSchemes().values().iterator().next()
-                    .getId());
+                    .getId(), R.nextDouble());
         Integer containerTypeId = EXECUTOR.exec(ctSaveAction).getId();
         provisioning.containerTypeIds.add(containerTypeId);
         return provisioning;

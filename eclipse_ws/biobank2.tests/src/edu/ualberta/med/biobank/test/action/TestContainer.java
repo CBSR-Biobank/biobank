@@ -35,7 +35,7 @@ public class TestContainer extends TestAction {
         containerTypeId = EXECUTOR.exec(ContainerTypeHelper.getSaveAction(
             "FREEZER_3x10", "FR3x10", siteId, true, 3, 10,
             getContainerLabelingSchemes().get("CBSR 2 char alphabetic")
-                .getId())).getId();
+                .getId(), R.nextDouble())).getId();
 
         containerSaveAction = new ContainerSaveAction();
         containerSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE

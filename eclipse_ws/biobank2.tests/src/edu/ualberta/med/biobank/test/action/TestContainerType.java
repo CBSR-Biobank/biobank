@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.validation.ConstraintViolationException;
+
 import junit.framework.Assert;
 
 import org.hibernate.Query;
@@ -13,7 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
-import edu.ualberta.med.biobank.common.action.constraint.ConstraintViolationException;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
@@ -50,7 +51,7 @@ public class TestContainerType extends TestAction {
         containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
             "FREEZER_3x10", "FR3x10", siteId, true, 3, 10,
             getContainerLabelingSchemes().get("CBSR 2 char alphabetic")
-                .getId());
+                .getId(), R.nextDouble());
     }
 
     @Test
@@ -85,16 +86,6 @@ public class TestContainerType extends TestAction {
         }
 
         containerTypeSaveAction.setSiteId(siteId);
-        containerTypeSaveAction.setTopLevel(null);
-        try {
-            EXECUTOR.exec(containerTypeSaveAction);
-            Assert
-                .fail("should not be allowed to add container type with null for top level");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        containerTypeSaveAction.setTopLevel(true);
         containerTypeSaveAction.setRowCapacity(null);
         try {
             EXECUTOR.exec(containerTypeSaveAction);
@@ -141,7 +132,6 @@ public class TestContainerType extends TestAction {
         containerTypeSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE
             .getId());
         EXECUTOR.exec(containerTypeSaveAction);
-
     }
 
     @Test
@@ -164,9 +154,11 @@ public class TestContainerType extends TestAction {
         Assert.assertEquals(0, topContainerTypeInfo.containerType
             .getCommentCollection().size());
 
-        containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
-            "HOTEL13", "H13", siteId, false, 13, 1,
-            getContainerLabelingSchemes().get("2 char numeric").getId());
+        containerTypeSaveAction =
+            ContainerTypeHelper.getSaveAction(
+                "HOTEL13", "H13", siteId, false, 13, 1,
+                getContainerLabelingSchemes().get("2 char numeric").getId(),
+                R.nextDouble());
         EXECUTOR.exec(containerTypeSaveAction).getId();
         topContainerTypeInfo =
             EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
@@ -196,12 +188,12 @@ public class TestContainerType extends TestAction {
         containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
             "FREEZER_4x12", "FR5x10", siteId, true, 3, 10,
             getContainerLabelingSchemes().get("CBSR 2 char alphabetic")
-                .getId());
+                .getId(), R.nextDouble());
         try {
             EXECUTOR.exec(containerTypeSaveAction);
             Assert
                 .fail("should not be allowed to add a second container type with same name");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -371,29 +363,36 @@ public class TestContainerType extends TestAction {
         ContainerTypeSaveAction hotelCtSaveAction =
             ContainerTypeHelper.getSaveAction(
                 "HOTEL12", "H12", siteId, false, 12, 1,
-                getContainerLabelingSchemes().get("2 char numeric").getId());
+                getContainerLabelingSchemes().get("2 char numeric").getId(),
+                R.nextDouble());
         Integer ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
         ContainerTypeInfo containerTypeInfo =
             EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
         result.add(containerTypeInfo.containerType);
 
-        hotelCtSaveAction = ContainerTypeHelper.getSaveAction(
-            "HOTEL13", "H13", siteId, false, 13, 1,
-            getContainerLabelingSchemes().get("2 char numeric").getId());
+        hotelCtSaveAction =
+            ContainerTypeHelper.getSaveAction(
+                "HOTEL13", "H13", siteId, false, 13, 1,
+                getContainerLabelingSchemes().get("2 char numeric").getId(),
+                R.nextDouble());
         ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
         containerTypeInfo = EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
         result.add(containerTypeInfo.containerType);
 
-        hotelCtSaveAction = ContainerTypeHelper.getSaveAction(
-            "HOTEL18", "H18", siteId, false, 18, 1,
-            getContainerLabelingSchemes().get("2 char numeric").getId());
+        hotelCtSaveAction =
+            ContainerTypeHelper.getSaveAction(
+                "HOTEL18", "H18", siteId, false, 18, 1,
+                getContainerLabelingSchemes().get("2 char numeric").getId(),
+                R.nextDouble());
         ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
         containerTypeInfo = EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
         result.add(containerTypeInfo.containerType);
 
-        hotelCtSaveAction = ContainerTypeHelper.getSaveAction(
-            "HOTEL19", "H19", siteId, false, 19, 1,
-            getContainerLabelingSchemes().get("2 char numeric").getId());
+        hotelCtSaveAction =
+            ContainerTypeHelper.getSaveAction(
+                "HOTEL19", "H19", siteId, false, 19, 1,
+                getContainerLabelingSchemes().get("2 char numeric").getId(),
+                R.nextDouble());
         ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
         containerTypeInfo = EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
         result.add(containerTypeInfo.containerType);
@@ -514,7 +513,7 @@ public class TestContainerType extends TestAction {
             Assert
                 .fail(
                 "should not be allowed to delete a child container type and linked to a parent type");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
     }

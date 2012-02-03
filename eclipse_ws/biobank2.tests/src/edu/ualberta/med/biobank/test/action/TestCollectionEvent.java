@@ -63,7 +63,7 @@ public class TestCollectionEvent extends TestAction {
 
     @Test
     public void saveNoSpecsNoAttrs() throws Exception {
-        final Integer visitNumber = R.nextInt(20);
+        final Integer visitNumber = R.nextInt(20) + 1;
         final String commentText = Utils.getRandomString(20, 30);
         final Integer statusId = 1;
         // test add
@@ -81,7 +81,7 @@ public class TestCollectionEvent extends TestAction {
 
     @Test
     public void saveWithSpecs() throws Exception {
-        final Integer visitNumber = R.nextInt(20);
+        final Integer visitNumber = R.nextInt(20) + 1;
         final String commentText = Utils.getRandomString(20, 30);
         final Integer statusId = 1;
 
@@ -218,7 +218,7 @@ public class TestCollectionEvent extends TestAction {
                 "abcdefghi");
         attrs.add(attrInfo);
 
-        Integer visitNber = R.nextInt(20);
+        Integer visitNber = R.nextInt(20) + 1;
         Integer statusId = 1;
         String commentText = Utils.getRandomString(20, 30);
         // Save a new cevent
@@ -275,7 +275,7 @@ public class TestCollectionEvent extends TestAction {
         }
         Assert.assertNotNull(phlebotomistStudyAttr);
 
-        final Integer visitNumber = R.nextInt(20);
+        final Integer visitNumber = R.nextInt(20) + 1;
         final String commentText = Utils.getRandomString(20, 30);
         final Integer statusId = 1;
 
@@ -415,9 +415,8 @@ public class TestCollectionEvent extends TestAction {
     public void deleteWithoutSpecimens() throws Exception {
         final Integer ceventId = EXECUTOR.exec(
             new CollectionEventSaveAction(null, provisioning.patientIds
-                .get(0),
-                R.nextInt(20), 1, Utils.getRandomString(20, 30), null,
-                null)).getId();
+                .get(0), R.nextInt(20) + 1, 1, Utils.getRandomString(20, 30),
+                null, null)).getId();
 
         // test delete
         EXECUTOR.exec(new CollectionEventDeleteAction(ceventId));
@@ -439,10 +438,8 @@ public class TestCollectionEvent extends TestAction {
         // Save a new cevent
         final Integer ceventId = EXECUTOR.exec(
             new CollectionEventSaveAction(null, provisioning.patientIds
-                .get(0),
-                R.nextInt(20), 1, null,
-                new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
-                null))
+                .get(0), R.nextInt(20) + 1, 1, null,
+                new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
             .getId();
 
         // try delete this cevent:
@@ -462,7 +459,7 @@ public class TestCollectionEvent extends TestAction {
 
     @Test
     public void saveNotUniqueVisitNumber() throws Exception {
-        final Integer visitNumber = R.nextInt(20);
+        final Integer visitNumber = R.nextInt(20) + 1;
         final Integer statusId = 1;
         // add
         EXECUTOR.exec(new CollectionEventSaveAction(null,
@@ -508,7 +505,7 @@ public class TestCollectionEvent extends TestAction {
                 phlebotomistStudyAttr.getId(), eventAttrType, value);
         attrs.add(attrInfo);
 
-        Integer visitNber = R.nextInt(20);
+        Integer visitNber = R.nextInt(20) + 1;
         Integer statusId = 1;
         // Save a new cevent
         final Integer ceventId =

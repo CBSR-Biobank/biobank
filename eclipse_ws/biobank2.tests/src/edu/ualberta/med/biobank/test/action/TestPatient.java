@@ -326,8 +326,8 @@ public class TestPatient extends TestAction {
 
         // Save a new cevent with specimens
         final Integer ceventId = EXECUTOR.exec(
-            new CollectionEventSaveAction(null, patientId, R
-                .nextInt(20), 1, null,
+            new CollectionEventSaveAction(null, patientId,
+                R.nextInt(20) + 1, 1, null,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
                 null)).getId();
 

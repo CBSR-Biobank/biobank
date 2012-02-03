@@ -129,7 +129,7 @@ public class TestResearchGroup extends TestAction {
             EXECUTOR.exec(delete);
             Assert.fail();
         } catch (ActionException e) {
-            System.out.println(e);
+            Assert.assertTrue(true);
         }
 
         session.beginTransaction();
