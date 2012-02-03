@@ -17,9 +17,7 @@ import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
-import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
-import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.util.ModelUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
@@ -31,7 +29,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
@@ -183,15 +180,16 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             .getDispatchSpecimenCollection(false))
             dsInfos.add(new DispatchSpecimenInfo(ds.getId(), ds.getSpecimen()
                 .getId(), ds.getState()));
-        DispatchSaveInfo dInfo =
-            new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter()
-                .getId(), dispatch.getSenderCenter().getId(),
-                dispatch.getState(), comment.getMessage() == null ? ""
-                    : comment.getMessage(),
-                dispatch.getRequest() != null ? dispatch.getRequest.getId()
-                    : null);
-        DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
-        dispatch.setId(SessionManager.getAppService().doAction(save).getId());
-        ((AdapterBase) adapter).setModelObject(dispatch);
+        // DispatchSaveInfo dInfo =
+        // new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter()
+        // .getId(), dispatch.getSenderCenter().getId(),
+        // dispatch.getState(), comment.getMessage() == null ? ""
+        // : comment.getMessage(),
+        // dispatch.getRequest() != null ? dispatch.getRequest.getId()
+        // : null);
+        // DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos,
+        // null);
+        // dispatch.setId(SessionManager.getAppService().doAction(save).getId());
+        // ((AdapterBase) adapter).setModelObject(dispatch);
     }
 }
