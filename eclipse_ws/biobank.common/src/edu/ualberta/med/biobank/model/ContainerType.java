@@ -12,6 +12,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
@@ -176,14 +177,17 @@ public class ContainerType extends AbstractBiobankModel {
         this.parentContainerTypeCollection = parentContainerTypeCollection;
     }
 
+    @Transient
     public Integer getRowCapacity() {
         return this.capacity.getRowCapacity();
     }
 
+    @Transient
     public Integer getColCapacity() {
         return this.capacity.getColCapacity();
     }
 
+    @Transient
     public String getPositionString(RowColPos position) {
         return ContainerLabelingScheme.getPositionString(position,
             getChildLabelingScheme().getId(), getRowCapacity(),
@@ -191,9 +195,16 @@ public class ContainerType extends AbstractBiobankModel {
 
     }
 
+    @Transient
     public RowColPos getRowColFromPositionString(String position)
         throws Exception {
         return childLabelingScheme.getRowColFromPositionString(position,
             getRowCapacity(), getColCapacity());
+    }
+
+    @Transient
+    public boolean isPallet96() {
+        return RowColPos.PALLET_96_ROW_MAX.equals(getRowCapacity())
+            && RowColPos.PALLET_96_COL_MAX.equals(getColCapacity());
     }
 }

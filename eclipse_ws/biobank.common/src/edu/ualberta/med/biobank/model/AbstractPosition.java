@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.model;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
@@ -13,7 +14,6 @@ public class AbstractPosition extends AbstractBiobankModel {
 
     private Integer row;
     private Integer col;
-    private String positionString;
 
     @NotNull
     @Min(value = 0)
@@ -37,16 +37,7 @@ public class AbstractPosition extends AbstractBiobankModel {
         this.col = col;
     }
 
-    @NotNull
-    @Column(name = "POSITION_STRING", length = 255, nullable = false)
-    public String getPositionString() {
-        return this.positionString;
-    }
-
-    public void setPositionString(String positionString) {
-        this.positionString = positionString;
-    }
-
+    @Transient
     public RowColPos getPosition() {
         return new RowColPos(getRow(), getCol());
     }

@@ -11,6 +11,8 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
@@ -150,6 +152,10 @@ public class ContainerDisplayWidget extends Canvas {
         }
     }
 
+    public void setContainer(ContainerWrapper container) {
+        setContainer(container.getWrappedObject());
+    }
+
     public void setContainerType(ContainerType type) {
         setContainerType(type, null, false);
     }
@@ -164,10 +170,18 @@ public class ContainerDisplayWidget extends Canvas {
         initDisplayFromType(createDefaultContainer, cellSize);
     }
 
+    public void setContainerType(ContainerTypeWrapper type) {
+        setContainerType(type.getWrappedObject());
+    }
+
     public void setContainerType(ContainerType type,
         boolean createDefaultContainer) {
         this.containerType = type;
         initDisplayFromType(createDefaultContainer);
+    }
+
+    public void setContainerType(ContainerTypeWrapper type, Integer cellSize) {
+        setContainerType(type.getWrappedObject(), cellSize, false);
     }
 
     public void initDisplayFromType(boolean createDefaultContainer) {

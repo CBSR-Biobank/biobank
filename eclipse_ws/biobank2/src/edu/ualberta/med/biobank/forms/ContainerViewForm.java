@@ -130,6 +130,7 @@ public class ContainerViewForm extends BiobankViewForm {
     private void updateContainerInfo() throws ApplicationException {
         containerInfo = SessionManager.getAppService().doAction(
             new ContainerGetInfoAction(adapter.getId()));
+        Assert.isNotNull(containerInfo);
     }
 
     @Override
@@ -283,8 +284,7 @@ public class ContainerViewForm extends BiobankViewForm {
         containerWidget =
             new ContainerDisplayWidget(client,
                 UICellStatus.DEFAULT_CONTAINER_STATUS_LIST);
-        containerWidget.setContainer(new ContainerWrapper(SessionManager
-            .getAppService(), containerInfo.container));
+        containerWidget.setContainer(containerInfo.container);
         containerWidget.setCells(cells);
         toolkit.adapt(containerWidget);
 

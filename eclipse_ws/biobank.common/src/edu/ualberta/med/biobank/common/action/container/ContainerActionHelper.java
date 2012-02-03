@@ -3,10 +3,8 @@ package edu.ualberta.med.biobank.common.action.container;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
-import edu.ualberta.med.biobank.model.ContainerType;
 
 public class ContainerActionHelper {
 
@@ -26,12 +24,6 @@ public class ContainerActionHelper {
 
             parent = context.load(Container.class, parentId);
             pos.setParentContainer(parent);
-            ContainerType parentType = parent.getContainerType();
-            String positionString = ContainerLabelingSchemeWrapper
-                .getPositionString(rcp, parentType.getChildLabelingScheme()
-                    .getId(), parentType.getCapacity().getRowCapacity(),
-                    parentType.getCapacity().getColCapacity());
-            pos.setPositionString(positionString);
         } else if ((parentId == null) && (rcp == null)) {
             if ((pos != null) && (pos.getId() != null)) {
                 context.getSession().delete(pos);
