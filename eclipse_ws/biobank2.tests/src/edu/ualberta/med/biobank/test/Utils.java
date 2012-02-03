@@ -7,12 +7,12 @@ import java.util.Random;
 
 public class Utils {
 
-    private static Random r = new Random();
+    private static Random R = new Random();
 
     public static String getRandomString(int minlen, int maxlen) {
         String str = new String();
-        for (int j = 0, n = minlen + r.nextInt(maxlen - minlen) + 1; j < n; ++j) {
-            str += (char) ('A' + r.nextInt(26));
+        for (int j = 0, n = minlen + R.nextInt(maxlen - minlen) + 1; j < n; ++j) {
+            str += (char) ('A' + R.nextInt(26));
         }
         return str;
     }
@@ -23,19 +23,19 @@ public class Utils {
 
     public static String getRandomNumericString(int maxlen) {
         String str = new String();
-        for (int j = 0, n = r.nextInt(maxlen) + 1; j < n; ++j) {
-            str += (char) ('0' + r.nextInt(10));
+        for (int j = 0, n = R.nextInt(maxlen) + 1; j < n; ++j) {
+            str += (char) ('0' + R.nextInt(10));
         }
         return str;
     }
 
     public static Date getRandomDate() {
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.YEAR, 2000 + r.nextInt(40));
-        cal.set(Calendar.DAY_OF_YEAR, r.nextInt(365) + 1);
-        cal.set(Calendar.HOUR_OF_DAY, r.nextInt(24));
-        cal.set(Calendar.MINUTE, r.nextInt(60));
-        cal.set(Calendar.SECOND, r.nextInt(60));
+        cal.set(Calendar.YEAR, 2000 + R.nextInt(40));
+        cal.set(Calendar.DAY_OF_YEAR, R.nextInt(365) + 1);
+        cal.set(Calendar.HOUR_OF_DAY, R.nextInt(24));
+        cal.set(Calendar.MINUTE, R.nextInt(60));
+        cal.set(Calendar.SECOND, R.nextInt(60));
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
     }
@@ -45,7 +45,7 @@ public class Utils {
             return list.get(0);
         }
         if (list.size() > 1) {
-            return list.get(r.nextInt(list.size()));
+            return list.get(R.nextInt(list.size()));
         }
         return null;
     }

@@ -491,14 +491,14 @@ End:
     <delete dir="${test.build.dir}" />
   </target>
 
-  <target name="prepare">
+  <target name="test-prepare">
     <mkdir dir="${test.build.dir}" />
     <mkdir dir="${test.output}" />
     <mkdir dir="${test.output.raw}" />
   </target>
 
   <!---->
-  <target name="tests-compile" depends="build-common-project,prepare" >
+  <target name="tests-compile" depends="build-common-project,test-prepare" >
     <copy includeemptydirs="false"
           todir="${test.build.dir}" overwrite="true">
       <fileset dir="${eclipse.proj.dir.tests}/src">
@@ -519,27 +519,39 @@ End:
       <include name="**/tools/utils/*.java" />
       <include name="**/test/reports/**/*.java" />
       <include name="**/Test*.java" />
-      <classpath>
+      <exclude name="**/presenters/**" />
+      <exclude name="**/TestingDispatcher.java" />
+     <classpath>
         <pathelement location="${eclipse.proj.dir.common}/output" />
         <pathelement location="${eclipse.proj.dir.common}/lib/client" />
+        <pathelement location="${req.jars.dir}" />
       </classpath>
       <classpath refid="biobank.common.build.classpath" />
     </javac>
   </target>
 
   <fileset id="testcase.files" dir="${eclipse.proj.dir.tests}/src">
-    <include name="**/Test*.java" />
     <exclude name="**/speed/**" />
     <exclude name="**/TestReportsProcedurallyGeneratedData.java" />
+    <exclude name="**/TestAction.java" />
     <exclude name="**/TestCommon.java" />
+    <exclude name="**/TestingDispatcher.java" />
+    <exclude name="**/TestHibernateLocking.java" />
     <exclude name="**/TestDatabase.java" />
     <exclude name="**/TestFunctionalities.java" />
     <exclude name="**/TestReportsOnExistingData.java" />
     <exclude name="**/AllTests.java" />
     <exclude name="**/wrappers/**" />
+    <exclude name="**/presenters/**" />
+    <include name="**/Test*.java" />
   </fileset>
 
-  <target name="test" depends="tests-compile" description="executes test cases">
+  <!-- target name="test-debug">
+    <pathconvert pathsep="${line.separator}" property="sounds" refid="testcase.files"/>
+    <echo file="sounds.txt">${sounds}</echo>
+  </target -->
+
+  <target name="test" depends="clean-test-results,tests-compile" description="executes test cases">
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
       <classpath refid="test.class.path" />
       <classpath refid="biobank.common.run.classpath" />
