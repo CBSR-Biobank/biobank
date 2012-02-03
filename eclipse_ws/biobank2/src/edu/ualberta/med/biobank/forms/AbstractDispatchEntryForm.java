@@ -180,6 +180,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             .getDispatchSpecimenCollection(false))
             dsInfos.add(new DispatchSpecimenInfo(ds.getId(), ds.getSpecimen()
                 .getId(), ds.getState()));
+        // TODO: uncomment code below and fix java error
         // DispatchSaveInfo dInfo =
         // new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter()
         // .getId(), dispatch.getSenderCenter().getId(),
