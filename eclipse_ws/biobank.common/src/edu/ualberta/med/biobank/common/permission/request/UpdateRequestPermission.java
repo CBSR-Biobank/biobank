@@ -14,23 +14,21 @@ public class UpdateRequestPermission implements Permission {
      * 
      */
     private static final long serialVersionUID = 5212290952626711959L;
-    private Integer workingCenterId;
     private List<Integer> specs;
 
-    public UpdateRequestPermission(Integer workingCenterId,
-        List<Integer> specs) {
-        this.workingCenterId = workingCenterId;
+    public UpdateRequestPermission(List<Integer> specs) {
         this.specs = specs;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) {
+        Integer id = specs.get(0);
         for (Integer spec : specs)
             if (!context.load(RequestSpecimen.class, spec)
                 .getSpecimen().getCurrentCenter().getId()
-                .equals(workingCenterId))
+                .equals(id))
                 return false;
         return PermissionEnum.REQUEST_UPDATE.isAllowed(context.getUser(),
-            context.get(Center.class, workingCenterId));
+            context.get(Center.class, id));
     }
 }

@@ -27,18 +27,16 @@ public class OriginInfoSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
     private OriginInfoSaveInfo oiInfo;
     private ShipmentInfoSaveInfo siInfo;
-    private Integer workingCenter;
 
     public OriginInfoSaveAction(OriginInfoSaveInfo oiInfo,
-        ShipmentInfoSaveInfo siInfo, Integer workingCenter) {
+        ShipmentInfoSaveInfo siInfo) {
         this.oiInfo = oiInfo;
         this.siInfo = siInfo;
-        this.workingCenter = workingCenter;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new OriginInfoSavePermission(oiInfo, workingCenter)
+        return new OriginInfoSavePermission(oiInfo)
             .isAllowed(context);
     }
 
@@ -89,7 +87,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
                     throw new ActionException("Specimen id can not be null");
                 Specimen spec =
                     context.load(Specimen.class, specId);
-                Center center = context.load(Center.class, workingCenter);
+                Center center = context.load(Center.class, oiInfo.siteId);
                 OriginInfo newOriginInfo = new OriginInfo();
                 newOriginInfo.setCenter(center);
                 spec.setOriginInfo(newOriginInfo);

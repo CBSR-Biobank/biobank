@@ -23,26 +23,23 @@ public class RequestDispatchAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 89092566507468524L;
     private DispatchSaveInfo dInfo;
     private List<Integer> specs;
-    private Integer workingCenter;
     private RequestSpecimenState rsstate;
     private Integer requestId;
     private Set<DispatchSpecimenInfo> dspecs;
 
     public RequestDispatchAction(Integer requestId, List<Integer> specs,
         RequestSpecimenState rsstate,
-        DispatchSaveInfo dInfo, Set<DispatchSpecimenInfo> dspecs,
-        Integer workingCenter) {
+        DispatchSaveInfo dInfo, Set<DispatchSpecimenInfo> dspecs) {
         this.specs = specs;
         this.dInfo = dInfo;
         this.dspecs = dspecs;
         this.rsstate = rsstate;
         this.requestId = requestId;
-        this.workingCenter = workingCenter;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new UpdateRequestPermission(workingCenter, specs)
+        return new UpdateRequestPermission(specs)
             .isAllowed(context);
     }
 

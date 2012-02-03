@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.permission.shipment;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.permission.Permission;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 
@@ -10,9 +11,11 @@ public class ShipmentDeletePermission implements Permission {
     private static final long serialVersionUID = 1L;
 
     private Integer shipmentId;
+    private Integer workingCenter;
 
-    public ShipmentDeletePermission(Integer shipId) {
+    public ShipmentDeletePermission(Integer shipId, Integer workingCenter) {
         this.shipmentId = shipId;
+        this.workingCenter = workingCenter;
     }
 
     @Override
@@ -23,7 +26,10 @@ public class ShipmentDeletePermission implements Permission {
                 ship = context.load(OriginInfo.class, shipmentId);
                 return PermissionEnum.ORIGIN_INFO_DELETE.isAllowed(
                     context.getUser(),
-                    ship.getCenter());
+                    ship.getCenter())
+                    && PermissionEnum.ORIGIN_INFO_CREATE.isAllowed(
+                        context.getUser(),
+                        context.load(Center.class, workingCenter));
             } catch (ModelNotFoundException e) {
                 return false;
             }
