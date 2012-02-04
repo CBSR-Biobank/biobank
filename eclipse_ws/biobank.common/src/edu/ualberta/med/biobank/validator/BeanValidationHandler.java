@@ -115,20 +115,24 @@ public class BeanValidationHandler implements PreInsertEventListener,
                     Set<ConstraintViolation<?>> propagatedViolations =
                         new HashSet<ConstraintViolation<?>>(
                             constraintViolations.size());
-                    Set<String> classNames = new HashSet<String>();
+                    
+
+                    StringBuilder builder = new StringBuilder();
+                    builder.append("validation failed for groups: ");
+                    builder.append(Arrays.toString(groups));
+                    
                     for (ConstraintViolation<?> violation : constraintViolations) {
                         // if (log.isTraceEnabled()) {
                         // log.trace(violation.toString());
                         // }
                         propagatedViolations.add(violation);
-                        classNames
-                            .add(violation.getLeafBean().getClass().getName());
+                        
+                        builder.append("\r\n");
+                        builder.append(violation.getLeafBean().getClass().getName());
+                        builder.append(":");
+                        builder.append(violation.getMessage());
                     }
-                    StringBuilder builder = new StringBuilder();
-                    builder.append("validation failed for classes ");
-                    builder.append(classNames);
-                    builder.append(" for groups ");
-                    builder.append(Arrays.toString(groups));
+
                     throw new ConstraintViolationException(
                         builder.toString(), propagatedViolations);
                 }

@@ -151,7 +151,6 @@ public class OgnlMessageInterpolator implements MessageInterpolator {
         String result = null;
 
         try {
-
             OgnlContext context = new OgnlContext();
             Object value = Ognl.getValue(expression, context, validatedValue);
 
