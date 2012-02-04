@@ -29,7 +29,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  * Base class for all "Session" tree view nodes. Generally, most of the nodes in
  * the tree are adapters for classes in the ORM model.
  */
-@Deprecated
 public abstract class AdapterBase extends AbstractAdapterBase {
 
     private static BgcLogger logger = BgcLogger.getLogger(AdapterBase.class

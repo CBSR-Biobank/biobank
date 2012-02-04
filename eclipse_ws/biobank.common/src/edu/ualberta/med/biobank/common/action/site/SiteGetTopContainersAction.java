@@ -14,13 +14,15 @@ import edu.ualberta.med.biobank.model.Site;
 public class SiteGetTopContainersAction implements
     Action<SiteGetTopContainersResult> {
     private static final long serialVersionUID = 1L;
+
     // @formatter:off
     @SuppressWarnings("nls")
     private static final String SELECT_TOP_CONTAINERS_HQL = "SELECT container"
         + " FROM " + Container.class.getName() + " container"
         + " INNER JOIN FETCH container.containerType containerType"
         + " INNER JOIN FETCH container.activityStatus activityStatus"
-        + " WHERE container.site.id = ?"
+        + " INNER JOIN FETCH container.site site"
+        + " WHERE site.id = ?"
         + " AND containerType.topLevel IS TRUE"; // only select top-level
                                                  // Container-s
     // @formatter:on
@@ -43,7 +45,7 @@ public class SiteGetTopContainersAction implements
     @Override
     public SiteGetTopContainersResult run(ActionContext context)
         throws ActionException {
-        ArrayList<Container> topContainers = new ArrayList<Container>();
+        ArrayList<Container> topContainers = new ArrayList<Container>(0);
 
         Query query =
             context.getSession().createQuery(SELECT_TOP_CONTAINERS_HQL);

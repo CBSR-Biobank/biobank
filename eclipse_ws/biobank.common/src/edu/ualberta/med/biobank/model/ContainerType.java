@@ -31,7 +31,7 @@ public class ContainerType extends AbstractBiobankModel {
     private String name;
     private String nameShort;
     private boolean topLevel = false;
-    private double defaultTemperature;
+    private Double defaultTemperature;
     private Set<SpecimenType> specimenTypeCollection =
         new HashSet<SpecimenType>(0);
     private Set<ContainerType> childContainerTypeCollection =
@@ -76,11 +76,11 @@ public class ContainerType extends AbstractBiobankModel {
 
     // TODO: change to decimal
     @Column(name = "DEFAULT_TEMPERATURE")
-    public double getDefaultTemperature() {
+    public Double getDefaultTemperature() {
         return this.defaultTemperature;
     }
 
-    public void setDefaultTemperature(double defaultTemperature) {
+    public void setDefaultTemperature(Double defaultTemperature) {
         this.defaultTemperature = defaultTemperature;
     }
 
