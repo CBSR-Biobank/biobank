@@ -1,14 +1,10 @@
 package edu.ualberta.med.biobank.validator.messageinterpolator;
 
-import java.awt.Dimension;
-import java.util.IllegalFormatException;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.validation.MessageInterpolator;
-import javax.validation.ValidationException;
-import javax.validation.MessageInterpolator.Context;
 
 import ognl.Ognl;
 import ognl.OgnlContext;
@@ -17,16 +13,16 @@ import ognl.OgnlException;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 
 /**
- * Adds custom
+ * Enables the OGNL evaluation of anything of the format
+ * <code>$&#123;ognl_expression&#125;</code>, where the validated value is the
+ * root object of the OGNL expression.
  * 
  * @author Jonathan Ferland
- * 
  */
 public class OgnlMessageInterpolator implements MessageInterpolator {
-    public static final String VALIDATED_VALUE_KEYWORD = "validatedValue";
+    private static final Pattern VARIABLE_START_PATTERN = Pattern
+        .compile("\\$\\{");
 
-    private static final Pattern EXPRESSION_PATTERN = Pattern
-        .compile("(\\{[^\\}]+?\\})");
     private final MessageInterpolator delegate;
     private final Locale defaultLocale;
 
@@ -34,14 +30,14 @@ public class OgnlMessageInterpolator implements MessageInterpolator {
         this(null);
     }
 
-    public OgnlMessageInterpolator(MessageInterpolator userMessageInterpolator) {
-        defaultLocale = Locale.getDefault();
-        if (userMessageInterpolator == null) {
+    public OgnlMessageInterpolator(MessageInterpolator delegate) {
+        if (delegate == null) {
             this.delegate = new ResourceBundleMessageInterpolator();
+        } else {
+            this.delegate = delegate;
         }
-        else {
-            this.delegate = userMessageInterpolator;
-        }
+
+        defaultLocale = Locale.getDefault();
     }
 
     @Override
@@ -66,34 +62,103 @@ public class OgnlMessageInterpolator implements MessageInterpolator {
      */
     private String interpolateMessage(String message, Object validatedValue,
         Locale locale) {
-        String interpolatedMessage =
-            replaceOgnlExpressions(message, validatedValue);
-        return interpolatedMessage;
-    }
-
-    private String replaceOgnlExpressions(String message, Object validatedValue) {
-        Matcher matcher = EXPRESSION_PATTERN.matcher(message);
-        StringBuffer sb = new StringBuffer();
+        String interpolatedMessage = message;
+        Matcher matcher = VARIABLE_START_PATTERN.matcher(message);
 
         while (matcher.find()) {
-            String parameter = matcher.group(1);
+            int curlyBraceOpenings = 1;
+            boolean inDoubleQuotes = false;
+            boolean inSingleQuotes = false;
+            int lastIndex = matcher.end();
 
-            try {
-                Object expr = Ognl.parseExpression(parameter);
-                OgnlContext ctx = new OgnlContext();
-                Object value = Ognl.getValue(parameter, validatedValue);
+            do {
+                char current = message.charAt(lastIndex);
 
-                matcher.appendReplacement(sb, value.toString());
+                if (current == '\'') {
+                    if (!inDoubleQuotes && !isEscaped(message, lastIndex)) {
+                        inSingleQuotes = !inSingleQuotes;
+                    }
+                } else if (current == '"') {
+                    if (!inSingleQuotes && !isEscaped(message, lastIndex)) {
+                        inDoubleQuotes = !inDoubleQuotes;
+                    }
+                } else if (!inDoubleQuotes && !inSingleQuotes) {
+                    if (current == '{') {
+                        curlyBraceOpenings++;
+                    } else if (current == '}') {
+                        curlyBraceOpenings--;
+                    }
+                }
 
-                System.out.println(value);
-            } catch (OgnlException e) {
-                // TODO: throw?
-                System.err.println("TROUBBBBLLLLEEEEEEEEE!");
+                lastIndex++;
+
+            } while (curlyBraceOpenings > 0 && lastIndex < message.length());
+
+            // The validated value expression seems correct
+            if (curlyBraceOpenings == 0) {
+                String variable = message.substring(matcher.start(), lastIndex);
+                String ognlExpression = extractContents(variable);
+
+                String evaluation =
+                    evaluateOgnl(ognlExpression, validatedValue);
+
+                String escapedVariable = Pattern.quote(variable);
+                String escapedEvaluation = Matcher.quoteReplacement(evaluation);
+
+                interpolatedMessage = interpolatedMessage.replaceFirst(
+                    escapedVariable,
+                    escapedEvaluation);
             }
         }
 
-        matcher.appendTail(sb);
+        return interpolatedMessage;
+    }
 
-        return sb.toString();
+    /**
+     * 
+     * @param variable a string matching <code>$&#123;contents&#125;</code>
+     * @return contents
+     */
+    private String extractContents(String variable) {
+        int start = 2;
+        int end = variable.length() - 1;
+
+        if (end < start) {
+            throw new IndexOutOfBoundsException("");
+        }
+
+        return variable.substring(start, end);
+    }
+
+    /**
+     * Return true if the char at the given index is preceded by a backslash in
+     * the containing String.
+     * 
+     * @param string the containing string
+     * @param charIndex the index of the character
+     * 
+     * @return true if the given character is escaped, otherwise false
+     */
+    private boolean isEscaped(String string, int charIndex) {
+        if (charIndex < 0 || charIndex > string.length()) {
+            throw new IndexOutOfBoundsException(
+                "Index must be between 0 and string.length() - 1.");
+        }
+        return charIndex > 0 && string.charAt(charIndex - 1) == '\\';
+    }
+
+    private String evaluateOgnl(String expression, Object validatedValue) {
+        String result = null;
+
+        try {
+
+            OgnlContext context = new OgnlContext();
+            Object value = Ognl.getValue(expression, context, validatedValue);
+
+            result = value.toString();
+        } catch (OgnlException e) {
+        }
+
+        return result;
     }
 }
