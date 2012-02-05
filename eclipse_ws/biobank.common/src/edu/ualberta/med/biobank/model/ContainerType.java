@@ -17,11 +17,23 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreInsert;
+import edu.ualberta.med.biobank.validator.group.PreUpdate;
+
 @Entity
 @Table(name = "CONTAINER_TYPE",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "SITE_ID", "NAME" }),
         @UniqueConstraint(columnNames = { "SITE_ID", "NAME_SHORT" }) })
+@Unique.List({
+    @Unique(properties = { "site.id", "name" },
+        groups = { PreInsert.class, PreUpdate.class },
+        message = "{edu.ualberta.med.biobank.model.ContainerType.name.Unique}"),
+    @Unique(properties = { "site.id", "nameShort" },
+        groups = { PreInsert.class, PreUpdate.class },
+        message = "{edu.ualberta.med.biobank.model.ContainerType.nameShort.Unique}")
+})
 public class ContainerType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

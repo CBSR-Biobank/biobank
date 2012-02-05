@@ -13,8 +13,15 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreInsert;
+import edu.ualberta.med.biobank.validator.group.PreUpdate;
+
 @Entity
 @Table(name = "SPECIMEN_TYPE")
+@Unique(properties = { "name" },
+    groups = { PreInsert.class, PreUpdate.class },
+    message = "{edu.ualberta.med.biobank.model.SpecimenType.name.Unique}")
 public class SpecimenType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

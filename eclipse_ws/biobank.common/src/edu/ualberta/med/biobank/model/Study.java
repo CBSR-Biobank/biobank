@@ -19,8 +19,20 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreInsert;
+import edu.ualberta.med.biobank.validator.group.PreUpdate;
+
 @Entity
 @Table(name = "STUDY")
+@Unique.List({
+    @Unique(properties = { "name" },
+        groups = { PreInsert.class, PreUpdate.class },
+        message = "{edu.ualberta.med.biobank.model.Study.name.Unique}"),
+    @Unique(properties = { "nameShort" },
+        groups = { PreInsert.class, PreUpdate.class },
+        message = "{edu.ualberta.med.biobank.model.Study.nameShort.Unique}")
+})
 public class Study extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

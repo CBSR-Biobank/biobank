@@ -18,12 +18,28 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreInsert;
+import edu.ualberta.med.biobank.validator.group.PreUpdate;
+
 @Entity
 @Table(name = "CONTAINER",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "SITE_ID", "CONTAINER_TYPE_ID",
             "LABEL" }),
         @UniqueConstraint(columnNames = { "SITE_ID", "PRODUCT_BARCODE" }) })
+// TODO: consider pulling @UniqueConstraint into this @Unique annotation,
+// because this is a total repeating of constraints. Would then need to figure
+// out how to add DDL constraints from our annotations and how to get a bean's
+// value of a specific column.
+@Unique.List({
+    @Unique(properties = { "site.id", "containerType.id", "label" },
+        groups = { PreInsert.class, PreUpdate.class },
+        message = "{edu.ualberta.med.biobank.model.Container.label.Unique}"),
+    @Unique(properties = { "site.id", "productBarcode" },
+        groups = { PreInsert.class, PreUpdate.class },
+        message = "{edu.ualberta.med.biobank.model.Container.productBarcode.Unique}")
+})
 public class Container extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

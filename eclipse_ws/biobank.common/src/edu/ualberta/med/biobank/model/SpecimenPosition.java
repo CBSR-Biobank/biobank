@@ -8,10 +8,17 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreInsert;
+import edu.ualberta.med.biobank.validator.group.PreUpdate;
+
 @Entity
 @Table(name = "SPECIMEN_POSITION",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "CONTAINER_ID", "ROW", "COL" }) })
+@Unique(properties = { "container", "row", "col" },
+    groups = { PreInsert.class, PreUpdate.class },
+    message = "{edu.ualberta.med.biobank.model.SpecimenPosition.position.Unique}")
 public class SpecimenPosition extends AbstractPosition {
     private static final long serialVersionUID = 1L;
 
