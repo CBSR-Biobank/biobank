@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import org.hibernate.EntityMode;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -29,7 +30,38 @@ public class EmptyValidator extends SessionAwareConstraintValidator<Object>
         if (value == null) {
             return true;
         }
-        return countRows(value) == 0;
+        
+        boolean empty = countRows(value) == 0;
+        
+        if (!empty) {
+            overrideEmptyMessageTemplate(value, context);
+        }
+        
+        return empty;
+    }
+
+    private void overrideEmptyMessageTemplate(Object value,
+        ConstraintValidatorContext context) {
+        String defaultTemplate = context.getDefaultConstraintMessageTemplate();
+
+        if (defaultTemplate.isEmpty()) {
+            ClassMetadata meta = getSession().getSessionFactory()
+                .getClassMetadata(value.getClass());
+
+            StringBuilder template = new StringBuilder();
+
+            template.append("{");
+            template.append(meta.getMappedClass(EntityMode.POJO).getName());
+            template.append(".");
+            template.append(Empty.class.getSimpleName());
+            template.append(".");
+            template.append(property);
+            template.append("}");
+
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate(template.toString())
+                .addConstraintViolation();
+        }
     }
 
     private int countRows(Object value) {

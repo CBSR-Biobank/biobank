@@ -29,7 +29,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ TYPE, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 public @interface NotUsed {
-    String message() default "{edu.ualberta.med.biobank.constraint.NotUsed.message}";
+    String message() default "";
 
     Class<?> by();
 

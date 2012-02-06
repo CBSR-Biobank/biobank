@@ -51,7 +51,9 @@ public class UniqueValidator extends SessionAwareConstraintValidator<Object>
 
             template.append("{");
             template.append(meta.getMappedClass(EntityMode.POJO).getName());
-            template.append(".Unique[");
+            template.append(".");
+            template.append(Unique.class.getSimpleName());
+            template.append("[");
 
             for (int i = 0, n = properties.length; i < n; i++) {
                 template.append(properties[i]);

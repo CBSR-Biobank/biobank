@@ -26,7 +26,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ TYPE, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 public @interface Empty {
-    String message() default "{edu.ualberta.med.biobank.constraint.Empty.message}";
+    String message() default "";
 
     String property();
 
