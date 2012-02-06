@@ -59,7 +59,7 @@ public class OriginInfo extends AbstractBiobankModel {
         this.shipmentInfo = shipmentInfo;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.OriginInfo.center.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.OriginInfo.center.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CENTER_ID", nullable = false)
     public Center getCenter() {

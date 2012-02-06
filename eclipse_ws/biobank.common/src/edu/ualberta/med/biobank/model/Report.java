@@ -30,7 +30,7 @@ public class Report extends AbstractBiobankModel {
     private Set<ReportFilter> reportFilterCollection =
         new HashSet<ReportFilter>(0);
 
-    @NotEmpty(message = "edu.ualberta.med.biobank.model.Report.name.NotEmpty")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Report.name.NotEmpty}")
     @Column(name = "NAME")
     public String getName() {
         return this.name;
@@ -89,7 +89,7 @@ public class Report extends AbstractBiobankModel {
         this.reportColumnCollection = reportColumnCollection;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.Report.entity.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Report.entity.NotNull}")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ENTITY_ID", nullable = false)
     public Entity getEntity() {

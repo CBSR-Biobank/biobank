@@ -24,7 +24,7 @@ public class PrinterLabelTemplate extends AbstractBiobankModel {
     private String configData;
     private JasperTemplate jasperTemplate;
 
-    @NotEmpty(message = "edu.ualberta.med.biobank.model.PrinterLabelTemplate.name.NotEmpty")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.PrinterLabelTemplate.name.NotEmpty}")
     @Column(name = "NAME", unique = true, length = 50)
     public String getName() {
         return this.name;
@@ -52,7 +52,7 @@ public class PrinterLabelTemplate extends AbstractBiobankModel {
         this.configData = configData;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.PrinterLabelTemplate.jasperTemplate.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.PrinterLabelTemplate.jasperTemplate.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "JASPER_TEMPLATE_ID", nullable = false)
     public JasperTemplate getJasperTemplate() {

@@ -84,7 +84,7 @@ public class Membership extends AbstractBiobankModel {
         this.study = study;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.Membership.principal.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Membership.principal.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRINCIPAL_ID", nullable = false)
     public Principal getPrincipal() {

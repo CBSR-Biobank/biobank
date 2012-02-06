@@ -22,7 +22,7 @@ public class SpecimenPosition extends AbstractPosition {
     private Container container;
     private Specimen specimen;
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.SpecimenPosition.container.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.SpecimenPosition.container.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CONTAINER_ID", nullable = false)
     public Container getContainer() {
@@ -33,7 +33,7 @@ public class SpecimenPosition extends AbstractPosition {
         this.container = container;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.SpecimenPosition.specimen.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.SpecimenPosition.specimen.NotNull}")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "SPECIMEN_ID", nullable = false, unique = true)
     public Specimen getSpecimen() {

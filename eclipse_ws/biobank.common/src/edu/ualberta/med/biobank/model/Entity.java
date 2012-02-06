@@ -22,7 +22,7 @@ public class Entity extends AbstractBiobankModel {
     private Set<EntityProperty> entityPropertyCollection =
         new HashSet<EntityProperty>(0);
 
-    @NotEmpty(message = "edu.ualberta.med.biobank.model.Entity.className.NotEmpty")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Entity.className.NotEmpty}")
     @Column(name = "CLASS_NAME")
     public String getClassName() {
         return this.className;
@@ -32,7 +32,7 @@ public class Entity extends AbstractBiobankModel {
         this.className = className;
     }
 
-    @NotEmpty(message = "edu.ualberta.med.biobank.model.Entity.name.NotEmpty")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Entity.name.NotEmpty}")
     @Column(name = "NAME")
     public String getName() {
         return this.name;

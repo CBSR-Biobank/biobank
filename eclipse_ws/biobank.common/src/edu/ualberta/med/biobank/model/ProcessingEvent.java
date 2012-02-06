@@ -40,7 +40,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
     private ActivityStatus activityStatus;
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
-    @NotEmpty(message = "edu.ualberta.med.biobank.model.ProcessingEvent.worksheet.NotEmpty")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.worksheet.NotEmpty}")
     @Column(name = "WORKSHEET", length = 100)
     public String getWorksheet() {
         return this.worksheet;
@@ -50,7 +50,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
         this.worksheet = worksheet;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.ProcessingEvent.createdAt.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.createdAt.NotNull}")
     @Column(name = "CREATED_AT", nullable = false)
     public Date getCreatedAt() {
         return this.createdAt;
@@ -60,7 +60,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
         this.createdAt = createdAt;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.ProcessingEvent.center.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.center.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CENTER_ID", nullable = false)
     public Center getCenter() {
@@ -81,7 +81,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
         this.specimenCollection = specimenCollection;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.ProcessingEvent.activityStatus.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.activityStatus.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {

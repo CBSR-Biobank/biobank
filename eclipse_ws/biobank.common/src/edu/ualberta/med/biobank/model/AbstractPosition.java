@@ -13,8 +13,8 @@ public class AbstractPosition extends AbstractBiobankModel {
     private Integer col;
     private String positionString;
 
-    @Min(value = 0, message = "edu.ualberta.med.biobank.model.AbstractPosition.row.Min")
-    @NotNull(message = "edu.ualberta.med.biobank.model.AbstractPosition.row.NotNull")
+    @Min(value = 0, message = "{edu.ualberta.med.biobank.model.AbstractPosition.row.Min}")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.AbstractPosition.row.NotNull}")
     @Column(name = "ROW", nullable = false)
     public Integer getRow() {
         return this.row;
@@ -24,8 +24,8 @@ public class AbstractPosition extends AbstractBiobankModel {
         this.row = row;
     }
 
-    @Min(value = 0, message = "edu.ualberta.med.biobank.model.AbstractPosition.col.Min")
-    @NotNull(message = "edu.ualberta.med.biobank.model.AbstractPosition.col.NotNull")
+    @Min(value = 0, message = "{edu.ualberta.med.biobank.model.AbstractPosition.col.Min}")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.AbstractPosition.col.NotNull}")
     @Column(name = "COL", nullable = false)
     public Integer getCol() {
         return this.col;
@@ -36,7 +36,7 @@ public class AbstractPosition extends AbstractBiobankModel {
     }
 
     // TODO: make position string abstract and use the container's type and labeling scheme?
-    @NotNull(message = "edu.ualberta.med.biobank.model.AbstractPosition.positionString.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.AbstractPosition.positionString.NotNull}")
     @Column(name = "POSITION_STRING", length = 255, nullable = false)
     public String getPositionString() {
         return this.positionString;

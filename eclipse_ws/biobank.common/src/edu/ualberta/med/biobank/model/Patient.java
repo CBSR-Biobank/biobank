@@ -39,7 +39,7 @@ public class Patient extends AbstractBiobankModel {
     private Study study;
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
-    @NotEmpty(message = "edu.ualberta.med.biobank.model.Patient.pnumber.NotEmpty")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Patient.pnumber.NotEmpty}")
     @Column(name = "PNUMBER", unique = true, nullable = false, length = 100)
     public String getPnumber() {
         return this.pnumber;
@@ -49,7 +49,7 @@ public class Patient extends AbstractBiobankModel {
         this.pnumber = pnumber;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.Patient.createdAt.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Patient.createdAt.NotNull}")
     @Column(name = "CREATED_AT")
     public Date getCreatedAt() {
         return this.createdAt;
@@ -69,7 +69,7 @@ public class Patient extends AbstractBiobankModel {
         this.collectionEventCollection = collectionEventCollection;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.Patient.study.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Patient.study.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_ID", nullable = false)
     public Study getStudy() {

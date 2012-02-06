@@ -36,7 +36,7 @@ public class Request extends AbstractBiobankModel {
         this.submitted = submitted;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.Request.created.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Request.created.NotNull}")
     @Column(name = "CREATED", nullable = false)
     public Date getCreated() {
         return this.created;
@@ -66,7 +66,7 @@ public class Request extends AbstractBiobankModel {
         this.requestSpecimenCollection = requestSpecimenCollection;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.Request.address.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Request.address.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ADDRESS_ID", nullable = false)
     public Address getAddress() {
@@ -77,7 +77,7 @@ public class Request extends AbstractBiobankModel {
         this.address = address;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.Request.researchGroup.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Request.researchGroup.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RESEARCH_GROUP_ID", nullable = false)
     public ResearchGroup getResearchGroup() {

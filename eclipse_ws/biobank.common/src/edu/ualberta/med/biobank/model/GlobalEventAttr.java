@@ -22,7 +22,7 @@ public class GlobalEventAttr extends AbstractBiobankModel {
     private String label;
     private EventAttrType eventAttrType;
 
-    @NotEmpty(message = "edu.ualberta.med.biobank.model.GlobalEventAttr.label.NotEmpty")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.GlobalEventAttr.label.NotEmpty}")
     @Column(name = "LABEL", unique = true, nullable = false, length = 50)
     public String getLabel() {
         return this.label;
@@ -32,7 +32,7 @@ public class GlobalEventAttr extends AbstractBiobankModel {
         this.label = label;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.GlobalEventAttr.eventAttrType.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.GlobalEventAttr.eventAttrType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "EVENT_ATTR_TYPE_ID", nullable = false)
     public EventAttrType getEventAttrType() {

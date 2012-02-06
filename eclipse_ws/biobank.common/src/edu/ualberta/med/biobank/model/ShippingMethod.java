@@ -20,7 +20,7 @@ public class ShippingMethod extends AbstractBiobankModel {
 
     private String name;
 
-    @NotEmpty(message = "edu.ualberta.med.biobank.model.ShippingMethod.name.NotEmpty")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.ShippingMethod.name.NotEmpty}")
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
         return this.name;

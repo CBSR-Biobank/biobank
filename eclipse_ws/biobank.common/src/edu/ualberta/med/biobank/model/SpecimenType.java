@@ -43,7 +43,7 @@ public class SpecimenType extends AbstractBiobankModel {
     private Set<SpecimenType> childSpecimenTypeCollection =
         new HashSet<SpecimenType>(0);
 
-    @NotEmpty(message = "edu.ualberta.med.biobank.model.SpecimenType.name.NotEmpty")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.SpecimenType.name.NotEmpty}")
     @Column(name = "NAME", unique = true)
     public String getName() {
         return this.name;
@@ -53,7 +53,7 @@ public class SpecimenType extends AbstractBiobankModel {
         this.name = name;
     }
 
-    @NotEmpty(message = "edu.ualberta.med.biobank.model.SpecimenType.nameShort.NotEmpty")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.SpecimenType.nameShort.NotEmpty}")
     @Column(name = "NAME_SHORT", unique = true)
     public String getNameShort() {
         return this.nameShort;

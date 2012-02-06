@@ -29,7 +29,7 @@ public class ShipmentInfo extends AbstractBiobankModel {
         this.receivedAt = receivedAt;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.ShipmentInfo.packedAt.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ShipmentInfo.packedAt.NotNull}")
     @Column(name = "PACKED_AT", nullable = false)
     public Date getPackedAt() {
         return this.packedAt;
@@ -57,7 +57,7 @@ public class ShipmentInfo extends AbstractBiobankModel {
         this.boxNumber = boxNumber;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.ShipmentInfo.shippingMethod.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ShipmentInfo.shippingMethod.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SHIPPING_METHOD_ID", nullable = false)
     public ShippingMethod getShippingMethod() {

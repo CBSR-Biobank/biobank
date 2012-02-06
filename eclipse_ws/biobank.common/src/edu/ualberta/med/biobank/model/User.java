@@ -31,7 +31,7 @@ public class User extends Principal {
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
     private Set<BbGroup> groupCollection = new HashSet<BbGroup>(0);
 
-    @NotEmpty(message = "edu.ualberta.med.biobank.model.User.login.NotEmpty")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.User.login.NotEmpty}")
     @Column(name = "LOGIN", unique = true)
     public String getLogin() {
         return this.login;
@@ -41,7 +41,7 @@ public class User extends Principal {
         this.login = login;
     }
 
-    @NotEmpty(message = "edu.ualberta.med.biobank.model.User.csmUserId.NotEmpty")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.User.csmUserId.NotEmpty}")
     @Column(name = "CSM_USER_ID")
     public Long getCsmUserId() {
         return this.csmUserId;

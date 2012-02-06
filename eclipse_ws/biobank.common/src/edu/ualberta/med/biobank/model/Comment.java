@@ -20,7 +20,7 @@ public class Comment extends AbstractBiobankModel {
     private Date createdAt;
     private User user;
 
-    @NotEmpty(message = "edu.ualberta.med.biobank.model.Comment.message.NotNull")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Comment.message.NotNull}")
     @Column(name = "MESSAGE", columnDefinition="TEXT")
     public String getMessage() {
         return this.message;
@@ -39,7 +39,7 @@ public class Comment extends AbstractBiobankModel {
         this.createdAt = createdAt;
     }
 
-    @NotNull(message = "edu.ualberta.med.biobank.model.Comment.user.NotNull")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Comment.user.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID", nullable = false)
     public User getUser() {
