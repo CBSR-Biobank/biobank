@@ -59,7 +59,7 @@ public class BeanValidationHandler implements PreInsertEventListener,
 
     @Override
     public boolean onPreDelete(PreDeleteEvent event) {
-        validate(event, new Class<?>[] { PreDelete.class, Default.class });
+        validate(event, new Class<?>[] { PreDelete.class });
         return false;
     }
 
