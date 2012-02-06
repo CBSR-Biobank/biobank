@@ -20,7 +20,7 @@ public class PrintedSsInvItem extends AbstractBiobankModel {
 
     private String txt;
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.PrintedSsInvItem.txt.NotEmpty}")
     @Column(name = "TXT", unique = true, length = 15)
     public String getTxt() {
         return this.txt;

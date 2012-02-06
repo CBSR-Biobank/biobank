@@ -41,7 +41,7 @@ public class StudyEventAttr extends AbstractBiobankModel {
         this.required = required;
     }
 
-    @NotNull
+    @NotNull(message = "edu.ualberta.med.biobank.model.StudyEventAttr.globalEventAttr.NotNull")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "GLOBAL_EVENT_ATTR_ID", nullable = false)
     public GlobalEventAttr getGlobalEventAttr() {
@@ -52,7 +52,7 @@ public class StudyEventAttr extends AbstractBiobankModel {
         this.globalEventAttr = globalEventAttr;
     }
 
-    @NotNull
+    @NotNull(message = "edu.ualberta.med.biobank.model.StudyEventAttr.study.NotNull")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_ID", nullable = false)
     public Study getStudy() {
@@ -63,7 +63,7 @@ public class StudyEventAttr extends AbstractBiobankModel {
         this.study = study;
     }
 
-    @NotNull
+    @NotNull(message = "edu.ualberta.med.biobank.model.StudyEventAttr.activityStatus.NotNull")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {

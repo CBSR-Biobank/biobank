@@ -19,7 +19,7 @@ public class RequestSpecimen extends AbstractBiobankModel {
     private Request request;
 
     // TODO: switch to enum?
-    @NotNull
+    @NotNull(message = "edu.ualberta.med.biobank.model.RequestSpecimen.state.NotNull")
     @Column(name = "STATE", nullable = false)
     public Integer getState() {
         return this.state;
@@ -38,7 +38,7 @@ public class RequestSpecimen extends AbstractBiobankModel {
         this.claimedBy = claimedBy;
     }
 
-    @NotNull
+    @NotNull(message = "edu.ualberta.med.biobank.model.RequestSpecimen.specimen.NotNull")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_ID", nullable = false)
     public Specimen getSpecimen() {
@@ -49,7 +49,7 @@ public class RequestSpecimen extends AbstractBiobankModel {
         this.specimen = specimen;
     }
 
-    @NotNull
+    @NotNull(message = "edu.ualberta.med.biobank.model.RequestSpecimen.request.NotNull")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "REQUEST_ID", nullable = false)
     public Request getRequest() {

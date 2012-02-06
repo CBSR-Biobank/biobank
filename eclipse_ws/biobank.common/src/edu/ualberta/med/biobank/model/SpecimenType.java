@@ -19,9 +19,14 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
 
 @Entity
 @Table(name = "SPECIMEN_TYPE")
-@Unique(properties = { "name" },
-    groups = { PreInsert.class, PreUpdate.class },
-    message = "{edu.ualberta.med.biobank.model.SpecimenType.name.Unique}")
+@Unique.List({
+    @Unique(properties = { "name" },
+        groups = { PreInsert.class, PreUpdate.class },
+        message = "{edu.ualberta.med.biobank.model.SpecimenType.name.Unique}"),
+    @Unique(properties = { "nameShort" },
+        groups = { PreInsert.class, PreUpdate.class },
+        message = "{edu.ualberta.med.biobank.model.SpecimenType.nameShort.Unique}")
+})
 public class SpecimenType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -34,7 +39,7 @@ public class SpecimenType extends AbstractBiobankModel {
     private Set<SpecimenType> childSpecimenTypeCollection =
         new HashSet<SpecimenType>(0);
 
-    @NotEmpty
+    @NotEmpty(message = "edu.ualberta.med.biobank.model.SpecimenType.name.NotEmpty")
     @Column(name = "NAME", unique = true)
     public String getName() {
         return this.name;
@@ -44,7 +49,7 @@ public class SpecimenType extends AbstractBiobankModel {
         this.name = name;
     }
 
-    @NotEmpty
+    @NotEmpty(message = "edu.ualberta.med.biobank.model.SpecimenType.nameShort.NotEmpty")
     @Column(name = "NAME_SHORT", unique = true)
     public String getNameShort() {
         return this.nameShort;

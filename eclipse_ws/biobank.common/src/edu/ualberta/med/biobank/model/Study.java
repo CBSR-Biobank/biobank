@@ -53,7 +53,7 @@ public class Study extends AbstractBiobankModel {
     private Set<SourceSpecimen> sourceSpecimenCollection =
         new HashSet<SourceSpecimen>(0);
 
-    @NotEmpty
+    @NotEmpty(message = "edu.ualberta.med.biobank.model.Study.name.NotEmpty")
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
         return this.name;
@@ -63,7 +63,7 @@ public class Study extends AbstractBiobankModel {
         this.name = name;
     }
 
-    @NotEmpty
+    @NotEmpty(message = "edu.ualberta.med.biobank.model.Study.nameShort.NotEmpty")
     @Column(name = "NAME_SHORT", unique = true, nullable = false, length = 50)
     public String getNameShort() {
         return this.nameShort;
@@ -115,7 +115,7 @@ public class Study extends AbstractBiobankModel {
         this.commentCollection = commentCollection;
     }
 
-    @NotNull
+    @NotNull(message = "edu.ualberta.med.biobank.model.Study.activityStatus.NotEmpty")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {
