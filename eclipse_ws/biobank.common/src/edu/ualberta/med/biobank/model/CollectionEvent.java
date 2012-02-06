@@ -22,16 +22,13 @@ import org.hibernate.annotations.CascadeType;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
-import edu.ualberta.med.biobank.validator.group.PreInsert;
-import edu.ualberta.med.biobank.validator.group.PreUpdate;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @Table(name = "COLLECTION_EVENT",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "PATIENT_ID", "VISIT_NUMBER" }) })
-@Unique(properties = { "patient.id", "visitNumber" },
-    groups = { PreInsert.class, PreUpdate.class },
-    message = "{edu.ualberta.med.biobank.model.CollectionEvent.visitNumber.Unique}")
+@Unique(properties = { "patient", "visitNumber" }, groups = PrePersist.class)
 @Empty(property = "allSpecimenCollection", groups = PreDelete.class,
     message = "edu.ualberta.med.biobank.model.CollectionEvent.Empty.allSpecimenCollection")
 public class CollectionEvent extends AbstractBiobankModel {

@@ -22,14 +22,11 @@ import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
-import edu.ualberta.med.biobank.validator.group.PreInsert;
-import edu.ualberta.med.biobank.validator.group.PreUpdate;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @Table(name = "PATIENT")
-@Unique(properties = { "pnumber" },
-    groups = { PreInsert.class, PreUpdate.class },
-    message = "{edu.ualberta.med.biobank.model.Patient.pnumber.Unique}")
+@Unique(properties = "pnumber", groups = PrePersist.class)
 @NotUsed(by = Specimen.class, property = "patient",
     groups = PreDelete.class,
     message = "edu.ualberta.med.biobank.model.Patient.NotUsed.specimen.patient")

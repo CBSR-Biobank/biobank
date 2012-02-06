@@ -7,14 +7,11 @@ import javax.persistence.Table;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.Unique;
-import edu.ualberta.med.biobank.validator.group.PreInsert;
-import edu.ualberta.med.biobank.validator.group.PreUpdate;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @Table(name = "PRINTED_SS_INV_ITEM")
-@Unique(properties = { "pnumber" },
-    groups = { PreInsert.class, PreUpdate.class },
-    message = "{edu.ualberta.med.biobank.model.PrintedSsInvItem.txt.Unique}")
+@Unique(properties = "pnumber", groups = PrePersist.class)
 public class PrintedSsInvItem extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

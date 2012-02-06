@@ -19,8 +19,7 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import edu.ualberta.med.biobank.validator.constraint.Unique;
-import edu.ualberta.med.biobank.validator.group.PreInsert;
-import edu.ualberta.med.biobank.validator.group.PreUpdate;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @Table(name = "MEMBERSHIP",
@@ -29,9 +28,7 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
         // TODO: could fix the null problem by having an in-between table?
         @UniqueConstraint(columnNames = { "PRINCIPAL_ID", "CENTER_ID",
             "STUDY_ID" }) })
-@Unique(properties = { "principal.id", "center.id", "study.id" },
-    groups = { PreInsert.class, PreUpdate.class },
-    message = "{edu.ualberta.med.biobank.model.Membership.realm.Unique}")
+@Unique(properties = { "principal", "center", "study" }, groups = PrePersist.class)
 public class Membership extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

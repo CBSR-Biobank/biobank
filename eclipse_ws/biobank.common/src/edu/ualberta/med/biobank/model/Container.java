@@ -21,8 +21,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
-import edu.ualberta.med.biobank.validator.group.PreInsert;
-import edu.ualberta.med.biobank.validator.group.PreUpdate;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @Table(name = "CONTAINER",
@@ -35,12 +34,8 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
 // out how to add DDL constraints from our annotations and how to get a bean's
 // value of a specific column.
 @Unique.List({
-    @Unique(properties = { "site.id", "containerType.id", "label" },
-        groups = { PreInsert.class, PreUpdate.class },
-        message = "{edu.ualberta.med.biobank.model.Container.label.Unique}"),
-    @Unique(properties = { "site.id", "productBarcode" },
-        groups = { PreInsert.class, PreUpdate.class },
-        message = "{edu.ualberta.med.biobank.model.Container.productBarcode.Unique}")
+    @Unique(properties = { "site", "containerType", "label" }, groups = PrePersist.class),
+    @Unique(properties = { "site", "productBarcode" }, groups = PrePersist.class)
 })
 @Empty.List({
     @Empty(property = "specimenPositionCollection", groups = PreDelete.class,
@@ -66,7 +61,7 @@ public class Container extends AbstractBiobankModel {
     private Site site;
     private ActivityStatus activityStatus;
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Container.productBarcode.Unique}")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Container.productBarcode.NotEmpty}")
     @Column(name = "PRODUCT_BARCODE")
     public String getProductBarcode() {
         return this.productBarcode;

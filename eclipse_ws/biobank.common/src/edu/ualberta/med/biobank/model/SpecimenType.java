@@ -16,18 +16,13 @@ import org.hibernate.validator.constraints.NotEmpty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
-import edu.ualberta.med.biobank.validator.group.PreInsert;
-import edu.ualberta.med.biobank.validator.group.PreUpdate;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @Table(name = "SPECIMEN_TYPE")
 @Unique.List({
-    @Unique(properties = { "name" },
-        groups = { PreInsert.class, PreUpdate.class },
-        message = "{edu.ualberta.med.biobank.model.SpecimenType.name.Unique}"),
-    @Unique(properties = { "nameShort" },
-        groups = { PreInsert.class, PreUpdate.class },
-        message = "{edu.ualberta.med.biobank.model.SpecimenType.nameShort.Unique}")
+    @Unique(properties = "name", groups = PrePersist.class),
+    @Unique(properties = "nameShort", groups = PrePersist.class)
 })
 @NotUsed.List({
     @NotUsed(by = Specimen.class, property = "specimenType",

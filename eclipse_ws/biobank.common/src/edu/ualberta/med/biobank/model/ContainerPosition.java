@@ -10,16 +10,13 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import edu.ualberta.med.biobank.validator.constraint.Unique;
-import edu.ualberta.med.biobank.validator.group.PreInsert;
-import edu.ualberta.med.biobank.validator.group.PreUpdate;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @Table(name = "CONTAINER_POSITION",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "PARENT_CONTAINER_ID", "ROW", "COL" }) })
-@Unique(properties = { "parentContainer.id", "row", "col" },
-    groups = { PreInsert.class, PreUpdate.class },
-    message = "{edu.ualberta.med.biobank.model.ContainerPosition.position.Unique}")
+@Unique(properties = { "parentContainer", "row", "col" }, groups = PrePersist.class)
 public class ContainerPosition extends AbstractPosition {
     private static final long serialVersionUID = 1L;
 

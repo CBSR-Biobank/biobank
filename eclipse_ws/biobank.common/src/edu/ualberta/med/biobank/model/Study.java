@@ -22,18 +22,13 @@ import org.hibernate.validator.constraints.NotEmpty;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
-import edu.ualberta.med.biobank.validator.group.PreInsert;
-import edu.ualberta.med.biobank.validator.group.PreUpdate;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @Table(name = "STUDY")
 @Unique.List({
-    @Unique(properties = { "name" },
-        groups = { PreInsert.class, PreUpdate.class },
-        message = "{edu.ualberta.med.biobank.model.Study.name.Unique}"),
-    @Unique(properties = { "nameShort" },
-        groups = { PreInsert.class, PreUpdate.class },
-        message = "{edu.ualberta.med.biobank.model.Study.nameShort.Unique}")
+    @Unique(properties = "name", groups = PrePersist.class),
+    @Unique(properties = "nameShort", groups = PrePersist.class)
 })
 @Empty(property = "patientCollection", groups = PreDelete.class,
     message = "edu.ualberta.med.biobank.model.Study.Empty.patientCollection")

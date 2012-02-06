@@ -11,14 +11,11 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.Unique;
-import edu.ualberta.med.biobank.validator.group.PreInsert;
-import edu.ualberta.med.biobank.validator.group.PreUpdate;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @Table(name = "GLOBAL_EVENT_ATTR")
-@Unique(properties = { "label" },
-    groups = { PreInsert.class, PreUpdate.class },
-    message = "{edu.ualberta.med.biobank.model.GlobalEventAttr.label.Unique}")
+@Unique(properties = "label", groups = PrePersist.class)
 public class GlobalEventAttr extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

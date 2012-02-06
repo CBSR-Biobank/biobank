@@ -22,8 +22,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.Unique;
-import edu.ualberta.med.biobank.validator.group.PreInsert;
-import edu.ualberta.med.biobank.validator.group.PreUpdate;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @Table(name = "CENTER")
@@ -31,12 +30,8 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
 @DiscriminatorColumn(name = "DISCRIMINATOR",
     discriminatorType = DiscriminatorType.STRING)
 @Unique.List({
-    @Unique(properties = { "name" },
-        groups = { PreInsert.class, PreUpdate.class },
-        message = "{edu.ualberta.med.biobank.model.Center.name.Unique}"),
-    @Unique(properties = { "nameShort" },
-        groups = { PreInsert.class, PreUpdate.class },
-        message = "{edu.ualberta.med.biobank.model.Center.nameShort.Unique}")
+    @Unique(properties = "name", groups = PrePersist.class),
+    @Unique(properties = "nameShort", groups = PrePersist.class)
 })
 public class Center extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;

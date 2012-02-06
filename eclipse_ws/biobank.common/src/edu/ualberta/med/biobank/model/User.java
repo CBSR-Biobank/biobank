@@ -14,14 +14,11 @@ import javax.persistence.OneToMany;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.Unique;
-import edu.ualberta.med.biobank.validator.group.PreInsert;
-import edu.ualberta.med.biobank.validator.group.PreUpdate;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @DiscriminatorValue("User")
-@Unique(properties = { "name" },
-    groups = { PreInsert.class, PreUpdate.class },
-    message = "{edu.ualberta.med.biobank.model.User.login.Unique}")
+@Unique(properties = "name", groups = PrePersist.class)
 public class User extends Principal {
     private static final long serialVersionUID = 1L;
 

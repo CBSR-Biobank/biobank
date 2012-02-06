@@ -20,8 +20,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
-import edu.ualberta.med.biobank.validator.group.PreInsert;
-import edu.ualberta.med.biobank.validator.group.PreUpdate;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @Table(name = "CONTAINER_TYPE",
@@ -29,12 +28,8 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
         @UniqueConstraint(columnNames = { "SITE_ID", "NAME" }),
         @UniqueConstraint(columnNames = { "SITE_ID", "NAME_SHORT" }) })
 @Unique.List({
-    @Unique(properties = { "site.id", "name" },
-        groups = { PreInsert.class, PreUpdate.class },
-        message = "{edu.ualberta.med.biobank.model.ContainerType.name.Unique}"),
-    @Unique(properties = { "site.id", "nameShort" },
-        groups = { PreInsert.class, PreUpdate.class },
-        message = "{edu.ualberta.med.biobank.model.ContainerType.nameShort.Unique}")
+    @Unique(properties = { "site", "name" }, groups = PrePersist.class),
+    @Unique(properties = { "site", "nameShort" }, groups = PrePersist.class)
 })
 @NotUsed.List({
     @NotUsed(by = Container.class, property = "containerType",
