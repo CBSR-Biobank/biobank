@@ -10,6 +10,10 @@ public class ContainerReadPermission implements Permission {
 
     private final Integer containerId;
 
+    public ContainerReadPermission() {
+        this.containerId = null;
+    }
+
     public ContainerReadPermission(Integer containerId) {
         this.containerId = containerId;
     }
@@ -20,8 +24,12 @@ public class ContainerReadPermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        Container container = context.load(Container.class, containerId);
-        return PermissionEnum.CONTAINER_READ.isAllowed(context.getUser(),
-            container.getSite());
+        if (this.containerId != null) {
+            Container container = context.load(Container.class, containerId);
+            return PermissionEnum.CONTAINER_READ.isAllowed(context.getUser(),
+                container.getSite());
+        }
+
+        return PermissionEnum.CONTAINER_READ.isAllowed(context.getUser());
     }
 }

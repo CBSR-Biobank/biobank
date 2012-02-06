@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.site;
+package edu.ualberta.med.biobank.common.action.container;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,60 +10,52 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.Site;
 
-public class SiteGetTopContainersAction implements
-    Action<SiteGetTopContainersResult> {
+public class ContainerGetChildrenAction implements
+    Action<ContainerChildrenResult> {
     private static final long serialVersionUID = 1L;
 
     // This query has to initialise specimenPositionCollection due to the
     // tree adapter needing to know this to display additional menu selections
     // when a right click is done on a container node.
-    //
-    // @formatter:off
     @SuppressWarnings("nls")
-    private static final String SELECT_TOP_CONTAINERS_HQL = 
+    private static final String SELECT_CHILD_CONTAINERS_HQL =
         "SELECT container"
             + " FROM " + Container.class.getName() + " container"
             + " INNER JOIN FETCH container.containerType containerType"
             + " INNER JOIN FETCH container.activityStatus activityStatus"
             + " INNER JOIN FETCH container.site site"
             + " LEFT JOIN container.specimenPositionCollection"
-            + " WHERE site.id = ?"
-            + " AND containerType.topLevel IS TRUE"; // only select top-level
-                                                     // Container-s
-    // @formatter:on
+            + " WHERE container.position.parentContainer.id = ?";
 
-    private final Integer siteId;
+    private final Integer parentContainerId;
 
-    public SiteGetTopContainersAction(Integer siteId) {
-        this.siteId = siteId;
-    }
-
-    public SiteGetTopContainersAction(Site site) {
-        this(site.getId());
+    public ContainerGetChildrenAction(Integer parentContainerId) {
+        this.parentContainerId = parentContainerId;
     }
 
     @Override
-    public boolean isAllowed(ActionContext context) {
-        return new ContainerReadPermission().isAllowed(context);
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return new ContainerReadPermission(parentContainerId)
+            .isAllowed(context);
     }
 
     @Override
-    public SiteGetTopContainersResult run(ActionContext context)
+    public ContainerChildrenResult run(ActionContext context)
         throws ActionException {
-        ArrayList<Container> topContainers = new ArrayList<Container>(0);
+        ArrayList<Container> childContainers = new ArrayList<Container>(0);
 
         Query query =
-            context.getSession().createQuery(SELECT_TOP_CONTAINERS_HQL);
-        query.setParameter(0, siteId);
+            context.getSession().createQuery(SELECT_CHILD_CONTAINERS_HQL);
+        query.setParameter(0, parentContainerId);
 
         @SuppressWarnings("unchecked")
         List<Container> results = query.list();
         if (results != null) {
-            topContainers.addAll(results);
+            childContainers.addAll(results);
         }
 
-        return new SiteGetTopContainersResult(topContainers);
+        return new ContainerChildrenResult(childContainers);
     }
+
 }
