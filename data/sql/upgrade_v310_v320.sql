@@ -660,7 +660,8 @@ ALTER TABLE principal
 
 -- upgrade the unknown commenter user
 UPDATE principal
-       SET discriminator='User'
+       SET discriminator='User', login='Unknown commenter', csm_user_id=0, recv_bulk_emails=0,
+       full_name='Unknown commenter', email='', need_pwd_change=0, activity_status_id=@asactive
        WHERE id=1;
 
 ALTER TABLE comment MODIFY COLUMN MESSAGE TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL;
