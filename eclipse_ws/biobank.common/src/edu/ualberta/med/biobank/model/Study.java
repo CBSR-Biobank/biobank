@@ -21,6 +21,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PreInsert;
 import edu.ualberta.med.biobank.validator.group.PreUpdate;
 
@@ -34,7 +35,7 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
         groups = { PreInsert.class, PreUpdate.class },
         message = "{edu.ualberta.med.biobank.model.Study.nameShort.Unique}")
 })
-@Empty(property = "patientCollection",
+@Empty(property = "patientCollection", groups = PreDelete.class,
     message = "edu.ualberta.med.biobank.model.Study.Empty.patientCollection")
 public class Study extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;

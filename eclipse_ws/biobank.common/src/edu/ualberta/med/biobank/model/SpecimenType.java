@@ -15,6 +15,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PreInsert;
 import edu.ualberta.med.biobank.validator.group.PreUpdate;
 
@@ -30,14 +31,19 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
 })
 @NotUsed.List({
     @NotUsed(by = Specimen.class, property = "specimenType",
+        groups = PreDelete.class,
         message = "edu.ualberta.med.biobank.model.SpecimenType.NotUsed.specimen.specimenType"),
     @NotUsed(by = SourceSpecimen.class, property = "specimenType",
+        groups = PreDelete.class,
         message = "edu.ualberta.med.biobank.model.SpecimenType.NotUsed.sourceSpecimen.specimenType"),
     @NotUsed(by = AliquotedSpecimen.class, property = "specimenType",
+        groups = PreDelete.class,
         message = "edu.ualberta.med.biobank.model.SpecimenType.NotUsed.aliquotedSpecimen.specimenType"),
     @NotUsed(by = SpecimenType.class, property = "parentSpecimenTypeCollection",
+        groups = PreDelete.class,
         message = "edu.ualberta.med.biobank.model.SpecimenType.NotUsed.specimenType.parentSpecimenTypeCollection"),
     @NotUsed(by = SpecimenType.class, property = "childSpecimenTypeCollection",
+        groups = PreDelete.class,
         message = "edu.ualberta.med.biobank.model.SpecimenType.NotUsed.specimenType.carentSpecimenTypeCollection")
 })
 public class SpecimenType extends AbstractBiobankModel {

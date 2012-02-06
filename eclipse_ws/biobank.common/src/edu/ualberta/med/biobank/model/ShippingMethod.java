@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PreInsert;
 import edu.ualberta.med.biobank.validator.group.PreUpdate;
 
@@ -17,6 +18,7 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
     groups = { PreInsert.class, PreUpdate.class },
     message = "{edu.ualberta.med.biobank.model.ShippingMethod.name.Unique}")
 @NotUsed(by = ShipmentInfo.class, property = "shippingMethod",
+    groups = PreDelete.class,
     message = "edu.ualberta.med.biobank.model.ShippingMethod.NotUsed.shippingMethod")
 public class ShippingMethod extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;

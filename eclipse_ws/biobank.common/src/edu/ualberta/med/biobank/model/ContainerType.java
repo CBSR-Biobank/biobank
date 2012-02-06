@@ -19,6 +19,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PreInsert;
 import edu.ualberta.med.biobank.validator.group.PreUpdate;
 
@@ -37,10 +38,13 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
 })
 @NotUsed.List({
     @NotUsed(by = Container.class, property = "containerType",
+        groups = PreDelete.class,
         message = "edu.ualberta.med.biobank.model.ContainerType.NotUsed.container.containerType"),
     @NotUsed(by = ContainerType.class, property = "parentContainerTypeCollection",
+        groups = PreDelete.class,
         message = "edu.ualberta.med.biobank.model.ContainerType.NotUsed.containerType.parentContainerTypeCollection"),
     @NotUsed(by = ContainerType.class, property = "childContainerTypeCollection",
+        groups = PreDelete.class,
         message = "edu.ualberta.med.biobank.model.ContainerType.NotUsed.containerType.childContainerTypeCollection")
 })
 public class ContainerType extends AbstractBiobankModel {

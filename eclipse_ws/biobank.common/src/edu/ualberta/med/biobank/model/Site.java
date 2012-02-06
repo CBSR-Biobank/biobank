@@ -13,15 +13,16 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 import edu.ualberta.med.biobank.validator.constraint.Empty;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 @Entity
 @DiscriminatorValue("Site")
 @Empty.List({
-    @Empty(property = "containerCollection",
+    @Empty(property = "containerCollection", groups = PreDelete.class,
         message = "edu.ualberta.med.biobank.model.Site.Empty.containerCollection"),
-    @Empty(property = "containerTypeCollection",
+    @Empty(property = "containerTypeCollection", groups = PreDelete.class,
         message = "edu.ualberta.med.biobank.model.Site.Empty.containerTypeCollection"),
-    @Empty(property = "processingEventCollection",
+    @Empty(property = "processingEventCollection", groups = PreDelete.class,
         message = "edu.ualberta.med.biobank.model.Site.Empty.processingEventCollection")
 })
 public class Site extends Center {

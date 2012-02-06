@@ -20,6 +20,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PreInsert;
 import edu.ualberta.med.biobank.validator.group.PreUpdate;
 
@@ -42,9 +43,9 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
         message = "{edu.ualberta.med.biobank.model.Container.productBarcode.Unique}")
 })
 @Empty.List({
-    @Empty(property = "specimenPositionCollection",
+    @Empty(property = "specimenPositionCollection", groups = PreDelete.class,
         message = "edu.ualberta.med.biobank.model.Container.Empty.specimenPositionCollection"),
-    @Empty(property = "childPositionCollection",
+    @Empty(property = "childPositionCollection", groups = PreDelete.class,
         message = "edu.ualberta.med.biobank.model.Container.Empty.childPositionCollection")
 })
 public class Container extends AbstractBiobankModel {

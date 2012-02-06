@@ -21,6 +21,7 @@ import org.hibernate.annotations.CascadeType;
 
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PreInsert;
 import edu.ualberta.med.biobank.validator.group.PreUpdate;
 
@@ -31,7 +32,7 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
 @Unique(properties = { "patient.id", "visitNumber" },
     groups = { PreInsert.class, PreUpdate.class },
     message = "{edu.ualberta.med.biobank.model.CollectionEvent.visitNumber.Unique}")
-@Empty(property = "allSpecimenCollection",
+@Empty(property = "allSpecimenCollection", groups = PreDelete.class,
     message = "edu.ualberta.med.biobank.model.CollectionEvent.Empty.allSpecimenCollection")
 public class CollectionEvent extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;

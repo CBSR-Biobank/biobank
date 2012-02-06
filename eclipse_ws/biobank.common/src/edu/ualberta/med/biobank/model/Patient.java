@@ -21,6 +21,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PreInsert;
 import edu.ualberta.med.biobank.validator.group.PreUpdate;
 
@@ -30,8 +31,9 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
     groups = { PreInsert.class, PreUpdate.class },
     message = "{edu.ualberta.med.biobank.model.Patient.pnumber.Unique}")
 @NotUsed(by = Specimen.class, property = "patient",
+    groups = PreDelete.class,
     message = "edu.ualberta.med.biobank.model.Patient.NotUsed.specimen.patient")
-@Empty(property = "collectionEventCollection",
+@Empty(property = "collectionEventCollection", groups = PreDelete.class,
     message = "edu.ualberta.med.biobank.model.Patient.Empty.collectionEventCollection")
 public class Patient extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;

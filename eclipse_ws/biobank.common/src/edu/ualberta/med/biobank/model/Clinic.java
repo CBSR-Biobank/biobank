@@ -11,14 +11,16 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 @Entity
 @DiscriminatorValue("Clinic")
 @NotUsed(by = Study.class, property = "contactCollection.clinic",
+    groups = PreDelete.class,
     message = "edu.ualberta.med.biobank.model.Clinic.NotUsed.study.contactCollection.clinic")
 public class Clinic extends Center {
     private static final long serialVersionUID = 1L;
-    
+
     private boolean sendsShipments = false;
     private Set<Contact> contactCollection = new HashSet<Contact>(0);
 
