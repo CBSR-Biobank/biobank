@@ -18,14 +18,11 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
-<<<<<<< HEAD
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
-=======
 import edu.ualberta.med.biobank.common.util.RowColPos;
->>>>>>> development
 
 @Entity
 @Table(name = "CONTAINER_TYPE",

@@ -18,6 +18,8 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import edu.ualberta.med.biobank.common.util.RowColPos;
 
 import edu.ualberta.med.biobank.validator.constraint.Empty;
