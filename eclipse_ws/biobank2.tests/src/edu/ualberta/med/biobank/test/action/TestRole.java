@@ -58,7 +58,6 @@ public class TestRole extends TestAction {
         tx = session.beginTransaction();
 
         Site loaded = (Site) session.load(Site.class, siteId);
-        System.out.println(loaded.getName());
 
         tx.commit();
     }
