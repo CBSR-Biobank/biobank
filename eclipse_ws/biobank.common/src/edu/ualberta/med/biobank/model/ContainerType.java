@@ -18,6 +18,11 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Empty;
+import edu.ualberta.med.biobank.validator.constraint.NotUsed;
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 
 @Entity
@@ -25,6 +30,15 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "SITE_ID", "NAME" }),
         @UniqueConstraint(columnNames = { "SITE_ID", "NAME_SHORT" }) })
+@Unique.List({
+    @Unique(properties = { "site", "name" }, groups = PrePersist.class),
+    @Unique(properties = { "site", "nameShort" }, groups = PrePersist.class)
+})
+@NotUsed(by = Container.class, property = "containerType", groups = PreDelete.class)
+@Empty.List({
+    @Empty(property = "childContainerTypeCollection", groups = PreDelete.class),
+    @Empty(property = "parentContainerTypeCollection", groups = PreDelete.class)
+})
 public class ContainerType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -44,7 +58,7 @@ public class ContainerType extends AbstractBiobankModel {
     private Set<ContainerType> parentContainerTypeCollection =
         new HashSet<ContainerType>(0);
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.ContainerType.name.NotEmpty}")
     @Column(name = "NAME")
     public String getName() {
         return this.name;
@@ -54,7 +68,7 @@ public class ContainerType extends AbstractBiobankModel {
         this.name = name;
     }
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.ContainerType.name.NotEmpty}")
     @Column(name = "NAME_SHORT")
     public String getNameShort() {
         return this.nameShort;
@@ -110,7 +124,7 @@ public class ContainerType extends AbstractBiobankModel {
         this.childContainerTypeCollection = childContainerTypeCollection;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.activityStatus.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {
@@ -133,7 +147,7 @@ public class ContainerType extends AbstractBiobankModel {
         this.commentCollection = commentCollection;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.capacity.NotNull}")
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "CAPACITY_ID", unique = true, nullable = false)
     public Capacity getCapacity() {
@@ -144,7 +158,7 @@ public class ContainerType extends AbstractBiobankModel {
         this.capacity = capacity;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.site.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SITE_ID", nullable = false)
     public Site getSite() {
@@ -155,7 +169,7 @@ public class ContainerType extends AbstractBiobankModel {
         this.site = site;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.childLabelingScheme.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHILD_LABELING_SCHEME_ID", nullable = false)
     public ContainerLabelingScheme getChildLabelingScheme() {

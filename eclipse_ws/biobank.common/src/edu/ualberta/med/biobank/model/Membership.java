@@ -18,12 +18,17 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
+
 @Entity
 @Table(name = "MEMBERSHIP",
     uniqueConstraints = {
         // this unique constraint only works when no value is null
+        // TODO: could fix the null problem by having an in-between table?
         @UniqueConstraint(columnNames = { "PRINCIPAL_ID", "CENTER_ID",
             "STUDY_ID" }) })
+@Unique(properties = { "principal", "center", "study" }, groups = PrePersist.class)
 public class Membership extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -79,7 +84,7 @@ public class Membership extends AbstractBiobankModel {
         this.study = study;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Membership.principal.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRINCIPAL_ID", nullable = false)
     public Principal getPrincipal() {

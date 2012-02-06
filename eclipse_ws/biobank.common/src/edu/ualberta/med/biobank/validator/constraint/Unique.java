@@ -14,12 +14,17 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * Asserts that the annotated bean has a unique set of the given properties.
+ * 
+ * @author Jonathan Ferland
+ */
 @Documented
 @Constraint(validatedBy = { UniqueValidator.class })
 @Target({ TYPE, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 public @interface Unique {
-    String message() default "{org.hibernate.validator.constraints.Unique.message}";
+    String message() default "";
 
     String[] properties();
 

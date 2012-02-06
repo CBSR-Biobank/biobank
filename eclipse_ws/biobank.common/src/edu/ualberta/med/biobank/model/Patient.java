@@ -18,8 +18,17 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Empty;
+import edu.ualberta.med.biobank.validator.constraint.NotUsed;
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
+
 @Entity
 @Table(name = "PATIENT")
+@Unique(properties = "pnumber", groups = PrePersist.class)
+@NotUsed(by = Specimen.class, property = "collectionEvent.patient", groups = PreDelete.class)
+@Empty(property = "collectionEventCollection", groups = PreDelete.class)
 public class Patient extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -30,7 +39,7 @@ public class Patient extends AbstractBiobankModel {
     private Study study;
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Patient.pnumber.NotEmpty}")
     @Column(name = "PNUMBER", unique = true, nullable = false, length = 100)
     public String getPnumber() {
         return this.pnumber;
@@ -40,7 +49,7 @@ public class Patient extends AbstractBiobankModel {
         this.pnumber = pnumber;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Patient.createdAt.NotNull}")
     @Column(name = "CREATED_AT")
     public Date getCreatedAt() {
         return this.createdAt;
@@ -60,7 +69,7 @@ public class Patient extends AbstractBiobankModel {
         this.collectionEventCollection = collectionEventCollection;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Patient.study.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_ID", nullable = false)
     public Study getStudy() {

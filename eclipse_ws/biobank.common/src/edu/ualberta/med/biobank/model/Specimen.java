@@ -21,8 +21,15 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Empty;
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
+
 @Entity
 @Table(name = "SPECIMEN")
+@Unique(properties = "inventoryId", groups = PrePersist.class)
+@Empty(property = "childSpecimenCollection", groups = PreDelete.class)
 public class Specimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -47,7 +54,7 @@ public class Specimen extends AbstractBiobankModel {
     private ProcessingEvent processingEvent;
     private Specimen parentSpecimen;
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Specimen.inventoryId.NotEmpty}")
     @Column(name = "INVENTORY_ID", unique = true, nullable = false, length = 100)
     public String getInventoryId() {
         return this.inventoryId;
@@ -57,7 +64,7 @@ public class Specimen extends AbstractBiobankModel {
         this.inventoryId = inventoryId;
     }
 
-    @Min(value = 0)
+    @Min(value = 0, message = "{edu.ualberta.med.biobank.model.Specimen.quantity.Min}")
     @Column(name = "QUANTITY")
     public Double getQuantity() {
         return this.quantity;
@@ -86,7 +93,7 @@ public class Specimen extends AbstractBiobankModel {
         this.topSpecimen = topSpecimen;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.collectionEvent.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false)
     public CollectionEvent getCollectionEvent() {
@@ -97,7 +104,7 @@ public class Specimen extends AbstractBiobankModel {
         this.collectionEvent = collectionEvent;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.currentCenter.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CURRENT_CENTER_ID", nullable = false)
     public Center getCurrentCenter() {
@@ -129,7 +136,7 @@ public class Specimen extends AbstractBiobankModel {
         this.originalCollectionEvent = originalCollectionEvent;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.specimenType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
     public SpecimenType getSpecimenType() {
@@ -183,7 +190,7 @@ public class Specimen extends AbstractBiobankModel {
         this.requestSpecimenCollection = requestSpecimenCollection;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.originInfo.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ORIGIN_INFO_ID", nullable = false)
     public OriginInfo getOriginInfo() {
@@ -194,7 +201,7 @@ public class Specimen extends AbstractBiobankModel {
         this.originInfo = originInfo;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.activityStatus.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {

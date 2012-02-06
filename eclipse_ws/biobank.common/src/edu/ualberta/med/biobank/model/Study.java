@@ -19,8 +19,18 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Empty;
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
+
 @Entity
 @Table(name = "STUDY")
+@Unique.List({
+    @Unique(properties = "name", groups = PrePersist.class),
+    @Unique(properties = "nameShort", groups = PrePersist.class)
+})
+@Empty(property = "patientCollection", groups = PreDelete.class)
 public class Study extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -41,7 +51,7 @@ public class Study extends AbstractBiobankModel {
     private Set<SourceSpecimen> sourceSpecimenCollection =
         new HashSet<SourceSpecimen>(0);
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Study.name.NotEmpty}")
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
         return this.name;
@@ -51,7 +61,7 @@ public class Study extends AbstractBiobankModel {
         this.name = name;
     }
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Study.nameShort.NotEmpty}")
     @Column(name = "NAME_SHORT", unique = true, nullable = false, length = 50)
     public String getNameShort() {
         return this.nameShort;
@@ -103,7 +113,7 @@ public class Study extends AbstractBiobankModel {
         this.commentCollection = commentCollection;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Study.activityStatus.NotEmpty}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {

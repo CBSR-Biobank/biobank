@@ -27,7 +27,7 @@ public class SourceSpecimen extends AbstractBiobankModel {
         this.needOriginalVolume = needOriginalVolume;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.SourceSpecimen.specimenType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
     public SpecimenType getSpecimenType() {
@@ -38,7 +38,7 @@ public class SourceSpecimen extends AbstractBiobankModel {
         this.specimenType = specimenType;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.SourceSpecimen.study.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_ID", nullable = false)
     public Study getStudy() {

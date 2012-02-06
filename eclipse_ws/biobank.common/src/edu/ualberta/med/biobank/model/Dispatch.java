@@ -29,7 +29,7 @@ public class Dispatch extends AbstractBiobankModel {
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
     // TODO: convert to enum
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Dispatch.state.NotNull}")
     @Column(name = "STATE")
     public Integer getState() {
         return this.state;
@@ -49,7 +49,7 @@ public class Dispatch extends AbstractBiobankModel {
         this.dispatchSpecimenCollection = dispatchSpecimenCollection;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Dispatch.senderCenter.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SENDER_CENTER_ID", nullable = false)
     public Center getSenderCenter() {
@@ -70,7 +70,7 @@ public class Dispatch extends AbstractBiobankModel {
         this.shipmentInfo = shipmentInfo;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Dispatch.receiverCenter.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RECEIVER_CENTER_ID", nullable = false)
     public Center getReceiverCenter() {

@@ -13,8 +13,27 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Empty;
+import edu.ualberta.med.biobank.validator.constraint.NotUsed;
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
+
 @Entity
 @Table(name = "SPECIMEN_TYPE")
+@Unique.List({
+    @Unique(properties = "name", groups = PrePersist.class),
+    @Unique(properties = "nameShort", groups = PrePersist.class)
+})
+@NotUsed.List({
+    @NotUsed(by = Specimen.class, property = "specimenType", groups = PreDelete.class),
+    @NotUsed(by = SourceSpecimen.class, property = "specimenType", groups = PreDelete.class),
+    @NotUsed(by = AliquotedSpecimen.class, property = "specimenType", groups = PreDelete.class)
+})
+@Empty.List({
+    @Empty(property = "childSpecimenTypeCollection", groups = PreDelete.class),
+    @Empty(property = "parentSpecimenTypeCollection", groups = PreDelete.class)
+})
 public class SpecimenType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -27,7 +46,7 @@ public class SpecimenType extends AbstractBiobankModel {
     private Set<SpecimenType> childSpecimenTypeCollection =
         new HashSet<SpecimenType>(0);
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.SpecimenType.name.NotEmpty}")
     @Column(name = "NAME", unique = true)
     public String getName() {
         return this.name;
@@ -37,7 +56,7 @@ public class SpecimenType extends AbstractBiobankModel {
         this.name = name;
     }
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.SpecimenType.nameShort.NotEmpty}")
     @Column(name = "NAME_SHORT", unique = true)
     public String getNameShort() {
         return this.nameShort;

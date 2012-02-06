@@ -19,16 +19,18 @@
   </path>
 
   <path id="hibernatetool.lib">
-    <path location="${lib.dir}/hibernate-tools.jar" />
-    <path location="${lib.dir}/hibernate3.jar" />
-    <path location="${lib.dir}/freemarker.jar" />
+    <path location="${lib.dir}/c3p0-0.9.0.jar" />
+    <path location="${lib.dir}/commons-logging-1.1.1.jar" />
     <path location="${lib.dir}/dom4j-1.6.1.jar" />
+    <path location="${lib.dir}/freemarker.jar" />
+    <path location="${lib.dir}/hibernate-jpa-2.0-api-1.0.1.Final.jar" />
+    <path location="${lib.dir}/hibernate-tools.jar" />
+    <path location="${lib.dir}/hibernate-validator-4.2.0.Final.jar" />
+    <path location="${lib.dir}/hibernate3.jar" />
     <path location="${lib.dir}/slf4j-api-1.6.1.jar" />
     <path location="${lib.dir}/slf4j-nop-1.6.4.jar" />
+    <path location="${lib.dir}/validation-api-1.0.0.GA.jar" />
     <path location="${lib.dir}/${jdbc.driver.jar}" />
-    <path location="${lib.dir}/hibernate-jpa-2.0-api-1.0.1.Final.jar" />
-    <path location="${lib.dir}/commons-logging-1.1.1.jar" />
-    <path location="${lib.dir}/c3p0-0.9.0.jar" />
   </path>
 
   <!-- hibernatetool is much faster and more powerful than schemaexport and

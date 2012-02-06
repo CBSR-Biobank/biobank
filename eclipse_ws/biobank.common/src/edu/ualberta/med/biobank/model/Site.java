@@ -12,8 +12,16 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import edu.ualberta.med.biobank.validator.constraint.Empty;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
+
 @Entity
 @DiscriminatorValue("Site")
+@Empty.List({
+    @Empty(property = "containerCollection", groups = PreDelete.class),
+    @Empty(property = "containerTypeCollection", groups = PreDelete.class),
+    @Empty(property = "processingEventCollection", groups = PreDelete.class)
+})
 public class Site extends Center {
     private static final long serialVersionUID = 1L;
 

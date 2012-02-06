@@ -74,6 +74,10 @@ public class PatientMergeAction implements Action<BooleanResult> {
             }
 
             context.getSession().saveOrUpdate(patient1);
+            
+            // flush so deleting the patient realizes its collection events have been removed.
+            context.getSession().flush();
+            
             context.getSession().delete(patient2);
 
             // FIXME see how logs should be done properly...

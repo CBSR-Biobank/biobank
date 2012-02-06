@@ -9,10 +9,14 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
+
 @Entity
 @Table(name = "SPECIMEN_POSITION",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "CONTAINER_ID", "ROW", "COL" }) })
+@Unique(properties = { "container", "row", "col" }, groups = PrePersist.class)
 public class SpecimenPosition extends AbstractPosition {
     private static final long serialVersionUID = 1L;
 
@@ -20,7 +24,7 @@ public class SpecimenPosition extends AbstractPosition {
     private Specimen specimen;
     private String positionString;
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.SpecimenPosition.container.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CONTAINER_ID", nullable = false)
     public Container getContainer() {
@@ -31,7 +35,7 @@ public class SpecimenPosition extends AbstractPosition {
         this.container = container;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.SpecimenPosition.specimen.NotNull}")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "SPECIMEN_ID", nullable = false, unique = true)
     public Specimen getSpecimen() {

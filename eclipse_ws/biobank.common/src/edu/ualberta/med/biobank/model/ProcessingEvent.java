@@ -19,8 +19,17 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.NotUsed;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
+
 @Entity
 @Table(name = "PROCESSING_EVENT")
+@NotUsed.List({
+    @NotUsed(by = Specimen.class, property = "processingEvent", groups = PreDelete.class),
+    @NotUsed(by = Specimen.class, property = "parentSpecimen.processingEvent", groups = PreDelete.class)
+})
+// Unable to delete processing event '{0}' ({1}) since some of its specimens
+// have already been derived into others specimens.
 public class ProcessingEvent extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -31,7 +40,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
     private ActivityStatus activityStatus;
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.worksheet.NotEmpty}")
     @Column(name = "WORKSHEET", length = 100)
     public String getWorksheet() {
         return this.worksheet;
@@ -41,7 +50,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
         this.worksheet = worksheet;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.createdAt.NotNull}")
     @Column(name = "CREATED_AT", nullable = false)
     public Date getCreatedAt() {
         return this.createdAt;
@@ -51,7 +60,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
         this.createdAt = createdAt;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.center.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CENTER_ID", nullable = false)
     public Center getCenter() {
@@ -72,7 +81,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
         this.specimenCollection = specimenCollection;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.activityStatus.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {

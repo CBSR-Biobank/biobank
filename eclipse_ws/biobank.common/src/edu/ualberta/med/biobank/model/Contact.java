@@ -13,8 +13,12 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Empty;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
+
 @Entity
 @Table(name = "CONTACT")
+@Empty(property = "studyCollection",groups = PreDelete.class)
 public class Contact extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -28,7 +32,7 @@ public class Contact extends AbstractBiobankModel {
     private Set<Study> studyCollection = new HashSet<Study>(0);
     private Clinic clinic;
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Contact.name.NotNull}")
     @Column(name = "NAME", length = 100)
     public String getName() {
         return this.name;

@@ -15,8 +15,15 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.NotUsed;
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
+
 @Entity
 @Table(name = "ROLE")
+@Unique(properties = "name", groups = PrePersist.class)
+@NotUsed(by = Membership.class, property = "roleCollection", groups = PreDelete.class)
 public class Role extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -24,7 +31,7 @@ public class Role extends AbstractBiobankModel {
     private Set<PermissionEnum> permissionCollection =
         new HashSet<PermissionEnum>(0);
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Role.name.NotEmpty}")
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
         return this.name;

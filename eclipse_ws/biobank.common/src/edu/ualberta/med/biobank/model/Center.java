@@ -21,17 +21,24 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
+
 @Entity
 @Table(name = "CENTER")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DISCRIMINATOR",
     discriminatorType = DiscriminatorType.STRING)
+@Unique.List({
+    @Unique(properties = "name", groups = PrePersist.class),
+    @Unique(properties = "nameShort", groups = PrePersist.class)
+})
 public class Center extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String name;
     private String nameShort;
-    private Address address;
+    private Address address = new Address();
     private Set<ProcessingEvent> processingEventCollection =
         new HashSet<ProcessingEvent>(0);
     private Set<Membership> membershipCollection =
@@ -45,7 +52,7 @@ public class Center extends AbstractBiobankModel {
     private ActivityStatus activityStatus;
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Center.name.NotEmpty}")
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
         return this.name;
@@ -55,7 +62,7 @@ public class Center extends AbstractBiobankModel {
         this.name = name;
     }
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Center.nameShort.NotEmpty}")
     @Column(name = "NAME_SHORT", unique = true, nullable = false, length = 50)
     public String getNameShort() {
         return this.nameShort;
@@ -65,7 +72,7 @@ public class Center extends AbstractBiobankModel {
         this.nameShort = nameShort;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Center.address.NotNull}")
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "ADDRESS_ID", unique = true, nullable = false)
     public Address getAddress() {
@@ -128,7 +135,7 @@ public class Center extends AbstractBiobankModel {
         this.originInfoCollection = originInfoCollection;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Center.activityStatus.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {

@@ -18,7 +18,14 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import edu.ualberta.med.biobank.common.util.RowColPos;
+
+import edu.ualberta.med.biobank.validator.constraint.Empty;
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @Table(name = "CONTAINER",
@@ -26,6 +33,18 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
         @UniqueConstraint(columnNames = { "SITE_ID", "CONTAINER_TYPE_ID",
             "LABEL" }),
         @UniqueConstraint(columnNames = { "SITE_ID", "PRODUCT_BARCODE" }) })
+// TODO: consider pulling @UniqueConstraint into this @Unique annotation,
+// because this is a total repeating of constraints. Would then need to figure
+// out how to add DDL constraints from our annotations and how to get a bean's
+// value of a specific column.
+@Unique.List({
+    @Unique(properties = { "site", "containerType", "label" }, groups = PrePersist.class),
+    @Unique(properties = { "site", "productBarcode" }, groups = PrePersist.class)
+})
+@Empty.List({
+    @Empty(property = "specimenPositionCollection", groups = PreDelete.class),
+    @Empty(property = "childPositionCollection", groups = PreDelete.class)
+})
 public class Container extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -53,7 +72,7 @@ public class Container extends AbstractBiobankModel {
         this.productBarcode = productBarcode;
     }
 
-    @NotNull
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Container.label.NotEmpty}")
     @Column(name = "LABEL", nullable = false)
     public String getLabel() {
         return this.label;
@@ -124,7 +143,7 @@ public class Container extends AbstractBiobankModel {
         this.specimenPositionCollection = specimenPositionCollection;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.containerType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false)
     public ContainerType getContainerType() {
@@ -145,7 +164,7 @@ public class Container extends AbstractBiobankModel {
         this.position = position;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.site.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SITE_ID", nullable = false)
     public Site getSite() {
@@ -156,7 +175,7 @@ public class Container extends AbstractBiobankModel {
         this.site = site;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.activityStatus.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {

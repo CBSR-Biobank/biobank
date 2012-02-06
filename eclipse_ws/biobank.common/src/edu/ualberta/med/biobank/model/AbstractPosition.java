@@ -15,8 +15,8 @@ public class AbstractPosition extends AbstractBiobankModel {
     private Integer row;
     private Integer col;
 
-    @NotNull
-    @Min(value = 0)
+    @Min(value = 0, message = "{edu.ualberta.med.biobank.model.AbstractPosition.row.Min}")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.AbstractPosition.row.NotNull}")
     @Column(name = "ROW", nullable = false)
     public Integer getRow() {
         return this.row;
@@ -26,8 +26,8 @@ public class AbstractPosition extends AbstractBiobankModel {
         this.row = row;
     }
 
-    @NotNull
-    @Min(value = 0)
+    @Min(value = 0, message = "{edu.ualberta.med.biobank.model.AbstractPosition.col.Min}")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.AbstractPosition.col.NotNull}")
     @Column(name = "COL", nullable = false)
     public Integer getCol() {
         return this.col;
