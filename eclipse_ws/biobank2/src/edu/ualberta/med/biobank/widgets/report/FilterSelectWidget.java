@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -51,7 +52,7 @@ public class FilterSelectWidget extends Composite {
     }
 
     public Collection<ReportFilter> getReportFilters() {
-        Collection<ReportFilter> rfs = new HashSet<ReportFilter>();
+        Set<ReportFilter> rfs = new HashSet<ReportFilter>();
 
         int filterPosition = 0;
         for (FilterRow filterRow : filterRowMap.values()) {

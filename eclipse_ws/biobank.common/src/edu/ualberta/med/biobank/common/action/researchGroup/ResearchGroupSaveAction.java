@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.common.action.researchGroup;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -48,7 +48,6 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
 
         Address address = new Address();
         address.setId(rgInfo.address.id);
-        address.setName(rgInfo.address.name);
         address.setCity(rgInfo.address.city);
         address.setProvince(rgInfo.address.province);
         address.setCountry(rgInfo.address.country);
@@ -64,7 +63,7 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
         // This stuff could be extracted to a util method. need to think about
         // how
         if (!rgInfo.comment.trim().equals("")) {
-            Collection<Comment> comments = rg.getCommentCollection();
+            Set<Comment> comments = rg.getCommentCollection();
             if (comments == null) comments = new HashSet<Comment>();
             Comment newComment = new Comment();
             newComment.setCreatedAt(new Date());

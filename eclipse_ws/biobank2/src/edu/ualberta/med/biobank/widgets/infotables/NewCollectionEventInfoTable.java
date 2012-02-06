@@ -81,8 +81,8 @@ public class NewCollectionEventInfoTable extends
                     && o2 instanceof PatientCEventInfo) {
                     PatientCEventInfo p1 = (PatientCEventInfo) o1;
                     PatientCEventInfo p2 = (PatientCEventInfo) o2;
-                    return p1.cevent.visitNumber
-                        .compareTo(p2.cevent.visitNumber);
+                    return p1.cevent.getVisitNumber()
+                        .compareTo(p2.cevent.getVisitNumber());
                 }
                 return super.compare(01, o2);
             }

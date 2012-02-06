@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.action.shipment;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -47,7 +48,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
         oi.setReceiverSite(context.get(Site.class, oiInfo.siteId));
         oi.setCenter(context.get(Center.class, oiInfo.centerId));
 
-        Collection<Specimen> oiSpecimens = oi.getSpecimenCollection();
+        Set<Specimen> oiSpecimens = oi.getSpecimenCollection();
         if (oiSpecimens == null) oiSpecimens = new HashSet<Specimen>();
 
         if (oiInfo.removedSpecIds != null)
@@ -68,10 +69,10 @@ public class OriginInfoSaveAction implements Action<IdResult> {
         ShipmentInfo si =
             context
                 .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
-        si.boxNumber = siInfo.boxNumber;
-        si.packedAt = siInfo.packedAt;
-        si.receivedAt = siInfo.receivedAt;
-        si.waybill = siInfo.waybill;
+        si.setBoxNumber(siInfo.boxNumber);
+        si.setPackedAt(siInfo.packedAt);
+        si.setReceivedAt(siInfo.receivedAt);
+        si.setWaybill(siInfo.waybill);
 
         ShippingMethod sm = context
             .get(ShippingMethod.class, siInfo.method.id, new ShippingMethod());
@@ -81,7 +82,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
         // This stuff could be extracted to a util method. need to think about
         // how
         if (!oiInfo.comment.trim().equals("")) {
-            Collection<Comment> comments = oi.getCommentCollection();
+            Set<Comment> comments = oi.getCommentCollection();
             if (comments == null) comments = new HashSet<Comment>();
             Comment newComment = new Comment();
             newComment.setCreatedAt(new Date());

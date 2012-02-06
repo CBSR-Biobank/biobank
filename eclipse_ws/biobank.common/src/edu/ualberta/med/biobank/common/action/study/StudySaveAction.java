@@ -265,7 +265,7 @@ public class StudySaveAction implements Action<IdResult> {
 
         // remove this study from sites in removed list
         for (Site site : sitesDiff.getRemoveSet()) {
-            Collection<Study> siteStudies = site.getStudyCollection();
+            Set<Study> siteStudies = site.getStudyCollection();
             if (siteStudies.remove(study)) {
                 site.setStudyCollection(siteStudies);
             } else {
@@ -284,14 +284,14 @@ public class StudySaveAction implements Action<IdResult> {
                 contacts.values());
 
         for (Contact contact : contactsDiff.getAddSet()) {
-            Collection<Study> contactStudies = contact.getStudyCollection();
+            Set<Study> contactStudies = contact.getStudyCollection();
             contactStudies.add(study);
             contact.setStudyCollection(contactStudies);
         }
 
         // remove this study from contacts in removed list
         for (Contact contact : contactsDiff.getRemoveSet()) {
-            Collection<Study> contactStudies = contact.getStudyCollection();
+            Set<Study> contactStudies = contact.getStudyCollection();
             if (contactStudies.remove(study)) {
                 contact.setStudyCollection(contactStudies);
             } else {

@@ -2,12 +2,10 @@ package edu.ualberta.med.biobank.server.interceptor;
 
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.exception.ExceptionUtils;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 import org.hibernate.PropertyValueException;
-import org.hibernate.validator.InvalidStateException;
 import org.springframework.aop.ThrowsAdvice;
 
 /**
@@ -30,8 +28,8 @@ public class ExceptionInterceptor implements ThrowsAdvice {
     public void afterThrowing(ApplicationException ae)
         throws ApplicationException {
         Throwable cause = ExceptionUtils.findCausesInThrowable(ae,
-            PropertyValueException.class, ActionException.class,
-            InvalidStateException.class);// ,
+            PropertyValueException.class, ActionException.class);
+        // ,
         // ValueNotSetException.class, // ConstraintViolationException.class);
         throwNotNullPropertyValueException(cause, ae);
         // if (cause != null && cause instanceof ValueNotSetException) {
@@ -39,9 +37,6 @@ public class ExceptionInterceptor implements ThrowsAdvice {
         // throw new ValueNotSetException(vnse.getPropertyName(),
         // vnse.getObjectName(), ae);
         // }
-        if (cause != null && cause instanceof InvalidStateException) {
-            throw new ValidationException((InvalidStateException) cause);
-        }
         if (cause != null && cause instanceof ActionException) {
             throw (ActionException) cause;
         }

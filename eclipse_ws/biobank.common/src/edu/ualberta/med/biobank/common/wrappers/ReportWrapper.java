@@ -74,7 +74,7 @@ public class ReportWrapper extends ReportBaseWrapper {
             filterCopy.setOperator(filter.getOperator());
             filterCopy.setPosition(filter.getPosition());
 
-            Collection<ReportFilterValue> values = new ArrayList<ReportFilterValue>();
+            Set<ReportFilterValue> values = new HashSet<ReportFilterValue>();
             for (ReportFilterValue value : notNull(filter
                 .getReportFilterValueCollection())) {
                 ReportFilterValue valueCopy = new ReportFilterValue();
