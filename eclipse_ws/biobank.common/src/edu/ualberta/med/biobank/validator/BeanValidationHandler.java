@@ -112,23 +112,30 @@ public class BeanValidationHandler implements PreInsertEventListener,
                     //
                     // TODO: ensure translatable ConstraintViolation-s?
                     //
+                    // TODO: include the bean being validated and the type of
+                    // action that was trying to be performed?
+                    // TODO: put some of this code in another separate class
+                    // that can be called directly (not through a listener)
+                    // through a specific action.
+                    // TODO: add a tag for validations to be performed on the
+                    // server (only) and not locally...
                     Set<ConstraintViolation<?>> propagatedViolations =
                         new HashSet<ConstraintViolation<?>>(
                             constraintViolations.size());
-                    
 
                     StringBuilder builder = new StringBuilder();
                     builder.append("validation failed for groups: ");
                     builder.append(Arrays.toString(groups));
-                    
+
                     for (ConstraintViolation<?> violation : constraintViolations) {
                         // if (log.isTraceEnabled()) {
                         // log.trace(violation.toString());
                         // }
                         propagatedViolations.add(violation);
-                        
+
                         builder.append("\r\n");
-                        builder.append(violation.getLeafBean().getClass().getName());
+                        builder.append(violation.getLeafBean().getClass()
+                            .getName());
                         builder.append(":");
                         builder.append(violation.getMessage());
                     }

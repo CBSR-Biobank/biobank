@@ -8,8 +8,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import edu.ualberta.med.biobank.validator.constraint.NotUsed;
+
 @Entity
 @Table(name = "STUDY_EVENT_ATTR")
+@NotUsed(by = EventAttr.class, property = "studyEventAttr",
+    message = "edu.ualberta.med.biobank.model.StudyEventAttr.NotUsed.eventAttr.studyEventAttr")
 public class StudyEventAttr extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

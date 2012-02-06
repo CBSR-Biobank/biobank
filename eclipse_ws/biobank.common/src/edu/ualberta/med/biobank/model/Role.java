@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreInsert;
 import edu.ualberta.med.biobank.validator.group.PreUpdate;
@@ -26,6 +27,8 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
         groups = { PreInsert.class, PreUpdate.class },
         message = "{edu.ualberta.med.biobank.model.Role.name.Unique}")
 })
+@NotUsed(by = Membership.class, property = "roleCollection",
+    message = "edu.ualberta.med.biobank.model.Role.NotUsed.membership.roleCollection")
 public class Role extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

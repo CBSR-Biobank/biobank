@@ -10,8 +10,12 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
+import edu.ualberta.med.biobank.validator.constraint.NotUsed;
+
 @Entity
 @DiscriminatorValue("Clinic")
+@NotUsed(by = Study.class, property = "contactCollection.clinic",
+    message = "edu.ualberta.med.biobank.model.Clinic.NotUsed.study.contactCollection.clinic")
 public class Clinic extends Center {
     private static final long serialVersionUID = 1L;
     

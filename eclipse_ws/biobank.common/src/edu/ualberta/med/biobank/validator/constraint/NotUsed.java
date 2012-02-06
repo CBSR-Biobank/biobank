@@ -17,6 +17,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * Asserts that the annotated bean is not used by the given class through the
  * given property.
+ * <p>
+ * The message need not contain a list of objects that reference the 'NotUsed'
+ * object because the person who catches the exception has the necessary data to
+ * go and get that list.
  * 
  * @author Jonathan Ferland
  */

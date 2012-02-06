@@ -19,8 +19,18 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.NotUsed;
+
 @Entity
 @Table(name = "PROCESSING_EVENT")
+@NotUsed.List({
+    @NotUsed(by = Specimen.class, property = "processingEvent",
+        message = "edu.ualberta.med.biobank.model.ProcessingEvent.NotUsed.specimen.processingEvent"),
+    @NotUsed(by = Specimen.class, property = "parentSpecimen.processingEvent",
+        message = "edu.ualberta.med.biobank.model.ProcessingEvent.NotUsed.specimen.parentSpecimen.processingEvent")
+})
+// Unable to delete processing event '{0}' ({1}) since some of its specimens
+// have already been derived into others specimens.
 public class ProcessingEvent extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
