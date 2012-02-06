@@ -21,6 +21,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreInsert;
 import edu.ualberta.med.biobank.validator.group.PreUpdate;
@@ -30,6 +31,8 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
 @Unique(properties = { "inventoryId" },
     groups = { PreInsert.class, PreUpdate.class },
     message = "{edu.ualberta.med.biobank.model.Specimen.inventoryId.Unique}")
+@Empty(property = "childSpecimenCollection",
+    message = "edu.ualberta.med.biobank.model.Specimen.Empty.childSpecimenCollection")
 public class Specimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

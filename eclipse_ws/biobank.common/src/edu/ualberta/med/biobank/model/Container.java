@@ -18,6 +18,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreInsert;
 import edu.ualberta.med.biobank.validator.group.PreUpdate;
@@ -39,6 +40,12 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
     @Unique(properties = { "site.id", "productBarcode" },
         groups = { PreInsert.class, PreUpdate.class },
         message = "{edu.ualberta.med.biobank.model.Container.productBarcode.Unique}")
+})
+@Empty.List({
+    @Empty(property = "specimenPositionCollection",
+        message = "edu.ualberta.med.biobank.model.Container.Empty.specimenPositionCollection"),
+    @Empty(property = "childPositionCollection",
+        message = "edu.ualberta.med.biobank.model.Container.Empty.childPositionCollection")
 })
 public class Container extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;

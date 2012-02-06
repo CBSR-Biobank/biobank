@@ -36,19 +36,8 @@ public class EmptyValidator extends SessionAwareConstraintValidator<Object>
         ClassMetadata meta = getSession().getSessionFactory()
             .getClassMetadata(value.getClass());
 
-        // TODO: not sure if it's a good idea to check the property directly if
-        // it is initialized. If so, uncomment the following code:
-        // if (Hibernate.isPropertyInitialized(value, property)) {
-        // Object propertyValue =
-        // meta.getPropertyValue(value, property, EntityMode.POJO);
-        //
-        // if (propertyValue instanceof Collection) {
-        // int size = ((Collection<?>) propertyValue).size();
-        // return size;
-        // } else {
-        // // TODO: throw an exception or log a warning?
-        // }
-        // }
+        // Don't check the property directy, but use HQL instead since it could
+        // be enormous.
 
         String idName = meta.getIdentifierPropertyName();
         Serializable id = meta.getIdentifier(value,
