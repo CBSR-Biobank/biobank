@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.action.container;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
+import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
@@ -88,11 +89,14 @@ public class ContainerSaveAction implements Action<IdResult> {
         container.setProductBarcode(barcode);
         container.setContainerType(context.load(ContainerType.class,
             typeId));
-        container.setLabel(label);
 
         StringBuilder path = new StringBuilder();
 
         if (parentId != null) {
+            if (label != null) {
+                throw new ActionCheckException(
+                    "cannot set label on child containers");
+            }
             Container parent = context.load(Container.class, parentId);
             String parentPath = parent.getPath();
             if ((parentPath != null) && !parentPath.isEmpty()) {
@@ -100,6 +104,12 @@ public class ContainerSaveAction implements Action<IdResult> {
             }
             path.append(parentId);
             container.setPath(path.toString());
+
+            container.setTopContainer(parent.getTopContainer());
+            container.setLabel(parent.getContainerType().getPositionString(
+                position));
+        } else {
+            setLabel(label);
         }
 
         ContainerActionHelper.setPosition(context, container, position,

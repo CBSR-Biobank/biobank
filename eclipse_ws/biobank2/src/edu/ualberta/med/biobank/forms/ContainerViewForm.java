@@ -468,7 +468,6 @@ public class ContainerViewForm extends BiobankViewForm {
         BooleanResult result =
             SessionManager.getAppService().doAction(
                 containerCreateChildrenAction);
-        reload();
         return result.isTrue();
     }
 
@@ -521,12 +520,13 @@ public class ContainerViewForm extends BiobankViewForm {
             new ContainerDeleteChildrenAction();
         containerDeleteChildrenAction
             .setParentContainerId(containerInfo.container.getId());
-        containerDeleteChildrenAction.setContainerTypeId(type.getId());
+        if (type != null) {
+            containerDeleteChildrenAction.setContainerTypeId(type.getId());
+        }
         containerDeleteChildrenAction.setParentPositions(positions);
         BooleanResult result =
             SessionManager.getAppService().doAction(
                 containerDeleteChildrenAction);
-        reload();
         return result.isTrue();
     }
 

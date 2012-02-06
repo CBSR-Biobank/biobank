@@ -18,8 +18,6 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotEmpty;
-
 import edu.ualberta.med.biobank.common.util.RowColPos;
 
 @Entity
@@ -46,7 +44,6 @@ public class Container extends AbstractBiobankModel {
     private Site site;
     private ActivityStatus activityStatus;
 
-    @NotEmpty
     @Column(name = "PRODUCT_BARCODE")
     public String getProductBarcode() {
         return this.productBarcode;

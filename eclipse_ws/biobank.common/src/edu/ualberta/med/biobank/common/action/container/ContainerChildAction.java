@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.action.container;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -11,7 +13,7 @@ public abstract class ContainerChildAction implements Action<BooleanResult> {
 
     protected Integer parentContainerId;
     protected Integer childContainerTypeId;
-    protected Set<RowColPos> positions;
+    protected List<RowColPos> positions;
 
     public void setParentContainerId(Integer parentContainerId) {
         this.parentContainerId = parentContainerId;
@@ -22,6 +24,6 @@ public abstract class ContainerChildAction implements Action<BooleanResult> {
     }
 
     public void setParentPositions(Set<RowColPos> positions) {
-        this.positions = positions;
+        this.positions = new ArrayList<RowColPos>(positions);
     }
 }

@@ -50,6 +50,9 @@ or protection_element_name = 'edu.ualberta.med.biobank.model.Comment';
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+-- *****************************************************************
+-- caution: this table gets dropped further on in the upgrade script
+-- *****************************************************************
 CREATE TABLE `bb_group` (
   `PRINCIPAL_ID` int(11) NOT NULL,
   `NAME` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
@@ -137,6 +140,9 @@ CREATE TABLE `role_permission` (
   CONSTRAINT `FK9C6EC93814388625` FOREIGN KEY (`ROLE_ID`) REFERENCES `role` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
+-- *****************************************************************
+-- caution: this table gets dropped further on in the upgrade script
+-- *****************************************************************
 CREATE TABLE `user` (
   `PRINCIPAL_ID` int(11) NOT NULL,
   `LOGIN` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
