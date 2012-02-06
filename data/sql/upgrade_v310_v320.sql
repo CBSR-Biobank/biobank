@@ -678,6 +678,14 @@ ALTER TABLE report MODIFY COLUMN DESCRIPTION TEXT CHARACTER SET latin1 COLLATE l
 ALTER TABLE report_filter_value MODIFY COLUMN VALUE TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, MODIFY COLUMN SECOND_VALUE TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL;
 ALTER TABLE printed_ss_inv_item ADD CONSTRAINT TXT UNIQUE KEY(TXT);
 
+-- apply new constraints based on annotations
+
+update study_event_attr
+set required=0 where required is null;
+
+update source_specimen
+set need_original_volume=0 where need_original_volume is null;
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
