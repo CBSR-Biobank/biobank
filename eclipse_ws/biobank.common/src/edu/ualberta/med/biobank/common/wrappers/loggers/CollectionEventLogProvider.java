@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers.loggers;
 
-import java.util.Collection;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
@@ -27,7 +27,7 @@ public class CollectionEventLogProvider implements
         int count = 0;
 
         // TODO: could be switched to HQL count query to be way faster
-        Collection<Specimen> originals = collectionEvent
+        Set<Specimen> originals = collectionEvent
             .getOriginalSpecimenCollection();
         if (originals != null) {
             count = originals.size();
