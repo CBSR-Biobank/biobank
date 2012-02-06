@@ -7,9 +7,6 @@ import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.EntityMode;
 import org.hibernate.Query;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.metadata.ClassMetadata;
 
 import edu.ualberta.med.biobank.validator.SessionAwareConstraintValidator;

@@ -18,6 +18,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -33,10 +34,10 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
     @Unique(properties = { "site", "name" }, groups = PrePersist.class),
     @Unique(properties = { "site", "nameShort" }, groups = PrePersist.class)
 })
-@NotUsed.List({
-    @NotUsed(by = Container.class, property = "containerType", groups = PreDelete.class),
-    @NotUsed(by = ContainerType.class, property = "parentContainerTypeCollection", groups = PreDelete.class),
-    @NotUsed(by = ContainerType.class, property = "childContainerTypeCollection", groups = PreDelete.class)
+@NotUsed(by = Container.class, property = "containerType", groups = PreDelete.class)
+@Empty.List({
+    @Empty(property = "childContainerTypeCollection", groups = PreDelete.class),
+    @Empty(property = "parentContainerTypeCollection", groups = PreDelete.class)
 })
 public class ContainerType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;

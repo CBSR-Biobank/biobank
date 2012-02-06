@@ -15,7 +15,7 @@
 		<property name="c3p0.idle_test_period">3000</property>
 		<property name="c3p0.acquire_increment">2</property>
 		<property name="c3p0.validate">false</property>
-		<property name="show_sql">true</property>
+		<property name="show_sql">false</property>
 		<property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
 		<property name="max_fetch_depth">1</property>
 		<property name="bytecode.use_reflection_optimizer">false</property>

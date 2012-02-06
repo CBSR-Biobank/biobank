@@ -13,6 +13,7 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -27,9 +28,11 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @NotUsed.List({
     @NotUsed(by = Specimen.class, property = "specimenType", groups = PreDelete.class),
     @NotUsed(by = SourceSpecimen.class, property = "specimenType", groups = PreDelete.class),
-    @NotUsed(by = AliquotedSpecimen.class, property = "specimenType", groups = PreDelete.class),
-    @NotUsed(by = SpecimenType.class, property = "parentSpecimenTypeCollection", groups = PreDelete.class),
-    @NotUsed(by = SpecimenType.class, property = "childSpecimenTypeCollection", groups = PreDelete.class)
+    @NotUsed(by = AliquotedSpecimen.class, property = "specimenType", groups = PreDelete.class)
+})
+@Empty.List({
+    @Empty(property = "childSpecimenTypeCollection", groups = PreDelete.class),
+    @Empty(property = "parentSpecimenTypeCollection", groups = PreDelete.class)
 })
 public class SpecimenType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
