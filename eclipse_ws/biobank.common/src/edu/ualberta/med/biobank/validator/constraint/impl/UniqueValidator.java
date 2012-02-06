@@ -31,8 +31,39 @@ public class UniqueValidator extends SessionAwareConstraintValidator<Object>
         if (value == null) {
             return true;
         }
-        
-        return countRows(value) == 0;
+
+        boolean unique = countRows(value) == 0;
+        if (!unique) {
+            overrideEmptyMessageTemplate(value, context);
+        }
+        return unique;
+    }
+
+    private void overrideEmptyMessageTemplate(Object value,
+        ConstraintValidatorContext context) {
+        String defaultTemplate = context.getDefaultConstraintMessageTemplate();
+
+        if (defaultTemplate.isEmpty()) {
+            ClassMetadata meta = getSession().getSessionFactory()
+                .getClassMetadata(value.getClass());
+
+            StringBuilder template = new StringBuilder();
+
+            template.append("{");
+            template.append(meta.getMappedClass(EntityMode.POJO).getName());
+            template.append(".Unique[");
+
+            for (int i = 0, n = properties.length; i < n; i++) {
+                template.append(properties[i]);
+                if (i < n - 1) template.append(",");
+            }
+
+            template.append("]}");
+
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate(template.toString())
+                .addConstraintViolation();
+        }
     }
 
     private int countRows(Object value) {
@@ -52,7 +83,7 @@ public class UniqueValidator extends SessionAwareConstraintValidator<Object>
 
         List<?> results = criteria.getExecutableCriteria(getSession()).list();
         Number count = (Number) results.iterator().next();
-        
+
         // Because actions are queued, it is possible for two objects to have
         // the same value for a unique field. The pre-insert/update validation
         // will succeed because they query the database, but when both actions
