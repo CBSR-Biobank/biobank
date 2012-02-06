@@ -14,24 +14,26 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 
 public class ContainerSaveAction implements Action<IdResult> {
-
     private static final long serialVersionUID = 1L;
 
+    public static final String PATH_DELIMITER = "/"; //$NON-NLS-1$
+
     public Integer containerId;
-    public Integer statusId;
+    public Integer activityStatusId;
     public String barcode;
     public String label;
     public Integer siteId;
     public Integer typeId;
     public RowColPos position;
+    public String path;
     public Integer parentId;
 
     public void setId(Integer containerId) {
         this.containerId = containerId;
     }
 
-    public void setStatusId(Integer statusId) {
-        this.statusId = statusId;
+    public void setActivityStatusId(Integer activityStatusId) {
+        this.activityStatusId = activityStatusId;
     }
 
     public void setBarcode(String barcode) {
@@ -81,12 +83,25 @@ public class ContainerSaveAction implements Action<IdResult> {
             container = new Container();
         }
         container.setActivityStatus(context.load(ActivityStatus.class,
-            statusId));
+            activityStatusId));
         container.setSite(context.load(Site.class, siteId));
         container.setProductBarcode(barcode);
         container.setContainerType(context.load(ContainerType.class,
             typeId));
         container.setLabel(label);
+
+        StringBuilder path = new StringBuilder();
+
+        if (parentId != null) {
+            Container parent = context.load(Container.class, parentId);
+            String parentPath = parent.getPath();
+            if ((parentPath != null) && !parentPath.isEmpty()) {
+                path.append(parentPath).append(PATH_DELIMITER);
+            }
+            path.append(parentId);
+            container.setPath(path.toString());
+        }
+
         ContainerActionHelper.setPosition(context, container, position,
             parentId);
 

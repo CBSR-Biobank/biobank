@@ -1003,7 +1003,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     csAction.typeId =
                         currentMultipleContainer.getContainerType()
                             .getId();
-                    csAction.statusId =
+                    csAction.activityStatusId =
                         currentMultipleContainer.getActivityStatus()
                             .getId();
                     csAction.siteId =

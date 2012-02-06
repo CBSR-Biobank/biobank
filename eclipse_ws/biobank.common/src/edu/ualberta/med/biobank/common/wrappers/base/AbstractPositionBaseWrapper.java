@@ -4,15 +4,17 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
-import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.AbstractPosition;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import java.util.ArrayList;
-import edu.ualberta.med.biobank.common.peer.AbstractPositionPeer;
+import java.util.List;
 
-public abstract class AbstractPositionBaseWrapper<E extends AbstractPosition> extends ModelWrapper<E> {
+import edu.ualberta.med.biobank.common.peer.AbstractPositionPeer;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.model.AbstractPosition;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
+public abstract class AbstractPositionBaseWrapper<E extends AbstractPosition>
+    extends ModelWrapper<E> {
 
     public AbstractPositionBaseWrapper(WritableApplicationService appService) {
         super(appService);
@@ -30,7 +32,8 @@ public abstract class AbstractPositionBaseWrapper<E extends AbstractPosition> ex
 
     @Override
     protected List<Property<?, ? super E>> getProperties() {
-        return new ArrayList<Property<?, ? super E>>(AbstractPositionPeer.PROPERTIES);
+        return new ArrayList<Property<?, ? super E>>(
+            AbstractPositionPeer.PROPERTIES);
     }
 
     public Integer getCol() {
@@ -39,15 +42,6 @@ public abstract class AbstractPositionBaseWrapper<E extends AbstractPosition> ex
 
     public void setCol(Integer col) {
         setProperty(AbstractPositionPeer.COL, col);
-    }
-
-    public String getPositionString() {
-        return getProperty(AbstractPositionPeer.POSITION_STRING);
-    }
-
-    public void setPositionString(String positionString) {
-        String trimmed = positionString == null ? null : positionString.trim();
-        setProperty(AbstractPositionPeer.POSITION_STRING, trimmed);
     }
 
     public Integer getRow() {

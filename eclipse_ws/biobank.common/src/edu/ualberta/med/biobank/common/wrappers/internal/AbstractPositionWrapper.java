@@ -6,7 +6,6 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.peer.AbstractPositionPeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
@@ -48,22 +47,16 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
         return position;
     }
 
-    private void setPosition(RowColPos newPosition) {
+    protected void setPosition(RowColPos newPosition) {
         if (newPosition == null) {
             throw new IllegalArgumentException(
                 "Position cannot be set to null."); //$NON-NLS-1$
         }
 
-        RowColPos oldPosition = getPosition();
-
         super.setRow(newPosition.getRow());
         super.setCol(newPosition.getCol());
 
         position = newPosition;
-
-        if (!position.equals(oldPosition)) {
-            updatePositionString();
-        }
     }
 
     public abstract ContainerWrapper getParent();
@@ -93,17 +86,5 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
         tasks.add(check().notNull(AbstractPositionPeer.COL));
 
         super.addPersistTasks(tasks);
-    }
-
-    private void updatePositionString() {
-        ContainerWrapper container = getParent();
-        if (container != null && getRow() != null && getCol() != null) {
-            ContainerTypeWrapper containerType = container.getContainerType();
-            if (containerType != null) {
-                String positionString = containerType
-                    .getPositionString(new RowColPos(getRow(), getCol()));
-                setPositionString(positionString);
-            }
-        }
     }
 }

@@ -27,7 +27,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionAdapter extends AdapterBase {
 
-    private static final String LOGOUT_COMMAND_ID = "edu.ualberta.med.biobank.commands.logout"; //$NON-NLS-1$
+    private static final String LOGOUT_COMMAND_ID =
+        "edu.ualberta.med.biobank.commands.logout"; //$NON-NLS-1$
 
     public static final int CLINICS_BASE_NODE_ID = 0;
 
@@ -60,32 +61,32 @@ public class SessionAdapter extends AdapterBase {
     }
 
     private void addSubNodes() {
-        if (SessionManager.getInstance().isConnected()) {
-            if (SessionManager.isSuperAdminMode()) {
-                addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
-                addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
-                addChild(new ResearchGroupMasterGroup(this,
-                    RESEARCH_GROUPS_BASE_NODE_ID));
-                SiteGroup siteGroup = new SiteGroup(this, SITES_NODE_ID);
-                addChild(siteGroup);
-                siteGroup.performExpand();
-            } else {
-                CenterWrapper<?> currentCenter = SessionManager.getUser()
-                    .getCurrentWorkingCenter();
-                CenterWrapper<?> clonedCenter;
-                try {
-                    clonedCenter = (CenterWrapper<?>) currentCenter
-                        .getDatabaseClone();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                if (clonedCenter != null) {
-                    AbstractAdapterBase child = AdapterFactory
-                        .getAdapter(clonedCenter);
-                    addChild(child);
-                    child.performExpand();
-                }
-            }
+        if (!SessionManager.getInstance().isConnected()) return;
+
+        if (SessionManager.isSuperAdminMode()) {
+            addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
+            addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
+            addChild(new ResearchGroupMasterGroup(this,
+                RESEARCH_GROUPS_BASE_NODE_ID));
+            SiteGroup siteGroup = new SiteGroup(this, SITES_NODE_ID);
+            addChild(siteGroup);
+            siteGroup.performExpand();
+            return;
+        }
+
+        // only get here if session is not in super admin mode
+        CenterWrapper<?> currentCenter = SessionManager.getUser()
+            .getCurrentWorkingCenter();
+        CenterWrapper<?> clonedCenter;
+        try {
+            clonedCenter = (CenterWrapper<?>) currentCenter.getDatabaseClone();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if (clonedCenter != null) {
+            AbstractAdapterBase child = AdapterFactory.getAdapter(clonedCenter);
+            addChild(child);
+            child.performExpand();
         }
     }
 
@@ -131,13 +132,15 @@ public class SessionAdapter extends AdapterBase {
     }
 
     private ClinicMasterGroup getClinicGroupNode() {
-        ClinicMasterGroup adapter = (ClinicMasterGroup) getChild(CLINICS_BASE_NODE_ID);
+        ClinicMasterGroup adapter =
+            (ClinicMasterGroup) getChild(CLINICS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
         return adapter;
     }
 
     private ResearchGroupMasterGroup getResearchGroupGroupNode() {
-        ResearchGroupMasterGroup adapter = (ResearchGroupMasterGroup) getChild(RESEARCH_GROUPS_BASE_NODE_ID);
+        ResearchGroupMasterGroup adapter =
+            (ResearchGroupMasterGroup) getChild(RESEARCH_GROUPS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
         return adapter;
     }

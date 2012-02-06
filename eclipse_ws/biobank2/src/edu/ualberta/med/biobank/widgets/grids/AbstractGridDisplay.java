@@ -12,7 +12,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 
@@ -181,7 +181,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     }
 
     @Override
-    public void setContainerType(ContainerTypeWrapper type) {
+    public void setContainerType(ContainerType type) {
         super.setContainerType(type);
         Integer rowCap = containerType.getRowCapacity();
         Integer colCap = containerType.getColCapacity();
@@ -215,7 +215,8 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
                     tmpFont.dispose();
                 }
                 height--;
-                FontData fd2 = new FontData(fd.getName(), height, fd.getStyle());
+                FontData fd2 =
+                    new FontData(fd.getName(), height, fd.getStyle());
                 tmpFont = new Font(e.display, fd2);
                 e.gc.setFont(tmpFont);
                 currentTextSize = e.gc.textExtent(text);

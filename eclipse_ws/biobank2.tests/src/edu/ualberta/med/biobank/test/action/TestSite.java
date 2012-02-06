@@ -405,7 +405,7 @@ public class TestSite extends TestAction {
         Integer containerTypeId = provisioning.containerTypeIds.get(0);
 
         ContainerSaveAction containerSaveAction = new ContainerSaveAction();
-        containerSaveAction.setStatusId(ActivityStatusEnum.ACTIVE.getId());
+        containerSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
         containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
         containerSaveAction.setLabel("01");
         containerSaveAction.setSiteId(provisioning.siteId);
