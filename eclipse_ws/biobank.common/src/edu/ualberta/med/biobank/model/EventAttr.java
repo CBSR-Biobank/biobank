@@ -26,7 +26,7 @@ public class EventAttr extends AbstractBiobankModel {
         this.value = value;
     }
 
-    @NotNull
+    @NotNull(message = "edu.ualberta.med.biobank.model.EventAttr.collectionEvent.NotNull")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false)
     public CollectionEvent getCollectionEvent() {
@@ -37,7 +37,7 @@ public class EventAttr extends AbstractBiobankModel {
         this.collectionEvent = collectionEvent;
     }
 
-    @NotNull
+    @NotNull(message = "edu.ualberta.med.biobank.model.EventAttr.studyEventAttr.NotNull")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_EVENT_ATTR_ID", nullable = false)
     public StudyEventAttr getStudyEventAttr() {

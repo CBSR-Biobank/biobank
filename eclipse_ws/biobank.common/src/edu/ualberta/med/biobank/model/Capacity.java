@@ -14,8 +14,8 @@ public class Capacity extends AbstractBiobankModel {
     private Integer rowCapacity;
     private Integer colCapacity;
 
-    @NotNull
-    @Min(value = 0)
+    @Min(value = 0, message = "{edu.ualberta.med.biobank.model.Capacity.rowCapacity.Min}")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Capacity.rowCapacity.NotNull}")
     @Column(name = "ROW_CAPACITY", nullable = false)
     public Integer getRowCapacity() {
         return this.rowCapacity;
@@ -25,8 +25,8 @@ public class Capacity extends AbstractBiobankModel {
         this.rowCapacity = rowCapacity;
     }
 
-    @NotNull
-    @Min(value = 0)
+    @Min(value = 0, message = "{edu.ualberta.med.biobank.model.Capacity.rowCapacity.Min}")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Capacity.rowCapacity.NotNull}")
     @Column(name = "COL_CAPACITY", nullable = false)
     public Integer getColCapacity() {
         return this.colCapacity;

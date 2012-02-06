@@ -39,7 +39,7 @@ public class Address extends AbstractBiobankModel {
         this.street2 = street2;
     }
 
-    @NotEmpty
+    @NotEmpty(message = "edu.ualberta.med.biobank.model.Address.city.NotEmpty")
     @Column(name = "CITY", length = 50)
     public String getCity() {
         return this.city;

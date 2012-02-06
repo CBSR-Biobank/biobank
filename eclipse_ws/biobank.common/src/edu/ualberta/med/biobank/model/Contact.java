@@ -28,7 +28,7 @@ public class Contact extends AbstractBiobankModel {
     private Set<Study> studyCollection = new HashSet<Study>(0);
     private Clinic clinic;
 
-    @NotEmpty
+    @NotEmpty(message = "edu.ualberta.med.biobank.model.Contact.name.NotNull")
     @Column(name = "NAME", length = 100)
     public String getName() {
         return this.name;

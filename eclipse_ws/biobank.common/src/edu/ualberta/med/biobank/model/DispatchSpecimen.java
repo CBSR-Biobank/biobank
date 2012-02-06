@@ -25,7 +25,7 @@ public class DispatchSpecimen extends AbstractBiobankModel {
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
     // TODO: convert to enum
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.DispatchSpecimen.state.NotNull}")
     @Column(name = "STATE")
     public Integer getState() {
         return this.state;
@@ -35,7 +35,7 @@ public class DispatchSpecimen extends AbstractBiobankModel {
         this.state = state;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.DispatchSpecimen.dispatch.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DISPATCH_ID", nullable = false)
     public Dispatch getDispatch() {
@@ -46,7 +46,7 @@ public class DispatchSpecimen extends AbstractBiobankModel {
         this.dispatch = dispatch;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.DispatchSpecimen.specimen.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_ID", nullable = false)
     public Specimen getSpecimen() {

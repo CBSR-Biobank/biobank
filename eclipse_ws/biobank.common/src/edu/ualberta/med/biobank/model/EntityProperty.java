@@ -26,7 +26,7 @@ public class EntityProperty extends AbstractBiobankModel {
     private Set<EntityFilter> entityFilterCollection =
         new HashSet<EntityFilter>(0);
 
-    @NotEmpty
+    @NotEmpty(message = "edu.ualberta.med.biobank.model.EntityProperty.property.NotEmpty")
     @Column(name = "PROPERTY")
     public String getProperty() {
         return this.property;
@@ -47,7 +47,7 @@ public class EntityProperty extends AbstractBiobankModel {
         this.entityColumnCollection = entityColumnCollection;
     }
 
-    @NotNull
+    @NotNull(message = "edu.ualberta.med.biobank.model.EntityProperty.propertyType.NotNull")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "PROPERTY_TYPE_ID", nullable = false)
     public PropertyType getPropertyType() {

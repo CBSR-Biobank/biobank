@@ -58,7 +58,7 @@ public class Container extends AbstractBiobankModel {
     private Site site;
     private ActivityStatus activityStatus;
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Container.productBarcode.Unique}")
     @Column(name = "PRODUCT_BARCODE")
     public String getProductBarcode() {
         return this.productBarcode;
@@ -68,7 +68,7 @@ public class Container extends AbstractBiobankModel {
         this.productBarcode = productBarcode;
     }
 
-    @NotNull
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Container.label.NotEmpty}")
     @Column(name = "LABEL", nullable = false)
     public String getLabel() {
         return this.label;
@@ -88,7 +88,7 @@ public class Container extends AbstractBiobankModel {
         this.temperature = temperature;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.path.NotEmpty}")
     @Column(name = "PATH", nullable = false)
     public String getPath() {
         return this.path;
@@ -140,7 +140,7 @@ public class Container extends AbstractBiobankModel {
         this.specimenPositionCollection = specimenPositionCollection;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.containerType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false)
     public ContainerType getContainerType() {
@@ -161,7 +161,7 @@ public class Container extends AbstractBiobankModel {
         this.position = position;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.site.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SITE_ID", nullable = false)
     public Site getSite() {
@@ -172,7 +172,7 @@ public class Container extends AbstractBiobankModel {
         this.site = site;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.activityStatus.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {

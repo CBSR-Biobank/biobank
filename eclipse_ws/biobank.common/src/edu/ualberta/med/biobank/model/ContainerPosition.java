@@ -26,7 +26,7 @@ public class ContainerPosition extends AbstractPosition {
     private Container parentContainer;
     private Container container;
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerPosition.parentContainer.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PARENT_CONTAINER_ID", nullable = false)
     public Container getParentContainer() {
@@ -37,7 +37,7 @@ public class ContainerPosition extends AbstractPosition {
         this.parentContainer = parentContainer;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerPosition.container.NotNull}")
     @OneToOne(fetch = FetchType.EAGER, mappedBy = "position")
     public Container getContainer() {
         return this.container;

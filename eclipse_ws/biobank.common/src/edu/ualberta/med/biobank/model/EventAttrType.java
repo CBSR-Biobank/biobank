@@ -14,8 +14,7 @@ public class EventAttrType extends AbstractBiobankModel {
 
     private String name;
 
-    // TODO: unique
-    @NotEmpty
+    @NotEmpty(message = "edu.ualberta.med.biobank.model.EventAttrType.name.NotEmpty")
     @Column(name = "NAME", unique = true, nullable = false, length = 50)
     public String getName() {
         return this.name;

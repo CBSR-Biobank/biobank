@@ -57,7 +57,7 @@ public class Center extends AbstractBiobankModel {
     private ActivityStatus activityStatus;
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Center.name.NotEmpty}")
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
         return this.name;
@@ -67,7 +67,7 @@ public class Center extends AbstractBiobankModel {
         this.name = name;
     }
 
-    @NotEmpty
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Center.nameShort.NotEmpty}")
     @Column(name = "NAME_SHORT", unique = true, nullable = false, length = 50)
     public String getNameShort() {
         return this.nameShort;
@@ -77,7 +77,7 @@ public class Center extends AbstractBiobankModel {
         this.nameShort = nameShort;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Center.address.NotNull}")
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "ADDRESS_ID", unique = true, nullable = false)
     public Address getAddress() {
@@ -140,7 +140,7 @@ public class Center extends AbstractBiobankModel {
         this.originInfoCollection = originInfoCollection;
     }
 
-    @NotNull
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Center.activityStatus.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {
