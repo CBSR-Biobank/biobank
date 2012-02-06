@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -38,6 +39,8 @@ public class BeanValidationHandler implements PreInsertEventListener,
     private static final long serialVersionUID = 1L;
 
     private final ValidatorFactory factory;
+    private final MessageInterpolator messageInterpolator =
+        new OgnlMessageInterpolator();
     private ConcurrentHashMap<EntityPersister, Set<String>> associationsPerEntityPersister =
         new ConcurrentHashMap<EntityPersister, Set<String>>();
 
@@ -94,8 +97,7 @@ public class BeanValidationHandler implements PreInsertEventListener,
         Validator validator = factory.usingContext()
             .traversableResolver(tr)
             .constraintValidatorFactory(validatorFactory)
-            // TODO: create a new one all the time? not sure...
-            .messageInterpolator(new OgnlMessageInterpolator())
+            .messageInterpolator(messageInterpolator)
             .getValidator();
 
         FlushMode oldMode = session.getFlushMode();
