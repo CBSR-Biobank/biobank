@@ -31,6 +31,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
@@ -188,6 +189,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
                 dispatch.getState(), comment.getMessage() == null ? ""
                     : comment.getMessage());
         DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
-        SessionManager.getAppService().doAction(save);
+        dispatch.setId(SessionManager.getAppService().doAction(save).getId());
+        ((AdapterBase) adapter).setModelObject(dispatch);
     }
 }

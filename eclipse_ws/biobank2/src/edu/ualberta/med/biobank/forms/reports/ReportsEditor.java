@@ -34,9 +34,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.reports.ReportAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.util.HQLCriteriaListProxy;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
@@ -76,7 +76,6 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     // Global status
     private IObservableValue statusObservable;
 
-    QueryHandle query;
     ProgressMonitorDialogBusyListener listener =
         new ProgressMonitorDialogBusyListener("Generating report..."); //$NON-NLS-1$
 
@@ -86,7 +85,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
         reportData = new ArrayList<Object>();
         node = (ReportTreeNode) ((ReportInput) getEditorInput()).getNode();
         report = node.getReport();
-        this.setPartName(report.getName());
+        this.setPartName(report.getClassName());
     }
 
     @Override
@@ -226,7 +225,6 @@ public abstract class ReportsEditor extends BiobankEntryForm {
         }
 
         try {
-            query = SessionManager.getAppService().createQuery(report);
 
             IRunnableContext context = new ProgressMonitorDialog(Display
                 .getDefault().getActiveShell());
@@ -237,8 +235,10 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                             @Override
                             public void run() {
                                 try {
-                                    reportData = SessionManager.getAppService()
-                                        .startQuery(query);
+                                    reportData =
+                                        SessionManager.getAppService()
+                                            .doAction(new ReportAction(report))
+                                            .getList();
                                 } catch (Exception e) {
                                     reportData = new ArrayList<Object>();
                                     BgcPlugin.openAsyncError("Query Error", e); //$NON-NLS-1$
@@ -251,7 +251,6 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                     while (true) {
                         if (monitor.isCanceled()) {
                             try {
-                                SessionManager.getAppService().stopQuery(query);
                             } catch (Exception e) {
                                 BgcPlugin.openAsyncError("Stop Failed", e); //$NON-NLS-1$
                             }

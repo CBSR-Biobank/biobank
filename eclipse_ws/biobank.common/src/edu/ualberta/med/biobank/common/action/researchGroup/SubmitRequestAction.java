@@ -37,20 +37,6 @@ public class SubmitRequestAction implements Action<IdResult> {
     @Override
     public IdResult run(ActionContext context) throws ActionException {
         Request request = new Request();
-        for (String id : specs) {
-            Query q = context.getSession().createQuery("from "
-                + Specimen.class.getName() + " where inventoryId=?");
-            q.setParameter(0, id);
-            Specimen spec = (Specimen) q.list().get(0);
-            if (spec == null)
-                continue;
-            RequestSpecimen r =
-                new RequestSpecimen();
-            r.setRequest(request);
-            r.setState(RequestSpecimenState.AVAILABLE_STATE.getId());
-            r.setSpecimen(spec);
-        }
-
         request.setResearchGroup(context.get(ResearchGroup.class, rgId));
         request.setCreated(new Date());
         request.setSubmitted(new Date());
@@ -59,6 +45,26 @@ public class SubmitRequestAction implements Action<IdResult> {
 
         context.getSession().saveOrUpdate(request);
         context.getSession().flush();
+
+        for (String id : specs) {
+            if (id == null || id.equals(""))
+                throw new ActionException(
+                    "Blank specimen id, please check your your file for correct input.");
+
+            Query q = context.getSession().createQuery("from "
+                + Specimen.class.getName() + " where inventoryId=?");
+            q.setParameter(0, id);
+
+            Specimen spec = (Specimen) q.list().get(0);
+            if (spec == null)
+                continue;
+            RequestSpecimen r =
+                new RequestSpecimen();
+            r.setRequest(request);
+            r.setState(RequestSpecimenState.AVAILABLE_STATE.getId());
+            r.setSpecimen(spec);
+            context.getSession().saveOrUpdate(r);
+        }
 
         return new IdResult(request.getId());
     }

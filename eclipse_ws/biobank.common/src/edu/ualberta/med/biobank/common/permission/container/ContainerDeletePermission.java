@@ -8,7 +8,10 @@ import edu.ualberta.med.biobank.model.PermissionEnum;
 public class ContainerDeletePermission implements Permission {
     private static final long serialVersionUID = 1L;
 
-    private Integer containerId;
+    private Integer containerId = null;
+
+    public ContainerDeletePermission() {
+    }
 
     public ContainerDeletePermission(Integer containerId) {
         this.containerId = containerId;
@@ -16,9 +19,13 @@ public class ContainerDeletePermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        Container container = context.load(Container.class, containerId);
-        return PermissionEnum.CONTAINER_DELETE.isAllowed(context.getUser(),
-            container.getSite());
+        if (containerId != null) {
+            Container container = context.load(Container.class, containerId);
+            return PermissionEnum.CONTAINER_DELETE.isAllowed(context.getUser(),
+                container.getSite());
+        } else {
+            return PermissionEnum.CONTAINER_DELETE.isAllowed(context.getUser());
+        }
     }
 
 }

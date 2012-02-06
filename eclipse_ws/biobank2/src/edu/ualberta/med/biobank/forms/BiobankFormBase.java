@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.forms.BgcFormBase;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -50,6 +51,8 @@ import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
  */
 public abstract class BiobankFormBase extends BgcFormBase {
 
+    protected static BgcLogger logger = BgcLogger
+        .getLogger(BiobankEntryForm.class.getName());
     protected AbstractAdapterBase adapter;
 
     public BiobankFormBase() {
@@ -106,6 +109,7 @@ public abstract class BiobankFormBase extends BgcFormBase {
         super.init(editorSite, formInput);
     }
 
+    @Deprecated
     protected Object getModelObject() throws Exception {
         if (adapter instanceof AdapterBase) {
             AdapterBase ab = (AdapterBase) adapter;
@@ -237,10 +241,13 @@ public abstract class BiobankFormBase extends BgcFormBase {
             cancelSave(monitor);
         } else {
             cancelSave(monitor);
-            if (lastThrowException)
-                throw new RuntimeException(ex);
-            BgcPlugin.openAsyncError(
-                Messages.BiobankFormBase_save_error_title, ex);
+            logger.error("Unknown error", ex);
+            if (lastThrowException) {
+                BgcPlugin
+                    .openAsyncError(
+                        Messages.BiobankFormBase_save_error_title,
+                        "An unknown error occurred. Report this issue to your administrator");
+            }
         }
     }
 

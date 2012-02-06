@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.mvp.view.form;
 
 import java.util.Collection;
 
-import edu.ualberta.med.biobank.common.action.info.ContainerTypeInfo;
+import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -143,7 +143,7 @@ public class SiteViewFormView extends AbstractViewFormView
     }
 
     @Override
-    public ValueField<Collection<ContainerTypeInfo>> getContainerTypeCollection() {
+    public ValueField<Collection<SiteContainerTypeInfo>> getContainerTypeCollection() {
         // TODO Auto-generated method stub
         return null;
     }

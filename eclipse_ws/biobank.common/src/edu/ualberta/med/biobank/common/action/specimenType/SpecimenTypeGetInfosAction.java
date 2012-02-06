@@ -15,12 +15,9 @@ public class SpecimenTypeGetInfosAction implements
     Action<ListResult<SpecimenTypeInfo>> {
     private static final long serialVersionUID = 1L;
 
-    // @formatter:off
     @SuppressWarnings("nls")
     private static final String SPEC_TYPE_QRY = "from "
         + SpecimenType.class.getName();
-
-    // @formatter:on
 
     public SpecimenTypeGetInfosAction() {
     }

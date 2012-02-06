@@ -47,8 +47,7 @@ public class StudyHelper extends Helper {
         return actionExecutor.exec(saveStudy).getId();
     }
 
-    public static StudySaveAction getSaveAction(
-        IActionExecutor actionExecutor, StudyInfo studyInfo) {
+    public static StudySaveAction getSaveAction(StudyInfo studyInfo) {
         StudySaveAction saveStudy = new StudySaveAction();
         saveStudy.setId(studyInfo.study.getId());
         saveStudy.setName(studyInfo.study.getName());

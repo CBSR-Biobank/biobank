@@ -48,20 +48,23 @@ public class ContainerPositionWrapper extends ContainerPositionBaseWrapper {
         setParentContainer(parent);
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(ContainerPositionPeer.CONTAINER));
 
         super.addPersistTasks(tasks);
 
-        BiobankSessionAction checkPosition = new ContainerPositionAvailableCheck<ContainerPosition>(
-            this, ContainerPositionPeer.PARENT_CONTAINER);
+        BiobankSessionAction checkPosition =
+            new ContainerPositionAvailableCheck<ContainerPosition>(
+                this, ContainerPositionPeer.PARENT_CONTAINER);
 
         tasks.add(check().ifProperty(ContainerPositionPeer.PARENT_CONTAINER,
             Is.NOT_NULL, checkPosition));
 
-        BiobankSessionAction checkBounds = new ContainerPositionInBoundsCheck<ContainerPosition>(
-            this, ContainerPositionPeer.PARENT_CONTAINER);
+        BiobankSessionAction checkBounds =
+            new ContainerPositionInBoundsCheck<ContainerPosition>(
+                this, ContainerPositionPeer.PARENT_CONTAINER);
 
         tasks.add(check().ifProperty(ContainerPositionPeer.PARENT_CONTAINER,
             Is.NOT_NULL, checkBounds));

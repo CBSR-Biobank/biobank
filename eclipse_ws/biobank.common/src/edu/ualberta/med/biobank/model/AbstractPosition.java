@@ -2,8 +2,11 @@ package edu.ualberta.med.biobank.model;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+
+import edu.ualberta.med.biobank.common.util.RowColPos;
 
 @MappedSuperclass
 public class AbstractPosition extends AbstractBiobankModel {
@@ -11,7 +14,6 @@ public class AbstractPosition extends AbstractBiobankModel {
 
     private Integer row;
     private Integer col;
-    private String positionString;
 
     @Min(value = 0, message = "{edu.ualberta.med.biobank.model.AbstractPosition.row.Min}")
     @NotNull(message = "{edu.ualberta.med.biobank.model.AbstractPosition.row.NotNull}")
@@ -35,14 +37,8 @@ public class AbstractPosition extends AbstractBiobankModel {
         this.col = col;
     }
 
-    // TODO: make position string abstract and use the container's type and labeling scheme?
-    @NotNull(message = "{edu.ualberta.med.biobank.model.AbstractPosition.positionString.NotNull}")
-    @Column(name = "POSITION_STRING", length = 255, nullable = false)
-    public String getPositionString() {
-        return this.positionString;
-    }
-
-    public void setPositionString(String positionString) {
-        this.positionString = positionString;
+    @Transient
+    public RowColPos getPosition() {
+        return new RowColPos(getRow(), getCol());
     }
 }

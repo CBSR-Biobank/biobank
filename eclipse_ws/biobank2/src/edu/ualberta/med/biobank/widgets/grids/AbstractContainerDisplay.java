@@ -7,8 +7,8 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Point;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 
@@ -18,9 +18,9 @@ import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
  */
 public abstract class AbstractContainerDisplay {
 
-    protected ContainerWrapper container;
+    protected Container container;
 
-    protected ContainerTypeWrapper containerType;
+    protected ContainerType containerType;
     /**
      * true if we want the container to display full info in each box displayed
      */
@@ -56,14 +56,14 @@ public abstract class AbstractContainerDisplay {
         this.legendStatus = status;
     }
 
-    public void setContainer(ContainerWrapper container) {
+    public void setContainer(Container container) {
         this.container = container;
         if (container != null) {
             setContainerType(container.getContainerType());
         }
     }
 
-    public void setContainerType(ContainerTypeWrapper type) {
+    public void setContainerType(ContainerType type) {
         this.containerType = type;
     }
 

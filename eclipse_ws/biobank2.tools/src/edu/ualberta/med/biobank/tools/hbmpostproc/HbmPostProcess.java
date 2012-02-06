@@ -37,8 +37,9 @@ public class HbmPostProcess {
     private static final Logger LOGGER = Logger.getLogger(HbmPostProcess.class
         .getName());
 
-    private static String USAGE = "Usage: strfields [options] UMLFILE HBMDIR TEMPLATE\n\n"
-        + "Options\n" + "  -v, --verbose    Shows verbose output";
+    private static String USAGE =
+        "Usage: strfields [options] UMLFILE HBMDIR TEMPLATE\n\n"
+            + "Options\n" + "  -v, --verbose    Shows verbose output";
 
     private static HbmPostProcess instance = null;
 
@@ -187,15 +188,10 @@ public class HbmPostProcess {
                 + beanFileName + ", classname " + className);
         }
 
-        if (modelClass.getExtendsClass() != null) {
-            // no need to update this class
-            return;
-        }
-
         // Create a new bean file with a declaration for lastUpdate time.
         String beanFilePath = appArgs.hbmDir + "/" + beanFileName;
 
-        BeanModifier.getInstance().alterBean(beanFilePath, className);
+        BeanModifier.getInstance().alterBean(beanFilePath, modelClass);
 
     }
 
@@ -222,8 +218,9 @@ public class HbmPostProcess {
                 System.exit(-1);
             }
 
-            Map<String, Attribute> dmClassAttrMap = new HashMap<String, Attribute>(
-                dmClass.getAttrMap());
+            Map<String, Attribute> dmClassAttrMap =
+                new HashMap<String, Attribute>(
+                    dmClass.getAttrMap());
             if (extendsClass != null) {
                 // add all attributes from the super class, not already in
                 // derived class
@@ -234,7 +231,8 @@ public class HbmPostProcess {
                     }
                 }
             }
-            Map<String, Attribute> dmTableAttrMap = new HashMap<String, Attribute>();
+            Map<String, Attribute> dmTableAttrMap =
+                new HashMap<String, Attribute>();
             if (dmTable != null)
                 dmTableAttrMap.putAll(dmTable.getAttrMap());
             if (dmExtendTable != null)

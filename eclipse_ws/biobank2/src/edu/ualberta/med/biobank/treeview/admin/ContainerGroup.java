@@ -14,17 +14,23 @@ import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersResult;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerGroup extends AdapterBase {
+
+    private SiteGetTopContainersResult topContainerResult;
 
     private static BgcLogger logger = BgcLogger.getLogger(ContainerGroup.class
         .getName());
@@ -42,6 +48,19 @@ public class ContainerGroup extends AdapterBase {
     @Override
     public void executeDoubleClick() {
         performExpand();
+    }
+
+    @Override
+    public void performExpand() {
+        SiteAdapter siteAdapter = (SiteAdapter) getParent();
+        try {
+            topContainerResult = SessionManager.getAppService().doAction(
+                new SiteGetTopContainersAction(siteAdapter.getId()));
+            super.performExpand();
+        } catch (ApplicationException e) {
+            // TODO: open an error dialog here?
+            logger.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
+        }
     }
 
     @Override
@@ -118,16 +137,21 @@ public class ContainerGroup extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper parentSite = (SiteWrapper) ((SiteAdapter) getParent())
-            .getModelObject();
-        Assert.isNotNull(parentSite, "site null"); //$NON-NLS-1$
-        parentSite.reload();
-        return parentSite.getTopContainerCollection();
+
+        List<ContainerWrapper> result = new ArrayList<ContainerWrapper>();
+
+        for (Container container : topContainerResult.getTopContainers()) {
+            ContainerWrapper wrapper =
+                new ContainerWrapper(SessionManager.getAppService(), container);
+            result.add(wrapper);
+        }
+
+        return result;
     }
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren().size();
+        return topContainerResult.getTopContainers().size();
     }
 
     @Override

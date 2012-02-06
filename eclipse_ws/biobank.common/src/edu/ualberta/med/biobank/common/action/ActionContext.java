@@ -9,15 +9,20 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 // TODO: for now extend SessionUtil only because I eventually want to delete SessionUtil and replace it with this context :-)
 public class ActionContext {
     private final User user;
     private final Session session;
+    private BiobankApplicationService appService;
 
-    public ActionContext(User user, Session session) {
+    public ActionContext(User user, Session session,
+        BiobankApplicationService appService) {
         this.user = user;
         this.session = session;
+        this.appService = appService;
     }
 
     public User getUser() {
@@ -120,5 +125,9 @@ public class ActionContext {
         }
 
         return results;
+    }
+
+    public WritableApplicationService getAppService() {
+        return appService;
     }
 }

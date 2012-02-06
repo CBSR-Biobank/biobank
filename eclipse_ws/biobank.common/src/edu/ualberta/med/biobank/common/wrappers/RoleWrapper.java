@@ -59,6 +59,7 @@ public class RoleWrapper extends RoleBaseWrapper {
         return newRole;
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         tasks.add(new RolePreDeleteChecks(this));

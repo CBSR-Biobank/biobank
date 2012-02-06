@@ -73,59 +73,62 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
         // return null;
         // }
         // },
-        // PEVENT_SOURCE_SPECIMENS(new String[] {
-        // Messages.SpecimenInfoTable_inventoryid_label,
-        // Messages.SpecimenInfoTable_type_label,
-        // Messages.SpecimenInfoTable_position_label,
-        // Messages.SpecimenInfoTable_time_drawn_label,
-        // Messages.SpecimenInfoTable_quantity_label,
-        // Messages.SpecimenInfoTable_status_label,
-        // Messages.SpecimenInfoTable_study_label,
-        // Messages.SpecimenInfoTable_pnumber_label,
-        // Messages.SpecimenInfoTable_origin_center_label,
-        // Messages.SpecimenInfoTable_current_center_label,
-        // Messages.SpecimenInfoTable_comments_label }) {
-        // @Override
-        // public String getColumnValue(TableRowData row, int columnIndex) {
-        // switch (columnIndex) {
-        // case 0:
-        // return row.inventoryId;
-        // case 1:
-        // return row.type;
-        // case 2:
-        // return row.position;
-        // case 3:
-        // return row.createdAt;
-        // case 4:
-        // return NumberFormatter.format(row.quantity);
-        // case 5:
-        // return row.activityStatus;
-        // case 6:
-        // return row.studyName;
-        // case 7:
-        // return row.patient;
-        // case 8:
-        // return row.originCenter;
-        // case 9:
-        // return row.center;
-        // case 10:
-        //                    return (row.comment == null || row.comment.equals("")) ? Messages.SpecimenInfoTable_no_first_letter //$NON-NLS-1$
-        // : Messages.SpecimenInfoTable_yes_first_letter;
-        // default:
-        //                    return ""; //$NON-NLS-1$
-        // }
-        // }
-        //
-        // @Override
-        // public Image getColumnImage(TableRowData row, int columnIndex) {
-        // if (columnIndex == 5
-        // && ActivityStatusWrapper.FLAGGED_STATUS_STRING
-        // .equals(row.activityStatus))
-        // return BgcPlugin.getDefault().getImageRegistry()
-        // .get(BgcPlugin.IMG_ERROR);
-        // return null;
-        // }
-        // },
+        PEVENT_SOURCE_SPECIMENS(new String[] {
+            Messages.SpecimenInfoTable_inventoryid_label,
+            Messages.SpecimenInfoTable_type_label,
+            Messages.SpecimenInfoTable_position_label,
+            Messages.SpecimenInfoTable_time_drawn_label,
+            Messages.SpecimenInfoTable_quantity_ml_label,
+            Messages.SpecimenInfoTable_status_label,
+            Messages.SpecimenInfoTable_study_label,
+            Messages.SpecimenInfoTable_pnumber_label,
+            Messages.SpecimenInfoTable_origin_center_label,
+            Messages.SpecimenInfoTable_current_center_label,
+            Messages.SpecimenInfoTable_comments_label }) {
+            @Override
+            public String getColumnValue(SpecimenInfo row, int columnIndex) {
+                switch (columnIndex) {
+                case 0:
+                    return row.specimen.getInventoryId();
+                case 1:
+                    return row.specimen.getSpecimenType().getNameShort();
+                case 2:
+                    return row.getPositionString(true, true);
+                case 3:
+                    return DateFormatter.formatAsDateTime(row.specimen
+                        .getCreatedAt());
+                case 4:
+                    return NumberFormatter.format(row.specimen.getQuantity());
+                case 5:
+                    return row.specimen.getActivityStatus().getName();
+                case 6:
+                    return row.specimen.getCollectionEvent().getPatient()
+                        .getStudy().getNameShort();
+                case 7:
+                    return row.specimen.getCollectionEvent().getPatient()
+                        .getPnumber();
+                case 8:
+                    OriginInfo oi = row.specimen.getOriginInfo();
+                    return oi == null ? "" : oi.getCenter().getNameShort(); //$NON-NLS-1$
+                case 9:
+                    return row.specimen.getCurrentCenter().getNameShort();
+                case 10:
+                    return getCommentLetter(row);
+                default:
+                    return ""; //$NON-NLS-1$
+                }
+            }
+
+            @Override
+            public Image getColumnImage(SpecimenInfo row, int columnIndex) {
+                if (columnIndex == 5
+                    && ActivityStatusWrapper.FLAGGED_STATUS_STRING
+                        .equals(row.specimen.getActivityStatus().getName()))
+                    return BgcPlugin.getDefault().getImageRegistry()
+                        .get(BgcPlugin.IMG_ERROR);
+                return null;
+            }
+        },
         CEVENT_SOURCE_SPECIMENS(new String[] {
             Messages.SpecimenInfoTable_inventoryid_label,
             Messages.SpecimenInfoTable_type_label,

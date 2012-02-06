@@ -26,6 +26,7 @@ public abstract class PrincipalWrapper<T extends Principal> extends
         super(appService);
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.deleteRemoved(this, PrincipalPeer.MEMBERSHIP_COLLECTION);
@@ -111,7 +112,8 @@ public abstract class PrincipalWrapper<T extends Principal> extends
             .get(WORKING_CENTERS_KEY);
         if (workingCenters == null) {
             workingCenters = new ArrayList<CenterWrapper<?>>();
-            Set<CenterWrapper<?>> setOfWorkingCenter = getWorkingCentersInternal();
+            Set<CenterWrapper<?>> setOfWorkingCenter =
+                getWorkingCentersInternal();
             workingCenters.addAll(setOfWorkingCenter);
             cache.put(WORKING_CENTERS_KEY, workingCenters);
         }
@@ -119,7 +121,8 @@ public abstract class PrincipalWrapper<T extends Principal> extends
     }
 
     protected Set<CenterWrapper<?>> getWorkingCentersInternal() {
-        Set<CenterWrapper<?>> setOfWorkingCenter = new HashSet<CenterWrapper<?>>();
+        Set<CenterWrapper<?>> setOfWorkingCenter =
+            new HashSet<CenterWrapper<?>>();
         for (MembershipWrapper ms : getMembershipCollection(false)) {
             if (ms.getCenter() != null)
                 setOfWorkingCenter.add(ms.getCenter());

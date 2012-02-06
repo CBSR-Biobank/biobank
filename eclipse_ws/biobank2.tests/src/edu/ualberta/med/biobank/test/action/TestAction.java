@@ -3,7 +3,9 @@ package edu.ualberta.med.biobank.test.action;
 import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 
@@ -21,10 +23,10 @@ import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.action.SessionProvider.Mode;
-import edu.ualberta.med.biobank.test.action.helper.SpecimenTypeHelper;
 
 public class TestAction {
     @Rule
@@ -123,9 +125,8 @@ public class TestAction {
     }
 
     /**
-     * NOT REQUIRED ANYMORE SINCE TESTS ARE RUN LOCALLY
+     * REQUIRED WHEN TESTS ARE RUN REMOTELY
      */
-    @Deprecated
     public static boolean compareDateInHibernate(Date localDate,
         Date hibernateDate) {
         Date convertdate = convertToGmt(localDate);
@@ -137,18 +138,36 @@ public class TestAction {
     }
 
     protected List<SpecimenType> getSpecimenTypes() {
-        List<SpecimenType> spcTypes =
-            SpecimenTypeHelper.getSpecimenTypes(session);
+        Query q = session.createQuery("from " + SpecimenType.class.getName());
+        @SuppressWarnings("unchecked")
+        List<SpecimenType> spcTypes = q.list();
+        Assert.assertTrue("specimen types not found in database",
+            !spcTypes.isEmpty());
         return spcTypes;
     }
 
-    protected List<ContainerLabelingScheme> getContainerLabelingSchemes() {
+    protected Map<String, ContainerLabelingScheme> getContainerLabelingSchemes() {
+        Map<String, ContainerLabelingScheme> result =
+            new HashMap<String, ContainerLabelingScheme>();
         Query q =
             session.createQuery("from "
                 + ContainerLabelingScheme.class.getName());
         @SuppressWarnings("unchecked")
         List<ContainerLabelingScheme> labelingSchemes = q.list();
         Assert.assertTrue("container labeling schemes not found in database",
+            !labelingSchemes.isEmpty());
+        for (ContainerLabelingScheme scheme : labelingSchemes) {
+            result.put(scheme.getName(), scheme);
+        }
+        return result;
+    }
+
+    protected List<ShippingMethod> getShippingMethods() {
+        Query q =
+            session.createQuery("from " + ShippingMethod.class.getName());
+        @SuppressWarnings("unchecked")
+        List<ShippingMethod> labelingSchemes = q.list();
+        Assert.assertTrue("shipping methods not found in database",
             !labelingSchemes.isEmpty());
         return labelingSchemes;
     }

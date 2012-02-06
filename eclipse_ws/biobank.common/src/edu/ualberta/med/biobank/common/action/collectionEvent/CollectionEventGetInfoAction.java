@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -19,17 +20,14 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
 
     @SuppressWarnings("nls")
     private static final String CEVENT_INFO_QRY =
-        "SELECT cevent"
-            + " FROM "
-            + CollectionEvent.class.getName()
-            + " cevent"
+        "SELECT distinct cevent"
+            + " FROM " + CollectionEvent.class.getName() + " cevent"
             + " INNER JOIN FETCH cevent.patient patient"
             + " INNER JOIN FETCH cevent.activityStatus status"
             + " LEFT JOIN FETCH cevent.commentCollection comments"
             + " LEFT JOIN FETCH comments.user commentsUser"
             + " INNER JOIN FETCH patient.study study"
-            + " WHERE cevent.id=?"
-            + " GROUP BY cevent";
+            + " WHERE cevent.id=?";
 
     private final Integer ceventId;
 
@@ -64,20 +62,19 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
 
         @SuppressWarnings("unchecked")
         List<CollectionEvent> rows = query.list();
-        if (rows.size() == 1) {
-            ceventInfo.cevent = rows.get(0);
-            ceventInfo.sourceSpecimenInfos =
-                new CollectionEventGetSpecimenInfosAction(
-                    ceventId, false).run(context).getList();
-            ceventInfo.aliquotedSpecimenInfos =
-                new CollectionEventGetSpecimenInfosAction(
-                    ceventId, true).run(context).getList();
-            ceventInfo.eventAttrs = new CollectionEventGetEventAttrInfoAction(
-                ceventId).run(context).getMap();
-        } else {
-            throw new ActionException("Cannot find a collection event with id=" //$NON-NLS-1$
-                + ceventId);
+        if (rows.size() != 1) {
+            throw new ModelNotFoundException(CollectionEvent.class, ceventId);
         }
+
+        ceventInfo.cevent = rows.get(0);
+        ceventInfo.sourceSpecimenInfos =
+            new CollectionEventGetSourceSpecimenInfoAction(ceventId).run(
+                context).getList();
+        ceventInfo.aliquotedSpecimenInfos =
+            new CollectionEventGetAliquotedSpecimenInfoAction(ceventId).run(
+                context).getList();
+        ceventInfo.eventAttrs = new CollectionEventGetEventAttrInfoAction(
+            ceventId).run(context).getMap();
 
         return ceventInfo;
     }

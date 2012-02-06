@@ -467,6 +467,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return (Integer) result.get(0) + 1;
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(CollectionEventPeer.VISIT_NUMBER));
@@ -480,6 +481,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         super.addPersistTasks(tasks);
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         tasks.add(check().empty(CollectionEventPeer.ALL_SPECIMEN_COLLECTION,

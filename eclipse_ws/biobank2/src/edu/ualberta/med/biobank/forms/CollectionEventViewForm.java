@@ -79,7 +79,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
-            +ceventInfo.cevent.getVisitNumber()));
+            ceventInfo.cevent.getVisitNumber()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();

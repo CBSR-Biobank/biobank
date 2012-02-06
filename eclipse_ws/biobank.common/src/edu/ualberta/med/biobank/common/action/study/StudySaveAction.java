@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
+import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
@@ -23,6 +24,7 @@ import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.Site;
@@ -140,6 +142,7 @@ public class StudySaveAction implements Action<IdResult> {
     private Collection<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos;
     private Collection<AliquotedSpecimenSaveInfo> aliquotSpecimenSaveInfos;
     private Collection<StudyEventAttrSaveInfo> studyEventAttrSaveInfos;
+    private String commentText;
     private Study study = null;
 
     public void setId(Integer id) {
@@ -179,6 +182,10 @@ public class StudySaveAction implements Action<IdResult> {
     public void setStudyEventAttrSaveInfo(
         Collection<StudyEventAttrSaveInfo> studyEventAttrSaveInfos) {
         this.studyEventAttrSaveInfos = studyEventAttrSaveInfos;
+    }
+
+    public void setCommentText(String commentText) {
+        this.commentText = commentText;
     }
 
     @Override
@@ -249,6 +256,7 @@ public class StudySaveAction implements Action<IdResult> {
         saveSourceSpecimens(context);
         saveAliquotedSpecimens(context);
         saveEventAttributes(context);
+        saveComment(context);
 
         context.getSession().saveOrUpdate(study);
         context.getSession().flush();
@@ -278,10 +286,10 @@ public class StudySaveAction implements Action<IdResult> {
     private void saveContacts(ActionContext context) {
         Map<Integer, Contact> contacts =
             context.load(Contact.class, contactIds);
-        study.setContactCollection(new HashSet<Contact>(contacts.values()));
         SetDifference<Contact> contactsDiff =
             new SetDifference<Contact>(study.getContactCollection(),
                 contacts.values());
+        study.setContactCollection(contactsDiff.getNewSet());
 
         for (Contact contact : contactsDiff.getAddSet()) {
             Set<Study> contactStudies = contact.getStudyCollection();
@@ -320,7 +328,7 @@ public class StudySaveAction implements Action<IdResult> {
         SetDifference<SourceSpecimen> srcSpcsDiff =
             new SetDifference<SourceSpecimen>(
                 study.getSourceSpecimenCollection(), newSsCollection);
-        study.setSourceSpecimenCollection(srcSpcsDiff.getNewSet());
+        study.setSourceSpecimenCollection(newSsCollection);
         for (SourceSpecimen srcSpc : srcSpcsDiff.getRemoveSet()) {
             context.getSession().delete(srcSpc);
         }
@@ -347,9 +355,9 @@ public class StudySaveAction implements Action<IdResult> {
         SetDifference<AliquotedSpecimen> aqSpcsDiff =
             new SetDifference<AliquotedSpecimen>(
                 study.getAliquotedSpecimenCollection(), newAsCollection);
+        study.setAliquotedSpecimenCollection(aqSpcsDiff.getNewSet());
 
         // delete aliquoted specimens no longer in use
-        study.setAliquotedSpecimenCollection(aqSpcsDiff.getNewSet());
         for (AliquotedSpecimen aqSpc : aqSpcsDiff.getRemoveSet()) {
             context.getSession().delete(aqSpc);
         }
@@ -382,10 +390,17 @@ public class StudySaveAction implements Action<IdResult> {
         SetDifference<StudyEventAttr> attrsDiff =
             new SetDifference<StudyEventAttr>(
                 study.getStudyEventAttrCollection(), newEAttrCollection);
-
         study.setStudyEventAttrCollection(attrsDiff.getNewSet());
         for (StudyEventAttr attr : attrsDiff.getRemoveSet()) {
             context.getSession().delete(attr);
+        }
+    }
+
+    private void saveComment(ActionContext context) {
+        Comment comment = CommentUtil.create(context.getUser(), commentText);
+        if (comment != null) {
+            context.getSession().save(comment);
+            study.getCommentCollection().add(comment);
         }
     }
 }

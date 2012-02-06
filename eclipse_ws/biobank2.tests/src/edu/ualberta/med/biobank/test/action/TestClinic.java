@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
@@ -25,6 +26,7 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
+import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
@@ -43,7 +45,7 @@ public class TestClinic extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + R.nextInt();
+        name = getMethodNameR();
 
         clinicSaveAction = ClinicHelper.getSaveAction(name, name,
             ActivityStatusEnum.ACTIVE, R.nextBoolean());
@@ -91,7 +93,9 @@ public class TestClinic extends TestAction {
             Assert.assertTrue(true);
         }
 
-        clinicSaveAction.setAddress(new Address());
+        Address address = new Address();
+        address.setCity(name);
+        clinicSaveAction.setAddress(address);
         clinicSaveAction.setContactSaveInfos(null);
         try {
             EXECUTOR.exec(clinicSaveAction);
@@ -105,6 +109,30 @@ public class TestClinic extends TestAction {
         clinicSaveAction
             .setContactSaveInfos(new HashSet<ContactSaveInfo>());
         EXECUTOR.exec(clinicSaveAction);
+    }
+
+    @Test
+    public void checkGetAction() throws Exception {
+        Provisioning provisioning =
+            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+
+        Integer ceventId = CollectionEventHelper
+            .createCEventWithSourceSpecimens(EXECUTOR,
+                provisioning.patientIds.get(0), provisioning.clinicId);
+        EXECUTOR.exec(new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+            .getList();
+
+        ClinicInfo clinicInfo =
+            EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
+
+        Assert.assertEquals("Active", clinicInfo.clinic.getActivityStatus()
+            .getName());
+        Assert.assertEquals(new Long(1), clinicInfo.patientCount);
+        Assert.assertEquals(new Long(1), clinicInfo.collectionEventCount);
+        Assert.assertEquals(1, clinicInfo.contacts.size());
+        Assert.assertEquals(1, clinicInfo.studyInfos.size());
+        Assert.assertEquals(name + "_clinic", clinicInfo.clinic.getAddress()
+            .getCity());
     }
 
     @Test
@@ -147,6 +175,34 @@ public class TestClinic extends TestAction {
             Assert.assertTrue(true);
         }
 
+    }
+
+    @Test
+    public void comments() {
+        // save with no comments
+        Integer clinicId = EXECUTOR.exec(clinicSaveAction).getId();
+        ClinicInfo clinicInfo =
+            EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
+        Assert.assertEquals(0, clinicInfo.clinic.getCommentCollection().size());
+
+        clinicInfo = addComment(clinicId);
+        Assert.assertEquals(1, clinicInfo.clinic.getCommentCollection().size());
+
+        clinicInfo = addComment(clinicId);
+        Assert.assertEquals(2, clinicInfo.clinic.getCommentCollection().size());
+
+        // TODO: check full name on each comment's user
+        // for (Comment comment : clinicInfo.clinic.getCommentCollection()) {
+        //
+        // }
+    }
+
+    private ClinicInfo addComment(Integer clinicId) {
+        ClinicSaveAction clinicSaveAction = ClinicHelper.getSaveAction(
+            EXECUTOR.exec(new ClinicGetInfoAction(clinicId)));
+        clinicSaveAction.setCommentText(Utils.getRandomString(20, 30));
+        EXECUTOR.exec(clinicSaveAction).getId();
+        return EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
     }
 
     @Test
@@ -227,7 +283,7 @@ public class TestClinic extends TestAction {
         Integer clinicId = EXECUTOR.exec(clinicSaveAction).getId();
         EXECUTOR.exec(new ClinicDeleteAction(clinicId));
 
-        // hql query for site should return empty
+        // hql query for clinic should return empty
         Query q =
             session.createQuery("SELECT COUNT(*) FROM "
                 + Clinic.class.getName() + " WHERE id=?");

@@ -1,17 +1,16 @@
 package edu.ualberta.med.biobank.common.action.specimen;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermission;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
@@ -26,12 +25,11 @@ public class SpecimenLinkSaveAction implements
 
     private Integer centerId;
 
-    private List<AliquotedSpecimenInfo> aliquotedSpecInfoList;
+    private Collection<AliquotedSpecimenInfo> aliquotedSpecInfoList;
 
     private Integer studyId;
 
-    public static class AliquotedSpecimenInfo implements Serializable,
-        NotAProxy {
+    public static class AliquotedSpecimenInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
         public String inventoryId;
         public Integer typeId;
@@ -41,8 +39,7 @@ public class SpecimenLinkSaveAction implements
         public RowColPos position;
     }
 
-    public static class AliquotedSpecimenResInfo implements Serializable,
-        NotAProxy {
+    public static class AliquotedSpecimenResInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
         public Integer id;
         public String inventoryId;
@@ -56,7 +53,7 @@ public class SpecimenLinkSaveAction implements
     }
 
     public SpecimenLinkSaveAction(Integer centerId, Integer studyId,
-        List<AliquotedSpecimenInfo> asiList) {
+        Collection<AliquotedSpecimenInfo> asiList) {
         this.centerId = centerId;
         this.studyId = studyId;
         this.aliquotedSpecInfoList = asiList;
@@ -76,7 +73,6 @@ public class SpecimenLinkSaveAction implements
         Center currentCenter = context.load(Center.class, centerId);
         Date currentDate = new Date();
 
-        // FIXME permissions?
         // FIXME Checks needed before saving the specimens? (see specimen
         // persist checks)
 
@@ -85,7 +81,7 @@ public class SpecimenLinkSaveAction implements
         context.getSession().saveOrUpdate(originInfo);
 
         ArrayList<AliquotedSpecimenResInfo> resList =
-            new ArrayList<SpecimenLinkSaveAction.AliquotedSpecimenResInfo>();
+            new ArrayList<AliquotedSpecimenResInfo>();
         for (AliquotedSpecimenInfo asi : aliquotedSpecInfoList) {
             // in specimen link, this is always a new specimen
             Specimen specimen = new Specimen();

@@ -94,7 +94,10 @@ public enum PermissionEnum implements Serializable {
     SPECIMEN_TYPE_CREATE(60),
     SPECIMEN_TYPE_READ(61),
     SPECIMEN_TYPE_UPDATE(62),
-    SPECIMEN_TYPE_DELETE(63);
+    SPECIMEN_TYPE_DELETE(63),
+
+    LOGGING(64),
+    REPORTS(65);
 
     private static final List<PermissionEnum> VALUES_LIST = Collections
         .unmodifiableList(Arrays.asList(values()));

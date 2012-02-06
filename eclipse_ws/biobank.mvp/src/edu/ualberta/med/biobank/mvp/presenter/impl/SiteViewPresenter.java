@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.common.action.Dispatcher;
-import edu.ualberta.med.biobank.common.action.info.ContainerTypeInfo;
+import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
@@ -49,7 +49,7 @@ public class SiteViewPresenter extends AbstractViewFormPresenter<View> {
 
         ValueField<Collection<StudyCountInfo>> getStudyCollection();
 
-        ValueField<Collection<ContainerTypeInfo>> getContainerTypeCollection();
+        ValueField<Collection<SiteContainerTypeInfo>> getContainerTypeCollection();
 
         ValueField<Collection<Container>> getTopContainerCollection();
     }

@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicReadPermission;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -17,17 +18,25 @@ import edu.ualberta.med.biobank.model.Contact;
 public class ClinicGetInfoAction implements Action<ClinicInfo> {
     private static final long serialVersionUID = 1L;
 
-    // @formatter:off
     @SuppressWarnings("nls")
-    private static final String CLINIC_INFO_HQL = 
+    private static final String CLINIC_INFO_HQL =
+        "SELECT DISTINCT clinic"
+            + " FROM " + Clinic.class.getName() + " clinic"
+            + " INNER JOIN FETCH clinic.address"
+            + " INNER JOIN FETCH clinic.activityStatus"
+            + " LEFT JOIN FETCH clinic.commentCollection comments"
+            + " LEFT JOIN FETCH comments.user"
+            + " WHERE clinic.id = ?";
+
+    @SuppressWarnings("nls")
+    private static final String CLINIC_COUNT_INFO_HQL =
         "SELECT clinic,COUNT(DISTINCT patients),COUNT(DISTINCT cevents)"
-        + " FROM "+ Clinic.class.getName() + " clinic"
-        + " LEFT JOIN clinic.originInfoCollection oi"
-        + " LEFT JOIN oi.specimenCollection spcs"
-        + " LEFT JOIN spcs.collectionEvent cevents"
-        + " LEFT JOIN cevents.patient patients"
-        + " WHERE clinic.id=?";
-    // @formatter:on
+            + " FROM " + Clinic.class.getName() + " clinic"
+            + " LEFT JOIN clinic.originInfoCollection oi"
+            + " LEFT JOIN oi.specimenCollection spcs"
+            + " LEFT JOIN spcs.collectionEvent cevents"
+            + " LEFT JOIN cevents.patient patients"
+            + " WHERE clinic.id=?";
 
     private final Integer clinicId;
     private final ClinicGetContactsAction getContacts;
@@ -46,24 +55,34 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
 
     @Override
     public ClinicInfo run(ActionContext context) throws ActionException {
-        ClinicInfo info = new ClinicInfo();
-
         Query query = context.getSession().createQuery(CLINIC_INFO_HQL);
+        query.setParameter(0, clinicId);
+
+        List<Clinic> clinics = query.list();
+
+        if (clinics.size() != 1) {
+            throw new ModelNotFoundException(Clinic.class, clinicId);
+        }
+
+        ClinicInfo clinicInfo = new ClinicInfo();
+        clinicInfo.clinic = clinics.get(0);
+
+        query = context.getSession().createQuery(CLINIC_COUNT_INFO_HQL);
         query.setParameter(0, clinicId);
 
         @SuppressWarnings("unchecked")
         List<Object[]> rows = query.list();
-        if (rows.size() == 1) {
-            Object[] row = rows.get(0);
-
-            info.clinic = (Clinic) row[0];
-            info.patientCount = (Long) row[1];
-            info.ceventCount = (Long) row[2];
-            info.contacts = getContacts.run(context).getList();
-            info.studyInfos = getStudyInfo.run(context).getList();
+        if (rows.size() != 1) {
+            throw new ModelNotFoundException(Clinic.class, clinicId);
         }
+        Object[] row = rows.get(0);
 
-        return info;
+        clinicInfo.patientCount = (Long) row[1];
+        clinicInfo.collectionEventCount = (Long) row[2];
+        clinicInfo.contacts = getContacts.run(context).getList();
+        clinicInfo.studyInfos = getStudyInfo.run(context).getList();
+
+        return clinicInfo;
     }
 
     public static class ClinicInfo implements ActionResult {
@@ -71,26 +90,9 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
 
         public Clinic clinic;
         public Long patientCount;
-        public Long ceventCount;
+        public Long collectionEventCount;
         public List<Contact> contacts;
         public List<StudyCountInfo> studyInfos;
-
-        public Clinic getClinic() {
-            return clinic;
-        }
-
-        public Long getPatientCount() {
-            return patientCount;
-        }
-
-        public Long getCeventCount() {
-            return ceventCount;
-        }
-
-        public List<StudyCountInfo> getStudyInfos() {
-            return studyInfos;
-        }
-
     }
 
 }

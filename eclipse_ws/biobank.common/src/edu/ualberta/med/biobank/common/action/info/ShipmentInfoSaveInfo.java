@@ -12,16 +12,16 @@ public class ShipmentInfoSaveInfo implements ActionResult {
     public Date packedAt;
     public Date receivedAt;
     public String waybill;
-    public ShippingMethodInfo method;
+    public Integer shippingMethodId;
 
     public ShipmentInfoSaveInfo(Integer siId, String boxNumber, Date packedAt,
-        Date receivedAt, String waybill, ShippingMethodInfo method) {
+        Date receivedAt, String waybill, Integer shippingMethodId) {
         this.siId = siId;
         this.boxNumber = boxNumber;
         this.packedAt = packedAt;
         this.receivedAt = receivedAt;
         this.waybill = waybill;
-        this.method = method;
+        this.shippingMethodId = shippingMethodId;
     }
 
 }

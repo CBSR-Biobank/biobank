@@ -1,20 +1,18 @@
 package edu.ualberta.med.biobank.common.action.processingEvent;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
+import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventCreatePermission;
@@ -40,19 +38,19 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
 
     private Integer statusId;
 
-    private Collection<CommentInfo> comments;
+    private String commentText;
 
     private Set<Integer> specimenIds;
 
     public ProcessingEventSaveAction(Integer peventId, Integer centerId,
         Date createdAt, String worksheet, Integer statusId,
-        Collection<CommentInfo> comments, Set<Integer> specimenIds) {
+        String commentText, Set<Integer> specimenIds) {
         this.peventId = peventId;
         this.centerId = centerId;
         this.createdAt = createdAt;
         this.worksheet = worksheet;
         this.statusId = statusId;
-        this.comments = comments;
+        this.commentText = commentText;
         this.specimenIds = specimenIds;
     }
 
@@ -118,16 +116,12 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         return new IdResult(peventToSave.getId());
     }
 
-    protected void setComments(ActionContext actionContext,
+    protected void setComments(ActionContext context,
         ProcessingEvent peventToSave) {
-        if (comments != null) {
-            Collection<Comment> dbComments = CollectionUtils.getCollection(
-                peventToSave, ProcessingEventPeer.COMMENT_COLLECTION);
-            for (CommentInfo info : comments) {
-                Comment commentModel = info.getCommentModel(actionContext);
-                dbComments.add(commentModel);
-                actionContext.getSession().saveOrUpdate(commentModel);
-            }
+        Comment comment = CommentUtil.create(context.getUser(), commentText);
+        if (comment != null) {
+            context.getSession().save(comment);
+            peventToSave.getCommentCollection().add(comment);
         }
     }
 }

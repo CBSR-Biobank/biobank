@@ -8,9 +8,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
-import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.permission.patient.PatientMergePermission;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
@@ -36,7 +34,7 @@ public class PatientMergeAction implements Action<BooleanResult> {
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         return new PatientMergePermission(patient1Id, patient2Id).isAllowed(
-            null);
+            context);
     }
 
     @Override
@@ -111,15 +109,16 @@ public class PatientMergeAction implements Action<BooleanResult> {
     private boolean merge(Session session, CollectionEvent c1event,
         CollectionEvent c2event) {
         if (c1event.getVisitNumber().equals(c2event.getVisitNumber())) {
-            Collection<Specimen> c2Origspecs = CollectionUtils.getCollection(
-                c2event, CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION);
-            Collection<Specimen> c2AllSpecs = CollectionUtils.getCollection(
-                c2event, CollectionEventPeer.ALL_SPECIMEN_COLLECTION);
+            Collection<Specimen> c2Origspecs =
+                c2event.getOriginalSpecimenCollection();
+            Collection<Specimen> c2AllSpecs =
+                c2event.getAllSpecimenCollection();
 
-            Collection<Specimen> c1OrigSpecs = CollectionUtils.getCollection(
-                c1event, CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION);
-            Collection<Specimen> c1AllSpecs = CollectionUtils.getCollection(
-                c1event, CollectionEventPeer.ALL_SPECIMEN_COLLECTION);
+            Collection<Specimen> c1OrigSpecs =
+                c1event.getOriginalSpecimenCollection();
+            Collection<Specimen> c1AllSpecs =
+                c1event.getAllSpecimenCollection();
+
             for (Specimen spec : c2AllSpecs) {
                 if (c2Origspecs.contains(spec)) {
                     spec.setOriginalCollectionEvent(c1event);

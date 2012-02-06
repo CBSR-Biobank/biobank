@@ -1,12 +1,14 @@
 package edu.ualberta.med.biobank.common.action.containerType;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
+import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCreatePermission;
@@ -17,6 +19,7 @@ import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SpecimenType;
 
 public class ContainerTypeSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
@@ -25,7 +28,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
     private String name;
     private String nameShort;
     private Integer siteId;
-    private boolean topLevel;
+    private boolean topLevel = false;
     private Integer rowCapacity;
     private Integer colCapacity;
     private Double defaultTemperature;
@@ -34,8 +37,8 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
 
     private String commentMessage;
 
-    private Set<Integer> specimenTypeIds;
-    private Set<Integer> containerTypeIds;
+    private Set<Integer> specimenTypeIds = new HashSet<Integer>();
+    private Set<Integer> childContainerTypeIds = new HashSet<Integer>();
 
     public void setId(Integer containerTypeId) {
         this.containerTypeId = containerTypeId;
@@ -85,8 +88,8 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         this.specimenTypeIds = specimenTypeIds;
     }
 
-    public void setContainerTypeIds(Set<Integer> containerTypeIds) {
-        this.containerTypeIds = containerTypeIds;
+    public void setChildContainerTypeIds(Set<Integer> childContainerTypeIds) {
+        this.childContainerTypeIds = childContainerTypeIds;
     }
 
     @Override
@@ -103,6 +106,14 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
     public IdResult run(ActionContext context)
         throws ActionException {
         ContainerType containerType = getContainerType(context);
+
+        // TODO:
+        //
+        // 1) capacity, top-level, and labeling scheme cannot be changed after
+        // containers have been assigned this type.
+        // 2) ensure the labeling scheme can label the capacity
+        // 3) ensure removed child container types are not in use
+        // 4) ensure removed specimen types are not in use
 
         containerType.setName(name);
         containerType.setNameShort(nameShort);
@@ -158,6 +169,28 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
     }
 
     private void setContents(ActionContext context, ContainerType containerType) {
-        // TODO: this
+        if ((specimenTypeIds.size() > 0) &&
+            (childContainerTypeIds.size() > 0)) {
+            throw new ActionCheckException(
+                "container type cannot have both specimen types and child container types");
+        }
+        setSpecimenTypes(context, containerType);
+        setChildContainerTypes(context, containerType);
+    }
+
+    private void setSpecimenTypes(ActionContext context,
+        ContainerType containerType) {
+        Map<Integer, SpecimenType> specimenTypes =
+            context.load(SpecimenType.class, specimenTypeIds);
+        containerType.setSpecimenTypeCollection(new HashSet<SpecimenType>(
+            specimenTypes.values()));
+    }
+
+    private void setChildContainerTypes(ActionContext context,
+        ContainerType containerType) {
+        Map<Integer, ContainerType> childContainerTypes =
+            context.load(ContainerType.class, childContainerTypeIds);
+        containerType.setChildContainerTypeCollection(
+            new HashSet<ContainerType>(childContainerTypes.values()));
     }
 }

@@ -23,7 +23,11 @@ public class SiteHelper extends Helper {
     public static SiteSaveAction getSaveAction(String name,
         String nameShort, ActivityStatusEnum active) {
         Address address = new Address();
-        address.setCity(Utils.getRandomString(5, 10));
+        String city = name + "_city";
+        if (city.length() > 50) {
+            city = city.substring(city.length() - 50);
+        }
+        address.setCity(city);
 
         SiteSaveAction siteSaveAction = new SiteSaveAction();
         siteSaveAction.setName(name);
@@ -58,14 +62,14 @@ public class SiteHelper extends Helper {
         throws ApplicationException {
         List<Integer> result = new ArrayList<Integer>();
         for (int i = 0; i < numToCreate; ++i) {
-            result.add(createSite(actionExecutor, name, Utils.getRandomString(15),
+            result.add(createSite(actionExecutor, name,
+                Utils.getRandomString(15),
                 activityStatus, new HashSet<Integer>()));
         }
         return result;
     }
 
-    public static SiteSaveAction getSaveAction(
-        IActionExecutor actionExecutor, SiteInfo siteInfo) {
+    public static SiteSaveAction getSaveAction(SiteInfo siteInfo) {
         SiteSaveAction siteSaveAction = new SiteSaveAction();
 
         siteSaveAction.setId(siteInfo.site.getId());
@@ -109,7 +113,7 @@ public class SiteHelper extends Helper {
         Provisioning provisioning = new Provisioning();
         provisioning.clinicId =
             ClinicHelper.createClinicWithContacts(actionExecutor, basename
-                + "_clinic", 10);
+                + "_clinic", 1);
         ClinicInfo clinicInfo =
             actionExecutor.exec(new ClinicGetInfoAction(
                 provisioning.clinicId));

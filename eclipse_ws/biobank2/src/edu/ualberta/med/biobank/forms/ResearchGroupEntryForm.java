@@ -12,6 +12,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.AddressSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.ResearchGroupAdapterInfo;
+import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
@@ -218,7 +220,14 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
                     : comment.getMessage(), addressInfo, researchGroup
                     .getActivityStatus().getId());
         ResearchGroupSaveAction save = new ResearchGroupSaveAction(info);
-        adapter.setId(SessionManager.getAppService().doAction(save).getId());
+        Integer id = SessionManager.getAppService().doAction(save)
+            .getId();
+        ResearchGroupReadInfo read =
+            SessionManager.getAppService().doAction(
+                new ResearchGroupGetInfoAction(id));
+        researchGroup.setWrappedObject(read.rg);
+        adapter.setValue(new ResearchGroupAdapterInfo(read.rg.getId(), read.rg
+            .getName()));
     }
 
     @Override

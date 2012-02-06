@@ -48,6 +48,7 @@ import org.junit.runners.Suite.SuiteClasses;
     FvLPatientVisitsTest.class, PatientVisitSummaryTest.class,
     QaSpecimensTest.class, SpecimenTypePvCountTest.class,
     SpecimenTypeSUsageTest.class })
+@Deprecated
 public final class TestReportsProcedurallyGeneratedData implements
     ReportDataSource {
     private static TestReportsProcedurallyGeneratedData instance = null;

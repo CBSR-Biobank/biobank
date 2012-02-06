@@ -938,6 +938,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return true;
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(new NotNullPreCheck<Container>(this, ContainerPeer.LABEL));
@@ -972,6 +973,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         tasks.add(new ContainerPersistChecks(this));
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         String hasSpecimensMsg = MessageFormat.format(HAS_SPECIMENS_MSG,

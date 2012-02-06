@@ -37,6 +37,7 @@ public class UserWrapper extends UserBaseWrapper {
         super(appService);
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         // FIXME problem= if persist fail, then the csm user is created anyway
@@ -56,6 +57,7 @@ public class UserWrapper extends UserBaseWrapper {
         // tasks.persistAdded(this, UserPeer.GROUP_COLLECTION);
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         // should remove this user from its groups

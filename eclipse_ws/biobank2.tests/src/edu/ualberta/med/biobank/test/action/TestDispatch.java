@@ -66,7 +66,7 @@ public class TestDispatch extends TestAction {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
                 centerId, DispatchState.CREATION.getId(),
-                Utils.getRandomString(5));
+                name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
                 patientId, centerId);
@@ -138,7 +138,7 @@ public class TestDispatch extends TestAction {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
                 centerId, DispatchState.CREATION.getId(),
-                Utils.getRandomString(5));
+                name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
                 patientId, centerId);
@@ -151,25 +151,29 @@ public class TestDispatch extends TestAction {
         EXECUTOR.exec(new DispatchChangeStateAction(id,
             DispatchState.IN_TRANSIT, shipsave));
         Assert
-            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch.getState()
+            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch
+                .getState()
                 .equals(DispatchState.IN_TRANSIT.getId()));
 
         EXECUTOR.exec(new DispatchChangeStateAction(id,
             DispatchState.LOST, shipsave));
         Assert
-            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch.getState()
+            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch
+                .getState()
                 .equals(DispatchState.LOST.getId()));
 
         EXECUTOR.exec(new DispatchChangeStateAction(id,
             DispatchState.CLOSED, shipsave));
         Assert
-            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch.getState()
+            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch
+                .getState()
                 .equals(DispatchState.CLOSED.getId()));
 
         EXECUTOR.exec(new DispatchChangeStateAction(id,
             DispatchState.RECEIVED, shipsave));
         Assert
-            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch.getState()
+            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch
+                .getState()
                 .equals(DispatchState.RECEIVED.getId()));
 
     }
@@ -179,7 +183,7 @@ public class TestDispatch extends TestAction {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
                 centerId, DispatchState.IN_TRANSIT.getId(),
-                Utils.getRandomString(5));
+                name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
                 patientId, centerId);
@@ -196,7 +200,7 @@ public class TestDispatch extends TestAction {
             EXECUTOR.exec(delete);
             Assert.fail();
         } catch (ActionException e) {
-            System.out.println(e);
+            Assert.assertTrue(true);
         }
 
         DispatchChangeStateAction stateChange =
@@ -205,4 +209,35 @@ public class TestDispatch extends TestAction {
         EXECUTOR.exec(delete);
     }
 
+    @Test
+    public void testComment() throws Exception {
+
+        DispatchSaveInfo d =
+            DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
+                centerId, DispatchState.IN_TRANSIT.getId(),
+                name + Utils.getRandomString(5));
+        Set<DispatchSpecimenInfo> specs =
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
+                patientId, centerId);
+        ShipmentInfoSaveInfo shipsave =
+            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
+        Integer id =
+            EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+                .getId();
+        d.id = id;
+
+        DispatchReadInfo info =
+            EXECUTOR.exec(new DispatchGetInfoAction(id));
+        Assert.assertEquals(1, info.dispatch.getCommentCollection().size());
+        EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+            .getId();
+        info =
+            EXECUTOR.exec(new DispatchGetInfoAction(id));
+        Assert.assertEquals(2, info.dispatch.getCommentCollection().size());
+        EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+            .getId();
+        info =
+            EXECUTOR.exec(new DispatchGetInfoAction(id));
+        Assert.assertEquals(3, info.dispatch.getCommentCollection().size());
+    }
 }

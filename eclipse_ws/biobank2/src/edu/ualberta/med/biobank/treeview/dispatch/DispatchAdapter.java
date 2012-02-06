@@ -14,8 +14,9 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
-import edu.ualberta.med.biobank.common.action.info.ShippingMethodInfo;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -83,12 +84,12 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public boolean isDeletable() {
-        if (SessionManager.getInstance().isConnected()
-            && SessionManager.getUser().getCurrentWorkingCenter() != null)
-            return SessionManager.getUser().getCurrentWorkingCenter()
-                .equals(getDispatchWrapper().getSenderCenter())
-                && SessionManager.canDelete(getDispatchWrapper())
-                && getDispatchWrapper().isInCreationState();
+        try {
+            return SessionManager.getAppService().isAllowed(
+                new DispatchDeletePermission(getDispatchWrapper().getId()));
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError("Delete failed", e);
+        }
         return false;
     }
 
@@ -144,6 +145,17 @@ public class DispatchAdapter extends AdapterBase {
         } catch (Exception e) {
             BgcPlugin.openAsyncError(Messages.DispatchAdapter_check_error_msg,
                 e);
+        }
+    }
+
+    @Override
+    public void runDelete() {
+        DispatchDeleteAction delete =
+            new DispatchDeleteAction(getDispatchWrapper().getId());
+        try {
+            SessionManager.getAppService().doAction(delete);
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Delete failed", e);
         }
     }
 
@@ -217,13 +229,11 @@ public class DispatchAdapter extends AdapterBase {
 
     private ShipmentInfoSaveInfo prepareShipInfo(
         ShipmentInfoWrapper shipmentInfo) {
-        ShippingMethodInfo methodInfo =
-            new ShippingMethodInfo(shipmentInfo.getShippingMethod().getId());
         ShipmentInfoSaveInfo si =
             new ShipmentInfoSaveInfo(shipmentInfo.getId(),
                 shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(),
                 shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),
-                methodInfo);
+                shipmentInfo.getShippingMethod().getId());
         return si;
     }
 

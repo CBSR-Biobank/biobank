@@ -25,7 +25,9 @@ public class RequestDeleteAction implements Action<EmptyResult> {
     public EmptyResult run(ActionContext context) throws ActionException {
         Request r = context.get(Request.class, rId);
 
-        // / ??? what checks???
+        if (r.getSubmitted() != null)
+            throw new ActionException(
+                "This request has already been submitted.");
 
         context.getSession().delete(r);
         return new EmptyResult();

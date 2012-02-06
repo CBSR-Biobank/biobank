@@ -34,7 +34,8 @@ public class WrapperTransaction {
 
     private static class Action {
         private enum Type {
-            PERSIST, DELETE;
+            PERSIST,
+            DELETE;
         }
 
         public final Type type;
@@ -75,6 +76,7 @@ public class WrapperTransaction {
         }
     }
 
+    @Deprecated
     public void commit() throws BiobankException, ApplicationException {
         // don't build the TaskList until now because it may depend on the state
         // of the wrappers, which may have been changed before now, but after
@@ -104,6 +106,7 @@ public class WrapperTransaction {
         tx.commit();
     }
 
+    @Deprecated
     public static void delete(ModelWrapper<?> wrapper,
         WritableApplicationService appService) throws BiobankException,
         ApplicationException {
@@ -178,9 +181,12 @@ public class WrapperTransaction {
      * 
      */
     public static class TaskList {
-        private final Map<ModelWrapper<?>, ModelWrapper<?>> cascaded = new IdentityHashMap<ModelWrapper<?>, ModelWrapper<?>>();
-        private final LinkedList<QueryTask> queryTasks = new LinkedList<QueryTask>();
-        private final List<PreQueryTask> preQueryTasks = new ArrayList<PreQueryTask>();
+        private final Map<ModelWrapper<?>, ModelWrapper<?>> cascaded =
+            new IdentityHashMap<ModelWrapper<?>, ModelWrapper<?>>();
+        private final LinkedList<QueryTask> queryTasks =
+            new LinkedList<QueryTask>();
+        private final List<PreQueryTask> preQueryTasks =
+            new ArrayList<PreQueryTask>();
         private final LogGroup logGroup;
 
         private TaskList() {
@@ -261,7 +267,8 @@ public class WrapperTransaction {
                 || wrapper.isInitialized(property)) {
                 if (property.isCollection()) {
                     @SuppressWarnings("unchecked")
-                    Property<Collection<P>, ? super M> tmp = (Property<Collection<P>, ? super M>) property;
+                    Property<Collection<P>, ? super M> tmp =
+                        (Property<Collection<P>, ? super M>) property;
                     Collection<ModelWrapper<P>> list = wrapper
                         .getWrapperCollection(tmp, null, false);
                     for (ModelWrapper<?> wrappedProperty : list) {
@@ -294,7 +301,8 @@ public class WrapperTransaction {
             Property<P, M> property) {
             if (property.isCollection()) {
                 @SuppressWarnings("unchecked")
-                Property<Collection<P>, ? super M> tmp = (Property<Collection<P>, ? super M>) property;
+                Property<Collection<P>, ? super M> tmp =
+                    (Property<Collection<P>, ? super M>) property;
                 Collection<ModelWrapper<P>> list = wrapper
                     .getWrapperCollection(tmp, null, false);
                 for (ModelWrapper<?> wrappedProperty : list) {
@@ -382,6 +390,7 @@ public class WrapperTransaction {
         // END CASCADE METHODS
         //
 
+        @Deprecated
         private void addPersistTasks(ModelWrapper<?> wrapper) {
             if (!cascaded.containsKey(wrapper)) {
                 cascaded.put(wrapper, wrapper);
@@ -389,6 +398,7 @@ public class WrapperTransaction {
             }
         }
 
+        @Deprecated
         private void addDeleteTasks(ModelWrapper<?> wrapper) {
             if (!cascaded.containsKey(wrapper)) {
                 cascaded.put(wrapper, wrapper);

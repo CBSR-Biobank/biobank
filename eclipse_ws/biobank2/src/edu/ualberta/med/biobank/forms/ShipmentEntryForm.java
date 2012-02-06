@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -21,9 +20,8 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
-import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
-import edu.ualberta.med.biobank.common.action.info.ShippingMethodInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
@@ -44,8 +42,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
@@ -173,12 +173,14 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             oiCopy.setReceiverSite(null);
             oiCopy.setShipmentInfo(null);
             oiCopy.setSpecimenCollection(new HashSet<Specimen>());
+            oiCopy.setCommentCollection(new HashSet<Comment>());
         } else {
             oiCopy.setId(oiInfo.oi.getId());
             oiCopy.setCenter(oiInfo.oi.getCenter());
             oiCopy.setReceiverSite(oiInfo.oi.getReceiverSite());
             oiCopy.setShipmentInfo(oiInfo.oi.getShipmentInfo());
-            oiCopy.setSpecimenCollection(new HashSet<Specimen>(oiInfo.specimens));
+            oiCopy.setSpecimenCollection(oiInfo.specimens);
+            oiCopy.setCommentCollection(oiInfo.oi.getCommentCollection());
         }
     }
 
@@ -488,8 +490,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             WrapperUtil.getCollectionIds(specimenEntryWidget
                 .getRemovedSpecimens());
 
-        ShippingMethodInfo methodInfo =
-            new ShippingMethodInfo(shipmentInfo.getShippingMethod().getId());
         OriginInfoSaveInfo oiInfo =
             new OriginInfoSaveInfo(originInfo.getId(), originInfo
                 .getReceiverSite().getId(), originInfo.getCenter().getId(),
@@ -500,34 +500,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             new ShipmentInfoSaveInfo(shipmentInfo.getId(),
                 shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(),
                 shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),
-                methodInfo);
-        OriginInfoSaveAction save = new OriginInfoSaveAction(oiInfo, siInfo);
-        SessionManager.getAppService().doAction(save);
-
-        /*
-         * if (shipmentInfo.getWaybill() != null &&
-         * shipmentInfo.getWaybill().isEmpty()) { shipmentInfo.setWaybill(null);
-         * } try { originInfo.setShipmentInfo(shipmentInfo);
-         * originInfo.persist(); } catch (ModificationConcurrencyException mc) {
-         * if (isTryingAgain) { // already tried once throw mc; }
-         * 
-         * Display.getDefault().syncExec(new Runnable() {
-         * 
-         * @Override public void run() { tryAgain = BgcPlugin.openConfirm(
-         * Messages.ShipmentEntryForm_concurrency_title,
-         * Messages.ShipmentEntryForm_concurrency_msg); setDirty(true); try {
-         * doTrySettingAgain(); tryAgain = true; } catch (Exception e) {
-         * saveErrorCatch(e, null, true); } } }); }
-         * 
-         * if (!tryAgain) // persist those specimens only once we are sure the
-         * shipment // persist has succeeded. for (SpecimenWrapper s :
-         * removedSpecimensToPersist) { // when remove a specimen, ask for the
-         * origin center. Then // create a new origin info with this center and
-         * the deleted // specimen: OriginInfoWrapper origin =
-         * s.getOriginInfo(); origin.persist(); // then we set back the originfo
-         * to the specimen to be sure it // has the right modelObject:
-         * s.setOriginInfo(origin); // then we save the specimen s.persist(); }
-         */
+                shipmentInfo.getShippingMethod().getId());
+        OriginInfoSaveAction save =
+            new OriginInfoSaveAction(oiInfo, siInfo);
+        originInfo.setId(SessionManager.getAppService().doAction(save).getId());
+        ((AdapterBase) adapter).setModelObject(originInfo);
     }
 
     /*

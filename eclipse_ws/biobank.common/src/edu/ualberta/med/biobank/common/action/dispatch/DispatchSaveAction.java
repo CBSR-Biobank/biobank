@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.dispatch;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -69,10 +68,8 @@ public class DispatchSaveAction implements Action<IdResult> {
             si.setReceivedAt(siInfo.receivedAt);
             si.setWaybill(siInfo.waybill);
 
-            ShippingMethod sm =
-                context
-                    .get(ShippingMethod.class, siInfo.method.id,
-                        new ShippingMethod());
+            ShippingMethod sm = context.load(ShippingMethod.class,
+                siInfo.shippingMethodId);
 
             si.setShippingMethod(sm);
             disp.setShipmentInfo(si);

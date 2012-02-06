@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -8,8 +11,16 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
@@ -39,13 +50,26 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private BgcBaseText ceventTotal;
 
+    private ClinicAdapter clinicAdapter;
+
+    private CommentWrapper comment;
+
+    private ClinicInfo clinicInfo;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ClinicAdapter,
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        clinic = (ClinicWrapper) getModelObject();
+        clinicAdapter = (ClinicAdapter) adapter;
+        comment = new CommentWrapper(SessionManager.getAppService());
+
+        clinicInfo = SessionManager.getAppService().doAction(
+            new ClinicGetInfoAction(adapter.getId()));
+        clinic =
+            new ClinicWrapper(SessionManager.getAppService(),
+                clinicInfo.clinic);
         setPartName(NLS.bind(Messages.ClinicViewForm_title,
             clinic.getNameShort()));
     }
@@ -96,16 +120,19 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setTextValue(nameShortLabel, clinic.getNameShort());
         setCheckBoxValue(hasShipmentsButton, clinic.getSendsShipments());
         setTextValue(activityStatusLabel, clinic.getActivityStatus());
-        setTextValue(patientTotal, clinic.getPatientCount());
-        setTextValue(ceventTotal, clinic.getCollectionEventCount());
+        setTextValue(patientTotal, clinicInfo.patientCount);
+        setTextValue(ceventTotal, clinicInfo.collectionEventCount);
     }
 
     private void createContactsSection() {
         Composite client =
             createSectionWithClient(Messages.clinic_contact_title);
-
+        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
+        for (Contact c : clinicInfo.contacts) {
+            contacts.add(new ContactWrapper(SessionManager.getAppService(), c));
+        }
         contactsTable =
-            new ContactInfoTable(client, clinic.getContactCollection(false));
+            new ContactInfoTable(client, contacts);
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
     }
@@ -122,8 +149,13 @@ public class ClinicViewForm extends AddressViewFormCommon {
     protected void createStudiesSection() {
         Composite client =
             createSectionWithClient(Messages.ClinicViewForm_studies_title);
+        List<StudyWrapper> studies = new ArrayList<StudyWrapper>();
+        for (StudyCountInfo s : clinicInfo.studyInfos) {
+            studies.add(new StudyWrapper(SessionManager.getAppService(), s
+                .getStudy()));
+        }
 
-        studiesTable = new ClinicStudyInfoTable(client, clinic);
+        studiesTable = new ClinicStudyInfoTable(client, studies);
         studiesTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studiesTable);
 

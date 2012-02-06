@@ -10,20 +10,22 @@ import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.test.action.TestClinic;
 import edu.ualberta.med.biobank.test.action.TestCollectionEvent;
+import edu.ualberta.med.biobank.test.action.TestContainerType;
 import edu.ualberta.med.biobank.test.action.TestDispatch;
 import edu.ualberta.med.biobank.test.action.TestPatient;
 import edu.ualberta.med.biobank.test.action.TestProcessingEvent;
 import edu.ualberta.med.biobank.test.action.TestRequest;
 import edu.ualberta.med.biobank.test.action.TestResearchGroup;
+import edu.ualberta.med.biobank.test.action.TestRole;
 import edu.ualberta.med.biobank.test.action.TestShipment;
 import edu.ualberta.med.biobank.test.action.TestSite;
 import edu.ualberta.med.biobank.test.action.TestStudy;
 
 @RunWith(Suite.class)
 @SuiteClasses({ TestClinic.class, TestCollectionEvent.class,
-    TestDispatch.class,
+    TestContainerType.class, TestDispatch.class,
     TestPatient.class, TestProcessingEvent.class, TestRequest.class,
-    TestResearchGroup.class,
+    TestResearchGroup.class, TestRole.class,
     TestShipment.class, TestSite.class, TestStudy.class })
 public class AllTests {
     public static BiobankApplicationService appService = null;

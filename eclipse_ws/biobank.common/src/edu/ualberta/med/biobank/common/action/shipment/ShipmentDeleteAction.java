@@ -14,13 +14,17 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
 
     protected Integer shipId = null;
 
-    public ShipmentDeleteAction(Integer id) {
+    private Integer workingCenter;
+
+    public ShipmentDeleteAction(Integer id, Integer workingCenter) {
         this.shipId = id;
+        this.workingCenter = workingCenter;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new ShipmentDeletePermission(shipId).isAllowed(context);
+        return new ShipmentDeletePermission(shipId, workingCenter)
+            .isAllowed(context);
     }
 
     @Override
@@ -28,7 +32,9 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
         OriginInfo ship = context.get(OriginInfo.class, shipId);
 
         OriginInfo oi = new OriginInfo();
+
         Center currentCenter = null;
+        Center wCenter = context.load(Center.class, workingCenter);
         for (Specimen spc : ship.getSpecimenCollection()) {
             if (currentCenter == null)
                 currentCenter = spc.getCurrentCenter();
@@ -36,8 +42,14 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
                 throw new ActionException(
                     "Specimens do not come from the same place.");
             spc.setOriginInfo(oi);
+            spc.setCurrentCenter(wCenter);
         }
-        oi.setCenter(currentCenter);
+        oi.setCenter(wCenter);
+        context.getSession().saveOrUpdate(oi);
+        for (Specimen spc : ship.getSpecimenCollection()) {
+            context.getSession().saveOrUpdate(spc);
+        }
+
         context.getSession().delete(ship);
         return new EmptyResult();
     }

@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.action;
 
 import java.io.Serializable;
 
-
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 
@@ -24,4 +23,5 @@ public interface Action<T extends ActionResult> extends NotAProxy, Serializable 
     public boolean isAllowed(ActionContext context) throws ActionException;
 
     public T run(ActionContext context) throws ActionException;
+
 }

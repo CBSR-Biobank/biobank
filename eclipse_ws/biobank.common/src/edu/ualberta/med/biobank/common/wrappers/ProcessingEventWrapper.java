@@ -201,6 +201,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
             CollectionEventWrapper.class);
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(ProcessingEventPeer.WORKSHEET));
@@ -211,6 +212,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         tasks.persistAdded(this, ProcessingEventPeer.SPECIMEN_COLLECTION);
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         tasks.persistRemoved(this, ProcessingEventPeer.SPECIMEN_COLLECTION);

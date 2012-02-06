@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
+import edu.ualberta.med.biobank.tools.modelumlparser.ModelClass;
+
 public class BeanModifier {
 
     private static final Logger LOGGER = Logger.getLogger(HbmModifier.class
@@ -42,7 +44,9 @@ public class BeanModifier {
         return instance;
     }
 
-    public void alterBean(String filename, String className) throws Exception {
+    public void alterBean(String filename, ModelClass modelClass)
+        throws Exception {
+        String className = modelClass.getName();
         if (!filename.contains(className)) {
             throw new Exception(
                 "Bean file name does not contain class name: filename "
@@ -60,18 +64,22 @@ public class BeanModifier {
         while (line != null) {
             String alteredLine = new String(line);
 
-            // add the version field
-            Matcher declMatcher = BEAN_SERIAL_VERSION_DECL.matcher(line);
-            if (declMatcher.find()) {
-                alteredLine = new StringBuffer(alteredLine).append("\n\n")
-                    .append(LAST_UPDATE_DECL).toString();
-            } else {
-                // implements IBiobankModel interface
-                Matcher implMatcher = IMPLEMENTS_SERIALIZABLE_PATTERN
-                    .matcher(line);
-                if (implMatcher.matches()) {
-                    alteredLine = line.replaceFirst(
-                        SERIALIZABLE_TEXT_TO_REPLACE, IMPLEMENTS_NEW_TEXT);
+            if (modelClass.getExtendsClass() == null) {
+                // this applies to base classes only
+                //
+                // add the version field
+                Matcher declMatcher = BEAN_SERIAL_VERSION_DECL.matcher(line);
+                if (declMatcher.find()) {
+                    alteredLine = new StringBuffer(alteredLine).append("\n\n")
+                        .append(LAST_UPDATE_DECL).toString();
+                } else {
+                    // implements IBiobankModel interface
+                    Matcher implMatcher = IMPLEMENTS_SERIALIZABLE_PATTERN
+                        .matcher(line);
+                    if (implMatcher.matches()) {
+                        alteredLine = line.replaceFirst(
+                            SERIALIZABLE_TEXT_TO_REPLACE, IMPLEMENTS_NEW_TEXT);
+                    }
                 }
             }
 
@@ -85,7 +93,8 @@ public class BeanModifier {
                 String type = m.group(2);
                 String variableName = m.group(3);
                 alteredLine =
-                    space + "private Collection<" + type + "> " + variableName
+                    space + "private Collection<" + type + "> "
+                        + variableName
                         + " = new HashSet<" + type + ">();\n";
             }
 

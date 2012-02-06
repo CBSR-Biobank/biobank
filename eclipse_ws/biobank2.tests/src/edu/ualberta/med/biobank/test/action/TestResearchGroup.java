@@ -13,14 +13,18 @@ import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
+import edu.ualberta.med.biobank.common.action.info.AddressSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
-import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
+import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
+import edu.ualberta.med.biobank.common.action.request.RequestGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupDeleteAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
+import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
 import edu.ualberta.med.biobank.test.action.helper.RequestHelper;
@@ -100,11 +104,12 @@ public class TestResearchGroup extends TestAction {
         Integer rId = EXECUTOR.exec(action).getId();
 
         // make sure you got what was requested
-        RequestGetInfoAction requestGetInfoAction =
-            new RequestGetInfoAction(rId);
-        RequestReadInfo rInfo = EXECUTOR.exec(requestGetInfoAction);
+        RequestGetSpecimenInfosAction specAction =
+            new RequestGetSpecimenInfosAction(rId);
+        List<Object[]> specInfo = EXECUTOR.exec(specAction).getList();
 
-        for (RequestSpecimen spec : rInfo.specimens) {
+        for (int i = 0; i < specInfo.size(); i++) {
+            RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
             Assert.assertTrue(specs.contains(spec.getSpecimen()
                 .getInventoryId()));
         }
@@ -118,19 +123,56 @@ public class TestResearchGroup extends TestAction {
             ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
                 name,
                 studyId);
+        Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
+        ResearchGroupDeleteAction delete =
+            new ResearchGroupDeleteAction(rgId);
+        try {
+            EXECUTOR.exec(delete);
+            Assert.fail();
+        } catch (ActionException e) {
+            Assert.assertTrue(true);
+        }
+
+        session.beginTransaction();
+
+        Request r = (Request) session.load(Request.class, rId);
+        for (RequestSpecimen rs : r.getRequestSpecimenCollection()) {
+            Specimen spec = rs.getSpecimen();
+            session.delete(rs);
+            session.delete(spec);
+        }
+        r = (Request) session.load(Request.class, rId);
+        session.delete(r);
+        session.getTransaction().commit();
+
+        EXECUTOR.exec(delete);
+        // should be fine
+    }
+
+    @Test
+    public void testComment() throws Exception {
+        AddressSaveInfo addressSaveInfo =
+            new AddressSaveInfo(null, "test", "test", "test", "test", "test",
+                "test", "test", "test", "test");
+        ResearchGroupSaveInfo save =
+            new ResearchGroupSaveInfo(null, name + "rg", name + "rg",
+                studyId, "comment", addressSaveInfo,
+                ActivityStatusEnum.ACTIVE.getId());
+        ResearchGroupSaveAction rgSave = new ResearchGroupSaveAction(save);
+
+        Integer rgId = EXECUTOR.exec(rgSave).getId();
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
         ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
 
-        RequestHelper.createRequest(EXECUTOR, rgId);
+        save.id = rgId;
 
-        try {
-            ResearchGroupDeleteAction delete =
-                new ResearchGroupDeleteAction(rgId);
-            EXECUTOR.exec(delete);
-            Assert.fail();
-        } catch (ActionException e) {
-            System.out.println(e);
-        }
+        Assert.assertEquals(1, rg.rg.getCommentCollection().size());
+        EXECUTOR.exec(rgSave);
+        rg = EXECUTOR.exec(reader);
+        Assert.assertEquals(2, rg.rg.getCommentCollection().size());
+        EXECUTOR.exec(rgSave);
+        rg = EXECUTOR.exec(reader);
+        Assert.assertEquals(3, rg.rg.getCommentCollection().size());
     }
 }

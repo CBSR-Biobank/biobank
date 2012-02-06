@@ -6,12 +6,14 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
+import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.reports.QueryProcess;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServiceImpl.AppServiceAction;
 import edu.ualberta.med.biobank.server.applicationservice.ReportData;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
@@ -61,17 +63,21 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
             return query(request, (BiobankSQLCriteria) obj);
         } else if (obj instanceof QueryHandleRequest) {
             return query(request, (QueryHandleRequest) obj);
-        } else if (obj instanceof Action) {
-            return query((Action<?>) obj);
+        } else if (obj instanceof AppServiceAction<?>) {
+            return query((AppServiceAction<?>) obj);
         }
         return super.query(request);
     }
 
-    private <T extends ActionResult> Response query(Action<T> action) {
+    private <T extends ActionResult> Response query(
+        AppServiceAction<T> appServiceAction) {
         Session session = getSession();
         User user = getCurrentUser(session);
 
-        ActionContext context = new ActionContext(user, session);
+        Action<T> action = appServiceAction.action;
+
+        ActionContext context =
+            new ActionContext(user, session, appServiceAction.appService);
 
         if (!action.isAllowed(context))
             throw new AccessDeniedException();
@@ -165,6 +171,13 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         }
 
         return null;
+    }
+
+    public Boolean isAllowed(Permission permission) {
+        return permission.isAllowed(new ActionContext(
+            getCurrentUser(getSession()),
+            getSession(),
+            null));
     }
 
     protected Response query(Request request, BiobankSQLCriteria sqlCriteria) {

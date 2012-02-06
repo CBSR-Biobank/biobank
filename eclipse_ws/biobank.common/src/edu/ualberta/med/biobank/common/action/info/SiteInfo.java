@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.model.Site;
 public class SiteInfo implements ActionResult {
     private static final long serialVersionUID = 1L;
     public final Site site;
-    public final List<ContainerTypeInfo> containerTypes;
+    public final List<SiteContainerTypeInfo> containerTypes;
     public final List<StudyCountInfo> studyCountInfo;
     public final List<Container> topContainers;
     public final Long patientCount;
@@ -28,7 +28,7 @@ public class SiteInfo implements ActionResult {
         return site;
     }
 
-    public List<ContainerTypeInfo> getContainerTypeCollection() {
+    public List<SiteContainerTypeInfo> getContainerTypeCollection() {
         return Collections.unmodifiableList(containerTypes);
     }
 
@@ -84,7 +84,7 @@ public class SiteInfo implements ActionResult {
         return true;
     }
 
-    private SiteInfo(Site site, List<ContainerTypeInfo> containerTypes,
+    private SiteInfo(Site site, List<SiteContainerTypeInfo> containerTypes,
         List<StudyCountInfo> studies, List<Container> topContainers,
         Long patientCount, Long collectionEventCount,
         Long aliquotedSpecimenCount) {
@@ -99,8 +99,8 @@ public class SiteInfo implements ActionResult {
 
     public static class Builder {
         private Site site = new Site();
-        private List<ContainerTypeInfo> containerTypes =
-            new ArrayList<ContainerTypeInfo>();
+        private List<SiteContainerTypeInfo> containerTypes =
+            new ArrayList<SiteContainerTypeInfo>();
         private List<StudyCountInfo> studies = new ArrayList<StudyCountInfo>();
         private List<Container> topContainers = new ArrayList<Container>();
         private Long patientCount;
@@ -116,7 +116,7 @@ public class SiteInfo implements ActionResult {
             return this;
         }
 
-        public Builder setContainerTypes(List<ContainerTypeInfo> containerTypes) {
+        public Builder setContainerTypes(List<SiteContainerTypeInfo> containerTypes) {
             this.containerTypes = containerTypes;
             return this;
         }

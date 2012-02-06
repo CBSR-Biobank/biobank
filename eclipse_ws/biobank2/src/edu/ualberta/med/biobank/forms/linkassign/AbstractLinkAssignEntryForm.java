@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
@@ -44,7 +45,9 @@ public abstract class AbstractLinkAssignEntryForm extends
     AbstractPalletSpecimenAdminForm {
 
     enum Mode {
-        SINGLE_NO_POSITION, SINGLE_POSITION, MULTIPLE;
+        SINGLE_NO_POSITION,
+        SINGLE_POSITION,
+        MULTIPLE;
 
         public boolean isSingleMode() {
             return this == SINGLE_NO_POSITION || this == SINGLE_POSITION;
@@ -94,11 +97,12 @@ public abstract class AbstractLinkAssignEntryForm extends
     protected void init() throws Exception {
         super.init();
         singleSpecimen = new SpecimenWrapper(SessionManager.getAppService());
-        canSaveSingleBinding = widgetCreator
-            .addBooleanBinding(
-                new WritableValue(Boolean.FALSE, Boolean.class),
-                canSaveSingleSpecimen,
-                Messages.AbstractLinkAssignEntryForm_fill_fields_or_previous_errors);
+        canSaveSingleBinding =
+            widgetCreator
+                .addBooleanBinding(
+                    new WritableValue(Boolean.FALSE, Boolean.class),
+                    canSaveSingleSpecimen,
+                    Messages.AbstractLinkAssignEntryForm_fill_fields_or_previous_errors);
     }
 
     protected abstract String getFormTitle();
@@ -423,8 +427,8 @@ public abstract class AbstractLinkAssignEntryForm extends
         thirdSingleParentLabel = toolkit.createLabel(singleVisualisation, ""); //$NON-NLS-1$
         secondSingleParentLabel = toolkit.createLabel(singleVisualisation, ""); //$NON-NLS-1$
 
-        ContainerTypeWrapper thirdSingleParentType = null;
-        ContainerTypeWrapper secondSingleParentType = null;
+        ContainerType thirdSingleParentType = null;
+        ContainerType secondSingleParentType = null;
         thirdSingleParentWidget = new ContainerDisplayWidget(
             singleVisualisation);
         thirdSingleParentWidget.setContainerType(thirdSingleParentType, true);
@@ -560,6 +564,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                     ContainerWrapper thirdParent = null;
                     ContainerWrapper secondParent = null;
                     ContainerWrapper firstParent = null;
+
                     if (parentContainers.size() >= 3)
                         thirdParent = parentContainers.get(2);
                     if (parentContainers.size() >= 2)
@@ -618,9 +623,10 @@ public abstract class AbstractLinkAssignEntryForm extends
             if (foundContainers.size() == 1) {
                 initParentContainers(foundContainers.get(0));
             } else if (foundContainers.size() > 1) {
-                SelectParentContainerDialog dlg = new SelectParentContainerDialog(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell(), foundContainers);
+                SelectParentContainerDialog dlg =
+                    new SelectParentContainerDialog(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), foundContainers);
                 dlg.open();
                 if (dlg.getSelectedContainer() == null) {
                     StringBuffer sb = new StringBuffer();

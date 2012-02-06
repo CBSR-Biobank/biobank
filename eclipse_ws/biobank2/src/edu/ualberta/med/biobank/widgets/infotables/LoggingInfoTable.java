@@ -54,7 +54,8 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = getCollectionModelObject((LogWrapper) element);
+                TableRowData item =
+                    getCollectionModelObject((LogWrapper) element);
                 if (item == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -100,8 +101,8 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
 
         Date logQueryDate = logQuery.getCreatedAt();
         if (logQueryDate != null) {
-            SimpleDateFormat dateTimeSecond = new SimpleDateFormat(
-                "yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
+            SimpleDateFormat dateTimeSecond =
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
             info.date = dateTimeSecond.format(logQueryDate);
         } else {
             info.date = null;
@@ -112,11 +113,6 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
 
     public Table getTable() {
         return tableViewer.getTable();
-    }
-
-    @Override
-    public List<LogWrapper> getList() {
-        return null;
     }
 
 }

@@ -304,6 +304,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         return getPropertyCount(PatientPeer.COLLECTION_EVENT_COLLECTION, fast);
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(PatientPeer.PNUMBER));
@@ -312,6 +313,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         super.addPersistTasks(tasks);
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         String hasCollectionEventsMsg = HAS_COLLECTION_EVENTS_MSG;

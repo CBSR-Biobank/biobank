@@ -13,20 +13,18 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
-import edu.ualberta.med.biobank.common.action.CollectionUtils;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
+import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventCreatePermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
@@ -52,7 +50,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
     private Integer patientId;
     private Integer visitNumber;
     private Integer statusId;
-    private Collection<CommentInfo> comments;
+    private String commentText;
 
     public static class SaveCEventSpecimenInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
@@ -63,7 +61,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         public Integer statusId;
         public Integer specimenTypeId;
         public Integer centerId;
-        public Collection<CommentInfo> comments;
+        public String commentText;
         public Double quantity;
     }
 
@@ -81,16 +79,44 @@ public class CollectionEventSaveAction implements Action<IdResult> {
     private List<CEventAttrSaveInfo> ceAttrList;
 
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
-        Integer visitNumber, Integer statusId,
-        Collection<CommentInfo> comments,
+        Integer visitNumber, Integer statusId, String commentText,
         Collection<SaveCEventSpecimenInfo> sourceSpecs,
         List<CEventAttrSaveInfo> ceAttrList) {
         this.ceventId = ceventId;
         this.patientId = patientId;
         this.visitNumber = visitNumber;
         this.statusId = statusId;
-        this.comments = comments;
+        this.commentText = commentText;
         this.sourceSpecimenInfos = sourceSpecs;
+        this.ceAttrList = ceAttrList;
+    }
+
+    public void setCeventId(Integer ceventId) {
+        this.ceventId = ceventId;
+    }
+
+    public void setPatientId(Integer patientId) {
+        this.patientId = patientId;
+    }
+
+    public void setVisitNumber(Integer visitNumber) {
+        this.visitNumber = visitNumber;
+    }
+
+    public void setStatusId(Integer statusId) {
+        this.statusId = statusId;
+    }
+
+    public void setCommentText(String commentText) {
+        this.commentText = commentText;
+    }
+
+    public void setSourceSpecimenInfos(
+        Collection<SaveCEventSpecimenInfo> sourceSpecimenInfos) {
+        this.sourceSpecimenInfos = sourceSpecimenInfos;
+    }
+
+    public void setCeAttrList(List<CEventAttrSaveInfo> ceAttrList) {
         this.ceAttrList = ceAttrList;
     }
 
@@ -125,13 +151,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         ceventToSave.setActivityStatus(context.load(ActivityStatus.class,
             statusId));
 
-        Collection<Comment> commentsToSave = CollectionUtils.getCollection(
-            ceventToSave, CollectionEventPeer.COMMENT_COLLECTION);
-        CommentInfo
-            .setCommentModelCollection(context, commentsToSave, comments);
-
+        saveComment(context, ceventToSave);
         setSourceSpecimens(context, ceventToSave);
-
         setEventAttrs(context, patient.getStudy(), ceventToSave);
 
         context.getSession().saveOrUpdate(ceventToSave);
@@ -191,11 +212,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 specimen.setCollectionEvent(ceventToSave);
                 // cascade will save-update the specimens from this list:
                 specimen.setOriginalCollectionEvent(ceventToSave);
-                Collection<Comment> commentsToSave = CollectionUtils
-                    .getCollection(specimen,
-                        SpecimenPeer.COMMENT_COLLECTION);
-                CommentInfo.setCommentModelCollection(context,
-                    commentsToSave, specInfo.comments);
+                saveSpecimenComment(context, specimen, specInfo.commentText);
                 specimen.setCreatedAt(specInfo.createdAt);
                 specimen.setInventoryId(specInfo.inventoryId);
                 specimen.setQuantity(specInfo.quantity);
@@ -205,9 +222,9 @@ public class CollectionEventSaveAction implements Action<IdResult> {
             }
         }
 
-        ceventToSave.setOriginalSpecimenCollection(newSsCollection);
         SetDifference<Specimen> origSpecDiff = new SetDifference<Specimen>(
             originalSpecimens, newSsCollection);
+        ceventToSave.setOriginalSpecimenCollection(newSsCollection);
         newAllSpecCollection.removeAll(origSpecDiff.getRemoveSet());
         ceventToSave.setAllSpecimenCollection(newAllSpecCollection);
         for (Specimen srcSpc : origSpecDiff.getRemoveSet()) {
@@ -305,9 +322,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 EventAttr eventAttr;
                 if (ceventAttrInfo == null) {
                     eventAttr = new EventAttr();
-                    CollectionUtils.getCollection(cevent,
-                        CollectionEventPeer.EVENT_ATTR_COLLECTION).add(
-                        eventAttr);
+                    cevent.getEventAttrCollection().add(eventAttr);
                     eventAttr.setCollectionEvent(cevent);
                     eventAttr.setStudyEventAttr(sAttr);
                 } else {
@@ -319,6 +334,23 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 // anymore
                 // in study maybe ? See previous code in wrapper ?
             }
+    }
+
+    private void saveComment(ActionContext context, CollectionEvent ceventToSave) {
+        Comment comment = CommentUtil.create(context.getUser(), commentText);
+        if (comment != null) {
+            context.getSession().save(comment);
+            ceventToSave.getCommentCollection().add(comment);
+        }
+    }
+
+    private void saveSpecimenComment(ActionContext context,
+        Specimen specimenToSave, String commentText) {
+        Comment comment = CommentUtil.create(context.getUser(), commentText);
+        if (comment != null) {
+            context.getSession().save(comment);
+            specimenToSave.getCommentCollection().add(comment);
+        }
     }
 
 }

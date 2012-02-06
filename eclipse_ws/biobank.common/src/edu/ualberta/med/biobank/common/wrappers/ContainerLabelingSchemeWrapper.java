@@ -33,15 +33,18 @@ public class ContainerLabelingSchemeWrapper extends
 
     public static final int SCHEME_2_CHAR_ALPHA = 6;
 
-    public static final String CBSR_2_CHAR_LABELLING_PATTERN = "ABCDEFGHJKLMNPQRSTUVWXYZ"; //$NON-NLS-1$
+    public static final String CBSR_2_CHAR_LABELLING_PATTERN =
+        "ABCDEFGHJKLMNPQRSTUVWXYZ"; //$NON-NLS-1$
 
-    public static final String TWO_CHAR_LABELLING_PATTERN = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; //$NON-NLS-1$
+    public static final String TWO_CHAR_LABELLING_PATTERN =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; //$NON-NLS-1$
 
     public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGHIJKLMNOP"; //$NON-NLS-1$
 
     public static String BOX81_LABELLING_PATTERN = "ABCDEFGHJ"; //$NON-NLS-1$
 
-    private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemes = null;
+    private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemes =
+        null;
 
     public ContainerLabelingSchemeWrapper(
         WritableApplicationService appService,
@@ -222,8 +225,9 @@ public class ContainerLabelingSchemeWrapper extends
         return canLabel;
     }
 
-    private static final String POS_LABEL_LEN_QRY = "select min(minChars), max(maxChars) from " //$NON-NLS-1$
-        + ContainerLabelingScheme.class.getName();
+    private static final String POS_LABEL_LEN_QRY =
+        "select min(minChars), max(maxChars) from " //$NON-NLS-1$
+            + ContainerLabelingScheme.class.getName();
 
     public static List<Integer> getPossibleLabelLength(
         WritableApplicationService appService) throws ApplicationException {
@@ -334,22 +338,25 @@ public class ContainerLabelingSchemeWrapper extends
             String maxValue = ContainerLabelingSchemeWrapper
                 .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
                     rowCap, colCap);
-            String msgStart = MessageFormat
-                .format(
-                    Messages
-                        .getString("ContainerLabelingSchemeWrapper.label.not.exists.msg"), //$NON-NLS-1$
-                    label);
-            if (containerTypeName != null)
-                msgStart = MessageFormat
+            String msgStart =
+                MessageFormat
                     .format(
                         Messages
-                            .getString("ContainerLabelingSchemeWrapper.label.not.exists.in.type.msg"), label, //$NON-NLS-1$
-                        containerTypeName);
-            String msgMax = MessageFormat
-                .format(
-                    Messages
-                        .getString("ContainerLabelingSchemeWrapper.scheme.max.value.msg"), maxValue, //$NON-NLS-1$
-                    rowCap, colCap);
+                            .getString("ContainerLabelingSchemeWrapper.label.not.exists.msg"), //$NON-NLS-1$
+                        label);
+            if (containerTypeName != null)
+                msgStart =
+                    MessageFormat
+                        .format(
+                            Messages
+                                .getString("ContainerLabelingSchemeWrapper.label.not.exists.in.type.msg"), label, //$NON-NLS-1$
+                            containerTypeName);
+            String msgMax =
+                MessageFormat
+                    .format(
+                        Messages
+                            .getString("ContainerLabelingSchemeWrapper.scheme.max.value.msg"), maxValue, //$NON-NLS-1$
+                        rowCap, colCap);
             throw new BiobankCheckException(msgStart + " " + msgMax); //$NON-NLS-1$
         }
         Integer row = pos % rowCap;
@@ -394,22 +401,25 @@ public class ContainerLabelingSchemeWrapper extends
             String maxValue = ContainerLabelingSchemeWrapper
                 .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
                     rowCap, colCap);
-            String msgStart = MessageFormat
-                .format(
-                    Messages
-                        .getString("ContainerLabelingSchemeWrapper.label.not.exists.msg"), //$NON-NLS-1$
-                    label);
-            if (containerTypeName != null)
-                msgStart = MessageFormat
+            String msgStart =
+                MessageFormat
                     .format(
                         Messages
-                            .getString("ContainerLabelingSchemeWrapper.label.not.exists.in.type.msg"), label, //$NON-NLS-1$
-                        containerTypeName);
-            String msgMax = MessageFormat
-                .format(
-                    Messages
-                        .getString("ContainerLabelingSchemeWrapper.scheme.max.value.msg"), maxValue, //$NON-NLS-1$
-                    rowCap, colCap);
+                            .getString("ContainerLabelingSchemeWrapper.label.not.exists.msg"), //$NON-NLS-1$
+                        label);
+            if (containerTypeName != null)
+                msgStart =
+                    MessageFormat
+                        .format(
+                            Messages
+                                .getString("ContainerLabelingSchemeWrapper.label.not.exists.in.type.msg"), label, //$NON-NLS-1$
+                            containerTypeName);
+            String msgMax =
+                MessageFormat
+                    .format(
+                        Messages
+                            .getString("ContainerLabelingSchemeWrapper.scheme.max.value.msg"), maxValue, //$NON-NLS-1$
+                        rowCap, colCap);
             throw new BiobankCheckException(msgStart + " " + msgMax); //$NON-NLS-1$
         }
         Integer row = pos % rowCap;
@@ -433,10 +443,11 @@ public class ContainerLabelingSchemeWrapper extends
                 Messages
                     .getString("ContainerLabelingSchemeWrapper.2char.numeric.not.found.msg")); //$NON-NLS-1$
         }
-        String errorMsg = MessageFormat
-            .format(
-                Messages
-                    .getString("ContainerLabelingSchemeWrapper.characters.length.incorrect.msg"), label); //$NON-NLS-1$
+        String errorMsg =
+            MessageFormat
+                .format(
+                    Messages
+                        .getString("ContainerLabelingSchemeWrapper.characters.length.incorrect.msg"), label); //$NON-NLS-1$
         int len = label.length();
         if ((len != scheme.getMinChars()) && (len != scheme.getMaxChars()))
             throw new Exception(errorMsg);
@@ -625,6 +636,7 @@ public class ContainerLabelingSchemeWrapper extends
         return null;
     }
 
+    @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
 

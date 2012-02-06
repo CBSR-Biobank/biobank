@@ -14,6 +14,8 @@ public class StudyInfo implements ActionResult {
     private static final long serialVersionUID = 1L;
 
     public Study study;
+    public Long patientCount;
+    public Long collectionEventCount;
     public List<ClinicInfo> clinicInfos;
     public List<SourceSpecimen> sourceSpcs;
     public List<AliquotedSpecimen> aliquotedSpcs;
@@ -33,6 +35,8 @@ public class StudyInfo implements ActionResult {
         List<AliquotedSpecimen> aliquotedSpcs,
         List<StudyEventAttr> studyEventAttrs) {
         this.study = study;
+        this.patientCount = patientCount;
+        this.collectionEventCount = ceventCount;
         this.clinicInfos = clinicInfos;
         this.sourceSpcs = sourceSpcs;
         this.aliquotedSpcs = aliquotedSpcs;

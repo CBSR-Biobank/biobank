@@ -8,7 +8,7 @@ import org.hibernate.Query;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.info.ContainerTypeInfo;
+import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.permission.site.SiteReadPermission;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -17,9 +17,10 @@ import edu.ualberta.med.biobank.model.Site;
 public class SiteGetContainerTypeInfoAction implements
     Action<SiteGetContainerTypeInfoResult> {
     private static final long serialVersionUID = 1L;
-    // @formatter:off
+
     @SuppressWarnings("nls")
-    private static final String SELECT_CONTAINER_TYPE_INFO_HQL = "SELECT containerType,"
+    private static final String SELECT_CONTAINER_TYPE_INFO_HQL = 
+    "SELECT containerType,"
         + " (SELECT COUNT(*) FROM "
         + Container.class.getName()
         + " c WHERE c.containerType = containerType)"
@@ -28,7 +29,6 @@ public class SiteGetContainerTypeInfoAction implements
         + " INNER JOIN FETCH containerType.capacity capacity"
         + " WHERE containerType.site.id = ?"
         + " ORDER BY containerType.nameShort";
-    // @formatter:on
 
     private final Integer siteId;
 
@@ -49,8 +49,8 @@ public class SiteGetContainerTypeInfoAction implements
     public SiteGetContainerTypeInfoResult run(ActionContext context)
         throws ActionException {
 
-        ArrayList<ContainerTypeInfo> containerTypes =
-            new ArrayList<ContainerTypeInfo>();
+        ArrayList<SiteContainerTypeInfo> containerTypes =
+            new ArrayList<SiteContainerTypeInfo>();
 
         Query query =
             context.getSession().createQuery(SELECT_CONTAINER_TYPE_INFO_HQL);
@@ -59,7 +59,7 @@ public class SiteGetContainerTypeInfoAction implements
         @SuppressWarnings("unchecked")
         List<Object[]> results = query.list();
         for (Object[] row : results) {
-            ContainerTypeInfo containerTypeInfo = new ContainerTypeInfo(
+            SiteContainerTypeInfo containerTypeInfo = new SiteContainerTypeInfo(
                 (ContainerType) row[0], (Long) row[1]);
             containerTypes.add(containerTypeInfo);
         }

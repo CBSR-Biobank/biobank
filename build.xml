@@ -465,7 +465,6 @@ End:
   <target name="clean"
           depends="clean-tests,clean-jars,clean-product"
           description="cleans project output, tests, and jars">
-    <delete dir="${buildDirectory}" />
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output-validators" />
     <delete dir="${eclipse.proj.dir.tools}/output" />
@@ -494,14 +493,14 @@ End:
     <delete dir="${test.build.dir}" />
   </target>
 
-  <target name="prepare">
+  <target name="test-prepare">
     <mkdir dir="${test.build.dir}" />
     <mkdir dir="${test.output}" />
     <mkdir dir="${test.output.raw}" />
   </target>
 
   <!---->
-  <target name="tests-compile" depends="build-common-project,prepare" >
+  <target name="tests-compile" depends="build-common-project,test-prepare" >
     <copy includeemptydirs="false"
           todir="${test.build.dir}" overwrite="true">
       <fileset dir="${eclipse.proj.dir.tests}/src">
@@ -522,26 +521,39 @@ End:
       <include name="**/tools/utils/*.java" />
       <include name="**/test/reports/**/*.java" />
       <include name="**/Test*.java" />
-      <classpath>
+      <exclude name="**/presenters/**" />
+      <exclude name="**/TestingDispatcher.java" />
+     <classpath>
         <pathelement location="${eclipse.proj.dir.common}/output" />
         <pathelement location="${eclipse.proj.dir.common}/lib/client" />
+        <pathelement location="${req.jars.dir}" />
       </classpath>
       <classpath refid="biobank.common.build.classpath" />
     </javac>
   </target>
 
   <fileset id="testcase.files" dir="${eclipse.proj.dir.tests}/src">
-    <include name="**/Test*.java" />
     <exclude name="**/speed/**" />
     <exclude name="**/TestReportsProcedurallyGeneratedData.java" />
+    <exclude name="**/TestAction.java" />
     <exclude name="**/TestCommon.java" />
+    <exclude name="**/TestingDispatcher.java" />
+    <exclude name="**/TestHibernateLocking.java" />
     <exclude name="**/TestDatabase.java" />
     <exclude name="**/TestFunctionalities.java" />
     <exclude name="**/TestReportsOnExistingData.java" />
     <exclude name="**/AllTests.java" />
+    <exclude name="**/wrappers/**" />
+    <exclude name="**/presenters/**" />
+    <include name="**/Test*.java" />
   </fileset>
 
-  <target name="test" depends="tests-compile" description="executes test cases">
+  <!-- target name="test-debug">
+    <pathconvert pathsep="${line.separator}" property="sounds" refid="testcase.files"/>
+    <echo file="sounds.txt">${sounds}</echo>
+  </target -->
+
+  <target name="test" depends="clean-test-results,tests-compile" description="executes test cases">
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
       <classpath refid="test.class.path" />
       <classpath refid="biobank.common.run.classpath" />
@@ -640,9 +652,6 @@ End:
     <copy todir="${buildDirectory}/plugins/biobank.nl1.fr_CA">
       <fileset dir="${eclipse.workspace.dir}/biobank.nl1.fr_CA" />
     </copy>
-    <copy todir="${buildDirectory}/plugins/biobank.mvp">
-      <fileset dir="${eclipse.workspace.dir}/biobank.mvp" />
-    </copy>
     <copy todir="${buildDirectory}/plugins/scannerConfig">
       <fileset dir="${eclipse.workspace.dir}/scannerConfig" />
     </copy>
@@ -657,6 +666,9 @@ End:
     </copy>
     <copy todir="${buildDirectory}/plugins/biobank.gui.common">
       <fileset dir="${eclipse.workspace.dir}/biobank.gui.common" />
+    </copy>
+    <copy todir="${buildDirectory}/plugins/biobank.mvp">
+      <fileset dir="${eclipse.workspace.dir}/biobank.mvp" />
     </copy>
     <copy todir="${buildDirectory}/features/biobank2.feature.core">
       <fileset dir="${eclipse.workspace.dir}/biobank2.feature.core" />
@@ -678,19 +690,6 @@ End:
     <last id="pde.build.id" count="1">
       <fileset refid="pde.build.id.all" />
     </last>
-
-    <echo message="-application org.eclipse.ant.core.antRunner" />
-    <echo message="-buildfile ${toString:pde.build.id}" />
-    <echo message="-Dbuilder=${product.dir}" />
-    <!-- product.dir is used in product/customTarget.xml -->
-    <echo message="-Dproduct.dir=${product.dir}" />
-    <!-- instead of fixed paths in product/build.properties: -->
-    <echo message="-Dproduct=${eclipse.proj.dir}/biobank2.product" />
-    <echo message="-DbuildDirectory=${product.dir}/buildDirectory" />
-    <echo message="-DbaseLocation=${env.ECLIPSE_HOME}" />
-    <echo message="-Djava.client.version.num=${java.client.version.num}" />
-
-
     <!-- launch product creation -->
     <java classpath="${toString:launcher.id}"
           classname="org.eclipse.equinox.launcher.Main"
@@ -698,7 +697,6 @@ End:
           fork="true">
       <arg line="-application org.eclipse.ant.core.antRunner" />
       <arg line="-buildfile ${toString:pde.build.id}" />
-      <arg line="-debug" />
       <arg line="-Dbuilder=${product.dir}" />
       <!-- product.dir is used in product/customTarget.xml -->
       <arg line="-Dproduct.dir=${product.dir}" />

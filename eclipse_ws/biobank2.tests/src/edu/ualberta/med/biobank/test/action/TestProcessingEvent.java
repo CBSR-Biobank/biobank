@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -15,26 +15,32 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
-import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSpecimenInfosAction;
-import edu.ualberta.med.biobank.common.action.info.CommentInfo;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
+import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
+import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.SiteInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
+import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
-import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
-import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
+import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 
 public class TestProcessingEvent extends TestAction {
 
@@ -42,98 +48,130 @@ public class TestProcessingEvent extends TestAction {
     public TestName testname = new TestName();
 
     private String name;
-
-    private Integer siteId;
-    private Integer studyId;
-    private ClinicWrapper clinic;
-    private Integer patientId;
+    private Provisioning provisioning;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + R.nextInt();
-
-        studyId = StudyHelper.createStudy(EXECUTOR, name,
-            ActivityStatusEnum.ACTIVE);
-
-        Integer clinicId =
-            ClinicHelper.createClinic(EXECUTOR, name + "_clinic",
-                ActivityStatusEnum.ACTIVE);
-        ContactSaveAction contactSave = new ContactSaveAction();
-        contactSave.setName(name + "_contact");
-        contactSave.setClinicId(clinicId);
-        Integer contactId = EXECUTOR.exec(contactSave).getId();
-
-        StudyInfo studyInfo =
-            EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        StudySaveAction studySaveAction =
-            StudyHelper.getSaveAction(EXECUTOR, studyInfo);
-        studySaveAction.setContactIds(new HashSet<Integer>(contactId));
-        EXECUTOR.exec(studySaveAction);
-
-        patientId = PatientHelper.createPatient(EXECUTOR,
-            name, studyId);
-
-        siteId = SiteHelper.createSite(EXECUTOR, name, "Edmonton",
-            ActivityStatusEnum.ACTIVE,
-            new HashSet<Integer>(studyId));
+        name = getMethodNameR();
+        provisioning =
+            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
     }
 
     @Test
     public void saveWithoutSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(20, 50);
-        List<CommentInfo> comments =
-            Utils.getRandomCommentInfos(EXECUTOR.getUserId());
+        String commentText = Utils.getRandomString(20, 30);
         Date date = Utils.getRandomDate();
         Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
-            null, siteId, date, worksheet, 1, comments,
+            null, provisioning.siteId, date, worksheet, 1, commentText,
             new HashSet<Integer>())).getId();
 
         // Check ProcessingEvent is in database with correct values
-        ProcessingEvent pevent = (ProcessingEvent) session.get(
-            ProcessingEvent.class, pEventId);
-        Assert.assertEquals(worksheet, pevent.getWorksheet());
-        Assert.assertEquals(comments.size(), pevent.getCommentCollection()
-            .size());
-        Assert.assertEquals(date, pevent.getCreatedAt());
-        Assert.assertEquals(0, pevent.getSpecimenCollection().size());
+        PEventInfo peventInfo =
+            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
+
+        Assert.assertEquals(worksheet, peventInfo.pevent.getWorksheet());
+        Assert.assertEquals(1, peventInfo.pevent.getCommentCollection().size());
+        Assert.assertEquals(date, peventInfo.pevent.getCreatedAt());
+        Assert
+            .assertEquals(0, peventInfo.sourceSpecimenInfos.size());
     }
 
     @Test
     public void saveWithSpecimens() throws Exception {
         String worksheet = Utils.getRandomString(50);
-        List<CommentInfo> comments =
-            Utils.getRandomCommentInfos(EXECUTOR.getUserId());
+        String commentText = Utils.getRandomString(20, 30);
         Date date = Utils.getRandomDate();
 
+        // create a collection event from a clinic
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
-                patientId, siteId);
-        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR
-            .exec(new CollectionEventGetSpecimenInfosAction(ceventId,
-                false)).getList();
+                provisioning.patientIds.get(0), provisioning.clinicId);
+        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
+            new CollectionEventGetSourceSpecimenInfoAction(ceventId)).getList();
+
+        // ship the specimens to the site
+        OriginInfoSaveInfo oiSaveInfo = new OriginInfoSaveInfo(
+            null, provisioning.siteId, provisioning.clinicId, null,
+            SpecimenInfo.getSpecimenIds(sourceSpecs), null);
+        ShipmentInfoSaveInfo shipSaveInfo = new ShipmentInfoSaveInfo(
+            null, Utils.getRandomString(2, 5), Utils.getRandomDate(),
+            Utils.getRandomDate(), Utils.getRandomString(2, 5),
+            getShippingMethods().get(0).getId());
+        EXECUTOR
+            .exec(new OriginInfoSaveAction(oiSaveInfo, shipSaveInfo));
 
         // create a processing event with one of the collection event source
         // specimen
-        Integer pEventId = EXECUTOR.exec(
-            new ProcessingEventSaveAction(
-                null, siteId, date, worksheet, 1, comments,
-                new HashSet<Integer>(
-                    Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
+        Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
+            null, provisioning.siteId, date, worksheet, 1, commentText,
+            new HashSet<Integer>(
+                Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
             .getId();
 
-        // FIXME should test to add specimens that can't add ???
+        // create aliquoted specimens by doing a scan link
+        Set<AliquotedSpecimenInfo> aliquotedSpecimenInfos =
+            new HashSet<AliquotedSpecimenInfo>();
+        for (int i = 0, n = R.nextInt(5) + 1; i < n; i++) {
+            AliquotedSpecimenInfo aliquotedSpecimenInfo =
+                new AliquotedSpecimenInfo();
+            aliquotedSpecimenInfo.inventoryId = Utils.getRandomString(10, 15);
+            aliquotedSpecimenInfo.typeId = getSpecimenTypes().get(0).getId();
+            aliquotedSpecimenInfo.statusId = ActivityStatusEnum.ACTIVE.getId();
+            aliquotedSpecimenInfo.parentSpecimenId =
+                sourceSpecs.get(0).specimen.getId();
+            aliquotedSpecimenInfo.containerId = null;
+            aliquotedSpecimenInfo.position = null;
+            aliquotedSpecimenInfos.add(aliquotedSpecimenInfo);
+        }
+
+        EXECUTOR.exec(new SpecimenLinkSaveAction(provisioning.siteId,
+            provisioning.studyId, aliquotedSpecimenInfos));
 
         // Check ProcessingEvent is in database with correct values
-        session.clear();
-        ProcessingEvent pevent = (ProcessingEvent) session.get(
-            ProcessingEvent.class, pEventId);
-        Assert.assertEquals(worksheet, pevent.getWorksheet());
-        Assert.assertEquals(comments.size(), pevent.getCommentCollection()
-            .size());
-        Assert.assertEquals(date, pevent.getCreatedAt());
-        Assert.assertEquals(1, pevent.getSpecimenCollection().size());
+        PEventInfo peventInfo =
+            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
+
+        Assert.assertEquals(worksheet, peventInfo.pevent.getWorksheet());
+        Assert.assertEquals(1, peventInfo.pevent.getCommentCollection().size());
+        Assert.assertEquals(date, peventInfo.pevent.getCreatedAt());
+        Assert
+            .assertEquals(1, peventInfo.sourceSpecimenInfos.size());
+
+        ClinicInfo clinicInfo =
+            EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
+        SiteInfo siteInfo =
+            EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
+        PatientInfo patientInfo =
+            EXECUTOR.exec(new PatientGetInfoAction(provisioning.patientIds
+                .get(0)));
+
+        // check eager loaded associations
+        for (SpecimenInfo specimenInfo : peventInfo.sourceSpecimenInfos) {
+            Assert.assertEquals(sourceSpecs.get(0).specimen.getSpecimenType()
+                .getName(), specimenInfo.specimen.getSpecimenType().getName());
+
+            Assert.assertEquals(sourceSpecs.get(0).specimen.getActivityStatus()
+                .getName(), specimenInfo.specimen.getActivityStatus()
+                .getName());
+
+            Assert.assertEquals(clinicInfo.clinic.getName(),
+                specimenInfo.specimen.getOriginInfo().getCenter().getName());
+
+            Assert.assertEquals(siteInfo.site.getName(),
+                specimenInfo.specimen.getCurrentCenter().getName());
+
+            Assert.assertEquals(patientInfo.patient.getPnumber(),
+                specimenInfo.specimen.getCollectionEvent().getPatient()
+                    .getPnumber());
+
+            Assert.assertEquals(patientInfo.patient.getStudy().getName(),
+                specimenInfo.specimen.getCollectionEvent().getPatient()
+                    .getStudy().getName());
+
+        }
     }
 
     @Test
@@ -141,13 +179,14 @@ public class TestProcessingEvent extends TestAction {
         String worksheet = Utils.getRandomString(50);
         Date date = Utils.getRandomDate();
         EXECUTOR.exec(new ProcessingEventSaveAction(
-            null, siteId, date, worksheet, 1, null,
+            null, provisioning.siteId, date, worksheet, 1, null,
             new HashSet<Integer>()));
 
         // try to save another pevent with the same worksheet
         try {
-            EXECUTOR.exec(new ProcessingEventSaveAction(null, siteId,
-                new Date(), worksheet, 1, null, new HashSet<Integer>()));
+            EXECUTOR.exec(new ProcessingEventSaveAction(null,
+                provisioning.siteId, new Date(), worksheet, 1, null,
+                new HashSet<Integer>()));
             Assert
                 .fail("should not be able to use the same worksheet to 2 different pevents");
         } catch (DuplicatePropertySetException e) {
@@ -158,15 +197,20 @@ public class TestProcessingEvent extends TestAction {
     @Test
     public void delete() throws Exception {
         Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
-            null, siteId, Utils.getRandomDate(), Utils
+            null, provisioning.siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), 1, null,
             new HashSet<Integer>())).getId();
 
         EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
 
-        ProcessingEvent pe = (ProcessingEvent) session.get(
-            ProcessingEvent.class, pEventId);
-        Assert.assertNull(pe);
+        try {
+            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
+            Assert
+                .fail("one of the source specimen of this pevent has children. "
+                    + "Can't delete the processing event");
+        } catch (ModelNotFoundException e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
@@ -174,16 +218,17 @@ public class TestProcessingEvent extends TestAction {
         // add cevent and source specimens
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
-                patientId, siteId);
-        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR
-            .exec(new CollectionEventGetSpecimenInfosAction(ceventId,
-                false)).getList();
+                provisioning.patientIds.get(0), provisioning.siteId);
+        ArrayList<SpecimenInfo> sourceSpecs =
+            EXECUTOR
+                .exec(new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+                .getList();
         Integer spcId = sourceSpecs.get(0).specimen.getId();
 
         // create a processing event with one of the collection event source
         // specimen.
         Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
-            null, siteId, Utils.getRandomDate(), Utils
+            null, provisioning.siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), 1, null,
             new HashSet<Integer>(Arrays.asList(spcId)))).getId();
 
@@ -196,11 +241,14 @@ public class TestProcessingEvent extends TestAction {
         // children
         EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
 
+        try {
+            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
+            Assert.fail("processing event still exists");
+        } catch (ModelNotFoundException e) {
+            Assert.assertTrue(true);
+        }
+
         session.clear();
-        ProcessingEvent pe =
-            (ProcessingEvent) session.get(
-                ProcessingEvent.class, pEventId);
-        Assert.assertNull(pe);
         spc = (Specimen) session.load(Specimen.class, spcId);
         session.refresh(spc);
         Assert.assertNotNull(spc);
@@ -216,10 +264,10 @@ public class TestProcessingEvent extends TestAction {
         // add cevent and source specimens
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
-                patientId, siteId);
-        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR
-            .exec(new CollectionEventGetSpecimenInfosAction(ceventId,
-                false)).getList();
+                provisioning.patientIds.get(0), provisioning.siteId);
+        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
+            new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+            .getList();
         Integer spcId = sourceSpecs.get(0).specimen.getId();
 
         // FIXME need to add a child to the source specimen
@@ -228,7 +276,7 @@ public class TestProcessingEvent extends TestAction {
         // specimen.
         Integer pEventId = EXECUTOR.exec(
             new ProcessingEventSaveAction(
-                null, siteId, Utils.getRandomDate(),
+                null, provisioning.siteId, Utils.getRandomDate(),
                 Utils.getRandomString(50), 1, null,
                 new HashSet<Integer>(Arrays.asList(spcId)))).getId();
 

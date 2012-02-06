@@ -50,10 +50,8 @@ public class DispatchChangeStateAction implements Action<IdResult> {
             si.setReceivedAt( shipInfo.receivedAt);
             si.setWaybill(shipInfo.waybill);
 
-            ShippingMethod sm =
-                context
-                    .get(ShippingMethod.class, shipInfo.method.id,
-                        new ShippingMethod());
+            ShippingMethod sm = context.load(ShippingMethod.class,
+                shipInfo.shippingMethodId);
 
             si.setShippingMethod(sm);
             disp.setShipmentInfo(si);

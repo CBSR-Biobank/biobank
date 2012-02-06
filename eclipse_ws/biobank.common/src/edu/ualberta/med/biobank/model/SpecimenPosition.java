@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -21,6 +22,7 @@ public class SpecimenPosition extends AbstractPosition {
 
     private Container container;
     private Specimen specimen;
+    private String positionString;
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.SpecimenPosition.container.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,5 +44,15 @@ public class SpecimenPosition extends AbstractPosition {
 
     public void setSpecimen(Specimen specimen) {
         this.specimen = specimen;
+    }
+
+    @NotNull
+    @Column(name = "POSITION_STRING", length = 255, nullable = false)
+    public String getPositionString() {
+        return this.positionString;
+    }
+
+    public void setPositionString(String positionString) {
+        this.positionString = positionString;
     }
 }

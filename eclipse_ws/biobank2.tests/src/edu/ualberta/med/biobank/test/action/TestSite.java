@@ -9,13 +9,11 @@ import java.util.Set;
 import org.hibernate.Query;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSpecimenInfosAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
@@ -36,6 +34,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenDeleteAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -50,9 +49,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestSite extends TestAction {
 
-    @Rule
-    public TestName testname = new TestName();
-
     private String name;
 
     private SiteSaveAction siteSaveAction;
@@ -61,7 +57,7 @@ public class TestSite extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + R.nextInt();
+        name = getMethodNameR();
 
         siteSaveAction =
             SiteHelper.getSaveAction(name, name, ActivityStatusEnum.ACTIVE);
@@ -73,8 +69,7 @@ public class TestSite extends TestAction {
         siteSaveAction.setName(null);
         try {
             EXECUTOR.exec(siteSaveAction);
-            Assert.fail(
-                "should not be allowed to add site with no name");
+            Assert.fail("should not be allowed to add site with no name");
         } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
@@ -112,8 +107,9 @@ public class TestSite extends TestAction {
         }
 
         // test invalid act status: 5, -1
-
-        siteSaveAction.setAddress(new Address());
+        Address address = new Address();
+        address.setCity(name);
+        siteSaveAction.setAddress(address);
         siteSaveAction.setStudyIds(null);
         try {
             EXECUTOR.exec(siteSaveAction);
@@ -129,26 +125,47 @@ public class TestSite extends TestAction {
     }
 
     @Test
+    public void checkGetAction() throws Exception {
+        Provisioning provisioning =
+            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+
+        Integer ceventId = CollectionEventHelper
+            .createCEventWithSourceSpecimens(EXECUTOR,
+                provisioning.patientIds.get(0), provisioning.clinicId);
+        EXECUTOR.exec(new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+            .getList();
+
+        SiteInfo siteInfo =
+            EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
+
+        Assert.assertEquals(name + "_site_city", siteInfo.site.getAddress()
+            .getCity());
+        Assert.assertEquals("Active", siteInfo.site.getActivityStatus()
+            .getName());
+        Assert.assertEquals(new Long(1), siteInfo.patientCount);
+        Assert.assertEquals(new Long(1), siteInfo.collectionEventCount);
+        Assert.assertEquals(new Long(0), siteInfo.aliquotedSpecimenCount);
+    }
+
+    @Test
     public void nameChecks() throws Exception {
         Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
 
         // ensure we can change name on existing clinic
-        SiteInfo siteInfo =
-            EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
         siteInfo.site.setName(name + "_2");
-        siteSaveAction = SiteHelper.getSaveAction(EXECUTOR, siteInfo);
+        siteSaveAction = SiteHelper.getSaveAction(siteInfo);
         EXECUTOR.exec(siteSaveAction);
 
         // ensure we can change short name on existing site
         siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
         siteInfo.site.setNameShort(name + "_2");
-        siteSaveAction = SiteHelper.getSaveAction(EXECUTOR, siteInfo);
+        siteSaveAction = SiteHelper.getSaveAction(siteInfo);
         EXECUTOR.exec(siteSaveAction);
 
         // test for duplicate name
-        SiteSaveAction saveSite =
-            SiteHelper.getSaveAction(name + "_2", name,
-                ActivityStatusEnum.ACTIVE);
+        SiteSaveAction saveSite = SiteHelper.getSaveAction(name + "_2", name,
+            ActivityStatusEnum.ACTIVE);
         try {
             EXECUTOR.exec(saveSite);
             Assert.fail("should not be allowed to add site with same name");
@@ -167,7 +184,34 @@ public class TestSite extends TestAction {
         } catch (ActionCheckException e) {
             Assert.assertTrue(true);
         }
+    }
 
+    @Test
+    public void comments() {
+        // save with no comments
+        Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
+        SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        Assert.assertEquals(0, siteInfo.site.getCommentCollection().size());
+
+        siteInfo = addComment(siteId);
+        Assert.assertEquals(1, siteInfo.site.getCommentCollection().size());
+
+        siteInfo = addComment(siteId);
+        Assert.assertEquals(2, siteInfo.site.getCommentCollection().size());
+
+        // TODO: check full name on each comment's user
+        // for (Comment comment : siteInfo.site.getCommentCollection()) {
+        //
+        // }
+
+    }
+
+    private SiteInfo addComment(Integer siteId) {
+        SiteSaveAction siteSaveAction = SiteHelper.getSaveAction(
+            EXECUTOR.exec(new SiteGetInfoAction(siteId)));
+        siteSaveAction.setCommentText(Utils.getRandomString(20, 30));
+        EXECUTOR.exec(siteSaveAction).getId();
+        return EXECUTOR.exec(new SiteGetInfoAction(siteId));
     }
 
     @Test
@@ -197,8 +241,7 @@ public class TestSite extends TestAction {
         for (Integer studyId : studyIdsSet1) {
             expectedStudyIds.add(studyId);
 
-            SiteSaveAction siteSaveAction =
-                SiteHelper.getSaveAction(EXECUTOR, siteInfo);
+            SiteSaveAction siteSaveAction = SiteHelper.getSaveAction(siteInfo);
             studyIds = getStudyIds(siteInfo.studyCountInfo);
             studyIds.add(studyId);
             siteSaveAction.setStudyIds(studyIds);
@@ -230,7 +273,7 @@ public class TestSite extends TestAction {
         for (Integer studyId : studyIdsSet1) {
             expectedStudyIds.remove(studyId);
 
-            siteSaveAction = SiteHelper.getSaveAction(EXECUTOR, siteInfo);
+            siteSaveAction = SiteHelper.getSaveAction(siteInfo);
             studyIds = getStudyIds(siteInfo.studyCountInfo);
             studyIds.remove(studyId);
             siteSaveAction.setStudyIds(studyIds);
@@ -244,15 +287,14 @@ public class TestSite extends TestAction {
         siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId2));
         studyIds = getStudyIds(siteInfo.studyCountInfo);
         studyIds.removeAll(studyIdsSet2);
-        siteSaveAction = SiteHelper.getSaveAction(EXECUTOR, siteInfo);
+        siteSaveAction = SiteHelper.getSaveAction(siteInfo);
         EXECUTOR.exec(siteSaveAction);
         siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
         Assert.assertTrue(getStudyIds(siteInfo.studyCountInfo).isEmpty());
 
         // attempt to add an invalid study ID
         siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
-        SiteSaveAction siteSaveAction =
-            SiteHelper.getSaveAction(EXECUTOR, siteInfo);
+        SiteSaveAction siteSaveAction = SiteHelper.getSaveAction(siteInfo);
         studyIds = getStudyIds(siteInfo.studyCountInfo);
         studyIds.add(-1);
         siteSaveAction.setStudyIds(studyIds);
@@ -262,6 +304,43 @@ public class TestSite extends TestAction {
         } catch (ModelNotFoundException e) {
             Assert.assertTrue(true);
         }
+    }
+
+    @Test
+    public void containerTypes() {
+        Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
+
+        List<ContainerLabelingScheme> labelingSchemes =
+            new ArrayList<ContainerLabelingScheme>(
+                getContainerLabelingSchemes().values());
+
+        String ctName = name + "FREEZER01";
+
+        ContainerTypeSaveAction ctSaveAction =
+            ContainerTypeHelper.getSaveAction(ctName, ctName, siteId, true, 6,
+                10, labelingSchemes.get(0).getId(), R.nextDouble());
+        Integer ctId = EXECUTOR.exec(ctSaveAction).getId();
+
+        SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        Assert.assertEquals(1, siteInfo.containerTypes.size());
+        Assert.assertEquals(ctId, siteInfo.containerTypes.get(0)
+            .getContainerType().getId());
+        Assert.assertEquals(ctName, siteInfo.containerTypes.get(0)
+            .getContainerType().getName());
+
+        // add another container
+        ctName += "_2";
+        ctSaveAction =
+            ContainerTypeHelper.getSaveAction(ctName, ctName, siteId, true, 3,
+                8, labelingSchemes.get(1).getId(), R.nextDouble());
+        ctId = EXECUTOR.exec(ctSaveAction).getId();
+
+        siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        Assert.assertEquals(2, siteInfo.containerTypes.size());
+        Assert.assertEquals(ctId, siteInfo.containerTypes.get(1)
+            .getContainerType().getId());
+        Assert.assertEquals(ctName, siteInfo.containerTypes.get(1)
+            .getContainerType().getName());
     }
 
     private Set<Integer> getStudyIds(List<StudyCountInfo> studyCountInfo) {
@@ -294,7 +373,8 @@ public class TestSite extends TestAction {
         ContainerTypeSaveAction ctSaveAction =
             ContainerTypeHelper.getSaveAction(name, name, provisioning.siteId,
                 true, 3, 10,
-                getContainerLabelingSchemes().get(0).getId());
+                getContainerLabelingSchemes().values().iterator().next()
+                    .getId(), R.nextDouble());
         Integer containerTypeId = EXECUTOR.exec(ctSaveAction).getId();
         provisioning.containerTypeIds.add(containerTypeId);
         return provisioning;
@@ -325,7 +405,7 @@ public class TestSite extends TestAction {
         Integer containerTypeId = provisioning.containerTypeIds.get(0);
 
         ContainerSaveAction containerSaveAction = new ContainerSaveAction();
-        containerSaveAction.setStatusId(ActivityStatusEnum.ACTIVE.getId());
+        containerSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
         containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
         containerSaveAction.setLabel("01");
         containerSaveAction.setSiteId(provisioning.siteId);
@@ -356,9 +436,9 @@ public class TestSite extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
-        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR
-            .exec(new CollectionEventGetSpecimenInfosAction(ceventId,
-                false)).getList();
+        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
+            new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+            .getList();
 
         // create a processing event with one of the collection event source
         // specimens

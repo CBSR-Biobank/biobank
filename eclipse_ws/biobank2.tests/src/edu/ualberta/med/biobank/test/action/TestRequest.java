@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Assert;
@@ -12,15 +13,17 @@ import org.junit.rules.TestName;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestClaimAction;
-import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
+import edu.ualberta.med.biobank.common.action.request.RequestDeleteAction;
+import edu.ualberta.med.biobank.common.action.request.RequestGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.request.RequestStateChangeAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
+import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
@@ -85,11 +88,12 @@ public class TestRequest extends TestAction {
         Integer rId = EXECUTOR.exec(action).getId();
 
         // make sure you got what was requested
-        RequestGetInfoAction requestGetInfoAction =
-            new RequestGetInfoAction(rId);
-        RequestReadInfo rInfo = EXECUTOR.exec(requestGetInfoAction);
+        RequestGetSpecimenInfosAction specAction =
+            new RequestGetSpecimenInfosAction(rId);
+        List<Object[]> specInfo = EXECUTOR.exec(specAction).getList();
 
-        for (RequestSpecimen spec : rInfo.specimens) {
+        for (int i = 0; i < specInfo.size(); i++) {
+            RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
             Assert.assertTrue(specs.contains(spec.getSpecimen()
                 .getInventoryId()));
         }
@@ -99,23 +103,26 @@ public class TestRequest extends TestAction {
     public void testClaim() throws Exception {
         Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
 
-        RequestGetInfoAction requestGetInfoAction =
-            new RequestGetInfoAction(rId);
-        RequestReadInfo rInfo = EXECUTOR.exec(requestGetInfoAction);
-
+        RequestGetSpecimenInfosAction specAction =
+            new RequestGetSpecimenInfosAction(rId);
+        List<Object[]> specInfo = EXECUTOR.exec(specAction).getList();
         List<Integer> ids = new ArrayList<Integer>();
-        for (RequestSpecimen rs : rInfo.specimens) {
-            ids.add(rs.getId());
+
+        for (int i = 0; i < specInfo.size(); i++) {
+            RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
+            ids.add(spec.getId());
         }
 
         RequestClaimAction claimAction =
             new RequestClaimAction(ids);
         EXECUTOR.exec(claimAction);
 
-        rInfo = EXECUTOR.exec(requestGetInfoAction);
-        for (RequestSpecimen spec : rInfo.specimens)
+        specInfo = EXECUTOR.exec(specAction).getList();
+        for (int i = 0; i < specInfo.size(); i++) {
+            RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
             Assert.assertTrue(spec.getClaimedBy() != null
                 && !spec.getClaimedBy().equals(""));
+        }
 
     }
 
@@ -123,13 +130,14 @@ public class TestRequest extends TestAction {
     public void testStateChanges() throws Exception {
         Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
 
-        RequestGetInfoAction requestGetInfoAction =
-            new RequestGetInfoAction(rId);
-        RequestReadInfo rInfo = EXECUTOR.exec(requestGetInfoAction);
-
+        RequestGetSpecimenInfosAction specAction =
+            new RequestGetSpecimenInfosAction(rId);
+        List<Object[]> specInfo = EXECUTOR.exec(specAction).getList();
         List<Integer> ids = new ArrayList<Integer>();
-        for (RequestSpecimen rs : rInfo.specimens) {
-            ids.add(rs.getId());
+
+        for (int i = 0; i < specInfo.size(); i++) {
+            RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
+            ids.add(spec.getId());
         }
 
         RequestStateChangeAction dispatchAction =
@@ -137,21 +145,34 @@ public class TestRequest extends TestAction {
                 RequestSpecimenState.DISPATCHED_STATE);
         EXECUTOR.exec(dispatchAction);
 
-        rInfo = EXECUTOR.exec(requestGetInfoAction);
-        for (RequestSpecimen spec : rInfo.specimens)
+        specInfo = EXECUTOR.exec(specAction).getList();
+        for (int i = 0; i < specInfo.size(); i++) {
+            RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
             Assert.assertTrue(RequestSpecimenState.getState(spec.getState())
                 .equals(RequestSpecimenState.DISPATCHED_STATE));
+        }
     }
 
     @Test
     public void testDelete() throws Exception {
         Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
 
-        RequestGetInfoAction requestGetInfoAction =
-            new RequestGetInfoAction(rId);
-        RequestReadInfo rInfo = EXECUTOR.exec(requestGetInfoAction);
+        RequestDeleteAction delete = new RequestDeleteAction(rId);
+        EXECUTOR.exec(delete);
 
-        session.delete(rInfo.request);
+        rId = RequestHelper.createRequest(EXECUTOR, rgId);
+        session.beginTransaction();
+        Request r = (Request) session.get(Request.class, rId);
+        r.setSubmitted(new Date());
+        session.saveOrUpdate(r);
+        session.getTransaction().commit();
+        delete = new RequestDeleteAction(rId);
+        try {
+            EXECUTOR.exec(delete);
+            Assert.fail();
+        } catch (ActionException e) {
+            // good
+        }
     }
 
 }

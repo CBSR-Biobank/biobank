@@ -510,6 +510,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return hasNewSpecimens;
     }
 
+    @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(DispatchPeer.SENDER_CENTER));
@@ -536,6 +537,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         tasks.add(new ResetInternalStateQueryTask(this));
     }
 
+    @Deprecated
     private void persistSpecimens(TaskList tasks) {
         for (DispatchSpecimenWrapper dispatchSpecimen : dispatchSpecimensToPersist) {
             SpecimenWrapper specimen = dispatchSpecimen.getSpecimen();
@@ -543,6 +545,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         }
     }
 
+    @Deprecated
     private void removeSpecimensFromParents(TaskList tasks) {
         if (DispatchState.IN_TRANSIT.equals(getDispatchState())) {
             Collection<DispatchSpecimenWrapper> dispatchSpecimens =

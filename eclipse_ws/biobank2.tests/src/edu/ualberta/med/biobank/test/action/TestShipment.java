@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
@@ -62,6 +63,13 @@ public class TestShipment extends TestAction {
                 patientId, siteId, centerId);
         ShipmentInfoSaveInfo shipsave =
             ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
+
+        for (Integer spec : oisave.addedSpecIds) {
+            Assert.assertTrue(((Specimen) session.load(Specimen.class, spec))
+                .getOriginInfo().getCenter().getId()
+                .equals(siteId));
+        }
+
         Integer id =
             EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
@@ -72,13 +80,19 @@ public class TestShipment extends TestAction {
         Assert.assertTrue(info.oi.getCenter().getId().equals(oisave.centerId));
         Assert.assertTrue(info.oi.getReceiverSite().getId()
             .equals(oisave.siteId));
-        for (Specimen spec : info.specimens)
+        for (Specimen spec : info.specimens) {
             Assert.assertTrue(oisave.addedSpecIds.contains(spec.getId()));
+            Assert.assertTrue(spec.getOriginInfo().getCenter().getId()
+                .equals(centerId));
+            Assert.assertTrue(spec.getOriginInfo().getReceiverSite().getId()
+                .equals(siteId));
+            Assert.assertTrue(spec.getCurrentCenter().getId().equals(siteId));
+        }
         for (Specimen spec : info.specimens)
             Assert.assertTrue(!oisave.removedSpecIds.contains(spec.getId()));
 
         oisave.removedSpecIds = oisave.addedSpecIds;
-        oisave.addedSpecIds = null;
+        oisave.addedSpecIds = new HashSet<Integer>();
         id =
             EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
@@ -101,9 +115,14 @@ public class TestShipment extends TestAction {
             .getId();
 
         // Set of null
-        oisave.addedSpecIds = mut.getSetWithNull();
-        EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
-            .getId();
+        try {
+            oisave.addedSpecIds = mut.getSetWithNull();
+            EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+                .getId();
+            Assert.fail();
+        } catch (ActionException e) {
+            // cool
+        }
 
         // Out of Bounds
         try {
@@ -126,7 +145,63 @@ public class TestShipment extends TestAction {
             EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
 
-        ShipmentDeleteAction action = new ShipmentDeleteAction(id);
+        for (Integer spec : oisave.addedSpecIds) {
+            Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
+                .getOriginInfo()
+                .getCenter().getId()
+                .equals(centerId));
+            Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
+                .getOriginInfo().getReceiverSite().getId()
+                .equals(siteId));
+            Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
+                .getCurrentCenter().getId()
+                .equals(siteId));
+        }
+
+        ShipmentDeleteAction action = new ShipmentDeleteAction(id, siteId);
         EXECUTOR.exec(action);
+
+        session.close();
+        session = SESSION_PROVIDER.openSession();
+
+        for (Integer spec : oisave.addedSpecIds) {
+            Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
+                .getOriginInfo()
+                .getCenter().getId()
+                .equals(siteId));
+            Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
+                .getCurrentCenter().getId()
+                .equals(siteId));
+        }
+
+    }
+
+    @Test
+    public void testComment() throws Exception {
+        OriginInfoSaveInfo oisave =
+            OriginInfoHelper.createSaveOriginInfoSpecimenInfoRandom(EXECUTOR,
+                patientId, siteId, centerId);
+        ShipmentInfoSaveInfo shipsave =
+            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
+        Integer id =
+            EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+                .getId();
+
+        oisave.oiId = id;
+
+        ShipmentReadInfo info =
+            EXECUTOR.exec(new ShipmentGetInfoAction(id));
+
+        Assert.assertEquals(1, info.oi.getCommentCollection().size());
+        EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+            .getId();
+        info =
+            EXECUTOR.exec(new ShipmentGetInfoAction(id));
+        Assert.assertEquals(2, info.oi.getCommentCollection().size());
+        EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+            .getId();
+        info =
+            EXECUTOR.exec(new ShipmentGetInfoAction(id));
+        Assert.assertEquals(3, info.oi.getCommentCollection().size());
     }
 }

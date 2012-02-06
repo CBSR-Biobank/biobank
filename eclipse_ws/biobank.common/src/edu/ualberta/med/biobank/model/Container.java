@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
+import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,10 +14,11 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotEmpty;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -88,8 +90,7 @@ public class Container extends AbstractBiobankModel {
         this.temperature = temperature;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.path.NotEmpty}")
-    @Column(name = "PATH", nullable = false)
+    @Column(name = "PATH")
     public String getPath() {
         return this.path;
     }
@@ -182,4 +183,133 @@ public class Container extends AbstractBiobankModel {
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }
+
+    @Transient
+    public RowColPos getPositionAsRowCol() {
+        return this.position == null ? null : this.position.getPosition();
+    }
+
+    @Transient
+    public Container getParentContainer() {
+        return this.position == null ? null : this.position
+            .getParentContainer();
+    }
+
+    @Transient
+    public String getPositionString() {
+        Container parent = getParentContainer();
+        if (parent != null) {
+            RowColPos pos = getPositionAsRowCol();
+            if (pos != null) {
+                return parent.getContainerType().getPositionString(pos);
+            }
+        }
+        return null;
+    }
+
+    public boolean isPositionFree(RowColPos requestedPosition) {
+        if (childPositionCollection.size() > 0) {
+            for (ContainerPosition pos : childPositionCollection) {
+                RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
+                if (requestedPosition.equals(rcp)) {
+                    return false;
+                }
+            }
+        }
+
+        // else assume this container has specimens
+        for (SpecimenPosition pos : specimenPositionCollection) {
+            RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
+            if (requestedPosition.equals(rcp)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Transient
+    public Container getChild(RowColPos requestedPosition) throws Exception {
+        if (childPositionCollection.size() == 0) {
+            throw new Exception("container does not have children");
+        }
+
+        for (ContainerPosition pos : childPositionCollection) {
+            RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
+            if (requestedPosition.equals(rcp)) {
+                return pos.getContainer();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Label can start with parent's label as prefix or without.
+     * 
+     * @param label
+     * @return
+     * @throws Exception
+     */
+    @Transient
+    public Container getChildByLabel(String childLabel) throws Exception {
+        if (containerType == null) {
+            throw new Exception("container type is null");
+        }
+
+        // remove parent label from child label
+        if (childLabel.startsWith(label)) {
+            childLabel = childLabel.substring(label.length());
+        }
+        RowColPos pos = getPositionFromLabelingScheme(label);
+        return getChild(pos);
+    }
+
+    /**
+     * position is 2 letters, or 2 number or 1 letter and 1 number... this
+     * position string is used to get the correct row and column index the given
+     * position String.
+     * 
+     * @throws Exception
+     */
+    @Transient
+    public RowColPos getPositionFromLabelingScheme(String position)
+        throws Exception {
+        RowColPos rcp = containerType.getRowColFromPositionString(position);
+        if (rcp != null) {
+            if (rcp.getRow() >= containerType.getRowCapacity()
+                || rcp.getCol() >= containerType.getColCapacity()) {
+                throw new Exception(
+                    MessageFormat
+                        .format(
+                            "Can''t use position {0} in container {1}. Reason: capacity = {2}*{3}",
+                            position, getFullInfoLabel(),
+                            containerType.getRowCapacity(),
+                            containerType.getColCapacity()));
+            }
+            if (rcp.getRow() < 0 || rcp.getCol() < 0) {
+                throw new Exception(
+                    MessageFormat.format(
+                        "Position ''{0}'' is invalid for this container {1}",
+                        position, getFullInfoLabel()));
+            }
+        }
+        return rcp;
+    }
+
+    /**
+     * @return a string with the label of this container + the short name of its
+     *         type
+     * 
+     */
+    @Transient
+    public String getFullInfoLabel() {
+        if ((containerType == null) || (containerType.getNameShort() == null)) {
+            return getLabel();
+        }
+        return getLabel() + " (" + containerType.getNameShort() + ")";
+    }
+
+    public boolean hasSpecimens() {
+        return (specimenPositionCollection.size() > 0);
+    }
+
 }

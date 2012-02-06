@@ -17,17 +17,20 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 
 public class UpdateContainerChildrenAction extends WrapperAction<Container> {
     private static final long serialVersionUID = 1L;
-    private static final String PATH_DELIMITER = ContainerWrapper.PATH_DELIMITER;
-    private static final Property<String, Container> POSITION_STRING = ContainerPeer.POSITION
-        .to(ContainerPositionPeer.POSITION_STRING);
-    private static final Property<Container, Container> PARENT_CONTAINER = ContainerPeer.POSITION
-        .to(ContainerPositionPeer.PARENT_CONTAINER);
-    private static final Property<Integer, Container> PARENT_CONTAINER_ID = PARENT_CONTAINER
-        .to(ContainerPeer.ID);
-    private static final Property<String, Container> PARENT_CONTAINER_PATH = PARENT_CONTAINER
-        .to(ContainerPeer.PATH);
-    private static final Property<String, Container> PARENT_CONTAINER_LABEL = PARENT_CONTAINER
-        .to(ContainerPeer.LABEL);
+    private static final String PATH_DELIMITER =
+        ContainerWrapper.PATH_DELIMITER;
+    private static final Property<Container, Container> PARENT_CONTAINER =
+        ContainerPeer.POSITION
+            .to(ContainerPositionPeer.PARENT_CONTAINER);
+    private static final Property<Integer, Container> PARENT_CONTAINER_ID =
+        PARENT_CONTAINER
+            .to(ContainerPeer.ID);
+    private static final Property<String, Container> PARENT_CONTAINER_PATH =
+        PARENT_CONTAINER
+            .to(ContainerPeer.PATH);
+    private static final Property<String, Container> PARENT_CONTAINER_LABEL =
+        PARENT_CONTAINER
+            .to(ContainerPeer.LABEL);
     // @formatter:off
     @SuppressWarnings("nls")
     private static final String UPDATE_HQL =
@@ -40,7 +43,6 @@ public class UpdateContainerChildrenAction extends WrapperAction<Container> {
     private static final String SELECT_CHILDREN_HQL = 
         "\nSELECT o." + ContainerPeer.ID.getName() +
         "\n      ,o." + PARENT_CONTAINER_LABEL.getName() +
-        "\n      ,o." + POSITION_STRING.getName() +
         "\n      ,o." + PARENT_CONTAINER_PATH.getName() +
         "\n FROM " + Container.class.getName() + " o" +
         "\n WHERE o." + PARENT_CONTAINER_ID.getName() + " = ?";

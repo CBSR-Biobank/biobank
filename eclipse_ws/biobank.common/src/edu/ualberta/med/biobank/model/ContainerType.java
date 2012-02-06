@@ -12,15 +12,20 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+<<<<<<< HEAD
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
+=======
+import edu.ualberta.med.biobank.common.util.RowColPos;
+>>>>>>> development
 
 @Entity
 @Table(name = "CONTAINER_TYPE",
@@ -42,7 +47,7 @@ public class ContainerType extends AbstractBiobankModel {
     private String name;
     private String nameShort;
     private boolean topLevel = false;
-    private double defaultTemperature;
+    private Double defaultTemperature;
     private Set<SpecimenType> specimenTypeCollection =
         new HashSet<SpecimenType>(0);
     private Set<ContainerType> childContainerTypeCollection =
@@ -87,11 +92,11 @@ public class ContainerType extends AbstractBiobankModel {
 
     // TODO: change to decimal
     @Column(name = "DEFAULT_TEMPERATURE")
-    public double getDefaultTemperature() {
+    public Double getDefaultTemperature() {
         return this.defaultTemperature;
     }
 
-    public void setDefaultTemperature(double defaultTemperature) {
+    public void setDefaultTemperature(Double defaultTemperature) {
         this.defaultTemperature = defaultTemperature;
     }
 
@@ -186,5 +191,36 @@ public class ContainerType extends AbstractBiobankModel {
     public void setParentContainerTypeCollection(
         Set<ContainerType> parentContainerTypeCollection) {
         this.parentContainerTypeCollection = parentContainerTypeCollection;
+    }
+
+    @Transient
+    public Integer getRowCapacity() {
+        return this.capacity.getRowCapacity();
+    }
+
+    @Transient
+    public Integer getColCapacity() {
+        return this.capacity.getColCapacity();
+    }
+
+    @Transient
+    public String getPositionString(RowColPos position) {
+        return ContainerLabelingScheme.getPositionString(position,
+            getChildLabelingScheme().getId(), getRowCapacity(),
+            getColCapacity());
+
+    }
+
+    @Transient
+    public RowColPos getRowColFromPositionString(String position)
+        throws Exception {
+        return childLabelingScheme.getRowColFromPositionString(position,
+            getRowCapacity(), getColCapacity());
+    }
+
+    @Transient
+    public boolean isPallet96() {
+        return RowColPos.PALLET_96_ROW_MAX.equals(getRowCapacity())
+            && RowColPos.PALLET_96_COL_MAX.equals(getColCapacity());
     }
 }

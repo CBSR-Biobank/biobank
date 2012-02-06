@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
+@Deprecated
 public class TestHibernateLocking extends TestDatabase {
 
     @Test
