@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 @Entity
 @DiscriminatorValue("Clinic")
-@NotUsed(by = Study.class, property = "contactCollection.clinic", groups = PreDelete.class)
+@NotUsed(by = Contact.class, property = "clinic", groups = PreDelete.class)
 public class Clinic extends Center {
     private static final long serialVersionUID = 1L;
 
