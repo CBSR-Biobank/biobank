@@ -25,12 +25,8 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Entity
 @Table(name = "PROCESSING_EVENT")
 @NotUsed.List({
-    @NotUsed(by = Specimen.class, property = "processingEvent",
-        groups = PreDelete.class,
-        message = "edu.ualberta.med.biobank.model.ProcessingEvent.NotUsed.specimen.processingEvent"),
-    @NotUsed(by = Specimen.class, property = "parentSpecimen.processingEvent",
-        groups = PreDelete.class,
-        message = "edu.ualberta.med.biobank.model.ProcessingEvent.NotUsed.specimen.parentSpecimen.processingEvent")
+    @NotUsed(by = Specimen.class, property = "processingEvent", groups = PreDelete.class),
+    @NotUsed(by = Specimen.class, property = "parentSpecimen.processingEvent", groups = PreDelete.class)
 })
 // Unable to delete processing event '{0}' ({1}) since some of its specimens
 // have already been derived into others specimens.

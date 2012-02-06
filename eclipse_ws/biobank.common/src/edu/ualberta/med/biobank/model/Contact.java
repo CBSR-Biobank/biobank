@@ -18,8 +18,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 @Entity
 @Table(name = "CONTACT")
-@Empty(property = "studyColllection",groups = PreDelete.class,
-    message = "edu.ualberta.med.biobank.model.Contact.Empty.studyCollection")
+@Empty(property = "studyColllection",groups = PreDelete.class)
 public class Contact extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

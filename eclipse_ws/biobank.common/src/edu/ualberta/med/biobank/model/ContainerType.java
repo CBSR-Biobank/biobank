@@ -32,15 +32,9 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Unique(properties = { "site", "nameShort" }, groups = PrePersist.class)
 })
 @NotUsed.List({
-    @NotUsed(by = Container.class, property = "containerType",
-        groups = PreDelete.class,
-        message = "edu.ualberta.med.biobank.model.ContainerType.NotUsed.container.containerType"),
-    @NotUsed(by = ContainerType.class, property = "parentContainerTypeCollection",
-        groups = PreDelete.class,
-        message = "edu.ualberta.med.biobank.model.ContainerType.NotUsed.containerType.parentContainerTypeCollection"),
-    @NotUsed(by = ContainerType.class, property = "childContainerTypeCollection",
-        groups = PreDelete.class,
-        message = "edu.ualberta.med.biobank.model.ContainerType.NotUsed.containerType.childContainerTypeCollection")
+    @NotUsed(by = Container.class, property = "containerType", groups = PreDelete.class),
+    @NotUsed(by = ContainerType.class, property = "parentContainerTypeCollection", groups = PreDelete.class),
+    @NotUsed(by = ContainerType.class, property = "childContainerTypeCollection", groups = PreDelete.class)
 })
 public class ContainerType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;

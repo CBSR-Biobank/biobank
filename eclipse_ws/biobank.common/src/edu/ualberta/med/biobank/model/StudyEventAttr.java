@@ -13,9 +13,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 @Entity
 @Table(name = "STUDY_EVENT_ATTR")
-@NotUsed(by = EventAttr.class, property = "studyEventAttr",
-    groups = PreDelete.class,
-    message = "edu.ualberta.med.biobank.model.StudyEventAttr.NotUsed.eventAttr.studyEventAttr")
+@NotUsed(by = EventAttr.class, property = "studyEventAttr", groups = PreDelete.class)
 public class StudyEventAttr extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

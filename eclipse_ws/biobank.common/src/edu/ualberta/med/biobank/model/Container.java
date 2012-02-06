@@ -38,10 +38,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Unique(properties = { "site", "productBarcode" }, groups = PrePersist.class)
 })
 @Empty.List({
-    @Empty(property = "specimenPositionCollection", groups = PreDelete.class,
-        message = "edu.ualberta.med.biobank.model.Container.Empty.specimenPositionCollection"),
-    @Empty(property = "childPositionCollection", groups = PreDelete.class,
-        message = "edu.ualberta.med.biobank.model.Container.Empty.childPositionCollection")
+    @Empty(property = "specimenPositionCollection", groups = PreDelete.class),
+    @Empty(property = "childPositionCollection", groups = PreDelete.class)
 })
 public class Container extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;

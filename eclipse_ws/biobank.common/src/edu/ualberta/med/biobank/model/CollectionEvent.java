@@ -29,8 +29,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "PATIENT_ID", "VISIT_NUMBER" }) })
 @Unique(properties = { "patient", "visitNumber" }, groups = PrePersist.class)
-@Empty(property = "allSpecimenCollection", groups = PreDelete.class,
-    message = "edu.ualberta.med.biobank.model.CollectionEvent.Empty.allSpecimenCollection")
+@Empty(property = "allSpecimenCollection", groups = PreDelete.class)
 public class CollectionEvent extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

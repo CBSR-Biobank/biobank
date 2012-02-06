@@ -30,8 +30,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Unique(properties = "name", groups = PrePersist.class),
     @Unique(properties = "nameShort", groups = PrePersist.class)
 })
-@Empty(property = "patientCollection", groups = PreDelete.class,
-    message = "edu.ualberta.med.biobank.model.Study.Empty.patientCollection")
+@Empty(property = "patientCollection", groups = PreDelete.class)
 public class Study extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

@@ -25,21 +25,11 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Unique(properties = "nameShort", groups = PrePersist.class)
 })
 @NotUsed.List({
-    @NotUsed(by = Specimen.class, property = "specimenType",
-        groups = PreDelete.class,
-        message = "edu.ualberta.med.biobank.model.SpecimenType.NotUsed.specimen.specimenType"),
-    @NotUsed(by = SourceSpecimen.class, property = "specimenType",
-        groups = PreDelete.class,
-        message = "edu.ualberta.med.biobank.model.SpecimenType.NotUsed.sourceSpecimen.specimenType"),
-    @NotUsed(by = AliquotedSpecimen.class, property = "specimenType",
-        groups = PreDelete.class,
-        message = "edu.ualberta.med.biobank.model.SpecimenType.NotUsed.aliquotedSpecimen.specimenType"),
-    @NotUsed(by = SpecimenType.class, property = "parentSpecimenTypeCollection",
-        groups = PreDelete.class,
-        message = "edu.ualberta.med.biobank.model.SpecimenType.NotUsed.specimenType.parentSpecimenTypeCollection"),
-    @NotUsed(by = SpecimenType.class, property = "childSpecimenTypeCollection",
-        groups = PreDelete.class,
-        message = "edu.ualberta.med.biobank.model.SpecimenType.NotUsed.specimenType.carentSpecimenTypeCollection")
+    @NotUsed(by = Specimen.class, property = "specimenType", groups = PreDelete.class),
+    @NotUsed(by = SourceSpecimen.class, property = "specimenType", groups = PreDelete.class),
+    @NotUsed(by = AliquotedSpecimen.class, property = "specimenType", groups = PreDelete.class),
+    @NotUsed(by = SpecimenType.class, property = "parentSpecimenTypeCollection", groups = PreDelete.class),
+    @NotUsed(by = SpecimenType.class, property = "childSpecimenTypeCollection", groups = PreDelete.class)
 })
 public class SpecimenType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;

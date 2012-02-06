@@ -14,9 +14,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "SHIPPING_METHOD")
 @Unique(properties = "name", groups = PrePersist.class)
-@NotUsed(by = ShipmentInfo.class, property = "shippingMethod",
-    groups = PreDelete.class,
-    message = "edu.ualberta.med.biobank.model.ShippingMethod.NotUsed.shippingMethod")
+@NotUsed(by = ShipmentInfo.class, property = "shippingMethod", groups = PreDelete.class)
 public class ShippingMethod extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
