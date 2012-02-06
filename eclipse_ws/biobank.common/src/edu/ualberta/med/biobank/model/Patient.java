@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "PATIENT")
 @Unique(properties = "pnumber", groups = PrePersist.class)
-@NotUsed(by = Specimen.class, property = "patient", groups = PreDelete.class)
+@NotUsed(by = Specimen.class, property = "collectionEvent.patient", groups = PreDelete.class)
 @Empty(property = "collectionEventCollection", groups = PreDelete.class)
 public class Patient extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;

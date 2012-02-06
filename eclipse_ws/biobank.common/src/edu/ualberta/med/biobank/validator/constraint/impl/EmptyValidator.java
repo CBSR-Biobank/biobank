@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.validator.constraint.Empty;
 
 public class EmptyValidator extends SessionAwareConstraintValidator<Object>
     implements ConstraintValidator<Empty, Object> {
-    private static final String SIZE_QUERY =
+    private static final String SIZE_QUERY_TEMPLATE =
         "SELECT {0}.size FROM {1} o WHERE o = ?";
 
     private String property;
@@ -74,7 +74,7 @@ public class EmptyValidator extends SessionAwareConstraintValidator<Object>
         // BUT, we would still have a problem if the database is out of sync
         // from the local collection.
 
-        String hql = MessageFormat.format(SIZE_QUERY,
+        String hql = MessageFormat.format(SIZE_QUERY_TEMPLATE,
             property, meta.getMappedClass(EntityMode.POJO).getName());
 
         Query query = getSession().createQuery(hql).setParameter(0, value);
