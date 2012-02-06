@@ -226,7 +226,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         }
     }
 
-    @SuppressWarnings("unused")
     public void loadChildrenBackground(final boolean updateNode) {
         if ((childUpdateThread != null) && childUpdateThread.isAlive()) {
             loadChildrenSemaphore.release();

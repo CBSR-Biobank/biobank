@@ -589,7 +589,7 @@ public class ContainerViewForm extends BiobankViewForm {
         setTextValue(productBarcodeLabel,
             containerInfo.container.getProductBarcode());
         setTextValue(activityStatusLabel,
-            containerInfo.container.getActivityStatus());
+            containerInfo.container.getActivityStatus().getName());
         setTextValue(containerTypeLabel, containerInfo.container
             .getContainerType().getName());
         setTextValue(temperatureLabel, containerInfo.container

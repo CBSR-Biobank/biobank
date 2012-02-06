@@ -58,6 +58,7 @@ public class ContainerGroup extends AdapterBase {
                 new SiteGetTopContainersAction(siteAdapter.getId()));
             super.performExpand();
         } catch (ApplicationException e) {
+            // TODO: open an error dialog here?
             logger.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
         }
     }

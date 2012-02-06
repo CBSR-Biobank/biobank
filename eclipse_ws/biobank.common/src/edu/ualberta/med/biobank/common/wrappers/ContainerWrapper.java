@@ -326,7 +326,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     public boolean hasSpecimens() {
-        return (!getContainerType().getTopLevel() && !getSpecimens().isEmpty());
+        return !getSpecimens().isEmpty();
     }
 
     public SpecimenWrapper getSpecimen(Integer row, Integer col)
