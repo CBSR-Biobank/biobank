@@ -1,4 +1,4 @@
 package edu.ualberta.med.biobank.validator.group;
 
-public interface PreUpdate {
+public interface PreUpdate extends PrePersist {
 }
