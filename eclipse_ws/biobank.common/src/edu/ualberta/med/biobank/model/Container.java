@@ -59,7 +59,6 @@ public class Container extends AbstractBiobankModel {
     private Site site;
     private ActivityStatus activityStatus;
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Container.productBarcode.NotEmpty}")
     @Column(name = "PRODUCT_BARCODE")
     public String getProductBarcode() {
         return this.productBarcode;
