@@ -34,38 +34,44 @@ public class ContainerTypeHelper {
         ContainerTypeSaveAction containerTypeSaveAction =
             new ContainerTypeSaveAction();
         containerTypeSaveAction
-            .setId(containerTypeInfo.containerType.getId());
-        containerTypeSaveAction.setName(containerTypeInfo.containerType
+            .setId(containerTypeInfo.getContainerType().getId());
+        containerTypeSaveAction.setName(containerTypeInfo.getContainerType()
             .getName());
-        containerTypeSaveAction.setNameShort(containerTypeInfo.containerType
+        containerTypeSaveAction.setNameShort(containerTypeInfo
+            .getContainerType()
             .getNameShort());
-        containerTypeSaveAction.setSiteId(containerTypeInfo.containerType
+        containerTypeSaveAction.setSiteId(containerTypeInfo.getContainerType()
             .getSite().getId());
-        containerTypeSaveAction.setTopLevel(containerTypeInfo.containerType
+        containerTypeSaveAction.setTopLevel(containerTypeInfo
+            .getContainerType()
             .getTopLevel());
 
-        containerTypeSaveAction.setRowCapacity(containerTypeInfo.containerType
+        containerTypeSaveAction.setRowCapacity(containerTypeInfo
+            .getContainerType()
             .getCapacity().getRowCapacity());
-        containerTypeSaveAction.setColCapacity(containerTypeInfo.containerType
+        containerTypeSaveAction.setColCapacity(containerTypeInfo
+            .getContainerType()
             .getCapacity().getColCapacity());
 
         containerTypeSaveAction.setDefaultTemperature(
-            containerTypeInfo.containerType.getDefaultTemperature());
+            containerTypeInfo.getContainerType().getDefaultTemperature());
         containerTypeSaveAction.setChildLabelingSchemeId(
-            containerTypeInfo.containerType.getChildLabelingScheme().getId());
+            containerTypeInfo.getContainerType().getChildLabelingScheme()
+                .getId());
 
         containerTypeSaveAction.setActivityStatusId(
-            containerTypeInfo.containerType.getActivityStatus().getId());
+            containerTypeInfo.getContainerType().getActivityStatus().getId());
 
         HashSet<Integer> ids = new HashSet<Integer>();
-        for (SpecimenType specimenType : containerTypeInfo.containerType
+        for (SpecimenType specimenType : containerTypeInfo.getContainerType()
             .getSpecimenTypeCollection()) {
             ids.add(specimenType.getId());
         }
         containerTypeSaveAction.setSpecimenTypeIds(ids);
 
         ids = new HashSet<Integer>();
-        for (ContainerType childContainerType : containerTypeInfo.containerType
+        for (ContainerType childContainerType : containerTypeInfo
+            .getContainerType()
             .getChildContainerTypeCollection()) {
             ids.add(childContainerType.getId());
         }
