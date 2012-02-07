@@ -1,16 +1,15 @@
 package edu.ualberta.med.biobank.common.action.site;
 
-import java.util.List;
-
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
+import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.permission.site.SiteReadPermission;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Specimen;
 
 public class SiteGetInfoAction implements Action<SiteInfo> {
     private static final long serialVersionUID = 1L;
@@ -25,22 +24,23 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
             + " LEFT JOIN FETCH comments.user"
             + " WHERE site.id = ?";
 
-    // count only aliquoted specimens
     @SuppressWarnings("nls")
     private static final String SITE_COUNT_INFO_HQL =
         "SELECT site, COUNT(DISTINCT patients), "
-            + "COUNT(DISTINCT collectionEvents), "
-            + "COUNT(DISTINCT aliquotedSpecimens)"
-            + " FROM "
-            + Site.class.getName()
-            + " site"
+            + "COUNT(DISTINCT collectionEvents) "
+            + " FROM " + Site.class.getName() + " site"
             + " LEFT JOIN site.studyCollection studies"
             + " LEFT JOIN studies.patientCollection patients"
             + " LEFT JOIN patients.collectionEventCollection collectionEvents"
-            + " LEFT JOIN collectionEvents.allSpecimenCollection aliquotedSpecimens"
-            + " WITH aliquotedSpecimens.originalCollectionEvent.id IS NULL"
             + " WHERE site.id = ?"
             + " GROUP BY site";
+
+    private static final String SITE_COUNT_INFO_2_HQL =
+        "SELECT count(*) "
+            + " FROM " + Specimen.class.getName() + " s"
+            + " JOIN s.activityStatus astatus"
+            + " WHERE s.activityStatus.id = ?"
+            + " AND s.currentCenter.id = ?";
 
     private final Integer siteId;
 
@@ -57,34 +57,30 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
         return new SiteReadPermission(siteId).isAllowed(context);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public SiteInfo run(ActionContext context) throws ActionException {
         Query query = context.getSession().createQuery(SITE_INFO_HQL);
         query.setParameter(0, siteId);
 
-        List<Site> sites = query.list();
-
-        if (sites.size() != 1) {
-            throw new ModelNotFoundException(Site.class, siteId);
-        }
+        Site site = (Site) query.uniqueResult();
 
         SiteInfo.Builder builder = new SiteInfo.Builder();
-        builder.setSite(sites.get(0));
+        builder.setSite(site);
 
         query = context.getSession().createQuery(SITE_COUNT_INFO_HQL);
         query.setParameter(0, siteId);
 
-        List<Object[]> rows = query.list();
-        if (rows.size() != 1) {
-            throw new ModelNotFoundException(Site.class, siteId);
-        }
+        Object[] items = (Object[]) query.uniqueResult();
 
-        Object[] row = rows.get(0);
+        builder.setPatientCount((Long) items[1]);
+        builder.setCollectionEventCount((Long) items[2]);
 
-        builder.setPatientCount((Long) row[1]);
-        builder.setCollectionEventCount((Long) row[2]);
-        builder.setAliquotedSpecimenCount((Long) row[3]);
+        query = context.getSession().createQuery(SITE_COUNT_INFO_2_HQL);
+        query.setParameter(0, ActivityStatusEnum.ACTIVE.getId());
+        query.setParameter(1, siteId);
+
+        Long l = (Long) query.uniqueResult();
+        builder.setAliquotedSpecimenCount(l);
 
         builder.setTopContainers(
             new SiteGetTopContainersAction(siteId).run(context)
