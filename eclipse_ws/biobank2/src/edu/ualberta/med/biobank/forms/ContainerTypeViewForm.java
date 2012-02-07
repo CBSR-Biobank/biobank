@@ -14,12 +14,16 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
     public static final String ID =
@@ -51,6 +55,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private CommentCollectionInfoTable commentTable;
 
+    private ContainerTypeInfo containerTypeInfo;
+
     public ContainerTypeViewForm() {
         super();
     }
@@ -61,9 +67,18 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        containerType = (ContainerTypeWrapper) getModelObject();
+        updateContainerTypeInfo();
         setPartName(NLS.bind(Messages.ContainerTypeViewForm_title,
             containerType.getName()));
+    }
+
+    private void updateContainerTypeInfo() throws ApplicationException {
+        containerTypeInfo = SessionManager.getAppService().doAction(
+            new ContainerTypeGetInfoAction(adapter.getId()));
+        Assert.isNotNull(containerTypeInfo);
+        containerType =
+            new ContainerTypeWrapper(SessionManager.getAppService(),
+                containerTypeInfo.getContainerType());
     }
 
     @Override
@@ -248,7 +263,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     @Override
     public void reload() throws Exception {
-        containerType.reload();
+        updateContainerTypeInfo();
         setPartName(NLS.bind(Messages.ContainerTypeViewForm_title,
             containerType.getName()));
         form.setText(NLS.bind(Messages.ContainerTypeViewForm_title,
