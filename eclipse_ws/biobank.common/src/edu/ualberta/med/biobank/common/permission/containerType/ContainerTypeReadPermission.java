@@ -10,6 +10,10 @@ public class ContainerTypeReadPermission implements Permission {
 
     private final Integer typeId;
 
+    public ContainerTypeReadPermission() {
+        this.typeId = null;
+    }
+
     public ContainerTypeReadPermission(Integer typeId) {
         this.typeId = typeId;
     }
@@ -20,8 +24,12 @@ public class ContainerTypeReadPermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        ContainerType cType = context.load(ContainerType.class, typeId);
-        return PermissionEnum.CONTAINER_TYPE_READ.isAllowed(context.getUser(),
-            cType.getSite());
+        if (typeId != null) {
+            ContainerType cType = context.load(ContainerType.class, typeId);
+            return PermissionEnum.CONTAINER_TYPE_READ.isAllowed(
+                context.getUser(),
+                cType.getSite());
+        }
+        return PermissionEnum.CONTAINER_TYPE_READ.isAllowed(context.getUser());
     }
 }
