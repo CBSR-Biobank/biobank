@@ -41,7 +41,7 @@ import edu.ualberta.med.biobank.treeview.util.NullDeltaListener;
 public abstract class AbstractAdapterBase implements
     Comparable<AbstractAdapterBase> {
 
-    private static BgcLogger logger = BgcLogger
+    private static BgcLogger LOGGER = BgcLogger
         .getLogger(AbstractAdapterBase.class.getName());
 
     private Integer id;
@@ -405,7 +405,7 @@ public abstract class AbstractAdapterBase implements
                 .openEditor(input, id, focusOnEditor);
             return part;
         } catch (PartInitException e) {
-            logger.error("Can't open form with id " + id, e); //$NON-NLS-1$
+            LOGGER.error("Can't open form with id " + id, e); //$NON-NLS-1$
             return null;
         }
 

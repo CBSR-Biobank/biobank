@@ -21,6 +21,8 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.container.ContainerChildrenResult;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetChildrenAction;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -29,16 +31,44 @@ import edu.ualberta.med.biobank.dialogs.MoveSpecimensToDialog;
 import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerAdapter extends AdapterBase {
 
+    private static BgcLogger LOGGER = BgcLogger
+        .getLogger(AbstractAdapterBase.class.getName());
+
+    private ContainerChildrenResult childrenResult;
+
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
         super(parent, container);
+        // assume it has children for now and set it appropriately when user
+        // double clicks on node
         if (container != null) {
-            setHasChildren(container.hasChildren());
+            setHasChildren(true);
+        }
+    }
+
+    @Override
+    public void executeDoubleClick() {
+        performExpand();
+        openViewForm();
+    }
+
+    @Override
+    public void performExpand() {
+        try {
+            childrenResult = SessionManager.getAppService().doAction(
+                new ContainerGetChildrenAction(getId()));
+            super.performExpand();
+        } catch (ApplicationException e) {
+            // TODO: open an error dialog here?
+            LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
         }
     }
 
@@ -75,12 +105,6 @@ public class ContainerAdapter extends AdapterBase {
             }
         }
         return getTooltipText(Messages.ContainerAdapter_container_label);
-    }
-
-    @Override
-    public void executeDoubleClick() {
-        performExpand();
-        openViewForm();
     }
 
     @Override
@@ -150,9 +174,10 @@ public class ContainerAdapter extends AdapterBase {
                         }
                     }
                 });
-                ContainerAdapter newContainerAdapter = (ContainerAdapter) SessionManager
-                    .searchFirstNode(ContainerWrapper.class,
-                        newContainer.getId());
+                ContainerAdapter newContainerAdapter =
+                    (ContainerAdapter) SessionManager
+                        .searchFirstNode(ContainerWrapper.class,
+                            newContainer.getId());
                 if (newContainerAdapter != null) {
                     getContainer().reload();
                     newContainerAdapter.performDoubleClick();
@@ -187,9 +212,10 @@ public class ContainerAdapter extends AdapterBase {
                     // update new parent
                     ContainerWrapper newParentContainer = getContainer()
                         .getParentContainer();
-                    ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
-                        .searchFirstNode(ContainerWrapper.class,
-                            newParentContainer.getId());
+                    ContainerAdapter parentAdapter =
+                        (ContainerAdapter) SessionManager
+                            .searchFirstNode(ContainerWrapper.class,
+                                newParentContainer.getId());
                     if (parentAdapter != null) {
                         parentAdapter.getContainer().reload();
                         parentAdapter.removeAll();
@@ -226,9 +252,11 @@ public class ContainerAdapter extends AdapterBase {
 
         ContainerWrapper newParent;
         if (newParentContainers.size() > 1) {
-            SelectParentContainerDialog dlg = new SelectParentContainerDialog(
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-                newParentContainers);
+            SelectParentContainerDialog dlg =
+                new SelectParentContainerDialog(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getShell(),
+                    newParentContainers);
             if (dlg.open() != Dialog.OK) {
                 return false;
             }
@@ -308,10 +336,15 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        Assert.isNotNull(getContainer(), "site null"); //$NON-NLS-1$
-        getContainer().reload();
-        return new ArrayList<ModelWrapper<?>>(getContainer().getChildren()
-            .values());
+        List<ContainerWrapper> result = new ArrayList<ContainerWrapper>();
+
+        for (Container container : childrenResult.getChildContainers()) {
+            ContainerWrapper wrapper =
+                new ContainerWrapper(SessionManager.getAppService(), container);
+            result.add(wrapper);
+        }
+
+        return result;
     }
 
     @Override

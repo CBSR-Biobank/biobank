@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.model.Container;
 
 public class SiteGetTopContainersResult implements ActionResult {
     private static final long serialVersionUID = 1L;
+
     private final ArrayList<Container> topContainers;
 
     public SiteGetTopContainersResult(ArrayList<Container> topContainers) {
