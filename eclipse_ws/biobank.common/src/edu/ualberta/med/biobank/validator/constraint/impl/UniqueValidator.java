@@ -80,8 +80,12 @@ public class UniqueValidator extends SessionAwareConstraintValidator<Object>
             criteria.add(Restrictions.eq(property,
                 meta.getPropertyValue(value, property, EntityMode.POJO)));
         }
-        criteria.add(Restrictions.ne(idName, id)).setProjection(
-            Projections.rowCount());
+
+        if (id != null) {
+            criteria.add(Restrictions.ne(idName, id));
+        }
+
+        criteria.setProjection(Projections.rowCount());
 
         List<?> results = criteria.getExecutableCriteria(getSession()).list();
         Number count = (Number) results.iterator().next();
