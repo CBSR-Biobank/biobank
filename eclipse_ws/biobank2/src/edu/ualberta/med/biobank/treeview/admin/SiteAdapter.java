@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -106,7 +107,7 @@ public class SiteAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        return null;
+        return SiteEntryForm.ID;
     }
 
     @Override

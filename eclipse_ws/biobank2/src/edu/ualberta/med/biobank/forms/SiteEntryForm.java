@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class OldSiteEntryForm extends AddressEntryFormCommon {
+public class SiteEntryForm extends AddressEntryFormCommon {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteEntryForm"; //$NON-NLS-1$
 
