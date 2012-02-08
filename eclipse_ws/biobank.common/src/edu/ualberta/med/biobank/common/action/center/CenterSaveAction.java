@@ -30,7 +30,7 @@ public abstract class CenterSaveAction implements Action<IdResult> {
     private String name;
     private String nameShort;
     private Address address;
-    private Integer aStatusId;
+    private ActivityStatus activityStatus;
     private String commentText;
 
     public void setId(Integer id) {
@@ -49,8 +49,8 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         this.address = address;
     }
 
-    public void setActivityStatusId(Integer activityStatusId) {
-        this.aStatusId = activityStatusId;
+    public void setActivityStatusId(ActivityStatus activityStatus) {
+        this.activityStatus = activityStatus;
     }
 
     public void setCommentText(String commentText) {
@@ -74,7 +74,7 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         if (address == null) {
             throw new NullPropertyException(Center.class, "address");
         }
-        if (aStatusId == null) {
+        if (activityStatus == null) {
             throw new NullPropertyException(Center.class,
                 CenterPeer.ACTIVITY_STATUS);
         }
@@ -103,8 +103,7 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         center.setName(name);
         center.setNameShort(nameShort);
 
-        ActivityStatus aStatus = context.load(ActivityStatus.class, aStatusId);
-        center.setActivityStatus(aStatus);
+        center.setActivityStatus(activityStatus);
 
         // TODO: remember to check the address
         center.setAddress(address);

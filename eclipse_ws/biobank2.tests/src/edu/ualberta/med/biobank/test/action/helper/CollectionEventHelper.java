@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.IActionExecutor;
@@ -34,7 +35,7 @@ public class CollectionEventHelper extends Helper {
         info.inventoryId = Utils.getRandomString(8, 12);
         info.quantity = r.nextDouble();
         info.specimenTypeId = specimenTypeId;
-        info.statusId = 1;
+        info.activityStatus = ActivityStatus.ACTIVE;
         info.createdAt = Utils.getRandomDate();
         info.centerId = centerId;
         return info;
@@ -80,7 +81,7 @@ public class CollectionEventHelper extends Helper {
 
         // Save a new cevent with specimens
         return actionExecutor.exec(new CollectionEventSaveAction(
-            null, patientId, r.nextInt(20) + 1, 1, null,
+            null, patientId, r.nextInt(20) + 1, ActivityStatus.ACTIVE, null,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
             .getId();
 
@@ -111,8 +112,8 @@ public class CollectionEventHelper extends Helper {
                 specimenInfo.specimen.getInventoryId();
             saveCEventSpecimenInfo.createdAt =
                 specimenInfo.specimen.getCreatedAt();
-            saveCEventSpecimenInfo.statusId =
-                specimenInfo.specimen.getActivityStatus().getId();
+            saveCEventSpecimenInfo.activityStatus =
+                specimenInfo.specimen.getActivityStatus();
             saveCEventSpecimenInfo.specimenTypeId =
                 specimenInfo.specimen.getSpecimenType().getId();
             saveCEventSpecimenInfo.centerId =
@@ -133,7 +134,7 @@ public class CollectionEventHelper extends Helper {
             new CollectionEventSaveAction(ceventInfo.cevent.getId(),
                 ceventInfo.cevent.getPatient().getId(),
                 ceventInfo.cevent.getVisitNumber(),
-                ceventInfo.cevent.getActivityStatus().getId(), null,
+                ceventInfo.cevent.getActivityStatus(), null,
                 sourceSpecimens, ceAttrList);
 
         return saveAction;

@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveActio
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -65,17 +66,21 @@ public class TestCollectionEvent extends TestAction {
     public void saveNoSpecsNoAttrs() throws Exception {
         final Integer visitNumber = R.nextInt(20) + 1;
         final String commentText = Utils.getRandomString(20, 30);
-        final Integer statusId = 1;
+
         // test add
-        final Integer ceventId = EXECUTOR.exec(
-            new CollectionEventSaveAction(null, provisioning.patientIds.get(0),
-                visitNumber, statusId, commentText, null, null)).getId();
+        final Integer ceventId =
+            EXECUTOR
+                .exec(
+                    new CollectionEventSaveAction(null, provisioning.patientIds
+                        .get(0),
+                        visitNumber, ActivityStatus.ACTIVE, commentText, null,
+                        null)).getId();
 
         // Check CollectionEvent is in database with correct values
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         Assert.assertEquals(visitNumber, cevent.getVisitNumber());
-        Assert.assertEquals(statusId, cevent.getActivityStatus().getId());
+        Assert.assertEquals(ActivityStatus.ACTIVE, cevent.getActivityStatus());
         Assert.assertEquals(1, cevent.getCommentCollection().size());
     }
 
@@ -83,7 +88,6 @@ public class TestCollectionEvent extends TestAction {
     public void saveWithSpecs() throws Exception {
         final Integer visitNumber = R.nextInt(20) + 1;
         final String commentText = Utils.getRandomString(20, 30);
-        final Integer statusId = 1;
 
         final Integer typeId = getSpecimenTypes().get(0).getId();
 
@@ -95,7 +99,7 @@ public class TestCollectionEvent extends TestAction {
         final Integer ceventId = EXECUTOR.exec(
             new CollectionEventSaveAction(null, provisioning.patientIds
                 .get(0),
-                visitNumber, statusId, commentText,
+                visitNumber, ActivityStatus.ACTIVE, commentText,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
                 null))
             .getId();
@@ -104,7 +108,8 @@ public class TestCollectionEvent extends TestAction {
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         Assert.assertEquals(visitNumber, cevent.getVisitNumber());
-        Assert.assertEquals(statusId, cevent.getActivityStatus().getId());
+        Assert.assertEquals(ActivityStatus.ACTIVE, cevent.getActivityStatus()
+            .getId());
         Assert.assertNotNull(cevent.getCommentCollection());
         Assert.assertEquals(1, cevent.getCommentCollection().size());
         Assert.assertEquals(specs.size(), cevent.getAllSpecimenCollection()
@@ -124,8 +129,8 @@ public class TestCollectionEvent extends TestAction {
                     .assertTrue(compareDouble(info.quantity, sp.getQuantity()));
                 Assert.assertEquals(info.specimenTypeId, sp.getSpecimenType()
                     .getId());
-                Assert.assertEquals(info.statusId, sp.getActivityStatus()
-                    .getId());
+                Assert
+                    .assertEquals(info.activityStatus, sp.getActivityStatus());
                 Assert.assertEquals(info.createdAt, sp.getCreatedAt());
                 // set the id to make some modification tests after that.
                 info.id = sp.getId();
@@ -146,7 +151,8 @@ public class TestCollectionEvent extends TestAction {
         newSpecList.add(newSpec);
         // modify cevent
         EXECUTOR.exec(new CollectionEventSaveAction(ceventId,
-            provisioning.patientIds.get(0), visitNumber + 1, statusId,
+            provisioning.patientIds.get(0), visitNumber + 1,
+            ActivityStatus.ACTIVE,
             commentText, newSpecList, null));
 
         // Check CollectionEvent is modified
@@ -172,8 +178,8 @@ public class TestCollectionEvent extends TestAction {
                     sp.getQuantity()));
                 Assert.assertEquals(newSpec.specimenTypeId, sp
                     .getSpecimenType().getId());
-                Assert.assertEquals(newSpec.statusId, sp.getActivityStatus()
-                    .getId());
+                Assert.assertEquals(newSpec.activityStatus,
+                    sp.getActivityStatus());
                 Assert.assertEquals(newSpec.createdAt, sp.getCreatedAt());
             }
             if (sp.getInventoryId().equals(modifiedSpec.inventoryId)) {
@@ -219,12 +225,11 @@ public class TestCollectionEvent extends TestAction {
         attrs.add(attrInfo);
 
         Integer visitNber = R.nextInt(20) + 1;
-        Integer statusId = 1;
         String commentText = Utils.getRandomString(20, 30);
         // Save a new cevent
         final Integer ceventId = EXECUTOR.exec(
             new CollectionEventSaveAction(null, provisioning.patientIds.get(0),
-                visitNber, statusId, commentText,
+                visitNber, ActivityStatus.ACTIVE, commentText,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
                 attrs)).getId();
 
@@ -238,8 +243,8 @@ public class TestCollectionEvent extends TestAction {
         Assert.assertEquals(0, info.aliquotedSpecimenInfos.size());
         Assert.assertNotNull(info.cevent);
         Assert.assertEquals(visitNber, info.cevent.getVisitNumber());
-        Assert.assertEquals("Active",
-            info.cevent.getActivityStatus().getName());
+        Assert.assertEquals(ActivityStatus.ACTIVE,
+            info.cevent.getActivityStatus());
 
         Assert.assertEquals(patientInfo.patient.getPnumber(), info.cevent
             .getPatient().getPnumber());
@@ -277,7 +282,6 @@ public class TestCollectionEvent extends TestAction {
 
         final Integer visitNumber = R.nextInt(20) + 1;
         final String commentText = Utils.getRandomString(20, 30);
-        final Integer statusId = 1;
 
         List<CEventAttrSaveInfo> attrs =
             new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
@@ -294,15 +298,18 @@ public class TestCollectionEvent extends TestAction {
         attrs.add(attrInfo);
 
         // Save a new cevent
-        final Integer ceventId = EXECUTOR.exec(
-            new CollectionEventSaveAction(null, provisioning.patientIds.get(0),
-                visitNumber, statusId, commentText, null, attrs)).getId();
+        final Integer ceventId =
+            EXECUTOR.exec(
+                new CollectionEventSaveAction(null, provisioning.patientIds
+                    .get(0),
+                    visitNumber, ActivityStatus.ACTIVE, commentText, null,
+                    attrs)).getId();
 
         // Check CollectionEvent is in database with correct values
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         Assert.assertEquals(visitNumber, cevent.getVisitNumber());
-        Assert.assertEquals(statusId, cevent.getActivityStatus().getId());
+        Assert.assertEquals(ActivityStatus.ACTIVE, cevent.getActivityStatus());
         Assert.assertEquals(1, cevent.getCommentCollection()
             .size());
         Assert.assertEquals(1, cevent.getEventAttrCollection().size());
@@ -316,7 +323,8 @@ public class TestCollectionEvent extends TestAction {
         attrInfo.value = value2;
         // Save with a different value for attrinfo
         EXECUTOR.exec(new CollectionEventSaveAction(ceventId,
-            provisioning.patientIds.get(0), visitNumber, statusId, commentText,
+            provisioning.patientIds.get(0), visitNumber, ActivityStatus.ACTIVE,
+            commentText,
             null, attrs));
 
         session.clear();
@@ -372,7 +380,7 @@ public class TestCollectionEvent extends TestAction {
             .get("PBMC Count (x10^6)").attr
             .getId());
         seAttrSave.setRequired(true);
-        seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
         seAttrSave.setStudyId(studyId);
         EXECUTOR.exec(seAttrSave);
 
@@ -381,7 +389,7 @@ public class TestCollectionEvent extends TestAction {
             .get("Consent").attr.getId());
         seAttrSave.setRequired(false);
         seAttrSave.setPermissible("c1;c2;c3");
-        seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
         seAttrSave.setStudyId(studyId);
         EXECUTOR.exec(seAttrSave);
 
@@ -389,7 +397,7 @@ public class TestCollectionEvent extends TestAction {
         seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
             .get("Patient Type").attr.getId());
         seAttrSave.required = true;
-        seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
         seAttrSave.setStudyId(studyId);
         EXECUTOR.exec(seAttrSave);
 
@@ -398,7 +406,7 @@ public class TestCollectionEvent extends TestAction {
             .get("Visit Type").attr.getId());
         seAttrSave.required = false;
         seAttrSave.setPermissible("v1;v2;v3;v4");
-        seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
         seAttrSave.setStudyId(studyId);
         EXECUTOR.exec(seAttrSave);
 
@@ -406,17 +414,19 @@ public class TestCollectionEvent extends TestAction {
         seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
             .get("Phlebotomist").attr.getId());
         seAttrSave.required = false;
-        seAttrSave.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
         seAttrSave.setStudyId(studyId);
         EXECUTOR.exec(seAttrSave);
     }
 
     @Test
     public void deleteWithoutSpecimens() throws Exception {
-        final Integer ceventId = EXECUTOR.exec(
-            new CollectionEventSaveAction(null, provisioning.patientIds
-                .get(0), R.nextInt(20) + 1, 1, Utils.getRandomString(20, 30),
-                null, null)).getId();
+        final Integer ceventId =
+            EXECUTOR.exec(
+                new CollectionEventSaveAction(null, provisioning.patientIds
+                    .get(0), R.nextInt(20) + 1, ActivityStatus.ACTIVE, Utils
+                    .getRandomString(20, 30),
+                    null, null)).getId();
 
         // test delete
         EXECUTOR.exec(new CollectionEventDeleteAction(ceventId));
@@ -438,7 +448,7 @@ public class TestCollectionEvent extends TestAction {
         // Save a new cevent
         final Integer ceventId = EXECUTOR.exec(
             new CollectionEventSaveAction(null, provisioning.patientIds
-                .get(0), R.nextInt(20) + 1, 1, null,
+                .get(0), R.nextInt(20) + 1, ActivityStatus.ACTIVE, null,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
             .getId();
 
@@ -460,16 +470,17 @@ public class TestCollectionEvent extends TestAction {
     @Test
     public void saveNotUniqueVisitNumber() throws Exception {
         final Integer visitNumber = R.nextInt(20) + 1;
-        final Integer statusId = 1;
         // add
         EXECUTOR.exec(new CollectionEventSaveAction(null,
-            provisioning.patientIds.get(0), visitNumber, statusId, null, null,
+            provisioning.patientIds.get(0), visitNumber, ActivityStatus.ACTIVE,
+            null, null,
             null));
 
         // try to add a second collection event with the same visit number
         try {
             EXECUTOR.exec(new CollectionEventSaveAction(null,
-                provisioning.patientIds.get(0), visitNumber, statusId, null,
+                provisioning.patientIds.get(0), visitNumber,
+                ActivityStatus.ACTIVE, null,
                 null, null));
             Assert
                 .fail("should throw an exception because the visit number is already used");
@@ -506,12 +517,12 @@ public class TestCollectionEvent extends TestAction {
         attrs.add(attrInfo);
 
         Integer visitNber = R.nextInt(20) + 1;
-        Integer statusId = 1;
         // Save a new cevent
         final Integer ceventId =
             EXECUTOR.exec(
                 new CollectionEventSaveAction(null, provisioning.patientIds
-                    .get(0), visitNber, statusId, null, null, attrs)).getId();
+                    .get(0), visitNber, ActivityStatus.ACTIVE, null, null,
+                    attrs)).getId();
 
         // Call get eventAttr infos action
         Map<Integer, EventAttrInfo> infos =

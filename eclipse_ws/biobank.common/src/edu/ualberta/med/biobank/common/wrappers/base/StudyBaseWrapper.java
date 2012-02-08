@@ -6,6 +6,7 @@ package edu.ualberta.med.biobank.common.wrappers.base;
 
 import java.util.List;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -25,8 +26,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.SiteBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyEventAttrBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.ActivityStatusBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.AliquotedSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
@@ -394,17 +393,12 @@ public class StudyBaseWrapper extends ModelWrapper<Study> {
         removeFromWrapperCollectionWithCheck(StudyPeer.STUDY_EVENT_ATTR_COLLECTION, studyEventAttrCollection);
     }
 
-    public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatusWrapper activityStatus = getWrappedProperty(StudyPeer.ACTIVITY_STATUS, ActivityStatusWrapper.class);
-        return activityStatus;
+    public ActivityStatus getActivityStatus() {
+        return wrappedObject.getActivityStatus();
     }
 
-    public void setActivityStatus(ActivityStatusBaseWrapper activityStatus) {
-        setWrappedProperty(StudyPeer.ACTIVITY_STATUS, activityStatus);
-    }
-
-    void setActivityStatusInternal(ActivityStatusBaseWrapper activityStatus) {
-        setWrappedProperty(StudyPeer.ACTIVITY_STATUS, activityStatus);
+    public void setActivityStatus(ActivityStatus activityStatus) {
+        wrappedObject.setActivityStatus(activityStatus);
     }
 
     public List<AliquotedSpecimenWrapper> getAliquotedSpecimenCollection(boolean sort) {

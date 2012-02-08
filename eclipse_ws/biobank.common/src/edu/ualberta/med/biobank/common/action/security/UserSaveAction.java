@@ -27,7 +27,7 @@ public class UserSaveAction extends PrincipalSaveAction {
     private String fullName;
     private String email;
     private Boolean needPwdChange;
-    private Integer aStatusId;
+    private ActivityStatus activityStatus;
     private Set<Integer> groupIds;
     private User newUser;
 
@@ -55,8 +55,8 @@ public class UserSaveAction extends PrincipalSaveAction {
         this.needPwdChange = needPwdChange;
     }
 
-    public void setActivityStatusId(Integer activityStatusId) {
-        this.aStatusId = activityStatusId;
+    public void setActivityStatusId(ActivityStatus activityStatus) {
+        this.activityStatus = activityStatus;
     }
 
     public void setGroupIds(Set<Integer> groupIds) {
@@ -84,9 +84,6 @@ public class UserSaveAction extends PrincipalSaveAction {
         if (needPwdChange == null) {
             throw new NullPropertyException(User.class,
                 UserPeer.NEED_PWD_CHANGE);
-        }
-        if (aStatusId == null) {
-            throw new NullPropertyException(User.class, "activity status id");
         }
         if (groupIds == null) {
             throw new NullPropertyException(User.class, "group ids");
@@ -122,9 +119,7 @@ public class UserSaveAction extends PrincipalSaveAction {
         newUser.setEmail(email);
         newUser.setNeedPwdChange(needPwdChange);
 
-        ActivityStatus aStatus =
-            context.load(ActivityStatus.class, aStatusId);
-        newUser.setActivityStatus(aStatus);
+        newUser.setActivityStatus(activityStatus);
 
         saveGroups(context);
 

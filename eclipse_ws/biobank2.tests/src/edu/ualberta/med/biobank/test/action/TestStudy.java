@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpe
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecimenSaveInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.StudyEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
@@ -93,7 +94,7 @@ public class TestStudy extends TestAction {
         }
 
         studySaveAction.setNameShort(name);
-        studySaveAction.setActivityStatusId(null);
+        studySaveAction.setActivityStatus(null);
         try {
             EXECUTOR.exec(studySaveAction);
             Assert
@@ -102,7 +103,7 @@ public class TestStudy extends TestAction {
             Assert.assertTrue(true);
         }
 
-        studySaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        studySaveAction.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
         studySaveAction.setSiteIds(null);
         try {
             EXECUTOR.exec(studySaveAction);
@@ -188,8 +189,7 @@ public class TestStudy extends TestAction {
 
         studyInfo = EXECUTOR.exec(new StudyGetInfoAction(provisioning.studyId));
 
-        Assert.assertEquals("Active", studyInfo.study.getActivityStatus()
-            .getName());
+        Assert.assertEquals(ActivityStatus.ACTIVE, studyInfo.study.getActivityStatus());
         Assert.assertEquals(new Long(1), studyInfo.patientCount);
         Assert.assertEquals(new Long(1), studyInfo.collectionEventCount);
         Assert.assertEquals(ssSaveInfosAll.size(), studyInfo.sourceSpcs.size());
@@ -483,7 +483,7 @@ public class TestStudy extends TestAction {
             asSaveInfo.id = null;
             asSaveInfo.quantity = R.nextInt();
             asSaveInfo.volume = R.nextDouble();
-            asSaveInfo.aStatusId = ActivityStatusEnum.ACTIVE.getId();
+            asSaveInfo.activityStatus = ActivityStatusEnum.ACTIVE.getId();
             asSaveInfo.specimenTypeId =
                 specimenTypes.get(R.nextInt(specimenTypes.size())).getId();
             result.add(asSaveInfo);
@@ -610,7 +610,7 @@ public class TestStudy extends TestAction {
             if (gEvAttr.getEventAttrType().getName().startsWith("select_")) {
                 seAttrSave.permissible = "a;b;c;d;e;f";
             }
-            seAttrSave.aStatusId = ActivityStatusEnum.ACTIVE.getId();
+            seAttrSave.activityStatus = ActivityStatusEnum.ACTIVE.getId();
             result.add(seAttrSave);
         }
         return result;

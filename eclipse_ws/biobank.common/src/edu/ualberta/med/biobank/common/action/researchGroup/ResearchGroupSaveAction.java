@@ -43,8 +43,7 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
         rg.setNameShort(rgInfo.nameShort);
 
         rg.setStudy(context.get(Study.class, rgInfo.studyId));
-        rg.setActivityStatus(context.get(ActivityStatus.class,
-            rgInfo.activityStatusId));
+        rg.setActivityStatus(rgInfo.activityStatus);
 
         Address address = new Address();
         address.setId(rgInfo.address.id);

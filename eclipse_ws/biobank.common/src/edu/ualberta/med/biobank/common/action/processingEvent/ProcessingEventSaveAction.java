@@ -36,20 +36,20 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
 
     private String worksheet;
 
-    private Integer statusId;
+    private ActivityStatus activityStatus;
 
     private String commentText;
 
     private Set<Integer> specimenIds;
 
     public ProcessingEventSaveAction(Integer peventId, Integer centerId,
-        Date createdAt, String worksheet, Integer statusId,
+        Date createdAt, String worksheet, ActivityStatus activityStatus,
         String commentText, Set<Integer> specimenIds) {
         this.peventId = peventId;
         this.centerId = centerId;
         this.createdAt = createdAt;
         this.worksheet = worksheet;
-        this.statusId = statusId;
+        this.activityStatus = activityStatus;
         this.commentText = commentText;
         this.specimenIds = specimenIds;
     }
@@ -89,8 +89,7 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
             Arrays.asList(new ValueProperty<ProcessingEvent>(
                 ProcessingEventPeer.WORKSHEET, worksheet))).run(context);
 
-        peventToSave.setActivityStatus(context.load(ActivityStatus.class,
-            statusId));
+        peventToSave.setActivityStatus(activityStatus);
         peventToSave.setCenter(context.load(Center.class, centerId));
         setComments(context, peventToSave);
         peventToSave.setCreatedAt(createdAt);

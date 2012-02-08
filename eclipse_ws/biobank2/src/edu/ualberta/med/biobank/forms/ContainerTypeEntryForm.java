@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -32,6 +31,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -110,8 +110,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         String tabName;
         if (containerType.isNew()) {
             tabName = Messages.ContainerTypeEntryForm_new_title;
-            containerType.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(SessionManager.getAppService()));
+            containerType.setActivityStatus(ActivityStatus.ACTIVE);
         } else {
             tabName = NLS.bind(Messages.ContainerTypeEntryForm_edit_title,
                 containerType.getName());
@@ -233,14 +232,13 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
-                .getAppService()), containerType.getActivityStatus(),
+            ActivityStatus.valuesList(), containerType.getActivityStatus(),
             Messages.ContainerTypeEntryForm_activity_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     containerType
-                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                        .setActivityStatus((ActivityStatus) selectedObject);
                 }
             });
 
@@ -401,8 +399,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         containerType.setSite(site);
 
         if (containerType.isNew()) {
-            containerType.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(SessionManager.getAppService()));
+            containerType.setActivityStatus(ActivityStatus.ACTIVE);
         }
 
         setChildContainerTypeSelection();

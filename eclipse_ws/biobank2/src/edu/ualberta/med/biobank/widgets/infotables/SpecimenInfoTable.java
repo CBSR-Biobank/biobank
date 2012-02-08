@@ -9,7 +9,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
@@ -20,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 
 public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
 
@@ -57,7 +57,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 8:
                     return NumberFormatter.format(row.quantity);
                 case 9:
-                    return row.activityStatus;
+                    return row.activityStatus.getName();
                 case 10:
                     return row.comment;
                 default:
@@ -68,8 +68,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             @Override
             public Image getColumnImage(TableRowData row, int columnIndex) {
                 if (columnIndex == 9
-                    && ActivityStatusWrapper.FLAGGED_STATUS_STRING
-                        .equals(row.activityStatus))
+                    && ActivityStatus.FLAGGED == row.activityStatus)
                     return BgcPlugin.getDefault().getImageRegistry()
                         .get(BgcPlugin.IMG_ERROR);
                 return null;
@@ -101,7 +100,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 4:
                     return NumberFormatter.format(row.quantity);
                 case 5:
-                    return row.activityStatus;
+                    return row.activityStatus.getName();
                 case 6:
                     return row.studyName;
                 case 7:
@@ -121,8 +120,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             @Override
             public Image getColumnImage(TableRowData row, int columnIndex) {
                 if (columnIndex == 5
-                    && ActivityStatusWrapper.FLAGGED_STATUS_STRING
-                        .equals(row.activityStatus))
+                    && ActivityStatus.FLAGGED == row.activityStatus)
                     return BgcPlugin.getDefault().getImageRegistry()
                         .get(BgcPlugin.IMG_ERROR);
                 return null;
@@ -157,7 +155,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         public String originCenter;
         public Double quantity;
         public String position;
-        public String activityStatus;
+        public ActivityStatus activityStatus;
         public String comment;
 
         @Override
@@ -165,7 +163,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             return StringUtils.join(new String[] { inventoryId, type, patient,
                 pvNumber, createdAt, center, originCenter,
                 (quantity == null) ? "" : quantity.toString(), position, //$NON-NLS-1$
-                activityStatus, comment }, "\t"); //$NON-NLS-1$
+                activityStatus.getName(), comment }, "\t"); //$NON-NLS-1$
         }
     }
 
@@ -240,8 +238,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         Double quantity = info.specimen.getQuantity();
         info.quantity = quantity;
         info.position = info.specimen.getPositionString();
-        ActivityStatusWrapper status = info.specimen.getActivityStatus();
-        info.activityStatus = (status == null) ? "" : status.getName(); //$NON-NLS-1$
+        ActivityStatus status = info.specimen.getActivityStatus();
+        info.activityStatus = status;
         List<CommentWrapper> comments =
             info.specimen.getCommentCollection(false);      
         info.comment =

@@ -12,7 +12,6 @@ import java.util.Map;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
@@ -25,6 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.loggers.CollectionEventLogProvider;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -220,9 +220,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             + " = ? and spec." //$NON-NLS-1$
             + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
                 ProcessingEventPeer.ID)
-            + " = ? and spec." //$NON-NLS-1$
-            + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
-                ActivityStatusPeer.NAME) + " != 'Flagged'"; //$NON-NLS-1$
+            + " = ? and spec.activityStatus != " + ActivityStatus.FLAGGED.getId(); //$NON-NLS-1$
 
     /**
      * source specimen that are in a process event
@@ -373,7 +371,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             }
         }
 
-        if (!studyEventAttr.getActivityStatus().isActive()) {
+        if (ActivityStatus.ACTIVE != studyEventAttr.getActivityStatus()) {
             throw new Exception("attribute for label \"" + label //$NON-NLS-1$
                 + "\" is locked, changes not premitted"); //$NON-NLS-1$
         }

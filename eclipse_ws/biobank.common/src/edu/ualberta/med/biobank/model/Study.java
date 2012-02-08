@@ -10,7 +10,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -114,8 +113,7 @@ public class Study extends AbstractBiobankModel {
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Study.activityStatus.NotEmpty}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
+    @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {
         return this.activityStatus;
     }

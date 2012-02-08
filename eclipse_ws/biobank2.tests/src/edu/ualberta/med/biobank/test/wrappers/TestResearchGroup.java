@@ -6,9 +6,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
@@ -51,8 +51,7 @@ public class TestResearchGroup extends TestDatabase {
         researchGroup.setStudy(rg.getStudy());
         researchGroup.setName(name);
         researchGroup.setNameShort(name);
-        researchGroup.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        researchGroup.setActivityStatus(ActivityStatus.ACTIVE);
 
         researchGroup.setCity("Vesoul");
         try {
@@ -74,8 +73,7 @@ public class TestResearchGroup extends TestDatabase {
             appService);
         researchGroup.setName(name);
         researchGroup.setNameShort(name);
-        researchGroup.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        researchGroup.setActivityStatus(ActivityStatus.ACTIVE);
         try {
             researchGroup.persist();
             Assert.fail("Should not insert the researchGroup : no address");
@@ -106,8 +104,7 @@ public class TestResearchGroup extends TestDatabase {
         } catch (ValueNotSetException vnse) {
             Assert.assertTrue(true);
         }
-        researchGroup.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        researchGroup.setActivityStatus(ActivityStatus.ACTIVE);
         researchGroup.persist();
         researchGroup.delete();
     }

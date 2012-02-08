@@ -36,6 +36,7 @@ import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.Search
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
@@ -193,7 +194,7 @@ public class TestPatient extends TestAction {
             null, provisioning.studyId, pnumber, date)).getId();
         // add a cevent to the patient:
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId, R
-            .nextInt(20), 1, null, null, null));
+            .nextInt(20), ActivityStatus.ACTIVE, null, null, null));
 
         // delete the patient
         try {
@@ -306,7 +307,7 @@ public class TestPatient extends TestAction {
                     EXECUTOR.getUserId(), provisioning.siteId);
         // Save a new cevent
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
-            visitNber, 1, null,
+            visitNber, ActivityStatus.ACTIVE, null,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
     }
 
@@ -327,7 +328,7 @@ public class TestPatient extends TestAction {
         // Save a new cevent with specimens
         final Integer ceventId = EXECUTOR.exec(
             new CollectionEventSaveAction(null, patientId,
-                R.nextInt(20) + 1, 1, null,
+                R.nextInt(20) + 1, ActivityStatus.ACTIVE, null,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
                 null)).getId();
 
@@ -366,7 +367,7 @@ public class TestPatient extends TestAction {
 
         // Save a new cevent with specimens
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId, R
-            .nextInt(20), 1, null,
+            .nextInt(20), ActivityStatus.ACTIVE, null,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
         ArrayList<PatientCEventInfo> infos =
@@ -399,7 +400,7 @@ public class TestPatient extends TestAction {
 
         Integer visitNumber = R.nextInt(20);
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
-            visitNumber, 1, null, null, null));
+            visitNumber, ActivityStatus.ACTIVE, null, null, null));
 
         Integer next = EXECUTOR.exec(new PatientNextVisitNumberAction(
             patientId)).getNextVisitNumber();
@@ -418,9 +419,9 @@ public class TestPatient extends TestAction {
         // add 2 cevents to this patient:
         int vnber = R.nextInt(20);
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
-            vnber, 1, null, null, null));
+            vnber, ActivityStatus.ACTIVE, null, null, null));
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
-            vnber + 1, 1, null, null, null));
+            vnber + 1, ActivityStatus.ACTIVE, null, null, null));
 
         // Check patient is in database
         Patient p = (Patient) session.get(Patient.class, patientId);

@@ -13,7 +13,6 @@ import org.apache.commons.lang.StringUtils;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
-import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -24,6 +23,7 @@ import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Contact;
@@ -129,7 +129,7 @@ public class StudyWrapper extends StudyBaseWrapper {
      * @return True if the attribute is locked. False otherwise.
      * @throws Exception
      */
-    public ActivityStatusWrapper getStudyEventAttrActivityStatus(String label)
+    public ActivityStatus getStudyEventAttrActivityStatus(String label)
         throws Exception {
         return getStudyEventAttr(label).getActivityStatus();
     }
@@ -181,8 +181,7 @@ public class StudyWrapper extends StudyBaseWrapper {
             studyEventAttr.setStudy(this);
         }
 
-        studyEventAttr.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        studyEventAttr.setActivityStatus(ActivityStatus.ACTIVE);
         studyEventAttr.setPermissible(StringUtils.join(permissibleValues, ';'));
         studyEventAttrMap.put(label, studyEventAttr);
 
@@ -215,7 +214,7 @@ public class StudyWrapper extends StudyBaseWrapper {
      * @throws Exception if attribute with label does not exist.
      */
     public void setStudyEventAttrActivityStatus(String label,
-        ActivityStatusWrapper activityStatus) throws Exception {
+        ActivityStatus activityStatus) throws Exception {
         getStudyEventAttrMap();
         StudyEventAttrWrapper studyEventAttr = getStudyEventAttr(label);
         studyEventAttr.setActivityStatus(activityStatus);
@@ -418,11 +417,8 @@ public class StudyWrapper extends StudyBaseWrapper {
             + AliquotedSpecimen.class.getName()
             + " as aspec where aspec."
             + Property.concatNames(AliquotedSpecimenPeer.STUDY, StudyPeer.ID)
-            + " = ? and aspec."
-            + Property.concatNames(AliquotedSpecimenPeer.ACTIVITY_STATUS,
-                ActivityStatusPeer.NAME)
-            + " = '"
-            + ActivityStatusWrapper.ACTIVE_STATUS_STRING + "'";
+            + " = ? and aspec.activityStatus = "
+            + ActivityStatus.ACTIVE.getId();
 
     public List<SpecimenTypeWrapper> getAuthorizedActiveAliquotedTypes(
         List<SpecimenTypeWrapper> authorizedTypes) throws ApplicationException {

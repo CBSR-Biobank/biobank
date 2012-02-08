@@ -25,7 +25,7 @@ public class ClinicHelper extends Helper {
         ClinicSaveAction saveClinic = new ClinicSaveAction();
         saveClinic.setName(name);
         saveClinic.setNameShort(nameShort);
-        saveClinic.setActivityStatusId(activityStatus.getId());
+        saveClinic.setActivityStatus(activityStatus.getId());
         saveClinic.setSendsShipments(sendsShipments);
         saveClinic.setContactSaveInfos(new HashSet<ContactSaveInfo>());
         saveClinic.setAddress(address);
@@ -41,7 +41,7 @@ public class ClinicHelper extends Helper {
         clinicSave.setNameShort(name);
         clinicSave.setSendsShipments(true);
         clinicSave.setContactSaveInfos(new HashSet<ContactSaveInfo>());
-        clinicSave.setActivityStatusId(activityStatus.getId());
+        clinicSave.setActivityStatus(activityStatus.getId());
 
         Address address = new Address();
         address.setCity(Utils.getRandomString(5, 10));
@@ -108,7 +108,7 @@ public class ClinicHelper extends Helper {
         saveAction.setId(clinicInfo.clinic.getId());
         saveAction.setName(clinicInfo.clinic.getName());
         saveAction.setNameShort(clinicInfo.clinic.getNameShort());
-        saveAction.setActivityStatusId(clinicInfo.clinic.getActivityStatus()
+        saveAction.setActivityStatus(clinicInfo.clinic.getActivityStatus()
             .getId());
         saveAction.setSendsShipments(clinicInfo.clinic.getSendsShipments());
         saveAction.setAddress(clinicInfo.clinic.getAddress());

@@ -35,6 +35,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -750,8 +751,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             newContainer.setContainerType(type);
             newContainer.setSite(getSite());
             newContainer.setParent(this, new RowColPos(i, j));
-            newContainer.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+            newContainer.setActivityStatus(ActivityStatus.ACTIVE);
             newContainer.persist();
         }
     }

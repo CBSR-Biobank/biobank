@@ -6,7 +6,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
@@ -22,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
@@ -174,8 +174,8 @@ public class BiobankLabelProvider extends LabelProvider implements
                 .getNameShort();
         } else if (element instanceof SiteWrapper) {
             return ((SiteWrapper) element).getName();
-        } else if (element instanceof ActivityStatusWrapper) {
-            return ((ActivityStatusWrapper) element).getName();
+        } else if (element instanceof ActivityStatus) {
+            return ((ActivityStatus) element).getName();
         } else if (element instanceof AbstractAdapterBase) {
             return ((AbstractAdapterBase) element).getLabel();
         }

@@ -3,9 +3,9 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 
 @Deprecated
 public class ResearchGroupHelper extends CenterHelper {
@@ -26,9 +26,7 @@ public class ResearchGroupHelper extends CenterHelper {
             }
         }
         researchGroup.setCity("");
-        researchGroup.setActivityStatus(ActivityStatusWrapper
-            .getActivityStatus(appService,
-                ActivityStatusWrapper.ACTIVE_STATUS_STRING));
+        researchGroup.setActivityStatus(ActivityStatus.ACTIVE);
         if (addToCreatedList) {
             createdResearchGroups.add(researchGroup);
         }

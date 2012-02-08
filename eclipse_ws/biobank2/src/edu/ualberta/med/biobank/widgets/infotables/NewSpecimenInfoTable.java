@@ -10,10 +10,10 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -122,8 +122,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
             @Override
             public Image getColumnImage(SpecimenInfo row, int columnIndex) {
                 if (columnIndex == 5
-                    && ActivityStatusWrapper.FLAGGED_STATUS_STRING
-                        .equals(row.specimen.getActivityStatus().getName()))
+                    && ActivityStatus.FLAGGED == row.specimen.getActivityStatus())
                     return BgcPlugin.getDefault().getImageRegistry()
                         .get(BgcPlugin.IMG_ERROR);
                 return null;
@@ -175,8 +174,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
             public Image getColumnImage(SpecimenInfo row, int columnIndex) {
                 // FIXME retrieve this info as an enum in SpecimenInfo ?
                 if (columnIndex == 5
-                    && ActivityStatusWrapper.FLAGGED_STATUS_STRING
-                        .equals(row.specimen.getActivityStatus().getName()))
+                    && ActivityStatus.FLAGGED == row.specimen.getActivityStatus())
                     return BgcPlugin.getDefault().getImageRegistry()
                         .get(BgcPlugin.IMG_ERROR);
                 return null;
@@ -229,8 +227,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
             public Image getColumnImage(SpecimenInfo row, int columnIndex) {
                 // FIXME retrieve this info as an enum in SpecimenInfo ?
                 if (columnIndex == 5
-                    && ActivityStatusWrapper.FLAGGED_STATUS_STRING
-                        .equals(row.specimen.getActivityStatus().getName()))
+                    && ActivityStatus.FLAGGED == row.specimen.getActivityStatus())
                     return BgcPlugin.getDefault().getImageRegistry()
                         .get(BgcPlugin.IMG_ERROR);
                 return null;

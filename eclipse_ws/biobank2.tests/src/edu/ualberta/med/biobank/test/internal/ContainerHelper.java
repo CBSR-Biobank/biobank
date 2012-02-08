@@ -3,10 +3,10 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.Arrays;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 
 @Deprecated
 public class ContainerHelper extends DbHelper {
@@ -33,8 +33,7 @@ public class ContainerHelper extends DbHelper {
         }
         container.setProductBarcode(barcode);
         container.setSite(site);
-        container.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
+        container.setActivityStatus(ActivityStatus.ACTIVE);
         return container;
     }
 

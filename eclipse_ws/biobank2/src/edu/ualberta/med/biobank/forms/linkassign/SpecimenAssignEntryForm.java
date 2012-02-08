@@ -47,7 +47,6 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenResInfo;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -60,6 +59,7 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
@@ -155,8 +155,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             currentMultipleContainer.initObjectWith(new ContainerWrapper(
                 SessionManager.getAppService()));
             currentMultipleContainer.reset();
-            currentMultipleContainer.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(SessionManager.getAppService()));
+            currentMultipleContainer.setActivityStatus(ActivityStatus.ACTIVE);
             currentMultipleContainer.setSite(SessionManager.getUser()
                 .getCurrentWorkingSite());
         } catch (Exception e) {
@@ -1003,7 +1002,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     csAction.typeId =
                         currentMultipleContainer.getContainerType()
                             .getId();
-                    csAction.activityStatusId =
+                    csAction.activityStatus =
                         currentMultipleContainer.getActivityStatus()
                             .getId();
                     csAction.siteId =

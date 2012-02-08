@@ -20,7 +20,7 @@ public class ContainerSaveAction implements Action<IdResult> {
     public static final String PATH_DELIMITER = "/"; //$NON-NLS-1$
 
     public Integer containerId;
-    public Integer activityStatusId;
+    public ActivityStatus activityStatus;
     public String barcode;
     public String label;
     public Integer siteId;
@@ -33,8 +33,8 @@ public class ContainerSaveAction implements Action<IdResult> {
         this.containerId = containerId;
     }
 
-    public void setActivityStatusId(Integer activityStatusId) {
-        this.activityStatusId = activityStatusId;
+    public void setActivityStatusId(ActivityStatus activityStatus) {
+        this.activityStatus = activityStatus;
     }
 
     public void setBarcode(String barcode) {
@@ -83,8 +83,7 @@ public class ContainerSaveAction implements Action<IdResult> {
         } else {
             container = new Container();
         }
-        container.setActivityStatus(context.load(ActivityStatus.class,
-            activityStatusId));
+        container.setActivityStatus(activityStatus);
         container.setSite(context.load(Site.class, siteId));
         container.setProductBarcode(barcode);
         container.setContainerType(context.load(ContainerType.class,

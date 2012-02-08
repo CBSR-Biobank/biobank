@@ -16,7 +16,7 @@ public class AliquotedSpecimenSaveAction implements Action<IdResult> {
     private Integer quantity;
     private Double volume;
     private Integer studyId;
-    private Integer aStatusId;
+    private ActivityStatus activityStatus;
     private Integer specimenTypeId;
 
     public void setId(Integer id) {
@@ -35,8 +35,8 @@ public class AliquotedSpecimenSaveAction implements Action<IdResult> {
         this.studyId = id;
     }
 
-    public void setActivityStatusId(Integer activityStatusId) {
-        this.aStatusId = activityStatusId;
+    public void setActivityStatus(ActivityStatus activityStatus) {
+        this.activityStatus = activityStatus;
     }
 
     public void setSpecimenTypeId(Integer specimenTypeId) {
@@ -61,7 +61,7 @@ public class AliquotedSpecimenSaveAction implements Action<IdResult> {
             throw new NullPointerException("specimen type id cannot be null");
         }
 
-        if (aStatusId == null) {
+        if (activityStatus == null) {
             throw new NullPointerException("activity status not specified");
         }
 
@@ -72,10 +72,7 @@ public class AliquotedSpecimenSaveAction implements Action<IdResult> {
 
         Study study = context.get(Study.class, studyId, new Study());
         aqSpc.setStudy(study);
-
-        ActivityStatus aStatus =
-            context.get(ActivityStatus.class, aStatusId);
-        aqSpc.setActivityStatus(aStatus);
+        aqSpc.setActivityStatus(activityStatus);
 
         SpecimenType specimenType =
             context.get(SpecimenType.class, specimenTypeId,

@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
 @Deprecated
@@ -27,8 +27,7 @@ public class ProcessingEventHelper extends DbHelper {
         pevent.setWorksheet(TestCommon.getUniqueWorksheet(r));
         pevent.setCenter(center);
         pevent.setCreatedAt(createdAt);
-        pevent.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        pevent.setActivityStatus(ActivityStatus.ACTIVE);
         return pevent;
     }
 

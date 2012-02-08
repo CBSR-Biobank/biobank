@@ -6,6 +6,7 @@ package edu.ualberta.med.biobank.common.wrappers.base;
 
 import java.util.List;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -24,8 +25,6 @@ import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.MembershipBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.ActivityStatusBaseWrapper;
 
 public abstract class CenterBaseWrapper<E extends Center> extends ModelWrapper<E> {
 
@@ -376,17 +375,11 @@ public abstract class CenterBaseWrapper<E extends Center> extends ModelWrapper<E
         removeFromWrapperCollectionWithCheck(CenterPeer.ORIGIN_INFO_COLLECTION, originInfoCollection);
     }
 
-    public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatusWrapper activityStatus = getWrappedProperty(CenterPeer.ACTIVITY_STATUS, ActivityStatusWrapper.class);
-        return activityStatus;
+    public ActivityStatus getActivityStatus() {
+        return wrappedObject.getActivityStatus();
     }
 
-    public void setActivityStatus(ActivityStatusBaseWrapper activityStatus) {
-        setWrappedProperty(CenterPeer.ACTIVITY_STATUS, activityStatus);
+    public void setActivityStatus(ActivityStatus activityStatus) {
+        wrappedObject.setActivityStatus(activityStatus);
     }
-
-    void setActivityStatusInternal(ActivityStatusBaseWrapper activityStatus) {
-        setWrappedProperty(CenterPeer.ACTIVITY_STATUS, activityStatus);
-    }
-
 }

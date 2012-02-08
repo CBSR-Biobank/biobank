@@ -19,7 +19,6 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankRuntimeException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -31,6 +30,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
@@ -490,8 +490,7 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        container.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        container.setActivityStatus(ActivityStatus.ACTIVE);
         container.persist();
     }
 
@@ -929,7 +928,7 @@ public class TestContainer extends TestDatabase {
                 sampleType = selectedSampleTypes.get(r.nextInt(n));
                 samplesTypesMap.put(new RowColPos(row, col), sampleType);
                 childL3.addSpecimen(row, col, SpecimenHelper.addSpecimen(
-                    sampleType, ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+                    sampleType, ActivityStatus.ACTIVE,
                     Utils.getRandomDate(), ce, site));
                 SpecimenWrapper spc = childL3.getSpecimen(row, col);
                 spc.persist();
@@ -1352,7 +1351,7 @@ public class TestContainer extends TestDatabase {
                 StudyHelper.addStudy("tests")), 1);
 
         SpecimenWrapper parentSpc = SpecimenHelper.addSpecimen(spcType,
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING, Utils.getRandomDate(),
+            ActivityStatus.ACTIVE, Utils.getRandomDate(),
             ce, site);
 
         PatientWrapper patient = PatientHelper.addPatient(

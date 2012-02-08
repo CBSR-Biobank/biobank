@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.junit.Assert;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 
 @Deprecated
 public class StudyHelper extends DbHelper {
@@ -17,8 +17,7 @@ public class StudyHelper extends DbHelper {
     public static StudyWrapper newStudy(String name) throws Exception {
         StudyWrapper study = new StudyWrapper(appService);
         study.setName(name);
-        study.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
+        study.setActivityStatus(ActivityStatus.ACTIVE);
         if (name != null) {
             if (name.length() < 50) {
                 study.setNameShort(name);

@@ -14,7 +14,6 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -22,6 +21,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
@@ -63,8 +63,7 @@ public class OldSiteEntryForm extends AddressEntryFormCommon {
         String tabName;
         if (site.isNew()) {
             tabName = Messages.SiteEntryForm_title_new;
-            site.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(SessionManager.getAppService()));
+            site.setActivityStatus(ActivityStatus.ACTIVE);
         } else {
             tabName = NLS.bind(Messages.SiteEntryForm_title_edit,
                 site.getNameShort());
@@ -108,13 +107,12 @@ public class OldSiteEntryForm extends AddressEntryFormCommon {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
-                .getAppService()), site.getActivityStatus(),
+            ActivityStatus.valuesList(), site.getActivityStatus(),
             Messages.SiteEntryForm_field_activity_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    site.setActivityStatus((ActivityStatusWrapper) selectedObject);
+                    site.setActivityStatus((ActivityStatus) selectedObject);
                 }
             });
 
@@ -167,8 +165,7 @@ public class OldSiteEntryForm extends AddressEntryFormCommon {
         site.reset();
 
         if (site.isNew()) {
-            site.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(SessionManager.getAppService()));
+            site.setActivityStatus(ActivityStatus.ACTIVE);
         }
 
         GuiUtil.reset(activityStatusComboViewer, site.getActivityStatus());

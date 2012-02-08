@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -23,6 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -59,7 +59,7 @@ public class TestCenter extends TestDatabase {
             site, PatientHelper.addPatient("testP", testStudy), 0,
             SpecimenHelper.newSpecimen(
                 SpecimenTypeHelper.addSpecimenType("testTypeRequest"),
-                "Active", new Date()));
+                ActivityStatus.ACTIVE, new Date()));
         RequestHelper.addRequest(testStudy, true,
             ce.getAllSpecimenCollection(false)
                 .toArray(new SpecimenWrapper[] {}));
@@ -87,7 +87,7 @@ public class TestCenter extends TestDatabase {
             .addProcessingEvent(site, new Date());
         SpecimenTypeWrapper testtype = SpecimenTypeHelper
             .addSpecimenType("testTypeAliquoted");
-        SpecimenWrapper parent = SpecimenHelper.newSpecimen(testtype, "Active",
+        SpecimenWrapper parent = SpecimenHelper.newSpecimen(testtype, ActivityStatus.ACTIVE,
             new Date());
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
             site, PatientHelper.addPatient("testP",
@@ -170,7 +170,7 @@ public class TestCenter extends TestDatabase {
             clinic, PatientHelper.addPatient("testP",
                 StudyHelper.addStudy("testStudy")), 0, SpecimenHelper
                 .newSpecimen(SpecimenTypeHelper.addSpecimenType("testType"),
-                    "Active", new Date()));
+                    ActivityStatus.ACTIVE, new Date()));
 
         dispatch.addSpecimens(ce.getAllSpecimenCollection(false),
             DispatchSpecimenState.EXTRA);
@@ -201,8 +201,7 @@ public class TestCenter extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        site.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        site.setActivityStatus(ActivityStatus.ACTIVE);
         SiteHelper.createdSites.add(site);
         site.persist();
         int newTotal = SiteQuery.getSites(appService).size();
@@ -265,8 +264,7 @@ public class TestCenter extends TestDatabase {
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
         site.setNameShort(name);
-        site.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        site.setActivityStatus(ActivityStatus.ACTIVE);
 
         try {
             site.persist();

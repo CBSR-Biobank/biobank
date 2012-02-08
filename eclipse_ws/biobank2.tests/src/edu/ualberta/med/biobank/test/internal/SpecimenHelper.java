@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -18,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
@@ -25,13 +25,12 @@ import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 public class SpecimenHelper extends DbHelper {
 
     public static SpecimenWrapper newSpecimen(SpecimenTypeWrapper specimenType,
-        String activityStatus, Date createdAt) throws Exception {
+        ActivityStatus activityStatus, Date createdAt) throws Exception {
         SpecimenWrapper specimen = new SpecimenWrapper(appService);
         specimen.setSpecimenType(specimenType);
         specimen.setInventoryId(TestCommon.getNewInventoryId(new Random()));
         if (activityStatus != null) {
-            specimen.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-                appService, activityStatus));
+            specimen.setActivityStatus(activityStatus);
         }
         specimen.setCreatedAt(createdAt);
         return specimen;
@@ -39,8 +38,7 @@ public class SpecimenHelper extends DbHelper {
 
     public static SpecimenWrapper newSpecimen(SpecimenTypeWrapper specimenType)
         throws Exception {
-        return newSpecimen(specimenType,
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING, Utils.getRandomDate());
+        return newSpecimen(specimenType, ActivityStatus.ACTIVE, Utils.getRandomDate());
     }
 
     public static SpecimenWrapper newSpecimen(String specimenTypeName)
@@ -49,7 +47,7 @@ public class SpecimenHelper extends DbHelper {
     }
 
     public static SpecimenWrapper newSpecimen(SpecimenWrapper parentSpc,
-        SpecimenTypeWrapper specimenType, String activityStatus,
+        SpecimenTypeWrapper specimenType, ActivityStatus activityStatus,
         ProcessingEventWrapper pevent) throws Exception {
         SpecimenWrapper specimen = newSpecimen(specimenType, activityStatus,
             Utils.getRandomDate());
@@ -67,7 +65,7 @@ public class SpecimenHelper extends DbHelper {
     }
 
     public static SpecimenWrapper newSpecimen(SpecimenWrapper parentSpc,
-        SpecimenTypeWrapper specimenType, String activityStatus,
+        SpecimenTypeWrapper specimenType, ActivityStatus activityStatus,
         ProcessingEventWrapper pevent, ContainerWrapper container, Integer row,
         Integer col) throws Exception {
 
@@ -82,7 +80,7 @@ public class SpecimenHelper extends DbHelper {
     }
 
     public static SpecimenWrapper addSpecimen(SpecimenWrapper parentSpc,
-        SpecimenTypeWrapper specimenType, String activityStatus,
+        SpecimenTypeWrapper specimenType, ActivityStatus activityStatus,
         ProcessingEventWrapper pevent) throws Exception {
         SpecimenWrapper spc = newSpecimen(parentSpc, specimenType,
             activityStatus, pevent);
@@ -94,13 +92,13 @@ public class SpecimenHelper extends DbHelper {
         SpecimenTypeWrapper specimenType, ProcessingEventWrapper pevent)
         throws Exception {
         SpecimenWrapper spc = newSpecimen(parentSpc, specimenType,
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING, pevent);
+            ActivityStatus.ACTIVE, pevent);
         spc.persist();
         return spc;
     }
 
     public static SpecimenWrapper addSpecimen(SpecimenTypeWrapper specimenType,
-        String activityStatus, Date createdAt, CollectionEventWrapper cevent,
+        ActivityStatus activityStatus, Date createdAt, CollectionEventWrapper cevent,
         CenterWrapper<?> center) throws Exception {
         SpecimenWrapper specimen = newSpecimen(specimenType, activityStatus,
             createdAt);
@@ -136,7 +134,7 @@ public class SpecimenHelper extends DbHelper {
         SpecimenTypeWrapper specimenType, ProcessingEventWrapper pevent,
         ContainerWrapper container, Integer row, Integer col) throws Exception {
         SpecimenWrapper spc = newSpecimen(parentSpc, specimenType,
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING, pevent, container, row,
+            ActivityStatus.ACTIVE, pevent, container, row,
             col);
         spc.persist();
         return spc;
@@ -261,8 +259,7 @@ public class SpecimenHelper extends DbHelper {
         st.persist();
         SpecimenWrapper newSpec = newSpecimen(st);
         newSpec.setCreatedAt(Utils.getRandomDate());
-        newSpec.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        newSpec.setActivityStatus(ActivityStatus.ACTIVE);
 
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
             clinic, patient, visitNumber, newSpec);

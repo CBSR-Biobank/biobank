@@ -25,7 +25,6 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.util.Holder;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
@@ -41,6 +40,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import edu.ualberta.med.biobank.wizards.SelectCollectionEventWizard;
@@ -289,14 +289,13 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.SpecimenEntryForm_status_label,
-            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
-                .getAppService()), specimen.getActivityStatus(),
+            ActivityStatus.valuesList(), specimen.getActivityStatus(),
             Messages.SpecimenEntryForm_status_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     specimen
-                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                        .setActivityStatus((ActivityStatus) selectedObject);
                 }
             });
 
@@ -360,7 +359,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         });
 
         updateAction.setCommentMessage(commentMessage.getValue());
-        updateAction.setActivityStatusId(specimen.getActivityStatus().getId());
+        updateAction.setActivityStatus(specimen.getActivityStatus().getId());
 
         SessionManager.getAppService().doAction(updateAction);
     }

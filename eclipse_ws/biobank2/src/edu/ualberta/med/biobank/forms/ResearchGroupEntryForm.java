@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
 import edu.ualberta.med.biobank.common.peer.ResearchGroupPeer;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -27,6 +26,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
@@ -89,8 +89,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         String tabName;
         if (researchGroup.isNew()) {
             tabName = Messages.ResearchGroupEntryForm_title_new;
-            researchGroup.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(SessionManager.getAppService()));
+            researchGroup.setActivityStatus(ActivityStatus.ACTIVE);
         } else
             tabName = NLS.bind(Messages.ResearchGroupEntryForm_title_edit,
                 researchGroup.getNameShort());
@@ -157,14 +156,13 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
-                .getAppService()), researchGroup.getActivityStatus(),
+            ActivityStatus.valuesList(), researchGroup.getActivityStatus(),
             Messages.ResearchGroupEntryForm_activity_validator_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     researchGroup
-                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                        .setActivityStatus((ActivityStatus) selectedObject);
                 }
             });
 
@@ -245,8 +243,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         researchGroup.reset();
 
         if (researchGroup.isNew()) {
-            researchGroup.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(SessionManager.getAppService()));
+            researchGroup.setActivityStatus(ActivityStatus.ACTIVE);
             researchGroup.setStudy(null);
         }
 

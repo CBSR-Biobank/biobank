@@ -508,7 +508,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 SpecimenWrapper sourceSpecimen = cell.getSourceSpecimen();
                 SpecimenWrapper aliquotedSpecimen = cell.getSpecimen();
                 AliquotedSpecimenInfo asi = new AliquotedSpecimenInfo();
-                asi.statusId = ActivityStatusEnum.ACTIVE.getId();
+                asi.activityStatus = ActivityStatusEnum.ACTIVE.getId();
                 asi.typeId = aliquotedSpecimen.getSpecimenType().getId();
                 asi.inventoryId = cell.getValue();
                 asi.parentSpecimenId = sourceSpecimen.getId();
@@ -549,7 +549,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     private void saveSingleSpecimen() throws Exception {
         AliquotedSpecimenInfo asi = new AliquotedSpecimenInfo();
-        asi.statusId = ActivityStatusEnum.ACTIVE.getId();
+        asi.activityStatus = ActivityStatusEnum.ACTIVE.getId();
         asi.typeId = singleSpecimen.getSpecimenType().getId();
         if (singleSpecimen.getParentContainer() != null) {
             asi.containerId = singleSpecimen.getParentContainer().getId();

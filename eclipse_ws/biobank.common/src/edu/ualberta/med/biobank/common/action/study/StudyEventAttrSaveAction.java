@@ -19,7 +19,7 @@ public class StudyEventAttrSaveAction implements Action<IdResult> {
     public Integer globalEventAttrId;
     public Boolean required;
     public String permissible;
-    public Integer aStatusId;
+    public ActivityStatus activityStatus;
     public Integer studyId;
 
     public void setId(Integer id) {
@@ -38,8 +38,8 @@ public class StudyEventAttrSaveAction implements Action<IdResult> {
         this.permissible = permissible;
     }
 
-    public void setActivityStatusId(Integer aStatusId) {
-        this.aStatusId = aStatusId;
+    public void setActivityStatusId(ActivityStatus activityStatus) {
+        this.activityStatus = activityStatus;
     }
 
     public void setStudyId(Integer studyId) {
@@ -64,9 +64,6 @@ public class StudyEventAttrSaveAction implements Action<IdResult> {
         if (required == null) {
             throw new NullPointerException("required field cannot be null");
         }
-        if (aStatusId == null) {
-            throw new NullPointerException("activity status cannot be null");
-        }
 
         StudyEventAttr attr = context.get(StudyEventAttr.class, id,
             new StudyEventAttr());
@@ -77,7 +74,7 @@ public class StudyEventAttrSaveAction implements Action<IdResult> {
         attr.setGlobalEventAttr(globalAttr);
         attr.setPermissible(permissible);
         attr.setRequired(required);
-        attr.setActivityStatus(context.load(ActivityStatus.class, aStatusId));
+        attr.setActivityStatus(activityStatus);
         attr.setStudy(context.load(Study.class, studyId));
 
         context.getSession().saveOrUpdate(attr);

@@ -17,7 +17,7 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
     private Integer specimenId;
     private Integer specimenTypeId;
     private Integer collectionEventId;
-    private Integer activityStatusId;
+    private ActivityStatus activityStatus;
     private String commentMessage;
 
     public void setSpecimenId(Integer specimenId) {
@@ -32,8 +32,8 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
         this.collectionEventId = collectionEventId;
     }
 
-    public void setActivityStatusId(Integer activityStatusId) {
-        this.activityStatusId = activityStatusId;
+    public void setActivityStatus(ActivityStatus activityStatus) {
+        this.activityStatus = activityStatus;
     }
 
     public void setCommentMessage(String commentMessage) {
@@ -53,8 +53,6 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
             context.load(SpecimenType.class, specimenTypeId);
         specimen.setSpecimenType(specimenType);
 
-        ActivityStatus activityStatus =
-            context.load(ActivityStatus.class, activityStatusId);
         specimen.setActivityStatus(activityStatus);
 
         Comment comment = addComment(context, specimen);

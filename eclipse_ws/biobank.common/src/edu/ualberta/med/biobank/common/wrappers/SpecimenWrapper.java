@@ -10,7 +10,6 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
@@ -31,6 +30,7 @@ import edu.ualberta.med.biobank.common.wrappers.loggers.SpecimenLogProvider;
 import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
 import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage;
 import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage.LazyArg;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -224,16 +224,14 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         + Specimen.class.getName()
         + " spec where spec." //$NON-NLS-1$
         + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
-        + " = ? and " //$NON-NLS-1$
-        + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
-            ActivityStatusPeer.NAME) + " != ?"; //$NON-NLS-1$
+        + " = ? and activityStatus != ?"; //$NON-NLS-1$
 
     public static List<SpecimenWrapper> getSpecimensNonActiveInCenter(
         WritableApplicationService appService, CenterWrapper<?> center)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(SPECIMENS_NON_ACTIVE_QRY,
             Arrays.asList(new Object[] { center.getId(),
-                ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
+                ActivityStatus.ACTIVE }));
         List<Specimen> Specimens = appService.query(criteria);
         List<SpecimenWrapper> list = new ArrayList<SpecimenWrapper>();
 
@@ -309,13 +307,13 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     public boolean isActive() {
-        ActivityStatusWrapper status = getActivityStatus();
-        return status != null && status.isActive();
+        ActivityStatus status = getActivityStatus();
+        return ActivityStatus.ACTIVE == status;
     }
 
     public boolean isFlagged() {
-        ActivityStatusWrapper status = getActivityStatus();
-        return status != null && status.isFlagged();
+        ActivityStatus status = getActivityStatus();
+        return ActivityStatus.FLAGGED == status;
     }
 
     public List<DispatchSpecimenWrapper> getDispatchSpecimenCollection() {

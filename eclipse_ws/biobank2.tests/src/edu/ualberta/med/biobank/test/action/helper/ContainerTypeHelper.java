@@ -22,7 +22,7 @@ public class ContainerTypeHelper {
         ctSaveAction.setTopLevel(isTopLevel);
         ctSaveAction.setRowCapacity(rowCapacity);
         ctSaveAction.setColCapacity(colCapacity);
-        ctSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        ctSaveAction.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
         ctSaveAction.setDefaultTemperature(defaultTemp);
         ctSaveAction.setChildLabelingSchemeId(childLabelingSchemeId);
 
@@ -54,7 +54,7 @@ public class ContainerTypeHelper {
         containerTypeSaveAction.setChildLabelingSchemeId(
             containerTypeInfo.containerType.getChildLabelingScheme().getId());
 
-        containerTypeSaveAction.setActivityStatusId(
+        containerTypeSaveAction.setActivityStatus(
             containerTypeInfo.containerType.getActivityStatus().getId());
 
         HashSet<Integer> ids = new HashSet<Integer>();

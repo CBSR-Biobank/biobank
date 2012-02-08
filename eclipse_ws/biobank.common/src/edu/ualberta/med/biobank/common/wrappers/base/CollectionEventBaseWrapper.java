@@ -6,6 +6,7 @@ package edu.ualberta.med.biobank.common.wrappers.base;
 
 import java.util.List;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -19,8 +20,6 @@ import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.EventAttrBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.CommentBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.ActivityStatusBaseWrapper;
 import java.util.Arrays;
 
 public class CollectionEventBaseWrapper extends ModelWrapper<CollectionEvent> {
@@ -218,17 +217,12 @@ public class CollectionEventBaseWrapper extends ModelWrapper<CollectionEvent> {
         removeFromWrapperCollectionWithCheck(CollectionEventPeer.COMMENT_COLLECTION, commentCollection);
     }
 
-    public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatusWrapper activityStatus = getWrappedProperty(CollectionEventPeer.ACTIVITY_STATUS, ActivityStatusWrapper.class);
-        return activityStatus;
+    public ActivityStatus getActivityStatus() {
+        return wrappedObject.getActivityStatus();
     }
 
-    public void setActivityStatus(ActivityStatusBaseWrapper activityStatus) {
-        setWrappedProperty(CollectionEventPeer.ACTIVITY_STATUS, activityStatus);
-    }
-
-    void setActivityStatusInternal(ActivityStatusBaseWrapper activityStatus) {
-        setWrappedProperty(CollectionEventPeer.ACTIVITY_STATUS, activityStatus);
+    public void setActivityStatus(ActivityStatus activityStatus) {
+        wrappedObject.setActivityStatus(activityStatus);
     }
 
     public List<SpecimenWrapper> getOriginalSpecimenCollection(boolean sort) {

@@ -70,7 +70,7 @@ public class StudySaveAction implements Action<IdResult> {
         public Integer id = null;
         public Integer quantity;
         public Double volume;
-        public Integer aStatusId;
+        public ActivityStatus activityStatus;
         public Integer specimenTypeId;
 
         public AliquotedSpecimenSaveInfo() {
@@ -81,7 +81,7 @@ public class StudySaveAction implements Action<IdResult> {
             this.id = aliquotedSpecimen.getId();
             this.quantity = aliquotedSpecimen.getQuantity();
             this.volume = aliquotedSpecimen.getVolume();
-            this.aStatusId = aliquotedSpecimen.getActivityStatus().getId();
+            this.activityStatus = aliquotedSpecimen.getActivityStatus();
             this.specimenTypeId = aliquotedSpecimen.getSpecimenType().getId();
         }
 
@@ -105,7 +105,7 @@ public class StudySaveAction implements Action<IdResult> {
         public Integer globalEventAttrId;
         public Boolean required;
         public String permissible;
-        public Integer aStatusId;
+        public ActivityStatus activityStatus;
 
         public StudyEventAttrSaveInfo() {
 
@@ -117,7 +117,7 @@ public class StudySaveAction implements Action<IdResult> {
                 studyEventAttr.getGlobalEventAttr().getId();
             this.required = studyEventAttr.getRequired();
             this.permissible = studyEventAttr.getPermissible();
-            this.aStatusId = studyEventAttr.getActivityStatus().getId();
+            this.activityStatus = studyEventAttr.getActivityStatus();
         }
 
         public StudyEventAttr populateStudyEventAttr(Study study,
@@ -136,7 +136,7 @@ public class StudySaveAction implements Action<IdResult> {
     private Integer id = null;
     private String name;
     private String nameShort;
-    private Integer aStatusId;
+    private ActivityStatus activityStatus;
     private Set<Integer> siteIds;
     private Set<Integer> contactIds;
     private Collection<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos;
@@ -157,8 +157,8 @@ public class StudySaveAction implements Action<IdResult> {
         this.nameShort = nameShort;
     }
 
-    public void setActivityStatusId(Integer activityStatusId) {
-        this.aStatusId = activityStatusId;
+    public void setActivityStatus(ActivityStatus activityStatus) {
+        this.activityStatus = activityStatus;
     }
 
     public void setSiteIds(Set<Integer> siteIds) {
@@ -206,7 +206,7 @@ public class StudySaveAction implements Action<IdResult> {
         if (nameShort == null) {
             throw new NullPropertyException(Study.class, StudyPeer.NAME_SHORT);
         }
-        if (aStatusId == null) {
+        if (activityStatus == null) {
             throw new NullPropertyException(Study.class, "activity status id");
         }
         if (siteIds == null) {
@@ -249,7 +249,7 @@ public class StudySaveAction implements Action<IdResult> {
         study.setId(id);
         study.setName(name);
         study.setNameShort(nameShort);
-        study.setActivityStatus(context.load(ActivityStatus.class, aStatusId));
+        study.setActivityStatus(activityStatus);
 
         saveSites(context);
         saveContacts(context);
@@ -346,8 +346,8 @@ public class StudySaveAction implements Action<IdResult> {
                     asSaveInfo.id);
             }
             newAsCollection.add(asSaveInfo.populateAliquotedSpecimen(study, as,
-                context.load(ActivityStatus.class,
-                    asSaveInfo.aStatusId),
+
+                asSaveInfo.activityStatus,
                 context.load(SpecimenType.class,
                     asSaveInfo.specimenTypeId)));
         }
@@ -382,8 +382,7 @@ public class StudySaveAction implements Action<IdResult> {
             newEAttrCollection.add(eAttrSaveInfo.populateStudyEventAttr(study,
                 seAttr, context.load(GlobalEventAttr.class,
                     eAttrSaveInfo.globalEventAttrId),
-                context.load(ActivityStatus.class,
-                    eAttrSaveInfo.aStatusId)));
+                eAttrSaveInfo.activityStatus));
             geAttrIdsUsed.add(eAttrSaveInfo.globalEventAttrId);
         }
 

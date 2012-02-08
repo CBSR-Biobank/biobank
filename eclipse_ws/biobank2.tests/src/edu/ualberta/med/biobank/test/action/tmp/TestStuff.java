@@ -59,11 +59,7 @@ public class TestStuff {
             s1.setNameShort("b");
         }
 
-        ActivityStatus active =
-            (ActivityStatus) session
-                .createQuery(
-                    "select o from " + ActivityStatus.class.getName()
-                        + " o where name = 'Active'").list().get(0);
+        ActivityStatus active = ActivityStatus.ACTIVE;
 
         Address address = s1.getAddress();
         address.setCity(new BigInteger(10, new Random()).toString(32));

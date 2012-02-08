@@ -37,7 +37,6 @@ import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimensAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -47,6 +46,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
@@ -145,9 +145,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             ceventCopy.setVisitNumber(SessionManager.getAppService().doAction(
                 new PatientNextVisitNumberAction(ceventInfo.cevent.getPatient()
                     .getId())).getNextVisitNumber());
-            ceventCopy.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(SessionManager.getAppService())
-                .getWrappedObject());
+            ceventCopy.setActivityStatus(ActivityStatus.ACTIVE);
             sourceSpecimens = new ArrayList<SpecimenInfo>();
         } else {
             ceventCopy.setId(ceventInfo.cevent.getId());
@@ -232,18 +230,17 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             createComboViewer(
                 client,
                 Messages.label_activity,
-                ActivityStatusWrapper.getAllActivityStatuses(SessionManager
-                    .getAppService()),
-                new ActivityStatusWrapper(null, ceventCopy.getActivityStatus()),
+                ActivityStatus.valuesList(),
+                ceventCopy.getActivityStatus(),
                 Messages.CollectionEventEntryForm_field_activity_validation_msg,
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
-                        if (!selectedObject.equals(ceventCopy
-                            .getActivityStatus())) setDirty(true);
+                        if (selectedObject != ceventCopy.getActivityStatus()) {
+                            setDirty(true);
+                        }
                         ceventCopy
-                            .setActivityStatus(((ActivityStatusWrapper) selectedObject)
-                                .getWrappedObject());
+                            .setActivityStatus((ActivityStatus) selectedObject);
                     }
                 });
 
@@ -403,7 +400,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             ceSpecInfo.quantity = specInfo.specimen.getQuantity();
             ceSpecInfo.specimenTypeId =
                 specInfo.specimen.getSpecimenType().getId();
-            ceSpecInfo.statusId = specInfo.specimen.getActivityStatus().getId();
+            ceSpecInfo.activityStatus = specInfo.specimen.getActivityStatus();
             ceSpecInfo.createdAt = specInfo.specimen.getCreatedAt();
             ceSpecInfo.centerId =
                 SessionManager.getUser().getCurrentWorkingCenter().getId();
@@ -424,7 +421,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         Integer savedCeventId = SessionManager.getAppService().doAction(
             new CollectionEventSaveAction(ceventCopy.getId(),
                 ceventCopy.getPatient().getId(), ceventCopy.getVisitNumber(),
-                ceventCopy.getActivityStatus().getId(), comment.getMessage(),
+                ceventCopy.getActivityStatus(), comment.getMessage(),
                 cevents, ceventAttrList)).getId();
         ((CollectionEventAdapter) adapter).setId(savedCeventId);
     }

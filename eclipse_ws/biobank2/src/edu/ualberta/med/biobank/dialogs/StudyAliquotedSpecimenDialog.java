@@ -14,13 +14,13 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -65,9 +65,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
 
             try {
                 this.newAliquotedSpecimen
-                    .setActivityStatus(ActivityStatusWrapper
-                        .getActiveActivityStatus(origAliquotedSpecimen
-                            .getAppService()));
+                    .setActivityStatus(ActivityStatus.ACTIVE);
             } catch (Exception e) {
                 BgcPlugin
                     .openAsyncError(
@@ -133,15 +131,14 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         activityStatus = getWidgetCreator().createComboViewer(
             contents,
             Messages.StudyAliquotedSpecimenDialog_label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
-                .getAppService()), newAliquotedSpecimen.getActivityStatus(),
+            ActivityStatus.valuesList(), newAliquotedSpecimen.getActivityStatus(),
             Messages.StudyAliquotedSpecimenDialog_validation_activity,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     try {
                         newAliquotedSpecimen
-                            .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                            .setActivityStatus((ActivityStatus) selectedObject);
                     } catch (Exception e) {
                         BgcPlugin
                             .openAsyncError(

@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResu
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenIsUsedInDispatchAction;
 import edu.ualberta.med.biobank.common.util.ItemState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Specimen;
 
@@ -193,8 +194,7 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
         if (specimen.getId() == null) {
             cell.setStatus(CellInfoStatus.ERROR);
             cell.setInformation(""); //$NON-NLS-1$
-        } else if (!specimen.getActivityStatus().getId()
-            .equals(ActivityStatusEnum.ACTIVE.getId())) {
+        } else if (specimen.getActivityStatus() != ActivityStatus.ACTIVE) {
             cell.setStatus(CellInfoStatus.ERROR);
             cell.setInformation(MessageFormat.format(Messages.getString(
                 "DispatchProcess.create.specimen.status", locale), //$NON-NLS-1$

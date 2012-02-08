@@ -82,7 +82,7 @@
 		<mapping class="edu.ualberta.med.biobank.model.StudyEventAttr" />
 		<mapping class="edu.ualberta.med.biobank.model.Study" />
 		<mapping class="edu.ualberta.med.biobank.model.User" />
-		
+
 		<event type="pre-update">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
 		</event>

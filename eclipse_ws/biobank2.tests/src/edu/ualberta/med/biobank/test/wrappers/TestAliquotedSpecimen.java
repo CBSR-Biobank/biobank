@@ -6,12 +6,12 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.AliquotedSpecimenBaseWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
@@ -118,18 +118,15 @@ public class TestAliquotedSpecimen extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        ActivityStatusWrapper as = ActivityStatusWrapper
-            .getActiveActivityStatus(appService);
-        ss.setActivityStatus(as);
+        ss.setActivityStatus(ActivityStatus.ACTIVE);
         ss.persist();
-        Assert.assertTrue(as.equals(ss.getActivityStatus()));
+        Assert.assertTrue(ActivityStatus.ACTIVE == ss.getActivityStatus());
 
-        ActivityStatusWrapper as2 = ActivityStatusWrapper.getActivityStatus(
-            appService, "Flagged");
-        ss.setActivityStatus(as2);
+
+        ss.setActivityStatus(ActivityStatus.FLAGGED);
         ss.persist();
-        Assert.assertTrue(as2.equals(ss.getActivityStatus()));
-        Assert.assertFalse(as.equals(ss.getActivityStatus()));
+        Assert.assertTrue(ActivityStatus.FLAGGED == ss.getActivityStatus());
+        Assert.assertFalse(ActivityStatus.ACTIVE == ss.getActivityStatus());
     }
 
     @Test

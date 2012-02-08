@@ -28,7 +28,7 @@ public class StudyHelper extends Helper {
         StudySaveAction saveAction = new StudySaveAction();
         saveAction.setName(name);
         saveAction.setNameShort(nameShort);
-        saveAction.setActivityStatusId(activityStatus.getId());
+        saveAction.setActivityStatus(activityStatus.getId());
         saveAction.setSiteIds(new HashSet<Integer>());
         saveAction.setContactIds(new HashSet<Integer>());
         saveAction
@@ -52,7 +52,7 @@ public class StudyHelper extends Helper {
         saveStudy.setId(studyInfo.study.getId());
         saveStudy.setName(studyInfo.study.getName());
         saveStudy.setNameShort(studyInfo.study.getNameShort());
-        saveStudy.setActivityStatusId(studyInfo.study.getActivityStatus()
+        saveStudy.setActivityStatus(studyInfo.study.getActivityStatus()
             .getId());
 
         saveStudy.setSiteIds(new HashSet<Integer>());

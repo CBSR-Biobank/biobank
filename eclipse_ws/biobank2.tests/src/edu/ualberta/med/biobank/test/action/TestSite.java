@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenDeleteAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
@@ -95,7 +96,7 @@ public class TestSite extends TestAction {
             Assert.assertTrue(true);
         }
 
-        siteSaveAction.setActivityStatusId(
+        siteSaveAction.setActivityStatus(
             ActivityStatusEnum.ACTIVE.getId());
         siteSaveAction.setAddress(null);
         try {
@@ -140,8 +141,7 @@ public class TestSite extends TestAction {
 
         Assert.assertEquals(name + "_site_city", siteInfo.site.getAddress()
             .getCity());
-        Assert.assertEquals("Active", siteInfo.site.getActivityStatus()
-            .getName());
+        Assert.assertEquals(ActivityStatus.ACTIVE, siteInfo.site.getActivityStatus());
         Assert.assertEquals(new Long(1), siteInfo.patientCount);
         Assert.assertEquals(new Long(1), siteInfo.collectionEventCount);
         Assert.assertEquals(new Long(0), siteInfo.aliquotedSpecimenCount);
@@ -405,7 +405,7 @@ public class TestSite extends TestAction {
         Integer containerTypeId = provisioning.containerTypeIds.get(0);
 
         ContainerSaveAction containerSaveAction = new ContainerSaveAction();
-        containerSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        containerSaveAction.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
         containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
         containerSaveAction.setLabel("01");
         containerSaveAction.setSiteId(provisioning.siteId);

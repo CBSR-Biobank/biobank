@@ -23,7 +23,6 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicI
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -32,6 +31,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
@@ -98,8 +98,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         String tabName;
         if (clinic.isNew()) {
             tabName = Messages.ClinicEntryForm_title_new;
-            clinic.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(SessionManager.getAppService()));
+            clinic.setActivityStatus(ActivityStatus.ACTIVE);
         } else
             tabName = NLS.bind(Messages.ClinicEntryForm_title_edit,
                 clinic.getNameShort());
@@ -152,14 +151,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
-                .getAppService()), clinic.getActivityStatus(),
+            ActivityStatus.valuesList(), clinic.getActivityStatus(),
             Messages.ClinicEntryForm_activity_validator_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     clinic
-                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                        .setActivityStatus((ActivityStatus) selectedObject);
                 }
             });
 
@@ -227,7 +225,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         saveClinic.setId(clinic.getId());
         saveClinic.setName(clinic.getName());
         saveClinic.setNameShort(clinic.getNameShort());
-        saveClinic.setActivityStatusId(clinic.getActivityStatus().getId());
+        saveClinic.setActivityStatus(clinic.getActivityStatus().getId());
         saveClinic.setSendsShipments(clinic.getSendsShipments());
         saveClinic.setContactSaveInfos(new HashSet<ContactSaveInfo>());
         saveClinic.setAddress(clinic.getAddress().getWrappedObject());
@@ -250,8 +248,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         clinic.reset();
 
         if (clinic.isNew()) {
-            clinic.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(SessionManager.getAppService()));
+            clinic.setActivityStatus(ActivityStatus.ACTIVE);
         }
 
         GuiUtil.reset(activityStatusComboViewer, clinic.getActivityStatus());

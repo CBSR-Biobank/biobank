@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGet
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
@@ -83,7 +84,7 @@ public class TestClinic extends TestAction {
             Assert.assertTrue(true);
         }
 
-        clinicSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE.getId());
+        clinicSaveAction.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
         clinicSaveAction.setAddress(null);
         try {
             EXECUTOR.exec(clinicSaveAction);
@@ -125,8 +126,7 @@ public class TestClinic extends TestAction {
         ClinicInfo clinicInfo =
             EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
 
-        Assert.assertEquals("Active", clinicInfo.clinic.getActivityStatus()
-            .getName());
+        Assert.assertEquals(ActivityStatus.ACTIVE, clinicInfo.clinic.getActivityStatus());
         Assert.assertEquals(new Long(1), clinicInfo.patientCount);
         Assert.assertEquals(new Long(1), clinicInfo.collectionEventCount);
         Assert.assertEquals(1, clinicInfo.contacts.size());

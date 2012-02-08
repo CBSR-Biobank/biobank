@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfo
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -119,7 +120,7 @@ public class TestContainerType extends TestAction {
             .setChildLabelingSchemeId(getContainerLabelingSchemes().get(
                 "CBSR 2 char alphabetic")
                 .getId());
-        containerTypeSaveAction.setActivityStatusId(null);
+        containerTypeSaveAction.setActivityStatus(null);
         try {
             EXECUTOR.exec(containerTypeSaveAction);
             Assert
@@ -129,7 +130,7 @@ public class TestContainerType extends TestAction {
         }
 
         // test success path
-        containerTypeSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE
+        containerTypeSaveAction.setActivityStatus(ActivityStatusEnum.ACTIVE
             .getId());
         EXECUTOR.exec(containerTypeSaveAction);
     }
@@ -143,8 +144,8 @@ public class TestContainerType extends TestAction {
 
         Assert.assertEquals("FREEZER_3x10",
             topContainerTypeInfo.containerType.getName());
-        Assert.assertEquals("Active", topContainerTypeInfo.containerType
-            .getActivityStatus().getName());
+        Assert.assertEquals(ActivityStatus.ACTIVE, topContainerTypeInfo.containerType
+            .getActivityStatus());
         Assert.assertEquals(3, topContainerTypeInfo.containerType
             .getCapacity().getRowCapacity().intValue());
         Assert.assertEquals(10, topContainerTypeInfo.containerType
@@ -431,7 +432,7 @@ public class TestContainerType extends TestAction {
             EXECUTOR.exec(containerTypeSaveAction).getId();
 
         ContainerSaveAction containerSaveAction = new ContainerSaveAction();
-        containerSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE
+        containerSaveAction.setActivityStatus(ActivityStatusEnum.ACTIVE
             .getId());
         containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
         containerSaveAction.setLabel("01");

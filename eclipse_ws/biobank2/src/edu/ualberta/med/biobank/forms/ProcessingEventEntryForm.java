@@ -22,7 +22,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -33,6 +32,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
@@ -65,7 +65,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     private SpecimenEntryWidget specimenEntryWidget;
 
-    private ActivityStatusWrapper closedActivityStatus;
+    private ActivityStatus closedActivityStatus;
 
     private CommentCollectionInfoTable commentEntryTable;
 
@@ -89,8 +89,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         String tabName;
         if (pEvent.isNew()) {
             tabName = Messages.ProcessingEventEntryForm_title_new;
-            pEvent.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(SessionManager.getAppService()));
+            pEvent.setActivityStatus(ActivityStatus.ACTIVE);
         } else {
             if (pEvent.getWorksheet() == null)
                 tabName =
@@ -103,10 +102,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                         Messages.ProcessingEventEntryForm_title_edit_noworksheet,
                         pEvent.getFormattedCreatedAt());
         }
-        closedActivityStatus =
-            ActivityStatusWrapper.getActivityStatus(
-                SessionManager.getAppService(),
-                ActivityStatusWrapper.CLOSED_STATUS_STRING);
+        closedActivityStatus = ActivityStatus.CLOSED;
         setPartName(tabName);
     }
 
@@ -153,8 +149,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             createComboViewer(
                 client,
                 Messages.label_activity,
-                ActivityStatusWrapper.getAllActivityStatuses(SessionManager
-                    .getAppService()),
+                ActivityStatus.valuesList(),
                 pEvent.getActivityStatus(),
                 Messages.ProcessingEventEntryForm_field_activity_validation_msg,
                 new ComboSelectionUpdate() {
@@ -162,7 +157,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     public void doSelection(Object selectedObject) {
                         setDirty(true);
                         pEvent
-                            .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                            .setActivityStatus((ActivityStatus) selectedObject);
                     }
                 });
         if (pEvent.getActivityStatus() != null) {
@@ -415,8 +410,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         pEvent.reset();
         pEvent.setCenter(center);
         if (pEvent.isNew()) {
-            pEvent.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(SessionManager.getAppService()));
+            pEvent.setActivityStatus(ActivityStatus.ACTIVE);
         }
         GuiUtil.reset(activityStatusComboViewer, pEvent.getActivityStatus());
         specimenEntryWidget.setSpecimens(pEvent.getSpecimenCollection(true));

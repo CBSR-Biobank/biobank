@@ -9,7 +9,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -146,9 +145,7 @@ public class ClinicCopy {
                 newClinic.setNameShort(clinic.getNameShort());
                 // newClinic.setComment(clinic.getComment());
                 newClinic.setAddress(newAddress);
-                newClinic.setActivityStatus(ActivityStatusWrapper
-                    .getActivityStatus(appService, clinic.getActivityStatus()
-                        .getName()));
+                newClinic.setActivityStatus(clinic.getActivityStatus());
                 newClinic.persist();
                 newClinic.reload();
 

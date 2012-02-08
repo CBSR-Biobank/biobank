@@ -32,7 +32,7 @@ public class SiteHelper extends Helper {
         SiteSaveAction siteSaveAction = new SiteSaveAction();
         siteSaveAction.setName(name);
         siteSaveAction.setNameShort(nameShort);
-        siteSaveAction.setActivityStatusId(active.getId());
+        siteSaveAction.setActivityStatus(active.getId());
         siteSaveAction.setAddress(address);
         siteSaveAction.setStudyIds(new HashSet<Integer>());
 
@@ -50,7 +50,7 @@ public class SiteHelper extends Helper {
         saveSite.setName(name);
         saveSite.setNameShort(name);
         saveSite.setAddress(address);
-        saveSite.setActivityStatusId(activityStatus.getId());
+        saveSite.setActivityStatus(activityStatus.getId());
         saveSite.setStudyIds(studyIds);
 
         return actionExecutor.exec(saveSite).getId();
@@ -75,7 +75,7 @@ public class SiteHelper extends Helper {
         siteSaveAction.setId(siteInfo.site.getId());
         siteSaveAction.setName(siteInfo.site.getName());
         siteSaveAction.setNameShort(siteInfo.site.getNameShort());
-        siteSaveAction.setActivityStatusId(siteInfo.site.getActivityStatus()
+        siteSaveAction.setActivityStatus(siteInfo.site.getActivityStatus()
             .getId());
         siteSaveAction.setAddress(siteInfo.site.getAddress());
 

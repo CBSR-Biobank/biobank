@@ -33,7 +33,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
     private Integer colCapacity;
     private Double defaultTemperature;
     private Integer childLabelingSchemeId;
-    private Integer activityStatusId;
+    private ActivityStatus activityStatus;
 
     private String commentMessage;
 
@@ -76,8 +76,8 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         this.childLabelingSchemeId = childLabelingSchemeId;
     }
 
-    public void setActivityStatusId(Integer activityStatusId) {
-        this.activityStatusId = activityStatusId;
+    public void setActivityStatus(ActivityStatus activityStatus) {
+        this.activityStatus = activityStatus;
     }
 
     public void setCommentMessage(String commentMessage) {
@@ -163,8 +163,6 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
 
     private void setActivityStatus(ActionContext context,
         ContainerType containerType) {
-        ActivityStatus activityStatus =
-            context.load(ActivityStatus.class, activityStatusId);
         containerType.setActivityStatus(activityStatus);
     }
 

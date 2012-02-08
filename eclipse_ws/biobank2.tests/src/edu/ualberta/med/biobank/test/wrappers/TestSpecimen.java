@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -33,6 +32,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.InvalidOptionException;
@@ -108,8 +108,7 @@ public class TestSpecimen extends TestDatabase {
         } catch (ValueNotSetException vnse) {
             Assert.assertTrue(true);
         }
-        parentSpc.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        parentSpc.setActivityStatus(ActivityStatus.ACTIVE);
         parentSpc.persist();
     }
 
@@ -118,7 +117,7 @@ public class TestSpecimen extends TestDatabase {
         Exception {
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
             childSpc.getSpecimenType(),
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            ActivityStatus.ACTIVE,
             childSpc.getProcessingEvent(), childSpc.getParentContainer(), 2, 2);
 
         duplicate.setInventoryId(parentSpc.getInventoryId());
@@ -138,7 +137,7 @@ public class TestSpecimen extends TestDatabase {
         parentSpc.persist();
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
             childSpc.getSpecimenType(),
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            ActivityStatus.ACTIVE,
             childSpc.getProcessingEvent(), childSpc.getParentContainer(), 2, 2);
 
         duplicate.setInventoryId("TOTO" + i);
@@ -156,7 +155,7 @@ public class TestSpecimen extends TestDatabase {
 
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
             childSpc.getSpecimenType(),
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            ActivityStatus.ACTIVE,
             childSpc.getProcessingEvent(), childSpc.getParentContainer(), 2, 2);
         duplicate.setInventoryId(parentSpc.getInventoryId());
 
@@ -188,7 +187,7 @@ public class TestSpecimen extends TestDatabase {
 
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
             childSpc.getSpecimenType(),
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            ActivityStatus.ACTIVE,
             childSpc.getProcessingEvent(), childSpc.getParentContainer(), 2, 2);
         duplicate.setInventoryId("toto" + i);
 
@@ -211,7 +210,7 @@ public class TestSpecimen extends TestDatabase {
 
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
             childSpc.getSpecimenType(),
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            ActivityStatus.ACTIVE,
             childSpc.getProcessingEvent(), childSpc.getParentContainer(),
             pos.getRow(), pos.getCol());
 
@@ -443,8 +442,7 @@ public class TestSpecimen extends TestDatabase {
         // no sample storages defined yet, should be null
         Assert.assertTrue(quantity == null);
 
-        ActivityStatusWrapper activeStatus = ActivityStatusWrapper
-            .getActiveActivityStatus(appService);
+        ActivityStatus activeStatus = ActivityStatus.ACTIVE;
 
         AliquotedSpecimenWrapper ss1 = new AliquotedSpecimenWrapper(appService);
         ss1.setSpecimenType(SpecimenTypeHelper.addSpecimenType("ss1"));
@@ -487,7 +485,7 @@ public class TestSpecimen extends TestDatabase {
         parentSpc.persist();
         SpecimenWrapper sample2 = SpecimenHelper.newSpecimen(parentSpc,
             childSpc.getSpecimenType(),
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            ActivityStatus.ACTIVE,
             childSpc.getProcessingEvent(), childSpc.getParentContainer(), 2, 3);
         sample2.setInventoryId("awert");
         sample2.persist();
@@ -527,16 +525,8 @@ public class TestSpecimen extends TestDatabase {
             .getSpecimenTypeCollection(false).get(0);
         Assert.assertNotNull(sampleType);
 
-        ActivityStatusWrapper activityStatusActive = ActivityStatusWrapper
-            .getActiveActivityStatus(appService);
-        ActivityStatusWrapper activityStatusNonActive = null;
-        for (ActivityStatusWrapper a : ActivityStatusWrapper
-            .getAllActivityStatuses(appService)) {
-            if (!a.equals(activityStatusActive)) {
-                activityStatusNonActive = a;
-                break;
-            }
-        }
+        ActivityStatus activityStatusActive = ActivityStatus.ACTIVE;
+        ActivityStatus activityStatusNonActive = ActivityStatus.CLOSED;
 
         List<SpecimenWrapper> activeSpecimens =
             new ArrayList<SpecimenWrapper>();
@@ -547,13 +537,13 @@ public class TestSpecimen extends TestDatabase {
         for (int i = 1, n = container.getColCapacity(); i < n; ++i) {
             activeSpecimens.add(SpecimenHelper.newSpecimen(parentSpc,
                 childSpc.getSpecimenType(),
-                ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+                ActivityStatus.ACTIVE,
                 childSpc.getProcessingEvent(), childSpc.getParentContainer(),
                 0, i));
 
             SpecimenWrapper a = SpecimenHelper.newSpecimen(parentSpc,
                 childSpc.getSpecimenType(),
-                ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+                ActivityStatus.ACTIVE,
                 childSpc.getProcessingEvent(), childSpc.getParentContainer(),
                 1, i);
             a.setActivityStatus(activityStatusNonActive);
@@ -579,16 +569,16 @@ public class TestSpecimen extends TestDatabase {
         childSpc.persist();
 
         SpecimenHelper.newSpecimen(childSpc, childSpc.getSpecimenType(),
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            ActivityStatus.ACTIVE,
             childSpc.getProcessingEvent(), childSpc.getParentContainer(), 0, 1);
 
         SpecimenHelper.newSpecimen(childSpc, childSpc.getSpecimenType(),
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            ActivityStatus.ACTIVE,
             childSpc.getProcessingEvent(), childSpc.getParentContainer(), 1, 0);
 
         childSpc = SpecimenHelper.newSpecimen(childSpc,
             childSpc.getSpecimenType(),
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            ActivityStatus.ACTIVE,
             childSpc.getProcessingEvent(), childSpc.getParentContainer(), 0, 2);
         childSpc.setInventoryId(Utils.getRandomString(5));
         childSpc.persist();
@@ -647,7 +637,7 @@ public class TestSpecimen extends TestDatabase {
         // add aliquoted specimen
         SpecimenWrapper specimen = SpecimenHelper.newSpecimen(parentSpc,
             childSpc.getSpecimenType(),
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            ActivityStatus.ACTIVE,
             childSpc.getProcessingEvent(), childSpc.getParentContainer(), 2, 3);
         specimen.setInventoryId(Utils.getRandomString(5));
         specimen.persist();
@@ -657,7 +647,7 @@ public class TestSpecimen extends TestDatabase {
 
         SpecimenWrapper s2 = SpecimenHelper.newSpecimen(childSpc,
             childSpc.getSpecimenType(),
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            ActivityStatus.ACTIVE,
             childSpc.getProcessingEvent(), childSpc.getParentContainer(), 2, 4);
         s2.setParent(null, null);
         s2.setParentSpecimen(null);
@@ -834,8 +824,7 @@ public class TestSpecimen extends TestDatabase {
     public void testFlagged() throws BiobankFailedQueryException,
         ApplicationException {
         Assert.assertFalse(parentSpc.isFlagged());
-        parentSpc.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, ActivityStatusWrapper.FLAGGED_STATUS_STRING));
+        parentSpc.setActivityStatus(ActivityStatus.FLAGGED);
         Assert.assertTrue(parentSpc.isFlagged());
     }
 

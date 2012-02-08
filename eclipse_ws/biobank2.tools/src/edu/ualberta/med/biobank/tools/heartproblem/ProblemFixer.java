@@ -14,7 +14,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -140,15 +139,17 @@ public class ProblemFixer {
             LOGGER.info("processing patient " + pnumber);
 
             for (Object raw : tsAppService.query(c)) {
-                CollectionEventWrapper ceventOnTraining = new CollectionEventWrapper(
-                    tsAppService, (CollectionEvent) raw);
+                CollectionEventWrapper ceventOnTraining =
+                    new CollectionEventWrapper(
+                        tsAppService, (CollectionEvent) raw);
 
                 String firstSourceSpecimenInvId = ceventOnTraining
                     .getOriginalSpecimenCollection(false).get(0)
                     .getInventoryId();
 
-                CollectionEventWrapper ceventOnProduction = collectionEventExists(
-                    appService, firstSourceSpecimenInvId);
+                CollectionEventWrapper ceventOnProduction =
+                    collectionEventExists(
+                        appService, firstSourceSpecimenInvId);
 
                 if (ceventOnProduction == null) {
 
@@ -180,9 +181,8 @@ public class ProblemFixer {
                         .setEventAttrValue(heartEventAttrLabel,
                             ceventOnTraining
                                 .getEventAttrValue(heartEventAttrLabel));
-                    ceventOnProduction.setActivityStatus(ActivityStatusWrapper
-                        .getActivityStatus(appService, ceventOnTraining
-                            .getActivityStatus().getName()));
+                    ceventOnProduction.setActivityStatus(ceventOnTraining
+                        .getActivityStatus());
                     ceventOnProduction.persist();
                     ceventOnProduction.reload();
 
@@ -238,9 +238,8 @@ public class ProblemFixer {
             spcOnProduction.setCollectionEvent(ceventOnProduction);
             spcOnProduction.setOriginalCollectionEvent(ceventOnProduction);
             spcOnProduction.setCurrentCenter(calgarySiteOnProduction);
-            spcOnProduction.setActivityStatus(ActivityStatusWrapper
-                .getActivityStatus(appService, spcOnTraining
-                    .getActivityStatus().getName()));
+            spcOnProduction
+                .setActivityStatus(spcOnTraining.getActivityStatus());
             spcOnProduction.setSpecimenType(specimenTypes.get(spcOnTraining
                 .getSpecimenType().getName()));
             spcOnProduction.setOriginInfo(oi);
@@ -267,9 +266,11 @@ public class ProblemFixer {
             }
 
             ProcessingEventWrapper peventOnProduction;
-            List<ProcessingEventWrapper> peventsOnProduction = ProcessingEventWrapper
-                .getProcessingEventsWithDateForCenter(appService,
-                    peventOnTraining.getCreatedAt(), calgarySiteOnProduction);
+            List<ProcessingEventWrapper> peventsOnProduction =
+                ProcessingEventWrapper
+                    .getProcessingEventsWithDateForCenter(appService,
+                        peventOnTraining.getCreatedAt(),
+                        calgarySiteOnProduction);
 
             if (peventsOnProduction.isEmpty()) {
                 peventOnProduction = new ProcessingEventWrapper(appService);
@@ -281,9 +282,8 @@ public class ProblemFixer {
                 // peventOnProduction.setComment(peventOnTraining.getCommentCollection(false));
 
                 peventOnProduction.setCenter(calgarySiteOnProduction);
-                peventOnProduction.setActivityStatus(ActivityStatusWrapper
-                    .getActivityStatus(appService, peventOnTraining
-                        .getActivityStatus().getName()));
+                peventOnProduction.setActivityStatus(peventOnTraining
+                        .getActivityStatus());
                 peventOnProduction.persist();
                 peventOnProduction.reload();
 
@@ -367,9 +367,7 @@ public class ProblemFixer {
         // calgary
         spcOnProduction.setCurrentCenter(calgarySiteOnProduction);
         spcOnProduction.setParentSpecimen(parentSpc);
-        spcOnProduction.setActivityStatus(ActivityStatusWrapper
-            .getActivityStatus(appService, spcOnTraining.getActivityStatus()
-                .getName()));
+        spcOnProduction.setActivityStatus(spcOnTraining.getActivityStatus());
         spcOnProduction.setSpecimenType(specimenTypes.get(spcOnTraining
             .getSpecimenType().getName()));
         spcOnProduction.setOriginInfo(oi);

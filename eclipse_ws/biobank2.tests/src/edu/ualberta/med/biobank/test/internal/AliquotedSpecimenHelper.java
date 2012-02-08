@@ -3,11 +3,11 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 
 @Deprecated
 public class AliquotedSpecimenHelper extends DbHelper {
@@ -21,9 +21,7 @@ public class AliquotedSpecimenHelper extends DbHelper {
         aliquotedSpecimen.setSpecimenType(type);
         aliquotedSpecimen.setQuantity(r.nextInt(10));
         aliquotedSpecimen.setVolume(r.nextDouble());
-        aliquotedSpecimen.setActivityStatus(ActivityStatusWrapper
-            .getActivityStatus(appService,
-                ActivityStatusWrapper.ACTIVE_STATUS_STRING));
+        aliquotedSpecimen.setActivityStatus(ActivityStatus.ACTIVE);
         return aliquotedSpecimen;
     }
 

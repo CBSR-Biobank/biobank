@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 
 @Deprecated
 public class ClinicHelper extends CenterHelper {
@@ -24,8 +24,7 @@ public class ClinicHelper extends CenterHelper {
         }
         clinic.setCity("");
         clinic.setSendsShipments(false);
-        clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
+        clinic.setActivityStatus(ActivityStatus.ACTIVE);
 
         return clinic;
     }

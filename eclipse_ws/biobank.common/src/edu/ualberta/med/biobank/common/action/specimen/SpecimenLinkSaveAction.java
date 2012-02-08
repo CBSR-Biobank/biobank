@@ -33,7 +33,7 @@ public class SpecimenLinkSaveAction implements
         private static final long serialVersionUID = 1L;
         public String inventoryId;
         public Integer typeId;
-        public Integer statusId;
+        public ActivityStatus activityStatus;
         public Integer parentSpecimenId;
         public Integer containerId;
         public RowColPos position;
@@ -89,8 +89,7 @@ public class SpecimenLinkSaveAction implements
             specimen.setCreatedAt(currentDate);
             specimen.setSpecimenType(context.load(SpecimenType.class,
                 asi.typeId));
-            specimen.setActivityStatus(context.load(ActivityStatus.class,
-                asi.statusId));
+            specimen.setActivityStatus(asi.activityStatus);
             specimen.setCurrentCenter(currentCenter);
             specimen.setOriginInfo(originInfo);
 

@@ -78,7 +78,6 @@
          password="${database.password}"
          classpathref="sql.classpath">
       <transaction src="${data.sql.dir}/createIndices.sql" />
-      <transaction src="${data.sql.dir}/activityStatus.sql" />
       <transaction src="${data.sql.dir}/eventAttrType.sql" />
       <transaction src="${data.sql.dir}/globalEventAttr.sql" />
       <transaction src="${data.sql.dir}/specimenTypes.sql" />

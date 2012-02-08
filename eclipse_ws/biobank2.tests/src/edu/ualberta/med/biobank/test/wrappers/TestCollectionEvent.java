@@ -8,7 +8,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -20,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -508,8 +508,7 @@ public class TestCollectionEvent extends TestDatabase {
 
         // lock an attribute
         study.setStudyEventAttrActivityStatus("Worksheet",
-            ActivityStatusWrapper.getActivityStatus(appService,
-                ActivityStatusWrapper.CLOSED_STATUS_STRING));
+            ActivityStatus.CLOSED);
         study.persist();
         cevent.reload();
         try {
@@ -520,8 +519,7 @@ public class TestCollectionEvent extends TestDatabase {
         }
 
         // unlock the attribute
-        study.setStudyEventAttrActivityStatus("Worksheet",
-            ActivityStatusWrapper.getActiveActivityStatus(appService));
+        study.setStudyEventAttrActivityStatus("Worksheet", ActivityStatus.ACTIVE);
         study.persist();
         cevent.reload();
         cevent.setEventAttrValue("Worksheet", "xyz");

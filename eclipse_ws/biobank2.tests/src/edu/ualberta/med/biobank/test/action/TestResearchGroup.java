@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfo
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -64,8 +65,7 @@ public class TestResearchGroup extends TestAction {
         Assert.assertTrue(rg.rg.getName().equals(name + "rg"));
         Assert.assertTrue(rg.rg.getNameShort().equals(name + "rg"));
         Assert.assertTrue(rg.rg.getStudy().getId().equals(studyId));
-        Assert.assertTrue(rg.rg.getActivityStatus().getId()
-            .equals(ActivityStatusEnum.ACTIVE.getId()));
+        Assert.assertTrue(rg.rg.getActivityStatus() != ActivityStatus.ACTIVE);
 
     }
 

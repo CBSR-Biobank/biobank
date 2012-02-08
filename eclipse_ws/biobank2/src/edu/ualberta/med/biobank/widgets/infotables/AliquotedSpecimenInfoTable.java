@@ -7,10 +7,10 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 
 public class AliquotedSpecimenInfoTable extends
     InfoTableWidget<AliquotedSpecimenWrapper> {
@@ -53,7 +53,7 @@ public class AliquotedSpecimenInfoTable extends
         info.typeName = type.getName();
         info.volume = info.sampleStorage.getVolume();
         info.quantity = info.sampleStorage.getQuantity();
-        ActivityStatusWrapper status = info.sampleStorage.getActivityStatus();
+        ActivityStatus status = info.sampleStorage.getActivityStatus();
         Assert.isNotNull(status, "sample storage - activity status is null"); //$NON-NLS-1$
         info.status = status.getName();
         return info;

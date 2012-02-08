@@ -86,8 +86,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         internalSpecimen = new Specimen();
         if (spec == null) {
             // FIXME ugly
-            internalSpecimen.setActivityStatus(allActivityStatuses
-                .get(ActivityStatusEnum.ACTIVE.getId()));
+            internalSpecimen.setActivityStatus(ActivityStatus.ACTIVE);
             internalSpecimen.setCreatedAt(defaultTimeDrawn);
         } else {
             internalSpecimen.setSpecimenType(spec.getSpecimenType());

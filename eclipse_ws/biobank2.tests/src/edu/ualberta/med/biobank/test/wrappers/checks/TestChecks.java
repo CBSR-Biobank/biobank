@@ -4,10 +4,10 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.TestDatabase;
 
 @Deprecated
@@ -17,8 +17,7 @@ public class TestChecks extends TestDatabase {
         StudyWrapper study = new StudyWrapper(appService);
         study.setName("a");
         study.setNameShort("a");
-        study.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        study.setActivityStatus(ActivityStatus.ACTIVE);
 
         study.setStudyEventAttr("asdf", EventAttrTypeEnum.NUMBER,
             new String[] { "1" });
@@ -34,14 +33,12 @@ public class TestChecks extends TestDatabase {
         StudyWrapper study2 = new StudyWrapper(appService);
         study2.setName("b");
         study2.setNameShort("b");
-        study2.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        study2.setActivityStatus(ActivityStatus.ACTIVE);
 
         StudyWrapper study3 = new StudyWrapper(appService);
         study3.setName("c");
         study3.setNameShort("c");
-        study3.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        study3.setActivityStatus(ActivityStatus.ACTIVE);
 
         WrapperTransaction tx = new WrapperTransaction(appService);
 

@@ -10,7 +10,6 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -22,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
@@ -425,15 +425,14 @@ public class TestStudy extends TestDatabase {
         study.reload();
 
         // attributes are not locked by default
-        Assert.assertEquals(ActivityStatusWrapper.ACTIVE_STATUS_STRING, study
-            .getStudyEventAttrActivityStatus("Patient Type 2").getName());
+        Assert.assertEquals(ActivityStatus.ACTIVE, study
+            .getStudyEventAttrActivityStatus("Patient Type 2"));
 
         // lock the attribute
         study.setStudyEventAttrActivityStatus("Patient Type 2",
-            ActivityStatusWrapper.getActivityStatus(appService,
-                ActivityStatusWrapper.CLOSED_STATUS_STRING));
-        Assert.assertEquals(ActivityStatusWrapper.CLOSED_STATUS_STRING, study
-            .getStudyEventAttrActivityStatus("Patient Type 2").getName());
+            ActivityStatus.CLOSED);
+        Assert.assertEquals(ActivityStatus.CLOSED, study
+            .getStudyEventAttrActivityStatus("Patient Type 2"));
 
         // get lock for non existing label, expect exception
         try {
@@ -448,7 +447,7 @@ public class TestStudy extends TestDatabase {
         try {
             study.setStudyEventAttrActivityStatus(
                 Utils.getRandomString(10, 20),
-                ActivityStatusWrapper.getActiveActivityStatus(appService));
+                ActivityStatus.ACTIVE);
             Assert.fail("call should generate an exception");
         } catch (Exception e) {
             Assert.assertTrue(true);
@@ -456,8 +455,7 @@ public class TestStudy extends TestDatabase {
         // add patient visit that uses the locked attribute
         study.setStudyEventAttr("Patient Type 2", EventAttrTypeEnum.TEXT);
         study.setStudyEventAttrActivityStatus("Patient Type 2",
-            ActivityStatusWrapper.getActivityStatus(appService,
-                ActivityStatusWrapper.CLOSED_STATUS_STRING));
+            ActivityStatus.CLOSED);
         study.persist();
         study.reload();
         SiteWrapper site = SiteHelper.addSite("testsite");
@@ -823,8 +821,7 @@ public class TestStudy extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        s1.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        s1.setActivityStatus(ActivityStatus.ACTIVE);
         s1.persist();
         StudyHelper.createdStudies.add(s1);
     }

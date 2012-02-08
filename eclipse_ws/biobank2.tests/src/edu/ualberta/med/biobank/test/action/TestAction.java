@@ -76,10 +76,6 @@ public class TestAction {
 
         session.beginTransaction();
 
-        ActivityStatus active = (ActivityStatus) session
-            .createCriteria(ActivityStatus.class)
-            .add(Restrictions.eq("name", "Active"))
-            .list().iterator().next();
 
         User superAdmin = new User();
         superAdmin.setLogin(SUPER_ADMIN_LOGIN);
@@ -89,7 +85,7 @@ public class TestAction {
         superAdmin.setEmail(randString());
         superAdmin.setNeedPwdChange(false);
         superAdmin.setNeedPwdChange(false);
-        superAdmin.setActivityStatus(active);
+        superAdmin.setActivityStatus(ActivityStatus.ACTIVE);
 
         session.save(superAdmin);
 

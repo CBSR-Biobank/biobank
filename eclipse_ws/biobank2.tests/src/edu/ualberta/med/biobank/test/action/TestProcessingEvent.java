@@ -119,7 +119,7 @@ public class TestProcessingEvent extends TestAction {
                 new AliquotedSpecimenInfo();
             aliquotedSpecimenInfo.inventoryId = Utils.getRandomString(10, 15);
             aliquotedSpecimenInfo.typeId = getSpecimenTypes().get(0).getId();
-            aliquotedSpecimenInfo.statusId = ActivityStatusEnum.ACTIVE.getId();
+            aliquotedSpecimenInfo.activityStatus = ActivityStatusEnum.ACTIVE.getId();
             aliquotedSpecimenInfo.parentSpecimenId =
                 sourceSpecs.get(0).specimen.getId();
             aliquotedSpecimenInfo.containerId = null;
@@ -153,9 +153,8 @@ public class TestProcessingEvent extends TestAction {
             Assert.assertEquals(sourceSpecs.get(0).specimen.getSpecimenType()
                 .getName(), specimenInfo.specimen.getSpecimenType().getName());
 
-            Assert.assertEquals(sourceSpecs.get(0).specimen.getActivityStatus()
-                .getName(), specimenInfo.specimen.getActivityStatus()
-                .getName());
+            Assert.assertEquals(sourceSpecs.get(0).specimen.getActivityStatus(),
+                specimenInfo.specimen.getActivityStatus());
 
             Assert.assertEquals(clinicInfo.clinic.getName(),
                 specimenInfo.specimen.getOriginInfo().getCenter().getName());

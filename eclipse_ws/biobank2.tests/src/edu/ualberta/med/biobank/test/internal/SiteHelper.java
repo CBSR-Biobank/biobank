@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.Utils;
 
 @Deprecated
@@ -27,8 +27,7 @@ public class SiteHelper extends CenterHelper {
                 site.setNameShort(name.substring(0, 49));
             }
         }
-        site.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
+        site.setActivityStatus(ActivityStatus.ACTIVE);
         site.setStreet1(Utils.getRandomString(32));
         site.setCity(Utils.getRandomString(32));
         return site;

@@ -10,7 +10,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -18,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
@@ -213,8 +213,7 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = new ClinicWrapper(appService);
         clinic.setName(name);
         clinic.setNameShort(name);
-        clinic.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        clinic.setActivityStatus(ActivityStatus.ACTIVE);
         try {
             clinic.persist();
             Assert.fail("Should not insert the clinic : no address");
@@ -243,8 +242,7 @@ public class TestClinic extends TestDatabase {
         } catch (ValueNotSetException vnse) {
             Assert.assertTrue(true);
         }
-        clinic.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        clinic.setActivityStatus(ActivityStatus.ACTIVE);
         clinic.persist();
         clinic.delete();
     }

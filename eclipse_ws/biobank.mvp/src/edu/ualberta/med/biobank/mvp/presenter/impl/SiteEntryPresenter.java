@@ -102,7 +102,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         saveSite.setNameShort(view.getNameShort().getValue());
         // saveSite.setComment(view.getComment().getValue());
         saveSite.setAddress(addressEntryPresenter.getAddress());
-        saveSite.setActivityStatusId(getActivityStatusId());
+        saveSite.setActivityStatus(getActivityStatusId());
         saveSite.setStudyIds(getStudyIds());
 
         // TODO: this happens asynchronously now, how to inform GUI?

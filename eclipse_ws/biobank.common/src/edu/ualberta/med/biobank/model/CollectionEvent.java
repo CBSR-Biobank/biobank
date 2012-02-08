@@ -78,8 +78,7 @@ public class CollectionEvent extends AbstractBiobankModel {
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.CollectionEvent.activityStatus.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ACTIVITY_STATUS_ID", nullable = false)
+    @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     public ActivityStatus getActivityStatus() {
         return this.activityStatus;
     }

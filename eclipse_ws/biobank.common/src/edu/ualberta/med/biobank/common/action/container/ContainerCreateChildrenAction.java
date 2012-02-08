@@ -74,7 +74,7 @@ public class ContainerCreateChildrenAction extends ContainerChildAction {
         containerSaveAction.setSiteId(siteId);
         containerSaveAction.setParentId(parentContainerId);
         containerSaveAction.setPosition(rcp);
-        containerSaveAction.setActivityStatusId(
+        containerSaveAction.setActivityStatus(
             ActivityStatusEnum.ACTIVE.getId());
         containerSaveAction.run(context);
 

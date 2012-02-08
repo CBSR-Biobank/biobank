@@ -102,7 +102,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         saveStudy.setName(view.getName().getValue());
         saveStudy.setNameShort(view.getNameShort().getValue());
-        saveStudy.setActivityStatusId(getActivityStatusId());
+        saveStudy.setActivityStatus(getActivityStatusId());
         saveStudy.setContactIds(getContactIds());
 
         Set<SourceSpecimenSaveInfo> ssSaveInfos =

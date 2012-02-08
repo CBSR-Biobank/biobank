@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
@@ -38,7 +39,7 @@ public class TestContainer extends TestAction {
                 .getId(), R.nextDouble())).getId();
 
         containerSaveAction = new ContainerSaveAction();
-        containerSaveAction.setActivityStatusId(ActivityStatusEnum.ACTIVE
+        containerSaveAction.setActivityStatus(ActivityStatusEnum.ACTIVE
             .getId());
         containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
         containerSaveAction.setLabel("01");
@@ -60,8 +61,8 @@ public class TestContainer extends TestAction {
         Assert.assertEquals("01", containerInfo.container.getLabel());
         Assert.assertEquals("FREEZER_3x10", containerInfo.container
             .getContainerType().getName());
-        Assert.assertEquals("Active", containerInfo.container
-            .getActivityStatus().getName());
+        Assert.assertEquals(ActivityStatus.ACTIVE, containerInfo.container
+            .getActivityStatus());
         Assert.assertEquals(name, containerInfo.container.getSite().getName());
         Assert.assertEquals(0, containerInfo.container
             .getChildPositionCollection().size());

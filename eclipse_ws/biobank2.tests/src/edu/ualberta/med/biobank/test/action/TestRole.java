@@ -27,10 +27,7 @@ public class TestRole extends TestAction {
 
         Site site = new Site();
 
-        ActivityStatus active = (ActivityStatus) session
-            .createCriteria(ActivityStatus.class)
-            .add(Restrictions.eq("name", "Active"))
-            .list().iterator().next();
+        ActivityStatus active = ActivityStatus.ACTIVE;
 
         site.setActivityStatus(active);
         site.getAddress().setCity("something");

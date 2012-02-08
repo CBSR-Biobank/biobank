@@ -15,7 +15,6 @@ import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
@@ -26,6 +25,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
@@ -84,8 +84,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         String tabName;
         if (container.isNew()) {
             tabName = Messages.ContainerEntryForm_new_title;
-            container.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(SessionManager.getAppService()));
+            container.setActivityStatus(ActivityStatus.ACTIVE);
             if (container.hasParentContainer()) {
                 // need to set the label at least for display. But will be set
                 // during persit dependencies of the container
@@ -163,14 +162,13 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.ContainerEntryForm_status_label,
-            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
-                .getAppService()), container.getActivityStatus(),
+            ActivityStatus.valuesList(), container.getActivityStatus(),
             Messages.ContainerEntryForm_status_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     container
-                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                        .setActivityStatus((ActivityStatus) selectedObject);
                 }
             });
 
@@ -312,8 +310,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         container.setSite(site);
 
         if (container.isNew()) {
-            container.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(SessionManager.getAppService()));
+            container.setActivityStatus(ActivityStatus.ACTIVE);
         }
 
         GuiUtil.reset(activityStatusComboViewer, container.getActivityStatus());

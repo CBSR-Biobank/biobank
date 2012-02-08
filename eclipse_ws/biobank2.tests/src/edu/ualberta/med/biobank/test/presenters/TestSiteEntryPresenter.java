@@ -95,7 +95,7 @@ public class TestSiteEntryPresenter {
         Mockito.when(nameShortHs.getValue()).thenReturn("TS");
         Mockito.when(commentsHs.getValue()).thenReturn(comments);
         Mockito.when(nullString.getValue()).thenReturn(null);
-        Mockito.when(astatus.getValue()).thenReturn(new ActivityStatus());
+        Mockito.when(astatus.getValue()).thenReturn(ActivityStatus.ACTIVE);
 
         Mockito.when(siteEntryView.getName()).thenReturn(nameHs);
         Mockito.when(siteEntryView.getNameShort()).thenReturn(nameShortHs);

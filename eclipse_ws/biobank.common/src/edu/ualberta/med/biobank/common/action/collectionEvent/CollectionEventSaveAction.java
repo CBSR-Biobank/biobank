@@ -49,7 +49,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
     private Integer ceventId;
     private Integer patientId;
     private Integer visitNumber;
-    private Integer statusId;
+    private ActivityStatus activityStatus;
     private String commentText;
 
     public static class SaveCEventSpecimenInfo implements ActionResult {
@@ -58,7 +58,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         public Integer id;
         public String inventoryId;
         public Date createdAt;
-        public Integer statusId;
+        public ActivityStatus activityStatus;
         public Integer specimenTypeId;
         public Integer centerId;
         public String commentText;
@@ -79,13 +79,13 @@ public class CollectionEventSaveAction implements Action<IdResult> {
     private List<CEventAttrSaveInfo> ceAttrList;
 
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
-        Integer visitNumber, Integer statusId, String commentText,
+        Integer visitNumber, ActivityStatus activityStatus, String commentText,
         Collection<SaveCEventSpecimenInfo> sourceSpecs,
         List<CEventAttrSaveInfo> ceAttrList) {
         this.ceventId = ceventId;
         this.patientId = patientId;
         this.visitNumber = visitNumber;
-        this.statusId = statusId;
+        this.activityStatus = activityStatus;
         this.commentText = commentText;
         this.sourceSpecimenInfos = sourceSpecs;
         this.ceAttrList = ceAttrList;
@@ -103,8 +103,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         this.visitNumber = visitNumber;
     }
 
-    public void setStatusId(Integer statusId) {
-        this.statusId = statusId;
+    public void setActivityStatus(ActivityStatus activityStatus) {
+        this.activityStatus = activityStatus;
     }
 
     public void setCommentText(String commentText) {
@@ -148,8 +148,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         Patient patient = context.load(Patient.class, patientId);
         ceventToSave.setPatient(patient);
         ceventToSave.setVisitNumber(visitNumber);
-        ceventToSave.setActivityStatus(context.load(ActivityStatus.class,
-            statusId));
+        ceventToSave.setActivityStatus(activityStatus);
 
         saveComment(context, ceventToSave);
         setSourceSpecimens(context, ceventToSave);
@@ -207,8 +206,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                             "specimen not found in collection");
                     }
                 }
-                specimen.setActivityStatus(context.load(
-                    ActivityStatus.class, specInfo.statusId));
+                specimen.setActivityStatus(activityStatus);
                 specimen.setCollectionEvent(ceventToSave);
                 // cascade will save-update the specimens from this list:
                 specimen.setOriginalCollectionEvent(ceventToSave);
