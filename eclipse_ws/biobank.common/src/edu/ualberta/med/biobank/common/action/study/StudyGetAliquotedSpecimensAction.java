@@ -22,7 +22,6 @@ public class StudyGetAliquotedSpecimensAction implements
     "SELECT srcspc"
     + " FROM " + AliquotedSpecimen.class.getName() + " srcspc"
     + " INNER JOIN FETCH srcspc.specimenType"
-    + " INNER JOIN FETCH srcspc.activityStatus"
     + " WHERE srcspc.study.id = ?";
     // @formatter:on
 

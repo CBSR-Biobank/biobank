@@ -27,7 +27,6 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     private static final String STUDY_COUNT_INFO_HQL =
         "SELECT study,COUNT(DISTINCT patients),COUNT(DISTINCT cevents)"
             + " FROM " + Study.class.getName() + " study"
-            + " INNER JOIN FETCH study.activityStatus"
             + " LEFT JOIN study.patientCollection as patients"
             + " LEFT JOIN patients.collectionEventCollection AS cevents"
             + " WHERE study.id = ?";

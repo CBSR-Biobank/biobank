@@ -23,7 +23,6 @@ public class ContainerGetChildrenAction implements
         "SELECT container"
             + " FROM " + Container.class.getName() + " container"
             + " INNER JOIN FETCH container.containerType containerType"
-            + " INNER JOIN FETCH container.activityStatus activityStatus"
             + " INNER JOIN FETCH container.site site"
             + " LEFT JOIN container.specimenPositionCollection"
             + " WHERE container.position.parentContainer.id = ?";

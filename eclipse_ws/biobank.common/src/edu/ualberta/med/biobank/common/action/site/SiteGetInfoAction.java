@@ -20,7 +20,6 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
         "SELECT DISTINCT site"
             + " FROM " + Site.class.getName() + " site"
             + " INNER JOIN FETCH site.address address"
-            + " INNER JOIN FETCH site.activityStatus activityStatus"
             + " LEFT JOIN FETCH site.commentCollection comments"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE site.id = ?";

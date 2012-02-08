@@ -35,7 +35,6 @@ public class VarCharLengths {
 		aMap.put("edu.ualberta.med.biobank.model.EventAttr.value", 255);
 		aMap.put("edu.ualberta.med.biobank.model.EventAttrType.name", 50);
 		aMap.put("edu.ualberta.med.biobank.model.RequestSpecimen.claimedBy", 50);
-		aMap.put("edu.ualberta.med.biobank.model.ActivityStatus.name", 50);
 		aMap.put("edu.ualberta.med.biobank.model.PrintedSsInvItem.txt", 15);
 		aMap.put("edu.ualberta.med.biobank.model.EntityColumn.name", 255);
 		aMap.put("edu.ualberta.med.biobank.model.GlobalEventAttr.label", 50);

@@ -25,7 +25,6 @@ public abstract class SpecimenGetInfoAction implements
             + " LEFT JOIN pos.container parent"
             + " LEFT JOIN parent.topContainer topparent"
             + " LEFT JOIN topparent.containerType toptype"
-            + " INNER JOIN FETCH spec.activityStatus"
             + " INNER JOIN FETCH spec.collectionEvent cevent"
             + " INNER JOIN FETCH spec.originInfo originInfo"
             + " INNER JOIN FETCH originInfo.center"

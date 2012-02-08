@@ -168,29 +168,4 @@ public class SiteQuery {
             Arrays.asList(new Object[] { site.getId(), study.getId() }));
         return ModelWrapper.getCountResult(site.getAppService(), c);
     }
-
-    @SuppressWarnings("nls")
-    private static final String SITE_STUDY_QUICK_INFO_QRY = "select studies.name,studies.nameShort,astatus.name,"
-        + " count(distinct patients), count(distinct collectionEvents)"
-        + " from edu.ualberta.med.biobank.model.Site site"
-        + " inner join site.studyCollection as studies"
-        + " inner join studies.patientCollection as patients"
-        + " inner join patients.collectionEventCollection as collectionEvents"
-        + " inner join studies.activityStatus astatus"
-        + " where site.id = ?"
-        + " group by studies order by studies.nameShort";
-
-    /**
-     * Used by site view form.
-     * 
-     * @return
-     * @throws ApplicationException
-     */
-    public static List<Object> getSiteStudyQuickInfo(SiteWrapper site)
-        throws ApplicationException {
-        HQLCriteria c = new HQLCriteria(SITE_STUDY_QUICK_INFO_QRY,
-            Arrays.asList(new Object[] { site.getId() }));
-        return site.getAppService().query(c);
-    }
-
 }

@@ -21,7 +21,6 @@ public class SiteGetStudyInfoAction implements
     private static final String STUDY_INFO_HQL = "SELECT studies, COUNT(DISTINCT patients), COUNT(DISTINCT collectionEvents)"
         + " FROM " + Site.class.getName() + " site"
         + " INNER JOIN site.studyCollection AS studies"
-        + " INNER JOIN FETCH studies.activityStatus aStatus"
         + " LEFT JOIN studies.patientCollection AS patients"
         + " LEFT JOIN patients.collectionEventCollection AS collectionEvents"
         + " WHERE site.id = ?"

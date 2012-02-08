@@ -20,7 +20,6 @@ public class ContainerTypeGetInfoAction implements Action<ContainerTypeInfo> {
     private static final String CTYPE_INFO_HQL =
         "SELECT DISTINCT ctype"
             + " FROM " + ContainerType.class.getName() + " ctype"
-            + " INNER JOIN FETCH ctype.activityStatus"
             + " INNER JOIN FETCH ctype.capacity"
             + " LEFT JOIN FETCH ctype.childContainerTypeCollection"
             + " LEFT JOIN FETCH ctype.specimenTypeCollection"

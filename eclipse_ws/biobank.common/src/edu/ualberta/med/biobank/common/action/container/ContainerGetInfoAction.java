@@ -24,7 +24,6 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
             + " INNER JOIN FETCH ctype.capacity"
             + " LEFT JOIN FETCH ctype.childContainerTypeCollection"
             + " LEFT JOIN FETCH ctype.specimenTypeCollection"
-            + " INNER JOIN FETCH container.activityStatus"
             + " LEFT JOIN FETCH container.position"
             + " INNER JOIN FETCH container.topContainer"
             + " INNER JOIN FETCH container.site"

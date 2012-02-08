@@ -25,7 +25,6 @@ public class SiteGetContainerTypeInfoAction implements
         + Container.class.getName()
         + " c WHERE c.containerType = containerType)"
         + " FROM " + ContainerType.class.getName() + " containerType"
-        + " INNER JOIN FETCH containerType.activityStatus AS activityStatus"
         + " INNER JOIN FETCH containerType.capacity capacity"
         + " WHERE containerType.site.id = ?"
         + " ORDER BY containerType.nameShort";

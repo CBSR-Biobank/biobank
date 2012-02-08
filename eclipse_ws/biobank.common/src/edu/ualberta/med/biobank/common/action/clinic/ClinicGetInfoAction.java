@@ -23,7 +23,6 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
         "SELECT DISTINCT clinic"
             + " FROM " + Clinic.class.getName() + " clinic"
             + " INNER JOIN FETCH clinic.address"
-            + " INNER JOIN FETCH clinic.activityStatus"
             + " LEFT JOIN FETCH clinic.commentCollection comments"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE clinic.id = ?";

@@ -20,7 +20,6 @@ public class DispatchGetSpecimenInfosAction implements
         "SELECT dspec FROM " + DispatchSpecimen.class.getName() + " dspec"
             + " INNER JOIN FETCH dspec.specimen spec"
             + " INNER JOIN FETCH spec.specimenType"
-            + " INNER JOIN FETCH spec.activityStatus"
             + " INNER JOIN FETCH spec.collectionEvent cevent"
             + " INNER JOIN FETCH spec.currentCenter center"
             + " INNER JOIN FETCH cevent.patient patient"

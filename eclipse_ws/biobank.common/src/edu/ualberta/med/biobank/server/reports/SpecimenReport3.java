@@ -7,6 +7,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -22,14 +23,13 @@ public class SpecimenReport3 extends AbstractReport {
         + ("    inner join fetch ce.patient p") //$NON-NLS-1$
         + ("    inner join fetch s.topSpecimen ts") //$NON-NLS-1$
         + ("    inner join fetch s.specimenType st") //$NON-NLS-1$
-        + ("    inner join fetch s.activityStatus a") //$NON-NLS-1$
         + ("    WHERE s.specimenPosition.container.label not like '" //$NON-NLS-1$
             + SENT_SAMPLES_FREEZER_NAME + "'") //$NON-NLS-1$
         + "     and s.collectionEvent.patient.pnumber = ?" //$NON-NLS-1$
         + "     and datediff(s.topSpecimen.createdAt, ?) = 0" //$NON-NLS-1$
         + "     and s.specimenType.nameShort like ?" //$NON-NLS-1$
-        + "     and s.activityStatus.name != 'Closed'" //$NON-NLS-1$
-        + " ORDER BY s.activityStatus.name, RAND()"; //$NON-NLS-1$
+        + "     and s.activityStatus != " + ActivityStatus.CLOSED.getId() //$NON-NLS-1$
+        + " ORDER BY s.activityStatus, RAND()"; //$NON-NLS-1$
 
     public SpecimenReport3(BiobankReport report) {
         super(QUERY, report);

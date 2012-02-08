@@ -60,7 +60,6 @@ public class ProblemFixer {
         + " inner join fetch cevents.allSpecimenCollection as spcs"
         + " left outer join fetch spcs.processingEvent pevents "
         + " left outer join fetch spcs.childSpecimenCollection childSpcs "
-        + " inner join fetch spcs.activityStatus "
         + " inner join fetch spcs.specimenType "
         + " where spcs.createdAt > '2011-06-18' and patients.pnumber=?";
 
