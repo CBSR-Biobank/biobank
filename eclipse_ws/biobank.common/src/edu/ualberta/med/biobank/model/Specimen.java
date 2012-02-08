@@ -50,7 +50,7 @@ public class Specimen extends AbstractBiobankModel {
     private Set<RequestSpecimen> requestSpecimenCollection =
         new HashSet<RequestSpecimen>(0);
     private OriginInfo originInfo;
-    private ActivityStatus activityStatus;
+    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private ProcessingEvent processingEvent;
     private Specimen parentSpecimen;
 

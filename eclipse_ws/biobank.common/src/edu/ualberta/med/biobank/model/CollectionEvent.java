@@ -37,7 +37,7 @@ public class CollectionEvent extends AbstractBiobankModel {
     private Set<Specimen> allSpecimenCollection = new HashSet<Specimen>(
         0);
     private Patient patient;
-    private ActivityStatus activityStatus;
+    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<EventAttr> eventAttrCollection = new HashSet<EventAttr>(
         0);
     private Set<Comment> commentCollection = new HashSet<Comment>(0);

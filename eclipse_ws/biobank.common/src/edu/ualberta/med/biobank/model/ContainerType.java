@@ -50,7 +50,7 @@ public class ContainerType extends AbstractBiobankModel {
         new HashSet<SpecimenType>(0);
     private Set<ContainerType> childContainerTypeCollection =
         new HashSet<ContainerType>(0);
-    private ActivityStatus activityStatus;
+    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
     private Capacity capacity;
     private Site site;

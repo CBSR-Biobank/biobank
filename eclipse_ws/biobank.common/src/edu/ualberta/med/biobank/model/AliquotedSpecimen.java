@@ -17,7 +17,7 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
     private double volume;
     private SpecimenType specimenType;
     private Study study;
-    private ActivityStatus activityStatus;
+    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
 
     @Column(name = "QUANTITY")
     public Integer getQuantity() {

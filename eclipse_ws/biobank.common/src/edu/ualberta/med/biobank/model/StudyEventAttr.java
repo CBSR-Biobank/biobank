@@ -21,7 +21,7 @@ public class StudyEventAttr extends AbstractBiobankModel {
     private boolean required = false;
     private GlobalEventAttr globalEventAttr;
     private Study study;
-    private ActivityStatus activityStatus;
+    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
 
     @Column(name = "PERMISSIBLE")
     public String getPermissible() {

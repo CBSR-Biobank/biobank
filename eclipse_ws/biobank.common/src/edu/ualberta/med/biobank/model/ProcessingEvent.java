@@ -37,7 +37,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
     private Date createdAt;
     private Center center;
     private Set<Specimen> specimenCollection = new HashSet<Specimen>(0);
-    private ActivityStatus activityStatus;
+    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.worksheet.NotEmpty}")

@@ -25,7 +25,7 @@ public class Principal extends AbstractBiobankModel {
 
     private Set<Membership> membershipCollection =
         new HashSet<Membership>(0);
-    private ActivityStatus activityStatus;
+    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "principal")
     public Set<Membership> getMembershipCollection() {

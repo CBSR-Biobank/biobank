@@ -61,7 +61,7 @@ public class Container extends AbstractBiobankModel {
     private ContainerType containerType;
     private ContainerPosition position;
     private Site site;
-    private ActivityStatus activityStatus;
+    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
 
     @Column(name = "PRODUCT_BARCODE")
     public String getProductBarcode() {

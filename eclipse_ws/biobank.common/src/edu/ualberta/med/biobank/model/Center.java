@@ -49,7 +49,7 @@ public class Center extends AbstractBiobankModel {
         0);
     private Set<OriginInfo> originInfoCollection =
         new HashSet<OriginInfo>(0);
-    private ActivityStatus activityStatus;
+    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Center.name.NotEmpty}")

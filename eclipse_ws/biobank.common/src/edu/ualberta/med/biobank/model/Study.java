@@ -40,7 +40,7 @@ public class Study extends AbstractBiobankModel {
     private Set<Patient> patientCollection = new HashSet<Patient>(0);
     private Set<Site> siteCollection = new HashSet<Site>(0);
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
-    private ActivityStatus activityStatus;
+    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<Membership> membershipCollection =
         new HashSet<Membership>(0);
     private Set<StudyEventAttr> studyEventAttrCollection =
