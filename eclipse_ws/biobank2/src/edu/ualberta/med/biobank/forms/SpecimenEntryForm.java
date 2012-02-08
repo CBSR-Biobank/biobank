@@ -359,7 +359,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         });
 
         updateAction.setCommentMessage(commentMessage.getValue());
-        updateAction.setActivityStatus(specimen.getActivityStatus().getId());
+        updateAction.setActivityStatus(specimen.getActivityStatus());
 
         SessionManager.getAppService().doAction(updateAction);
     }

@@ -1,34 +1,29 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecimenSaveInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.StudyEventAttrSaveInfo;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.test.action.IActionExecutor;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyHelper extends Helper {
-
-    private Map<String, GlobalEventAttr> globalEventAttrs = null;
-
     public static StudySaveAction getSaveAction(String name, String nameShort,
-        ActivityStatusEnum activityStatus) {
+        ActivityStatus activityStatus) {
         StudySaveAction saveAction = new StudySaveAction();
         saveAction.setName(name);
         saveAction.setNameShort(nameShort);
-        saveAction.setActivityStatus(activityStatus.getId());
+        saveAction.setActivityStatus(activityStatus);
         saveAction.setSiteIds(new HashSet<Integer>());
         saveAction.setContactIds(new HashSet<Integer>());
         saveAction
@@ -41,7 +36,7 @@ public class StudyHelper extends Helper {
     }
 
     public static Integer createStudy(IActionExecutor actionExecutor,
-        String name, ActivityStatusEnum activityStatus)
+        String name, ActivityStatus activityStatus)
         throws ApplicationException {
         StudySaveAction saveStudy = getSaveAction(name, name, activityStatus);
         return actionExecutor.exec(saveStudy).getId();
@@ -52,8 +47,7 @@ public class StudyHelper extends Helper {
         saveStudy.setId(studyInfo.study.getId());
         saveStudy.setName(studyInfo.study.getName());
         saveStudy.setNameShort(studyInfo.study.getNameShort());
-        saveStudy.setActivityStatus(studyInfo.study.getActivityStatus()
-            .getId());
+        saveStudy.setActivityStatus(studyInfo.study.getActivityStatus());
 
         saveStudy.setSiteIds(new HashSet<Integer>());
 

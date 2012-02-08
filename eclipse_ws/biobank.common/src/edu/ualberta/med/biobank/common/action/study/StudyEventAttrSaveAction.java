@@ -38,7 +38,7 @@ public class StudyEventAttrSaveAction implements Action<IdResult> {
         this.permissible = permissible;
     }
 
-    public void setActivityStatusId(ActivityStatus activityStatus) {
+    public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }
 

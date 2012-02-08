@@ -8,7 +8,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
@@ -18,6 +17,7 @@ import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentDeleteAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.IdSetMutator;
@@ -44,13 +44,13 @@ public class TestShipment extends TestAction {
         name = testname.getMethodName() + R.nextInt();
         studyId =
             StudyHelper
-                .createStudy(EXECUTOR, name, ActivityStatusEnum.ACTIVE);
+                .createStudy(EXECUTOR, name, ActivityStatus.ACTIVE);
         siteId =
             SiteHelper.createSite(EXECUTOR, name + "1", "Edmonton",
-                ActivityStatusEnum.ACTIVE, new HashSet<Integer>(studyId));
+                ActivityStatus.ACTIVE, new HashSet<Integer>(studyId));
         centerId =
             SiteHelper.createSite(EXECUTOR, name + "2", "Calgary",
-                ActivityStatusEnum.ACTIVE, new HashSet<Integer>(studyId));
+                ActivityStatus.ACTIVE, new HashSet<Integer>(studyId));
         patientId =
             EXECUTOR.exec(new PatientSaveAction(null, studyId, name,
                 Utils.getRandomDate())).getId();

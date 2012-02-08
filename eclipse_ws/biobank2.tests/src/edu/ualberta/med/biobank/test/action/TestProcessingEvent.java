@@ -14,7 +14,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
@@ -33,6 +32,7 @@ import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
@@ -64,9 +64,12 @@ public class TestProcessingEvent extends TestAction {
         String worksheet = Utils.getRandomString(20, 50);
         String commentText = Utils.getRandomString(20, 30);
         Date date = Utils.getRandomDate();
-        Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
-            null, provisioning.siteId, date, worksheet, 1, commentText,
-            new HashSet<Integer>())).getId();
+        Integer pEventId =
+            EXECUTOR.exec(
+                new ProcessingEventSaveAction(
+                    null, provisioning.siteId, date, worksheet,
+                    ActivityStatus.ACTIVE, commentText,
+                    new HashSet<Integer>())).getId();
 
         // Check ProcessingEvent is in database with correct values
         PEventInfo peventInfo =
@@ -106,7 +109,8 @@ public class TestProcessingEvent extends TestAction {
         // create a processing event with one of the collection event source
         // specimen
         Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
-            null, provisioning.siteId, date, worksheet, 1, commentText,
+            null, provisioning.siteId, date, worksheet,
+            ActivityStatus.ACTIVE, commentText,
             new HashSet<Integer>(
                 Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
             .getId();
@@ -119,7 +123,7 @@ public class TestProcessingEvent extends TestAction {
                 new AliquotedSpecimenInfo();
             aliquotedSpecimenInfo.inventoryId = Utils.getRandomString(10, 15);
             aliquotedSpecimenInfo.typeId = getSpecimenTypes().get(0).getId();
-            aliquotedSpecimenInfo.activityStatus = ActivityStatusEnum.ACTIVE.getId();
+            aliquotedSpecimenInfo.activityStatus = ActivityStatus.ACTIVE;
             aliquotedSpecimenInfo.parentSpecimenId =
                 sourceSpecs.get(0).specimen.getId();
             aliquotedSpecimenInfo.containerId = null;
@@ -153,7 +157,8 @@ public class TestProcessingEvent extends TestAction {
             Assert.assertEquals(sourceSpecs.get(0).specimen.getSpecimenType()
                 .getName(), specimenInfo.specimen.getSpecimenType().getName());
 
-            Assert.assertEquals(sourceSpecs.get(0).specimen.getActivityStatus(),
+            Assert.assertEquals(
+                sourceSpecs.get(0).specimen.getActivityStatus(),
                 specimenInfo.specimen.getActivityStatus());
 
             Assert.assertEquals(clinicInfo.clinic.getName(),
@@ -178,13 +183,15 @@ public class TestProcessingEvent extends TestAction {
         String worksheet = Utils.getRandomString(50);
         Date date = Utils.getRandomDate();
         EXECUTOR.exec(new ProcessingEventSaveAction(
-            null, provisioning.siteId, date, worksheet, 1, null,
+            null, provisioning.siteId, date, worksheet,
+            ActivityStatus.ACTIVE, null,
             new HashSet<Integer>()));
 
         // try to save another pevent with the same worksheet
         try {
             EXECUTOR.exec(new ProcessingEventSaveAction(null,
-                provisioning.siteId, new Date(), worksheet, 1, null,
+                provisioning.siteId, new Date(), worksheet,
+                ActivityStatus.ACTIVE, null,
                 new HashSet<Integer>()));
             Assert
                 .fail("should not be able to use the same worksheet to 2 different pevents");
@@ -197,7 +204,7 @@ public class TestProcessingEvent extends TestAction {
     public void delete() throws Exception {
         Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
             null, provisioning.siteId, Utils.getRandomDate(), Utils
-                .getRandomString(50), 1, null,
+                .getRandomString(50), ActivityStatus.ACTIVE, null,
             new HashSet<Integer>())).getId();
 
         EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
@@ -228,7 +235,7 @@ public class TestProcessingEvent extends TestAction {
         // specimen.
         Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
             null, provisioning.siteId, Utils.getRandomDate(), Utils
-                .getRandomString(50), 1, null,
+                .getRandomString(50), ActivityStatus.ACTIVE, null,
             new HashSet<Integer>(Arrays.asList(spcId)))).getId();
 
         Specimen spc = (Specimen) session.load(Specimen.class, spcId);
@@ -276,7 +283,7 @@ public class TestProcessingEvent extends TestAction {
         Integer pEventId = EXECUTOR.exec(
             new ProcessingEventSaveAction(
                 null, provisioning.siteId, Utils.getRandomDate(),
-                Utils.getRandomString(50), 1, null,
+                Utils.getRandomString(50), ActivityStatus.ACTIVE, null,
                 new HashSet<Integer>(Arrays.asList(spcId)))).getId();
 
         Specimen spc = (Specimen) session.load(Specimen.class, spcId);

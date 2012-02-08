@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
 import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
@@ -260,8 +259,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     }
                 }
 
-                if (!ActivityStatusEnum.ACTIVE.getId().equals(
-                    sAttr.getActivityStatus().getId())) {
+                if (ActivityStatus.ACTIVE != sAttr.getActivityStatus()) {
                     throw new ActionException(
                         "Attribute for \"" + sAttr.getGlobalEventAttr().getLabel() //$NON-NLS-1$
                             + "\" is locked, changes not premitted"); //$NON-NLS-1$

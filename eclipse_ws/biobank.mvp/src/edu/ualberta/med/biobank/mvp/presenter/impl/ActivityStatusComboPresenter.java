@@ -1,13 +1,9 @@
 package edu.ualberta.med.biobank.mvp.presenter.impl;
 
-import java.util.ArrayList;
-
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.common.action.Dispatcher;
-import edu.ualberta.med.biobank.common.action.MapResult;
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusGetAllAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
 import edu.ualberta.med.biobank.mvp.presenter.HasState;
@@ -56,10 +52,6 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View>
         return view.getActivityStatus().getValue();
     }
 
-    public Integer getActivityStatusId() {
-        return getActivityStatus() != null ? getActivityStatus().getId() : null;
-    }
-
     public void setActivityStatus(ActivityStatus activityStatus)
         throws InitPresenterException {
         loadOptions();
@@ -68,19 +60,8 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View>
     }
 
     private void loadOptions() throws InitPresenterException {
-        try {
-            ActivityStatusGetAllAction action =
-                new ActivityStatusGetAllAction();
-
-            MapResult<Integer, ActivityStatus> result = dispatcher.exec(action);
-
-            view.getActivityStatus()
-                .setOptions(new ArrayList<ActivityStatus>(
-                    result.getMap().values()));
-
-        } catch (Exception caught) {
-            throw new InitPresenterException(caught);
-        }
+        view.getActivityStatus()
+            .setOptions(ActivityStatus.valuesList());
     }
 
     private static class OptionLabeller implements

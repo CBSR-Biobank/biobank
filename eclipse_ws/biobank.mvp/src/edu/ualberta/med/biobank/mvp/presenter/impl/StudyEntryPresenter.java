@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecimenSaveInfo;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
@@ -102,7 +103,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
 
         saveStudy.setName(view.getName().getValue());
         saveStudy.setNameShort(view.getNameShort().getValue());
-        saveStudy.setActivityStatus(getActivityStatusId());
+        saveStudy.setActivityStatus(getActivityStatus());
         saveStudy.setContactIds(getContactIds());
 
         Set<SourceSpecimenSaveInfo> ssSaveInfos =
@@ -164,8 +165,8 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         view.getContacts().setElements(getContacts(studyInfo.getClinicInfos()));
     }
 
-    private Integer getActivityStatusId() {
-        return activityStatusComboPresenter.getActivityStatusId();
+    private ActivityStatus getActivityStatus() {
+        return activityStatusComboPresenter.getActivityStatus();
     }
 
     private List<Contact> getContacts(List<ClinicInfo> clinicInfos) {

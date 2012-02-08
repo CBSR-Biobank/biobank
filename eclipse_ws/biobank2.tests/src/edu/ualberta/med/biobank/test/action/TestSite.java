@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.ListResult;
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
@@ -61,7 +60,7 @@ public class TestSite extends TestAction {
         name = getMethodNameR();
 
         siteSaveAction =
-            SiteHelper.getSaveAction(name, name, ActivityStatusEnum.ACTIVE);
+            SiteHelper.getSaveAction(name, name, ActivityStatus.ACTIVE);
     }
 
     @Test
@@ -87,7 +86,7 @@ public class TestSite extends TestAction {
         }
 
         siteSaveAction.setNameShort(name);
-        siteSaveAction.setActivityStatusId(null);
+        siteSaveAction.setActivityStatus(null);
         try {
             EXECUTOR.exec(siteSaveAction);
             Assert.fail(
@@ -96,8 +95,7 @@ public class TestSite extends TestAction {
             Assert.assertTrue(true);
         }
 
-        siteSaveAction.setActivityStatus(
-            ActivityStatusEnum.ACTIVE.getId());
+        siteSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
         siteSaveAction.setAddress(null);
         try {
             EXECUTOR.exec(siteSaveAction);
@@ -141,7 +139,8 @@ public class TestSite extends TestAction {
 
         Assert.assertEquals(name + "_site_city", siteInfo.site.getAddress()
             .getCity());
-        Assert.assertEquals(ActivityStatus.ACTIVE, siteInfo.site.getActivityStatus());
+        Assert.assertEquals(ActivityStatus.ACTIVE,
+            siteInfo.site.getActivityStatus());
         Assert.assertEquals(new Long(1), siteInfo.patientCount);
         Assert.assertEquals(new Long(1), siteInfo.collectionEventCount);
         Assert.assertEquals(new Long(0), siteInfo.aliquotedSpecimenCount);
@@ -165,7 +164,7 @@ public class TestSite extends TestAction {
 
         // test for duplicate name
         SiteSaveAction saveSite = SiteHelper.getSaveAction(name + "_2", name,
-            ActivityStatusEnum.ACTIVE);
+            ActivityStatus.ACTIVE);
         try {
             EXECUTOR.exec(saveSite);
             Assert.fail("should not be allowed to add site with same name");
@@ -223,7 +222,7 @@ public class TestSite extends TestAction {
 
         for (int i = 0; i < 20; ++i) {
             Integer id = StudyHelper.createStudy(
-                EXECUTOR, name + "_study" + i, ActivityStatusEnum.ACTIVE);
+                EXECUTOR, name + "_study" + i, ActivityStatus.ACTIVE);
             allStudyIds.add(id);
             if (i < 10) {
                 studyIdsSet1.add(id);
@@ -254,7 +253,7 @@ public class TestSite extends TestAction {
         // create a second site, site 2, with the second set of studies
         Integer siteId2 = SiteHelper.createSite(EXECUTOR, name + "_2",
             Utils.getRandomString(8, 12),
-            ActivityStatusEnum.ACTIVE, studyIdsSet2);
+            ActivityStatus.ACTIVE, studyIdsSet2);
         siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId2));
         expectedStudyIds.clear();
         expectedStudyIds.addAll(studyIdsSet2);
@@ -405,7 +404,7 @@ public class TestSite extends TestAction {
         Integer containerTypeId = provisioning.containerTypeIds.get(0);
 
         ContainerSaveAction containerSaveAction = new ContainerSaveAction();
-        containerSaveAction.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
+        containerSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
         containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
         containerSaveAction.setLabel("01");
         containerSaveAction.setSiteId(provisioning.siteId);
@@ -445,7 +444,7 @@ public class TestSite extends TestAction {
         Integer pEventId = EXECUTOR.exec(
             new ProcessingEventSaveAction(
                 null, provisioning.siteId, Utils.getRandomDate(), Utils
-                    .getRandomString(5, 8), 1, null,
+                    .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
                 new HashSet<Integer>(
                     Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
             .getId();
@@ -477,7 +476,7 @@ public class TestSite extends TestAction {
         // create a second site to dispatch to
         Integer siteId2 = EXECUTOR.exec(
             SiteHelper.getSaveAction(name + "_site2", name + "_site2",
-                ActivityStatusEnum.ACTIVE)).getId();
+                ActivityStatus.ACTIVE)).getId();
 
         Integer dispatchId2 =
             DispatchHelper.createDispatch(EXECUTOR, provisioning.siteId,

@@ -102,7 +102,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         saveSite.setNameShort(view.getNameShort().getValue());
         // saveSite.setComment(view.getComment().getValue());
         saveSite.setAddress(addressEntryPresenter.getAddress());
-        saveSite.setActivityStatus(getActivityStatusId());
+        saveSite.setActivityStatus(getActivityStatus());
         saveSite.setStudyIds(getStudyIds());
 
         // TODO: this happens asynchronously now, how to inform GUI?
@@ -149,8 +149,8 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         addressEntryPresenter.setAddress(address);
     }
 
-    private Integer getActivityStatusId() {
-        return activityStatusComboPresenter.getActivityStatusId();
+    private ActivityStatus getActivityStatus() {
+        return activityStatusComboPresenter.getActivityStatus();
     }
 
     private Set<Integer> getStudyIds() {

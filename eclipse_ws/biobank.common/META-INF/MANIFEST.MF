@@ -76,7 +76,6 @@ Export-Package: antlr;
    gov.nih.nci.system.applicationservice,
    edu.ualberta.med.biobank.common.wrappers",
  edu.ualberta.med.biobank.common.action,
- edu.ualberta.med.biobank.common.action.activityStatus,
  edu.ualberta.med.biobank.common.action.center,
  edu.ualberta.med.biobank.common.action.clinic,
  edu.ualberta.med.biobank.common.action.collectionEvent,

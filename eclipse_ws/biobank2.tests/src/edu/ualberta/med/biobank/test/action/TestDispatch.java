@@ -11,7 +11,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
@@ -23,6 +22,7 @@ import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
@@ -48,13 +48,13 @@ public class TestDispatch extends TestAction {
         name = testname.getMethodName() + R.nextInt();
         studyId =
             StudyHelper
-                .createStudy(EXECUTOR, name, ActivityStatusEnum.ACTIVE);
+                .createStudy(EXECUTOR, name, ActivityStatus.ACTIVE);
         siteId =
             SiteHelper.createSite(EXECUTOR, name + "1", "Edmonton",
-                ActivityStatusEnum.ACTIVE, new HashSet<Integer>(studyId));
+                ActivityStatus.ACTIVE, new HashSet<Integer>(studyId));
         centerId =
             SiteHelper.createSite(EXECUTOR, name + "2", "Calgary",
-                ActivityStatusEnum.ACTIVE, new HashSet<Integer>(studyId));
+                ActivityStatus.ACTIVE, new HashSet<Integer>(studyId));
         patientId =
             EXECUTOR.exec(new PatientSaveAction(null, studyId, name,
                 Utils.getRandomDate())).getId();
@@ -193,8 +193,6 @@ public class TestDispatch extends TestAction {
             EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
-        DispatchReadInfo info =
-            EXECUTOR.exec(new DispatchGetInfoAction(id));
         DispatchDeleteAction delete = new DispatchDeleteAction(id);
         try {
             EXECUTOR.exec(delete);

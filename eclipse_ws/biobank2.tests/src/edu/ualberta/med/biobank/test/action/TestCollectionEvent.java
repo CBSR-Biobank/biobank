@@ -15,7 +15,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
@@ -380,7 +379,7 @@ public class TestCollectionEvent extends TestAction {
             .get("PBMC Count (x10^6)").attr
             .getId());
         seAttrSave.setRequired(true);
-        seAttrSave.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
         seAttrSave.setStudyId(studyId);
         EXECUTOR.exec(seAttrSave);
 
@@ -389,7 +388,7 @@ public class TestCollectionEvent extends TestAction {
             .get("Consent").attr.getId());
         seAttrSave.setRequired(false);
         seAttrSave.setPermissible("c1;c2;c3");
-        seAttrSave.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
         seAttrSave.setStudyId(studyId);
         EXECUTOR.exec(seAttrSave);
 
@@ -397,7 +396,7 @@ public class TestCollectionEvent extends TestAction {
         seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
             .get("Patient Type").attr.getId());
         seAttrSave.required = true;
-        seAttrSave.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
         seAttrSave.setStudyId(studyId);
         EXECUTOR.exec(seAttrSave);
 
@@ -406,7 +405,7 @@ public class TestCollectionEvent extends TestAction {
             .get("Visit Type").attr.getId());
         seAttrSave.required = false;
         seAttrSave.setPermissible("v1;v2;v3;v4");
-        seAttrSave.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
         seAttrSave.setStudyId(studyId);
         EXECUTOR.exec(seAttrSave);
 
@@ -414,7 +413,7 @@ public class TestCollectionEvent extends TestAction {
         seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
             .get("Phlebotomist").attr.getId());
         seAttrSave.required = false;
-        seAttrSave.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
+        seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
         seAttrSave.setStudyId(studyId);
         EXECUTOR.exec(seAttrSave);
     }

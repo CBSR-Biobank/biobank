@@ -11,7 +11,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicDeleteAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
@@ -49,7 +48,7 @@ public class TestClinic extends TestAction {
         name = getMethodNameR();
 
         clinicSaveAction = ClinicHelper.getSaveAction(name, name,
-            ActivityStatusEnum.ACTIVE, R.nextBoolean());
+            ActivityStatus.ACTIVE, R.nextBoolean());
     }
 
     @Test
@@ -75,7 +74,7 @@ public class TestClinic extends TestAction {
         }
 
         clinicSaveAction.setNameShort(name);
-        clinicSaveAction.setActivityStatusId(null);
+        clinicSaveAction.setActivityStatus(null);
         try {
             EXECUTOR.exec(clinicSaveAction);
             Assert.fail(
@@ -84,7 +83,7 @@ public class TestClinic extends TestAction {
             Assert.assertTrue(true);
         }
 
-        clinicSaveAction.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
+        clinicSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
         clinicSaveAction.setAddress(null);
         try {
             EXECUTOR.exec(clinicSaveAction);
@@ -155,7 +154,7 @@ public class TestClinic extends TestAction {
         // test for duplicate name
         ClinicSaveAction saveClinic2 =
             ClinicHelper.getSaveAction(name + "_2", name,
-                ActivityStatusEnum.ACTIVE, false);
+                ActivityStatus.ACTIVE, false);
         try {
             EXECUTOR.exec(saveClinic2);
             Assert.fail("should not be allowed to add clinic with same name");
@@ -336,7 +335,7 @@ public class TestClinic extends TestAction {
 
         ClinicSaveAction csa2 =
             ClinicHelper.getSaveAction(name + "_clinic2", name,
-                ActivityStatusEnum.ACTIVE, R.nextBoolean());
+                ActivityStatus.ACTIVE, R.nextBoolean());
         Integer clinicId2 = EXECUTOR.exec(csa2).getId();
 
         DispatchHelper.createDispatch(EXECUTOR, provisioning.clinicId,

@@ -33,7 +33,7 @@ public class ContainerSaveAction implements Action<IdResult> {
         this.containerId = containerId;
     }
 
-    public void setActivityStatusId(ActivityStatus activityStatus) {
+    public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }
 

@@ -326,7 +326,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             SessionManager.getAppService().doAction(
                 new ProcessingEventSaveAction(pEvent.getId(), pEvent
                     .getCenter().getId(), pEvent.getCreatedAt(), pEvent
-                    .getWorksheet(), pEvent.getActivityStatus().getId(), null,
+                    .getWorksheet(), pEvent.getActivityStatus(), null,
                     specimens)).getId();
         ((ProcessingEventWrapper) pEventAdapter.getModelObject())
             .getWrappedObject().setId(peventId);

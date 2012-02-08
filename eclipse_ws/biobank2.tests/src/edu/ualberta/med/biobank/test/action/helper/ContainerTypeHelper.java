@@ -2,9 +2,9 @@ package edu.ualberta.med.biobank.test.action.helper;
 
 import java.util.HashSet;
 
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenType;
 
@@ -22,7 +22,7 @@ public class ContainerTypeHelper {
         ctSaveAction.setTopLevel(isTopLevel);
         ctSaveAction.setRowCapacity(rowCapacity);
         ctSaveAction.setColCapacity(colCapacity);
-        ctSaveAction.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
+        ctSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
         ctSaveAction.setDefaultTemperature(defaultTemp);
         ctSaveAction.setChildLabelingSchemeId(childLabelingSchemeId);
 
@@ -55,7 +55,7 @@ public class ContainerTypeHelper {
             containerTypeInfo.containerType.getChildLabelingScheme().getId());
 
         containerTypeSaveAction.setActivityStatus(
-            containerTypeInfo.containerType.getActivityStatus().getId());
+            containerTypeInfo.containerType.getActivityStatus());
 
         HashSet<Integer> ids = new HashSet<Integer>();
         for (SpecimenType specimenType : containerTypeInfo.containerType

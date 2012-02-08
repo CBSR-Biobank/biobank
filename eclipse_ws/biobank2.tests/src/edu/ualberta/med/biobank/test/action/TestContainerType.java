@@ -14,7 +14,6 @@ import org.hibernate.Query;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
@@ -47,7 +46,7 @@ public class TestContainerType extends TestAction {
         name = getMethodNameR();
 
         siteId = EXECUTOR.exec(SiteHelper.getSaveAction(
-            name, name, ActivityStatusEnum.ACTIVE)).getId();
+            name, name, ActivityStatus.ACTIVE)).getId();
 
         containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
             "FREEZER_3x10", "FR3x10", siteId, true, 3, 10,
@@ -130,8 +129,7 @@ public class TestContainerType extends TestAction {
         }
 
         // test success path
-        containerTypeSaveAction.setActivityStatus(ActivityStatusEnum.ACTIVE
-            .getId());
+        containerTypeSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
         EXECUTOR.exec(containerTypeSaveAction);
     }
 
@@ -432,8 +430,7 @@ public class TestContainerType extends TestAction {
             EXECUTOR.exec(containerTypeSaveAction).getId();
 
         ContainerSaveAction containerSaveAction = new ContainerSaveAction();
-        containerSaveAction.setActivityStatus(ActivityStatusEnum.ACTIVE
-            .getId());
+        containerSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
         containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
         containerSaveAction.setLabel("01");
         containerSaveAction.setSiteId(siteId);

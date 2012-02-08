@@ -216,7 +216,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
                 researchGroup.getStudy().getId(),
                 comment.getMessage() == null ? ""
                     : comment.getMessage(), addressInfo, researchGroup
-                    .getActivityStatus().getId());
+                    .getActivityStatus());
         ResearchGroupSaveAction save = new ResearchGroupSaveAction(info);
         Integer id = SessionManager.getAppService().doAction(save)
             .getId();

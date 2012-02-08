@@ -9,7 +9,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -47,7 +46,7 @@ public class TestResearchGroup extends TestAction {
         name = testname.getMethodName() + R.nextInt();
         studyId =
             StudyHelper
-                .createStudy(EXECUTOR, name, ActivityStatusEnum.ACTIVE);
+                .createStudy(EXECUTOR, name, ActivityStatus.ACTIVE);
     }
 
     @Test
@@ -157,7 +156,7 @@ public class TestResearchGroup extends TestAction {
         ResearchGroupSaveInfo save =
             new ResearchGroupSaveInfo(null, name + "rg", name + "rg",
                 studyId, "comment", addressSaveInfo,
-                ActivityStatusEnum.ACTIVE.getId());
+                ActivityStatus.ACTIVE);
         ResearchGroupSaveAction rgSave = new ResearchGroupSaveAction(save);
 
         Integer rgId = EXECUTOR.exec(rgSave).getId();

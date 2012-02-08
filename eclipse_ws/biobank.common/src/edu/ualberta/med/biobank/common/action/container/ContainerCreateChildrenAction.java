@@ -5,10 +5,10 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
@@ -74,8 +74,7 @@ public class ContainerCreateChildrenAction extends ContainerChildAction {
         containerSaveAction.setSiteId(siteId);
         containerSaveAction.setParentId(parentContainerId);
         containerSaveAction.setPosition(rcp);
-        containerSaveAction.setActivityStatus(
-            ActivityStatusEnum.ACTIVE.getId());
+        containerSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
         containerSaveAction.run(context);
 
         return true;

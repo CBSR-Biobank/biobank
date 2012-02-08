@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
@@ -13,6 +12,7 @@ import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.IActionExecutor;
@@ -21,7 +21,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class SiteHelper extends Helper {
 
     public static SiteSaveAction getSaveAction(String name,
-        String nameShort, ActivityStatusEnum active) {
+        String nameShort, ActivityStatus activityStatus) {
         Address address = new Address();
         String city = name + "_city";
         if (city.length() > 50) {
@@ -32,7 +32,7 @@ public class SiteHelper extends Helper {
         SiteSaveAction siteSaveAction = new SiteSaveAction();
         siteSaveAction.setName(name);
         siteSaveAction.setNameShort(nameShort);
-        siteSaveAction.setActivityStatus(active.getId());
+        siteSaveAction.setActivityStatus(activityStatus);
         siteSaveAction.setAddress(address);
         siteSaveAction.setStudyIds(new HashSet<Integer>());
 
@@ -40,7 +40,7 @@ public class SiteHelper extends Helper {
     }
 
     public static Integer createSite(IActionExecutor actionExecutor,
-        String name, String city, ActivityStatusEnum activityStatus,
+        String name, String city, ActivityStatus activityStatus,
         Set<Integer> studyIds) throws ApplicationException {
 
         Address address = new Address();
@@ -50,7 +50,7 @@ public class SiteHelper extends Helper {
         saveSite.setName(name);
         saveSite.setNameShort(name);
         saveSite.setAddress(address);
-        saveSite.setActivityStatus(activityStatus.getId());
+        saveSite.setActivityStatus(activityStatus);
         saveSite.setStudyIds(studyIds);
 
         return actionExecutor.exec(saveSite).getId();
@@ -58,7 +58,7 @@ public class SiteHelper extends Helper {
 
     public static List<Integer> createSites(
         IActionExecutor actionExecutor,
-        String name, ActivityStatusEnum activityStatus, int numToCreate)
+        String name, ActivityStatus activityStatus, int numToCreate)
         throws ApplicationException {
         List<Integer> result = new ArrayList<Integer>();
         for (int i = 0; i < numToCreate; ++i) {
@@ -75,8 +75,7 @@ public class SiteHelper extends Helper {
         siteSaveAction.setId(siteInfo.site.getId());
         siteSaveAction.setName(siteInfo.site.getName());
         siteSaveAction.setNameShort(siteInfo.site.getNameShort());
-        siteSaveAction.setActivityStatus(siteInfo.site.getActivityStatus()
-            .getId());
+        siteSaveAction.setActivityStatus(siteInfo.site.getActivityStatus());
         siteSaveAction.setAddress(siteInfo.site.getAddress());
 
         Set<Integer> ids = new HashSet<Integer>();
@@ -119,7 +118,7 @@ public class SiteHelper extends Helper {
                 provisioning.clinicId));
         StudySaveAction studySaveAction =
             StudyHelper.getSaveAction(basename + "_study", basename + "_study",
-                ActivityStatusEnum.ACTIVE);
+                ActivityStatus.ACTIVE);
         HashSet<Integer> ids = new HashSet<Integer>();
         ids.add(clinicInfo.contacts.get(0).getId());
         studySaveAction.setContactIds(ids);
@@ -127,7 +126,7 @@ public class SiteHelper extends Helper {
 
         SiteSaveAction siteSaveAction =
             SiteHelper.getSaveAction(basename + "_site", basename + "_site",
-                ActivityStatusEnum.ACTIVE);
+                ActivityStatus.ACTIVE);
         ids = new HashSet<Integer>();
         ids.add(provisioning.studyId);
         siteSaveAction.setStudyIds(ids);

@@ -3,11 +3,11 @@ package edu.ualberta.med.biobank.test.action.helper;
 import java.util.HashSet;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.test.Utils;
@@ -17,7 +17,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ClinicHelper extends Helper {
 
     public static ClinicSaveAction getSaveAction(String name, String nameShort,
-        ActivityStatusEnum activityStatus, Boolean sendsShipments) {
+        ActivityStatus activityStatus, Boolean sendsShipments) {
 
         Address address = new Address();
         address.setCity(name);
@@ -25,7 +25,7 @@ public class ClinicHelper extends Helper {
         ClinicSaveAction saveClinic = new ClinicSaveAction();
         saveClinic.setName(name);
         saveClinic.setNameShort(nameShort);
-        saveClinic.setActivityStatus(activityStatus.getId());
+        saveClinic.setActivityStatus(activityStatus);
         saveClinic.setSendsShipments(sendsShipments);
         saveClinic.setContactSaveInfos(new HashSet<ContactSaveInfo>());
         saveClinic.setAddress(address);
@@ -33,7 +33,7 @@ public class ClinicHelper extends Helper {
     }
 
     public static Integer createClinic(IActionExecutor actionExecutor,
-        String name, ActivityStatusEnum activityStatus)
+        String name, ActivityStatus activityStatus)
         throws ApplicationException {
 
         ClinicSaveAction clinicSave = new ClinicSaveAction();
@@ -41,7 +41,7 @@ public class ClinicHelper extends Helper {
         clinicSave.setNameShort(name);
         clinicSave.setSendsShipments(true);
         clinicSave.setContactSaveInfos(new HashSet<ContactSaveInfo>());
-        clinicSave.setActivityStatus(activityStatus.getId());
+        clinicSave.setActivityStatus(activityStatus);
 
         Address address = new Address();
         address.setCity(Utils.getRandomString(5, 10));
@@ -83,7 +83,7 @@ public class ClinicHelper extends Helper {
         }
 
         ClinicSaveAction clinicSave = ClinicHelper.getSaveAction(
-            name, name, ActivityStatusEnum.ACTIVE, true);
+            name, name, ActivityStatus.ACTIVE, true);
         clinicSave.setContactSaveInfos(contactsAll);
         return actionExecutor.exec(clinicSave).getId();
     }
@@ -108,8 +108,7 @@ public class ClinicHelper extends Helper {
         saveAction.setId(clinicInfo.clinic.getId());
         saveAction.setName(clinicInfo.clinic.getName());
         saveAction.setNameShort(clinicInfo.clinic.getNameShort());
-        saveAction.setActivityStatus(clinicInfo.clinic.getActivityStatus()
-            .getId());
+        saveAction.setActivityStatus(clinicInfo.clinic.getActivityStatus());
         saveAction.setSendsShipments(clinicInfo.clinic.getSendsShipments());
         saveAction.setAddress(clinicInfo.clinic.getAddress());
 

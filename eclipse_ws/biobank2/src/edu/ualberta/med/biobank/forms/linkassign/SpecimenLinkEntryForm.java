@@ -28,7 +28,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenLinkProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenHierarchyInfo;
@@ -48,6 +47,7 @@ import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
@@ -508,7 +508,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 SpecimenWrapper sourceSpecimen = cell.getSourceSpecimen();
                 SpecimenWrapper aliquotedSpecimen = cell.getSpecimen();
                 AliquotedSpecimenInfo asi = new AliquotedSpecimenInfo();
-                asi.activityStatus = ActivityStatusEnum.ACTIVE.getId();
+                asi.activityStatus = ActivityStatus.ACTIVE;
                 asi.typeId = aliquotedSpecimen.getSpecimenType().getId();
                 asi.inventoryId = cell.getValue();
                 asi.parentSpecimenId = sourceSpecimen.getId();
@@ -549,7 +549,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     private void saveSingleSpecimen() throws Exception {
         AliquotedSpecimenInfo asi = new AliquotedSpecimenInfo();
-        asi.activityStatus = ActivityStatusEnum.ACTIVE.getId();
+        asi.activityStatus = ActivityStatus.ACTIVE;
         asi.typeId = singleSpecimen.getSpecimenType().getId();
         if (singleSpecimen.getParentContainer() != null) {
             asi.containerId = singleSpecimen.getParentContainer().getId();

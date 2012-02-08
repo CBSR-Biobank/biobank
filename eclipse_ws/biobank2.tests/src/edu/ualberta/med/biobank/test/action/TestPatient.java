@@ -13,7 +13,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
@@ -279,7 +278,7 @@ public class TestPatient extends TestAction {
 
         // create a new patient 2
         Integer studyId2 = StudyHelper.createStudy(EXECUTOR, name + "_2",
-            ActivityStatusEnum.ACTIVE);
+            ActivityStatus.ACTIVE);
         final Integer patientId2 = EXECUTOR.exec(new PatientSaveAction(
             null, studyId2, name + "2", Utils.getRandomDate())).getId();
         // create cevents in patient2

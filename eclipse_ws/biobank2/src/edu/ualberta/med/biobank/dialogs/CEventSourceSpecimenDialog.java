@@ -18,12 +18,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusGetAllAction;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeInfo;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
@@ -35,7 +31,6 @@ import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.InventoryIdValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CEventSourceSpecimenDialog extends PagedDialog {
 
@@ -46,8 +41,6 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
     private Map<String, SourceSpecimen> mapStudySourceSpecimen;
 
     private List<SpecimenTypeInfo> allSpecimenTypes;
-
-    private Map<Integer, ActivityStatus> allActivityStatuses;
 
     private String currentTitle;
 
@@ -75,13 +68,6 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         super(parent, listener, spec == null);
         this.defaultTimeDrawn = defaultTimeDrawn;
         this.inventoryIdExcludeList = inventoryIdExcludeList;
-        try {
-            allActivityStatuses = SessionManager.getAppService().doAction(
-                new ActivityStatusGetAllAction()).getMap();
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(
-                Messages.CEventSourceSpecimenDialog_activity_error_msg, e);
-        }
         Assert.isNotNull(studySourceSpecimen);
         internalSpecimen = new Specimen();
         if (spec == null) {
@@ -172,7 +158,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         activityStatusComboViewer =
             widgetCreator.createComboViewer(contents,
                 Messages.CEventSourceSpecimenDialog_label_activity,
-                allActivityStatuses.values(),
+                ActivityStatus.valuesList(),
                 internalSpecimen.getActivityStatus(),
                 Messages.CEventSourceSpecimenDialog_validation_activity,
                 new ComboSelectionUpdate() {
@@ -332,8 +318,8 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         quantityText.setText(""); //$NON-NLS-1$
         timeDrawnWidget.setDate(null);
         specimenTypeComboViewer.getCombo().deselectAll();
-        activityStatusComboViewer.setSelection(new StructuredSelection(
-            allActivityStatuses.get(ActivityStatusEnum.ACTIVE.getId())));
+        activityStatusComboViewer.setSelection(
+            new StructuredSelection(ActivityStatus.ACTIVE));
         updateWidgetVisibilityAndValues();
     }
 

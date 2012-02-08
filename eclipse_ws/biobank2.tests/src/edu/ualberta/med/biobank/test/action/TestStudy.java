@@ -14,7 +14,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicDeleteAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
@@ -68,7 +67,7 @@ public class TestStudy extends TestAction {
         super.setUp();
         name = getMethodNameR();
         studySaveAction =
-            StudyHelper.getSaveAction(name, name, ActivityStatusEnum.ACTIVE);
+            StudyHelper.getSaveAction(name, name, ActivityStatus.ACTIVE);
     }
 
     @Test
@@ -103,7 +102,7 @@ public class TestStudy extends TestAction {
             Assert.assertTrue(true);
         }
 
-        studySaveAction.setActivityStatus(ActivityStatusEnum.ACTIVE.getId());
+        studySaveAction.setActivityStatus(ActivityStatus.ACTIVE);
         studySaveAction.setSiteIds(null);
         try {
             EXECUTOR.exec(studySaveAction);
@@ -218,7 +217,7 @@ public class TestStudy extends TestAction {
         // test for duplicate name
         StudySaveAction saveStudy =
             StudyHelper.getSaveAction(name + "_2", name,
-                ActivityStatusEnum.ACTIVE);
+                ActivityStatus.ACTIVE);
         try {
             EXECUTOR.exec(saveStudy);
             Assert.fail("should not be allowed to add study with same name");
@@ -483,7 +482,7 @@ public class TestStudy extends TestAction {
             asSaveInfo.id = null;
             asSaveInfo.quantity = R.nextInt();
             asSaveInfo.volume = R.nextDouble();
-            asSaveInfo.activityStatus = ActivityStatusEnum.ACTIVE.getId();
+            asSaveInfo.activityStatus = ActivityStatus.ACTIVE;
             asSaveInfo.specimenTypeId =
                 specimenTypes.get(R.nextInt(specimenTypes.size())).getId();
             result.add(asSaveInfo);
@@ -610,7 +609,7 @@ public class TestStudy extends TestAction {
             if (gEvAttr.getEventAttrType().getName().startsWith("select_")) {
                 seAttrSave.permissible = "a;b;c;d;e;f";
             }
-            seAttrSave.activityStatus = ActivityStatusEnum.ACTIVE.getId();
+            seAttrSave.activityStatus = ActivityStatus.ACTIVE;
             result.add(seAttrSave);
         }
         return result;
@@ -744,7 +743,7 @@ public class TestStudy extends TestAction {
         StudyInfo studyInfo =
             EXECUTOR.exec(new StudyGetInfoAction(studyId));
         Integer clinicId = ClinicHelper.createClinic(EXECUTOR,
-            name + "_clinic", ActivityStatusEnum.ACTIVE);
+            name + "_clinic", ActivityStatus.ACTIVE);
         ContactSaveAction contactSave = new ContactSaveAction();
         contactSave.setName(name + "_contact");
         contactSave.setClinicId(clinicId);

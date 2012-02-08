@@ -225,7 +225,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         saveClinic.setId(clinic.getId());
         saveClinic.setName(clinic.getName());
         saveClinic.setNameShort(clinic.getNameShort());
-        saveClinic.setActivityStatus(clinic.getActivityStatus().getId());
+        saveClinic.setActivityStatus(clinic.getActivityStatus());
         saveClinic.setSendsShipments(clinic.getSendsShipments());
         saveClinic.setContactSaveInfos(new HashSet<ContactSaveInfo>());
         saveClinic.setAddress(clinic.getAddress().getWrappedObject());
