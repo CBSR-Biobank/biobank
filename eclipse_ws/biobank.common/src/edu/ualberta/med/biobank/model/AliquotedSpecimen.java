@@ -13,7 +13,7 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private Integer quantity;
-    private double volume;
+    private Double volume;
     private SpecimenType specimenType;
     private Study study;
     private ActivityStatus activityStatus;
@@ -29,11 +29,11 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
 
     // TODO: change to decimal
     @Column(name = "VOLUME")
-    public double getVolume() {
+    public Double getVolume() {
         return this.volume;
     }
 
-    public void setVolume(double volume) {
+    public void setVolume(Double volume) {
         this.volume = volume;
     }
 
