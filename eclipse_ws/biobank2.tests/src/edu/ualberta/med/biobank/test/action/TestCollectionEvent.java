@@ -108,8 +108,7 @@ public class TestCollectionEvent extends TestAction {
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         Assert.assertEquals(visitNumber, cevent.getVisitNumber());
-        Assert.assertEquals(ActivityStatus.ACTIVE, cevent.getActivityStatus()
-            .getId());
+        Assert.assertEquals(ActivityStatus.ACTIVE, cevent.getActivityStatus());
         Assert.assertNotNull(cevent.getCommentCollection());
         Assert.assertEquals(1, cevent.getCommentCollection().size());
         Assert.assertEquals(specs.size(), cevent.getAllSpecimenCollection()
