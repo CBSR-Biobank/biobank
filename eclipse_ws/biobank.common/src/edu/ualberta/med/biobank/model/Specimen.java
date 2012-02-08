@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +16,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cascade;
@@ -34,7 +35,7 @@ public class Specimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String inventoryId;
-    private Double quantity;
+    private BigDecimal quantity;
     private Date createdAt;
     private Specimen topSpecimen;
     private CollectionEvent collectionEvent;
@@ -64,13 +65,13 @@ public class Specimen extends AbstractBiobankModel {
         this.inventoryId = inventoryId;
     }
 
-    @Min(value = 0, message = "{edu.ualberta.med.biobank.model.Specimen.quantity.Min}")
-    @Column(name = "QUANTITY")
-    public Double getQuantity() {
+    @Digits(integer = 10, fraction = 10, message = "{edu.ualberta.med.biobank.model.Specimen.quantity.Digits}")
+    @Column(name = "QUANTITY", precision = 10, scale = 10)
+    public BigDecimal getQuantity() {
         return this.quantity;
     }
 
-    public void setQuantity(Double quantity) {
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
     }
 

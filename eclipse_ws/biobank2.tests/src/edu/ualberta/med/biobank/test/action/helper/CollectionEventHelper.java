@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public class CollectionEventHelper extends Helper {
         if (userId != null)
             info.commentText = Utils.getRandomString(20, 30);
         info.inventoryId = Utils.getRandomString(8, 12);
-        info.quantity = r.nextDouble();
+        info.quantity = new BigDecimal(r.nextInt(10) + 1);
         info.specimenTypeId = specimenTypeId;
         info.activityStatus = ActivityStatus.ACTIVE;
         info.createdAt = Utils.getRandomDate();

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -152,7 +153,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                     specimen
                         .setSpecimenType((SpecimenTypeWrapper) selectedObject);
                     specimen.setQuantityFromType();
-                    Double volume = specimen.getQuantity();
+                    BigDecimal volume = specimen.getQuantity();
                     if (volumeField != null) {
                         if (volume == null) {
                             volumeField.setText(""); //$NON-NLS-1$

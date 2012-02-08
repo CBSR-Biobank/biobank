@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -165,8 +166,8 @@ public class TestAliquotedSpecimen extends TestDatabase {
             .addAliquotedSpecimen(study, DbHelper.chooseRandomlyInList(types));
 
         aliquotedSpec.reload();
-        Double oldVolume = aliquotedSpec.getVolume();
-        aliquotedSpec.setVolume(6.3);
+        BigDecimal oldVolume = aliquotedSpec.getVolume();
+        aliquotedSpec.setVolume(new BigDecimal(6.3));
         aliquotedSpec.reset();
         Assert.assertEquals(oldVolume, aliquotedSpec.getVolume());
     }
@@ -175,7 +176,7 @@ public class TestAliquotedSpecimen extends TestDatabase {
     public void testResetNew() throws Exception {
         AliquotedSpecimenWrapper aliquotedSpec = new AliquotedSpecimenWrapper(
             appService);
-        aliquotedSpec.setVolume(5.2);
+        aliquotedSpec.setVolume(new BigDecimal(5.2));
         aliquotedSpec.reset();
         Assert.assertEquals(null, aliquotedSpec.getVolume());
     }

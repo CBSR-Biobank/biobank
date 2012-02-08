@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.action;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -481,7 +482,7 @@ public class TestStudy extends TestAction {
                 new AliquotedSpecimenSaveInfo();
             asSaveInfo.id = null;
             asSaveInfo.quantity = R.nextInt();
-            asSaveInfo.volume = R.nextDouble();
+            asSaveInfo.volume = new BigDecimal(R.nextInt(10) + 1);
             asSaveInfo.activityStatus = ActivityStatus.ACTIVE;
             asSaveInfo.specimenTypeId =
                 specimenTypes.get(R.nextInt(specimenTypes.size())).getId();

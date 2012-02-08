@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class AliquotedSpecimenHelper extends DbHelper {
         aliquotedSpecimen.setStudy(study);
         aliquotedSpecimen.setSpecimenType(type);
         aliquotedSpecimen.setQuantity(r.nextInt(10));
-        aliquotedSpecimen.setVolume(r.nextDouble());
+        aliquotedSpecimen.setVolume(new BigDecimal(r.nextInt() + 1));
         aliquotedSpecimen.setActivityStatus(ActivityStatus.ACTIVE);
         return aliquotedSpecimen;
     }

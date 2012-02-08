@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.common.peer;
 
 import edu.ualberta.med.biobank.common.util.TypeReference;
+
+import java.math.BigDecimal;
 import java.util.Collections;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import java.util.List;
@@ -26,17 +28,17 @@ public class AliquotedSpecimenPeer {
 			}
 		});
 
-	public static final Property<Double, AliquotedSpecimen> VOLUME = Property.create(
+	public static final Property<BigDecimal, AliquotedSpecimen> VOLUME = Property.create(
 		"volume" //$NON-NLS-1$
 		, AliquotedSpecimen.class
-		, new TypeReference<Double>() {}
-		, new Property.Accessor<Double, AliquotedSpecimen>() { private static final long serialVersionUID = 1L;
+		, new TypeReference<BigDecimal>() {}
+		, new Property.Accessor<BigDecimal, AliquotedSpecimen>() { private static final long serialVersionUID = 1L;
 			@Override
-			public Double get(AliquotedSpecimen model) {
+			public BigDecimal get(AliquotedSpecimen model) {
 				return model.getVolume();
 			}
 			@Override
-			public void set(AliquotedSpecimen model, Double value) {
+			public void set(AliquotedSpecimen model, BigDecimal value) {
 				model.setVolume(value);
 			}
 		});

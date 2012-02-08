@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.action.study;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -69,7 +70,7 @@ public class StudySaveAction implements Action<IdResult> {
 
         public Integer id = null;
         public Integer quantity;
-        public Double volume;
+        public BigDecimal volume;
         public ActivityStatus activityStatus;
         public Integer specimenTypeId;
 

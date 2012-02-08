@@ -4,6 +4,7 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
+import java.math.BigDecimal;
 import java.util.List;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -78,11 +79,11 @@ public class SpecimenBaseWrapper extends ModelWrapper<Specimen> {
         setProperty(SpecimenPeer.INVENTORY_ID, trimmed);
     }
 
-    public Double getQuantity() {
+    public BigDecimal getQuantity() {
         return getProperty(SpecimenPeer.QUANTITY);
     }
 
-    public void setQuantity(Double quantity) {
+    public void setQuantity(BigDecimal quantity) {
         setProperty(SpecimenPeer.QUANTITY, quantity);
     }
 

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.action.collectionEvent;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,7 +62,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         public Integer specimenTypeId;
         public Integer centerId;
         public String commentText;
-        public Double quantity;
+        public BigDecimal quantity;
     }
 
     public static class CEventAttrSaveInfo implements ActionResult {

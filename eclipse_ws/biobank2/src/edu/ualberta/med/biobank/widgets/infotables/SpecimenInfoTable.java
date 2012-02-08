@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -153,7 +154,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         public String createdAt;
         public String center;
         public String originCenter;
-        public Double quantity;
+        public BigDecimal quantity;
         public String position;
         public ActivityStatus activityStatus;
         public String comment;
@@ -235,7 +236,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         info.createdAt = info.specimen.getFormattedCreatedAt();
         info.worksheet = info.specimen.getParentSpecimen() == null ? "" : info.specimen //$NON-NLS-1$
                 .getParentSpecimen().getProcessingEvent().getWorksheet();
-        Double quantity = info.specimen.getQuantity();
+        BigDecimal quantity = info.specimen.getQuantity();
         info.quantity = quantity;
         info.position = info.specimen.getPositionString();
         ActivityStatus status = info.specimen.getActivityStatus();

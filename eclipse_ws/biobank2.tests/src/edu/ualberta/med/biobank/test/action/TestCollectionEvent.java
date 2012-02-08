@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.action;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -125,7 +126,7 @@ public class TestCollectionEvent extends TestAction {
                 Assert.assertEquals(1, sp.getCommentCollection().size());
                 Assert.assertEquals(info.inventoryId, sp.getInventoryId());
                 Assert
-                    .assertTrue(compareDouble(info.quantity, sp.getQuantity()));
+                    .assertTrue(info.quantity.equals(sp.getQuantity()));
                 Assert.assertEquals(info.specimenTypeId, sp.getSpecimenType()
                     .getId());
                 Assert
@@ -142,7 +143,7 @@ public class TestCollectionEvent extends TestAction {
             new ArrayList<SaveCEventSpecimenInfo>();
         SaveCEventSpecimenInfo modifiedSpec = specs.values().iterator().next();
         modifiedSpec.inventoryId += "Modified";
-        modifiedSpec.quantity += 1;
+        modifiedSpec.quantity = modifiedSpec.quantity.add(BigDecimal.ONE);
         newSpecList.add(modifiedSpec);
         SaveCEventSpecimenInfo newSpec =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandom(typeId,
@@ -173,8 +174,7 @@ public class TestCollectionEvent extends TestAction {
                 Assert.assertNotNull(sp.getCommentCollection());
                 Assert.assertEquals(1, sp.getCommentCollection().size());
                 Assert.assertEquals(newSpec.inventoryId, sp.getInventoryId());
-                Assert.assertTrue(compareDouble(newSpec.quantity,
-                    sp.getQuantity()));
+                Assert.assertTrue(newSpec.quantity.equals(sp.getQuantity()));
                 Assert.assertEquals(newSpec.specimenTypeId, sp
                     .getSpecimenType().getId());
                 Assert.assertEquals(newSpec.activityStatus,
@@ -184,8 +184,8 @@ public class TestCollectionEvent extends TestAction {
             if (sp.getInventoryId().equals(modifiedSpec.inventoryId)) {
                 Assert.assertEquals(modifiedSpec.inventoryId,
                     sp.getInventoryId());
-                Assert.assertTrue(compareDouble(modifiedSpec.quantity,
-                    sp.getQuantity()));
+                Assert
+                    .assertTrue(modifiedSpec.quantity.equals(sp.getQuantity()));
             }
         }
     }

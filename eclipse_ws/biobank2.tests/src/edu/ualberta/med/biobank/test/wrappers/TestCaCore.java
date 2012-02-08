@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -26,11 +27,11 @@ public class TestCaCore extends TestDatabase {
 
         Specimen s1 = new Specimen();
         s1.setId(1);
-        s1.setQuantity(0.1);
+        s1.setQuantity(new BigDecimal(0.1));
 
         Specimen s2 = new Specimen();
         s2.setId(1);
-        s1.setQuantity(0.2);
+        s1.setQuantity(new BigDecimal(0.2));
 
         ce.setAllSpecimenCollection(new HashSet<Specimen>(Arrays.asList(s1)));
         ce.setOriginalSpecimenCollection(new HashSet<Specimen>(Arrays.asList(s2)));

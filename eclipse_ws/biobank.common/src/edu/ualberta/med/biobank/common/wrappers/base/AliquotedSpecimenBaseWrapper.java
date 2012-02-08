@@ -4,6 +4,7 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
+import java.math.BigDecimal;
 import java.util.List;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -43,11 +44,11 @@ public class AliquotedSpecimenBaseWrapper extends ModelWrapper<AliquotedSpecimen
         return AliquotedSpecimenPeer.PROPERTIES;
     }
 
-    public Double getVolume() {
+    public BigDecimal getVolume() {
         return getProperty(AliquotedSpecimenPeer.VOLUME);
     }
 
-    public void setVolume(Double volume) {
+    public void setVolume(BigDecimal volume) {
         setProperty(AliquotedSpecimenPeer.VOLUME, volume);
     }
 

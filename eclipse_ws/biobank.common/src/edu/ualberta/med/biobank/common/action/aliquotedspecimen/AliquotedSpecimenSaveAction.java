@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.action.aliquotedspecimen;
 
+import java.math.BigDecimal;
+
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -13,8 +15,8 @@ public class AliquotedSpecimenSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
     private Integer id = null;
-    private Integer quantity;
-    private Double volume;
+    private int quantity;
+    private BigDecimal volume;
     private Integer studyId;
     private ActivityStatus activityStatus;
     private Integer specimenTypeId;
@@ -23,11 +25,11 @@ public class AliquotedSpecimenSaveAction implements Action<IdResult> {
         this.id = id;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 
-    public void setVolume(Double volume) {
+    public void setVolume(BigDecimal volume) {
         this.volume = volume;
     }
 
@@ -51,20 +53,6 @@ public class AliquotedSpecimenSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        if (quantity == null) {
-            throw new NullPointerException("needOriginalVolume cannot be null");
-        }
-        if (studyId == null) {
-            throw new NullPointerException("study id cannot be null");
-        }
-        if (specimenTypeId == null) {
-            throw new NullPointerException("specimen type id cannot be null");
-        }
-
-        if (activityStatus == null) {
-            throw new NullPointerException("activity status not specified");
-        }
-
         AliquotedSpecimen aqSpc =
             context.get(AliquotedSpecimen.class, id, new AliquotedSpecimen());
         aqSpc.setQuantity(quantity);

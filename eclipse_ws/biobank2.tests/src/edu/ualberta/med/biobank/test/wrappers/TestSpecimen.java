@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -437,7 +438,7 @@ public class TestSpecimen extends TestDatabase {
 
     @Test
     public void testGetSetQuantityFromType() throws Exception {
-        Double quantity = parentSpc.getQuantity();
+        BigDecimal quantity = parentSpc.getQuantity();
         parentSpc.setQuantityFromType();
         // no sample storages defined yet, should be null
         Assert.assertTrue(quantity == null);
@@ -446,19 +447,19 @@ public class TestSpecimen extends TestDatabase {
 
         AliquotedSpecimenWrapper ss1 = new AliquotedSpecimenWrapper(appService);
         ss1.setSpecimenType(SpecimenTypeHelper.addSpecimenType("ss1"));
-        ss1.setVolume(1.0);
+        ss1.setVolume(new BigDecimal(1.0));
         ss1.setStudy(parentSpc.getCollectionEvent().getPatient().getStudy());
         ss1.setActivityStatus(activeStatus);
         ss1.persist();
         AliquotedSpecimenWrapper ss2 = new AliquotedSpecimenWrapper(appService);
         ss2.setSpecimenType(SpecimenTypeHelper.addSpecimenType("ss2"));
-        ss2.setVolume(2.0);
+        ss2.setVolume(new BigDecimal(2.0));
         ss2.setStudy(parentSpc.getCollectionEvent().getPatient().getStudy());
         ss2.setActivityStatus(activeStatus);
         ss2.persist();
         AliquotedSpecimenWrapper ss3 = new AliquotedSpecimenWrapper(appService);
         ss3.setSpecimenType(parentSpc.getSpecimenType());
-        ss3.setVolume(3.0);
+        ss3.setVolume(new BigDecimal(3.0));
         ss3.setStudy(parentSpc.getCollectionEvent().getPatient().getStudy());
         ss3.setActivityStatus(activeStatus);
         ss3.persist();
@@ -796,16 +797,12 @@ public class TestSpecimen extends TestDatabase {
             .addAliquotedSpecimen(study, parentSpc.getSpecimenType());
         study.reload();
         Assert.assertNotNull(as.getVolume());
-        Assert.assertTrue(as.getVolume() != 0);
+        Assert.assertTrue(!as.getVolume().equals(BigDecimal.ZERO));
 
         parentSpc.setQuantityFromType();
-        // FIXME: temporary fix for caCORE not supporting DECIMAL
-        // MySQL type
-        //
-        // our wish is to convert all Doubles in the model to
-        // DECIMALs
+
         Assert
-            .assertTrue(Math.abs(as.getVolume() - parentSpc.getQuantity()) < 0.0001);
+            .assertTrue(as.getVolume().equals(parentSpc.getQuantity()));
     }
 
     @Test

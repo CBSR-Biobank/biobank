@@ -1,11 +1,14 @@
 package edu.ualberta.med.biobank.model;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -13,28 +16,28 @@ import javax.validation.constraints.NotNull;
 public class AliquotedSpecimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
-    private Integer quantity;
-    private double volume;
+    private int quantity;
+    private BigDecimal volume;
     private SpecimenType specimenType;
     private Study study;
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
 
     @Column(name = "QUANTITY")
-    public Integer getQuantity() {
+    public int getQuantity() {
         return this.quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 
-    // TODO: change to decimal
-    @Column(name = "VOLUME")
-    public double getVolume() {
+    @Digits(integer = 10, fraction = 10, message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.volume.Digits}")
+    @Column(name = "VOLUME", precision = 10, scale = 10)
+    public BigDecimal getVolume() {
         return this.volume;
     }
 
-    public void setVolume(double volume) {
+    public void setVolume(BigDecimal volume) {
         this.volume = volume;
     }
 

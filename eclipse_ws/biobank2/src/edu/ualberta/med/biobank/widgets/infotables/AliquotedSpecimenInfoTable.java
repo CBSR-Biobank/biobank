@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -20,7 +21,7 @@ public class AliquotedSpecimenInfoTable extends
     protected static class TableRowData {
         public AliquotedSpecimenWrapper sampleStorage;
         public String typeName;
-        public Double volume;
+        public BigDecimal volume;
         public Integer quantity;
         public String status;
 
