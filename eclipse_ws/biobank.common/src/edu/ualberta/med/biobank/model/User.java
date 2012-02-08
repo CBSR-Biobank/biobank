@@ -19,7 +19,11 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @DiscriminatorValue("User")
-@Unique(properties = "login", groups = PrePersist.class)
+@Unique.List({
+    @Unique(properties = "csmUserId", groups = PrePersist.class),
+    @Unique(properties = "email", groups = PrePersist.class),
+    @Unique(properties = "login", groups = PrePersist.class)
+})
 public class User extends Principal {
     private static final long serialVersionUID = 1L;
 
@@ -43,7 +47,7 @@ public class User extends Principal {
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.User.csmUserId.NotNull}")
-    @Column(name = "CSM_USER_ID")
+    @Column(name = "CSM_USER_ID", unique = true)
     public Long getCsmUserId() {
         return this.csmUserId;
     }
@@ -72,7 +76,7 @@ public class User extends Principal {
     }
 
     // TODO: write an email check that allows null @Email
-    @Column(name = "EMAIL")
+    @Column(name = "EMAIL", unique = true)
     public String getEmail() {
         return this.email;
     }

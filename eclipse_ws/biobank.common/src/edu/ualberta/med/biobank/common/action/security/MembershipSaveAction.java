@@ -7,7 +7,6 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Center;
@@ -59,11 +58,6 @@ public class MembershipSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        if (roleIds == null) {
-            throw new NullPropertyException(Membership.class,
-                "role ids cannot be null");
-        }
-
         membership =
             context.get(Membership.class, membershipId, new Membership());
         membership.setPrincipal(context.load(Principal.class, principalId));

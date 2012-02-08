@@ -64,10 +64,6 @@ public class ContactSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        if (clinicId == null) {
-            throw new NullPointerException("clinic id cannot be null");
-        }
-
         Contact contact = context.get(Contact.class, id, new Contact());
 
         contact.setName(name);

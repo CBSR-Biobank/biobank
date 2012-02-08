@@ -1,15 +1,11 @@
 package edu.ualberta.med.biobank.common.action.patient;
 
-import java.util.Arrays;
 import java.util.Date;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
-import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermission;
 import edu.ualberta.med.biobank.common.permission.patient.PatientUpdatePermission;
@@ -44,14 +40,8 @@ public class PatientSaveAction implements Action<IdResult> {
         return permission.isAllowed(context);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        // checks pnumber unique to send a proper message:
-        new UniquePreCheck<Patient>(Patient.class, patientId,
-            Arrays.asList(new ValueProperty<Patient>(PatientPeer.PNUMBER,
-                pnumber))).run(context);
-
         Patient patientToSave;
 
         if (patientId == null) {

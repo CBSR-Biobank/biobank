@@ -57,7 +57,8 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
         Query query = context.getSession().createQuery(CLINIC_INFO_HQL);
         query.setParameter(0, clinicId);
 
-        List<Clinic> clinics = query.list();
+        @SuppressWarnings("unchecked")
+        List<Clinic> clinics = (List<Clinic>) query.list();
 
         if (clinics.size() != 1) {
             throw new ModelNotFoundException(Clinic.class, clinicId);

@@ -75,7 +75,6 @@ public class ContainerSaveAction implements Action<IdResult> {
     @Override
     public IdResult run(ActionContext context) throws ActionException {
         // FIXME logging
-        // FIXME checks
 
         Container container;
         if (containerId != null) {

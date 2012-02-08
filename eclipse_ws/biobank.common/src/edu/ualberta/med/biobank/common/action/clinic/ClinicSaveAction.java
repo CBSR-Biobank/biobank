@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -68,8 +66,6 @@ public class ClinicSaveAction extends CenterSaveAction {
 
     private Boolean sendsShipments;
     private Collection<ContactSaveInfo> contactSaveInfos;
-    private Session session = null;
-    private ActionContext context = null;
     private Clinic clinic = null;
 
     public void setSendsShipments(Boolean sendsShipments) {

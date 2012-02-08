@@ -7,7 +7,6 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Membership;
@@ -35,11 +34,6 @@ public abstract class PrincipalSaveAction implements Action<IdResult> {
 
     public IdResult run(ActionContext context, Principal principal)
         throws ActionException {
-        if (membershipIds == null) {
-            throw new NullPropertyException(Principal.class,
-                "membership ids cannot be null");
-        }
-
         principal.setId(principalId);
 
         Map<Integer, Membership> memberships =

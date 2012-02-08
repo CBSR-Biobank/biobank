@@ -3,9 +3,7 @@ package edu.ualberta.med.biobank.common.action.containerType;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
-import edu.ualberta.med.biobank.common.action.check.CollectionIsEmptyCheck;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeDeletePermission;
 import edu.ualberta.med.biobank.model.ContainerType;
 
@@ -29,10 +27,6 @@ public class ContainerTypeDeleteAction implements Action<EmptyResult> {
         // have it as a child.
 
         ContainerType containerType = context.load(ContainerType.class, typeId);
-
-        new CollectionIsEmptyCheck<ContainerType>(ContainerType.class,
-            containerType, ContainerTypePeer.SPECIMEN_TYPE_COLLECTION,
-            containerType.getName(), null).run(context);
 
         // cascades delete all comments
 

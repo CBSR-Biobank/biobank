@@ -22,7 +22,6 @@ public class SiteDeleteAction extends CenterDeleteAction {
     @Override
     public EmptyResult run(ActionContext context) throws ActionException {
         Site site = context.load(Site.class, centerId);
-        new SitePreDeleteChecks(site).run(context);
         return super.run(context, site);
     }
 }

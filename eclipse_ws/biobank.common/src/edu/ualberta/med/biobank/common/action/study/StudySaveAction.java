@@ -1,10 +1,8 @@
 package edu.ualberta.med.biobank.common.action.study;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,13 +10,9 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
-import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
@@ -201,49 +195,7 @@ public class StudySaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        if (name == null) {
-            throw new NullPropertyException(Study.class, StudyPeer.NAME);
-        }
-        if (nameShort == null) {
-            throw new NullPropertyException(Study.class, StudyPeer.NAME_SHORT);
-        }
-        if (activityStatus == null) {
-            throw new NullPropertyException(Study.class, "activity status id");
-        }
-        if (siteIds == null) {
-            throw new NullPropertyException(Study.class,
-                "site ids cannot be null");
-        }
-        if (contactIds == null) {
-            throw new NullPropertyException(Study.class,
-                "contact ids cannot be null");
-        }
-        if (sourceSpecimenSaveInfos == null) {
-            throw new NullPropertyException(Study.class,
-                "specimen ids cannot be null");
-        }
-        if (aliquotSpecimenSaveInfos == null) {
-            throw new NullPropertyException(Study.class,
-                "aliquot ids cannot be null");
-        }
-        if (studyEventAttrSaveInfos == null) {
-            throw new NullPropertyException(Study.class,
-                "aliquot ids cannot be null");
-        }
-
         study = context.get(Study.class, id, new Study());
-
-        // check for duplicate name
-        List<ValueProperty<Study>> uniqueValProps =
-            new ArrayList<ValueProperty<Study>>();
-        uniqueValProps.add(new ValueProperty<Study>(StudyPeer.NAME, name));
-        new UniquePreCheck<Study>(Study.class, id, uniqueValProps).run(context);
-
-        // check for duplicate name short
-        uniqueValProps = new ArrayList<ValueProperty<Study>>();
-        uniqueValProps.add(new ValueProperty<Study>(StudyPeer.NAME_SHORT,
-            nameShort));
-        new UniquePreCheck<Study>(Study.class, id, uniqueValProps).run(context);
 
         // TODO: version check?
 

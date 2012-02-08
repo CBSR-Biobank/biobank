@@ -1,18 +1,13 @@
 package edu.ualberta.med.biobank.common.action.specimenType;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
-import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeCreatePermission;
 import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeUpdatePermission;
@@ -64,21 +59,6 @@ public class SpecimenTypeSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        // check for duplicate name
-        List<ValueProperty<SpecimenType>> uniqueValProps =
-            new ArrayList<ValueProperty<SpecimenType>>();
-        uniqueValProps.add(new ValueProperty<SpecimenType>(
-            SpecimenTypePeer.NAME, name));
-        new UniquePreCheck<SpecimenType>(SpecimenType.class, specimenTypeId,
-            uniqueValProps).run(context);
-
-        // check for duplicate name short
-        uniqueValProps = new ArrayList<ValueProperty<SpecimenType>>();
-        uniqueValProps.add(new ValueProperty<SpecimenType>(
-            SpecimenTypePeer.NAME_SHORT, nameShort));
-        new UniquePreCheck<SpecimenType>(SpecimenType.class, specimenTypeId,
-            uniqueValProps).run(context);
-
         specimenType =
             context.get(SpecimenType.class, specimenTypeId, new SpecimenType());
         specimenType.setName(name);

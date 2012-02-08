@@ -1,17 +1,10 @@
 package edu.ualberta.med.biobank.common.action.center;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
-import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Center;
@@ -65,47 +58,13 @@ public abstract class CenterSaveAction implements Action<IdResult> {
 
     protected IdResult run(ActionContext context, Center center)
         throws ActionException {
-        if (name == null) {
-            throw new NullPropertyException(Center.class, CenterPeer.NAME);
-        }
-        if (nameShort == null) {
-            throw new NullPropertyException(Center.class, CenterPeer.NAME_SHORT);
-        }
-        if (address == null) {
-            throw new NullPropertyException(Center.class, "address");
-        }
-        if (activityStatus == null) {
-            throw new NullPropertyException(Center.class,
-                CenterPeer.ACTIVITY_STATUS);
-        }
-
-        // check for duplicate name
-        List<ValueProperty<Center>> uniqueValProps =
-            new ArrayList<ValueProperty<Center>>();
-        uniqueValProps.add(new ValueProperty<Center>(CenterPeer.NAME, name));
-        new UniquePreCheck<Center>(Center.class, centerId, uniqueValProps).run(
-            context);
-
-        // check for duplicate name short
-        uniqueValProps = new ArrayList<ValueProperty<Center>>();
-        uniqueValProps.add(new ValueProperty<Center>(CenterPeer.NAME_SHORT,
-            nameShort));
-        new UniquePreCheck<Center>(Center.class, centerId, uniqueValProps).run(
-            context);
-
-        // TODO: check permission? (can edit site?)
-
-        // TODO: error checks
         // TODO: version check?
-
-        // TODO: LocalizedMessage in Exception?
 
         center.setName(name);
         center.setNameShort(nameShort);
 
         center.setActivityStatus(activityStatus);
 
-        // TODO: remember to check the address
         center.setAddress(address);
         saveComments(context, center);
 

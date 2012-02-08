@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.action.collectionEvent;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -15,16 +14,12 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
-import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
-import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventCreatePermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
@@ -133,9 +128,6 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-
-        check(context);
-
         CollectionEvent ceventToSave;
         if (ceventId == null) {
             ceventToSave = new CollectionEvent();
@@ -157,18 +149,6 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         context.getSession().saveOrUpdate(ceventToSave);
 
         return new IdResult(ceventToSave.getId());
-    }
-
-    private void check(ActionContext context) {
-        // Check that the visit number is unique for the patient
-        List<ValueProperty<CollectionEvent>> propUple =
-            new ArrayList<ValueProperty<CollectionEvent>>();
-        propUple.add(new ValueProperty<CollectionEvent>(
-            CollectionEventPeer.PATIENT.to(PatientPeer.ID), patientId));
-        propUple.add(new ValueProperty<CollectionEvent>(
-            CollectionEventPeer.VISIT_NUMBER, visitNumber));
-        new UniquePreCheck<CollectionEvent>(CollectionEvent.class, ceventId,
-            propUple).run(context);
     }
 
     private void setSourceSpecimens(ActionContext context,

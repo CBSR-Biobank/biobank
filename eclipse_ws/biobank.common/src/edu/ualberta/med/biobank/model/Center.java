@@ -21,7 +21,9 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
@@ -32,6 +34,10 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Unique.List({
     @Unique(properties = "name", groups = PrePersist.class),
     @Unique(properties = "nameShort", groups = PrePersist.class)
+})
+@Empty.List({
+    @Empty(property = "srcDispatchCollection", groups = PreDelete.class),
+    @Empty(property = "dstDispatchCollection", groups = PreDelete.class)
 })
 public class Center extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;

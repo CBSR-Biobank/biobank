@@ -10,8 +10,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import edu.ualberta.med.biobank.validator.constraint.Empty;
+import edu.ualberta.med.biobank.validator.group.PreDelete;
+
 @Entity
 @DiscriminatorValue("ResearchGroup")
+@Empty(property = "requestCollection", groups = PreDelete.class)
 public class ResearchGroup extends Center {
     private static final long serialVersionUID = 1L;
 

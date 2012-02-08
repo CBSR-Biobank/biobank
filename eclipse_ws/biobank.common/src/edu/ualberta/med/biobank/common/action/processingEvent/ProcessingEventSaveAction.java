@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.processingEvent;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -8,12 +7,8 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
-import edu.ualberta.med.biobank.common.action.check.ValueProperty;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventCreatePermission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventUpdatePermission;
@@ -65,14 +60,8 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         return permission.isAllowed(context);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        if (specimenIds == null) {
-            throw new NullPropertyException(ProcessingEvent.class,
-                ProcessingEventPeer.SPECIMEN_COLLECTION);
-        }
-
         ProcessingEvent peventToSave;
 
         if (peventId == null) {
@@ -82,12 +71,6 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         }
 
         // FIXME Version check?
-
-        // check worksheet number unique. Can't set it as a database constraint
-        // since imported pevent can have a null worksheet:
-        new UniquePreCheck<ProcessingEvent>(ProcessingEvent.class, peventId,
-            Arrays.asList(new ValueProperty<ProcessingEvent>(
-                ProcessingEventPeer.WORKSHEET, worksheet))).run(context);
 
         peventToSave.setActivityStatus(activityStatus);
         peventToSave.setCenter(context.load(Center.class, centerId));

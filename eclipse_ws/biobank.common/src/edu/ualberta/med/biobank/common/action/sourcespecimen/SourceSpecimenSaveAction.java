@@ -40,16 +40,6 @@ public class SourceSpecimenSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        if (needOriginalVolume == null) {
-            throw new NullPointerException("needOriginalVolume cannot be null");
-        }
-        if (studyId == null) {
-            throw new NullPointerException("study id cannot be null");
-        }
-        if (specimenTypeId == null) {
-            throw new NullPointerException("specimen type id cannot be null");
-        }
-
         SourceSpecimen srcSpc =
             context.get(SourceSpecimen.class, id, new SourceSpecimen());
         srcSpc.setNeedOriginalVolume(needOriginalVolume);

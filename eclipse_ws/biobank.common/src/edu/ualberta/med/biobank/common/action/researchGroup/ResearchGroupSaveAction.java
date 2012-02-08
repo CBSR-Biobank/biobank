@@ -10,7 +10,6 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupSavePermission;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ResearchGroup;

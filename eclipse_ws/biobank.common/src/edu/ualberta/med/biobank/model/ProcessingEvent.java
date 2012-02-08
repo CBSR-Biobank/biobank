@@ -28,8 +28,6 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
     @NotUsed(by = Specimen.class, property = "processingEvent", groups = PreDelete.class),
     @NotUsed(by = Specimen.class, property = "parentSpecimen.processingEvent", groups = PreDelete.class)
 })
-// Unable to delete processing event '{0}' ({1}) since some of its specimens
-// have already been derived into others specimens.
 public class ProcessingEvent extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

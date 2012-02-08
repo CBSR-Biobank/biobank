@@ -7,8 +7,6 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.center.CenterSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.site.SiteCreatePermission;
 import edu.ualberta.med.biobank.common.permission.site.SiteUpdatePermission;
@@ -39,11 +37,6 @@ public class SiteSaveAction extends CenterSaveAction {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        if (studyIds == null) {
-            throw new NullPropertyException(Site.class,
-                SitePeer.STUDY_COLLECTION);
-        }
-
         Site site = context.load(Site.class, centerId, new Site());
 
         // TODO: check that the user has access to at least the studies they are

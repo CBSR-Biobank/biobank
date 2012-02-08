@@ -36,6 +36,7 @@ public class BbGroup extends Principal {
         this.name = name;
     }
 
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.BbGroup.name.NotEmpty}")
     @Column(name = "DESCRIPTION")
     public String getDescription() {
         return this.description;

@@ -58,13 +58,6 @@ public class StudyEventAttrSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        if (globalEventAttrId == null) {
-            throw new NullPointerException("globalEventAttrId cannot be null");
-        }
-        if (required == null) {
-            throw new NullPointerException("required field cannot be null");
-        }
-
         StudyEventAttr attr = context.get(StudyEventAttr.class, id,
             new StudyEventAttr());
 
