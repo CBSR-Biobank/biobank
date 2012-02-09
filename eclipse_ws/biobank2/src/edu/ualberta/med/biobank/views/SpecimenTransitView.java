@@ -319,7 +319,6 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 centerAdapter = new ClinicWithShipmentAdapter(topNode,
                     (ClinicWrapper) originInfo.getCenter());
                 centerAdapter.setEditable(false);
-                centerAdapter.setLoadChildrenInBackground(false);
                 topNode.addChild(centerAdapter);
             }
 

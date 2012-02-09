@@ -19,7 +19,7 @@ public abstract class AbstractRequestGroup extends AdapterBase {
 
     public AbstractRequestGroup(AdapterBase parent, int id, String name,
         CenterWrapper<?> center) {
-        super(parent, id, name, true, true);
+        super(parent, id, name, true);
         this.center = center;
     }
 

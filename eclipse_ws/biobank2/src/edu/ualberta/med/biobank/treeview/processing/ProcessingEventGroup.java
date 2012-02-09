@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public class ProcessingEventGroup extends AdapterBase {
 
     public ProcessingEventGroup(AdapterBase parent, int id, String name) {
-        super(parent, id, name, true, true);
+        super(parent, id, name, true);
     }
 
     @Override
@@ -43,8 +43,9 @@ public class ProcessingEventGroup extends AdapterBase {
                         SessionManager.getAppService());
                     pEvent.setCenter(SessionManager.getUser()
                         .getCurrentWorkingCenter());
-                    ProcessingEventAdapter adapter = new ProcessingEventAdapter(
-                        ProcessingEventGroup.this, pEvent);
+                    ProcessingEventAdapter adapter =
+                        new ProcessingEventAdapter(
+                            ProcessingEventGroup.this, pEvent);
                     adapter.openEntryForm();
                 }
             });

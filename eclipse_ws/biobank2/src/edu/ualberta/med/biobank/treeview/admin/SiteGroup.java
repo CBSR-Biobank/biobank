@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public class SiteGroup extends AdapterBase {
     public SiteGroup(SessionAdapter parent, int id) {
-        super(parent, id, Messages.SiteGroup_sites_node_label, true, false);
+        super(parent, id, Messages.SiteGroup_sites_node_label, true);
     }
 
     @Override

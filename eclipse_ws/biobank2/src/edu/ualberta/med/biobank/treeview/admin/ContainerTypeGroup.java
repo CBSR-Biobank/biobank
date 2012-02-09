@@ -33,8 +33,7 @@ public class ContainerTypeGroup extends AdapterBase {
     private SiteGetContainerTypesResult containerTypesResult;
 
     public ContainerTypeGroup(SiteAdapter parent, int id) {
-        super(parent, id, Messages.ContainerTypeGroup_types_node_label, true,
-            true);
+        super(parent, id, Messages.ContainerTypeGroup_types_node_label, true);
     }
 
     @Override

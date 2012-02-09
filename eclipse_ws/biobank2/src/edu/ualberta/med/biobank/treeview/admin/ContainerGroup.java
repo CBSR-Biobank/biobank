@@ -36,8 +36,7 @@ public class ContainerGroup extends AdapterBase {
     private SiteGetTopContainersResult topContainerResult;
 
     public ContainerGroup(SiteAdapter parent, int id) {
-        super(parent, id, Messages.ContainerGroup_containers_node_label, true,
-            true);
+        super(parent, id, Messages.ContainerGroup_containers_node_label, true);
     }
 
     @Override

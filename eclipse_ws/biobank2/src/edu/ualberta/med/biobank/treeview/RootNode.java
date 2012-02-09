@@ -15,7 +15,7 @@ public class RootNode extends AdapterBase {
     private TreeViewer treeViewer;
 
     public RootNode() {
-        super(null, 1, "root", true, false); //$NON-NLS-1$
+        super(null, 1, "root", true); //$NON-NLS-1$
     }
 
     public void setTreeViewer(TreeViewer treeViewer) {

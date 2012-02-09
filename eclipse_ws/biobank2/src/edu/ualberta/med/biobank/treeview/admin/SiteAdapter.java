@@ -24,7 +24,7 @@ public class SiteAdapter extends AdapterBase {
     public static final int CONTAINERS_BASE_NODE_ID = 1;
 
     public SiteAdapter(AdapterBase parent, SiteWrapper site) {
-        super(parent, site, false);
+        super(parent, site);
         this.site = site;
         if (site != null && site.getId() != null) {
             nodeIdOffset *= site.getId();

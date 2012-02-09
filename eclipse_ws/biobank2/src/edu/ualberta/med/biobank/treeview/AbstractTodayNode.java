@@ -21,7 +21,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     private List<E> currentTodayElements;
 
     public AbstractTodayNode(AdapterBase parent, int id) {
-        super(parent, id, Messages.AbstractTodayNode_today, true, false);
+        super(parent, id, Messages.AbstractTodayNode_today, true);
     }
 
     @Override
@@ -76,8 +76,9 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
                 childWrapper.reload();
 
                 for (AbstractAdapterBase grandchild : child.getChildren()) {
-                    ModelWrapper<?> grandchildWrapper = ((AdapterBase) grandchild)
-                        .getModelObject();
+                    ModelWrapper<?> grandchildWrapper =
+                        ((AdapterBase) grandchild)
+                            .getModelObject();
                     grandchildWrapper.reload();
                     if (!currentTodayElements.contains(grandchildWrapper)
                         || !isParentTo(childWrapper, grandchildWrapper)) {

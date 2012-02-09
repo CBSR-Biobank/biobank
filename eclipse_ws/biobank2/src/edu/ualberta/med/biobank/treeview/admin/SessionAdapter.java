@@ -46,7 +46,7 @@ public class SessionAdapter extends AdapterBase {
     public SessionAdapter(AdapterBase parent,
         BiobankApplicationService appService, int sessionId, String serverName,
         UserWrapper user) {
-        super(parent, null, false);
+        super(parent, null);
         this.appService = appService;
         setId(sessionId);
         if (user.getLogin().isEmpty()) {
