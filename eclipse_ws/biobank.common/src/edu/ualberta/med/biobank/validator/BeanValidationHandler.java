@@ -29,6 +29,7 @@ import org.hibernate.event.PreUpdateEvent;
 import org.hibernate.event.PreUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 
+import edu.ualberta.med.biobank.validator.engine.LocalizedConstraintViolation;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PreInsert;
 import edu.ualberta.med.biobank.validator.group.PreUpdate;
@@ -121,7 +122,7 @@ public class BeanValidationHandler implements PreInsertEventListener,
                     // through a specific action.
                     // TODO: add a tag for validations to be performed on the
                     // server (only) and not locally...
-                    Set<ConstraintViolation<?>> propagatedViolations =
+                    Set<ConstraintViolation<?>> localizedViolations =
                         new HashSet<ConstraintViolation<?>>(
                             constraintViolations.size());
 
@@ -129,11 +130,15 @@ public class BeanValidationHandler implements PreInsertEventListener,
                     builder.append("validation failed for groups: ");
                     builder.append(Arrays.toString(groups));
 
-                    for (ConstraintViolation<?> violation : constraintViolations) {
+                    for (ConstraintViolation<T> violation : constraintViolations) {
                         // if (log.isTraceEnabled()) {
                         // log.trace(violation.toString());
                         // }
-                        propagatedViolations.add(violation);
+
+                        ConstraintViolation<T> localizedViolation =
+                            new LocalizedConstraintViolation<T>(violation);
+
+                        localizedViolations.add(localizedViolation);
 
                         builder.append("\r\n");
                         builder.append(violation.getLeafBean().getClass()
@@ -143,7 +148,7 @@ public class BeanValidationHandler implements PreInsertEventListener,
                     }
 
                     throw new ConstraintViolationException(
-                        builder.toString(), propagatedViolations);
+                        builder.toString(), localizedViolations);
                 }
             }
         } finally {
