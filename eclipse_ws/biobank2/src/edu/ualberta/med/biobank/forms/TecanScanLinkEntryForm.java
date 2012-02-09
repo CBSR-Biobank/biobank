@@ -197,7 +197,7 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
             @Override
             public void handleEvent(org.eclipse.swt.widgets.Event event) {
                 String[] filterExt = new String[] { "*.csv" };
-                File fl = new File("");
+                File fl = null; // new File("");
                 path = runFileDialog("home", filterExt);
                 if (path != null) {
                     fileToUpload.setText(path);
@@ -216,6 +216,21 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
             }
         });
         return composite;
+    }
+
+    private String getFileName(String path) {
+        String fileName = null;
+        int i = -1;
+        char uSep = '\\';
+        char wSep = '/';
+        int j = path.indexOf(".csv");
+        if (path.lastIndexOf(wSep) > 0) {
+            i = path.lastIndexOf(wSep);
+        } else {
+            i = path.lastIndexOf(uSep);
+        }
+        fileName = path.substring(i + 1, j - 1);
+        return fileName = path.substring(i + 1, j);
     }
 
     private String runFileDialog(String name, String[] exts) {
@@ -247,9 +262,10 @@ public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
                                     // SEND DATA TO SERVER
                                     int cCenter = SessionManager.getUser()
                                         .getCurrentWorkingSite().getId();
+                                    String fileName = getFileName(path);
                                     processed = appService.tecanloadFile(
                                         csvfile, pStudy, pWorkSheet, pComment,
-                                        cCenter);
+                                        cCenter, fileName);
                                 } catch (final RemoteConnectFailureException exp) {
                                     BgcPlugin
                                         .openRemoteConnectErrorMessage(exp);

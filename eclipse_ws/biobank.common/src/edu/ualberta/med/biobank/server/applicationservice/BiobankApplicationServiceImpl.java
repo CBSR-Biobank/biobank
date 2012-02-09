@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
@@ -48,6 +49,7 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -366,19 +368,27 @@ public class BiobankApplicationServiceImpl extends
         return newFile;
     }
 
+    /**
+     * Load Tecan CSV file, sent by client.
+     * 
+     * 
+     * @author Dwain Elson
+     * 
+     */
     @Override
     public List<String> tecanloadFile(byte[] bytes, int pStudy,
-        String pWorkSheet, String pComment, int cCenter)
+        String pWorkSheet, String pComment, int cCenter, String fileName)
         throws ApplicationException {
 
         String uploadDir = System.getProperty("upload.dir");
-        // List<String> processed = new ArrayList<String>();
-        Calendar currentDate = Calendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MMM_dd-HH_mm");
-        String dateNow = formatter.format(currentDate.getTime());
+        // Calendar currentDate = Calendar.getInstance();
+        // SimpleDateFormat formatter = new
+        // SimpleDateFormat("yyyy_MMM_dd-HH_mm");
+        // String dateNow = formatter.format(currentDate.getTime());
 
-        String newFile = uploadDir + "/" + dateNow + "_ID_" + "currentSite"
-            + ".csv";
+        String newFile = uploadDir + "/" + fileName + ".csv";
+        // String newFile = uploadDir + "/" + dateNow + "_ID_" + "currentSite"
+        // + ".csv";
         File fl = new File(newFile);
 
         try {
@@ -386,6 +396,8 @@ public class BiobankApplicationServiceImpl extends
             if (success) {
                 // File did not exist and was created
             } else {
+                processed.add("File name already exists: " + newFile);
+                return processed;
                 // File already exists
             }
         } catch (IOException e) {
@@ -398,28 +410,45 @@ public class BiobankApplicationServiceImpl extends
         }
 
         try {
-            processed = tecanProcessCVS(newFile, pStudy, pWorkSheet, pComment,
-                cCenter);
+            processed = tecanProcessCVS(newFile, pWorkSheet, pComment, cCenter,
+                fileName);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return processed;
     }
 
-    public List<String> tecanProcessCVS(String myfile, int pStudy,
-        String pWorkSheet, String pComment, int cCenter) throws Exception {
+    /**
+     * Process Tecan CSV
+     * 
+     * 
+     * @author Dwain Elson
+     * 
+     */
+    public List<String> tecanProcessCVS(String myfile, String pWorkSheet,
+        String pComment, int cCenter, String fileName) throws Exception {
 
-        System.out.println("FILE: " + myfile);
+        ProcessingEventWrapper pEvent = new ProcessingEventWrapper(this);
 
         ICsvBeanReader inFile = new CsvBeanReader(new FileReader(myfile),
             CsvPreference.EXCEL_PREFERENCE);
-
-        final CellProcessor[] userProcessors = new CellProcessor[] {
-            new StrNotNullOrEmpty(), new StrNotNullOrEmpty(),
-            new StrNotNullOrEmpty(), new StrNotNullOrEmpty(),
-            new DMinMax(0, Double.MAX_VALUE), new ParseDate("yyyy-MM-dd"),
-            new ParseDate("yyyy-MM-dd") };
-
+        // Will have different cell processors depending on what process type it
+        // is
+        CellProcessor[] userProcessors;
+        if (false) {
+            userProcessors = new CellProcessor[] { new StrNotNullOrEmpty(),
+                new StrNotNullOrEmpty(), new StrNotNullOrEmpty(),
+                new StrNotNullOrEmpty(), new DMinMax(0, Double.MAX_VALUE),
+                new ParseDate(TecanCSV.dateFormat),
+                new ParseDate(TecanCSV.dateFormat) };
+        } else {
+            userProcessors = new CellProcessor[] { new StrNotNullOrEmpty(),
+                new StrNotNullOrEmpty(), new StrNotNullOrEmpty(),
+                new StrNotNullOrEmpty(), new DMinMax(0, Double.MAX_VALUE),
+                new ParseDate(TecanCSV.dateFormat),
+                new ParseDate(TecanCSV.dateFormat),
+                new DMinMax(0, Double.MAX_VALUE), null };
+        }
         try {
             processed.add("Uploaded File: " + myfile);
 
@@ -438,17 +467,25 @@ public class BiobankApplicationServiceImpl extends
             }
             processed.add("HEADER: " + tmpString);
 
+            //
+            List<TecanCSV> listTecanCSV = new ArrayList<TecanCSV>();
             while ((tecanCsv = inFile.read(TecanCSV.class, header,
                 userProcessors)) != null) {
-
-                persistData(tecanCsv, pStudy, pWorkSheet, pComment, cCenter);
-                processed.add(tecanCsv.getLine());
+                listTecanCSV.add(tecanCsv);
             }
 
+            pEvent = persistEvent(pWorkSheet, pComment, cCenter, fileName);
+
+            int j = 0;
+            while (j < listTecanCSV.size()) {
+                persistData(listTecanCSV.get(j), cCenter, pEvent);
+                processed.add("Line Processed: "
+                    + listTecanCSV.get(j).getLine());
+                j++;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             processed.add(e.toString());
-            // throw new ApplicationException("TestING: ", e);
         }
 
         finally {
@@ -457,97 +494,261 @@ public class BiobankApplicationServiceImpl extends
         return processed;
     }
 
-    private void persistData(TecanCSV tecanCsv, int pStudy, String pWorkSheet,
-        String pComment, int cCenter) {
+    /**
+     * Populate then persist Event
+     * 
+     * 
+     * @author Dwain Elson
+     * 
+     */
+    private ProcessingEventWrapper persistEvent(String pWorkSheet,
+        String pComment, int cCenter, String fileName) {
+
+        ProcessingEventWrapper pEvent = new ProcessingEventWrapper(this);
+        long pEventCount = 0;
+        try {
+            pEventCount = ProcessingEventWrapper
+                .getProcessingEventsWithWorksheetCount(this, fileName);
+        } catch (ApplicationException ae) {
+            processed.add(ae.toString());
+        } catch (BiobankQueryResultSizeException be) {
+            processed.add(be.toString());
+        }
+        if (pEventCount == 0) {
+            try {
+                ActivityStatusWrapper active = ActivityStatusWrapper
+                    .getActiveActivityStatus(this);
+                CenterWrapper<?> currentWorkingCenter = CenterWrapper
+                    .getCenterFromId(this, cCenter);
+                pEvent.setCenter(currentWorkingCenter);
+                pEvent.setCreatedAt(Calendar.getInstance().getTime());
+
+                if (pWorkSheet == "" || pWorkSheet == null) {
+                    pEvent.setWorksheet(fileName);
+                } else {
+                    // May need to change if don't allow to enter own worksheet
+                    pEvent.setWorksheet(pWorkSheet + "_" + fileName);
+                }
+
+                pEvent.setActivityStatus(active);
+                if (pComment != null) {
+                    pEvent.setComment(pComment.trim());
+                }
+                pEvent.persist();
+
+            } catch (Exception caught) {
+                // transaction will be rollback if exception thrown
+                processed.add(caught.toString());
+                throw new RuntimeException(caught);
+            }
+        }
+        return pEvent;
+
+    }
+
+    /**
+     * Populate aliquote information then persist
+     * 
+     * 
+     * @author Dwain Elson
+     * 
+     */
+    private void persistData(TecanCSV tecanCsv, int cCenter,
+        ProcessingEventWrapper pEvent) {
         try {
 
             String sOriginalSample;
-            String tWorkSheet;
 
             ActivityStatusWrapper active = ActivityStatusWrapper
                 .getActiveActivityStatus(this);
             CenterWrapper<?> currentWorkingCenter = CenterWrapper
                 .getCenterFromId(this, cCenter);
 
-            ProcessingEventWrapper pEvent = new ProcessingEventWrapper(this);
-            pEvent.setCenter(currentWorkingCenter);
-            pEvent.setCreatedAt(Calendar.getInstance().getTime());
-            tWorkSheet = tecanCsv.getProcessId();
-            if (pWorkSheet == "" || pWorkSheet == null) {
-                pEvent.setWorksheet(tWorkSheet);
-            } else {
-                pEvent.setWorksheet(pWorkSheet + "_" + tWorkSheet);
-            }
-
-            pEvent.setActivityStatus(active);
-            pEvent.setComment(pComment.trim());
-            // pEvent.persist();
-
-            OriginInfoWrapper originInfo = new OriginInfoWrapper(this);
-            originInfo.setCenter(currentWorkingCenter);
-            // originInfo.persist();
-
             SpecimenWrapper aliquoteSpecimen = new SpecimenWrapper(this);
             sOriginalSample = tecanCsv.getOrgSample();
             SpecimenWrapper sourceSpecimen = SpecimenWrapper.getSpecimen(this,
                 sOriginalSample);
+
+            if (sourceSpecimen.getProcessingEvent() == null) {
+                sourceSpecimen.setProcessingEvent(pEvent);
+                sourceSpecimen.persist();
+            }
 
             // Source specimen is the specimen for pEvent. In the case of the
             // DNA it would be the Aliquot specimen DFE
             // Check to see if specimen can be aliquoted
             // List<AliquotedSpecimenWrapper> allowedAliquotedSpecimen = study
             // .getAliquotedSpecimenCollection(true);
+
             CollectionEventWrapper collectionEvent = sourceSpecimen
                 .getCollectionEvent();
             StudyWrapper currentStudy = collectionEvent.getPatient().getStudy();
-
-            aliquoteSpecimen.setParentSpecimen(sourceSpecimen);
-
             String aAliquotType = tecanCsv.getAliquotType();
             SpecimenTypeWrapper specimenType = validAliquote(currentStudy,
                 aAliquotType);
+            if (SpecimenWrapper.getSpecimen(this, tecanCsv.getAliquotId()) == null) {
 
-            aliquoteSpecimen.setCurrentCenter(currentWorkingCenter);
-            aliquoteSpecimen.setSpecimenType(specimenType);
-            aliquoteSpecimen.setCollectionEvent(collectionEvent);
-            aliquoteSpecimen.setActivityStatus(active);
-            String aAliquotId = tecanCsv.getAliquotId();
-            aliquoteSpecimen.setInventoryId(aAliquotId);
-            aliquoteSpecimen.setCreatedAt(Calendar.getInstance().getTime());
-            aliquoteSpecimen.setProcessingEvent(pEvent);
-            aliquoteSpecimen.setOriginInfo(originInfo);
+                OriginInfoWrapper originInfo = new OriginInfoWrapper(this);
+                originInfo.setCenter(currentWorkingCenter);
+                originInfo.persist();
 
-            // aliquoteSpecimen.persist();
+                aliquoteSpecimen.setParentSpecimen(sourceSpecimen);
+                aliquoteSpecimen.setCurrentCenter(currentWorkingCenter);
+                aliquoteSpecimen.setSpecimenType(specimenType);
+                aliquoteSpecimen.setCollectionEvent(collectionEvent);
+                aliquoteSpecimen.setActivityStatus(active);
+                String aAliquotId = tecanCsv.getAliquotId();
+                aliquoteSpecimen.setInventoryId(aAliquotId);
+                aliquoteSpecimen.setCreatedAt(Calendar.getInstance().getTime());
+                aliquoteSpecimen.setProcessingEvent(pEvent);
+                aliquoteSpecimen.setOriginInfo(originInfo);
+                aliquoteSpecimen.persist();
 
-            SpecimenAttrWrapper specimenAttr = new SpecimenAttrWrapper(this);
-            specimenAttr.setSpecimen(aliquoteSpecimen);
-            StudySpecimenAttrWrapper studySpecimenAttr = currentStudy
-                .getStudySpecimenAttr("Volume");
-            specimenAttr.setStudySpecimenAttr(studySpecimenAttr);
-            String dVolume = Double.toString(tecanCsv.getVolume());
-            specimenAttr.setValue(dVolume);
-
-            // TESTING DFE
-            pEvent.persist();
-            originInfo.persist();
-            aliquoteSpecimen.persist();
-            specimenAttr.persist();
+                setSpecimenAttributes(aliquoteSpecimen, currentStudy, tecanCsv);
+            }
 
         } catch (Exception caught) {
             // transaction will be rollback if exception thrown
             processed.add(caught.toString());
             throw new RuntimeException(caught);
-
         }
     }
 
-    public SpecimenTypeWrapper validAliquote(StudyWrapper currentStudy,
+    /**
+     * Populate specimen attributes then persist
+     * 
+     * 
+     * @author Dwain Elson
+     * 
+     */
+    private void setSpecimenAttributes(SpecimenWrapper aliquoteSpecimen,
+        StudyWrapper currentStudy, TecanCSV tecanCsv) {
+
+        Double doubleAttr;
+        Date dateAttr;
+        String stringAttr;
+
+        try {
+            doubleAttr = tecanCsv.getVolume();
+            if (doubleAttr != null) {
+                setDoubleAttribute(doubleAttr, "Volume", currentStudy,
+                    aliquoteSpecimen);
+            }
+
+            doubleAttr = tecanCsv.getConcentration();
+            if (doubleAttr != null) {
+                setDoubleAttribute(doubleAttr, "Concentration", currentStudy,
+                    aliquoteSpecimen);
+            }
+
+            dateAttr = tecanCsv.getStartProcess();
+            if (dateAttr != null) {
+                setDateAttribute(dateAttr, "startProcess", currentStudy,
+                    aliquoteSpecimen);
+            }
+
+            dateAttr = tecanCsv.getStartProcess();
+            if (dateAttr != null) {
+                setDateAttribute(dateAttr, "endProcess", currentStudy,
+                    aliquoteSpecimen);
+            }
+            stringAttr = tecanCsv.getSampleErrors();
+            if (dateAttr != null) {
+                setStringAttribute(stringAttr, "SampleErrors", currentStudy,
+                    aliquoteSpecimen);
+            }
+        } catch (Exception e) {
+            processed.add(e.toString());
+        }
+    }
+
+    /**
+     * Populate double attributes then persist
+     * 
+     * 
+     * @author Dwain Elson
+     * 
+     */
+    private void setDoubleAttribute(Double doubleAttr, String label,
+        StudyWrapper currentStudy, SpecimenWrapper aliquoteSpecimen) {
+        try {
+            StudySpecimenAttrWrapper studySpecimenAttr = new StudySpecimenAttrWrapper(
+                this);
+            SpecimenAttrWrapper specimenAttr = new SpecimenAttrWrapper(this);
+            specimenAttr.setSpecimen(aliquoteSpecimen);
+            studySpecimenAttr = currentStudy.getStudySpecimenAttr(label);
+            specimenAttr.setStudySpecimenAttr(studySpecimenAttr);
+            specimenAttr.setValue(Double.toString(doubleAttr));
+            specimenAttr.persist();
+        } catch (Exception e) {
+            processed.add(e.toString());
+        }
+
+    }
+
+    /**
+     * Populate date attributes then persist
+     * 
+     * 
+     * @author Dwain Elson
+     * 
+     */
+    private void setDateAttribute(Date dateAttr, String label,
+        StudyWrapper currentStudy, SpecimenWrapper aliquoteSpecimen) {
+        try {
+            StudySpecimenAttrWrapper studySpecimenAttr = new StudySpecimenAttrWrapper(
+                this);
+            SpecimenAttrWrapper specimenAttr = new SpecimenAttrWrapper(this);
+            SimpleDateFormat formatter = new SimpleDateFormat(
+                TecanCSV.dateFormat);
+            String dateStart = formatter.format(dateAttr);
+            specimenAttr.setSpecimen(aliquoteSpecimen);
+            studySpecimenAttr = currentStudy.getStudySpecimenAttr(label);
+            specimenAttr.setStudySpecimenAttr(studySpecimenAttr);
+            specimenAttr.setValue(dateStart);
+            specimenAttr.persist();
+        } catch (Exception e) {
+            processed.add(e.toString());
+        }
+    }
+
+    /**
+     * Populate string attributes then persist
+     * 
+     * 
+     * @author Dwain Elson
+     * 
+     */
+    private void setStringAttribute(String stringAttr, String label,
+        StudyWrapper currentStudy, SpecimenWrapper aliquoteSpecimen) {
+        try {
+            StudySpecimenAttrWrapper studySpecimenAttr = new StudySpecimenAttrWrapper(
+                this);
+            SpecimenAttrWrapper specimenAttr = new SpecimenAttrWrapper(this);
+            specimenAttr.setSpecimen(aliquoteSpecimen);
+            studySpecimenAttr = currentStudy.getStudySpecimenAttr(label);
+            specimenAttr.setStudySpecimenAttr(studySpecimenAttr);
+            specimenAttr.setValue(stringAttr);
+            specimenAttr.persist();
+        } catch (Exception e) {
+            processed.add(e.toString());
+        }
+
+    }
+
+    /**
+     * Check to see if it is a valid aliquote type
+     * 
+     * 
+     * @author Dwain Elson
+     * 
+     */
+    private SpecimenTypeWrapper validAliquote(StudyWrapper currentStudy,
         String aAliquotType) throws RuntimeException {
 
         SpecimenTypeWrapper specimenType = null;
         String specimenTypeName = "";
         try {
-
             List<SpecimenTypeWrapper> specimenTypelist = SpecimenTypeWrapper
                 .getAllSpecimenTypes(this, false);
 
@@ -565,7 +766,6 @@ public class BiobankApplicationServiceImpl extends
             if (!allowedAliquotedSpecimen.contains(specimenType)) {
                 throw new RuntimeException("Wrong Aliquote TYPE"
                     + specimenType.getName());
-
             }
         } catch (Exception e) {
 

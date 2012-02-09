@@ -16,6 +16,10 @@ public class TecanCSV implements Serializable {
     private double volume;
     private Date startProcess;
     private Date endProcess;
+    private double concentration;
+    private String SampleErrors;
+
+    public static String dateFormat = "MM/dd/yyyy hh:mm:ss a";
 
     public String getOrgSample() {
         return orgSample;
@@ -43,6 +47,14 @@ public class TecanCSV implements Serializable {
 
     public Date getEndProcess() {
         return endProcess;
+    }
+
+    public double getConcentration() {
+        return concentration;
+    }
+
+    public String getSampleErrors() {
+        return SampleErrors;
     }
 
     public void setOrgSample(final String orgSample) {
@@ -73,15 +85,24 @@ public class TecanCSV implements Serializable {
         this.endProcess = endProcess;
     }
 
+    public void setConcentration(final double concentration) {
+        this.concentration = concentration;
+    }
+
+    public void setSampleErrors(final String SampleErrors) {
+        this.SampleErrors = SampleErrors;
+    }
+
     public String getLine() {
 
         Calendar cal = Calendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
         cal.setTime(startProcess);
         String sDate = formatter.format(cal.getTime());
         cal.setTime(endProcess);
         String eDate = formatter.format(cal.getTime());
         return orgSample + "," + processId + "," + aliquotId + ","
-            + aliquotType + "," + volume + "," + sDate + "," + eDate;
+            + aliquotType + "," + volume + "," + sDate + "," + eDate + ","
+            + concentration + "," + SampleErrors;
     }
 }
