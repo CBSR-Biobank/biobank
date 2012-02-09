@@ -41,7 +41,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ContainerAdapter extends AdapterBase {
 
     private static BgcLogger LOGGER = BgcLogger
-        .getLogger(AbstractAdapterBase.class.getName());
+        .getLogger(ContainerAdapter.class.getName());
 
     private ContainerChildrenResult childrenResult;
 

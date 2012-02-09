@@ -686,7 +686,7 @@ set required=0 where required is null;
 update source_specimen
 set need_original_volume=0 where need_original_volume is null;
 
----
+-- more constraints
 
 ALTER TABLE address MODIFY COLUMN CITY VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL;
 ALTER TABLE comment MODIFY COLUMN MESSAGE TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL;

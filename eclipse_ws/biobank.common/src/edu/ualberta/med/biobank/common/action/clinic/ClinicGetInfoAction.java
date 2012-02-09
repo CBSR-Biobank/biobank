@@ -9,7 +9,6 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicReadPermission;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -58,27 +57,16 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
         Query query = context.getSession().createQuery(CLINIC_INFO_HQL);
         query.setParameter(0, clinicId);
 
-        List<Clinic> clinics = query.list();
-
-        if (clinics.size() != 1) {
-            throw new ModelNotFoundException(Clinic.class, clinicId);
-        }
-
+        Clinic clinic = (Clinic) query.uniqueResult();
         ClinicInfo clinicInfo = new ClinicInfo();
-        clinicInfo.clinic = clinics.get(0);
+        clinicInfo.clinic = clinic;
 
         query = context.getSession().createQuery(CLINIC_COUNT_INFO_HQL);
         query.setParameter(0, clinicId);
 
-        @SuppressWarnings("unchecked")
-        List<Object[]> rows = query.list();
-        if (rows.size() != 1) {
-            throw new ModelNotFoundException(Clinic.class, clinicId);
-        }
-        Object[] row = rows.get(0);
-
-        clinicInfo.patientCount = (Long) row[1];
-        clinicInfo.collectionEventCount = (Long) row[2];
+        Object[] items = (Object[]) query.uniqueResult();
+        clinicInfo.patientCount = (Long) items[1];
+        clinicInfo.collectionEventCount = (Long) items[2];
         clinicInfo.contacts = getContacts.run(context).getList();
         clinicInfo.studyInfos = getStudyInfo.run(context).getList();
 
