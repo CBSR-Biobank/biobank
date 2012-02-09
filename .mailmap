@@ -1,0 +1,45 @@
+#
+# This list is used by git-shortlog to fix a few botched name translations
+# in the git archive, either because the author's full name was messed up
+# and/or not always written the same way, making contributions from the
+# same person appearing not to be so.
+#
+Aaron Young <aaron@acme>
+Aaron Young <aaron@cs.ualberta.ca>
+Aaron Young <aaron.young@ualberta.ca>
+Aaron Young <aaron.young@ualberta.ca>
+Aaron Young <aaron@acme.(none)>
+Aaron Young <aaron.young@ualberta.ca>
+Aaron Young <aaron@.cs.ualberta.ca>
+Aaron Young <Aaron@.(none)>
+Aaron Young <aaron@.(none)>
+biobank <biobank@cs.ualberta.ca>
+biobank <biobank@aicml5.(none)>
+biobank <biobank@aicml-med.(none)>
+biobank <biobank@cs.ualberta.ca>
+biobank <biobank@localhost.(none)>
+Delphine Degris-Dard <degrisda@amber-rv.cs.ualberta.ca>
+Delphine Degris-Dard <degrisda@cs.ualberta.ca>
+Delphine Degris-Dard <degrisda@cs.ualberta.ca>
+Delphine Degris-Dard <degrisda@ualberta.ca>
+Delphine Degris-Dard <delphine@homer.(none)>
+Delphine Degris-Dard <delphine@capucine>
+Delphine Degris-Dard <delphine@capucine.(none)>
+Delphine Degris-Dard <delphine@homer>
+Delphine Degris-Dard <delphine@huallen>
+Delphine Degris-Dard <delphine@huallen.(none)>
+Jonathan Ferland <jferland@ualberta.ca>
+Jonathan Ferland <jmferland@gmail.com>
+kory <korymath@gmail.com>
+Mike Sokolsky <sokolsky@shadycharacter.local>
+Mike Sokolsky <sokolsky@ualberta.ca>
+Mike Sokolsky <sokolsky@10.13.3.169>
+Nelson Loyola <biobank@kingman.(none)>
+Nelson Loyola <loyola@aicml-desktop.(none)>
+Nelson Loyola <loyola@cannell.(none)>
+Nelson Loyola <loyola@cs.ualberta.ca>
+Nelson Loyola <loyola@gmail.com>
+Nelson Loyola <nloyola@gmail.com>
+Thomas Polasek <tpolasek@cs.ualberta.ca>
+Thomas Polasek <tpolasek@ualberta.ca>
+Thomas Polasek <Thomas@.(none)>
