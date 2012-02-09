@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -65,7 +64,8 @@ public class ProcessingEventGroup extends AdapterBase {
     @Override
     public List<AbstractAdapterBase> search(Class<?> searchedClass,
         Integer objectId) {
-        return findChildFromClass(searchedClass, objectId, ClinicWrapper.class);
+        return findChildFromClass(searchedClass, objectId,
+            ProcessingEventWrapper.class);
     }
 
     @Override
