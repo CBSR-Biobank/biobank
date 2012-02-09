@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
@@ -23,7 +24,8 @@ import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
 
 public class SpecimenViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.SpecimenViewForm"; //$NON-NLS-1$
 
     private SpecimenWrapper specimen;
 
@@ -61,16 +63,29 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private Button isSourceSpcButton;
 
+    private SpecimenInfo specimenInfo;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof SpecimenAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
+        updateSpecimenInfo();
 
+        // REMOVE THIS LINE WHEN USING ACTION
         specimen = (SpecimenWrapper) getModelObject();
+
         SessionManager.logLookup(specimen);
         setPartName(NLS.bind(Messages.SpecimenViewForm_title,
             specimen.getInventoryId()));
+    }
+
+    private void updateSpecimenInfo() throws Exception {
+        // specimenInfo = SessionManager.getAppService().doAction(
+        // new SpecimenListGetInfoAction(adapter.getId()));
+        // specimen =
+        // new StudyWrapper(SessionManager.getAppService(),
+        // specimenInfo.getSpecimen());
     }
 
     @Override
@@ -87,7 +102,8 @@ public class SpecimenViewForm extends BiobankViewForm {
     }
 
     private void createDispatchSection() {
-        Section section = createSection(Messages.SpecimenViewForm_dispatch_title);
+        Section section =
+            createSection(Messages.SpecimenViewForm_dispatch_title);
         Composite client = toolkit.createComposite(section);
         section.setClient(client);
         section.setExpanded(false);
@@ -151,7 +167,8 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private void createContainersSection() {
         if (specimen.getParentContainer() != null) {
-            Section section = createSection(Messages.SpecimenViewForm_visualization_title);
+            Section section =
+                createSection(Messages.SpecimenViewForm_visualization_title);
             Composite containersComposite = toolkit.createComposite(section);
             section.setClient(containersComposite);
             section.setExpanded(false);
@@ -182,8 +199,9 @@ public class SpecimenViewForm extends BiobankViewForm {
                 toolkit.createLabel(containerComposite, container.getLabel()
                     + " (" + container.getContainerType().getNameShort() //$NON-NLS-1$
                     + ") "); //$NON-NLS-1$
-                ContainerDisplayWidget containerWidget = new ContainerDisplayWidget(
-                    containerComposite);
+                ContainerDisplayWidget containerWidget =
+                    new ContainerDisplayWidget(
+                        containerComposite);
                 containerWidget.setContainer(container);
                 containerWidget.setSelection(position);
                 toolkit.adapt(containerWidget);

@@ -60,7 +60,7 @@ public class ProcessingEventGetInfoAction implements Action<PEventInfo> {
 
         peventInfo.pevent = rows.get(0);
         peventInfo.sourceSpecimenInfos =
-            new ProcessingEventGetSourceSpecimenInfoAction(peventId).run(
+            new ProcessingEventGetSourceSpecimenListInfoAction(peventId).run(
                 context).getList();
 
         return peventInfo;

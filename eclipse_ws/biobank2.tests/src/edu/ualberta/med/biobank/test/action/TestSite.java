@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
@@ -132,7 +132,7 @@ public class TestSite extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
-        EXECUTOR.exec(new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+        EXECUTOR.exec(new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
             .getList();
 
         SiteInfo siteInfo =
@@ -437,7 +437,7 @@ public class TestSite extends TestAction {
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
         ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
-            new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+            new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
             .getList();
 
         // create a processing event with one of the collection event source

@@ -16,7 +16,7 @@ import org.junit.rules.TestName;
 import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
@@ -108,7 +108,7 @@ public class TestPatient extends TestAction {
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
         List<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
-            new CollectionEventGetSourceSpecimenInfoAction(ceventId)).getList();
+            new CollectionEventGetSourceSpecimenListInfoAction(ceventId)).getList();
 
         // save some comments on the colection event
         CEventInfo ceventInfo =
