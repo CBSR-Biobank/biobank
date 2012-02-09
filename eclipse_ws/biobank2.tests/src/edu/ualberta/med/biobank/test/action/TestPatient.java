@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.ConstraintViolationException;
+
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -38,8 +40,6 @@ import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
@@ -160,7 +160,7 @@ public class TestPatient extends TestAction {
             EXECUTOR.exec(new PatientSaveAction(null, provisioning.studyId,
                 pnumber, new Date()));
             Assert.fail("should not be able to use the same pnumber twice");
-        } catch (DuplicatePropertySetException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
     }
@@ -200,7 +200,7 @@ public class TestPatient extends TestAction {
             EXECUTOR.exec(new PatientDeleteAction(patientId));
             Assert
                 .fail("should throw an exception since the patient still has on cevent");
-        } catch (CollectionNotEmptyException ae) {
+        } catch (ConstraintViolationException ae) {
             Assert.assertTrue(true);
         }
 

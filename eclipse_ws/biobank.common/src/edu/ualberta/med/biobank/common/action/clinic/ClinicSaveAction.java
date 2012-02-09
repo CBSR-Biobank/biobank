@@ -9,8 +9,6 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.center.CenterSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
-import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicCreatePermission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
@@ -91,11 +89,6 @@ public class ClinicSaveAction extends CenterSaveAction {
      */
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        if (contactSaveInfos == null) {
-            throw new NullPropertyException(Clinic.class,
-                ClinicPeer.CONTACT_COLLECTION);
-        }
-
         clinic = context.load(Clinic.class, centerId, new Clinic());
         clinic.setSendsShipments(sendsShipments);
 

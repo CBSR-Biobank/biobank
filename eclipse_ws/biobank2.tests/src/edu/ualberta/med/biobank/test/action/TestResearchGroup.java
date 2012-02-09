@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.test.action;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.ConstraintViolationException;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -11,7 +13,6 @@ import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.AddressSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
@@ -128,7 +129,7 @@ public class TestResearchGroup extends TestAction {
         try {
             EXECUTOR.exec(delete);
             Assert.fail();
-        } catch (ActionException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 

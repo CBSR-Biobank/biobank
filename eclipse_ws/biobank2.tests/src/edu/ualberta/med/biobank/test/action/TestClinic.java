@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.validation.ConstraintViolationException;
+
 import org.hibernate.Query;
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,7 +20,6 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
-import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
@@ -58,7 +59,7 @@ public class TestClinic extends TestAction {
             EXECUTOR.exec(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no name");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -69,7 +70,7 @@ public class TestClinic extends TestAction {
             EXECUTOR.exec(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no short name");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -79,7 +80,7 @@ public class TestClinic extends TestAction {
             EXECUTOR.exec(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add Clinic with no activity status");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -89,7 +90,7 @@ public class TestClinic extends TestAction {
             EXECUTOR.exec(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no address");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -101,7 +102,7 @@ public class TestClinic extends TestAction {
             EXECUTOR.exec(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add site with null site ids");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -125,7 +126,8 @@ public class TestClinic extends TestAction {
         ClinicInfo clinicInfo =
             EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
 
-        Assert.assertEquals(ActivityStatus.ACTIVE, clinicInfo.clinic.getActivityStatus());
+        Assert.assertEquals(ActivityStatus.ACTIVE,
+            clinicInfo.clinic.getActivityStatus());
         Assert.assertEquals(new Long(1), clinicInfo.patientCount);
         Assert.assertEquals(new Long(1), clinicInfo.collectionEventCount);
         Assert.assertEquals(1, clinicInfo.contacts.size());
@@ -158,7 +160,7 @@ public class TestClinic extends TestAction {
         try {
             EXECUTOR.exec(saveClinic2);
             Assert.fail("should not be allowed to add clinic with same name");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -301,7 +303,7 @@ public class TestClinic extends TestAction {
                 provisioning.clinicId));
             Assert
                 .fail("should not be allowed to delete a clinic linked to a study");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
     }
@@ -347,7 +349,7 @@ public class TestClinic extends TestAction {
             Assert
                 .fail(
                 "should not be allowed to delete a clinic which is a destination for dispatches");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 

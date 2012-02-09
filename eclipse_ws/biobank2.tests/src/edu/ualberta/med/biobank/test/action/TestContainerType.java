@@ -142,8 +142,9 @@ public class TestContainerType extends TestAction {
 
         Assert.assertEquals("FREEZER_3x10",
             topContainerTypeInfo.containerType.getName());
-        Assert.assertEquals(ActivityStatus.ACTIVE, topContainerTypeInfo.containerType
-            .getActivityStatus());
+        Assert.assertEquals(ActivityStatus.ACTIVE,
+            topContainerTypeInfo.containerType
+                .getActivityStatus());
         Assert.assertEquals(3, topContainerTypeInfo.containerType
             .getCapacity().getRowCapacity().intValue());
         Assert.assertEquals(10, topContainerTypeInfo.containerType
@@ -203,7 +204,7 @@ public class TestContainerType extends TestAction {
             EXECUTOR.exec(containerTypeSaveAction);
             Assert
                 .fail("should not be allowed to add a second container type with same name");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
     }
@@ -551,7 +552,7 @@ public class TestContainerType extends TestAction {
             Assert
                 .fail(
                 "should not be allowed to delete a container type in use by a container");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
     }

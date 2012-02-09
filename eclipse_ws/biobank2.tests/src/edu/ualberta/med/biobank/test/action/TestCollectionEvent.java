@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.ConstraintViolationException;
+
 import junit.framework.Assert;
 
 import org.hibernate.Query;
@@ -38,8 +40,6 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
@@ -455,7 +455,7 @@ public class TestCollectionEvent extends TestAction {
             EXECUTOR.exec(new CollectionEventDeleteAction(ceventId));
             Assert
                 .fail("should throw an exception because specimens are still in the cevent");
-        } catch (CollectionNotEmptyException ae) {
+        } catch (ConstraintViolationException ae) {
             Assert.assertTrue(true);
         }
 
@@ -482,7 +482,7 @@ public class TestCollectionEvent extends TestAction {
                 null, null));
             Assert
                 .fail("should throw an exception because the visit number is already used");
-        } catch (DuplicatePropertySetException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
     }

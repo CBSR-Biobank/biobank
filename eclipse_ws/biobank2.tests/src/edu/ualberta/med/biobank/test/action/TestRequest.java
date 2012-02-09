@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.ConstraintViolationException;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -12,7 +14,6 @@ import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestClaimAction;
 import edu.ualberta.med.biobank.common.action.request.RequestDeleteAction;
@@ -170,7 +171,7 @@ public class TestRequest extends TestAction {
         try {
             EXECUTOR.exec(delete);
             Assert.fail();
-        } catch (ActionException e) {
+        } catch (ConstraintViolationException e) {
             // good
         }
     }

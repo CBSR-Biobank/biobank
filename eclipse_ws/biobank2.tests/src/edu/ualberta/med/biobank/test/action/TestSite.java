@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.validation.ConstraintViolationException;
+
 import org.hibernate.Query;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,7 +23,6 @@ import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
-import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
@@ -70,7 +71,7 @@ public class TestSite extends TestAction {
         try {
             EXECUTOR.exec(siteSaveAction);
             Assert.fail("should not be allowed to add site with no name");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -81,7 +82,7 @@ public class TestSite extends TestAction {
             EXECUTOR.exec(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no short name");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -91,7 +92,7 @@ public class TestSite extends TestAction {
             EXECUTOR.exec(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add Site with no activity status");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -101,7 +102,7 @@ public class TestSite extends TestAction {
             EXECUTOR.exec(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no address");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -114,7 +115,7 @@ public class TestSite extends TestAction {
             EXECUTOR.exec(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with null site ids");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -168,7 +169,7 @@ public class TestSite extends TestAction {
         try {
             EXECUTOR.exec(saveSite);
             Assert.fail("should not be allowed to add site with same name");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -416,7 +417,7 @@ public class TestSite extends TestAction {
             Assert
                 .fail(
                 "should not be allowed to delete a site with containers");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -454,7 +455,7 @@ public class TestSite extends TestAction {
             Assert
                 .fail(
                 "should not be allowed to delete a site with processing events");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -487,7 +488,7 @@ public class TestSite extends TestAction {
             Assert
                 .fail(
                 "should not be allowed to delete a site which is a source of dispatches");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -533,7 +534,7 @@ public class TestSite extends TestAction {
             Assert
                 .fail(
                 "should not be allowed to delete a site which is a destination for dispatches");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 

@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.validation.ConstraintViolationException;
+
 import org.hibernate.Query;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,7 +23,6 @@ import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
-import edu.ualberta.med.biobank.common.action.exception.NullPropertyException;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
@@ -41,7 +42,6 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
@@ -78,7 +78,7 @@ public class TestStudy extends TestAction {
         try {
             EXECUTOR.exec(studySaveAction);
             Assert.fail("should not be allowed to add study with no name");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -89,7 +89,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(studySaveAction);
             Assert
                 .fail("should not be allowed to add study with no short name");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -99,7 +99,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(studySaveAction);
             Assert
                 .fail("should not be allowed to add study with no activity status");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -109,7 +109,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(studySaveAction);
             Assert
                 .fail("should not be allowed to add study with null site ids");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -119,7 +119,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(studySaveAction);
             Assert
                 .fail("should not be allowed to add study with null site ids");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -129,7 +129,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(studySaveAction);
             Assert
                 .fail("should not be allowed to add study with null site ids");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -140,7 +140,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(studySaveAction);
             Assert
                 .fail("should not be allowed to add study with null site ids");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -151,7 +151,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(studySaveAction);
             Assert
                 .fail("should not be allowed to add study with null site ids");
-        } catch (NullPropertyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -189,7 +189,8 @@ public class TestStudy extends TestAction {
 
         studyInfo = EXECUTOR.exec(new StudyGetInfoAction(provisioning.studyId));
 
-        Assert.assertEquals(ActivityStatus.ACTIVE, studyInfo.study.getActivityStatus());
+        Assert.assertEquals(ActivityStatus.ACTIVE,
+            studyInfo.study.getActivityStatus());
         Assert.assertEquals(new Long(1), studyInfo.patientCount);
         Assert.assertEquals(new Long(1), studyInfo.collectionEventCount);
         Assert.assertEquals(ssSaveInfosAll.size(), studyInfo.sourceSpcs.size());
@@ -222,7 +223,7 @@ public class TestStudy extends TestAction {
         try {
             EXECUTOR.exec(saveStudy);
             Assert.fail("should not be allowed to add study with same name");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
@@ -728,7 +729,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(new StudyDeleteAction(studyId));
             Assert
                 .fail("should not be allowed to delete a study with patients");
-        } catch (CollectionNotEmptyException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
         EXECUTOR.exec(new PatientDeleteAction(patientId));
