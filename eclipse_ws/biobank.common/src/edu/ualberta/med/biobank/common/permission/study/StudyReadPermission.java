@@ -10,6 +10,10 @@ public class StudyReadPermission implements Permission {
 
     private final Integer studyId;
 
+    public StudyReadPermission() {
+        this.studyId = null;
+    }
+
     public StudyReadPermission(Integer studyId) {
         this.studyId = studyId;
     }
@@ -20,7 +24,12 @@ public class StudyReadPermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        Study study = context.load(Study.class, studyId);
-        return PermissionEnum.STUDY_READ.isAllowed(context.getUser(), study);
+        if (studyId == null) {
+            Study study = context.load(Study.class, studyId);
+            return PermissionEnum.STUDY_READ
+                .isAllowed(context.getUser(), study);
+        }
+
+        return PermissionEnum.STUDY_READ.isAllowed(context.getUser());
     }
 }
