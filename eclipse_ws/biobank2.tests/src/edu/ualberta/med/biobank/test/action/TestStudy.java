@@ -721,7 +721,7 @@ public class TestStudy extends TestAction {
         PatientSaveAction patientSaveAction =
             new PatientSaveAction(null, studyId, Utils.getRandomString(
                 5, 10),
-                Utils.getRandomDate());
+                Utils.getRandomDate(), null);
         Integer patientId = EXECUTOR.exec(patientSaveAction).getId();
 
         try {

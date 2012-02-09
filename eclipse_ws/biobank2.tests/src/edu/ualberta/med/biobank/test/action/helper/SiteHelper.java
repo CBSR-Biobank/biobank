@@ -135,7 +135,7 @@ public class SiteHelper extends Helper {
 
         PatientSaveAction patientSaveAction =
             new PatientSaveAction(null, provisioning.studyId,
-                basename + "_patient1", Utils.getRandomDate());
+                basename + "_patient1", Utils.getRandomDate(), null);
         provisioning.patientIds.add(actionExecutor.exec(patientSaveAction)
             .getId());
         return provisioning;
