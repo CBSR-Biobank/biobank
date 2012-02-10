@@ -164,12 +164,12 @@ public class TestRole extends TestAction {
 
             tx.commit();
 
+            session.flush();
+            session.clear();
+
             Assert.fail();
         } catch (ConstraintViolationException e) {
         }
-
-        session.flush();
-        session.clear();
     }
 
     @Test

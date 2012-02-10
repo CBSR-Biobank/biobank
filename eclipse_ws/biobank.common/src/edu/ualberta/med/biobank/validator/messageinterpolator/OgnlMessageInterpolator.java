@@ -159,6 +159,7 @@ public class OgnlMessageInterpolator implements MessageInterpolator {
             result = value.toString();
         } catch (OgnlException e) {
             // TODO: something better?
+            throw new RuntimeException(e);
         }
 
         return result;

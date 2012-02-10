@@ -17,7 +17,7 @@ public class ShipmentInfoHelper extends Helper {
     public static Integer createNewShippingMethod(
         IActionExecutor actionExecutor) throws Exception {
         ShippingMethodSaveAction action =
-            new ShippingMethodSaveAction(null, Utils.getRandomString(5));
+            new ShippingMethodSaveAction(null, Utils.getRandomString(10, 20));
         return actionExecutor.exec(action).getId();
     }
 }

@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.validation.ConstraintViolationException;
+
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -35,7 +37,6 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.Al
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
@@ -195,7 +196,7 @@ public class TestProcessingEvent extends TestAction {
                 new HashSet<Integer>()));
             Assert
                 .fail("should not be able to use the same worksheet to 2 different pevents");
-        } catch (DuplicatePropertySetException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
     }

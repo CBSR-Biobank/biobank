@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteA
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
-import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
@@ -537,7 +536,7 @@ public class TestContainerType extends TestAction {
             Assert
                 .fail(
                 "should not be allowed to delete a parent container type and linked to a children types");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
     }

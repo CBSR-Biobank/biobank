@@ -48,7 +48,7 @@ public class ClinicSaveAction extends CenterSaveAction {
             this.emailAddress = contact.getEmailAddress();
         }
 
-        public Contact populateContcat(Clinic clinic, Contact contact) {
+        public Contact populateContact(Clinic clinic, Contact contact) {
             contact.setClinic(clinic);
             contact.setId(this.id);
             contact.setName(this.name);
@@ -107,7 +107,7 @@ public class ClinicSaveAction extends CenterSaveAction {
             } else {
                 contact = context.load(Contact.class, contactSaveInfo.id);
             }
-            newContactCollection.add(contactSaveInfo.populateContcat(clinic,
+            newContactCollection.add(contactSaveInfo.populateContact(clinic,
                 contact));
         }
 

@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteA
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetSpecimenInfosAction;
-import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
@@ -388,7 +387,7 @@ public class TestSite extends TestAction {
             Assert
                 .fail(
                 "should not be allowed to delete a site with container types");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 

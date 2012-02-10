@@ -20,7 +20,9 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
+import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @Table(name = "PROCESSING_EVENT")
@@ -28,6 +30,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
     @NotUsed(by = Specimen.class, property = "processingEvent", groups = PreDelete.class),
     @NotUsed(by = Specimen.class, property = "parentSpecimen.processingEvent", groups = PreDelete.class)
 })
+@Unique(properties = "worksheet", groups = PrePersist.class)
 public class ProcessingEvent extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -39,7 +42,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.worksheet.NotEmpty}")
-    @Column(name = "WORKSHEET", length = 100)
+    @Column(name = "WORKSHEET", length = 150, unique = true)
     public String getWorksheet() {
         return this.worksheet;
     }

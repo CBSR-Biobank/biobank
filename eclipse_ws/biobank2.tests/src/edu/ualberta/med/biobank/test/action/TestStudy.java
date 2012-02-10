@@ -109,7 +109,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(studySaveAction);
             Assert
                 .fail("should not be allowed to add study with null site ids");
-        } catch (ConstraintViolationException e) {
+        } catch (NullPointerException e) {
             Assert.assertTrue(true);
         }
 
@@ -119,7 +119,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(studySaveAction);
             Assert
                 .fail("should not be allowed to add study with null site ids");
-        } catch (ConstraintViolationException e) {
+        } catch (NullPointerException e) {
             Assert.assertTrue(true);
         }
 
@@ -129,7 +129,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(studySaveAction);
             Assert
                 .fail("should not be allowed to add study with null site ids");
-        } catch (ConstraintViolationException e) {
+        } catch (NullPointerException e) {
             Assert.assertTrue(true);
         }
 
@@ -140,7 +140,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(studySaveAction);
             Assert
                 .fail("should not be allowed to add study with null site ids");
-        } catch (ConstraintViolationException e) {
+        } catch (NullPointerException e) {
             Assert.assertTrue(true);
         }
 
@@ -151,7 +151,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(studySaveAction);
             Assert
                 .fail("should not be allowed to add study with null site ids");
-        } catch (ConstraintViolationException e) {
+        } catch (NullPointerException e) {
             Assert.assertTrue(true);
         }
 

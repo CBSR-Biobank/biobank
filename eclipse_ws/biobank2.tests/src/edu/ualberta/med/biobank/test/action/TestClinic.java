@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicI
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
-import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
@@ -102,7 +101,7 @@ public class TestClinic extends TestAction {
             EXECUTOR.exec(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add site with null site ids");
-        } catch (ConstraintViolationException e) {
+        } catch (NullPointerException e) {
             Assert.assertTrue(true);
         }
 
@@ -323,7 +322,7 @@ public class TestClinic extends TestAction {
             Assert
                 .fail(
                 "should not be allowed to delete a clinic which is a source of dispatches");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
     }
