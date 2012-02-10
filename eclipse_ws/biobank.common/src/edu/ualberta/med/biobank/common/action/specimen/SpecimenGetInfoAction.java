@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.permission.specimen.SpecimenReadPermissio
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenPosition;
 
 public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
     private static final long serialVersionUID = 1L;
@@ -40,7 +41,7 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
         private static final long serialVersionUID = 1L;
 
         private Specimen specimen;
-        private Stack<Container> parents;
+        private Stack<Container> parents = new Stack<Container>();
 
         public SpecimenBriefInfo(Specimen specimen, Stack<Container> parents) {
             this.specimen = specimen;
@@ -90,16 +91,19 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
 
         // get all parent containers - can be used for visualisation
         Stack<Container> parents = new Stack<Container>();
-        Container container = specimen.getSpecimenPosition().getContainer();
-        while (container != null) {
-            parents.push(container);
-            container = container.getParentContainer();
-            if (container != null) {
-                container.getContainerType().getNameShort();
-                container.getContainerType().getCapacity().getRowCapacity();
+        SpecimenPosition pos = specimen.getSpecimenPosition();
+        if (pos != null) {
+            Container container = pos.getContainer();
+            while (container != null) {
+                if (container != null) {
+                    container.getContainerType().getChildLabelingScheme()
+                        .getName();
+                    container.getContainerType().getCapacity().getRowCapacity();
+                }
+                parents.push(container);
+                container = container.getParentContainer();
             }
         }
-
         return new SpecimenBriefInfo(specimen, parents);
     }
 
