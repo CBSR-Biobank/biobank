@@ -37,9 +37,6 @@ public abstract class SpecimenListGetInfoAction implements
             + " INNER JOIN FETCH cevent.patient patient"
             + " INNER JOIN FETCH patient.study study";
 
-    @SuppressWarnings("nls")
-    protected static final String SPEC_END_QRY = " GROUP BY spec";
-
     @Override
     public boolean isAllowed(ActionContext context) {
         // this is only called as a sub-action

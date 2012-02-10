@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank.common.action.collectionEvent;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenListGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenListGetInfoAction;
 
 public class CollectionEventGetSourceSpecimenListInfoAction extends
     SpecimenListGetInfoAction {
@@ -14,8 +14,7 @@ public class CollectionEventGetSourceSpecimenListInfoAction extends
     private static final String SOURCE_SPEC_QRY =
         SpecimenListGetInfoAction.SPEC_BASE_QRY
             + " LEFT JOIN FETCH spec.processingEvent"
-            + " WHERE spec.originalCollectionEvent.id=?"
-            + SpecimenListGetInfoAction.SPEC_END_QRY;
+            + " WHERE spec.originalCollectionEvent.id=?";
 
     private Integer ceventId;
 

@@ -61,4 +61,5 @@ public class Site extends Center {
     public void setContainerCollection(Set<Container> containerCollection) {
         this.containerCollection = containerCollection;
     }
+
 }
