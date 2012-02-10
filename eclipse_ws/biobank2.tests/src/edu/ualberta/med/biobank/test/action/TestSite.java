@@ -181,7 +181,7 @@ public class TestSite extends TestAction {
             EXECUTOR.exec(saveSite);
             Assert.fail(
                 "should not be allowed to add site with same name short");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
     }

@@ -13,6 +13,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+
+import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 @Entity
 @Table(name = "REQUEST")
@@ -27,6 +30,7 @@ public class Request extends AbstractBiobankModel {
     private Address address;
     private ResearchGroup researchGroup;
 
+    @Null(groups = PreDelete.class, message = "{edu.ualberta.med.biobank.model.Request.submitted.Null}")
     @Column(name = "SUBMITTED")
     public Date getSubmitted() {
         return this.submitted;

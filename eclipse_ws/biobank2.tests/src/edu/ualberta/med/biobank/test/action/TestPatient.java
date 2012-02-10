@@ -193,7 +193,7 @@ public class TestPatient extends TestAction {
             null, provisioning.studyId, pnumber, date)).getId();
         // add a cevent to the patient:
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId, R
-            .nextInt(20), ActivityStatus.ACTIVE, null, null, null));
+            .nextInt(20) + 1, ActivityStatus.ACTIVE, null, null, null));
 
         // delete the patient
         try {

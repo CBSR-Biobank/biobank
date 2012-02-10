@@ -235,7 +235,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(saveStudy);
             Assert
                 .fail("should not be allowed to add study with same name short");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 

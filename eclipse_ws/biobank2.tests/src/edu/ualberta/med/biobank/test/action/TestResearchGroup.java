@@ -65,7 +65,7 @@ public class TestResearchGroup extends TestAction {
         Assert.assertTrue(rg.rg.getName().equals(name + "rg"));
         Assert.assertTrue(rg.rg.getNameShort().equals(name + "rg"));
         Assert.assertTrue(rg.rg.getStudy().getId().equals(studyId));
-        Assert.assertTrue(rg.rg.getActivityStatus() != ActivityStatus.ACTIVE);
+        Assert.assertTrue(rg.rg.getActivityStatus() == ActivityStatus.ACTIVE);
 
     }
 

@@ -172,7 +172,7 @@ public class TestClinic extends TestAction {
             EXECUTOR.exec(saveClinic2);
             Assert
                 .fail("should not be allowed to add clinic with same name short");
-        } catch (ActionCheckException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 

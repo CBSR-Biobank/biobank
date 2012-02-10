@@ -22,7 +22,6 @@ public class ClinicDeleteAction extends CenterDeleteAction {
     @Override
     public EmptyResult run(ActionContext context) throws ActionException {
         Clinic clinic = context.load(Clinic.class, centerId);
-        new ClinicPreDeleteChecks(clinic).run(context);
         return super.run(context, clinic);
     }
 }

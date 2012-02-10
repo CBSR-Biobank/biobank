@@ -4,21 +4,20 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.FlushMode;
+import javax.validation.ConstraintViolationException;
+
+import junit.framework.Assert;
+
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 import org.junit.Test;
-import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.security.RoleSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
 
 public class TestRole extends TestAction {
     @Test
@@ -66,7 +65,7 @@ public class TestRole extends TestAction {
 
         IdResult result = EXECUTOR.exec(action);
 
-        Assert.notNull(session.get(Role.class, result.getId()));
+        Assert.assertNotNull(session.get(Role.class, result.getId()));
     }
 
     @Test
@@ -84,9 +83,10 @@ public class TestRole extends TestAction {
 
         Role role = (Role) session.get(Role.class, result.getId());
 
-        Assert.notNull(role);
-        Assert.isTrue(role.getPermissionCollection().containsAll(permissions),
-            "Permissions not saved.");
+        Assert.assertNotNull(role);
+        Assert.assertTrue(
+            "Permissions not saved.",
+            role.getPermissionCollection().containsAll(permissions));
     }
 
     @Test
@@ -115,9 +115,9 @@ public class TestRole extends TestAction {
         // check
         Role role = (Role) session.get(Role.class, result.getId());
 
-        Assert.notNull(role);
-        Assert.isTrue(role.getPermissionCollection().equals(permissions),
-            "Permissions not saved.");
+        Assert.assertNotNull(role);
+        Assert.assertTrue("Permissions not saved.", role
+            .getPermissionCollection().equals(permissions));
     }
 
     @Test
@@ -126,7 +126,13 @@ public class TestRole extends TestAction {
         action.setName(getMethodNameR());
 
         EXECUTOR.exec(action);
-        EXECUTOR.exec(action);
+
+        try {
+            EXECUTOR.exec(action);
+            Assert.fail();
+        } catch (ConstraintViolationException e) {
+        }
+
     }
 
     @Test
@@ -153,9 +159,14 @@ public class TestRole extends TestAction {
         Role roleB = new Role();
         roleB.setName(nameA);
 
-        session.save(roleB);
+        try {
+            session.save(roleB);
 
-        tx.commit();
+            tx.commit();
+
+            Assert.fail();
+        } catch (ConstraintViolationException e) {
+        }
 
         session.flush();
         session.clear();

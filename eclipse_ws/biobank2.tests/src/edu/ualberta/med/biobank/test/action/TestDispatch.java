@@ -4,7 +4,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.hibernate.PropertyValueException;
+import javax.validation.ConstraintViolationException;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -115,7 +116,7 @@ public class TestDispatch extends TestAction {
                 EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
                     .getId();
             Assert.fail("test should fail");
-        } catch (PropertyValueException e) {
+        } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
