@@ -131,8 +131,9 @@ public class ProcessingEventViewForm extends BiobankViewForm {
             DateFormatter.formatAsDateTime(peventInfo.pevent.getCreatedAt())));
         setValues();
         sourceSpecimenTable.setList(peventInfo.sourceSpecimenInfos);
-
-        // TODO: reload comment table
+        commentTable.setList(ModelWrapper.wrapModelCollection(
+            SessionManager.getAppService(),
+            peventInfo.pevent.getCommentCollection(),
+            CommentWrapper.class));
     }
-
 }

@@ -12,10 +12,9 @@ public class CollectionEventGetSourceSpecimenListInfoAction extends
 
     @SuppressWarnings("nls")
     private static final String SOURCE_SPEC_QRY =
-        SpecimenListGetInfoAction.SPEC_BASE_QRY
+        SpecimenGetInfoAction.SPEC_BASE_QRY
             + " LEFT JOIN FETCH spec.processingEvent"
-            + " WHERE spec.originalCollectionEvent.id=?"
-            + SpecimenListGetInfoAction.SPEC_END_QRY;
+            + " WHERE spec.originalCollectionEvent.id=?";
 
     private Integer ceventId;
 
