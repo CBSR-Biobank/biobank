@@ -115,7 +115,7 @@ public class Specimen extends AbstractBiobankModel {
         this.currentCenter = currentCenter;
     }
 
-    @OneToMany(mappedBy = "specimen")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "specimen")
     public Set<DispatchSpecimen> getDispatchSpecimenCollection() {
         return this.dispatchSpecimenCollection;
     }

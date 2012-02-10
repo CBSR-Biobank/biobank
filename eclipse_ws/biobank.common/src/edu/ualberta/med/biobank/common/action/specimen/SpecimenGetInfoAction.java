@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.action.specimen;
 
+import java.util.Stack;
+
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -8,6 +10,7 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenReadPermission;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 
@@ -26,6 +29,8 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
             + " INNER JOIN FETCH spc.collectionEvent cevent"
             + " INNER JOIN FETCH cevent.patient patient"
             + " INNER JOIN FETCH patient.study"
+            + " LEFT JOIN FETCH spc.specimenPosition pos"
+            + " LEFT JOIN FETCH pos.container"
             + " LEFT JOIN spc.dispatchSpecimenCollection"
             + " LEFT JOIN FETCH spc.childSpecimenCollection"
             + " LEFT JOIN FETCH spc.commentCollection"
@@ -34,14 +39,20 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
     public static class SpecimenBriefInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
 
-        public Specimen specimen;
+        private Specimen specimen;
+        private Stack<Container> parents;
 
-        public SpecimenBriefInfo(Specimen specimen) {
+        public SpecimenBriefInfo(Specimen specimen, Stack<Container> parents) {
             this.specimen = specimen;
+            this.parents = parents;
         }
 
         public Specimen getSpecimen() {
             return specimen;
+        }
+
+        public Stack<Container> getParents() {
+            return parents;
         }
     }
 
@@ -77,7 +88,19 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
             topSpecimen.getOriginInfo().getCenter().getName();
         }
 
-        return new SpecimenBriefInfo(specimen);
+        // get all parent containers - can be used for visualisation
+        Stack<Container> parents = new Stack<Container>();
+        Container container = specimen.getSpecimenPosition().getContainer();
+        while (container != null) {
+            parents.push(container);
+            container = container.getParentContainer();
+            if (container != null) {
+                container.getContainerType().getNameShort();
+                container.getContainerType().getCapacity().getRowCapacity();
+            }
+        }
+
+        return new SpecimenBriefInfo(specimen, parents);
     }
 
 }

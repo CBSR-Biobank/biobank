@@ -39,7 +39,7 @@ public class Dispatch extends AbstractBiobankModel {
         this.state = state;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dispatch")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "dispatch")
     public Set<DispatchSpecimen> getDispatchSpecimenCollection() {
         return this.dispatchSpecimenCollection;
     }

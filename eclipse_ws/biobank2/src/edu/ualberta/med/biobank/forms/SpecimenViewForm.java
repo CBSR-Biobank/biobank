@@ -17,10 +17,10 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetDispatchesActi
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
@@ -185,12 +185,8 @@ public class SpecimenViewForm extends BiobankViewForm {
             containersComposite.setLayout(new GridLayout(1, false));
             toolkit.paintBordersFor(containersComposite);
 
-            Stack<ContainerWrapper> parents = new Stack<ContainerWrapper>();
-            ContainerWrapper container = specimenWrapper.getParentContainer();
-            while (container != null) {
-                parents.push(container);
-                container = container.getParentContainer();
-            }
+            Stack<Container> parents = specimenBriefInfo.getParents();
+            Container container;
             while (!parents.isEmpty()) {
                 container = parents.pop();
                 RowColPos position;
@@ -206,12 +202,15 @@ public class SpecimenViewForm extends BiobankViewForm {
                 layout.marginWidth = 0;
                 layout.verticalSpacing = 0;
                 containerComposite.setLayout(layout);
-                toolkit.createLabel(containerComposite, container.getLabel()
-                    + " (" + container.getContainerType().getNameShort() //$NON-NLS-1$
-                    + ") "); //$NON-NLS-1$
+
+                StringBuffer sb = new StringBuffer(container.getLabel());
+                sb.append(" (");
+                sb.append(container.getContainerType().getNameShort());
+                sb.append(") ");
+
+                toolkit.createLabel(containerComposite, sb.toString());
                 ContainerDisplayWidget containerWidget =
-                    new ContainerDisplayWidget(
-                        containerComposite);
+                    new ContainerDisplayWidget(containerComposite);
                 containerWidget.setContainer(container);
                 containerWidget.setSelection(position);
                 toolkit.adapt(containerWidget);
@@ -280,6 +279,8 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     @Override
     public void setFocus() {
+        // LEAVE AS EMPTY METHOD
+        //
         // specimens are not present in treeviews, unnecessary reloads can be
         // prevented with this method
     }

@@ -55,6 +55,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     public DispatchInfoTable(Composite parent, SpecimenWrapper specimen,
         List<Dispatch> dispatchesRaw) {
         super(parent, null, HEADINGS, 15, DispatchWrapper.class);
+        this.specimen = specimen;
         this.dispatches = new ArrayList<DispatchWrapper>();
         for (Dispatch dispatch : dispatchesRaw) {
             dispatches.add(new DispatchWrapper(SessionManager.getAppService(),

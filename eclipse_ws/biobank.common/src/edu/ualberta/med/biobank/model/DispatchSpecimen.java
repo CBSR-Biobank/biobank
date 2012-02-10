@@ -36,7 +36,7 @@ public class DispatchSpecimen extends AbstractBiobankModel {
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.DispatchSpecimen.dispatch.NotNull}")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DISPATCH_ID", nullable = false)
     public Dispatch getDispatch() {
         return this.dispatch;

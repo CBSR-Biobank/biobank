@@ -20,9 +20,9 @@ public class SpecimenGetDispatchesAction implements
     @SuppressWarnings("nls")
     private static final String SPECIMEN_DISPATCH_HQL =
         "SELECT dispatch FROM " + Dispatch.class.getName() + " dispatch"
-            + " INNER JOIN dispatch.senderCenter"
-            + " INNER JOIN dispatch.receiverCenter"
-            + " INNER JOIN dispatch.shipmentInfo"
+            + " INNER JOIN FETCH dispatch.senderCenter"
+            + " INNER JOIN FETCH dispatch.receiverCenter"
+            + " LEFT JOIN FETCH dispatch.shipmentInfo"
             + " LEFT JOIN FETCH dispatch.dispatchSpecimenCollection dspecs"
             + " LEFT JOIN FETCH dspecs.specimen specimens"
             + " WHERE specimens.id=?";
