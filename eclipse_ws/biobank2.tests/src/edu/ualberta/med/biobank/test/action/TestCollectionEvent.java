@@ -40,6 +40,7 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
+import edu.ualberta.med.biobank.model.util.MathUtil;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
@@ -125,7 +126,7 @@ public class TestCollectionEvent extends TestAction {
                 Assert.assertEquals(1, sp.getCommentCollection().size());
                 Assert.assertEquals(info.inventoryId, sp.getInventoryId());
                 Assert
-                    .assertTrue(info.quantity.equals(sp.getQuantity()));
+                    .assertTrue(MathUtil.equals(info.quantity, sp.getQuantity()));
                 Assert.assertEquals(info.specimenTypeId, sp.getSpecimenType()
                     .getId());
                 Assert
@@ -173,7 +174,8 @@ public class TestCollectionEvent extends TestAction {
                 Assert.assertNotNull(sp.getCommentCollection());
                 Assert.assertEquals(1, sp.getCommentCollection().size());
                 Assert.assertEquals(newSpec.inventoryId, sp.getInventoryId());
-                Assert.assertTrue(newSpec.quantity.equals(sp.getQuantity()));
+                Assert.assertTrue(MathUtil.equals(newSpec.quantity,
+                    sp.getQuantity()));
                 Assert.assertEquals(newSpec.specimenTypeId, sp
                     .getSpecimenType().getId());
                 Assert.assertEquals(newSpec.activityStatus,
@@ -184,7 +186,8 @@ public class TestCollectionEvent extends TestAction {
                 Assert.assertEquals(modifiedSpec.inventoryId,
                     sp.getInventoryId());
                 Assert
-                    .assertTrue(modifiedSpec.quantity.equals(sp.getQuantity()));
+                    .assertTrue(MathUtil.equals(modifiedSpec.quantity,
+                        sp.getQuantity()));
             }
         }
     }
