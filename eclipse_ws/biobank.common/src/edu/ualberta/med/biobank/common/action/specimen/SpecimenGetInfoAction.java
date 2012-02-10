@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenReadPermission;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 
 public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
@@ -15,7 +16,19 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
 
     @SuppressWarnings("nls")
     private static final String SPECIMEN_INFO_HQL =
-        "FROM " + Specimen.class.getName() + " spc"
+        "SELECT spc FROM " + Specimen.class.getName() + " spc"
+            + " INNER JOIN FETCH spc.topSpecimen"
+            + " INNER JOIN FETCH spc.specimenType"
+            + " INNER JOIN FETCH spc.currentCenter"
+            + " INNER JOIN FETCH spc.activityStatus"
+            + " INNER JOIN FETCH spc.originInfo originInfo"
+            + " INNER JOIN FETCH originInfo.center"
+            + " INNER JOIN FETCH spc.collectionEvent cevent"
+            + " INNER JOIN FETCH cevent.patient patient"
+            + " INNER JOIN FETCH patient.study"
+            + " LEFT JOIN spc.dispatchSpecimenCollection"
+            + " LEFT JOIN FETCH spc.childSpecimenCollection"
+            + " LEFT JOIN FETCH spc.commentCollection"
             + " WHERE spc.id=?";
 
     public static class SpecimenBriefInfo implements ActionResult {
@@ -27,6 +40,9 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
             this.specimen = specimen;
         }
 
+        public Specimen getSpecimen() {
+            return specimen;
+        }
     }
 
     private final Integer specimenId;
@@ -46,6 +62,21 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
         query.setParameter(0, specimenId);
 
         Specimen specimen = (Specimen) query.uniqueResult();
+
+        // lazy load some associations
+        ProcessingEvent pevent = specimen.getProcessingEvent();
+        if (pevent != null) {
+            specimen.getProcessingEvent().getCenter().getName();
+        }
+        Specimen topSpecimen = specimen.getTopSpecimen();
+        if (topSpecimen != null) {
+            ProcessingEvent topPevent = topSpecimen.getProcessingEvent();
+            if (topPevent != null) {
+                topPevent.getCenter();
+            }
+            topSpecimen.getOriginInfo().getCenter().getName();
+        }
+
         return new SpecimenBriefInfo(specimen);
     }
 

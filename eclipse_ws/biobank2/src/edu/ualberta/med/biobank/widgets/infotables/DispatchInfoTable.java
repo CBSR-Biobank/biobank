@@ -1,24 +1,28 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.Dispatch;
 
 public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
-    SpecimenWrapper a;
+    private SpecimenWrapper specimen;
+    private List<DispatchWrapper> dispatches;
 
     protected static class TableRowData {
-
-        DispatchWrapper ds;
+        DispatchWrapper dispatch;
         String sender;
         Date dispatchTime;
         String receiver;
@@ -48,10 +52,15 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
     private boolean editMode = false;
 
-    public DispatchInfoTable(Composite parent, SpecimenWrapper a) {
+    public DispatchInfoTable(Composite parent, SpecimenWrapper specimen,
+        List<Dispatch> dispatchesRaw) {
         super(parent, null, HEADINGS, 15, DispatchWrapper.class);
-        this.a = a;
-        setList(a.getDispatches());
+        this.dispatches = new ArrayList<DispatchWrapper>();
+        for (Dispatch dispatch : dispatchesRaw) {
+            dispatches.add(new DispatchWrapper(SessionManager.getAppService(),
+                dispatch));
+        }
+        setList(dispatches);
     }
 
     @Override
@@ -64,7 +73,8 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -96,18 +106,22 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     @Override
     public TableRowData getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
-        info.ds = (DispatchWrapper) obj;
-        info.sender = info.ds.getSenderCenter().getNameShort();
-        info.dispatchTime = info.ds.getShipmentInfo() == null ? null : info.ds
-            .getShipmentInfo().getPackedAt();
-        info.receiver = info.ds.getReceiverCenter().getNameShort();
-        info.dateReceived = info.ds.getShipmentInfo() == null ? null : info.ds
-            .getShipmentInfo().getReceivedAt();
-        info.dstatus = info.ds.getStateDescription();
-        info.astatus = info.ds.getDispatchSpecimen(a.getInventoryId())
-            .getStateDescription();
-        info.waybill = info.ds.getShipmentInfo() == null ? null : info.ds
-            .getShipmentInfo().getWaybill();
+        info.dispatch = (DispatchWrapper) obj;
+        info.sender = info.dispatch.getSenderCenter().getNameShort();
+        info.dispatchTime =
+            info.dispatch.getShipmentInfo() == null ? null : info.dispatch
+                .getShipmentInfo().getPackedAt();
+        info.receiver = info.dispatch.getReceiverCenter().getNameShort();
+        info.dateReceived =
+            info.dispatch.getShipmentInfo() == null ? null : info.dispatch
+                .getShipmentInfo().getReceivedAt();
+        info.dstatus = info.dispatch.getStateDescription();
+        info.astatus =
+            info.dispatch.getDispatchSpecimen(specimen.getInventoryId())
+                .getStateDescription();
+        info.waybill =
+            info.dispatch.getShipmentInfo() == null ? null : info.dispatch
+                .getShipmentInfo().getWaybill();
         return info;
     }
 
@@ -124,7 +138,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
             return;
         for (BiobankCollectionModel item : model) {
             TableRowData info = (TableRowData) item.o;
-            if (info.ds.equals(selected)) {
+            if (info.dispatch.equals(selected)) {
                 getTableViewer().setSelection(new StructuredSelection(item),
                     true);
             }
@@ -138,7 +152,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
             return null;
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
-        return row.ds;
+        return row.dispatch;
     }
 
     @Override
@@ -147,7 +161,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     }
 
     public void reloadCollection() {
-        reloadCollection(a.getDispatches());
+        reloadCollection(specimen.getDispatches());
     }
 
 }
