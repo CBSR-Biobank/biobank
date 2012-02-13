@@ -14,9 +14,9 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetStudyInfoAction;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicViewForm extends AddressViewFormCommon {
     public static final String ID =
@@ -50,10 +51,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private BgcBaseText ceventTotal;
 
-    private ClinicAdapter clinicAdapter;
-
-    private CommentWrapper comment;
-
     private ClinicInfo clinicInfo;
 
     @Override
@@ -62,16 +59,16 @@ public class ClinicViewForm extends AddressViewFormCommon {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        clinicAdapter = (ClinicAdapter) adapter;
-        comment = new CommentWrapper(SessionManager.getAppService());
+        updateClinicInfo();
+        setPartName(NLS.bind(Messages.ClinicViewForm_title,
+            clinic.getNameShort()));
+    }
 
+    private void updateClinicInfo() throws Exception {
         clinicInfo = SessionManager.getAppService().doAction(
             new ClinicGetInfoAction(adapter.getId()));
         clinic =
-            new ClinicWrapper(SessionManager.getAppService(),
-                clinicInfo.clinic);
-        setPartName(NLS.bind(Messages.ClinicViewForm_title,
-            clinic.getNameShort()));
+            new ClinicWrapper(SessionManager.getAppService(), clinicInfo.clinic);
     }
 
     @Override
@@ -146,7 +143,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(commentTable);
     }
 
-    protected void createStudiesSection() {
+    protected void createStudiesSection() throws ApplicationException {
         Composite client =
             createSectionWithClient(Messages.ClinicViewForm_studies_title);
         List<StudyWrapper> studies = new ArrayList<StudyWrapper>();
@@ -155,7 +152,11 @@ public class ClinicViewForm extends AddressViewFormCommon {
                 .getStudy()));
         }
 
-        studiesTable = new ClinicStudyInfoTable(client, studies);
+        List<StudyCountInfo> studyCountInfo =
+            SessionManager.getAppService().doAction(
+                new ClinicGetStudyInfoAction(adapter.getId())).getList();
+
+        studiesTable = new ClinicStudyInfoTable(client, studyCountInfo);
         studiesTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studiesTable);
 
@@ -165,7 +166,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     @Override
     public void reload() throws Exception {
-        clinic.reload();
+        updateClinicInfo();
         setPartName(NLS.bind(Messages.ClinicViewForm_title, clinic.getName()));
         form.setText(NLS.bind(Messages.ClinicViewForm_title, clinic.getName()));
         setClinicValues();

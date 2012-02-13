@@ -23,7 +23,9 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
             + " FROM " + Clinic.class.getName() + " clinic"
             + " INNER JOIN FETCH clinic.address"
             + " INNER JOIN FETCH clinic.activityStatus"
+            + " LEFT JOIN FETCH clinic.contactCollection contacts"
             + " LEFT JOIN FETCH clinic.commentCollection comments"
+            + " LEFT JOIN FETCH contacts.studyCollection"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE clinic.id = ?";
 
