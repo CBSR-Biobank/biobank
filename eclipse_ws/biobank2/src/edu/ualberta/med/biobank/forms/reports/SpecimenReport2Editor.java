@@ -24,7 +24,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenReport2Editor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.QAAliquotsEditor"; //$NON-NLS-1$
+    public static String ID =
+        "edu.ualberta.med.biobank.editors.QAAliquotsEditor"; //$NON-NLS-1$
 
     private DateTimeWidget start;
     private DateTimeWidget end;
@@ -91,9 +92,11 @@ public class SpecimenReport2Editor extends ReportsEditor {
         Composite parent) throws ApplicationException {
         Collection<SpecimenTypeWrapper> allSpecTypes = SpecimenTypeWrapper
             .getAllSpecimenTypes(SessionManager.getAppService(), true);
-        ComboViewer widget = widgetCreator.createComboViewer(parent, labelText,
-            allSpecTypes, null, Messages.QaSpecimensEditor_types_validation_msg,
-            null, new BiobankLabelProvider());
+        ComboViewer widget =
+            widgetCreator.createComboViewer(parent, labelText,
+                allSpecTypes, null,
+                Messages.QaSpecimensEditor_types_validation_msg,
+                null, new BiobankLabelProvider());
         widget.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {
@@ -137,13 +140,13 @@ public class SpecimenReport2Editor extends ReportsEditor {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         start.setDate(null);
         end.setDate(null);
         topContainers.reset();
         typesViewer.getCombo().deselectAll();
         numSpecimensText.setText(""); //$NON-NLS-1$
-        super.onReset();
+        super.setValues();
     }
 
 }

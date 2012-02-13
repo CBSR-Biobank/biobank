@@ -26,7 +26,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerReport2Editor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.ContainerEmptyLocationsEditor"; //$NON-NLS-1$
+    public static String ID =
+        "edu.ualberta.med.biobank.editors.ContainerEmptyLocationsEditor"; //$NON-NLS-1$
 
     private BgcBaseText containerLabel;
     private TopContainerListWidget topContainers;
@@ -138,10 +139,10 @@ public class ContainerReport2Editor extends ReportsEditor {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         containerLabel.setText(""); //$NON-NLS-1$
         topContainers.reset();
         validate(""); //$NON-NLS-1$
-        super.onReset();
+        super.setValues();
     }
 }

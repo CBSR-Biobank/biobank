@@ -627,10 +627,8 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() throws Exception {
+    public void setValues() throws Exception {
         if (form.isDisposed()) return;
-
-        updateContainerInfo();
 
         form.setText(NLS.bind(Messages.ContainerViewForm_title,
             containerInfo.container

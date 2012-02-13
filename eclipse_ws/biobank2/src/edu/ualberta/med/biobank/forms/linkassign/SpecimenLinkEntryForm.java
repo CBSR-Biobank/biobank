@@ -587,8 +587,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public void onReset() throws Exception {
-        super.onReset();
+    public void setValues() throws Exception {
+        super.setValues();
         if (isSingleMode())
             singleTypesWidget.deselectAll();
         showOnlyPallet(true);

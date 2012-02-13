@@ -279,7 +279,7 @@ public class PatientMergeForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         pnumber1Text.setText(patient1.getPnumber());
         study1Text.setText(patient1.getStudy().getNameShort());
         patient1VisitsTable.setList(patient1

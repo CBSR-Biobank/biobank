@@ -13,7 +13,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SpecimenTypeReport1Editor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.AliquotCountEditor"; //$NON-NLS-1$
+    public static String ID =
+        "edu.ualberta.med.biobank.editors.AliquotCountEditor"; //$NON-NLS-1$
 
     private ComboViewer studyCombo;
 
@@ -66,9 +67,9 @@ public class SpecimenTypeReport1Editor extends ReportsEditor {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         studyCombo.getCombo().select(0);
-        super.onReset();
+        super.setValues();
 
     }
 }

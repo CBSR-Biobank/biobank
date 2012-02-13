@@ -212,8 +212,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
     }
 
     @Override
-    public void reload() throws Exception {
-        researchGroup.reload();
+    public void setValues() throws Exception {
         setPartName(NLS.bind(Messages.ResearchGroupViewForm_title,
             researchGroup.getName()));
         form.setText(NLS.bind(Messages.ResearchGroupViewForm_title,

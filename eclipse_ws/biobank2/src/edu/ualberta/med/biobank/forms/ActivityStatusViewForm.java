@@ -15,9 +15,11 @@ import edu.ualberta.med.biobank.widgets.infotables.entry.ActivityStatusEntryInfo
 
 public class ActivityStatusViewForm extends BiobankFormBase {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ActivityStatusViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ActivityStatusViewForm"; //$NON-NLS-1$
 
-    public static final String OK_MESSAGE = Messages.ActivityStatusViewForm_ok_msg;
+    public static final String OK_MESSAGE =
+        Messages.ActivityStatusViewForm_ok_msg;
 
     private ActivityStatusEntryInfoTable statusWidget;
 
@@ -36,8 +38,9 @@ public class ActivityStatusViewForm extends BiobankFormBase {
 
     private void createGlobalSampleTypeSection() throws Exception {
         Section section = createSection(Messages.ActivityStatusViewForm_title);
-        List<ActivityStatusWrapper> globalActivityStatus = ActivityStatusWrapper
-            .getAllActivityStatuses(SessionManager.getAppService());
+        List<ActivityStatusWrapper> globalActivityStatus =
+            ActivityStatusWrapper
+                .getAllActivityStatuses(SessionManager.getAppService());
         if (globalActivityStatus == null) {
             globalActivityStatus = new ArrayList<ActivityStatusWrapper>();
         }
@@ -67,6 +70,12 @@ public class ActivityStatusViewForm extends BiobankFormBase {
             throw new RuntimeException(
                 Messages.ActivityStatusViewForm_access_denied_error_msg);
         }
+    }
+
+    @Override
+    public void setValues() throws Exception {
+        // TODO Auto-generated method stub
+
     }
 
 }

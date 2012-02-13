@@ -229,28 +229,28 @@ public class SpecimenViewForm extends BiobankViewForm {
         }
     }
 
-    private void setValues() {
-        setTextValue(originCenterLabel, specimenWrapper.getOriginInfo()
-            .getCenter().getNameShort());
-        setTextValue(centerLabel, specimenWrapper.getCurrentCenter()
+    @Override
+    public void setValues() throws Exception {
+        setPartName(NLS.bind(Messages.SpecimenViewForm_title,
+            specimen.getInventoryId()));
+        form.setText(NLS.bind(Messages.SpecimenViewForm_title,
+            specimen.getInventoryId()));
+        dispatchInfoTable.reloadCollection();
+        setTextValue(originCenterLabel, specimen.getOriginInfo().getCenter()
             .getNameShort());
-        setTextValue(sampleTypeLabel, specimenWrapper.getSpecimenType()
-            .getName());
-        setTextValue(createdDateLabel, specimenWrapper.getFormattedCreatedAt());
-        setTextValue(volumeLabel, specimenWrapper.getQuantity() == null ? null
-            : specimenWrapper.getQuantity().toString());
-        setTextValue(studyLabel, specimenWrapper.getCollectionEvent()
-            .getPatient()
+        setTextValue(centerLabel, specimen.getCurrentCenter().getNameShort());
+        setTextValue(sampleTypeLabel, specimen.getSpecimenType().getName());
+        setTextValue(createdDateLabel, specimen.getFormattedCreatedAt());
+        setTextValue(volumeLabel, specimen.getQuantity() == null ? null
+            : specimen.getQuantity().toString());
+        setTextValue(studyLabel, specimen.getCollectionEvent().getPatient()
             .getStudy().getNameShort());
-        setTextValue(patientLabel, specimenWrapper.getCollectionEvent()
-            .getPatient()
+        setTextValue(patientLabel, specimen.getCollectionEvent().getPatient()
             .getPnumber());
-        setTextValue(positionLabel,
-            specimenWrapper.getPositionString(true, false));
-        setTextValue(ceventLabel, specimenWrapper.getCollectionInfo());
+        setTextValue(positionLabel, specimen.getPositionString(true, false));
+        setTextValue(ceventLabel, specimen.getCollectionInfo());
 
-        boolean isSourceSpc =
-            specimenWrapper.getTopSpecimen().equals(specimenWrapper);
+        boolean isSourceSpc = specimen.getTopSpecimen().equals(specimen);
 
         setCheckBoxValue(isSourceSpcButton, isSourceSpc);
 
@@ -294,18 +294,6 @@ public class SpecimenViewForm extends BiobankViewForm {
         //
         // specimens are not present in treeviews, unnecessary reloads can be
         // prevented with this method left empty
-    }
-
-    @Override
-    public void reload() throws Exception {
-        updateSpecimenInfo();
-        setValues();
-        setPartName(NLS.bind(Messages.SpecimenViewForm_title,
-            specimenWrapper.getInventoryId()));
-        form.setText(NLS.bind(Messages.SpecimenViewForm_title,
-            specimenWrapper.getInventoryId()));
-        dispatchInfoTable.reloadCollection();
-        commentTable.setList(specimenWrapper.getCommentCollection(false));
     }
 
 }

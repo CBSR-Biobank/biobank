@@ -90,7 +90,7 @@ public class DispatchViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() throws Exception {
+    public void setValues() throws Exception {
         commentTable.setList(dispatch.getCommentCollection(false));
         setPartName(Messages.DispatchViewForm_fulltitle
             + dispatch.getShipmentInfo().getPackedAt());

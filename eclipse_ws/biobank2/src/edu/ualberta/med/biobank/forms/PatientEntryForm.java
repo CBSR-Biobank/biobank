@@ -264,7 +264,7 @@ public class PatientEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         copyPatient();
         GuiUtil.reset(studiesViewer, patientCopy.getStudy());
     }

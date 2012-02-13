@@ -83,8 +83,9 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         super.init();
 
         if (dispatch.isNew()) {
-            dispatch.setSenderCenter(SessionManager.getUser()
-                .getCurrentWorkingCenter());
+            dispatch.getWrappedObject().setSenderCenter(
+                SessionManager.getUser()
+                    .getCurrentWorkingCenter().getWrappedObject());
         } else {
             shipmentInfo = dispatch.getShipmentInfo();
         }
@@ -316,13 +317,12 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         CenterWrapper<?> sender = dispatch.getSenderCenter();
-        super.onReset();
+        super.setValues();
         dispatch.setSenderCenter(sender);
 
         if (shipmentInfo != null) {
-            shipmentInfo.reset();
             dispatch.setShipmentInfo(shipmentInfo);
 
             GuiUtil.reset(shippingMethodViewer,

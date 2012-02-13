@@ -107,7 +107,8 @@ public class LoggingForm extends BiobankViewForm {
     private void generateSearchQueryTable() {
         LogQuery.getInstance().queryDatabase();
 
-        Composite client = createSectionWithClient(Messages.LoggingForm_search_title);
+        Composite client =
+            createSectionWithClient(Messages.LoggingForm_search_title);
         client.setLayout(new GridLayout(1, false));
         Button button = new Button(client, SWT.PUSH);
         button.setText(Messages.LoggingForm_1);
@@ -198,8 +199,9 @@ public class LoggingForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() throws Exception {
-        //
+    public void setValues() throws Exception {
+        // TODO Auto-generated method stub
+
     }
 
 }

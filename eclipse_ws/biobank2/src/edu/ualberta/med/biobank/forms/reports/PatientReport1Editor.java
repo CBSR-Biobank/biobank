@@ -13,7 +13,8 @@ public class PatientReport1Editor extends ReportsEditor {
     protected DateTimeWidget start;
     protected DateTimeWidget end;
 
-    public static String ID = "edu.ualberta.med.biobank.editors.PatientVisitSummaryEditor"; //$NON-NLS-1$
+    public static String ID =
+        "edu.ualberta.med.biobank.editors.PatientVisitSummaryEditor"; //$NON-NLS-1$
 
     @Override
     protected void createOptionSection(Composite parent) {
@@ -63,10 +64,10 @@ public class PatientReport1Editor extends ReportsEditor {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         start.setDate(null);
         end.setDate(null);
-        super.onReset();
+        super.setValues();
     }
 
 }

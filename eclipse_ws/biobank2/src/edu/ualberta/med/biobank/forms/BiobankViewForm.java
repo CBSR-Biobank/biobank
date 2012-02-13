@@ -34,9 +34,11 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
  */
 public abstract class BiobankViewForm extends BiobankFormBase {
 
-    private static final String RELOAD_COMMAND_ID = "edu.ualberta.med.biobank.commands.reloadViewForm"; //$NON-NLS-1$
+    private static final String RELOAD_COMMAND_ID =
+        "edu.ualberta.med.biobank.commands.reloadViewForm"; //$NON-NLS-1$
 
-    private static final String EDIT_COMMAND_ID = "edu.ualberta.med.biobank.commands.edit"; //$NON-NLS-1$
+    private static final String EDIT_COMMAND_ID =
+        "edu.ualberta.med.biobank.commands.edit"; //$NON-NLS-1$
 
     private static final String CONTEXT_VIEW_FORM = "biobank.context.viewForm"; //$NON-NLS-1$
 
@@ -149,7 +151,5 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                 Messages.BiobankViewForm_reload_label, true));
         form.getToolBarManager().add(reload);
     }
-
-    public abstract void reload() throws Exception;
 
 }

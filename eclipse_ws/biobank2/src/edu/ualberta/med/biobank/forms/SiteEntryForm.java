@@ -29,10 +29,13 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteEntryForm extends AddressEntryFormCommon {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.SiteEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.SiteEntryForm"; //$NON-NLS-1$
 
-    private static final String MSG_NEW_SITE_OK = Messages.SiteEntryForm_creation_msg;
-    private static final String MSG_SITE_OK = Messages.SiteEntryForm_edition_msg;
+    private static final String MSG_NEW_SITE_OK =
+        Messages.SiteEntryForm_creation_msg;
+    private static final String MSG_SITE_OK =
+        Messages.SiteEntryForm_edition_msg;
 
     private SiteAdapter siteAdapter;
 
@@ -44,12 +47,13 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private StudyAddInfoTable studiesTable;
 
-    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BgcEntryFormWidgetListener listener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     @Override
     public void init() throws Exception {
@@ -163,14 +167,11 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    protected void onReset() throws Exception {
-        site.reset();
-
+    public void setValues() throws Exception {
         if (site.isNew()) {
             site.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(SessionManager.getAppService()));
         }
-
         GuiUtil.reset(activityStatusComboViewer, site.getActivityStatus());
 
         studiesTable.reload();

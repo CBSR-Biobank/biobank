@@ -478,18 +478,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         }
     }
 
-    @Override
-    public void reset() {
-        try {
-            onReset();
-            setDirty(false);
-        } catch (Exception e) {
-            logger.error("Can't reset the form", e); //$NON-NLS-1$
-        }
-    }
-
-    protected abstract void onReset() throws Exception;
-
     /**
      * Return the ID of the form that should be opened after the save action is
      * performed and the current form closed

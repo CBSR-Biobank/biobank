@@ -164,10 +164,11 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     @Override
-    public void reload() throws Exception {
-        clinic.reload();
-        setPartName(NLS.bind(Messages.ClinicViewForm_title, clinic.getName()));
-        form.setText(NLS.bind(Messages.ClinicViewForm_title, clinic.getName()));
+    public void setValues() throws Exception {
+        setPartName(NLS.bind(Messages.ClinicViewForm_title,
+            clinic.getName()));
+        form.setText(NLS.bind(Messages.ClinicViewForm_title,
+            clinic.getName()));
         setClinicValues();
         setAddressValues(clinic);
         contactsTable.setList(clinic.getContactCollection(true));

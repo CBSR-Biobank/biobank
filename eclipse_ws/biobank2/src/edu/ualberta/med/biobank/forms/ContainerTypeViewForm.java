@@ -262,8 +262,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() throws Exception {
-        updateContainerTypeInfo();
+    public void setValues() throws Exception {
         setPartName(NLS.bind(Messages.ContainerTypeViewForm_title,
             containerType.getName()));
         form.setText(NLS.bind(Messages.ContainerTypeViewForm_title,

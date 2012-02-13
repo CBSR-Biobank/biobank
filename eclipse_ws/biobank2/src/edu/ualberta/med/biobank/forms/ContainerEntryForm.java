@@ -34,17 +34,23 @@ import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class ContainerEntryForm extends BiobankEntryForm {
-    public static final String ID = "edu.ualberta.med.biobank.forms.ContainerEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ContainerEntryForm"; //$NON-NLS-1$
 
-    public static final String MSG_STORAGE_CONTAINER_NEW_OK = Messages.ContainerEntryForm_new_ok_msg;
+    public static final String MSG_STORAGE_CONTAINER_NEW_OK =
+        Messages.ContainerEntryForm_new_ok_msg;
 
-    public static final String MSG_STORAGE_CONTAINER_OK = Messages.ContainerEntryForm_edit_ok_msg;
+    public static final String MSG_STORAGE_CONTAINER_OK =
+        Messages.ContainerEntryForm_edit_ok_msg;
 
-    public static final String MSG_CONTAINER_NAME_EMPTY = Messages.ContainerEntryForm_name_validation_msg;
+    public static final String MSG_CONTAINER_NAME_EMPTY =
+        Messages.ContainerEntryForm_name_validation_msg;
 
-    public static final String MSG_CONTAINER_TYPE_EMPTY = Messages.ContainerEntryForm_type_validation_msg;
+    public static final String MSG_CONTAINER_TYPE_EMPTY =
+        Messages.ContainerEntryForm_type_validation_msg;
 
-    public static final String MSG_INVALID_POSITION = Messages.ContainerEntryForm_position_validation_msg;
+    public static final String MSG_INVALID_POSITION =
+        Messages.ContainerEntryForm_position_validation_msg;
 
     private ContainerAdapter containerAdapter;
 
@@ -64,12 +70,13 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private boolean renamingChildren;
 
-    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BgcEntryFormWidgetListener listener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     private CommentCollectionInfoTable commentEntryTable;
 
@@ -220,7 +227,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
             currentType, MSG_CONTAINER_TYPE_EMPTY, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    ContainerTypeWrapper ct = (ContainerTypeWrapper) selectedObject;
+                    ContainerTypeWrapper ct =
+                        (ContainerTypeWrapper) selectedObject;
                     container.setContainerType(ct);
                     if (tempWidget != null) {
                         if (ct != null && Boolean.TRUE.equals(ct.getTopLevel())) {
@@ -306,7 +314,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         SiteWrapper site = container.getSite();
         container.reset();
         container.setSite(site);

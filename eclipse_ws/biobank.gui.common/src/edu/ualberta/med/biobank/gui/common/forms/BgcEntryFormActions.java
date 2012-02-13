@@ -18,9 +18,9 @@ public class BgcEntryFormActions {
         .createFromImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_PRINTER));
 
-    private static ImageDescriptor resetActionImage = ImageDescriptor
+    private static ImageDescriptor reloadActionImage = ImageDescriptor
         .createFromImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_RESET_FORM));
+            .get(BgcPlugin.IMG_RELOAD_FORM));
 
     private static ImageDescriptor cancelActionImage = ImageDescriptor
         .createFromImage(BgcPlugin.getDefault().getImageRegistry()
@@ -64,7 +64,8 @@ public class BgcEntryFormActions {
         };
         confirmAction.setActionDefinitionId(commandId);
         confirmAction.setImageDescriptor(confirmActionImage);
-        confirmAction.setToolTipText(Messages.BgcEntryFormActions_confirm_tooltip);
+        confirmAction
+            .setToolTipText(Messages.BgcEntryFormActions_confirm_tooltip);
         entryForm.getScrolledForm().getToolBarManager().add(confirmAction);
     }
 
@@ -72,11 +73,16 @@ public class BgcEntryFormActions {
         if (reset != null)
             return;
 
-        reset = new CommandContributionItem(
-            new CommandContributionItemParameter(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow(), Messages.BgcEntryFormActions_reset_label, commandId, null,
-                resetActionImage, null, null, Messages.BgcEntryFormActions_reset_label, Messages.BgcEntryFormActions_reset_label, Messages.BgcEntryFormActions_reset_label,
-                SWT.NONE, Messages.BgcEntryFormActions_reset_label, true));
+        reset =
+            new CommandContributionItem(
+                new CommandContributionItemParameter(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow(),
+                    Messages.BgcEntryFormActions_reset_label, commandId, null,
+                    reloadActionImage, null, null,
+                    Messages.BgcEntryFormActions_reset_label,
+                    Messages.BgcEntryFormActions_reset_label,
+                    Messages.BgcEntryFormActions_reset_label,
+                    SWT.NONE, Messages.BgcEntryFormActions_reset_label, true));
         entryForm.getScrolledForm().getToolBarManager().add(reset);
     }
 
@@ -84,11 +90,16 @@ public class BgcEntryFormActions {
         if (cancel != null)
             return;
 
-        cancel = new CommandContributionItem(
-            new CommandContributionItemParameter(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow(), Messages.BgcEntryFormActions_cancel_label, commandId, null,
-                cancelActionImage, null, null, Messages.BgcEntryFormActions_cancel_label, Messages.BgcEntryFormActions_cancel_label, Messages.BgcEntryFormActions_cancel_label,
-                SWT.NONE, Messages.BgcEntryFormActions_cancel_label, true));
+        cancel =
+            new CommandContributionItem(
+                new CommandContributionItemParameter(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow(),
+                    Messages.BgcEntryFormActions_cancel_label, commandId, null,
+                    cancelActionImage, null, null,
+                    Messages.BgcEntryFormActions_cancel_label,
+                    Messages.BgcEntryFormActions_cancel_label,
+                    Messages.BgcEntryFormActions_cancel_label,
+                    SWT.NONE, Messages.BgcEntryFormActions_cancel_label, true));
         entryForm.getScrolledForm().getToolBarManager().add(cancel);
     }
 
@@ -105,7 +116,9 @@ public class BgcEntryFormActions {
                         try {
                             entryForm.print();
                         } catch (Exception ex) {
-                            BgcPlugin.openAsyncError(Messages.BgcEntryFormActions_print_error_msg, ex);
+                            BgcPlugin.openAsyncError(
+                                Messages.BgcEntryFormActions_print_error_msg,
+                                ex);
                         }
                     }
                 });
