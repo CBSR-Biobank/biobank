@@ -232,25 +232,32 @@ public class SpecimenViewForm extends BiobankViewForm {
     @Override
     public void setValues() throws Exception {
         setPartName(NLS.bind(Messages.SpecimenViewForm_title,
-            specimen.getInventoryId()));
+            specimenWrapper.getInventoryId()));
         form.setText(NLS.bind(Messages.SpecimenViewForm_title,
-            specimen.getInventoryId()));
+            specimenWrapper.getInventoryId()));
         dispatchInfoTable.reloadCollection();
-        setTextValue(originCenterLabel, specimen.getOriginInfo().getCenter()
+        setTextValue(originCenterLabel, specimenWrapper.getOriginInfo()
+            .getCenter()
             .getNameShort());
-        setTextValue(centerLabel, specimen.getCurrentCenter().getNameShort());
-        setTextValue(sampleTypeLabel, specimen.getSpecimenType().getName());
-        setTextValue(createdDateLabel, specimen.getFormattedCreatedAt());
-        setTextValue(volumeLabel, specimen.getQuantity() == null ? null
-            : specimen.getQuantity().toString());
-        setTextValue(studyLabel, specimen.getCollectionEvent().getPatient()
+        setTextValue(centerLabel, specimenWrapper.getCurrentCenter()
+            .getNameShort());
+        setTextValue(sampleTypeLabel, specimenWrapper.getSpecimenType()
+            .getName());
+        setTextValue(createdDateLabel, specimenWrapper.getFormattedCreatedAt());
+        setTextValue(volumeLabel, specimenWrapper.getQuantity() == null ? null
+            : specimenWrapper.getQuantity().toString());
+        setTextValue(studyLabel, specimenWrapper.getCollectionEvent()
+            .getPatient()
             .getStudy().getNameShort());
-        setTextValue(patientLabel, specimen.getCollectionEvent().getPatient()
+        setTextValue(patientLabel, specimenWrapper.getCollectionEvent()
+            .getPatient()
             .getPnumber());
-        setTextValue(positionLabel, specimen.getPositionString(true, false));
-        setTextValue(ceventLabel, specimen.getCollectionInfo());
+        setTextValue(positionLabel,
+            specimenWrapper.getPositionString(true, false));
+        setTextValue(ceventLabel, specimenWrapper.getCollectionInfo());
 
-        boolean isSourceSpc = specimen.getTopSpecimen().equals(specimen);
+        boolean isSourceSpc =
+            specimenWrapper.getTopSpecimen().equals(specimenWrapper);
 
         setCheckBoxValue(isSourceSpcButton, isSourceSpc);
 
