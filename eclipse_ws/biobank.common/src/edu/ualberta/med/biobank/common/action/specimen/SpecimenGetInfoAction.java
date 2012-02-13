@@ -34,7 +34,8 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
             + " LEFT JOIN FETCH pos.container"
             + " LEFT JOIN spc.dispatchSpecimenCollection"
             + " LEFT JOIN FETCH spc.childSpecimenCollection"
-            + " LEFT JOIN FETCH spc.commentCollection"
+            + " LEFT JOIN FETCH spc.commentCollection comment"
+            + " LEFT JOIN FETCH comment.user"
             + " WHERE spc.id=?";
 
     public static class SpecimenBriefInfo implements ActionResult {

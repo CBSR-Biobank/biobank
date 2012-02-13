@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -70,6 +71,8 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private SpecimenBriefInfo specimenBriefInfo;
 
+    private CommentCollectionInfoTable commentTable;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof SpecimenAdapter),
@@ -99,6 +102,7 @@ public class SpecimenViewForm extends BiobankViewForm {
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createInformationSection();
+        createCommentsSection();
         createDispatchSection();
         createContainersSection();
         setValues();
@@ -170,9 +174,16 @@ public class SpecimenViewForm extends BiobankViewForm {
             Messages.SpecimenViewForm_children_nber_label);
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.SpecimenViewForm_status_label);
-        commentLabel = createReadOnlyLabelledField(client,
-            SWT.WRAP | SWT.MULTI, Messages.SpecimenViewForm_comments_label);
 
+    }
+
+    private void createCommentsSection() {
+        Composite client = createSectionWithClient(Messages.label_comments);
+        commentTable =
+            new CommentCollectionInfoTable(client,
+                specimenWrapper.getCommentCollection(false));
+        commentTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(commentTable);
     }
 
     private void createContainersSection() {
@@ -282,7 +293,7 @@ public class SpecimenViewForm extends BiobankViewForm {
         // LEAVE AS EMPTY METHOD
         //
         // specimens are not present in treeviews, unnecessary reloads can be
-        // prevented with this method
+        // prevented with this method left empty
     }
 
     @Override
@@ -294,6 +305,7 @@ public class SpecimenViewForm extends BiobankViewForm {
         form.setText(NLS.bind(Messages.SpecimenViewForm_title,
             specimenWrapper.getInventoryId()));
         dispatchInfoTable.reloadCollection();
+        commentTable.setList(specimenWrapper.getCommentCollection(false));
     }
 
 }
