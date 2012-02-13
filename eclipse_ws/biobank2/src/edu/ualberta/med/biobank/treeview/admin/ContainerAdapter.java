@@ -43,7 +43,7 @@ public class ContainerAdapter extends AdapterBase {
     private static BgcLogger LOGGER = BgcLogger
         .getLogger(ContainerAdapter.class.getName());
 
-    private ContainerChildrenResult childrenResult;
+    private ContainerChildrenResult childrenResult = null;
 
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
         super(parent, container);
@@ -338,10 +338,14 @@ public class ContainerAdapter extends AdapterBase {
         throws Exception {
         List<ContainerWrapper> result = new ArrayList<ContainerWrapper>();
 
-        for (Container container : childrenResult.getChildContainers()) {
-            ContainerWrapper wrapper =
-                new ContainerWrapper(SessionManager.getAppService(), container);
-            result.add(wrapper);
+        if (childrenResult != null) {
+            // return results only if this node has been expanded
+            for (Container container : childrenResult.getChildContainers()) {
+                ContainerWrapper wrapper =
+                    new ContainerWrapper(SessionManager.getAppService(),
+                        container);
+                result.add(wrapper);
+            }
         }
 
         return result;

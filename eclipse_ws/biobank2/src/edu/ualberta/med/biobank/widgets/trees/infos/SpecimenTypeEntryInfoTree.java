@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.widgets.trees.infos;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
@@ -10,11 +12,14 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.dialogs.SpecimenTypeDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeAddItemListener;
 import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeDeleteItemListener;
@@ -186,8 +191,13 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
 
     public void reload() {
         try {
-            setLists(SpecimenTypeWrapper.getAllSpecimenTypes(
-                SessionManager.getAppService(), true));
+            ArrayList<SpecimenType> globalSpecimenTypes =
+                SessionManager.getAppService().doAction(
+                    new SpecimenTypeGetAllAction()).getList();
+            Assert.isNotNull(globalSpecimenTypes);
+            setLists(ModelWrapper.wrapModelCollection(
+                SessionManager.getAppService(),
+                globalSpecimenTypes, SpecimenTypeWrapper.class));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
                 Messages.SpecimenTypeEntryInfoTree_unaivalable_error_title, e);

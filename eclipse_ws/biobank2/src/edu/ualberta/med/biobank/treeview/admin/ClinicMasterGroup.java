@@ -27,7 +27,7 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
     private static BgcLogger LOGGER = BgcLogger
         .getLogger(ClinicMasterGroup.class.getName());
 
-    private ClinicsInfo clinicsInfo;
+    private ClinicsInfo clinicsInfo = null;
 
     public ClinicMasterGroup(SessionAdapter sessionAdapter, int id) {
         super(sessionAdapter, id, Messages.ClinicMasterGroup_clinics_node_label);
@@ -64,10 +64,13 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
         throws Exception {
         List<ClinicWrapper> result = new ArrayList<ClinicWrapper>();
 
-        for (Clinic clinic : clinicsInfo.getClinics()) {
-            ClinicWrapper wrapper =
-                new ClinicWrapper(SessionManager.getAppService(), clinic);
-            result.add(wrapper);
+        if (clinicsInfo != null) {
+            // return results only if this node has been expanded
+            for (Clinic clinic : clinicsInfo.getClinics()) {
+                ClinicWrapper wrapper =
+                    new ClinicWrapper(SessionManager.getAppService(), clinic);
+                result.add(wrapper);
+            }
         }
 
         return result;

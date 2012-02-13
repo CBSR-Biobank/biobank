@@ -27,7 +27,7 @@ public class StudyMasterGroup extends AbstractStudyGroup {
     private static BgcLogger LOGGER = BgcLogger
         .getLogger(StudyMasterGroup.class.getName());
 
-    private StudiesInfo studiesInfo;
+    private StudiesInfo studiesInfo = null;
 
     public StudyMasterGroup(SessionAdapter parent, int id) {
         super(parent, id, Messages.StudyMasterGroup_studies_node_label);
@@ -64,10 +64,13 @@ public class StudyMasterGroup extends AbstractStudyGroup {
         throws Exception {
         List<StudyWrapper> result = new ArrayList<StudyWrapper>();
 
-        for (Study study : studiesInfo.getStudies()) {
-            StudyWrapper wrapper =
-                new StudyWrapper(SessionManager.getAppService(), study);
-            result.add(wrapper);
+        if (studiesInfo != null) {
+            // return results only if this node has been expanded
+            for (Study study : studiesInfo.getStudies()) {
+                StudyWrapper wrapper =
+                    new StudyWrapper(SessionManager.getAppService(), study);
+                result.add(wrapper);
+            }
         }
 
         return result;

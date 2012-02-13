@@ -30,8 +30,7 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientNextVisitNumberAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetInfosAction;
-import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeInfo;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimensAction;
@@ -50,6 +49,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
@@ -266,9 +266,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);
         try {
-            final List<SpecimenTypeInfo> allSpecimenTypes =
+            final List<SpecimenType> allSpecimenTypes =
                 SessionManager
-                    .getAppService().doAction(new SpecimenTypeGetInfosAction())
+                    .getAppService().doAction(new SpecimenTypeGetAllAction())
                     .getList();
             final List<SourceSpecimen> studySourceSpecimens = SessionManager
                 .getAppService().doAction(

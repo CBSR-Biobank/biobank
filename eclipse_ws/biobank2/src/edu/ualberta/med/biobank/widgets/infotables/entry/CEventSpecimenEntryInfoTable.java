@@ -14,7 +14,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeInfo;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.CEventSourceSpecimenDialog;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
@@ -24,6 +23,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 
 public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
 
@@ -43,7 +43,7 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
 
     public void addOrEditSpecimen(boolean add, SpecimenInfo si,
         List<SourceSpecimen> studySourceTypes,
-        List<SpecimenTypeInfo> allSpecimenTypes, final CollectionEvent cEvent,
+        List<SpecimenType> allSpecimenTypes, final CollectionEvent cEvent,
         final Date defaultTimeDrawn) {
         NewListener newListener = null;
         List<String> inventoryIdExcludeList = new ArrayList<String>();
@@ -83,7 +83,7 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
     }
 
     public void addEditSupport(final List<SourceSpecimen> studySourceTypes,
-        final List<SpecimenTypeInfo> allSpecimenTypes) {
+        final List<SpecimenType> allSpecimenTypes) {
         if (SessionManager.canUpdate(SpecimenWrapper.class)) {
             addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {
                 @Override

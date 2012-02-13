@@ -64,6 +64,7 @@ public class TestSpecimen extends TestAction {
             EXECUTOR.exec(new SpecimenGetInfoAction(specimenInfo.specimen
                 .getId()));
 
-        Assert.assertEquals(specimenInfo.specimen, specimenBriefInfo.specimen);
+        Assert.assertEquals(specimenInfo.specimen,
+            specimenBriefInfo.getSpecimen());
     }
 }

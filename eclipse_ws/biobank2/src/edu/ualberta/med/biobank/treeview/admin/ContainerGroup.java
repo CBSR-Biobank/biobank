@@ -33,7 +33,7 @@ public class ContainerGroup extends AdapterBase {
     private static BgcLogger LOGGER = BgcLogger.getLogger(ContainerGroup.class
         .getName());
 
-    private SiteGetTopContainersResult topContainerResult;
+    private SiteGetTopContainersResult topContainerResult = null;
 
     public ContainerGroup(SiteAdapter parent, int id) {
         super(parent, id, Messages.ContainerGroup_containers_node_label, true);
@@ -138,10 +138,14 @@ public class ContainerGroup extends AdapterBase {
         throws Exception {
         List<ContainerWrapper> result = new ArrayList<ContainerWrapper>();
 
-        for (Container container : topContainerResult.getTopContainers()) {
-            ContainerWrapper wrapper =
-                new ContainerWrapper(SessionManager.getAppService(), container);
-            result.add(wrapper);
+        if (topContainerResult != null) {
+            // return results only if this node has been expanded
+            for (Container container : topContainerResult.getTopContainers()) {
+                ContainerWrapper wrapper =
+                    new ContainerWrapper(SessionManager.getAppService(),
+                        container);
+                result.add(wrapper);
+            }
         }
 
         return result;

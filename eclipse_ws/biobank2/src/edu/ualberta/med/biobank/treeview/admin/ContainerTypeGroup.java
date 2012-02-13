@@ -30,7 +30,7 @@ public class ContainerTypeGroup extends AdapterBase {
     private static BgcLogger LOGGER = BgcLogger.getLogger(ContainerGroup.class
         .getName());
 
-    private SiteGetContainerTypesResult containerTypesResult;
+    private SiteGetContainerTypesResult containerTypesResult = null;
 
     public ContainerTypeGroup(SiteAdapter parent, int id) {
         super(parent, id, Messages.ContainerTypeGroup_types_node_label, true);
@@ -103,12 +103,15 @@ public class ContainerTypeGroup extends AdapterBase {
         List<ContainerTypeWrapper> result =
             new ArrayList<ContainerTypeWrapper>();
 
-        for (ContainerType containerType : containerTypesResult
-            .getContainerTypes()) {
-            ContainerTypeWrapper wrapper =
-                new ContainerTypeWrapper(SessionManager.getAppService(),
-                    containerType);
-            result.add(wrapper);
+        if (containerTypesResult != null) {
+            // return results only if this node has been expanded
+            for (ContainerType containerType : containerTypesResult
+                .getContainerTypes()) {
+                ContainerTypeWrapper wrapper =
+                    new ContainerTypeWrapper(SessionManager.getAppService(),
+                        containerType);
+                result.add(wrapper);
+            }
         }
 
         return result;
