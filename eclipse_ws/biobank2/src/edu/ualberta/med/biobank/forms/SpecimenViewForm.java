@@ -231,6 +231,7 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     @Override
     public void setValues() throws Exception {
+        updateSpecimenInfo();
         setPartName(NLS.bind(Messages.SpecimenViewForm_title,
             specimenWrapper.getInventoryId()));
         form.setText(NLS.bind(Messages.SpecimenViewForm_title,

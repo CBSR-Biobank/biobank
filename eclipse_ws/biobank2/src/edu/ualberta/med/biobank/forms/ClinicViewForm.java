@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -18,9 +17,8 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetStudyInfoAction;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
@@ -53,6 +51,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private ClinicInfo clinicInfo;
 
+    private List<StudyCountInfo> studyCountInfo;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ClinicAdapter,
@@ -69,6 +69,10 @@ public class ClinicViewForm extends AddressViewFormCommon {
             new ClinicGetInfoAction(adapter.getId()));
         clinic =
             new ClinicWrapper(SessionManager.getAppService(), clinicInfo.clinic);
+
+        studyCountInfo =
+            SessionManager.getAppService().doAction(
+                new ClinicGetStudyInfoAction(adapter.getId())).getList();
     }
 
     @Override
@@ -124,10 +128,11 @@ public class ClinicViewForm extends AddressViewFormCommon {
     private void createContactsSection() {
         Composite client =
             createSectionWithClient(Messages.clinic_contact_title);
-        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
-        for (Contact c : clinicInfo.contacts) {
-            contacts.add(new ContactWrapper(SessionManager.getAppService(), c));
-        }
+        List<ContactWrapper> contacts =
+            ModelWrapper.wrapModelCollection(
+                SessionManager.getAppService(), clinicInfo.contacts,
+                ContactWrapper.class);
+
         contactsTable =
             new ContactInfoTable(client, contacts);
         contactsTable.adaptToToolkit(toolkit, true);
@@ -146,15 +151,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
     protected void createStudiesSection() throws ApplicationException {
         Composite client =
             createSectionWithClient(Messages.ClinicViewForm_studies_title);
-        List<StudyWrapper> studies = new ArrayList<StudyWrapper>();
-        for (StudyCountInfo s : clinicInfo.studyInfos) {
-            studies.add(new StudyWrapper(SessionManager.getAppService(), s
-                .getStudy()));
-        }
-
-        List<StudyCountInfo> studyCountInfo =
-            SessionManager.getAppService().doAction(
-                new ClinicGetStudyInfoAction(adapter.getId())).getList();
 
         studiesTable = new ClinicStudyInfoTable(client, studyCountInfo);
         studiesTable.adaptToToolkit(toolkit, true);
@@ -165,7 +161,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     @Override
-    public void reload() {
+    public void setValues() throws Exception {
         updateClinicInfo();
         setPartName(NLS.bind(Messages.ClinicViewForm_title,
             clinic.getName()));
@@ -174,7 +170,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setClinicValues();
         setAddressValues(clinic);
         contactsTable.setList(clinic.getContactCollection(true));
-        studiesTable.setList(clinic.getStudyCollection());
+        studiesTable.setList(studyCountInfo);
         commentTable.setList(clinic.getCommentCollection(false));
     }
 
