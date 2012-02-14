@@ -12,7 +12,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 
-public class BgcEntryForm extends BgcFormBase implements IBgcEntryForm {
+public abstract class BgcEntryForm extends BgcFormBase implements IBgcEntryForm {
 
     private static BgcLogger logger = BgcLogger.getLogger(BgcEntryForm.class
         .getName());
@@ -111,11 +111,6 @@ public class BgcEntryForm extends BgcFormBase implements IBgcEntryForm {
     @Override
     public void cancel() {
         // override me
-    }
-
-    @Override
-    public void reset() {
-        setDirty(false);
     }
 
     @Override

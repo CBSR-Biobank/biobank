@@ -430,7 +430,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         CenterWrapper<?> center = pevent.getCenter();
         pevent.reset();
         pevent.setCenter(center);

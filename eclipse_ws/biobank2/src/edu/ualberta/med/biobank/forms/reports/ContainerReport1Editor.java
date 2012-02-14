@@ -7,7 +7,8 @@ import org.eclipse.swt.widgets.Composite;
 
 public class ContainerReport1Editor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.ContainerCapacityEditor"; //$NON-NLS-1$
+    public static String ID =
+        "edu.ualberta.med.biobank.editors.ContainerCapacityEditor"; //$NON-NLS-1$
 
     @Override
     protected void createOptionSection(Composite parent) {
@@ -38,7 +39,7 @@ public class ContainerReport1Editor extends ReportsEditor {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
     }
 
 }

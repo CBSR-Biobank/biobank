@@ -47,7 +47,7 @@
      </activeWhen>
       </handler> 
       <handler
-            class="edu.ualberta.med.biobank.gui.common.handlers.BgcResetHandler"
+            class="edu.ualberta.med.biobank.gui.common.handlers.BgcReloadHandler"
             commandId="edu.ualberta.med.biobank.gui.common.commands.reset">
          <activeWhen>
             <with

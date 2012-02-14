@@ -556,9 +556,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
-        init();
-
+    public void setValues() throws Exception {
         // do not change origin if form reset
         removedSpecimensToPersist.clear();
 

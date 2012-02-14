@@ -472,4 +472,17 @@ public abstract class BgcFormBase extends EditorPart implements
     public ISelection getSelection() {
         return null;
     }
+
+    public void reload() {
+        try {
+            init();
+            setValues();
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError("Error", "Unable to reload form.");
+            logger.error("Can't reload the form", e); //$NON-NLS-1$
+        }
+    }
+
+    public abstract void setValues() throws Exception;
+
 }

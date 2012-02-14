@@ -509,8 +509,8 @@ public abstract class AbstractLinkAssignEntryForm extends
     }
 
     @Override
-    protected void onReset() throws Exception {
-        super.onReset();
+    public void setValues() throws Exception {
+        super.setValues();
         singleSpecimen.initObjectWith(new SpecimenWrapper(SessionManager
             .getAppService()));
         singleSpecimen.reset();

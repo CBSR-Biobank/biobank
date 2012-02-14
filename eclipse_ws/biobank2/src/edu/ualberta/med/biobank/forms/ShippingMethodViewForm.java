@@ -15,9 +15,11 @@ import edu.ualberta.med.biobank.widgets.infotables.entry.ShippingMethodEntryInfo
 
 public class ShippingMethodViewForm extends BiobankFormBase {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ShippingMethodViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ShippingMethodViewForm"; //$NON-NLS-1$
 
-    public static final String OK_MESSAGE = Messages.ShippingMethodViewForm_ok_msg;
+    public static final String OK_MESSAGE =
+        Messages.ShippingMethodViewForm_ok_msg;
 
     private ShippingMethodEntryInfoTable statusWidget;
 
@@ -36,8 +38,9 @@ public class ShippingMethodViewForm extends BiobankFormBase {
 
     private void createGlobalSampleTypeSection() throws Exception {
         Section section = createSection(Messages.ShippingMethodViewForm_title);
-        List<ShippingMethodWrapper> globalShippingMethod = ShippingMethodWrapper
-            .getShippingMethods(SessionManager.getAppService());
+        List<ShippingMethodWrapper> globalShippingMethod =
+            ShippingMethodWrapper
+                .getShippingMethods(SessionManager.getAppService());
         if (globalShippingMethod == null) {
             globalShippingMethod = new ArrayList<ShippingMethodWrapper>();
         }
@@ -66,6 +69,12 @@ public class ShippingMethodViewForm extends BiobankFormBase {
             throw new RuntimeException(
                 Messages.ShippingMethodViewForm_access_denied_error_msg);
         }
+    }
+
+    @Override
+    public void setValues() throws Exception {
+        // TODO Auto-generated method stub
+
     }
 
 }

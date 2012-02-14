@@ -25,7 +25,8 @@ import edu.ualberta.med.biobank.server.reports.RequestData;
 public class SpecimenReport3Editor extends ReportsEditor implements
     IBgcFileBrowserListener {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.AliquotRequestEditor"; //$NON-NLS-1$
+    public static String ID =
+        "edu.ualberta.med.biobank.editors.AliquotRequestEditor"; //$NON-NLS-1$
 
     private BgcFileBrowser csvSelector;
 
@@ -103,8 +104,8 @@ public class SpecimenReport3Editor extends ReportsEditor implements
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         csvSelector.reset();
-        super.onReset();
+        super.setValues();
     }
 }

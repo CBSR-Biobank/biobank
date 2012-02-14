@@ -128,7 +128,13 @@ public class PatientViewForm extends BiobankViewForm {
         collectionEventTable.createDefaultEditItem();
     }
 
-    private void setValues() {
+    @Override
+    public void setValues() throws Exception {
+        setPartName(NLS.bind(Messages.PatientViewForm_title,
+            patientInfo.patient.getPnumber()));
+        form.setText(NLS.bind(Messages.PatientViewForm_title,
+            patientInfo.patient.getPnumber()));
+        collectionEventTable.setList(patientInfo.ceventInfos);
         setTextValue(studyLabel, patientInfo.patient.getStudy().getName());
         setTextValue(createdAtLabel,
             DateFormatter.formatAsDateTime(patientInfo.patient.getCreatedAt()));
@@ -137,17 +143,6 @@ public class PatientViewForm extends BiobankViewForm {
         setTextValue(aliquotedSpecimenCountLabel,
             patientInfo.aliquotedSpecimenCount);
         setTextValue(commentLabel, patientInfo.patient.getCommentCollection());
-    }
-
-    @Override
-    public void reload() throws Exception {
-        updatePatientInfo();
-        setValues();
-        setPartName(NLS.bind(Messages.PatientViewForm_title,
-            patientInfo.patient.getPnumber()));
-        form.setText(NLS.bind(Messages.PatientViewForm_title,
-            patientInfo.patient.getPnumber()));
-        collectionEventTable.setList(patientInfo.ceventInfos);
     }
 
 }

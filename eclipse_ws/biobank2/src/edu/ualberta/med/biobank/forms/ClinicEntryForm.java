@@ -246,7 +246,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         clinic.reset();
 
         if (clinic.isNew()) {

@@ -202,9 +202,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     @Override
-    public void reload() throws Exception {
-        updateSiteInfo();
-
+    public void setValues() throws Exception {
         setPartName(NLS.bind(Messages.SiteViewForm_title,
             siteInfo.site.getNameShort()));
         form.setText(NLS.bind(Messages.SiteViewForm_title,

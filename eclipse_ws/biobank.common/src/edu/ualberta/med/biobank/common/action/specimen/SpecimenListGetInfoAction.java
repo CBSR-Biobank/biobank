@@ -21,7 +21,7 @@ public abstract class SpecimenListGetInfoAction implements
 
     @SuppressWarnings("nls")
     protected static final String SPEC_BASE_QRY =
-        "SELECT spec,parent.label,pos.positionString,toptype.nameShort"
+        "SELECT distinct spec,parent.label,pos.positionString,toptype.nameShort"
             + " FROM " + Specimen.class.getName() + " spec"
             + " INNER JOIN FETCH spec.specimenType"
             + " INNER JOIN FETCH spec.currentCenter"

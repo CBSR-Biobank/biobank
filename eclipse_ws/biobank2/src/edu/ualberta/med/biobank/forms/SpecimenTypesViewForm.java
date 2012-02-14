@@ -85,4 +85,11 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
                 Messages.SpecimenTypesViewForm_access_denied_error_msg);
         }
     }
+
+    @Override
+    public void setValues() throws Exception {
+        // TODO Auto-generated method stub
+
+    }
+
 }

@@ -102,15 +102,14 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     private CommentCollectionInfoTable commentEntryTable;
 
     private BgcBaseText commentWidget;
-    private CommentWrapper comment;
+    private CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
 
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof CollectionEventAdapter,
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
-
-        comment = new CommentWrapper(SessionManager.getAppService());
 
         ceventCopy = new CollectionEvent();
         if (adapter.getId() == null) {
@@ -457,47 +456,45 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void reset() {
-        super.reset();
-        if (adapter.getId() == null)
-            // because we set the visit number and the activity status default
-            setDirty(true);
-    }
-
-    @Override
-    protected void onReset() throws Exception {
-        copyCEvent();
-
+    public void setValues() throws Exception {
         GuiUtil
             .reset(activityStatusComboViewer, ceventCopy.getActivityStatus());
         specimensTable.reload(sourceSpecimens);
-        // FIXME reset will be done with the presenter
-        // resetPvCustomInfo();
+        commentEntryTable.setList(ModelWrapper.wrapModelCollection(
+            SessionManager.getAppService(),
+            ceventInfo.cevent.getCommentCollection(),
+            CommentWrapper.class));
+        resetPvCustomInfo();
     }
 
     private void resetPvCustomInfo() throws Exception {
-        // FIXME reset will be done with the presenter
-        // StudyWrapper study = cevent.getPatient().getStudy();
-        // String[] labels = study.getStudyEventAttrLabels();
-        // if (labels == null)
-        // return;
-        //
-        // for (FormPvCustomInfo pvCustomInfo : pvCustomInfoList) {
-        // pvCustomInfo.setValue(cevent.getEventAttrValue(pvCustomInfo
-        // .getLabel()));
-        // if (EventAttrTypeEnum.DATE_TIME == pvCustomInfo.getType()) {
-        // DateTimeWidget dateWidget = (DateTimeWidget) pvCustomInfo.control;
-        // dateWidget.setDate(DateFormatter.parseToDateTime(pvCustomInfo
-        // .getValue()));
-        // } else if (EventAttrTypeEnum.SELECT_MULTIPLE == pvCustomInfo
-        // .getType()) {
-        // SelectMultipleWidget s = (SelectMultipleWidget) pvCustomInfo.control;
-        // if (pvCustomInfo.getValue() != null) {
-        // s.setSelections(pvCustomInfo.getValue().split(
-        // FormPvCustomInfo.VALUE_MULTIPLE_SEPARATOR));
-        // } else
-        // s.setSelections(new String[] {});
-        // }
-        // }
+        Map<Integer, StudyEventAttrInfo> studyAttrInfos =
+            SessionManager.getAppService().doAction(
+                new StudyGetEventAttrInfoAction(ceventInfo.cevent.getPatient()
+                    .getStudy().getId())).getMap();
+
+        for (Entry<Integer, StudyEventAttrInfo> entry : studyAttrInfos
+            .entrySet()) {
+            for (FormPvCustomInfo pvCustomInfo : pvCustomInfoList) {
+                if (pvCustomInfo.getLabel().equals(entry.getValue().attr
+                    .getGlobalEventAttr()
+                    .getLabel())) {
+                    pvCustomInfo.setStudyEventAttrId(entry.getValue().attr
+                        .getId());
+                    pvCustomInfo.setLabel(entry.getValue().attr
+                        .getGlobalEventAttr()
+                        .getLabel());
+                    pvCustomInfo.setType(entry.getValue().type);
+                    pvCustomInfo.setAllowedValues(entry.getValue()
+                        .getStudyEventAttrPermissible());
+                    // FIXME ugly
+                    EventAttrInfo eventAttrInfo =
+                        adapter.getId() == null ? null : ceventInfo.eventAttrs
+                            .get(entry.getKey());
+                    pvCustomInfo.setValue(eventAttrInfo == null ? "" //$NON-NLS-1$
+                        : eventAttrInfo.attr.getValue());
+                }
+            }
+        }
     }
 }

@@ -22,7 +22,7 @@ public class ResetHandler extends AbstractHandler implements IHandler {
                     BiobankEntryForm biobankEntryForm = (BiobankEntryForm) PlatformUI
                         .getWorkbench().getActiveWorkbenchWindow()
                         .getActivePage().getActiveEditor();
-                    biobankEntryForm.reset();
+                    biobankEntryForm.setValues();
                 } catch (Exception ex) {
                     BgcPlugin.openAsyncError(Messages.ResetHandler_reset_error, ex);
                 }

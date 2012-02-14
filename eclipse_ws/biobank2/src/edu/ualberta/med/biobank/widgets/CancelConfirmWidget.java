@@ -66,7 +66,7 @@ public class CancelConfirmWidget extends BgcBaseWidget {
                     e.doit = false;
                 } else if (BiobankPlugin.getDefault().isCancelBarcode(text)) {
                     try {
-                        form.reset();
+                        form.setValues();
                         form.setAfterKeyCancel();
                     } catch (Exception ex) {
                         logger.error("Error while reseting pallet values", ex); //$NON-NLS-1$
@@ -81,7 +81,7 @@ public class CancelConfirmWidget extends BgcBaseWidget {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 try {
-                    form.reset();
+                    form.setValues();
                 } catch (Exception ex) {
                     logger.error("Error while reseting pallet values", ex); //$NON-NLS-1$
                 }

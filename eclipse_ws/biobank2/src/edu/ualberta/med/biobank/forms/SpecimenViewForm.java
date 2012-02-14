@@ -229,9 +229,16 @@ public class SpecimenViewForm extends BiobankViewForm {
         }
     }
 
-    private void setValues() {
+    @Override
+    public void setValues() throws Exception {
+        setPartName(NLS.bind(Messages.SpecimenViewForm_title,
+            specimenWrapper.getInventoryId()));
+        form.setText(NLS.bind(Messages.SpecimenViewForm_title,
+            specimenWrapper.getInventoryId()));
+        dispatchInfoTable.reloadCollection();
         setTextValue(originCenterLabel, specimenWrapper.getOriginInfo()
-            .getCenter().getNameShort());
+            .getCenter()
+            .getNameShort());
         setTextValue(centerLabel, specimenWrapper.getCurrentCenter()
             .getNameShort());
         setTextValue(sampleTypeLabel, specimenWrapper.getSpecimenType()
@@ -294,18 +301,6 @@ public class SpecimenViewForm extends BiobankViewForm {
         //
         // specimens are not present in treeviews, unnecessary reloads can be
         // prevented with this method left empty
-    }
-
-    @Override
-    public void reload() throws Exception {
-        updateSpecimenInfo();
-        setValues();
-        setPartName(NLS.bind(Messages.SpecimenViewForm_title,
-            specimenWrapper.getInventoryId()));
-        form.setText(NLS.bind(Messages.SpecimenViewForm_title,
-            specimenWrapper.getInventoryId()));
-        dispatchInfoTable.reloadCollection();
-        commentTable.setList(specimenWrapper.getCommentCollection(false));
     }
 
 }

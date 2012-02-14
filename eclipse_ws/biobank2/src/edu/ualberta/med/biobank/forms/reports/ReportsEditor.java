@@ -569,7 +569,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         createEmptyReportTable();
         setEnablePrintAction(false);
 

@@ -81,14 +81,16 @@ public class ReportEntryForm extends BiobankEntryForm {
         .createFromImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_SAVE_AS_NEW));
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ReportEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ReportEntryForm"; //$NON-NLS-1$
 
-    private static final Comparator<EntityFilter> COMPARE_FILTERS_BY_NAME = new Comparator<EntityFilter>() {
-        @Override
-        public int compare(EntityFilter lhs, EntityFilter rhs) {
-            return lhs.getName().compareToIgnoreCase(rhs.getName());
-        }
-    };
+    private static final Comparator<EntityFilter> COMPARE_FILTERS_BY_NAME =
+        new Comparator<EntityFilter>() {
+            @Override
+            public int compare(EntityFilter lhs, EntityFilter rhs) {
+                return lhs.getName().compareToIgnoreCase(rhs.getName());
+            }
+        };
 
     private FilterSelectWidget filtersWidget;
     private ColumnSelectWidget columnsWidget;
@@ -308,8 +310,9 @@ public class ReportEntryForm extends BiobankEntryForm {
                     generateButton.getDisplay().syncExec(new Runnable() {
                         @Override
                         public void run() {
-                            resultsTable = new ReportResultsTableWidget<Object>(
-                                resultsContainer, null, getHeaders());
+                            resultsTable =
+                                new ReportResultsTableWidget<Object>(
+                                    resultsContainer, null, getHeaders());
 
                             resultsTable.adaptToToolkit(toolkit, true);
 
@@ -750,7 +753,7 @@ public class ReportEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         emptyResultsContainer();
         report.reset();
     }

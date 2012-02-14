@@ -247,8 +247,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() throws Exception {
-        updateStudyInfo();
+    public void setValues() throws Exception {
         setPartName(NLS
             .bind(Messages.StudyViewForm_title, study.getNameShort()));
         form.setText(NLS.bind(Messages.StudyViewForm_title, study.getName()));
@@ -256,7 +255,8 @@ public class StudyViewForm extends BiobankViewForm {
         setPvDataSectionValues();
         aliquotedSpecimenTable.setList(study
             .getAliquotedSpecimenCollection(true));
-        sourceSpecimenTable.setList(study.getSourceSpecimenCollection(true));
+        sourceSpecimenTable
+            .setList(study.getSourceSpecimenCollection(true));
         contactsTable.setCollectionByStudy(study);
         commentTable.setList(study.getCommentCollection(false));
     }
