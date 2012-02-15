@@ -26,7 +26,8 @@ import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManage
 public class DecodeImageForm extends PlateForm implements
     IBgcFileBrowserListener {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.DecodeImageForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.DecodeImageForm"; //$NON-NLS-1$
 
     private ScanPalletWidget spw;
 
@@ -100,8 +101,9 @@ public class DecodeImageForm extends PlateForm implements
     }
 
     @Override
-    public void reload() throws Exception {
-        // do nothing
+    public void setValues() throws Exception {
+        // TODO Auto-generated method stub
+
     }
 
 }

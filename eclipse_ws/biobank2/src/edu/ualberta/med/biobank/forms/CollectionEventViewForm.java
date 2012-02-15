@@ -62,9 +62,6 @@ public class CollectionEventViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         updateCEventInfo();
-        // FIXME log edit action?
-        // SessionManager.logLookup(new CollectionEventWrapper(SessionManager
-        // .getAppService(), cevent));
 
         setPartName(NLS.bind(Messages.CollectionEventViewForm_title,
             ceventInfo.cevent.getVisitNumber()));
@@ -203,8 +200,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() throws Exception {
-        updateCEventInfo();
+    public void setValues() throws Exception {
         setPartName(NLS.bind(Messages.CollectionEventViewForm_title,
             ceventInfo.cevent.getVisitNumber()));
         form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
@@ -212,9 +208,10 @@ public class CollectionEventViewForm extends BiobankViewForm {
         setCollectionEventValues();
         sourceSpecimenTable.setList(ceventInfo.sourceSpecimenInfos);
         aliquotedSpcTable.setList(ceventInfo.aliquotedSpecimenInfos);
-        // TODO: fix this
-        // commentTable.setList((List<?>) ceventInfo.cevent
-        // .getCommentCollection());
+        commentTable.setList(ModelWrapper.wrapModelCollection(
+            SessionManager.getAppService(),
+            ceventInfo.cevent.getCommentCollection(),
+            CommentWrapper.class));
     }
 
 }

@@ -170,8 +170,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
     protected abstract void reloadSpecimens();
 
     @Override
-    protected void onReset() throws Exception {
-        dispatch.reset();
+    public void setValues() throws Exception {
         reloadSpecimens();
     }
 

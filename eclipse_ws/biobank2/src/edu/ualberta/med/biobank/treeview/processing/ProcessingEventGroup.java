@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -23,7 +22,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public class ProcessingEventGroup extends AdapterBase {
 
     public ProcessingEventGroup(AdapterBase parent, int id, String name) {
-        super(parent, id, name, true, true);
+        super(parent, id, name, true);
     }
 
     @Override
@@ -43,8 +42,9 @@ public class ProcessingEventGroup extends AdapterBase {
                         SessionManager.getAppService());
                     pEvent.setCenter(SessionManager.getUser()
                         .getCurrentWorkingCenter());
-                    ProcessingEventAdapter adapter = new ProcessingEventAdapter(
-                        ProcessingEventGroup.this, pEvent);
+                    ProcessingEventAdapter adapter =
+                        new ProcessingEventAdapter(
+                            ProcessingEventGroup.this, pEvent);
                     adapter.openEntryForm();
                 }
             });
@@ -64,7 +64,8 @@ public class ProcessingEventGroup extends AdapterBase {
     @Override
     public List<AbstractAdapterBase> search(Class<?> searchedClass,
         Integer objectId) {
-        return findChildFromClass(searchedClass, objectId, ClinicWrapper.class);
+        return findChildFromClass(searchedClass, objectId,
+            ProcessingEventWrapper.class);
     }
 
     @Override

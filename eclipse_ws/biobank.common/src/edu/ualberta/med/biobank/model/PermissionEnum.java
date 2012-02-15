@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-
 /**
  * The names of these enumerations are saved in the database. Therefore, DO NOT
  * CHANGE THESE ENUM INSTANCE/ VARIABLE NAMES (unless you are prepared to write
@@ -97,7 +96,9 @@ public enum PermissionEnum implements Serializable {
     SPECIMEN_TYPE_DELETE(63),
 
     LOGGING(64),
-    REPORTS(65);
+    REPORTS(65),
+
+    SPECIMEN_LIST(66);
 
     private static final List<PermissionEnum> VALUES_LIST = Collections
         .unmodifiableList(Arrays.asList(values()));
@@ -107,7 +108,7 @@ public enum PermissionEnum implements Serializable {
     private PermissionEnum(Integer permissionId) {
         this.permissionId = permissionId;
     }
-    
+
     public static List<PermissionEnum> valuesList() {
         return VALUES_LIST;
     }

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -76,11 +75,16 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private CommentCollectionInfoTable commentEntryTable;
 
+    private BgcBaseText commentWidget;
+
+    private CommentWrapper comment;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof PatientAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
+        comment = new CommentWrapper(SessionManager.getAppService());
 
         patientCopy = new Patient();
         patientCopy.setCommentCollection(new HashSet<Comment>());
@@ -208,8 +212,10 @@ public class PatientEntryForm extends BiobankEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add);
+        commentWidget =
+            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
+                SWT.MULTI,
+                Messages.Comments_add, null, comment, "message", null);
 
     }
 
@@ -227,7 +233,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             SessionManager.getAppService().doAction(
                 new PatientSaveAction(patientCopy.getId(), patientCopy
                     .getStudy().getId(), patientCopy.getPnumber(), patientCopy
-                    .getCreatedAt())).getId();
+                    .getCreatedAt(), comment.getMessage())).getId();
         adapter.setId(patientId);
 
         // FIXME the tree needs to get the new value from the patien in case it
@@ -258,7 +264,7 @@ public class PatientEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         copyPatient();
         GuiUtil.reset(studiesViewer, patientCopy.getStudy());
     }

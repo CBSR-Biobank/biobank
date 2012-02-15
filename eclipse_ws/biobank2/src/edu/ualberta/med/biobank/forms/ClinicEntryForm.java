@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -83,18 +84,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         Assert.isTrue((adapter instanceof ClinicAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
-        clinicAdapter = (ClinicAdapter) adapter;
-        comment = new CommentWrapper(SessionManager.getAppService());
-
-        if (adapter.getId() != null) {
-            clinicInfo = SessionManager.getAppService().doAction(
-                new ClinicGetInfoAction(adapter.getId()));
-            clinic =
-                new ClinicWrapper(SessionManager.getAppService(),
-                    clinicInfo.clinic);
-        } else
-            clinic =
-                new ClinicWrapper(SessionManager.getAppService());
+        updateClinicInfo();
         String tabName;
         if (clinic.isNew()) {
             tabName = Messages.ClinicEntryForm_title_new;
@@ -103,6 +93,19 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             tabName = NLS.bind(Messages.ClinicEntryForm_title_edit,
                 clinic.getNameShort());
         setPartName(tabName);
+    }
+
+    private void updateClinicInfo() throws Exception {
+        if (adapter.getId() != null) {
+            clinicInfo = SessionManager.getAppService().doAction(
+                new ClinicGetInfoAction(adapter.getId()));
+            clinic =
+                new ClinicWrapper(SessionManager.getAppService(),
+                    clinicInfo.clinic);
+        } else {
+            clinic =
+                new ClinicWrapper(SessionManager.getAppService());
+        }
     }
 
     @Override
@@ -177,10 +180,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        commentWidget =
-            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
-                SWT.MULTI,
-                Messages.Comments_add, null, comment, "message", null);
+        comment = new CommentWrapper(SessionManager.getAppService());
+        commentWidget = (BgcBaseText) createBoundWidgetWithLabel(client,
+            BgcBaseText.class, SWT.MULTI, Messages.Comments_add, null,
+            comment, "message", null);
 
     }
 
@@ -227,7 +230,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         saveClinic.setNameShort(clinic.getNameShort());
         saveClinic.setActivityStatus(clinic.getActivityStatus());
         saveClinic.setSendsShipments(clinic.getSendsShipments());
-        saveClinic.setContactSaveInfos(new HashSet<ContactSaveInfo>());
+        saveClinic.setContactSaveInfos(getNewContactInfo());
         saveClinic.setAddress(clinic.getAddress().getWrappedObject());
         saveClinic.setCommentText(comment.getMessage());
         Integer id =
@@ -238,21 +241,41 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         SessionManager.getUser().updateCurrentCenter(clinic);
     }
 
+    private HashSet<ContactSaveInfo> getNewContactInfo() {
+        HashMap<Integer, ContactSaveInfo> allContacts =
+            new HashMap<Integer, ContactSaveInfo>();
+        for (Contact contact : clinicInfo.contacts) {
+            allContacts.put(contact.getId(), new ContactSaveInfo(contact));
+        }
+
+        HashSet<ContactSaveInfo> contactSaveInfos =
+            new HashSet<ContactSaveInfo>();
+        for (ContactWrapper contactWrapper : contactEntryWidget
+            .getAddedOrModifedContacts()) {
+            if (contactWrapper.getId() == null) {
+                contactSaveInfos.add(new ContactSaveInfo(contactWrapper
+                    .getWrappedObject()));
+            } else {
+                allContacts.put(contactWrapper.getId(),
+                    new ContactSaveInfo(contactWrapper.getWrappedObject()));
+            }
+        }
+        contactSaveInfos.addAll(allContacts.values());
+        return contactSaveInfos;
+    }
+
     @Override
     public String getNextOpenedFormID() {
         return ClinicViewForm.ID;
     }
 
     @Override
-    protected void onReset() throws Exception {
-        clinic.reset();
-
+    public void setValues() throws Exception {
         if (clinic.isNew()) {
             clinic.setActivityStatus(ActivityStatus.ACTIVE);
         }
 
         GuiUtil.reset(activityStatusComboViewer, clinic.getActivityStatus());
-
         contactEntryWidget.reload();
     }
 }

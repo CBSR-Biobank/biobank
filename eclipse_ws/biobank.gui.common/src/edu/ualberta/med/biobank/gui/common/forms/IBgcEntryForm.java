@@ -10,8 +10,6 @@ public interface IBgcEntryForm {
 
     public void cancel();
 
-    public void reset();
-
     public boolean print();
 
 }

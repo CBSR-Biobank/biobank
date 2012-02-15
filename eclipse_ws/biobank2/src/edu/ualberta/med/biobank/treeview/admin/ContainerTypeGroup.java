@@ -13,18 +13,27 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypesAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypesAction.SiteGetContainerTypesResult;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeGroup extends AdapterBase {
 
+    private static BgcLogger LOGGER = BgcLogger.getLogger(ContainerGroup.class
+        .getName());
+
+    private SiteGetContainerTypesResult containerTypesResult = null;
+
     public ContainerTypeGroup(SiteAdapter parent, int id) {
-        super(parent, id, Messages.ContainerTypeGroup_types_node_label, true,
-            true);
+        super(parent, id, Messages.ContainerTypeGroup_types_node_label, true);
     }
 
     @Override
@@ -35,6 +44,19 @@ public class ContainerTypeGroup extends AdapterBase {
     @Override
     public void executeDoubleClick() {
         performExpand();
+    }
+
+    @Override
+    public void performExpand() {
+        SiteAdapter siteAdapter = (SiteAdapter) getParent();
+        try {
+            containerTypesResult = SessionManager.getAppService().doAction(
+                new SiteGetContainerTypesAction(siteAdapter.getId()));
+            super.performExpand();
+        } catch (ApplicationException e) {
+            // TODO: open an error dialog here?
+            LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
+        }
     }
 
     @Override
@@ -78,12 +100,21 @@ public class ContainerTypeGroup extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper currentSite = (SiteWrapper) ((SiteAdapter) getParent())
-            .getModelObject();
-        Assert.isNotNull(currentSite, "null site"); //$NON-NLS-1$
-        currentSite.reload();
-        return new ArrayList<ContainerTypeWrapper>(
-            currentSite.getContainerTypeCollection());
+        List<ContainerTypeWrapper> result =
+            new ArrayList<ContainerTypeWrapper>();
+
+        if (containerTypesResult != null) {
+            // return results only if this node has been expanded
+            for (ContainerType containerType : containerTypesResult
+                .getContainerTypes()) {
+                ContainerTypeWrapper wrapper =
+                    new ContainerTypeWrapper(SessionManager.getAppService(),
+                        containerType);
+                result.add(wrapper);
+            }
+        }
+
+        return result;
     }
 
     @Override

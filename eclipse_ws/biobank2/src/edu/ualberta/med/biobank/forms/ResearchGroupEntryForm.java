@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.peer.ResearchGroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
@@ -239,17 +240,19 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    protected void onReset() throws Exception {
-        researchGroup.reset();
+    public void setValues() throws Exception {
+        try {
+            if (researchGroup.isNew()) {
+                researchGroup.setActivityStatus(ActivityStatus.ACTIVE));
+                researchGroup.setStudy(null);
+            }
 
-        if (researchGroup.isNew()) {
-            researchGroup.setActivityStatus(ActivityStatus.ACTIVE);
-            researchGroup.setStudy(null);
+            GuiUtil.reset(activityStatusComboViewer,
+                researchGroup.getActivityStatus());
+            GuiUtil.reset(studyComboViewer, researchGroup.getStudy());
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError("Error", "Unable to reload form");
         }
-
-        GuiUtil.reset(activityStatusComboViewer,
-            researchGroup.getActivityStatus());
-        GuiUtil.reset(studyComboViewer, researchGroup.getStudy());
 
     }
 }

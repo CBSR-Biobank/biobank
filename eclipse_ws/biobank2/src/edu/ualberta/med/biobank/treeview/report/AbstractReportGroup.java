@@ -21,7 +21,7 @@ public abstract class AbstractReportGroup extends AdapterBase {
     private boolean isModifiable;
 
     public AbstractReportGroup(AdapterBase parent, int id, String name) {
-        super(parent, id, name, true, false);
+        super(parent, id, name, true);
 
         int i = 0;
         for (Entity entity : getEntities()) {

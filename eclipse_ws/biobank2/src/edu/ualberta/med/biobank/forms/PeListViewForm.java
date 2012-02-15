@@ -13,7 +13,8 @@ import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PeListInfoTable;
 
 public class PeListViewForm extends BiobankViewForm {
-    public static final String ID = "edu.ualberta.med.biobank.forms.PvListViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.PvListViewForm"; //$NON-NLS-1$
 
     private PeListInfoTable processingEvents;
 
@@ -43,7 +44,9 @@ public class PeListViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() throws Exception {
+    public void setValues() throws Exception {
+        // TODO Auto-generated method stub
+
     }
 
 }

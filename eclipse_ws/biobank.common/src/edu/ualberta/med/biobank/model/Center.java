@@ -162,4 +162,5 @@ public class Center extends AbstractBiobankModel {
     public void setCommentCollection(Set<Comment> commentCollection) {
         this.commentCollection = commentCollection;
     }
+
 }

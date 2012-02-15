@@ -20,7 +20,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicDeleteAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
@@ -169,7 +169,7 @@ public class TestStudy extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
-        EXECUTOR.exec(new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+        EXECUTOR.exec(new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
             .getList();
 
         Set<SourceSpecimenSaveInfo> ssSaveInfosAll =
@@ -722,7 +722,7 @@ public class TestStudy extends TestAction {
         PatientSaveAction patientSaveAction =
             new PatientSaveAction(null, studyId, Utils.getRandomString(
                 5, 10),
-                Utils.getRandomDate());
+                Utils.getRandomDate(), null);
         Integer patientId = EXECUTOR.exec(patientSaveAction).getId();
 
         try {

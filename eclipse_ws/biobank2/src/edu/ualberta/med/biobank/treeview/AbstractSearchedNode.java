@@ -31,7 +31,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
 
     public AbstractSearchedNode(AdapterBase parent, int id,
         boolean keepDirectLeafChild) {
-        super(parent, id, Messages.AbstractSearchedNode_searched, true, false);
+        super(parent, id, Messages.AbstractSearchedNode_searched, true);
         this.keepDirectLeafChild = keepDirectLeafChild;
     }
 
@@ -49,7 +49,8 @@ public abstract class AbstractSearchedNode extends AdapterBase {
 
     @Override
     public void performExpand() {
-        List<ModelWrapper<?>> alreadyHasListener = new ArrayList<ModelWrapper<?>>();
+        List<ModelWrapper<?>> alreadyHasListener =
+            new ArrayList<ModelWrapper<?>>();
         try {
             for (AbstractAdapterBase child : getChildren()) {
                 if (child instanceof AdapterBase) {
@@ -59,9 +60,11 @@ public abstract class AbstractSearchedNode extends AdapterBase {
                         childWrapper.reload();
                     }
                 }
-                List<AbstractAdapterBase> subChildren = new ArrayList<AbstractAdapterBase>(
-                    child.getChildren());
-                List<AbstractAdapterBase> toRemove = new ArrayList<AbstractAdapterBase>();
+                List<AbstractAdapterBase> subChildren =
+                    new ArrayList<AbstractAdapterBase>(
+                        child.getChildren());
+                List<AbstractAdapterBase> toRemove =
+                    new ArrayList<AbstractAdapterBase>();
                 for (AbstractAdapterBase subChild : subChildren) {
                     ModelWrapper<?> wrapper = null;
                     if (subChild instanceof AdapterBase) {
@@ -104,8 +107,9 @@ public abstract class AbstractSearchedNode extends AdapterBase {
 
             if (!keepDirectLeafChild) {
                 // remove sub children without any children
-                List<AbstractAdapterBase> children = new ArrayList<AbstractAdapterBase>(
-                    getChildren());
+                List<AbstractAdapterBase> children =
+                    new ArrayList<AbstractAdapterBase>(
+                        getChildren());
                 for (AbstractAdapterBase child : children) {
                     if (!(child instanceof DispatchAdapter)
                         && child.getChildren().size() == 0) {

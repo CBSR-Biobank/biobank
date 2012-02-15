@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public abstract class AbstractClinicGroup extends AdapterBase {
 
     public AbstractClinicGroup(AdapterBase parent, int id, String name) {
-        super(parent, id, name, true, true);
+        super(parent, id, name, true);
     }
 
     @Override

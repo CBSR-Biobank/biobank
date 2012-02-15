@@ -58,7 +58,7 @@ public class TestDispatch extends TestAction {
                 ActivityStatus.ACTIVE, new HashSet<Integer>(studyId));
         patientId =
             EXECUTOR.exec(new PatientSaveAction(null, studyId, name,
-                Utils.getRandomDate())).getId();
+                Utils.getRandomDate(), null)).getId();
     }
 
     @Test

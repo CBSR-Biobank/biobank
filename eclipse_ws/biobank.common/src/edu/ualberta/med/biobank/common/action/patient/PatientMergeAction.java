@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.action.patient;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 import org.hibernate.Session;
 
@@ -49,9 +50,9 @@ public class PatientMergeAction implements Action<BooleanResult> {
                 PatientMergeException.ExceptionTypeEnum.STUDY);
         }
 
-        Collection<CollectionEvent> c1events =
+        Set<CollectionEvent> c1events =
             patient1.getCollectionEventCollection();
-        Collection<CollectionEvent> c2events =
+        Set<CollectionEvent> c2events =
             patient2.getCollectionEventCollection();
         if (!c2events.isEmpty()) {
             boolean merged = false;

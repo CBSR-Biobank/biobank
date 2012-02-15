@@ -8,18 +8,18 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.gui.common.forms.BgcEntryForm;
+import edu.ualberta.med.biobank.gui.common.forms.BgcFormBase;
 
-public class BgcResetHandler extends AbstractHandler implements IHandler {
+public class BgcReloadHandler extends AbstractHandler implements IHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
-                ((BgcEntryForm) PlatformUI.getWorkbench()
+                ((BgcFormBase) PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getActivePage()
-                    .getActiveEditor()).reset();
+                    .getActiveEditor()).reload();
             }
         });
         return null;

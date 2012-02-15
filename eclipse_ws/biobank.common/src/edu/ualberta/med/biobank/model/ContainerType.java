@@ -53,7 +53,7 @@ public class ContainerType extends AbstractBiobankModel {
         new HashSet<ContainerType>(0);
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<Comment> commentCollection = new HashSet<Comment>(0);
-    private Capacity capacity;
+    private Capacity capacity = new Capacity();
     private Site site;
     private ContainerLabelingScheme childLabelingScheme;
     private Set<ContainerType> parentContainerTypeCollection =

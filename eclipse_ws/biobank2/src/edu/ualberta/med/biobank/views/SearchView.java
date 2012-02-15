@@ -5,9 +5,7 @@ import java.util.Map;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyAdapter;
@@ -75,20 +73,6 @@ public class SearchView extends ViewPart {
         gd.grabExcessHorizontalSpace = true;
 
         searchTypeCombo.getCombo().setLayoutData(gd);
-        searchTypeCombo
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    IStructuredSelection selection = (IStructuredSelection) event
-                        .getSelection();
-                    SearchType searchType = (SearchType) selection
-                        .getFirstElement();
-                    searchText
-                        .setEnabled(searchType != SearchType.SPECIMEN_NON_ACTIVE);
-                    searchText.setText(""); //$NON-NLS-1$
-                }
-            });
-
         searchText = new BgcBaseText(parent, SWT.NONE);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
@@ -138,8 +122,9 @@ public class SearchView extends ViewPart {
             public void run() {
                 String searchString = searchText.getText().trim();
 
-                SearchType type = (SearchType) ((IStructuredSelection) searchTypeCombo
-                    .getSelection()).getFirstElement();
+                SearchType type =
+                    (SearchType) ((IStructuredSelection) searchTypeCombo
+                        .getSelection()).getFirstElement();
                 try {
                     List<? extends ModelWrapper<?>> res = type.search(
                         searchString, SessionManager.getUser()

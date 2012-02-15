@@ -382,8 +382,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
-        specimen.reset();
+    public void setValues() throws Exception {
         allchildren.clear();
         origchildren.clear();
         GuiUtil.reset(activityStatusComboViewer, specimen.getActivityStatus());

@@ -1,13 +1,10 @@
 package edu.ualberta.med.biobank.common.action.study;
 
-import java.util.List;
-
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.model.Study;
@@ -19,6 +16,13 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     private static final String STUDY_INFO_HQL =
         "SELECT DISTINCT study"
             + " FROM " + Study.class.getName() + " study"
+            + " LEFT JOIN FETCH study.contactCollection"
+            + " LEFT JOIN FETCH study.sourceSpecimenCollection srcSpc"
+            + " LEFT JOIN FETCH srcSpc.specimenType"
+            + " LEFT JOIN FETCH study.aliquotedSpecimenCollection aqSpc"
+            + " LEFT JOIN FETCH aqSpc.specimenType"
+            + " LEFT JOIN FETCH study.studyEventAttrCollection seattr"
+            + " LEFT JOIN FETCH seattr.globalEventAttr"
             + " LEFT JOIN FETCH study.commentCollection comments"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE study.id = ?";
@@ -55,29 +59,22 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
         return new StudyReadPermission(studyId).isAllowed(context);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public StudyInfo run(ActionContext context) throws ActionException {
         Query query = context.getSession().createQuery(STUDY_INFO_HQL);
         query.setParameter(0, studyId);
 
-        List<Study> studies = query.list();
-
-        if (studies.size() != 1) {
-            throw new ModelNotFoundException(Study.class, studyId);
-        }
-
+        Study study = (Study) query.uniqueResult();
         StudyInfo studyInfo = new StudyInfo();
-        studyInfo.study = studies.get(0);
+        studyInfo.study = study;
 
         query = context.getSession().createQuery(STUDY_COUNT_INFO_HQL);
         query.setParameter(0, studyId);
 
-        List<Object[]> rows = query.list();
-        Object[] row = rows.get(0);
+        Object[] items = (Object[]) query.uniqueResult();
 
-        studyInfo.patientCount = (Long) row[1];
-        studyInfo.collectionEventCount = (Long) row[2];
+        studyInfo.patientCount = (Long) items[1];
+        studyInfo.collectionEventCount = (Long) items[2];
         studyInfo.clinicInfos = getClinicInfo.run(context).getList();
         studyInfo.sourceSpcs = getSourceSpecimens.run(context).getList();
         studyInfo.aliquotedSpcs =

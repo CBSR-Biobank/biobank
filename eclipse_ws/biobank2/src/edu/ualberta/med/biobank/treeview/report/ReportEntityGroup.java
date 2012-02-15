@@ -28,7 +28,7 @@ public class ReportEntityGroup extends AdapterBase {
     private final Entity entity;
 
     public ReportEntityGroup(AbstractReportGroup parent, int id, Entity entity) {
-        super(parent, id, entity.getName(), true, true);
+        super(parent, id, entity.getName(), true);
 
         this.parent = parent;
         this.entity = entity;

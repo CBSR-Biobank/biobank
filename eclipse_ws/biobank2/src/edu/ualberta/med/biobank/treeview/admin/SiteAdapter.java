@@ -7,14 +7,12 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IEditorPart;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
-import edu.ualberta.med.biobank.mvp.event.model.site.SiteEditEvent;
-import edu.ualberta.med.biobank.mvp.event.model.site.SiteViewEvent;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
@@ -26,14 +24,11 @@ public class SiteAdapter extends AdapterBase {
     public static final int CONTAINERS_BASE_NODE_ID = 1;
 
     public SiteAdapter(AdapterBase parent, SiteWrapper site) {
-        super(parent, site, false);
-
+        super(parent, site);
         this.site = site;
-
         if (site != null && site.getId() != null) {
             nodeIdOffset *= site.getId();
         }
-
         createNodes();
     }
 
@@ -112,7 +107,7 @@ public class SiteAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        return null;
+        return SiteEntryForm.ID;
     }
 
     @Override
@@ -140,15 +135,16 @@ public class SiteAdapter extends AdapterBase {
         return 0;
     }
 
-    @Override
-    public IEditorPart openEntryForm(boolean hasPreviousForm) {
-        eventBus.fireEvent(new SiteEditEvent(site.getId()));
-        return null; // TODO: problem !?
-    }
+    // disable MVP for version 3.2.0
+    // @Override
+    // public IEditorPart openEntryForm(boolean hasPreviousForm) {
+    // eventBus.fireEvent(new SiteEditEvent(site.getId()));
+    // return null; // TODO: problem !?
+    // }
 
-    @Override
-    public void openViewForm() {
-        super.openViewForm();
-        eventBus.fireEvent(new SiteViewEvent(site.getId()));
-    }
+    // disable MVP for version 3.2.0
+    // @Override
+    // public void openViewForm() {
+    // eventBus.fireEvent(new SiteViewEvent(site.getId()));
+    // }
 }

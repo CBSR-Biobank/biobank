@@ -19,8 +19,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
@@ -33,6 +36,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
@@ -57,8 +61,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     private ProcessingEventAdapter pEventAdapter;
 
-    private ProcessingEventWrapper pEvent;
-
     private ComboViewer activityStatusComboViewer;
 
     private DateTimeWidget dateWidget;
@@ -77,6 +79,10 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             }
         };
 
+    private PEventInfo peventInfo;
+
+    private ProcessingEventWrapper pevent;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ProcessingEventAdapter,
@@ -84,26 +90,39 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         pEventAdapter = (ProcessingEventAdapter) adapter;
-        pEvent = (ProcessingEventWrapper) getModelObject();
-
+        ProcessingEvent pe;
         String tabName;
-        if (pEvent.isNew()) {
+        if (pEventAdapter.getId() == null) {
+            pe = new ProcessingEvent();
             tabName = Messages.ProcessingEventEntryForm_title_new;
-            pEvent.setActivityStatus(ActivityStatus.ACTIVE);
+            pe.setActivityStatus(ActivityStatus.ACTIVE);
         } else {
-            if (pEvent.getWorksheet() == null)
+            updatePEventInfo();
+            pe = peventInfo.pevent;
+            if (pe.getWorksheet() == null)
                 tabName =
                     NLS.bind(
                         Messages.ProcessingEventEntryForm_title_edit_worksheet,
-                        pEvent.getWorksheet(), pEvent.getFormattedCreatedAt());
+                        pevent.getWorksheet(), pevent.getFormattedCreatedAt());
             else
                 tabName =
                     NLS.bind(
                         Messages.ProcessingEventEntryForm_title_edit_noworksheet,
-                        pEvent.getFormattedCreatedAt());
+                        DateFormatter.formatAsDateTime(pe.getCreatedAt()));
         }
+
+        pevent =
+            new ProcessingEventWrapper(SessionManager.getAppService(),
+                pe);
+
         closedActivityStatus = ActivityStatus.CLOSED;
         setPartName(tabName);
+    }
+
+    private void updatePEventInfo() throws Exception {
+        peventInfo =
+            SessionManager.getAppService().doAction(
+                new ProcessingEventGetInfoAction(adapter.getId()));
     }
 
     @Override
@@ -124,24 +143,24 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ProcessingEvent_field_center_label, pEvent.getCenter()
+            Messages.ProcessingEvent_field_center_label, pevent.getCenter()
                 .getName());
 
         dateWidget =
             createDateTimeWidget(
                 client,
                 Messages.ProcessingEvent_field_date_label,
-                pEvent.getCreatedAt(),
-                pEvent,
+                pevent.getCreatedAt(),
+                pevent,
                 ProcessingEventPeer.CREATED_AT.getName(),
                 new NotNullValidator(
                     Messages.ProcessingEventEntryForm_field_date_validation_msg));
         setFirstControl(dateWidget);
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.ProcessingEvent_field_worksheet_label, null, pEvent,
+            Messages.ProcessingEvent_field_worksheet_label, null, pevent,
             ProcessingEventPeer.WORKSHEET.getName(),
-            (!pEvent.isNew() && pEvent.getWorksheet() == null) ? null
+            (!pevent.isNew() && pevent.getWorksheet() == null) ? null
                 : new NonEmptyStringValidator(
                     Messages.ProcessingEventEntryForm_worksheet_validation_msg));
 
@@ -150,19 +169,19 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                 client,
                 Messages.label_activity,
                 ActivityStatus.valuesList(),
-                pEvent.getActivityStatus(),
+                pevent.getActivityStatus(),
                 Messages.ProcessingEventEntryForm_field_activity_validation_msg,
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
                         setDirty(true);
-                        pEvent
+                        pevent
                             .setActivityStatus((ActivityStatus) selectedObject);
                     }
                 });
-        if (pEvent.getActivityStatus() != null) {
+        if (pevent.getActivityStatus() != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
-                pEvent.getActivityStatus()));
+                pevent.getActivityStatus()));
             setDirty(false);
         }
 
@@ -177,7 +196,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         client.setLayout(gl);
         commentEntryTable =
             new CommentCollectionInfoTable(client,
-                pEvent.getCommentCollection(false));
+                pevent.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
@@ -196,7 +215,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
         toolkit.paintBordersFor(client);
 
-        List<SpecimenWrapper> specimens = pEvent.getSpecimenCollection(true);
+        List<SpecimenWrapper> specimens = pevent.getSpecimenCollection(true);
 
         specimenEntryWidget =
             new SpecimenEntryWidget(client, SWT.NONE, toolkit,
@@ -266,8 +285,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                     Messages.ProcessingEventEntryForm_spec_study_allowed_only_error_msg,
                                     specimen.getCollectionEvent().getPatient()
                                         .getStudy().getNameShort()));
-                        else if (pEvent.getSpecimenCollection(false).size() > 0
-                            && !pEvent
+                        else if (pevent.getSpecimenCollection(false).size() > 0
+                            && !pevent
                                 .getSpecimenCollection(false)
                                 .get(0)
                                 .getCollectionEvent()
@@ -280,9 +299,9 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                 Messages.ProcessingEventEntryForm_study_spec_error_msg);
                         break;
                     case POST_ADD:
-                        specimen.setProcessingEvent(pEvent);
+                        specimen.setProcessingEvent(pevent);
                         specimen.setActivityStatus(closedActivityStatus);
-                        pEvent.addToSpecimenCollection(Arrays.asList(specimen));
+                        pevent.addToSpecimenCollection(Arrays.asList(specimen));
                         break;
                     case PRE_DELETE:
                         if (specimen.getChildSpecimenCollection(false).size() > 0) {
@@ -295,7 +314,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                         }
                         break;
                     case POST_DELETE:
-                        pEvent.removeFromSpecimenCollection(Arrays
+                        pevent.removeFromSpecimenCollection(Arrays
                             .asList(specimen));
                         break;
                     }
@@ -318,15 +337,15 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         Set<Integer> specimens = new HashSet<Integer>();
-        for (SpecimenWrapper spc : pEvent.getSpecimenCollection(false)) {
+        for (SpecimenWrapper spc : pevent.getSpecimenCollection(false)) {
             specimens.add(spc.getId());
         }
 
         Integer peventId =
             SessionManager.getAppService().doAction(
-                new ProcessingEventSaveAction(pEvent.getId(), pEvent
-                    .getCenter().getId(), pEvent.getCreatedAt(), pEvent
-                    .getWorksheet(), pEvent.getActivityStatus(), null,
+                new ProcessingEventSaveAction(pevent.getId(), pevent
+                    .getCenter().getId(), pevent.getCreatedAt(), pevent
+                    .getWorksheet(), pevent.getActivityStatus(), null,
                     specimens)).getId();
         ((ProcessingEventWrapper) pEventAdapter.getModelObject())
             .getWrappedObject().setId(peventId);
@@ -347,13 +366,13 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
         List<SpecimenWrapper> removedSpecimens =
             specimenEntryWidget.getRemovedSpecimens();
-        List<SpecimenWrapper> pEventSpecs = pEvent.getSpecimenCollection(false);
+        List<SpecimenWrapper> pEventSpecs = pevent.getSpecimenCollection(false);
         pEventSpecs.removeAll(addedSpecimens);
         pEventSpecs.addAll(removedSpecimens);
         for (SpecimenWrapper sp : pEventSpecs) {
             sp.reload();
         }
-        pEvent.setSpecimenWrapperCollection(pEventSpecs);
+        pevent.setSpecimenWrapperCollection(pEventSpecs);
         specimenEntryWidget.setSpecimens(pEventSpecs);
 
         Map<String, String> problems = new HashMap<String, String>();
@@ -396,7 +415,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        return (pEvent.isNew()) ? MSG_NEW_PEVENT_OK : MSG_PEVENT_OK;
+        return (pevent.isNew()) ? MSG_NEW_PEVENT_OK : MSG_PEVENT_OK;
     }
 
     @Override
@@ -405,14 +424,14 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
-        CenterWrapper<?> center = pEvent.getCenter();
-        pEvent.reset();
-        pEvent.setCenter(center);
-        if (pEvent.isNew()) {
-            pEvent.setActivityStatus(ActivityStatus.ACTIVE);
+    public void setValues() throws Exception {
+        CenterWrapper<?> center = pevent.getCenter();
+        pevent.reset();
+        pevent.setCenter(center);
+        if (pevent.isNew()) {
+            pevent.setActivityStatus(ActivityStatus.ACTIVE);
         }
-        GuiUtil.reset(activityStatusComboViewer, pEvent.getActivityStatus());
-        specimenEntryWidget.setSpecimens(pEvent.getSpecimenCollection(true));
+        GuiUtil.reset(activityStatusComboViewer, pevent.getActivityStatus());
+        specimenEntryWidget.setSpecimens(pevent.getSpecimenCollection(true));
     }
 }

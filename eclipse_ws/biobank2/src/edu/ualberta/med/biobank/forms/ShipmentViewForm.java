@@ -174,8 +174,7 @@ public class ShipmentViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() throws Exception {
-        originInfo.reload();
+    public void setValues() throws Exception {
         setPartName();
         setFormText();
         setShipmentValues();

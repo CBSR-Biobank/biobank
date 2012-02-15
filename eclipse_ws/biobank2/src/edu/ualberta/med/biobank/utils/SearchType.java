@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.PeListViewForm;
-import edu.ualberta.med.biobank.forms.SpecimenListViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -50,36 +49,6 @@ public enum SearchType {
                     SessionManager.getAppService(), (SiteWrapper) center,
                     searchString);
             return Collections.emptyList();
-        }
-    },
-
-    SPECIMEN_NON_ACTIVE(Messages.SearchType_nonactive_spec_label) {
-        @Override
-        public List<? extends ModelWrapper<?>> search(String searchString,
-            CenterWrapper<?> center) throws Exception {
-            List<SpecimenWrapper> specimens = SpecimenWrapper
-                .getSpecimensNonActiveInCenter(SessionManager.getAppService(),
-                    center);
-            return specimens;
-        }
-
-        @Override
-        public void processResults(List<? extends ModelWrapper<?>> res) {
-            Assert.isNotNull(res);
-            FormInput input = new FormInput(res,
-                Messages.SearchType_specimens_list_label);
-            try {
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                    .getActivePage()
-                    .openEditor(input, SpecimenListViewForm.ID, false);
-            } catch (PartInitException e) {
-                logger.error(NLS.bind(CAN_T_OPEN_FORM_WITH_ID_MSG,
-                    SpecimenListViewForm.ID), e);
-            }
-        }
-
-        @Override
-        protected void openResult(ModelWrapper<?> wrapper) {
         }
     },
 
@@ -143,7 +112,8 @@ public enum SearchType {
         }
     };
 
-    private static final String CAN_T_OPEN_FORM_WITH_ID_MSG = "Can''t open form with id {0}"; //$NON-NLS-1$
+    private static final String CAN_T_OPEN_FORM_WITH_ID_MSG =
+        "Can''t open form with id {0}"; //$NON-NLS-1$
 
     private static BgcLogger logger = BgcLogger.getLogger(SearchType.class
         .getName());

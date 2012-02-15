@@ -6,7 +6,7 @@ import java.text.MessageFormat;
 public class ModelNotFoundException extends ActionException {
     private static final long serialVersionUID = 1L;
     private static final String MESSAGE =
-        "Cannot find model of type {1} with id {1} in persistence.";
+        "Cannot find model of type {0} with id {1} in persistence.";
 
     private final Class<?> modelClass;
     private final Serializable modelId;

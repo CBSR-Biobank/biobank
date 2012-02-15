@@ -12,6 +12,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -42,6 +45,8 @@ public class StudyViewForm extends BiobankViewForm {
     private AliquotedSpecimenInfoTable aliquotedSpecimenTable;
     private SourceSpecimenInfoTable sourceSpecimenTable;
 
+    private StudyInfo studyInfo;
+
     private static class StudyPvCustomInfo extends EventAttrCustom {
         public BgcBaseText widget;
     }
@@ -56,10 +61,18 @@ public class StudyViewForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        study = (StudyWrapper) getModelObject();
+        updateStudyInfo();
         setPartName(NLS
             .bind(Messages.StudyViewForm_title, study.getNameShort()));
         pvCustomInfoList = new ArrayList<StudyPvCustomInfo>();
+    }
+
+    private void updateStudyInfo() throws Exception {
+        studyInfo = SessionManager.getAppService().doAction(
+            new StudyGetInfoAction(adapter.getId()));
+        study =
+            new StudyWrapper(SessionManager.getAppService(),
+                studyInfo.getStudy());
     }
 
     @Override
@@ -234,8 +247,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() throws Exception {
-        study.reload();
+    public void setValues() throws Exception {
         setPartName(NLS
             .bind(Messages.StudyViewForm_title, study.getNameShort()));
         form.setText(NLS.bind(Messages.StudyViewForm_title, study.getName()));
@@ -243,7 +255,8 @@ public class StudyViewForm extends BiobankViewForm {
         setPvDataSectionValues();
         aliquotedSpecimenTable.setList(study
             .getAliquotedSpecimenCollection(true));
-        sourceSpecimenTable.setList(study.getSourceSpecimenCollection(true));
+        sourceSpecimenTable
+            .setList(study.getSourceSpecimenCollection(true));
         contactsTable.setCollectionByStudy(study);
         commentTable.setList(study.getCommentCollection(false));
     }

@@ -3,23 +3,22 @@ package edu.ualberta.med.biobank.common.action.collectionEvent;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenListGetInfoAction;
 
-public class CollectionEventGetSourceSpecimenInfoAction extends
-    SpecimenGetInfoAction {
+public class CollectionEventGetSourceSpecimenListInfoAction extends
+    SpecimenListGetInfoAction {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
     private static final String SOURCE_SPEC_QRY =
-        SpecimenGetInfoAction.SPEC_BASE_QRY
+        SpecimenListGetInfoAction.SPEC_BASE_QRY
             + " LEFT JOIN FETCH spec.processingEvent"
-            + " WHERE spec.originalCollectionEvent.id=?"
-            + SpecimenGetInfoAction.SPEC_END_QRY;
+            + " WHERE spec.originalCollectionEvent.id=?";
 
     private Integer ceventId;
 
-    public CollectionEventGetSourceSpecimenInfoAction(Integer cevenId) {
+    public CollectionEventGetSourceSpecimenListInfoAction(Integer cevenId) {
         this.ceventId = cevenId;
     }
 

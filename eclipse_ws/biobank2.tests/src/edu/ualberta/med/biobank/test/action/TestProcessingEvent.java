@@ -18,7 +18,7 @@ import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
@@ -94,7 +94,7 @@ public class TestProcessingEvent extends TestAction {
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
         ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
-            new CollectionEventGetSourceSpecimenInfoAction(ceventId)).getList();
+            new CollectionEventGetSourceSpecimenListInfoAction(ceventId)).getList();
 
         // ship the specimens to the site
         OriginInfoSaveInfo oiSaveInfo = new OriginInfoSaveInfo(
@@ -228,7 +228,7 @@ public class TestProcessingEvent extends TestAction {
                 provisioning.patientIds.get(0), provisioning.siteId);
         ArrayList<SpecimenInfo> sourceSpecs =
             EXECUTOR
-                .exec(new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+                .exec(new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
                 .getList();
         Integer spcId = sourceSpecs.get(0).specimen.getId();
 
@@ -273,7 +273,7 @@ public class TestProcessingEvent extends TestAction {
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.siteId);
         ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
-            new CollectionEventGetSourceSpecimenInfoAction(ceventId))
+            new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
             .getList();
         Integer spcId = sourceSpecs.get(0).specimen.getId();
 

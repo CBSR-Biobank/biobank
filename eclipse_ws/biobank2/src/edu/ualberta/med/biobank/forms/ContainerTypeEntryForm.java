@@ -47,11 +47,14 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private static BgcLogger logger = BgcLogger
         .getLogger(ContainerTypeEntryForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm"; //$NON-NLS-1$
 
-    private static final String MSG_NEW_STORAGE_TYPE_OK = Messages.ContainerTypeEntryForm_creation_msg;
+    private static final String MSG_NEW_STORAGE_TYPE_OK =
+        Messages.ContainerTypeEntryForm_creation_msg;
 
-    private static final String MSG_STORAGE_TYPE_OK = Messages.ContainerTypeEntryForm_edition_msg;
+    private static final String MSG_STORAGE_TYPE_OK =
+        Messages.ContainerTypeEntryForm_edition_msg;
 
     private ContainerTypeAdapter containerTypeAdapter;
 
@@ -81,12 +84,13 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private CommentCollectionInfoTable commentEntryTable;
 
-    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BgcEntryFormWidgetListener listener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     public ContainerTypeEntryForm() {
         super();
@@ -245,7 +249,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void createContainsSection() throws Exception {
-        Composite client = createSectionWithClient(Messages.ContainerTypeEntryForm_contents_title);
+        Composite client =
+            createSectionWithClient(Messages.ContainerTypeEntryForm_contents_title);
         hasContainersRadio = toolkit.createButton(client,
             Messages.ContainerTypeEntryForm_contents_button_container,
             SWT.RADIO);
@@ -283,7 +288,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         specimensMultiSelect.setVisible(show);
         ((GridData) specimensMultiSelect.getLayoutData()).exclude = !show;
         childContainerTypesMultiSelect.setVisible(!show);
-        ((GridData) childContainerTypesMultiSelect.getLayoutData()).exclude = show;
+        ((GridData) childContainerTypesMultiSelect.getLayoutData()).exclude =
+            show;
         form.layout(true, true);
     }
 
@@ -314,15 +320,19 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void createChildContainerTypesSection(Composite parent) {
-        childContainerTypesMultiSelect = new MultiSelectWidget<ContainerTypeWrapper>(
-            parent, SWT.NONE,
-            Messages.ContainerTypeEntryForm_contents_subcontainer_available,
-            Messages.ContainerTypeEntryForm_contents_subcontainer_selected, 100) {
-            @Override
-            protected String getTextForObject(ContainerTypeWrapper nodeObject) {
-                return nodeObject.getName();
-            }
-        };
+        childContainerTypesMultiSelect =
+            new MultiSelectWidget<ContainerTypeWrapper>(
+                parent,
+                SWT.NONE,
+                Messages.ContainerTypeEntryForm_contents_subcontainer_available,
+                Messages.ContainerTypeEntryForm_contents_subcontainer_selected,
+                100) {
+                @Override
+                protected String getTextForObject(
+                    ContainerTypeWrapper nodeObject) {
+                    return nodeObject.getName();
+                }
+            };
         childContainerTypesMultiSelect.adaptToToolkit(toolkit, true);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
@@ -375,10 +385,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private void setChildContainerTypes() {
         if (!hasSpecimens) {
-            List<ContainerTypeWrapper> addedTypes = childContainerTypesMultiSelect
-                .getAddedToSelection();
-            List<ContainerTypeWrapper> removedTypes = childContainerTypesMultiSelect
-                .getRemovedFromSelection();
+            List<ContainerTypeWrapper> addedTypes =
+                childContainerTypesMultiSelect
+                    .getAddedToSelection();
+            List<ContainerTypeWrapper> removedTypes =
+                childContainerTypesMultiSelect
+                    .getRemovedFromSelection();
             containerType.addToChildContainerTypeCollection(addedTypes);
             containerType.removeFromChildContainerTypeCollection(removedTypes);
         } else {
@@ -393,7 +405,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         SiteWrapper site = containerType.getSite();
         containerType.reset();
         containerType.setSite(site);

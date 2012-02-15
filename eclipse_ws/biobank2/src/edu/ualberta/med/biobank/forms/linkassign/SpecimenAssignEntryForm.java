@@ -349,7 +349,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             // 4 letters specimens are now C+4letters
             inventoryId = "C" + inventoryId; //$NON-NLS-1$
         }
-        reset();
+        setValues();
         singleSpecimen.setInventoryId(inventoryId);
         inventoryIdText.setText(inventoryId);
         oldSinglePositionCheckText.setText("?"); //$NON-NLS-1$
@@ -886,7 +886,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         }
         try {
-            reset();
+            setValues();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -1079,8 +1079,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public void onReset() throws Exception {
-        super.onReset();
+    public void setValues() throws Exception {
+        super.setValues();
         parentContainers = null;
         // resultShownValue.setValue(Boolean.FALSE);
         // the 2 following lines are needed. The validator won't update if don't
@@ -1173,7 +1173,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         else
             setFirstControl(palletPositionText);
         try {
-            reset();
+            setValues();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

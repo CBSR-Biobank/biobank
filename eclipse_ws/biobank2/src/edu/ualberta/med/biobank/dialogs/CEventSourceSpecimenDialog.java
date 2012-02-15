@@ -40,7 +40,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
     private Map<String, SourceSpecimen> mapStudySourceSpecimen;
 
-    private List<SpecimenTypeInfo> allSpecimenTypes;
+    private List<SpecimenType> allSpecimenTypes;
 
     private String currentTitle;
 
@@ -62,7 +62,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
     public CEventSourceSpecimenDialog(Shell parent, Specimen spec,
         List<SourceSpecimen> studySourceSpecimen,
-        List<SpecimenTypeInfo> allSpecimenTypes,
+        List<SpecimenType> allSpecimenTypes,
         List<String> inventoryIdExcludeList, NewListener listener,
         Date defaultTimeDrawn) {
         super(parent, listener, spec == null);

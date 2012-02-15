@@ -11,15 +11,16 @@ import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.SpecimenType;
 
-public class SpecimenTypeGetInfosAction implements
-    Action<ListResult<SpecimenTypeInfo>> {
+public class SpecimenTypeGetAllAction implements
+    Action<ListResult<SpecimenType>> {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
-    private static final String SPEC_TYPE_QRY = "from "
-        + SpecimenType.class.getName();
+    private static final String SPEC_TYPE_QRY =
+        "SELECT DISTINCT stype FROM " + SpecimenType.class.getName() + " stype"
+            + " LEFT JOIN FETCH stype.childSpecimenTypeCollection";
 
-    public SpecimenTypeGetInfosAction() {
+    public SpecimenTypeGetAllAction() {
     }
 
     @Override
@@ -28,20 +29,18 @@ public class SpecimenTypeGetInfosAction implements
     }
 
     @Override
-    public ListResult<SpecimenTypeInfo> run(ActionContext context)
+    public ListResult<SpecimenType> run(ActionContext context)
         throws ActionException {
-        ArrayList<SpecimenTypeInfo> specs = new ArrayList<SpecimenTypeInfo>();
+        ArrayList<SpecimenType> specs = new ArrayList<SpecimenType>();
 
         Query query = context.getSession().createQuery(SPEC_TYPE_QRY);
 
         @SuppressWarnings("unchecked")
-        List<SpecimenType> rows = query.list();
-        for (SpecimenType row : rows) {
-            SpecimenTypeInfo specInfo = new SpecimenTypeInfo();
-            specInfo.type = row;
-            specs.add(specInfo);
+        List<SpecimenType> results = query.list();
+        if (results != null) {
+            specs.addAll(results);
         }
 
-        return new ListResult<SpecimenTypeInfo>(specs);
+        return new ListResult<SpecimenType>(specs);
     }
 }

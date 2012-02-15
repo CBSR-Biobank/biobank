@@ -3,25 +3,24 @@ package edu.ualberta.med.biobank.common.action.collectionEvent;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenListGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 
-public class CollectionEventGetAliquotedSpecimenInfoAction extends
-    SpecimenGetInfoAction {
+public class CollectionEventGetAliquotedSpecimenListInfoAction extends
+    SpecimenListGetInfoAction {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
     private static final String ALIQUOTED_SPEC_QRY =
-        SpecimenGetInfoAction.SPEC_BASE_QRY
+        SpecimenListGetInfoAction.SPEC_BASE_QRY
             + " LEFT JOIN FETCH spec.parentSpecimen parentSpec"
             + " LEFT JOIN FETCH parentSpec.processingEvent"
             + " WHERE spec.collectionEvent.id=?"
-            + " AND spec.parentSpecimen IS NOT null"
-            + SPEC_END_QRY;
+            + " AND spec.parentSpecimen IS NOT null";
 
     private Integer ceventId;
 
-    public CollectionEventGetAliquotedSpecimenInfoAction(Integer cevenId) {
+    public CollectionEventGetAliquotedSpecimenListInfoAction(Integer cevenId) {
         this.ceventId = cevenId;
     }
 

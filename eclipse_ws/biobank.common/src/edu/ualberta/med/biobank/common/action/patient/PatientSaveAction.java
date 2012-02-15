@@ -5,10 +5,14 @@ import java.util.Date;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
+import edu.ualberta.med.biobank.common.action.check.UniquePreCheck;
+import edu.ualberta.med.biobank.common.action.check.ValueProperty;
+import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermission;
 import edu.ualberta.med.biobank.common.permission.patient.PatientUpdatePermission;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 
@@ -21,12 +25,15 @@ public class PatientSaveAction implements Action<IdResult> {
     private String pnumber;
     private Date createdAt;
 
+    private String commentText;
+
     public PatientSaveAction(Integer patientId, Integer studyId,
-        String pnumber, Date createdAt) {
+        String pnumber, Date createdAt, String commentText) {
         this.patientId = patientId;
         this.studyId = studyId;
         this.pnumber = pnumber;
         this.createdAt = createdAt;
+        this.commentText = commentText;
     }
 
     @Override
@@ -53,9 +60,18 @@ public class PatientSaveAction implements Action<IdResult> {
         patientToSave.setPnumber(pnumber);
         patientToSave.setCreatedAt(createdAt);
         patientToSave.setStudy(context.load(Study.class, studyId));
+        saveComment(context, patientToSave);
 
         context.getSession().saveOrUpdate(patientToSave);
 
         return new IdResult(patientToSave.getId());
+    }
+
+    private void saveComment(ActionContext context, Patient p) {
+        Comment comment = CommentUtil.create(context.getUser(), commentText);
+        if (comment != null) {
+            context.getSession().save(comment);
+            p.getCommentCollection().add(comment);
+        }
     }
 }

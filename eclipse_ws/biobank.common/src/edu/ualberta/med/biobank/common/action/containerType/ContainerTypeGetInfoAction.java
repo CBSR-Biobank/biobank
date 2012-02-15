@@ -21,6 +21,7 @@ public class ContainerTypeGetInfoAction implements Action<ContainerTypeInfo> {
         "SELECT DISTINCT ctype"
             + " FROM " + ContainerType.class.getName() + " ctype"
             + " INNER JOIN FETCH ctype.capacity"
+            + " INNER JOIN FETCH ctype.childLabelingScheme"
             + " LEFT JOIN FETCH ctype.childContainerTypeCollection"
             + " LEFT JOIN FETCH ctype.specimenTypeCollection"
             + " LEFT JOIN FETCH ctype.commentCollection comments"
@@ -29,7 +30,15 @@ public class ContainerTypeGetInfoAction implements Action<ContainerTypeInfo> {
 
     public static class ContainerTypeInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
-        public ContainerType containerType;
+        private ContainerType containerType;
+
+        public ContainerTypeInfo(ContainerType containerType) {
+            this.containerType = containerType;
+        }
+
+        public ContainerType getContainerType() {
+            return containerType;
+        }
     }
 
     private final Integer ctypeId;
@@ -56,8 +65,8 @@ public class ContainerTypeGetInfoAction implements Action<ContainerTypeInfo> {
             throw new ModelNotFoundException(ContainerType.class, ctypeId);
         }
 
-        ContainerTypeInfo containerTypeInfo = new ContainerTypeInfo();
-        containerTypeInfo.containerType = containerTypes.get(0);
+        ContainerTypeInfo containerTypeInfo =
+            new ContainerTypeInfo(containerTypes.get(0));
         return containerTypeInfo;
     }
 }

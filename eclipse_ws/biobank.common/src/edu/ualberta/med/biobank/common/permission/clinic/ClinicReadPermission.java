@@ -10,6 +10,10 @@ public class ClinicReadPermission implements Permission {
 
     private final Integer clinicId;
 
+    public ClinicReadPermission() {
+        this.clinicId = null;
+    }
+
     public ClinicReadPermission(Integer clinicId) {
         this.clinicId = clinicId;
     }
@@ -20,7 +24,12 @@ public class ClinicReadPermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        Clinic clinic = context.load(Clinic.class, clinicId);
-        return PermissionEnum.CLINIC_READ.isAllowed(context.getUser(), clinic);
+        if (clinicId != null) {
+            Clinic clinic = context.load(Clinic.class, clinicId);
+            return PermissionEnum.CLINIC_READ.isAllowed(context.getUser(),
+                clinic);
+        }
+
+        return PermissionEnum.CLINIC_READ.isAllowed(context.getUser());
     }
 }

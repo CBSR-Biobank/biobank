@@ -13,8 +13,8 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public class SpecimenLinkAdapter extends AdapterBase {
 
     public SpecimenLinkAdapter(AdapterBase parent, int id, String name,
-        boolean hasChildren, boolean loadChildrenInBackground) {
-        super(parent, id, name, hasChildren, loadChildrenInBackground);
+        boolean hasChildren) {
+        super(parent, id, name, hasChildren);
     }
 
     @Override

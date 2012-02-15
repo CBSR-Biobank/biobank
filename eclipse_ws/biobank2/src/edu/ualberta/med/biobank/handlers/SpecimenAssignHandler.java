@@ -11,23 +11,23 @@ import edu.ualberta.med.biobank.treeview.processing.SpecimenAssignAdapter;
 
 public class SpecimenAssignHandler extends LinkAssignCommonHandler {
 
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		openLinkAssignPerspective(SpecimenAssignEntryForm.ID,
-				new SpecimenAssignAdapter(null, 0,
-						Messages.SpecimenAssignHandler_specimenAssign_label,
-						false, false));
-		return null;
-	}
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        openLinkAssignPerspective(SpecimenAssignEntryForm.ID,
+            new SpecimenAssignAdapter(null, 0,
+                Messages.SpecimenAssignHandler_specimenAssign_label,
+                false));
+        return null;
+    }
 
-	@Override
-	protected boolean canUserPerformAction(UserWrapper user) {
-		try {
-			return user.getCurrentWorkingSite() != null
-					&& SessionManager
-							.isAllowed(SessionSecurityHelper.SPECIMEN_ASSIGN_KEY_DESC);
-		} catch (Exception ae) {
-			throw new RuntimeException(ae);
-		}
-	}
+    @Override
+    protected boolean canUserPerformAction(UserWrapper user) {
+        try {
+            return user.getCurrentWorkingSite() != null
+                && SessionManager
+                    .isAllowed(SessionSecurityHelper.SPECIMEN_ASSIGN_KEY_DESC);
+        } catch (Exception ae) {
+            throw new RuntimeException(ae);
+        }
+    }
 }

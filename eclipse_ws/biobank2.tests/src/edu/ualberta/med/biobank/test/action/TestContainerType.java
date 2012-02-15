@@ -140,17 +140,16 @@ public class TestContainerType extends TestAction {
             EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
 
         Assert.assertEquals("FREEZER_3x10",
-            topContainerTypeInfo.containerType.getName());
-        Assert.assertEquals(ActivityStatus.ACTIVE,
-            topContainerTypeInfo.containerType
-                .getActivityStatus());
-        Assert.assertEquals(3, topContainerTypeInfo.containerType
+            topContainerTypeInfo.getContainerType().getName());
+        Assert.assertEquals(ActivityStatus.ACTIVE, topContainerTypeInfo.getContainerType()
+            .getActivityStatus());
+        Assert.assertEquals(3, topContainerTypeInfo.getContainerType()
             .getCapacity().getRowCapacity().intValue());
-        Assert.assertEquals(10, topContainerTypeInfo.containerType
+        Assert.assertEquals(10, topContainerTypeInfo.getContainerType()
             .getCapacity().getColCapacity().intValue());
-        Assert.assertEquals(0, topContainerTypeInfo.containerType
+        Assert.assertEquals(0, topContainerTypeInfo.getContainerType()
             .getChildContainerTypeCollection().size());
-        Assert.assertEquals(0, topContainerTypeInfo.containerType
+        Assert.assertEquals(0, topContainerTypeInfo.getContainerType()
             .getCommentCollection().size());
 
         containerTypeSaveAction =
@@ -266,13 +265,13 @@ public class TestContainerType extends TestAction {
         EXECUTOR.exec(containerTypeSaveAction);
         containerTypeInfo =
             EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
-        Assert.assertEquals(0, containerTypeInfo.containerType
+        Assert.assertEquals(0, containerTypeInfo.getContainerType()
             .getSpecimenTypeCollection().size());
     }
 
     private Set<Integer> getSpecimenTypeIds(ContainerTypeInfo containerTypeInfo) {
         HashSet<Integer> result = new HashSet<Integer>();
-        for (SpecimenType specimenType : containerTypeInfo.containerType
+        for (SpecimenType specimenType : containerTypeInfo.getContainerType()
             .getSpecimenTypeCollection()) {
             result.add(specimenType.getId());
         }
@@ -339,14 +338,15 @@ public class TestContainerType extends TestAction {
         EXECUTOR.exec(containerTypeSaveAction);
         containerTypeInfo =
             EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
-        Assert.assertEquals(0, containerTypeInfo.containerType
+        Assert.assertEquals(0, containerTypeInfo.getContainerType()
             .getChildContainerTypeCollection().size());
     }
 
     private Set<Integer> getChildContainerTypeIds(
         ContainerTypeInfo containerTypeInfo) {
         HashSet<Integer> result = new HashSet<Integer>();
-        for (ContainerType childContainerType : containerTypeInfo.containerType
+        for (ContainerType childContainerType : containerTypeInfo
+            .getContainerType()
             .getChildContainerTypeCollection()) {
             result.add(childContainerType.getId());
         }
@@ -367,7 +367,7 @@ public class TestContainerType extends TestAction {
         Integer ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
         ContainerTypeInfo containerTypeInfo =
             EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
-        result.add(containerTypeInfo.containerType);
+        result.add(containerTypeInfo.getContainerType());
 
         hotelCtSaveAction =
             ContainerTypeHelper.getSaveAction(
@@ -376,7 +376,7 @@ public class TestContainerType extends TestAction {
                 R.nextDouble());
         ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
         containerTypeInfo = EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
-        result.add(containerTypeInfo.containerType);
+        result.add(containerTypeInfo.getContainerType());
 
         hotelCtSaveAction =
             ContainerTypeHelper.getSaveAction(
@@ -385,7 +385,7 @@ public class TestContainerType extends TestAction {
                 R.nextDouble());
         ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
         containerTypeInfo = EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
-        result.add(containerTypeInfo.containerType);
+        result.add(containerTypeInfo.getContainerType());
 
         hotelCtSaveAction =
             ContainerTypeHelper.getSaveAction(
@@ -394,7 +394,7 @@ public class TestContainerType extends TestAction {
                 R.nextDouble());
         ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
         containerTypeInfo = EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
-        result.add(containerTypeInfo.containerType);
+        result.add(containerTypeInfo.getContainerType());
 
         return result;
     }
@@ -406,15 +406,15 @@ public class TestContainerType extends TestAction {
             EXECUTOR.exec(containerTypeSaveAction).getId();
         ContainerTypeInfo containerTypeInfo =
             EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
-        Assert.assertEquals(0, containerTypeInfo.containerType
+        Assert.assertEquals(0, containerTypeInfo.getContainerType()
             .getCommentCollection().size());
 
         containerTypeInfo = addComment(containerTypeId);
-        Assert.assertEquals(1, containerTypeInfo.containerType
+        Assert.assertEquals(1, containerTypeInfo.getContainerType()
             .getCommentCollection().size());
 
         containerTypeInfo = addComment(containerTypeId);
-        Assert.assertEquals(2, containerTypeInfo.containerType
+        Assert.assertEquals(2, containerTypeInfo.getContainerType()
             .getCommentCollection().size());
 
         // TODO: check full name on each comment's user
@@ -503,7 +503,8 @@ public class TestContainerType extends TestAction {
         ContainerTypeInfo containerTypeInfo =
             EXECUTOR.exec(new ContainerTypeGetInfoAction(parentCtId));
         Integer childCtId =
-            containerTypeInfo.containerType.getChildContainerTypeCollection()
+            containerTypeInfo.getContainerType()
+                .getChildContainerTypeCollection()
                 .iterator().next().getId();
 
         try {

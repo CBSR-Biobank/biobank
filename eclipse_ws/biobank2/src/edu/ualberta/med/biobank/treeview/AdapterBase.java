@@ -6,9 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -37,34 +35,16 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     protected static final String BGR_LOADING_LABEL =
         Messages.AdapterBase_loading;
 
-    private boolean loadChildrenInBackground;
-
-    private Thread childUpdateThread;
-
-    private Semaphore loadChildrenSemaphore;
-
     private Object modelObject;
 
-    public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
-        boolean loadChildrenInBackground) {
+    public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
         super(parent, object == null ? null : object.getId(), null, null, false);
         this.modelObject = object;
-        this.loadChildrenInBackground = loadChildrenInBackground;
-    }
-
-    public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
-        this(parent, object, true);
     }
 
     public AdapterBase(AdapterBase parent, Integer id, String label,
-        boolean hasChildren, boolean loadChildrenInBackground) {
+        boolean hasChildren) {
         super(parent, id, label, null, hasChildren);
-        this.loadChildrenInBackground = loadChildrenInBackground;
-    }
-
-    @Override
-    protected void init() {
-        loadChildrenSemaphore = new Semaphore(10, true);
     }
 
     public ModelWrapper<?> getModelObject() {
@@ -101,9 +81,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     public final String getLabel() {
         if (getModelObject() != null) {
             return getLabelInternal();
-        } else if (parent != null
-            && ((AdapterBase) parent).loadChildrenInBackground) {
-            return BGR_LOADING_LABEL;
         }
         return super.getLabel();
     }
@@ -187,17 +164,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     @Override
     public void loadChildren(boolean updateNode) {
         try {
-            loadChildrenSemaphore.acquire();
-        } catch (InterruptedException e) {
-            BgcPlugin.openAsyncError(Messages.AdapterBase_load_error_title, e);
-        }
-
-        if (loadChildrenInBackground) {
-            loadChildrenBackground(true);
-            return;
-        }
-
-        try {
             Collection<? extends ModelWrapper<?>> children =
                 getWrapperChildren();
             if (children != null) {
@@ -221,91 +187,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
                 text = getModelObject().toString();
             }
             logger.error("Error while loading children of node " + text, e); //$NON-NLS-1$
-        } finally {
-            loadChildrenSemaphore.release();
-        }
-    }
-
-    public void loadChildrenBackground(final boolean updateNode) {
-        if ((childUpdateThread != null) && childUpdateThread.isAlive()) {
-            loadChildrenSemaphore.release();
-            return;
-        }
-
-        try {
-            int childCount = getWrapperChildCount();
-            if (childCount == 0) {
-                setHasChildren(false);
-            } else
-                setHasChildren(true);
-            final List<AbstractAdapterBase> newNodes =
-                new ArrayList<AbstractAdapterBase>();
-            for (int i = 0, n = childCount - children.size(); i < n; ++i) {
-                final AbstractAdapterBase node = createChildNode(-i);
-                addChild(node);
-                newNodes.add(node);
-            }
-
-            childUpdateThread = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        Collection<? extends ModelWrapper<?>> childObjects =
-                            getWrapperChildren();
-                        if (childObjects != null) {
-                            for (ModelWrapper<?> child : childObjects) {
-                                // first see if this object is among the
-                                // children, if not then it is being loaded
-                                // for the first time
-                                AbstractAdapterBase node = getChild(child
-                                    .getId());
-                                if (node == null) {
-                                    Assert.isTrue(newNodes.size() > 0);
-                                    node = newNodes.get(0);
-                                    newNodes.remove(0);
-                                }
-                                Assert.isNotNull(node);
-                                ((AdapterBase) node).setModelObject(child);
-                                final AbstractAdapterBase nodeToUpdate = node;
-                                Display.getDefault().syncExec(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        SessionManager
-                                            .refreshTreeNode(nodeToUpdate);
-                                    }
-                                });
-                            }
-                            Display.getDefault().asyncExec(new Runnable() {
-                                @Override
-                                public void run() {
-                                    SessionManager
-                                        .refreshTreeNode(AdapterBase.this);
-                                }
-                            });
-                        }
-                    } catch (final RemoteAccessException exp) {
-                        BgcPlugin.openRemoteAccessErrorMessage(exp);
-                    } catch (Exception e) {
-                        String modelString = Messages.AdapterBase_unknow;
-                        if (getModelObject() != null) {
-                            modelString = getModelObject().toString();
-                        }
-                        logger.error("Error while loading children of node " //$NON-NLS-1$
-                            + modelString + " in background", e); //$NON-NLS-1$
-                    } finally {
-                        loadChildrenSemaphore.release();
-                    }
-                }
-            };
-            childUpdateThread.start();
-        } catch (Exception e) {
-            String nodeString = "null"; //$NON-NLS-1$
-            if (getModelObject() != null) {
-                nodeString = getModelObject().toString();
-            }
-            logger.error(
-                "Error while expanding children of node " + nodeString, e); //$NON-NLS-1$
-            loadChildrenSemaphore.release();
         }
     }
 
@@ -405,10 +286,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     @Override
     public boolean isEditable() {
         return super.isEditable() && SessionManager.canUpdate(getModelObject());
-    }
-
-    public void setLoadChildrenInBackground(boolean loadChildrenInBackground) {
-        this.loadChildrenInBackground = loadChildrenInBackground;
     }
 
     protected List<AbstractAdapterBase> searchChildContainers(

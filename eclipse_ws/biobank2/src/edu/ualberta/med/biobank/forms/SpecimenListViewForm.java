@@ -13,7 +13,8 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 
 public class SpecimenListViewForm extends BiobankViewForm {
-    public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenListViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.SpecimenListViewForm"; //$NON-NLS-1$
 
     private SpecimenInfoTable specimensWidget;
 
@@ -44,7 +45,9 @@ public class SpecimenListViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() throws Exception {
+    public void setValues() throws Exception {
+        // TODO Auto-generated method stub
+
     }
 
 }

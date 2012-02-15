@@ -67,10 +67,10 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
 
         ceventInfo.cevent = rows.get(0);
         ceventInfo.sourceSpecimenInfos =
-            new CollectionEventGetSourceSpecimenInfoAction(ceventId).run(
+            new CollectionEventGetSourceSpecimenListInfoAction(ceventId).run(
                 context).getList();
         ceventInfo.aliquotedSpecimenInfos =
-            new CollectionEventGetAliquotedSpecimenInfoAction(ceventId).run(
+            new CollectionEventGetAliquotedSpecimenListInfoAction(ceventId).run(
                 context).getList();
         ceventInfo.eventAttrs = new CollectionEventGetEventAttrInfoAction(
             ceventId).run(context).getMap();

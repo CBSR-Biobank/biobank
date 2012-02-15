@@ -106,7 +106,7 @@ public class Specimen extends AbstractBiobankModel {
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.currentCenter.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CURRENT_CENTER_ID", nullable = false)
     public Center getCurrentCenter() {
         return this.currentCenter;

@@ -30,14 +30,13 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerGroup extends AdapterBase {
 
-    private SiteGetTopContainersResult topContainerResult;
-
-    private static BgcLogger logger = BgcLogger.getLogger(ContainerGroup.class
+    private static BgcLogger LOGGER = BgcLogger.getLogger(ContainerGroup.class
         .getName());
 
+    private SiteGetTopContainersResult topContainerResult = null;
+
     public ContainerGroup(SiteAdapter parent, int id) {
-        super(parent, id, Messages.ContainerGroup_containers_node_label, true,
-            true);
+        super(parent, id, Messages.ContainerGroup_containers_node_label, true);
     }
 
     @Override
@@ -59,7 +58,7 @@ public class ContainerGroup extends AdapterBase {
             super.performExpand();
         } catch (ApplicationException e) {
             // TODO: open an error dialog here?
-            logger.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
+            LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
         }
     }
 
@@ -137,13 +136,16 @@ public class ContainerGroup extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-
         List<ContainerWrapper> result = new ArrayList<ContainerWrapper>();
 
-        for (Container container : topContainerResult.getTopContainers()) {
-            ContainerWrapper wrapper =
-                new ContainerWrapper(SessionManager.getAppService(), container);
-            result.add(wrapper);
+        if (topContainerResult != null) {
+            // return results only if this node has been expanded
+            for (Container container : topContainerResult.getTopContainers()) {
+                ContainerWrapper wrapper =
+                    new ContainerWrapper(SessionManager.getAppService(),
+                        container);
+                result.add(wrapper);
+            }
         }
 
         return result;
@@ -179,7 +181,7 @@ public class ContainerGroup extends AdapterBase {
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (Exception e) {
-            logger.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$
+            LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$
         }
     }
 

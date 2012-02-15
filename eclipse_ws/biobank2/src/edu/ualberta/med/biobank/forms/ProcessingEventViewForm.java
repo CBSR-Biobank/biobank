@@ -88,7 +88,12 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
         createCommentsSection();
 
-        setValues();
+        try {
+
+            setValues();
+        } catch (Exception e) {
+            // TODO: ??
+        }
     }
 
     private void createCommentsSection() {
@@ -102,7 +107,18 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(commentTable);
     }
 
-    private void setValues() {
+    @Override
+    public void setValues() throws Exception {
+        setPartName(NLS.bind(Messages.ProcessingEventViewForm_title,
+            DateFormatter.formatAsDateTime(peventInfo.pevent.getCreatedAt())));
+        form.setText(NLS.bind(Messages.ProcessingEventViewForm_title,
+            DateFormatter.formatAsDateTime(peventInfo.pevent.getCreatedAt())));
+        sourceSpecimenTable.setList(peventInfo.sourceSpecimenInfos);
+        commentTable.setList(ModelWrapper.wrapModelCollection(
+            SessionManager.getAppService(),
+            peventInfo.pevent.getCommentCollection(),
+            CommentWrapper.class));
+
         setTextValue(centerLabel, peventInfo.pevent.getCenter().getName());
         setTextValue(worksheetLabel, peventInfo.pevent.getWorksheet());
         setTextValue(dateCreationLabel,
@@ -120,19 +136,6 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
         sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
         sourceSpecimenTable.createDefaultEditItem();
-    }
-
-    @Override
-    public void reload() throws Exception {
-        updatePEventInfo();
-        setPartName(NLS.bind(Messages.ProcessingEventViewForm_title,
-            DateFormatter.formatAsDateTime(peventInfo.pevent.getCreatedAt())));
-        form.setText(NLS.bind(Messages.ProcessingEventViewForm_title,
-            DateFormatter.formatAsDateTime(peventInfo.pevent.getCreatedAt())));
-        setValues();
-        sourceSpecimenTable.setList(peventInfo.sourceSpecimenInfos);
-
-        // TODO: reload comment table
     }
 
 }

@@ -63,15 +63,22 @@ public class SiteViewForm extends AddressViewFormCommon {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
+        siteAdapter = (SiteAdapter) adapter;
         updateSiteInfo();
         setPartName(NLS.bind(Messages.SiteViewForm_title,
             siteInfo.site.getNameShort()));
     }
 
+    private void updateSiteInfo() throws Exception {
+        siteInfo = SessionManager.getAppService().doAction(
+            new SiteGetInfoAction(adapter.getId()));
+        site =
+            new SiteWrapper(SessionManager.getAppService(), siteInfo.getSite());
+    }
+
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind(Messages.SiteViewForm_title,
-            siteInfo.site.getName()));
+        form.setText(NLS.bind(Messages.SiteViewForm_title, site.getName()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -195,9 +202,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     @Override
-    public void reload() throws Exception {
-        updateSiteInfo();
-
+    public void setValues() throws Exception {
         setPartName(NLS.bind(Messages.SiteViewForm_title,
             siteInfo.site.getNameShort()));
         form.setText(NLS.bind(Messages.SiteViewForm_title,
@@ -211,14 +216,5 @@ public class SiteViewForm extends AddressViewFormCommon {
         // TODO: load comments?
         // commentTable.setList((List<?>) siteInfo.site
         // .getCommentCollection());
-    }
-
-    private void updateSiteInfo() throws Exception {
-        siteAdapter = (SiteAdapter) adapter;
-        site = (SiteWrapper) getModelObject();
-
-        siteInfo =
-            SessionManager.getAppService().doAction(
-                new SiteGetInfoAction(site.getWrappedObject()));
     }
 }
