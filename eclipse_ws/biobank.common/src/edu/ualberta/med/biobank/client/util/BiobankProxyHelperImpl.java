@@ -39,6 +39,23 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
         return super.convertToProxy(as, obj);
     }
 
+    @SuppressWarnings("rawtypes")
+    @Override
+    protected Object convertCollectionToProxy(ApplicationService as,
+        Collection collection) {
+        if (null == collection) return null;
+        Collection<Object> modifiedCollection;
+        if (collection instanceof List)
+            modifiedCollection = new ArrayList<Object>();
+        else if (collection instanceof Set)
+            modifiedCollection = new HashSet<Object>();
+        else
+            throw new RuntimeException("Unable to convert collection to proxy");
+        for (Object obj : collection)
+            modifiedCollection.add(convertToProxy(as, obj));
+        return modifiedCollection;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public Object convertToObject(Object proxyObject) throws Throwable {
