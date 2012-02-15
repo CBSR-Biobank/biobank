@@ -243,7 +243,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     public void setValues() throws Exception {
         try {
             if (researchGroup.isNew()) {
-                researchGroup.setActivityStatus(ActivityStatus.ACTIVE));
+                researchGroup.setActivityStatus(ActivityStatus.ACTIVE);
                 researchGroup.setStudy(null);
             }
 

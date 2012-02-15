@@ -4,10 +4,10 @@ import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.activityStatus.ActivityStatusEnum;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.permission.site.SiteReadPermission;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 
@@ -37,8 +37,7 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
     private static final String SITE_COUNT_INFO_2_HQL =
         "SELECT count(*) "
             + " FROM " + Specimen.class.getName() + " s"
-            + " JOIN s.activityStatus astatus"
-            + " WHERE s.activityStatus.id = ?"
+            + " WHERE s.activityStatus = ?"
             + " AND s.currentCenter.id = ?";
 
     private final Integer siteId;
@@ -75,7 +74,7 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
         builder.setCollectionEventCount((Long) items[2]);
 
         query = context.getSession().createQuery(SITE_COUNT_INFO_2_HQL);
-        query.setParameter(0, ActivityStatusEnum.ACTIVE.getId());
+        query.setParameter(0, ActivityStatus.ACTIVE);
         query.setParameter(1, siteId);
 
         Long l = (Long) query.uniqueResult();

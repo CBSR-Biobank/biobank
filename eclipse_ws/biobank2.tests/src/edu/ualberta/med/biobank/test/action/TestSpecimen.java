@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSav
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
@@ -50,7 +51,7 @@ public class TestSpecimen extends TestAction {
         final Integer ceventId = EXECUTOR.exec(
             new CollectionEventSaveAction(null, provisioning.patientIds
                 .get(0),
-                R.nextInt(20) + 1, 1, null,
+                R.nextInt(20) + 1, ActivityStatus.ACTIVE, null,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
                 null))
             .getId();
