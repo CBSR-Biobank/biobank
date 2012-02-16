@@ -59,6 +59,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
+        Assert.isNotNull(adapter.getId());
         updateClinicInfo();
         setPartName(NLS.bind(Messages.ClinicViewForm_title,
             clinic.getNameShort()));
@@ -67,6 +68,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
     private void updateClinicInfo() throws Exception {
         clinicInfo = SessionManager.getAppService().doAction(
             new ClinicGetInfoAction(adapter.getId()));
+        Assert.isNotNull(clinicInfo);
+        Assert.isNotNull(clinicInfo.clinic);
         clinic =
             new ClinicWrapper(SessionManager.getAppService(), clinicInfo.clinic);
 
@@ -78,7 +81,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
     @Override
     protected void createFormContent() throws Exception {
         form.setText(NLS.bind(Messages.ClinicViewForm_title, clinic.getName()));
-
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

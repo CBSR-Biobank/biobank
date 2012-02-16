@@ -81,11 +81,6 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
-            id="edu.ualberta.med.biobank.commands.reset"
-            name="%Reset.command">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.cancel"
             name="%Cancel.command">
       </command>
@@ -228,7 +223,7 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
-            id="edu.ualberta.med.biobank.commands.reloadViewForm"
+            id="edu.ualberta.med.biobank.commands.reload"
             name="%Reload.command">
 	  </command>
 	  <command
@@ -328,15 +323,6 @@
             </and>
          </activeWhen>
       </handler>   
-      <handler
-            class="edu.ualberta.med.biobank.handlers.ResetHandler"
-            commandId="edu.ualberta.med.biobank.commands.reset">
-         <activeWhen>
-               <reference
-                     definitionId="edu.ualberta.med.biobank.form.instanceof.BiobankEntryForm">
-               </reference>
-         </activeWhen>
-      </handler>         
       <handler
             class="edu.ualberta.med.biobank.handlers.PrintHandler"
             commandId="edu.ualberta.med.biobank.commands.print">
@@ -680,26 +666,20 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.EditHandler"
             commandId="edu.ualberta.med.biobank.commands.edit">
-         <activeWhen>
-            <with
-                  variable="activeEditor">
-               <instanceof
-                     value="edu.ualberta.med.biobank.forms.BiobankViewForm">
-               </instanceof>
-            </with>
-         </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="edu.ualberta.med.biobank.form.instanceof.BiobankViewForm">
+            </reference>
+         </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.ReloadViewFormHandler"
-            commandId="edu.ualberta.med.biobank.commands.reloadViewForm">
-         <activeWhen>
-            <with
-                  variable="activeEditor">
-               <instanceof
-                     value="edu.ualberta.med.biobank.forms.BiobankViewForm">
-               </instanceof>
-            </with>
-            </activeWhen>
+            class="edu.ualberta.med.biobank.handlers.ReloadHandler"
+            commandId="edu.ualberta.med.biobank.commands.reload">
+         <enabledWhen>
+            <reference
+                  definitionId="edu.ualberta.med.biobank.form.instanceof.BiobankFormBase">
+            </reference>
+         </enabledWhen>
             </handler>
 	   <handler
             class="edu.ualberta.med.biobank.handlers.EditActivityStatusHandler"
@@ -2068,8 +2048,8 @@
             sequence="M2+M3+A">
       </key>
       <key
-            commandId="edu.ualberta.med.biobank.commands.reset"
-            contextId="biobank.context.entryForm"
+            commandId="edu.ualberta.med.biobank.commands.reload"
+            contextId="biobank.context.form"
             schemeId="biobank.scheme"
             sequence="M1+R"/>
       <key
@@ -2103,12 +2083,6 @@
             id="biobank.scheme"
             name="Scheme Biobank">
       </scheme>
-      <key
-            commandId="edu.ualberta.med.biobank.commands.reloadViewForm"
-            contextId="biobank.context.viewForm"
-            schemeId="biobank.scheme"
-            sequence="M1+R">
-      </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.edit"
             contextId="biobank.context.viewForm"
@@ -2348,6 +2322,22 @@
            </instanceof>
         </with>
       </definition>
+      <definition id="edu.ualberta.med.biobank.form.instanceof.BiobankViewForm">
+        <with
+              variable="activeEditor">
+           <instanceof
+                 value="edu.ualberta.med.biobank.forms.BiobankViewForm">
+           </instanceof>
+        </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.form.instanceof.BiobankFormBase">
+        <with
+              variable="activeEditor">
+           <instanceof
+                 value="edu.ualberta.med.biobank.forms.BiobankFormBase">
+           </instanceof>
+        </with>
+      </definition>
       <definition
             id="biobank.sampleManagementPerspectiveSelected">
          <with
@@ -2553,6 +2543,10 @@
       <context
             id="biobank.context.viewForm"
             name="Biobank View Form">
+      </context>
+      <context
+            id="biobank.context.form"
+            name="Biobank Form">
       </context>
       <context
             id="biobank.context.loggedIn"

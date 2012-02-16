@@ -46,18 +46,6 @@
         </with>
      </activeWhen>
       </handler> 
-      <handler
-            class="edu.ualberta.med.biobank.gui.common.handlers.BgcReloadHandler"
-            commandId="edu.ualberta.med.biobank.gui.common.commands.reset">
-         <activeWhen>
-            <with
-                  variable="activeEditor">
-               <instanceof
-                     value="edu.ualberta.med.biobank.gui.common.forms.BgcEntryForm">
-               </instanceof>
-            </with>
-         </activeWhen>
-      </handler>         
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -73,8 +61,8 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
-            id="edu.ualberta.med.biobank.gui.common.commands.reset"
-            name="%reset.command.name">
+            id="edu.ualberta.med.biobank.gui.common.commands.reload"
+            name="%reload.command.name">
       </command>
    </extension>
 </plugin>

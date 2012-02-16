@@ -82,7 +82,7 @@ public abstract class BgcEntryForm extends BgcFormBase implements IBgcEntryForm 
     }
 
     protected void addResetAction() {
-        formActions.addResetAction(Actions.GUI_COMMON_RESET);
+        formActions.addResetAction(Actions.GUI_COMMON_RELOAD);
     }
 
     protected void addCancelAction() {

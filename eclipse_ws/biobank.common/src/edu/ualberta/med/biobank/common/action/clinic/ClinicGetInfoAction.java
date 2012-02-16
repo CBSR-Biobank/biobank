@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.action.clinic;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -80,8 +81,9 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
         public Clinic clinic;
         public Long patientCount;
         public Long collectionEventCount;
-        public List<Contact> contacts;
-        public List<StudyCountInfo> studyInfos;
+        public List<Contact> contacts = new ArrayList<Contact>();
+        public List<StudyCountInfo> studyInfos =
+            new ArrayList<StudyCountInfo>();
     }
 
 }

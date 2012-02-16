@@ -332,7 +332,7 @@ public class SessionManager {
             @Override
             public void run() {
                 try {
-                    // add to add the correct node if it is a new adapter:
+                    // add to the correct node if it is a new adapter:
                     AbstractAdapterBase parent = adapter.getParent();
                     if (parent != null)
                         parent.addChild(adapter);

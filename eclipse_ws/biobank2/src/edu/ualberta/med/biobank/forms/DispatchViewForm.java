@@ -24,10 +24,10 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchChangeStatePermission;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
-import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -92,8 +92,6 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     public void setValues() throws Exception {
         commentTable.setList(dispatch.getCommentCollection(false));
-        setPartName(Messages.DispatchViewForm_fulltitle
-            + dispatch.getShipmentInfo().getPackedAt());
         setDispatchValues();
         specimensTree.refresh();
     }
@@ -121,22 +119,30 @@ public class DispatchViewForm extends BiobankViewForm {
 
         setDispatchValues();
 
-        UserWrapper user = SessionManager.getUser();
-        if (dispatch.canBeSentBy(user))
-            createSendButton();
-        else if (dispatch.canBeReceivedBy(user))
-            createReceiveButtons();
-        else if (dispatch.canBeClosedBy(user)
-            && dispatch.isInReceivedState()
-            && dispatch.getNonProcessedDispatchSpecimenCollection().size() == 0)
-            createCloseButton();
+        DispatchChangeStatePermission perm =
+            new DispatchChangeStatePermission(dispatch.getId());
+        if (SessionManager.getAppService().isAllowed(perm)) {
+            if (dispatch.isInCreationState()
+                && SessionManager.getUser().getCurrentWorkingCenter()
+                    .equals(dispatch.getSenderCenter()))
+                createSendButton();
+            else if (dispatch.isInTransitState()
+                && SessionManager.getUser().getCurrentWorkingCenter()
+                    .equals(dispatch.getReceiverCenter()))
+                createReceiveButtons();
+            else if (dispatch.isInReceivedState()
+                && SessionManager.getUser().getCurrentWorkingCenter()
+                    .equals(dispatch.getReceiverCenter())
+                && dispatch.getNonProcessedDispatchSpecimenCollection().size() == 0)
+                createCloseButton();
+        }
 
         commentTable.setList(dispatch.getCommentCollection(false));
     }
 
     @Override
     protected void addEditAction() {
-        // super.addEditAction();
+        super.addEditAction();
     }
 
     private void createTreeTableSection() {
@@ -254,9 +260,7 @@ public class DispatchViewForm extends BiobankViewForm {
                                     Messages.DispatchViewForm_saving_text,
                                     IProgressMonitor.UNKNOWN);
                                 try {
-                                    ShipmentInfoWrapper si =
-                                        dispatch.getShipmentInfo();
-                                    dispatch.setShipmentInfo(si);
+                                    dispatchAdapter.setModelObject(dispatch);
                                     dispatchAdapter.doSend();
                                 } catch (Exception ex) {
                                     saveErrorCatch(ex, monitor, false);
