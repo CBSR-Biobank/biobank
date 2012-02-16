@@ -36,7 +36,7 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.TecanScanLinkDialog;
-import edu.ualberta.med.biobank.forms.linkassign.AbstractSpecimenAdminForm;
+import edu.ualberta.med.biobank.forms.linkassign.AbstractTecanSpecimenLinkForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -45,7 +45,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 /*
  * Auth
  */
-public class TecanScanLinkEntryForm extends AbstractSpecimenAdminForm {
+public class TecanScanLinkEntryForm extends AbstractTecanSpecimenLinkForm {
 
     private static BgcLogger logger = BgcLogger
         .getLogger(TecanScanLinkEntryForm.class.getName());

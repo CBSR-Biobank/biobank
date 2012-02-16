@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,8 +35,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     private static final String DISPATCHS_CACHE_KEY = "dispatchs";
     private AbstractObjectWithPositionManagement<SpecimenPosition, SpecimenWrapper> objectWithPositionManagement;
 
-    private Map<String, StudySpecimenAttrWrapper> studySpecimenAttrMap;
-    private Map<String, SpecimenAttrWrapper> specimenAttrMap;
+    private LinkedHashMap<String, StudySpecimenAttrWrapper> studySpecimenAttrMap;
+    private LinkedHashMap<String, SpecimenAttrWrapper> specimenAttrMap;
     private SpecimenAttrWrapper specimenAttr;
 
     public SpecimenWrapper(WritableApplicationService appService,
@@ -547,7 +547,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         CollectionEventWrapper collectionEvent = getCollectionEvent();
         PatientWrapper patient = collectionEvent.getPatient();
 
-        studySpecimenAttrMap = new HashMap<String, StudySpecimenAttrWrapper>();
+        studySpecimenAttrMap = new LinkedHashMap<String, StudySpecimenAttrWrapper>();
         if (patient != null && patient.getStudy() != null) {
             Collection<StudySpecimenAttrWrapper> studySpecimenAttrCollection = patient
                 .getStudy().getStudySpecimenAttrCollection();
@@ -566,8 +566,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         if (specimenAttrMap != null)
             return specimenAttrMap;
 
-        specimenAttrMap = new HashMap<String, SpecimenAttrWrapper>();
-        List<SpecimenAttrWrapper> pvAttrCollection = getSpecimenAttrCollection(false);
+        specimenAttrMap = new LinkedHashMap<String, SpecimenAttrWrapper>();
+        List<SpecimenAttrWrapper> pvAttrCollection = getSpecimenAttrCollection(true);
 
         if (pvAttrCollection != null) {
             for (SpecimenAttrWrapper pvAttr : pvAttrCollection) {

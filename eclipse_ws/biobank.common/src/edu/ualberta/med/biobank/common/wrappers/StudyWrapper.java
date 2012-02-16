@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -325,20 +327,35 @@ public class StudyWrapper extends StudyBaseWrapper {
         if (studySpecimenAttrMap != null)
             return studySpecimenAttrMap;
 
-        studySpecimenAttrMap = new HashMap<String, StudySpecimenAttrWrapper>();
+        studySpecimenAttrMap = new LinkedHashMap<String, StudySpecimenAttrWrapper>();
 
         List<StudySpecimenAttrWrapper> specimenAttrList = getStudySpecimenAttrCollection(false);
         // StudySpecimenAttrWrapper.getStudySpecimenAttrCollection(this);
 
         for (StudySpecimenAttrWrapper studySpecimenAttr : specimenAttrList) {
+            String TEMP = studySpecimenAttr.getLabel();
+            System.out.println("TEMP: " + TEMP);
             studySpecimenAttrMap.put(studySpecimenAttr.getLabel(),
                 studySpecimenAttr);
+            System.out.println("BOOOGEER  " + studySpecimenAttrMap.toString());
         }
         return studySpecimenAttrMap;
     }
 
+    // DFEDFE
     public String[] getStudySpecimenAttrLabels() {
         getStudySpecimenAttrMap();
+        String[] strLabels = new String[] {};
+        Iterator it = studySpecimenAttrMap.entrySet().iterator();
+        int i = 0;
+        while (it.hasNext()) {
+            Map.Entry pairs = (Map.Entry) it.next();
+            strLabels[i] = ((StudySpecimenAttrWrapper) pairs.getValue())
+                .getLabel();
+            System.out.println(pairs.getKey() + " = " + pairs.getValue());
+            it.remove(); // avoids a ConcurrentModificationException
+        }
+
         return studySpecimenAttrMap.keySet().toArray(new String[] {});
     }
 

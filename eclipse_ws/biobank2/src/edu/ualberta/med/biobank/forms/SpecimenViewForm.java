@@ -172,7 +172,6 @@ public class SpecimenViewForm extends BiobankViewForm {
         try {
             createPvDataSection(client);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -183,11 +182,12 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     // DFE
     private void createPvDataSection(Composite client) throws Exception {
-        specimen.getSpecimenAttrLabels();
-        // StudyWrapper study = cevent.getPatient().getStudy();
         String[] labels = specimen.getSpecimenAttrLabels();
         if (labels == null)
             return;
+
+        // TODO Need to display the list in a different order depending on the
+        // label name.
 
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 

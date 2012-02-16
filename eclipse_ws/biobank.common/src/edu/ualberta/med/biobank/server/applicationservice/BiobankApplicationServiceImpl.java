@@ -600,7 +600,6 @@ public class BiobankApplicationServiceImpl extends
                 String aAliquotId = tecanCsv.getAliquotId();
                 aliquoteSpecimen.setInventoryId(aAliquotId);
                 aliquoteSpecimen.setCreatedAt(Calendar.getInstance().getTime());
-                aliquoteSpecimen.setProcessingEvent(pEvent);
                 aliquoteSpecimen.setOriginInfo(originInfo);
                 aliquoteSpecimen.persist();
 
@@ -643,13 +642,13 @@ public class BiobankApplicationServiceImpl extends
 
             dateAttr = tecanCsv.getStartProcess();
             if (dateAttr != null) {
-                setDateAttribute(dateAttr, "startProcess", currentStudy,
+                setDateAttribute(dateAttr, "StartProcess", currentStudy,
                     aliquoteSpecimen);
             }
 
-            dateAttr = tecanCsv.getStartProcess();
+            dateAttr = tecanCsv.getEndProcess();
             if (dateAttr != null) {
-                setDateAttribute(dateAttr, "endProcess", currentStudy,
+                setDateAttribute(dateAttr, "EndProcess", currentStudy,
                     aliquoteSpecimen);
             }
             stringAttr = tecanCsv.getSampleErrors();

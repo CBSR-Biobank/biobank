@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.linkassign.AbstractSpecimenAdminForm;
+import edu.ualberta.med.biobank.forms.linkassign.AbstractTecanSpecimenLinkForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
@@ -37,9 +38,15 @@ public class BiobankPartListener implements IPartListener {
     @Override
     public void partClosed(IWorkbenchPart part) {
         IWorkbench workbench = BiobankPlugin.getDefault().getWorkbench();
-        if (!workbench.isClosing() && part instanceof AbstractSpecimenAdminForm) {
+        if (!workbench.isClosing()
+            && (part instanceof AbstractSpecimenAdminForm || part instanceof AbstractTecanSpecimenLinkForm)) {
             // when the form is closed, call the method onClose
-            boolean reallyClose = ((AbstractSpecimenAdminForm) part).onClose();
+            boolean reallyClose;
+            if (part instanceof AbstractSpecimenAdminForm) {
+                reallyClose = ((AbstractSpecimenAdminForm) part).onClose();
+            } else {
+                reallyClose = ((AbstractTecanSpecimenLinkForm) part).onClose();
+            }
             if (reallyClose) {
                 try {
                     workbench.showPerspective(ProcessingPerspective.ID,
