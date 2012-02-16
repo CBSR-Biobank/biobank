@@ -69,7 +69,6 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         saveComments(context, center);
 
         context.getSession().saveOrUpdate(center);
-        context.getSession().flush();
 
         // TODO: SHOULD NOT require a flush so that we can get the inserted id
         // if this was an insert, try using a callback that sets the response
