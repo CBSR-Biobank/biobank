@@ -211,24 +211,26 @@ public class DispatchAdapter extends AdapterBase {
     private void persistDispatch() {
         DispatchChangeStateAction action =
             new DispatchChangeStateAction(getDispatchWrapper().getId(),
-                DispatchState.CREATION, prepareShipInfo(getDispatchWrapper()
+                getDispatchWrapper().getDispatchState(),
+                prepareShipInfo(getDispatchWrapper()
                     .getShipmentInfo()));
         try {
             SessionManager.getAppService().doAction(action);
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Unable to save changes", e);
         }
-        SpecimenTransitView.getCurrent().reload();
+        SpecimenTransitView.reloadCurrent();
     }
 
     private void setDispatchAsCreation() {
         getDispatchWrapper().setState(DispatchState.CREATION);
-        getDispatchWrapper().getShipmentInfo().setPackedAt(null);
+        getDispatchWrapper().setShipmentInfo(null);
         persistDispatch();
     }
 
     private ShipmentInfoSaveInfo prepareShipInfo(
         ShipmentInfoWrapper shipmentInfo) {
+        if (shipmentInfo == null) return null;
         ShipmentInfoSaveInfo si =
             new ShipmentInfoSaveInfo(shipmentInfo.getId(),
                 shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(),

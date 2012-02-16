@@ -40,14 +40,15 @@ public class DispatchChangeStateAction implements Action<IdResult> {
 
         disp.setState(newState.getId());
 
-        if (shipInfo != null) {
-
+        if (shipInfo == null)
+            disp.setShipmentInfo(null);
+        else {
             ShipmentInfo si =
                 context
                     .get(ShipmentInfo.class, shipInfo.siId, new ShipmentInfo());
             si.setBoxNumber(shipInfo.boxNumber);
             si.setPackedAt(shipInfo.packedAt);
-            si.setReceivedAt( shipInfo.receivedAt);
+            si.setReceivedAt(shipInfo.receivedAt);
             si.setWaybill(shipInfo.waybill);
 
             ShippingMethod sm = context.load(ShippingMethod.class,
