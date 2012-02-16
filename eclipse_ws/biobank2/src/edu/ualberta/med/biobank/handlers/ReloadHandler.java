@@ -8,10 +8,10 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.forms.BiobankViewForm;
 
-public class ReloadViewFormHandler extends AbstractHandler implements IHandler {
+public class ReloadHandler extends AbstractHandler implements IHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -19,11 +19,12 @@ public class ReloadViewFormHandler extends AbstractHandler implements IHandler {
             @Override
             public void run() {
                 try {
-                    ((BiobankViewForm) PlatformUI.getWorkbench()
+                    ((BiobankFormBase) PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow().getActivePage()
                         .getActiveEditor()).reload();
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError(Messages.ReloadViewFormHandler_reload_error_title,
+                    BgcPlugin.openAsyncError(
+                        Messages.ReloadViewFormHandler_reload_error_title,
                         Messages.ReloadViewFormHandler_reload_error_msg);
                 }
             }

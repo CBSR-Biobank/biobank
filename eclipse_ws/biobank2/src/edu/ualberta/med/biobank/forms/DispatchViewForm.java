@@ -122,11 +122,17 @@ public class DispatchViewForm extends BiobankViewForm {
         DispatchChangeStatePermission perm =
             new DispatchChangeStatePermission(dispatch.getId());
         if (SessionManager.getAppService().isAllowed(perm)) {
-            if (dispatch.isInCreationState())
+            if (dispatch.isInCreationState()
+                && SessionManager.getUser().getCurrentWorkingCenter()
+                    .equals(dispatch.getSenderCenter()))
                 createSendButton();
-            else if (dispatch.isInTransitState())
+            else if (dispatch.isInTransitState()
+                && SessionManager.getUser().getCurrentWorkingCenter()
+                    .equals(dispatch.getReceiverCenter()))
                 createReceiveButtons();
             else if (dispatch.isInReceivedState()
+                && SessionManager.getUser().getCurrentWorkingCenter()
+                    .equals(dispatch.getReceiverCenter())
                 && dispatch.getNonProcessedDispatchSpecimenCollection().size() == 0)
                 createCloseButton();
         }

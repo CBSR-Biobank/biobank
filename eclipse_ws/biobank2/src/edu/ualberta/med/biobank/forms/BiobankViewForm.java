@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 public abstract class BiobankViewForm extends BiobankFormBase {
 
     private static final String RELOAD_COMMAND_ID =
-        "edu.ualberta.med.biobank.commands.reloadViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.commands.reload"; //$NON-NLS-1$
 
     private static final String EDIT_COMMAND_ID =
         "edu.ualberta.med.biobank.commands.edit"; //$NON-NLS-1$

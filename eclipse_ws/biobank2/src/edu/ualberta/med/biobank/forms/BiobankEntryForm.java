@@ -409,7 +409,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     }
 
     protected void addResetAction() {
-        formActions.addResetAction(Actions.BIOBANK_RESET);
+        formActions.addResetAction(Actions.BIOBANK_RELOAD);
     }
 
     protected void addCancelAction() {

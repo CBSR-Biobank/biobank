@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -28,6 +29,7 @@ import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -42,9 +44,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
@@ -118,15 +119,18 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             }
         };
 
-    private OriginInfo oiCopy;
-
     private ShipmentReadInfo oiInfo;
 
-    private OriginInfoWrapper originInfo;
-    private ShipmentInfoWrapper shipmentInfo;
+    private OriginInfoWrapper originInfo = new OriginInfoWrapper(
+        SessionManager.getAppService());
+    private ShipmentInfoWrapper shipmentInfo = new ShipmentInfoWrapper(
+        SessionManager.getAppService());
 
     private BgcBaseText commentWidget;
-    private CommentWrapper comment;
+    private CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
+
+    private List<SpecimenWrapper> specimens;
 
     @Override
     protected void init() throws Exception {
@@ -134,25 +138,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        comment = new CommentWrapper(SessionManager.getAppService());
-
-        oiCopy = new OriginInfo();
-        if (adapter.getId() != null) {
-            oiInfo =
-                SessionManager.getAppService().doAction(
-                    new ShipmentGetInfoAction(adapter.getId()));
-            copyShipment();
-        }
-
-        originInfo =
-            new OriginInfoWrapper(SessionManager.getAppService(), oiCopy);
-        if (oiCopy.getShipmentInfo() == null)
-            shipmentInfo =
-                new ShipmentInfoWrapper(SessionManager.getAppService());
-        else
-            shipmentInfo =
-                new ShipmentInfoWrapper(SessionManager.getAppService(),
-                    oiCopy.getShipmentInfo());
+        setOiInfo(adapter.getId());
 
         setDefaultValues();
 
@@ -167,21 +153,25 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         setPartName(tabName);
     }
 
-    public void copyShipment() {
-        if (oiInfo == null) {
-            oiCopy.setCenter(null);
-            oiCopy.setReceiverSite(null);
-            oiCopy.setShipmentInfo(null);
-            oiCopy.setSpecimenCollection(new HashSet<Specimen>());
-            oiCopy.setCommentCollection(new HashSet<Comment>());
+    private void setOiInfo(Integer id) throws ApplicationException {
+        if (id == null) {
+            OriginInfo oi = new OriginInfo();
+            oi.setShipmentInfo(new ShipmentInfo());
+            originInfo.setWrappedObject(oi);
+            shipmentInfo.setWrappedObject(oi.getShipmentInfo());
+            specimens = new ArrayList<SpecimenWrapper>();
         } else {
-            oiCopy.setId(oiInfo.oi.getId());
-            oiCopy.setCenter(oiInfo.oi.getCenter());
-            oiCopy.setReceiverSite(oiInfo.oi.getReceiverSite());
-            oiCopy.setShipmentInfo(oiInfo.oi.getShipmentInfo());
-            oiCopy.setSpecimenCollection(oiInfo.specimens);
-            oiCopy.setCommentCollection(oiInfo.oi.getCommentCollection());
+            ShipmentReadInfo read =
+                SessionManager.getAppService().doAction(
+                    new ShipmentGetInfoAction(id));
+            originInfo.setWrappedObject(read.oi);
+            shipmentInfo.setWrappedObject(read.oi.getShipmentInfo());
+            specimens =
+                ModelWrapper.wrapModelCollection(
+                    SessionManager.getAppService(), read.specimens,
+                    SpecimenWrapper.class);
         }
+
     }
 
     @Override
@@ -240,7 +230,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 Messages.ShipmentEntryForm_waybill_validation_msg);
         waybillWidget =
             (BgcBaseText) createBoundWidget(client, BgcBaseText.class,
-                SWT.NONE, waybillLabel, new String[0], shipmentInfo,
+                SWT.NONE, waybillLabel, new String[0],
+                shipmentInfo,
                 ShipmentInfoPeer.WAYBILL.getName(), waybillValidator,
                 WAYBILL_BINDING);
 
@@ -248,7 +239,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             createComboViewer(client,
                 Messages.ShipmentEntryForm_shipMethod_label,
                 ShippingMethodWrapper.getShippingMethods(SessionManager
-                    .getAppService()), shipmentInfo.getShippingMethod(), null,
+                    .getAppService()), shipmentInfo
+                    .getShippingMethod(), null,
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -272,7 +264,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         dateSentWidget =
             createDateTimeWidget(client, departedLabel,
-                shipmentInfo.getPackedAt(), shipmentInfo,
+                shipmentInfo.getPackedAt(),
+                shipmentInfo,
                 ShipmentInfoPeer.PACKED_AT.getName(), departedValidator,
                 SWT.DATE | SWT.TIME, DATE_SHIPPED_BINDING);
         activateDepartedWidget(shipmentInfo.getShippingMethod() != null
@@ -284,7 +277,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         boxLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         boxNumberWidget =
             (BgcBaseText) createBoundWidget(client, BgcBaseText.class,
-                SWT.NONE, waybillLabel, new String[0], shipmentInfo,
+                SWT.NONE, waybillLabel, new String[0],
+                shipmentInfo,
                 ShipmentInfoPeer.BOX_NUMBER.getName(), null, BOX_NUMBER_BINDING);
 
         ClinicWrapper clinic = (ClinicWrapper) originInfo.getCenter();
@@ -293,7 +287,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         }
 
         createDateTimeWidget(client, Messages.ShipmentEntryForm_received_label,
-            shipmentInfo.getReceivedAt(), shipmentInfo,
+            shipmentInfo.getReceivedAt(),
+            shipmentInfo,
             ShipmentInfoPeer.RECEIVED_AT.getName(), new NotNullValidator(
                 Messages.ShipmentEntryForm_received_validation_msg));
 
@@ -353,9 +348,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
         toolkit.paintBordersFor(client);
-
-        List<SpecimenWrapper> specimens =
-            originInfo.getSpecimenCollection(true);
 
         specimenEntryWidget =
             new SpecimenEntryWidget(client, SWT.NONE, toolkit,
@@ -498,50 +490,17 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 removedSpecimenIds);
         ShipmentInfoSaveInfo siInfo =
             new ShipmentInfoSaveInfo(shipmentInfo.getId(),
-                shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(),
-                shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),
+                shipmentInfo.getBoxNumber(), originInfo
+                    .getShipmentInfo()
+                    .getPackedAt(),
+                shipmentInfo.getReceivedAt(), originInfo
+                    .getShipmentInfo().getWaybill(),
                 shipmentInfo.getShippingMethod().getId());
         OriginInfoSaveAction save =
             new OriginInfoSaveAction(oiInfo, siInfo);
         originInfo.setId(SessionManager.getAppService().doAction(save).getId());
         ((AdapterBase) adapter).setModelObject(originInfo);
     }
-
-    /*
-     * protected void doTrySettingAgain() throws Exception { // remove added
-     * specimens and add removed specimens and try to // add/remove them again
-     * (after reloading them) through the // SpecimenEntryWidget to check again
-     * if can perform the action
-     * 
-     * List<SpecimenWrapper> addedSpecimens =
-     * specimenEntryWidget.getAddedSpecimens();
-     * 
-     * List<SpecimenWrapper> removedSpecimens =
-     * specimenEntryWidget.getRemovedSpecimens(); List<SpecimenWrapper>
-     * pEventSpecs = originInfo.getSpecimenCollection(false);
-     * pEventSpecs.removeAll(addedSpecimens);
-     * pEventSpecs.addAll(removedSpecimens); for (SpecimenWrapper sp :
-     * pEventSpecs) { sp.reload(); }
-     * originInfo.setSpecimenWrapperCollection(pEventSpecs);
-     * specimenEntryWidget.setSpecimens(pEventSpecs);
-     * 
-     * Map<String, String> problems = new HashMap<String, String>(); for
-     * (SpecimenWrapper spec : addedSpecimens) { String inventoryId =
-     * spec.getInventoryId(); try { spec.reload();
-     * specimenEntryWidget.addSpecimen(spec); } catch (Exception ex) {
-     * problems.put(Messages.ShipmentEntryForm_adding_label + " " + inventoryId,
-     * ex.getMessage()); //$NON-NLS-1$ } } for (SpecimenWrapper spec :
-     * removedSpecimens) { String inventoryId = spec.getInventoryId(); try {
-     * spec.reload(); specimenEntryWidget.removeSpecimen(spec); } catch
-     * (Exception ex) { problems.put(Messages.ShipmentEntryForm_removing_label +
-     * " " + inventoryId, ex.getMessage()); //$NON-NLS-1$ } } if
-     * (problems.size() != 0) { StringBuffer msg = new StringBuffer(); for
-     * (Entry<String, String> entry : problems.entrySet()) { if (msg.length() >
-     * 0) msg.append("\n"); //$NON-NLS-1$
-     * msg.append(entry.getKey()).append(": ") //$NON-NLS-1$
-     * .append(entry.getValue()); } throw new BiobankException(
-     * Messages.ShipmentEntryForm_tryAgain_error_msg + msg.toString()); } }
-     */
 
     @Override
     protected void doAfterSave() throws Exception {
@@ -562,8 +521,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         originInfo.setShipmentInfo(shipmentInfo);
 
-        specimenEntryWidget.setSpecimens(originInfo
-            .getSpecimenCollection(false));
+        specimenEntryWidget.setSpecimens(specimens);
 
         setDefaultValues();
         GuiUtil.reset(senderComboViewer, originInfo.getCenter());
