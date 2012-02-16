@@ -11,7 +11,17 @@
 		<property name="c3p0.max_size">10</property>
 		<property name="c3p0.min_size">2</property>
 		<property name="c3p0.timeout">5000</property>
-		<property name="c3p0.max_statements">100</property>
+		
+		<!-- ZERO because when hibernate calls `result = conn.prepareStatement( sql );` (in 
+		AbstractBatcher) a PreparedStatement is returned by c3p0 that already has batches in
+		it, so, if it was executed immediately, it would already insert rows, even
+		though we never told it to add any, see this bug:
+		http://sourceforge.net/tracker/?func=detail&aid=3019762&group_id=25357&atid=383690
+		
+		Possible fixes are for us to call clearBatch() on the ps, or to use another 
+		connection pooler -->
+		<property name="c3p0.max_statements">0</property>
+		
 		<property name="c3p0.idle_test_period">3000</property>
 		<property name="c3p0.acquire_increment">2</property>
 		<property name="c3p0.validate">false</property>
