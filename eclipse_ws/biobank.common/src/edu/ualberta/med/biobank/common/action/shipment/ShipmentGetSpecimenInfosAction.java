@@ -24,7 +24,6 @@ public class ShipmentGetSpecimenInfosAction implements
         + Specimen.class.getName() + " as spec" + " inner join fetch spec."
         + SpecimenPeer.SPECIMEN_TYPE.getName() + " left join fetch spec."
         + SpecimenPeer.COMMENT_COLLECTION.getName() + " inner join fetch spec."
-        + SpecimenPeer.ACTIVITY_STATUS.getName() + " inner join fetch spec."
         + SpecimenPeer.COLLECTION_EVENT.getName() + " cevent"
         + " inner join fetch spec." + SpecimenPeer.ORIGIN_INFO.getName()
         + " originInfo inner join fetch originInfo."
