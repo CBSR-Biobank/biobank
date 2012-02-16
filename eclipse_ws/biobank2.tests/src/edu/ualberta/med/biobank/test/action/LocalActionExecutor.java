@@ -36,9 +36,8 @@ public class LocalActionExecutor implements IActionExecutor {
         // session and close it before and after this action is executed, every
         // time. The User object should also be loaded fresh from the database.
         Session session = sessionProvider.openSession();
+        Transaction transaction = session.beginTransaction();
         try {
-            Transaction transaction = session.beginTransaction();
-
             User user = (User) session.createCriteria(User.class)
                 .add(Restrictions.eq("id", userId))
                 .list().iterator().next();
@@ -54,8 +53,11 @@ public class LocalActionExecutor implements IActionExecutor {
 
             return result;
         } catch (RuntimeException e) {
+            transaction.rollback();
+
             throw e;
         } finally {
+            session.clear();
             session.close();
         }
     }
