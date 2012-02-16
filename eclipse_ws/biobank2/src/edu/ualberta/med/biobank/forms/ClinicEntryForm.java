@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +27,7 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
@@ -84,7 +84,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         Assert.isTrue((adapter instanceof ClinicAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
-        updateClinicInfo();
+        clinicAdapter = (ClinicAdapter) adapter;
+        updateClinicInfo(adapter.getId());
         String tabName;
         if (clinic.isNew()) {
             tabName = Messages.ClinicEntryForm_title_new;
@@ -96,16 +97,16 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         setPartName(tabName);
     }
 
-    private void updateClinicInfo() throws Exception {
-        if (adapter.getId() != null) {
+    private void updateClinicInfo(Integer id) throws Exception {
+        if (id != null) {
             clinicInfo = SessionManager.getAppService().doAction(
-                new ClinicGetInfoAction(adapter.getId()));
+                new ClinicGetInfoAction(id));
             clinic =
                 new ClinicWrapper(SessionManager.getAppService(),
                     clinicInfo.clinic);
         } else {
-            clinic =
-                new ClinicWrapper(SessionManager.getAppService());
+            clinicInfo = new ClinicInfo();
+            clinic = new ClinicWrapper(SessionManager.getAppService());
         }
     }
 
@@ -192,9 +193,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private void createContactSection() {
         Section section = createSection(Messages.clinic_contact_title);
 
-        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
-        for (Contact c : clinicInfo.contacts)
-            contacts.add(new ContactWrapper(SessionManager.getAppService(), c));
+        List<ContactWrapper> contacts = ModelWrapper.wrapModelCollection(
+            SessionManager.getAppService(), clinicInfo.contacts,
+            ContactWrapper.class);
 
         contactEntryWidget = new ContactEntryInfoTable(section, contacts);
         contactEntryWidget.adaptToToolkit(toolkit, true);
@@ -237,7 +238,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         saveClinic.setCommentText(comment.getMessage());
         Integer id =
             SessionManager.getAppService().doAction(saveClinic).getId();
-        clinic.setId(id);
+        updateClinicInfo(id);
         ((AdapterBase) adapter).setModelObject(clinic);
         SessionManager.updateAllSimilarNodes(clinicAdapter, true);
         SessionManager.getUser().updateCurrentCenter(clinic);
@@ -246,6 +247,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private HashSet<ContactSaveInfo> getNewContactInfo() {
         HashMap<Integer, ContactSaveInfo> allContacts =
             new HashMap<Integer, ContactSaveInfo>();
+
         for (Contact contact : clinicInfo.contacts) {
             allContacts.put(contact.getId(), new ContactSaveInfo(contact));
         }

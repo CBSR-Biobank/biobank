@@ -88,7 +88,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         if (wrapper instanceof ClinicWrapper) {
             String myName = wrappedObject.getName();
             String wrapperName = wrapper.wrappedObject.getName();
-            return myName.compareTo(wrapperName);
+            return ModelWrapper.nullSafeComparator(myName, wrapperName);
         }
         return 0;
     }
