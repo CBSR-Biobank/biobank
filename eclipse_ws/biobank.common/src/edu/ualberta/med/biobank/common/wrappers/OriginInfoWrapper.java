@@ -210,4 +210,5 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     public void setSpecimenWrapperCollection(List<SpecimenWrapper> specs) {
         setWrapperCollection(OriginInfoPeer.SPECIMEN_COLLECTION, specs);
     }
+
 }

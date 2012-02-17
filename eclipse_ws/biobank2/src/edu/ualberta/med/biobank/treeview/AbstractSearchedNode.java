@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -24,8 +26,8 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractSearchedNode.class.getName());
 
-    protected ArrayList<Object> searchedObjects = new ArrayList<Object>();
-    protected ArrayList<Integer> searchedObjectIds = new ArrayList<Integer>();
+    protected Set<Object> searchedObjects = new HashSet<Object>();
+    protected Set<Integer> searchedObjectIds = new HashSet<Integer>();
 
     private boolean keepDirectLeafChild;
 
@@ -72,7 +74,9 @@ public abstract class AbstractSearchedNode extends AdapterBase {
                             .getModelObject();
                         if (subChildObj instanceof ModelWrapper) {
                             wrapper = (ModelWrapper<?>) subChildObj;
-                            wrapper.reload();
+                            // wrapper.reload();
+                            // FIXME: using reload here breaks a lot of stuff,
+                            // why?
                         }
                     }
                     Integer subChildId = subChild.getId();
@@ -179,6 +183,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         searchedObjects.clear();
         searchedObjectIds.clear();
         removeAll();
+        performExpand();
     }
 
     public void removeObject(Object child, Integer childId) {

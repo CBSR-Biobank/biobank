@@ -13,23 +13,27 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentViewForm extends BiobankViewForm {
 
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ShipmentViewForm"; //$NON-NLS-1$
 
-    private OriginInfoWrapper originInfo;
+    private OriginInfoWrapper originInfo = new OriginInfoWrapper(
+        SessionManager.getAppService());
 
     private BgcBaseText senderLabel;
 
@@ -49,23 +53,39 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private CommentCollectionInfoTable commentEntryTable;
 
-    private ShipmentReadInfo oiInfo;
+    private ShipmentInfoWrapper shipmentInfo = new ShipmentInfoWrapper(
+        SessionManager.getAppService());
+
+    private List<SpecimenWrapper> specimens;
 
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ShipmentAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
-        if (adapter.getId() != null) {
-            oiInfo =
-                SessionManager.getAppService().doAction(
-                    new ShipmentGetInfoAction(adapter.getId()));
-            originInfo =
-                new OriginInfoWrapper(SessionManager.getAppService(), oiInfo.oi);
-        } else
-            originInfo =
-                new OriginInfoWrapper(SessionManager.getAppService());
+        setOiInfo(adapter.getId());
         setPartName();
+    }
+
+    private void setOiInfo(Integer id) throws ApplicationException {
+        if (id == null) {
+            OriginInfo oi = new OriginInfo();
+            oi.setShipmentInfo(new ShipmentInfo());
+            originInfo.setWrappedObject(oi);
+            shipmentInfo.setWrappedObject(oi.getShipmentInfo());
+            specimens = new ArrayList<SpecimenWrapper>();
+        } else {
+            ShipmentReadInfo read =
+                SessionManager.getAppService().doAction(
+                    new ShipmentGetInfoAction(id));
+            originInfo.setWrappedObject(read.oi);
+            shipmentInfo.setWrappedObject(read.oi.getShipmentInfo());
+            specimens =
+                ModelWrapper.wrapModelCollection(
+                    SessionManager.getAppService(), read.specimens,
+                    SpecimenWrapper.class);
+        }
+
     }
 
     @Override
@@ -87,17 +107,8 @@ public class ShipmentViewForm extends BiobankViewForm {
         specimenWidget =
             new SpecimenEntryWidget(client, SWT.NONE, toolkit,
                 SessionManager.getAppService(), false);
-        specimenWidget.setSpecimens(getSpecs());
+        specimenWidget.setSpecimens(specimens);
         specimenWidget.addDoubleClickListener(collectionDoubleClickListener);
-    }
-
-    private List<SpecimenWrapper> getSpecs() {
-        List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>();
-        for (Specimen spec : oiInfo.specimens) {
-            specs
-                .add(new SpecimenWrapper(SessionManager.getAppService(), spec));
-        }
-        return specs;
     }
 
     private void createMainSection() {
@@ -180,7 +191,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         setShipmentValues();
 
         commentEntryTable.setList(originInfo.getCommentCollection(false));
-        specimenWidget.setSpecimens(getSpecs());
+        specimenWidget.setSpecimens(specimens);
     }
 
     private void setPartName() {
