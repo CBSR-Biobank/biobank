@@ -46,9 +46,15 @@ public class P2Util {
 
     @SuppressWarnings("restriction")
     public static void checkForUpdates() {
-        final IProvisioningAgent agent = (IProvisioningAgent) org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper
-            .getService(BiobankPlugin.bundleContext,
-                IProvisioningAgent.SERVICE_NAME);
+        if (BiobankPlugin.getDefault().isDebugging()) {
+            // do not try to update the client if running in debug mode
+            return;
+        }
+
+        final IProvisioningAgent agent =
+            (IProvisioningAgent) org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper
+                .getService(BiobankPlugin.bundleContext,
+                    IProvisioningAgent.SERVICE_NAME);
         if (agent == null) {
             logger
                 .addRcpLogStatus(
