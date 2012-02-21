@@ -8,6 +8,6 @@ select (select coalesce(MAX(id), 0)+1 from membership),
 0, id from principal where name='Super Administrators';
 
 -- add a 'AdministratorPersmission permission (id = 1 ) to this membership
-insert into membership_permission(id, permission_name) values
-((select max(id) from membership), 'ADMINISTRATION');
+insert into membership_permission(id, permission_id) values
+((select max(id) from membership), 1);
 

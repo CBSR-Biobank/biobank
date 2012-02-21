@@ -3,15 +3,21 @@ package edu.ualberta.med.biobank.model;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * The names of these enumerations are saved in the database. Therefore, DO NOT
- * CHANGE THESE ENUM INSTANCE/ VARIABLE NAMES (unless you are prepared to write
- * an upgrade script). However, order does not matter and can be changed.
+ * The id of these enumerations are saved in the database. Therefore, DO NOT
+ * CHANGE THESE ENUM IDS (unless you are prepared to write an upgrade script).
+ * However, order and enum name can be modified freely.
+ * <p>
+ * Also, these enums should probably never be deleted, unless they are not used
+ * in <em>any</em> database. Instead, they should be deprecated and probably
+ * always return false when checking allow-ability.
  * 
- * @author jferland
+ * @author Jonathan Ferland
  * 
  */
 public enum PermissionEnum implements Serializable {
@@ -102,19 +108,39 @@ public enum PermissionEnum implements Serializable {
 
     private static final List<PermissionEnum> VALUES_LIST = Collections
         .unmodifiableList(Arrays.asList(values()));
+    private static final Map<Integer, PermissionEnum> VALUES_MAP;
 
-    private final Integer permissionId;
+    static {
+        Map<Integer, PermissionEnum> map =
+            new HashMap<Integer, PermissionEnum>();
+
+        for (PermissionEnum permissionEnum : values()) {
+            map.put(permissionEnum.getId(), permissionEnum);
+        }
+
+        VALUES_MAP = Collections.unmodifiableMap(map);
+    }
+
+    private final Integer id;
 
     private PermissionEnum(Integer permissionId) {
-        this.permissionId = permissionId;
+        this.id = permissionId;
     }
 
     public static List<PermissionEnum> valuesList() {
         return VALUES_LIST;
     }
 
+    public static Map<Integer, PermissionEnum> valuesMap() {
+        return VALUES_MAP;
+    }
+
     public Integer getId() {
-        return permissionId;
+        return id;
+    }
+
+    public static PermissionEnum fromId(Integer id) {
+        return valuesMap().get(id);
     }
 
     public boolean isAllowed(User user) {
@@ -152,8 +178,8 @@ public enum PermissionEnum implements Serializable {
         Set<Membership> membs = principal.getMembershipCollection();
         if (membs != null) {
             for (Membership memb : membs) {
-                boolean x = isMembershipAllowed(memb, center, study);
-                if (x) {
+                boolean allowed = isMembershipAllowed(memb, center, study);
+                if (allowed) {
                     return true;
                 }
             }

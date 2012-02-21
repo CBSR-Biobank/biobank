@@ -42,8 +42,7 @@ public class Role extends AbstractBiobankModel {
     @ElementCollection(targetClass = PermissionEnum.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "ROLE_PERMISSION",
         joinColumns = @JoinColumn(name = "ID"))
-    @Column(name = "PERMISSION_NAME")
-    @Enumerated(EnumType.STRING)
+    @Column(name = "PERMISSION_ID", nullable = false)
     public Set<PermissionEnum> getPermissionCollection() {
         return this.permissionCollection;
     }

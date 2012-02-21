@@ -35,7 +35,7 @@ public enum ActivityStatus {
         return name;
     }
 
-    public ActivityStatus fromId(int id) {
+    public static ActivityStatus fromId(int id) {
         for (ActivityStatus item : values()) {
             if (item.id == id) {
                 return item;

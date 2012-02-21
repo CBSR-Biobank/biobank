@@ -3,9 +3,13 @@
         typeClass = GenericEnumUserType.class,
         defaultForType = ActivityStatus.class,
         parameters = {
-            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.ActivityStatus"),
-            @Parameter(name = "identifierMethod", value = "getId"),
-            @Parameter(name = "valueOfMethod", value = "fromId")
+            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.ActivityStatus")
+        }),
+    @TypeDef(
+        typeClass = GenericEnumUserType.class,
+        defaultForType = PermissionEnum.class,
+        parameters = {
+            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.PermissionEnum")
         })
 })
 package edu.ualberta.med.biobank.model;
