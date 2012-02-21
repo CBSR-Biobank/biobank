@@ -233,7 +233,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             dispatch, edit) {
             @Override
             public List<DispatchSpecimenWrapper> getInternalDispatchSpecimens() {
-                return dispatch.getNonProcessedDispatchSpecimenCollection();
+                return specimens;
             }
         };
         specimensNonProcessedTable.adaptToToolkit(toolkit, true);

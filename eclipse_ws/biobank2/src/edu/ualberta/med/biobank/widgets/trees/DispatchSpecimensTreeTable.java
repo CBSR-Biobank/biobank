@@ -104,8 +104,9 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
-                groups = DispatchTableGroup
-                    .getGroupsForShipment(DispatchSpecimensTreeTable.this.shipment);
+                groups =
+                    DispatchTableGroup
+                        .getGroupsForShipment(DispatchSpecimensTreeTable.this.shipment);
             }
 
             @Override
@@ -144,8 +145,9 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                     return ""; //$NON-NLS-1$
                 } else if (element instanceof TreeItemAdapter) {
                     if (columnIndex == 4)
-                        return CommentWrapper.commentListToString(((DispatchSpecimenWrapper) ((TreeItemAdapter) element)
-                            .getSpecimen()).getCommentCollection(false));
+                        return CommentWrapper
+                            .commentListToString(((DispatchSpecimenWrapper) ((TreeItemAdapter) element)
+                                .getSpecimen()).getCommentCollection(false));
                     return ((TreeItemAdapter) element)
                         .getColumnText(columnIndex);
                 }
@@ -224,8 +226,11 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         DispatchSpecimenState newState) {
         String previousComment = null;
         if (iStructuredSelection.size() == 1) {
-            previousComment = CommentWrapper.commentListToString(((DispatchSpecimenWrapper) ((TreeItemAdapter) iStructuredSelection
-                .getFirstElement()).getSpecimen()).getCommentCollection(false));
+            previousComment =
+                CommentWrapper
+                    .commentListToString(((DispatchSpecimenWrapper) ((TreeItemAdapter) iStructuredSelection
+                        .getFirstElement()).getSpecimen())
+                        .getCommentCollection(false));
         }
         ModifyStateDispatchDialog dialog = new ModifyStateDispatchDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
@@ -235,8 +240,9 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
             String comment = dialog.getComment();
             for (Iterator<?> iter = iStructuredSelection.iterator(); iter
                 .hasNext();) {
-                DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) ((TreeItemAdapter) iter
-                    .next()).getSpecimen();
+                DispatchSpecimenWrapper dsa =
+                    (DispatchSpecimenWrapper) ((TreeItemAdapter) iter
+                        .next()).getSpecimen();
                 CommentWrapper commentOb = new CommentWrapper(
                     SessionManager.getAppService());
                 commentOb.setCreatedAt(new Date());
