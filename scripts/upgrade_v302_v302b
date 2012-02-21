@@ -57,4 +57,4 @@ echo "extracting old database..."
 mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank create biobank
 gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
 echo "upgrading database..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v301_v302.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v302_v302b.sql
