@@ -14,13 +14,14 @@ import org.hibernate.usertype.ParameterizedType;
 import org.hibernate.usertype.UserType;
 
 public class GenericEnumUserType implements UserType, ParameterizedType {
+    private static final String DEFAULT_IDENTIFIER_METHOD_NAME = "getId";
+    private static final String DEFAULT_VALUE_OF_METHOD_NAME = "fromId";
+    
     @SuppressWarnings("rawtypes")
     private Class<? extends Enum> enumClass;
     private Class<?> identifierType;
     private Method identifierMethod;
     private Method valueOfMethod;
-    private static final String defaultIdentifierMethodName = "name";
-    private static final String defaultValueOfMethodName = "valueOf";
     private AbstractSingleColumnStandardBasicType<?> type;
     private int[] sqlTypes;
 
@@ -35,7 +36,7 @@ public class GenericEnumUserType implements UserType, ParameterizedType {
 
         String identifierMethodName =
             parameters.getProperty("identifierMethod",
-                defaultIdentifierMethodName);
+                DEFAULT_IDENTIFIER_METHOD_NAME);
 
         try {
             identifierMethod = enumClass.getMethod(identifierMethodName,
@@ -57,7 +58,7 @@ public class GenericEnumUserType implements UserType, ParameterizedType {
         sqlTypes = new int[] { type.sqlType() };
 
         String valueOfMethodName = parameters.getProperty("valueOfMethod",
-            defaultValueOfMethodName);
+            DEFAULT_VALUE_OF_METHOD_NAME);
 
         try {
             valueOfMethod = enumClass.getMethod(valueOfMethodName,
