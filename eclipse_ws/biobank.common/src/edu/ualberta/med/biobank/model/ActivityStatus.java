@@ -8,6 +8,9 @@ public enum ActivityStatus {
     // TODO: a key for translation? Even if comes from server is enum, so will
     // use local translation.
     // TODO: comment on NOT CHANGING THE ID!!!
+    // 0 value is necessary for hibernate
+    @Deprecated
+    DUMMY(0, "DUMMY"),
     ACTIVE(1, "Active"),
     CLOSED(2, "Closed"),
     FLAGGED(4, "Flagged");
@@ -30,7 +33,7 @@ public enum ActivityStatus {
     public int getId() {
         return id;
     }
-    
+
     public String getName() {
         return name;
     }
