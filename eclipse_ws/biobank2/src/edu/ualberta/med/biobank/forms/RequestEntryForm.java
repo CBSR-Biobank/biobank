@@ -40,6 +40,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.RequestReceiveScanDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
@@ -52,13 +53,13 @@ public class RequestEntryForm extends BiobankViewForm {
 
     public static final String ID =
         "edu.ualberta.med.biobank.forms.RequestEntryFormBase"; //$NON-NLS-1$
-    private RequestWrapper request;
+    private RequestWrapper request = new RequestWrapper(
+        SessionManager.getAppService());
     private RequestSpecimensTreeTable specimensTree;
     private RequestDispatchInfoTable dispatchTable;
     private BgcBaseText newSpecimenText;
     private Button addButton;
     private Button openScanButton;
-    private RequestReadInfo requestInfo;
 
     @Override
     protected void init() throws Exception {
@@ -67,19 +68,24 @@ public class RequestEntryForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        if (adapter.getId() != null) {
-            requestInfo = SessionManager.getAppService().doAction(
-                new RequestGetInfoAction(adapter.getId()));
-            request =
-                new RequestWrapper(SessionManager.getAppService(),
-                    requestInfo.request);
-        } else
-            request = new RequestWrapper(SessionManager.getAppService());
+        setRequestInfo(adapter.getId());
 
         SessionManager.logEdit(request);
 
         setPartName(Messages.RequestEntryForm_title
             + request.getId().toString());
+    }
+
+    private void setRequestInfo(Integer id) throws ApplicationException {
+        if (id == null) {
+            Request r = new Request();
+            request.setWrappedObject(r);
+        } else {
+            RequestReadInfo read =
+                SessionManager.getAppService().doAction(
+                    new RequestGetInfoAction(id));
+            request.setWrappedObject(read.request);
+        }
     }
 
     @Override
