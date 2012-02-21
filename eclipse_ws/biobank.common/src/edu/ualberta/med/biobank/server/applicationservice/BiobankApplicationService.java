@@ -92,4 +92,7 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public List<String> executeGetSourceSpecimenUniqueInventoryIds(int numIds)
         throws ApplicationException;
 
+    public String uploadFile(byte[] bytes, String uploadFile)
+        throws ApplicationException;
+
 }

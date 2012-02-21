@@ -123,6 +123,18 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+
+        // If there is no TempLogger Device ID entered
+        // Note: If there is has been a TempLogger previously persisted clearing
+        // the device ID entry will not delete the record, no update will occur
+        // for device ID
+        if (dispatch.getShipmentInfo() != null
+            && dispatch.getShipmentInfo().getShipmentTempLogger() != null
+            && (dispatch.getShipmentInfo().getShipmentTempLogger()
+                .getDeviceId() == null || dispatch.getShipmentInfo()
+                .getShipmentTempLogger().getDeviceId().isEmpty())) {
+            dispatch.getShipmentInfo().setShipmentTempLogger(null);
+        }
         dispatch.persist();
 
         Display.getDefault().asyncExec(new Runnable() {

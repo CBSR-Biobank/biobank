@@ -237,4 +237,15 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         log.setType("Shipment");
         return log;
     }
+
+    @Override
+    protected void persistDependencies(OriginInfo origObject) throws Exception {
+
+        if (getShipmentInfo() != null
+            && getShipmentInfo().getShipmentTempLogger() != null
+            && getShipmentInfo().getShipmentTempLogger().getFile() != null) {
+            getShipmentInfo().getShipmentTempLogger().setFileIdForCurrentFile();
+        }
+    }
+
 }

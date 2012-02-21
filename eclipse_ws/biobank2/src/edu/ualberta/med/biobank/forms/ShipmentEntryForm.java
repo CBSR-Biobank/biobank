@@ -1,28 +1,38 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentTempLoggerPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentTempLoggerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -82,6 +92,32 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private Set<SpecimenWrapper> specimensToPersist = new HashSet<SpecimenWrapper>();
 
+    private Button radioTempPass;
+    private Button radioTempFail;
+    private Button uploadButton;
+    private String path;
+
+    private static final String HI_TEMP_BINDING = "hi-temp-binding";
+    private static final String LOW_TEMP_BINDING = "low-temp-binding";
+    private static final String ABOVE_MAX_TEMP_BINDING = "above-max-temp-binding";
+    private static final String BELOW_MAX_TEMP_BINDING = "below-max-binding";
+
+    private Label hiTempLabel;
+    private Label lowTempLabel;
+    private Label aboveMaxTempLabel;
+    private Label belowMaxTempLabel;
+    private Label tempResultLabel;
+    private Label uploadtLabel;
+
+    private BgcBaseText hiTempWidget;
+    private BgcBaseText lowTempWidget;
+    private BgcBaseText aboveMaxTempWidget;
+    private BgcBaseText belowMaxTempWidget;
+    private BgcBaseText deviceIDWidget;
+
+    private Composite passFailComposite;
+    private Composite uploadComposite;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ShipmentAdapter,
@@ -103,6 +139,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         } else {
             tabName = "Shipment "
                 + originInfo.getShipmentInfo().getFormattedDateReceived();
+        }
+        if (shipmentInfo.getShipmentTempLogger() == null) {
+            ShipmentTempLoggerWrapper shipLogger = new ShipmentTempLoggerWrapper(
+                SessionManager.getAppService());
+            shipmentInfo.setShipmentTempLogger(shipLogger);
+            shipmentInfo.getShipmentTempLogger().setShipmentInfo(shipmentInfo);
         }
         setPartName(tabName);
     }
@@ -197,6 +239,212 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             shipmentInfo, ShipmentInfoPeer.RECEIVED_AT.getName(),
             new NotNullValidator("Date Received should be set"));
 
+        if (originInfo.isNew()
+            || originInfo.getShipmentInfo().getShipmentTempLogger()
+                .getDeviceId() == null) {
+            deviceIDWidget = (BgcBaseText) createBoundWidgetWithLabel(client,
+                BgcBaseText.class, SWT.NONE, "Logger Device ID", null,
+                shipmentInfo.getShipmentTempLogger(),
+                ShipmentTempLoggerPeer.DEVICE_ID.getName(), null);
+            deviceIDWidget.addListener(SWT.Modify, new Listener() {
+                // org.eclipse.swt.widgets.Event conflicts with the other Event
+                @Override
+                public void handleEvent(org.eclipse.swt.widgets.Event event) {
+                    if (!deviceIDWidget.getText().trim().isEmpty()) {
+                        activateLoggerWidgets(true);
+                    } else {
+                        activateLoggerWidgets(false);
+                    }
+                }
+            });
+
+        } else {
+            BgcBaseText deviceIDLabel = createReadOnlyLabelledField(client,
+                SWT.NONE, "Logger Device ID");
+            setTextValue(deviceIDLabel, originInfo.getShipmentInfo()
+                .getShipmentTempLogger().getDeviceId());
+        }
+
+        hiTempLabel = widgetCreator.createLabel(client,
+            "Highest temperature during transport (Celcius)");
+        hiTempLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+        hiTempWidget = (BgcBaseText) createBoundWidget(client,
+            BgcBaseText.class, SWT.NONE, hiTempLabel, new String[0],
+            shipmentInfo.getShipmentTempLogger(),
+            ShipmentTempLoggerPeer.HIGH_TEMPERATURE.getName(),
+            new NonEmptyStringValidator("Highest temperature should be set"),
+            HI_TEMP_BINDING);
+
+        lowTempLabel = widgetCreator.createLabel(client,
+            "Lowest temperature during transport (Celcius)");
+        lowTempLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+        lowTempWidget = (BgcBaseText) createBoundWidget(client,
+            BgcBaseText.class, SWT.NONE, lowTempLabel, new String[0],
+            shipmentInfo.getShipmentTempLogger(),
+            ShipmentTempLoggerPeer.LOW_TEMPERATURE.getName(),
+            new NonEmptyStringValidator("Lowest temperature should be set"),
+            LOW_TEMP_BINDING);
+
+        tempResultLabel = widgetCreator.createLabel(client,
+            "Shipment temperature result");
+        tempResultLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+        passFailComposite = createPassFail(client);
+
+        aboveMaxTempLabel = widgetCreator.createLabel(client,
+            "Number of minutes above maximum threshold");
+        aboveMaxTempLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+        aboveMaxTempWidget = (BgcBaseText) createBoundWidget(client,
+            BgcBaseText.class, SWT.NONE, aboveMaxTempLabel, new String[0],
+            shipmentInfo.getShipmentTempLogger(),
+            ShipmentTempLoggerPeer.MINUTES_ABOVE_MAX.getName(), null,
+            ABOVE_MAX_TEMP_BINDING);
+
+        belowMaxTempLabel = widgetCreator.createLabel(client,
+            "Number of minutes below maximum threshold");
+        belowMaxTempLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+        belowMaxTempWidget = (BgcBaseText) createBoundWidget(client,
+            BgcBaseText.class, SWT.NONE, belowMaxTempLabel, new String[0],
+            shipmentInfo.getShipmentTempLogger(),
+            ShipmentTempLoggerPeer.MINUTES_BELOW_MAX.getName(), null,
+            BELOW_MAX_TEMP_BINDING);
+
+        uploadtLabel = widgetCreator.createLabel(client,
+            "Upload tempurature logger report");
+        uploadtLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+
+        uploadComposite = createUpload(client);
+
+        if (originInfo.getShipmentInfo().getShipmentTempLogger().getDeviceId() == null) {
+            activateLoggerWidgets(false);
+        } else {
+            activateLoggerWidgets(true);
+        }
+
+        // createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
+        // "Highest temperature during transport (Celcius)", null,
+        // shipmentInfo.getShipmentTempLogger(),
+        // ShipmentTempLoggerPeer.HIGH_TEMPERATURE.getName(), null);
+        //
+        // createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
+        // "Lowest temperature during transport (Celcius)", null,
+        // shipmentInfo.getShipmentTempLogger(),
+        // ShipmentTempLoggerPeer.LOW_TEMPERATURE.getName(), null);
+        //
+        // createPassFail(client);
+
+        // createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
+        // "Number of minutes above maximum threshold", null,
+        // shipmentInfo.getShipmentTempLogger(),
+        // ShipmentTempLoggerPeer.MINUTES_ABOVE_MAX.getName(), null);
+        //
+        // createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
+        // "Number of minutes below maximum threshold", null,
+        // shipmentInfo.getShipmentTempLogger(),
+        // ShipmentTempLoggerPeer.MINUTES_BELOW_MAX.getName(), null);
+        //
+        // createUpload(client);
+
+    }
+
+    protected Composite createPassFail(Composite client) {
+
+        Composite composite = new Composite(client, SWT.NONE);
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 30;
+        layout.marginHeight = 0;
+        layout.verticalSpacing = 0;
+        composite.setLayout(layout);
+        composite
+            .setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+
+        radioTempPass = new Button(composite, SWT.RADIO);
+        radioTempPass.setText("Pass");
+        radioTempFail = new Button(composite, SWT.RADIO);
+        radioTempFail.setText("Fail");
+        if (shipmentInfo.getShipmentTempLogger() != null
+            && shipmentInfo.getShipmentTempLogger().getTemperatureResult() != null) {
+            if (shipmentInfo.getShipmentTempLogger().getTemperatureResult()) {
+                radioTempPass.setSelection(true);
+            } else {
+                radioTempFail.setSelection(true);
+            }
+        }
+
+        radioTempPass.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (radioTempPass.getSelection()) {
+                    shipmentInfo.getShipmentTempLogger().setTemperatureResult(
+                        true);
+                    setDirty(true);
+                }
+            }
+        });
+
+        radioTempFail.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (radioTempFail.getSelection()) {
+                    shipmentInfo.getShipmentTempLogger().setTemperatureResult(
+                        false);
+                    setDirty(true);
+                }
+            }
+        });
+        return composite;
+    }
+
+    private Composite createUpload(Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        layout.marginHeight = 0;
+        layout.verticalSpacing = 0;
+        layout.marginLeft = -5;
+        composite.setLayout(layout);
+        composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(composite);
+
+        final BgcBaseText fileToUpload = widgetCreator.createReadOnlyField(
+            composite, SWT.NONE, "PDF File", true);
+
+        uploadButton = toolkit.createButton(composite, "Upload", SWT.NONE);
+        uploadButton.addListener(SWT.Selection, new Listener() {
+            // org.eclipse.swt.widgets.Event conflicts with the other Event
+            @Override
+            public void handleEvent(org.eclipse.swt.widgets.Event event) {
+                String[] filterExt = new String[] { "*.pdf" };
+                path = runFileDialog("home", filterExt);
+                if (path != null)
+                    fileToUpload.setText(path);
+                File fl = new File(path);
+                try {
+                    shipmentInfo.getShipmentTempLogger().setFile(
+                        FileUtils.readFileToByteArray(fl));
+                    setDirty(true);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+            }
+        });
+        return composite;
+    }
+
+    private String runFileDialog(String name, String[] exts) {
+        FileDialog fd = new FileDialog(form.getShell(), SWT.OPEN);
+        fd.setOverwrite(true);
+        fd.setText("Select PDF");
+        fd.setFilterExtensions(exts);
+        fd.setFileName(name);
+        return fd.open();
     }
 
     protected void activateWaybillWidget(boolean waybillNeeded) {
@@ -213,6 +461,56 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             } else {
                 widgetCreator.removeBinding(WAYBILL_BINDING);
                 waybillWidget.setText("");
+            }
+        }
+        form.layout(true, true);
+    }
+
+    protected void activateLoggerWidgets(boolean isNeeded) {
+        if (hiTempLabel != null && !hiTempLabel.isDisposed()) {
+            hiTempLabel.setVisible(isNeeded);
+            ((GridData) hiTempLabel.getLayoutData()).exclude = !isNeeded;
+            lowTempLabel.setVisible(isNeeded);
+            ((GridData) lowTempLabel.getLayoutData()).exclude = !isNeeded;
+            tempResultLabel.setVisible(isNeeded);
+            ((GridData) tempResultLabel.getLayoutData()).exclude = !isNeeded;
+            aboveMaxTempLabel.setVisible(isNeeded);
+            ((GridData) aboveMaxTempLabel.getLayoutData()).exclude = !isNeeded;
+            belowMaxTempLabel.setVisible(isNeeded);
+            ((GridData) belowMaxTempLabel.getLayoutData()).exclude = !isNeeded;
+            uploadtLabel.setVisible(isNeeded);
+            ((GridData) uploadtLabel.getLayoutData()).exclude = !isNeeded;
+
+        }
+        if (hiTempWidget != null && !hiTempWidget.isDisposed()) {
+            hiTempWidget.setVisible(isNeeded);
+            ((GridData) hiTempWidget.getLayoutData()).exclude = !isNeeded;
+            lowTempWidget.setVisible(isNeeded);
+            ((GridData) lowTempWidget.getLayoutData()).exclude = !isNeeded;
+            passFailComposite.setVisible(isNeeded);
+            ((GridData) passFailComposite.getLayoutData()).exclude = !isNeeded;
+            aboveMaxTempWidget.setVisible(isNeeded);
+            ((GridData) aboveMaxTempWidget.getLayoutData()).exclude = !isNeeded;
+            belowMaxTempWidget.setVisible(isNeeded);
+            ((GridData) belowMaxTempWidget.getLayoutData()).exclude = !isNeeded;
+            uploadComposite.setVisible(isNeeded);
+            ((GridData) uploadComposite.getLayoutData()).exclude = !isNeeded;
+            if (isNeeded) {
+                widgetCreator.addBinding(HI_TEMP_BINDING);
+                widgetCreator.addBinding(LOW_TEMP_BINDING);
+                widgetCreator.addBinding(ABOVE_MAX_TEMP_BINDING);
+                widgetCreator.addBinding(BELOW_MAX_TEMP_BINDING);
+            } else {
+                widgetCreator.removeBinding(HI_TEMP_BINDING);
+                widgetCreator.removeBinding(LOW_TEMP_BINDING);
+                widgetCreator.removeBinding(ABOVE_MAX_TEMP_BINDING);
+                widgetCreator.removeBinding(BELOW_MAX_TEMP_BINDING);
+                hiTempWidget.setText("");
+                lowTempWidget.setText("");
+                radioTempPass.setSelection(false);
+                radioTempFail.setSelection(true);
+                aboveMaxTempWidget.setText("");
+                belowMaxTempWidget.setText("");
             }
         }
         form.layout(true, true);
@@ -338,6 +636,14 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         if (originInfo.getShipmentInfo().getWaybill() != null
             && originInfo.getShipmentInfo().getWaybill().isEmpty()) {
             originInfo.getShipmentInfo().setWaybill(null);
+        }
+
+        // If there is no device ID don't persist ShipmentTempLogger
+        if (originInfo.getShipmentInfo().getShipmentTempLogger().getDeviceId() == null
+            || (originInfo.getShipmentInfo().getShipmentTempLogger()
+                .getDeviceId() != null && originInfo.getShipmentInfo()
+                .getDeviceID().isEmpty())) {
+            originInfo.getShipmentInfo().setShipmentTempLogger(null);
         }
 
         originInfo.persist();

@@ -1,15 +1,25 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentTempLoggerPeer;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
@@ -17,6 +27,7 @@ import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
@@ -24,6 +35,11 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm";
     private DispatchSpecimensTreeTable specimensTree;
+
+    private Button radioTempPass;
+    private Button radioTempFail;
+    private Button uploadButton;
+    private String path;
 
     @Override
     protected void createFormContent() throws Exception {
@@ -75,9 +91,144 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
             .getFormattedDateReceived());
 
+        if (dispatch.getShipmentInfo().getShipmentTempLogger() != null) {
+            BgcBaseText deviceIdLabel = createReadOnlyLabelledField(client,
+                SWT.NONE, "Logger Device ID");
+            setTextValue(deviceIdLabel, dispatch.getShipmentInfo()
+                .getShipmentTempLogger().getDeviceId());
+
+            createBoundWidgetWithLabel(
+                client,
+                BgcBaseText.class,
+                SWT.NONE,
+                "Highest temperature during transport (Celcius)",
+                null,
+                dispatch.getShipmentInfo().getShipmentTempLogger(),
+                ShipmentTempLoggerPeer.HIGH_TEMPERATURE.getName(),
+                new NonEmptyStringValidator("Highest temperature should be set"));
+
+            createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
+                "Lowest temperature during transport (Celcius)", null, dispatch
+                    .getShipmentInfo().getShipmentTempLogger(),
+                ShipmentTempLoggerPeer.LOW_TEMPERATURE.getName(),
+                new NonEmptyStringValidator("Lowest temperature should be set"));
+
+            createPassFail(client);
+
+            createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
+                "Number of minutes above maximum threshold", null, dispatch
+                    .getShipmentInfo().getShipmentTempLogger(),
+                ShipmentTempLoggerPeer.MINUTES_ABOVE_MAX.getName(), null);
+
+            createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
+                "Number of minutes below maximum threshold", null, dispatch
+                    .getShipmentInfo().getShipmentTempLogger(),
+                ShipmentTempLoggerPeer.MINUTES_BELOW_MAX.getName(), null);
+
+            createUpload(client);
+
+        }
+
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             "Comments", null, dispatch, DispatchPeer.COMMENT.getName(), null);
 
+    }
+
+    protected void createPassFail(Composite client) {
+
+        widgetCreator.createLabel(client, "Shipment temperature result");
+
+        Composite composite = new Composite(client, SWT.NONE);
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 30;
+        layout.marginHeight = 0;
+        layout.verticalSpacing = 0;
+        composite.setLayout(layout);
+
+        radioTempPass = new Button(composite, SWT.RADIO);
+        radioTempPass.setText("Pass");
+        radioTempFail = new Button(composite, SWT.RADIO);
+        radioTempFail.setText("Fail");
+
+        if (dispatch.getShipmentInfo().getShipmentTempLogger()
+            .getTemperatureResult() != null) {
+            if (dispatch.getShipmentInfo().getShipmentTempLogger()
+                .getTemperatureResult()) {
+                radioTempPass.setSelection(true);
+            } else {
+                radioTempFail.setSelection(true);
+            }
+        }
+
+        radioTempPass.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (radioTempPass.getSelection()) {
+                    dispatch.getShipmentInfo().getShipmentTempLogger()
+                        .setTemperatureResult(true);
+                    setDirty(true);
+                }
+            }
+        });
+
+        radioTempFail.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (radioTempFail.getSelection()) {
+                    dispatch.getShipmentInfo().getShipmentTempLogger()
+                        .setTemperatureResult(false);
+                    setDirty(true);
+                }
+            }
+        });
+    }
+
+    private void createUpload(Composite parent) {
+
+        widgetCreator.createLabel(parent, "Upload tempurature logger report");
+
+        Composite composite = toolkit.createComposite(parent);
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        layout.marginHeight = 0;
+        layout.verticalSpacing = 0;
+        layout.marginLeft = -5;
+        composite.setLayout(layout);
+        composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(composite);
+
+        final BgcBaseText fileToUpload = widgetCreator.createReadOnlyField(
+            composite, SWT.NONE, "PDF File", true);
+
+        uploadButton = toolkit.createButton(composite, "Upload", SWT.NONE);
+        uploadButton.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                String[] filterExt = new String[] { "*.pdf" };
+                path = runFileDialog("home", filterExt);
+
+                if (path != null)
+                    fileToUpload.setText(path);
+                File fl = new File(path);
+                try {
+                    dispatch.getShipmentInfo().getShipmentTempLogger()
+                        .setFile(FileUtils.readFileToByteArray(fl));
+                    // Make sure the persistence is called
+                    setDirty(true);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private String runFileDialog(String name, String[] exts) {
+        FileDialog fd = new FileDialog(form.getShell(), SWT.OPEN);
+        fd.setOverwrite(true);
+        fd.setText("Select PDF");
+        fd.setFilterExtensions(exts);
+        fd.setFileName(name);
+        return fd.open();
     }
 
     @Override

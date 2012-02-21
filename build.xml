@@ -53,7 +53,7 @@
   <property name="biobank.jar.files"
             value="gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
   <property name="biobank.common.jar.files"
-            value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar" />
+            value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar,commons-io-1.4.jar" />
   <property name="biobank.tools.jar.files"
             value="commons-io-1.4.jar, jargs.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar,mysql-connector-java-5.1.15-bin.jar" />
   <property name="cacore.system.jar.files"
@@ -241,28 +241,6 @@
     <copy file="${tmp.file}" tofile="${eclipse.proj.dir}/biobank2.product"
       overwrite="true"/>
   </target>
-  <!--
-<target name="hbm-class-sort">
- <taskdef resource="net/sf/antcontrib/antlib.xml">
-      <classpath>
-        <pathelement location="${product.dir}/ant-contrib/ant-contrib-1.0b3.jar" />
-      </classpath>
-    </taskdef>
-<for param="file">
-  <path>
-    <fileset dir="${cacore.sdk.dir}/output/biobank/src/edu/ualberta/med/biobank/model"
-             includes="*.hbm.xml"/>
-  </path>
-  <sequential>
-   <tempfile property="tmp.file" destdir="${java.io.tmpdir}" prefix="@{file}" />
-    <xslt in="@{file}"
-          out="${tmp.file}"
-          style="scripts/hbm-class-sort.xsl"/>
-    <copy file="${tmp.file}" tofile="@{file}" overwrite="true"/>
-  </sequential>
-</for>
-</target>
--->
 
 
   <target name="biobank-feature-core-version-modify">
@@ -481,7 +459,7 @@
     <ant dir="${schema.dir}" target="schemaexport" inheritRefs="false" />
   </target>
   <target name="dbcreate-add-tables" depends="sdk,package-webapp-orm">
-    <sql driver="${DB_DRIVER}"
+    <!--sql driver="${DB_DRIVER}"
          url="${DB_CONNECTION_URL}"
          userid="${DB_USERNAME}"
          password="${DB_PASSWORD}">
@@ -493,7 +471,7 @@
           <include name="*.jar" />
         </fileset>
       </classpath>
-    </sql>
+    </sql-->
     <antcall target="schema" />
     <sql driver="${DB_DRIVER}"
          url="${DB_CONNECTION_URL}"

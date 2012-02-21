@@ -108,6 +108,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 + " already exists for sending site "
                 + getSenderCenter().getNameShort());
         }
+
     }
 
     @Override
@@ -117,11 +118,17 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 dds.delete();
             }
         }
-
         // FIXME: temporary fix - this should be converted to a batch update
         for (DispatchSpecimenWrapper rds : toBePersistedDispatchedSpecimens) {
             rds.getSpecimen().persist();
         }
+        // To save the temperature report
+        if (getShipmentInfo() != null
+            && getShipmentInfo().getShipmentTempLogger() != null
+            && getShipmentInfo().getShipmentTempLogger().getFile() != null) {
+            getShipmentInfo().getShipmentTempLogger().setFileIdForCurrentFile();
+        }
+
     }
 
     private static final String WAYBILL_UNIQUE_FOR_SENDER_QRY = "from "
@@ -462,7 +469,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         if ((state != null)
             && ((state.equals(DispatchState.CREATION)
                 || state.equals(DispatchState.IN_TRANSIT) || state
-                .equals(DispatchState.LOST)))) {
+                    .equals(DispatchState.LOST)))) {
             String packedAt = getFormattedPackedAt();
             if ((packedAt != null) && (packedAt.length() > 0)) {
                 detailsList.add(new StringBuilder("packed at: ").append(
