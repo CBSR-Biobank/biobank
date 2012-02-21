@@ -1,7 +1,5 @@
 *.jasper
 backup/
-caCORE_SDK
-caCORE_SDK_411.tar.gz
 lib-sources/
 lib-sources.tar.bz2
 eclipse_ws/.metadata
