@@ -107,6 +107,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             clinicInfo = new ClinicInfo();
             clinic = new ClinicWrapper(SessionManager.getAppService());
         }
+        ((AdapterBase) adapter).setModelObject(clinic);
     }
 
     @Override
@@ -237,7 +238,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         Integer id =
             SessionManager.getAppService().doAction(saveClinic).getId();
         updateClinicInfo(id);
-        ((AdapterBase) adapter).setModelObject(clinic);
         SessionManager.updateAllSimilarNodes(clinicAdapter, true);
         SessionManager.getUser().updateCurrentCenter(clinic);
     }
