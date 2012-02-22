@@ -155,8 +155,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         activityStatusComboViewer = createComboViewer(client,
-            Messages.label_activity,
-            ActivityStatus.valuesList(), clinic.getActivityStatus(),
+            Messages.label_activity, ActivityStatus.valuesList(),
+            clinic.getActivityStatus(),
             Messages.ClinicEntryForm_activity_validator_msg,
             new ComboSelectionUpdate() {
                 @Override
