@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -21,16 +22,16 @@ import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
-import edu.ualberta.med.biobank.common.util.ModelUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
-import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
@@ -41,7 +42,8 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractDispatchEntryForm.class.getName());
 
-    protected DispatchWrapper dispatch;
+    protected DispatchWrapper dispatch = new DispatchWrapper(
+        SessionManager.getAppService());
 
     protected BgcEntryFormWidgetListener biobankListener =
         new BgcEntryFormWidgetListener() {
@@ -56,9 +58,12 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     protected DispatchReadInfo dispatchInfo;
 
-    protected CommentWrapper comment;
+    protected CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
 
     protected Set<Integer> oldSpecIds;
+
+    protected List<DispatchSpecimenWrapper> specimens;
 
     @Override
     protected void init() throws Exception {
@@ -67,24 +72,28 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        comment = new CommentWrapper(SessionManager.getAppService());
-        if (adapter.getId() != null) {
-            dispatchInfo = SessionManager.getAppService().doAction(
-                new DispatchGetInfoAction(adapter.getId()));
-            dispatch =
-                new DispatchWrapper(SessionManager.getAppService(),
-                    dispatchInfo.dispatch);
-        } else
-            dispatch = new DispatchWrapper(SessionManager.getAppService());
-
-        oldSpecIds =
-            ModelUtil
-                .getCollectionIds(dispatchInfo == null ? new ArrayList<DispatchSpecimen>()
-                    : dispatchInfo.specimens);
+        setDispatchInfo(adapter.getId());
 
         SessionManager.logEdit(dispatch);
 
         setPartName(getTextForPartName());
+    }
+
+    private void setDispatchInfo(Integer id) throws Exception {
+        if (id == null) {
+            Dispatch d = new Dispatch();
+            dispatch.setWrappedObject(d);
+            specimens = new ArrayList<DispatchSpecimenWrapper>();
+        } else {
+            DispatchReadInfo read =
+                SessionManager.getAppService().doAction(
+                    new DispatchGetInfoAction(adapter.getId()));
+            dispatch.setWrappedObject(read.dispatch);
+            specimens =
+                ModelWrapper.wrapModelCollection(
+                    SessionManager.getAppService(), read.specimens,
+                    DispatchSpecimenWrapper.class);
+        }
     }
 
     protected abstract String getTextForPartName();

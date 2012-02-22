@@ -243,7 +243,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 if (ActivityStatus.ACTIVE != sAttr.getActivityStatus()) {
                     throw new ActionException(
                         "Attribute for \"" + sAttr.getGlobalEventAttr().getLabel() //$NON-NLS-1$
-                            + "\" is locked, changes not premitted"); //$NON-NLS-1$
+                            + "\" is locked, changes not permitted"); //$NON-NLS-1$
                 }
 
                 if (attrInfo.value != null) {

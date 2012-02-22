@@ -226,11 +226,6 @@
             id="edu.ualberta.med.biobank.commands.reload"
             name="%Reload.command">
 	  </command>
-	  <command
-         categoryId="org.eclipse.ui.category.edit"
-         id="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
-         name="%EditActivityStatus.command">
-      </command>
       <command
             categoryId="biobank.command.category.server"
             id="edu.ualberta.med.biobank.commands.userManagement"
@@ -681,20 +676,6 @@
             </reference>
          </enabledWhen>
             </handler>
-	   <handler
-            class="edu.ualberta.med.biobank.handlers.EditActivityStatusHandler"
-            commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
-               </reference>
-               <reference
-                     definitionId="biobank.mainPerspectiveSelected">
-               </reference>
-            </and>
-         </activeWhen>
-      </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ChangePasswordHandler"
             commandId="edu.ualberta.med.biobank.commands.changePassword">
@@ -959,18 +940,7 @@
                </command>
                 <command
                       commandId="edu.ualberta.med.biobank.commands.editShippingMethods"
-                      id="edu.ualberta.med.biobank.menu.editActivityStatusMethods"
-                      style="push">
-                   <visibleWhen
-                         checkEnabled="false">
-                      <reference
-                            definitionId="biobank.isSuperAdminMode">
-                      </reference>
-                   </visibleWhen>
-                </command>
-                <command
-                      commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
-                      id="edu.ualberta.med.biobank.menu.editActivityStatusMethods"
+                      id="edu.ualberta.med.biobank.menu.editShippingMethods"
                       style="push">
                    <visibleWhen
                          checkEnabled="false">
@@ -1873,12 +1843,6 @@
             id="edu.ualberta.med.biobank.editors.PatientReport1Editor"
             name="PatientReport1Editor">
       </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.ActivityStatusViewForm"
-            default="false"
-            id="edu.ualberta.med.biobank.forms.ActivityStatusViewForm"
-            name="%ActivityStatusEntry.editor">
-      </editor>
 <editor
       class="edu.ualberta.med.biobank.forms.reports.ContainerReport1Editor"
       default="false"
@@ -2113,12 +2077,6 @@
             schemeId="biobank.scheme"
             sequence="M3+M">
       </key> 
-	  <key
-            commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
-            contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank.scheme"
-            sequence="M3+A">
-      </key>  
 	  <key
             commandId="edu.ualberta.med.biobank.commands.changePassword"
             contextId="edu.ualberta.med.biobank.perspective.main"

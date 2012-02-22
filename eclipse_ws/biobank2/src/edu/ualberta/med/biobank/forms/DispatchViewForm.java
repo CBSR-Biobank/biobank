@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -35,6 +36,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
@@ -51,7 +54,8 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private DispatchAdapter dispatchAdapter;
 
-    private DispatchWrapper dispatch;
+    private DispatchWrapper dispatch = new DispatchWrapper(
+        SessionManager.getAppService());
 
     private BgcBaseText senderLabel;
 
@@ -71,8 +75,6 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private CommentCollectionInfoTable commentTable;
 
-    private DispatchReadInfo dispatchInfo;
-
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof DispatchAdapter),
@@ -80,13 +82,27 @@ public class DispatchViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         dispatchAdapter = (DispatchAdapter) adapter;
-        dispatchInfo = SessionManager.getAppService().doAction(
-            new DispatchGetInfoAction(adapter.getId()));
-        dispatch =
-            new DispatchWrapper(SessionManager.getAppService(),
-                dispatchInfo.dispatch);
+
+        setDispatchInfo(adapter.getId());
+
         SessionManager.logLookup(dispatch);
         setPartName(Messages.DispatchViewForm_title);
+    }
+
+    private void setDispatchInfo(Integer id) throws Exception {
+        if (id == null) {
+            Dispatch d = new Dispatch();
+            d.setDispatchSpecimenCollection(new HashSet<DispatchSpecimen>());
+            dispatch.setWrappedObject(d);
+        } else {
+            DispatchReadInfo read =
+                SessionManager.getAppService().doAction(
+                    new DispatchGetInfoAction(adapter.getId()));
+            read.dispatch
+                .setDispatchSpecimenCollection(new HashSet<DispatchSpecimen>(
+                    read.specimens));
+            dispatch.setWrappedObject(read.dispatch);
+        }
     }
 
     @Override

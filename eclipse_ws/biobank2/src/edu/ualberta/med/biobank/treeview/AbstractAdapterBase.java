@@ -216,7 +216,9 @@ public abstract class AbstractAdapterBase implements
                 closeEditor(new FormInput(itemToRemove));
             }
             children.remove(itemToRemove);
+            fireRemove(itemToRemove);
         }
+
         if (!nodeOnly)
             // node might need to remove completely the information from inside
             // (not only node child)

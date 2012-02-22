@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -9,6 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.DateNode;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
@@ -43,8 +46,16 @@ public class OriginInfoSearchedNode extends AbstractSearchedNode {
     @Override
     public List<AbstractAdapterBase> search(Class<?> searchedClass,
         Integer objectId) {
-        if (Integer.class.isAssignableFrom(searchedClass))
-            return findChildFromClass(searchedClass, objectId, Integer.class);
+        if (searchedClass.equals(Date.class)) {
+            List<AbstractAdapterBase> list =
+                new ArrayList<AbstractAdapterBase>();
+            for (AbstractAdapterBase child : getChildren()) {
+                if (child instanceof DateNode
+                    && ((DateNode) child).getId().equals(objectId))
+                    list.add(child);
+            }
+            return list;
+        }
         return searchChildren(searchedClass, objectId);
     }
 

@@ -252,22 +252,25 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
             List<AbstractAdapterBase> nodeRes = rootNode.search(
                 searchedObject.getClass(), searchedObject.getId());
-            if (nodeRes.size() == 0)
+            if (nodeRes.size() == 0) {
                 searchedNode.addSearchObject(searchedObject,
                     searchedObject.getId());
+                SpecimenTransitView.addToNode(searchedNode, searchedObject);
+            }
         }
-        searchedNode.performExpand();
         if (searchedObjects.size() == 1) {
             ModelWrapper<?> searchedWrap = searchedObjects.get(0);
             List<AbstractAdapterBase> nodeRes = rootNode.search(
                 searchedWrap.getClass(), searchedWrap.getId());
             if (nodeRes.size() > 0)
                 nodeRes.get(0).performDoubleClick();
-        } else
+        } else {
+            searchedNode.performExpand();
             BgcPlugin.openMessage(
                 Messages.SpecimenTransitView_res_dialog_title, NLS.bind(
                     Messages.SpecimenTransitView_found_multiple_msg,
                     searchedObjects.size()));
+        }
     }
 
     public static AbstractAdapterBase addToNode(AdapterBase parentNode,

@@ -8,10 +8,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -121,7 +119,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     private List<DispatchSpecimenWrapper> getDispatchSpecimenCollectionWithState(
         DispatchSpecimenState... states) {
         return getDispatchSpecimenCollectionWithState(dispatchSpecimenMap,
-            getFastDispatchSpecimenCollection(), states);
+            getDispatchSpecimenCollection(false), states);
     }
 
     private List<DispatchSpecimenWrapper> getDispatchSpecimenCollectionWithState(
@@ -373,24 +371,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         + " where ra." //$NON-NLS-1$
         + Property.concatNames(DispatchSpecimenPeer.DISPATCH, DispatchPeer.ID)
         + " = ?"; //$NON-NLS-1$
-
-    // fast... from db. should only call this once then use the cached value
-    public List<DispatchSpecimenWrapper> getFastDispatchSpecimenCollection() {
-        if (!isPropertyCached(DispatchPeer.DISPATCH_SPECIMEN_COLLECTION)) {
-            Set<DispatchSpecimen> results = new HashSet<DispatchSpecimen>();
-            // test hql
-            HQLCriteria query = new HQLCriteria(FAST_DISPATCH_SPECIMEN_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            try {
-                List<DispatchSpecimen> list = appService.query(query);
-                results.addAll(list);
-            } catch (ApplicationException e) {
-                throw new RuntimeException(e);
-            }
-            wrappedObject.setDispatchSpecimenCollection(results);
-        }
-        return getDispatchSpecimenCollection(false);
-    }
 
     public boolean canBeClosedBy(UserWrapper user) {
         return isInReceivedState()
