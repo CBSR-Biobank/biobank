@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank.tools.heartproblem;
 import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
 import edu.ualberta.med.biobank.tools.utils.HostUrl;
@@ -69,9 +69,6 @@ public class CalgaryPaxgeneFix {
         appService = ServiceConnection.getAppService(hostUrl, appArgs.username,
             appArgs.password);
 
-        ActivityStatusWrapper activeStatus = ActivityStatusWrapper
-            .getActiveActivityStatus(appService);
-
         for (String invId : PAXGENE_INV_IDS) {
             SpecimenWrapper spc = SpecimenWrapper
                 .getSpecimen(appService, invId);
@@ -91,7 +88,7 @@ public class CalgaryPaxgeneFix {
                     + " does not have activity status closed: "
                     + spc.getActivityStatus().getName());
             }
-            spc.setActivityStatus(activeStatus);
+            spc.setActivityStatus(ActivityStatus.ACTIVE);
             spc.persist();
             LOGGER.info("fixed activity status for " + invId);
         }

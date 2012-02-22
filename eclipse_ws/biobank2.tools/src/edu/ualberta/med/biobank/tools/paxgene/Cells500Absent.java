@@ -18,7 +18,6 @@ import org.supercsv.io.ICsvBeanReader;
 import org.supercsv.prefs.CsvPreference;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
@@ -40,23 +39,26 @@ import edu.ualberta.med.biobank.tools.utils.HostUrl;
  */
 public class Cells500Absent {
 
-    private static String USAGE = "Usage: Cells500Absent [options] CSV_FILE\n\n"
-        + "Options\n"
-        + "  -H, --host       hostname for BioBank server and MySQL server\n"
-        + "  -p, --port       port number for BioBank server\n"
-        + "  -u, --user       user name to log into BioBank server\n"
-        + "  -w, --password   password to log into BioBank server\n"
-        + "  -v, --verbose    shows verbose output\n"
-        + "  -h, --help       shows this text\n"; //$NON-NLS-1$
+    private static String USAGE =
+        "Usage: Cells500Absent [options] CSV_FILE\n\n"
+            + "Options\n"
+            + "  -H, --host       hostname for BioBank server and MySQL server\n"
+            + "  -p, --port       port number for BioBank server\n"
+            + "  -u, --user       user name to log into BioBank server\n"
+            + "  -w, --password   password to log into BioBank server\n"
+            + "  -v, --verbose    shows verbose output\n"
+            + "  -h, --help       shows this text\n"; //$NON-NLS-1$
 
-    private static String CLOSED_COMMENT = "Sample was absent during Cell Pull MK.";
+    private static String CLOSED_COMMENT =
+        "Sample was absent during Cell Pull MK.";
 
     private static final Logger LOGGER = Logger.getLogger(Cells500Absent.class
         .getName());
 
     private BiobankApplicationService appService;
 
-    private static Map<String, String> SPC_COMMENTS = new HashMap<String, String>();
+    private static Map<String, String> SPC_COMMENTS =
+        new HashMap<String, String>();
 
     static {
         SPC_COMMENTS.put("1DFS", "RV01AG00BD Pulled 2010-09-10");
@@ -295,10 +297,6 @@ public class Cells500Absent {
     private void processSpecimens(List<SpecimenData> specimenDataList)
         throws Exception {
 
-        ActivityStatusWrapper closedStatus = ActivityStatusWrapper
-            .getActivityStatus(appService,
-                ActivityStatusWrapper.CLOSED_STATUS_STRING);
-
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String todaysDate = dateFormat.format(Calendar.getInstance().getTime());
 
@@ -320,40 +318,42 @@ public class Cells500Absent {
                 continue;
             }
 
-            if (spc.getActivityStatus().getName().equals("Closed")) {
-                if (SPC_COMMENTS.get(specimenData.inventoryId) != null) {
-                    String comment = spc.getComment();
-                    if (comment == null) {
-                        LOGGER.info("specimen with inventory id "
-                            + specimenData.inventoryId
-                            + " has null for comment");
-                    }
+            // TODO: comments are now a collection
 
-                    StringBuffer commentBuf = new StringBuffer(
-                        SPC_COMMENTS.get(specimenData.inventoryId))
-                        .append("\n").append(comment);
-                    spc.setComment(commentBuf.toString());
-                    spc.persist();
-                    LOGGER
-                        .info("fixed comment for " + specimenData.inventoryId);
-                }
-                continue;
-            }
-
-            spc.setActivityStatus(closedStatus);
-            StringBuffer commentBuf = new StringBuffer();
-            String comment = spc.getComment();
-            if (comment != null) {
-                commentBuf.append(comment);
-                if (!comment.isEmpty()) {
-                    commentBuf.append("\n");
-                }
-            }
-            commentBuf.append(todaysDate).append(" ").append(CLOSED_COMMENT);
-            spc.setComment(commentBuf.toString());
-            spc.persist();
-            LOGGER
-                .info("fixed activity status for " + specimenData.inventoryId);
+            // if (spc.getActivityStatus().getName().equals("Closed")) {
+            // if (SPC_COMMENTS.get(specimenData.inventoryId) != null) {
+            // String comment = spc.getComment();
+            // if (comment == null) {
+            // LOGGER.info("specimen with inventory id "
+            // + specimenData.inventoryId
+            // + " has null for comment");
+            // }
+            //
+            // StringBuffer commentBuf = new StringBuffer(
+            // SPC_COMMENTS.get(specimenData.inventoryId))
+            // .append("\n").append(comment);
+            // spc.setComment(commentBuf.toString());
+            // spc.persist();
+            // LOGGER
+            // .info("fixed comment for " + specimenData.inventoryId);
+            // }
+            // continue;
+            // }
+            //
+            // spc.setActivityStatus(ActivityStatus.CLOSED);
+            // StringBuffer commentBuf = new StringBuffer();
+            // String comment = spc.getComment();
+            // if (comment != null) {
+            // commentBuf.append(comment);
+            // if (!comment.isEmpty()) {
+            // commentBuf.append("\n");
+            // }
+            // }
+            // commentBuf.append(todaysDate).append(" ").append(CLOSED_COMMENT);
+            // spc.setComment(commentBuf.toString());
+            // spc.persist();
+            // LOGGER
+            // .info("fixed activity status for " + specimenData.inventoryId);
 
         }
     }
