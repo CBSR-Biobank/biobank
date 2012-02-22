@@ -161,7 +161,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
             .getActivityStatus());
 
         view.getAliquotedSpecimens().setElements(studyInfo.getAliquotedSpcs());
-        view.getSourceSpecimens().setElements(studyInfo.getSourceSpcs());
+        view.getSourceSpecimens().setElements(studyInfo.getSourceSpecimens());
         view.getContacts().setElements(getContacts(studyInfo.getClinicInfos()));
     }
 

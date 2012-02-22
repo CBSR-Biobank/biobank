@@ -699,21 +699,48 @@ ALTER TABLE aliquoted_specimen MODIFY COLUMN VOLUME DECIMAL(20, 10) NULL DEFAULT
 ALTER TABLE principal ADD CONSTRAINT CSM_USER_ID UNIQUE KEY(CSM_USER_ID), ADD CONSTRAINT EMAIL UNIQUE KEY(EMAIL);
 ALTER TABLE specimen MODIFY COLUMN QUANTITY DECIMAL(20, 10) NULL DEFAULT NULL;
 
--- make processing_event.worksheet unique
+-- merge processing_events that share the same worksheet and created_at time
 
-set @dwct = null;
-set @cworksheet = null;
+CREATE TABLE `new_processing_event` (
+  `ID` int(11) NOT NULL auto_increment,
+  `WORKSHEET` varchar(150) COLLATE latin1_general_cs NOT NULL,
+  `CREATED_AT` datetime NOT NULL,
+  `CENTER_ID` int(11) NOT NULL,
+  `ACTIVITY_STATUS_ID` int(11) NOT NULL,
+  `VERSION` int(11) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK327B1E4E92FAA70E` (`CENTER_ID`),
+  KEY `CREATED_AT_IDX` (`CREATED_AT`),
+  CONSTRAINT `FK327B1E4E92FAA70E` FOREIGN KEY (`CENTER_ID`) REFERENCES `center` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
-update processing_event set worksheet = 'NOT_ASSIGNED' where worksheet is null;
+insert into new_processing_event (worksheet, created_at, center_id, activity_status_id, version)
+select worksheet, created_at, center_id, activity_status_id, 0 from processing_event
+group by worksheet,created_at;
 
--- append _X to duplicates where X is a count
-update processing_event
-       set worksheet = if(@cworksheet <> worksheet or @cworksheet is null,
-           if(@cworksheet := worksheet,if(@dwct := 1, worksheet,worksheet),if(@dwct := 1, worksheet,worksheet)),
-           if(@dwct := @dwct + 1, concat(@cworksheet, '_', @dwct), concat(@cworksheet, '_', @dwct)))
-       order by worksheet, created_at;
+update processing_event_comment pec, processing_event pe, new_processing_event npe
+set pec.processing_event_id=npe.id
+where pec.processing_event_id=pe.id
+and npe.worksheet=pe.worksheet
+and npe.created_at=pe.created_at;
 
-ALTER TABLE processing_event ADD CONSTRAINT WORKSHEET UNIQUE KEY(WORKSHEET);
+update specimen spc, processing_event pe, new_processing_event npe
+set spc.processing_event_id=npe.id
+where spc.processing_event_id=pe.id
+and npe.worksheet=pe.worksheet
+and npe.created_at=pe.created_at;
+
+SET FOREIGN_KEY_CHECKS = 0;
+drop table processing_event;
+rename table new_processing_event to processing_event;
+ALTER TABLE new_processing_event DROP FOREIGN KEY FK327B1E4E92FAA70E;
+ALTER TABLE new_processing_event DROP INDEX FK327B1E4E92FAA70E;
+
+ALTER TABLE new_processing_event ADD INDEX FK327B1E4E92FAA705 (CENTER_ID);
+ALTER TABLE new_processing_event
+      ADD CONSTRAINT FK327B1E4E92FAA705 FOREIGN KEY FK3A16800EC449A4 (CENTER_ID) REFERENCES center (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+SET FOREIGN_KEY_CHECKS = 1;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

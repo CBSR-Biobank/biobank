@@ -59,7 +59,7 @@ public class StudyInfo implements ActionResult {
         this.clinicInfos = clinicInfos;
     }
 
-    public List<SourceSpecimen> getSourceSpcs() {
+    public List<SourceSpecimen> getSourceSpecimens() {
         return sourceSpcs;
     }
 

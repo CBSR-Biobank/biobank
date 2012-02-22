@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -29,6 +30,7 @@ import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.GlobalEventAttrWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.exception.UserUIException;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -38,6 +40,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.EventAttrWidget;
@@ -341,6 +344,34 @@ public class StudyEntryForm extends BiobankEntryForm {
             .setStudyEventAttrSaveInfo(new HashSet<StudyEventAttrSaveInfo>());
 
         SessionManager.updateAllSimilarNodes(studyAdapter, true);
+    }
+
+    private HashSet<SourceSpecimenSaveInfo> getNewSourceSpecimenInfo() {
+        HashMap<Integer, SourceSpecimenSaveInfo> allSourceSpecimens =
+            new HashMap<Integer, SourceSpecimenSaveInfo>();
+
+        for (SourceSpecimen sourceSpecimen : studyInfo.getSourceSpecimens()) {
+            allSourceSpecimens.put(sourceSpecimen.getId(),
+                new SourceSpecimenSaveInfo(sourceSpecimen));
+        }
+
+        HashSet<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos =
+            new HashSet<SourceSpecimenSaveInfo>();
+        for (SourceSpecimenWrapper sourceSpecimenWrapper : sourceSpecimenEntryTable
+            .getAddedOrModifedSourceSpecimens()) {
+            if (sourceSpecimenWrapper.getId() == null) {
+                sourceSpecimenSaveInfos.add(new SourceSpecimenSaveInfo(
+                    sourceSpecimenWrapper
+                        .getWrappedObject()));
+            } else {
+                allSourceSpecimens.put(
+                    sourceSpecimenWrapper.getId(),
+                    new SourceSpecimenSaveInfo(sourceSpecimenWrapper
+                        .getWrappedObject()));
+            }
+        }
+        sourceSpecimenSaveInfos.addAll(allSourceSpecimens.values());
+        return sourceSpecimenSaveInfos;
     }
 
     private void setStudyPvAttr() throws Exception, UserUIException {
