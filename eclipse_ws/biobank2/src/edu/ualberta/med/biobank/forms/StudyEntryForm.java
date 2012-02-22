@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -19,6 +20,10 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecimenSaveInfo;
+import edu.ualberta.med.biobank.common.action.study.StudySaveAction.StudyEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
@@ -98,7 +103,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         studyAdapter = (StudyAdapter) adapter;
-        study = (StudyWrapper) getModelObject();
+        updateStudyInfo(adapter.getId());
 
         String tabName;
         if (study.isNew()) {
@@ -115,9 +120,8 @@ public class StudyEntryForm extends BiobankEntryForm {
         if (id != null) {
             studyInfo = SessionManager.getAppService().doAction(
                 new StudyGetInfoAction(id));
-            study =
-                new StudyWrapper(SessionManager.getAppService(),
-                    studyInfo.study);
+            study = new StudyWrapper(SessionManager.getAppService(),
+                studyInfo.study);
         } else {
             studyInfo = new StudyInfo();
             study = new StudyWrapper(SessionManager.getAppService());
@@ -155,8 +159,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    study
-                        .setActivityStatus((ActivityStatus) selectedObject);
+                    study.setActivityStatus((ActivityStatus) selectedObject);
                 }
             });
 
@@ -322,7 +325,20 @@ public class StudyEntryForm extends BiobankEntryForm {
             .getAddedOrModifiedAliquotedSpecimens());
         study.removeFromAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
             .getDeletedAliquotedSpecimens());
-        study.persist();
+
+        StudySaveAction saveAction = new StudySaveAction();
+        saveAction.setId(study.getId());
+        saveAction.setName(study.getName());
+        saveAction.setNameShort(study.getNameShort());
+        saveAction.setActivityStatus(study.getActivityStatus());
+        saveAction.setSiteIds(new HashSet<Integer>());
+        saveAction.setContactIds(new HashSet<Integer>());
+        saveAction
+            .setSourceSpecimenSaveInfo(new HashSet<SourceSpecimenSaveInfo>());
+        saveAction
+            .setAliquotSpecimenSaveInfo(new HashSet<AliquotedSpecimenSaveInfo>());
+        saveAction
+            .setStudyEventAttrSaveInfo(new HashSet<StudyEventAttrSaveInfo>());
 
         SessionManager.updateAllSimilarNodes(studyAdapter, true);
     }
