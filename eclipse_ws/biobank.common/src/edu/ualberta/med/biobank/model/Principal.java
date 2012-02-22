@@ -15,6 +15,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Type;
+
 @Entity
 @Table(name = "PRINCIPAL")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -39,6 +41,7 @@ public class Principal extends AbstractBiobankModel {
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Principal.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
+    @Type(type = "activityStatus")
     public ActivityStatus getActivityStatus() {
         return this.activityStatus;
     }

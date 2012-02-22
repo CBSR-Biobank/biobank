@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 
-// TODO: should be an enum?
+// TODO: should be an enum? Maybe make types that require java code, but put parameters and names into the database?
 @Entity
 @Table(name = "CONTAINER_LABELING_SCHEME")
 public class ContainerLabelingScheme extends AbstractBiobankModel {

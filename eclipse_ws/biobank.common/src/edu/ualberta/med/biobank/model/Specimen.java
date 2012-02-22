@@ -22,6 +22,7 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.Empty;
@@ -207,6 +208,7 @@ public class Specimen extends AbstractBiobankModel {
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
+    @Type(type = "activityStatus")
     public ActivityStatus getActivityStatus() {
         return this.activityStatus;
     }

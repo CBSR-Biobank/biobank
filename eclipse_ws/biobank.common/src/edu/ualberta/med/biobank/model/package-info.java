@@ -1,11 +1,13 @@
 @TypeDefs({
     @TypeDef(
+        name = "activityStatus", 
         typeClass = GenericEnumUserType.class,
         defaultForType = ActivityStatus.class,
         parameters = {
             @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.ActivityStatus")
         }),
     @TypeDef(
+        name = "permissionEnum",
         typeClass = GenericEnumUserType.class,
         defaultForType = PermissionEnum.class,
         parameters = {

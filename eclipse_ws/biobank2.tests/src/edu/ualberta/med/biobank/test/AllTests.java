@@ -8,11 +8,13 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.test.action.TestActivityStatus;
 import edu.ualberta.med.biobank.test.action.TestClinic;
 import edu.ualberta.med.biobank.test.action.TestCollectionEvent;
 import edu.ualberta.med.biobank.test.action.TestContainerType;
 import edu.ualberta.med.biobank.test.action.TestDispatch;
 import edu.ualberta.med.biobank.test.action.TestPatient;
+import edu.ualberta.med.biobank.test.action.TestPermissionEnum;
 import edu.ualberta.med.biobank.test.action.TestProcessingEvent;
 import edu.ualberta.med.biobank.test.action.TestRequest;
 import edu.ualberta.med.biobank.test.action.TestResearchGroup;
@@ -26,7 +28,8 @@ import edu.ualberta.med.biobank.test.action.TestStudy;
     TestContainerType.class, TestDispatch.class,
     TestPatient.class, TestProcessingEvent.class, TestRequest.class,
     TestResearchGroup.class, TestRole.class,
-    TestShipment.class, TestSite.class, TestStudy.class })
+    TestShipment.class, TestSite.class, TestStudy.class,
+    TestActivityStatus.class, TestPermissionEnum.class })
 public class AllTests {
     public static BiobankApplicationService appService = null;
     public static final String userLogin = "testuser";
