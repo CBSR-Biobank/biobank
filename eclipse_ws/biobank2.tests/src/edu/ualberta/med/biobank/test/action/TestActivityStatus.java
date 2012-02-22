@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.action;
 
+import org.hibernate.Transaction;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,6 +10,8 @@ import edu.ualberta.med.biobank.model.Study;
 public class TestActivityStatus extends TestAction {
     @Test
     public void testPersistedId() {
+        Transaction tx = session.beginTransaction();
+        
         String name = getMethodNameR();
 
         Study study = new Study();
@@ -38,5 +41,7 @@ public class TestActivityStatus extends TestAction {
                     + activityStatus.name(),
                 activityStatusId.intValue() == activityStatus.getId());
         }
+        
+        tx.rollback();
     }
 }

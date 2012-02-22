@@ -38,6 +38,10 @@
 			to the database schema when generated with Hibernate -->
 		<property name="javax.persistence.validation.mode">ddl</property>
 
+		<!-- Mapped package loads package-info.java, which contains package-wide
+		information, such as, @TypeDefs -->
+		<mapping package="edu.ualberta.med.biobank.model" />
+
 		<!-- Mapped classes -->
 		<mapping class="edu.ualberta.med.biobank.model.AbstractPosition" />
 		<mapping class="edu.ualberta.med.biobank.model.Address" />

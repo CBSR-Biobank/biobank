@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.action;
 
+import org.hibernate.Transaction;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,6 +10,8 @@ import edu.ualberta.med.biobank.model.Role;
 public class TestPermissionEnum extends TestAction {
     @Test
     public void testPersistedId() {
+        Transaction tx = session.beginTransaction();
+        
         String name = getMethodNameR();
 
         Role role = new Role();
@@ -37,5 +40,7 @@ public class TestPermissionEnum extends TestAction {
                     + permissionEnum.name(),
                 permissionEnumId.intValue() == permissionEnum.getId());
         }
+        
+        tx.rollback();
     }
 }
