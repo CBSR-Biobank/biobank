@@ -1,19 +1,20 @@
 package edu.ualberta.med.biobank.common.action.dispatch;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.ListResult;
+import edu.ualberta.med.biobank.common.action.SetResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 
 public class DispatchGetSpecimenInfosAction implements
-    Action<ListResult<DispatchSpecimen>> {
+    Action<SetResult<DispatchSpecimen>> {
 
     @SuppressWarnings("nls")
     public static final String DISPATCH_SPECIMEN_INFO_HQL =
@@ -40,10 +41,10 @@ public class DispatchGetSpecimenInfosAction implements
     }
 
     @Override
-    public ListResult<DispatchSpecimen> run(ActionContext context)
+    public SetResult<DispatchSpecimen> run(ActionContext context)
         throws ActionException {
-        ArrayList<DispatchSpecimen> specInfos =
-            new ArrayList<DispatchSpecimen>();
+        Set<DispatchSpecimen> specInfos =
+            new HashSet<DispatchSpecimen>();
 
         Query query =
             context.getSession().createQuery(DISPATCH_SPECIMEN_INFO_HQL);
@@ -54,6 +55,6 @@ public class DispatchGetSpecimenInfosAction implements
         for (Object row : rows) {
             specInfos.add((DispatchSpecimen) row);
         }
-        return new ListResult<DispatchSpecimen>(specInfos);
+        return new SetResult<DispatchSpecimen>(specInfos);
     }
 }

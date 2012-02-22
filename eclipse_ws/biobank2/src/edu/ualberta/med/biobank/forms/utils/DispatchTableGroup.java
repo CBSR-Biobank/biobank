@@ -23,6 +23,7 @@ public class DispatchTableGroup extends TableGroup<DispatchWrapper> {
 
     public static List<DispatchTableGroup> getGroupsForShipment(
         DispatchWrapper ship) {
+
         List<DispatchTableGroup> groups = new ArrayList<DispatchTableGroup>();
         if (ship.isInCreationState()) {
             groups.add(new DispatchTableGroup(DispatchSpecimenState.NONE,
@@ -77,6 +78,6 @@ public class DispatchTableGroup extends TableGroup<DispatchWrapper> {
     @Override
     public void removeChild(Node o) {
         // TODO Auto-generated method stub
-        
+
     }
 }

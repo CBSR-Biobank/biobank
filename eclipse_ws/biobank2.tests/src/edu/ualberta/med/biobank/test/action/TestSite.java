@@ -13,7 +13,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.action.ListResult;
+import edu.ualberta.med.biobank.common.action.SetResult;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
@@ -494,17 +494,17 @@ public class TestSite extends TestAction {
 
         // delete the dispatch and then the site
         Set<Specimen> specimens = new HashSet<Specimen>();
-        ListResult<DispatchSpecimen> dispatchSpecimens =
+        SetResult<DispatchSpecimen> dispatchSpecimens =
             EXECUTOR
                 .exec(new DispatchGetSpecimenInfosAction(dispatchId1));
-        for (DispatchSpecimen dspec : dispatchSpecimens.getList()) {
+        for (DispatchSpecimen dspec : dispatchSpecimens.getSet()) {
             specimens.add(dspec.getSpecimen());
         }
 
         dispatchSpecimens =
             EXECUTOR
                 .exec(new DispatchGetSpecimenInfosAction(dispatchId2));
-        for (DispatchSpecimen dspec : dispatchSpecimens.getList()) {
+        for (DispatchSpecimen dspec : dispatchSpecimens.getSet()) {
             specimens.add(dspec.getSpecimen());
         }
 
