@@ -5,12 +5,11 @@ import java.util.List;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IEditorPart;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
-import edu.ualberta.med.biobank.mvp.event.model.study.StudyEditEvent;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
@@ -81,7 +80,7 @@ public class StudyAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        return null;
+        return StudyEntryForm.ID;
     }
 
     @Override
@@ -96,15 +95,17 @@ public class StudyAdapter extends AdapterBase {
         return 0;
     }
 
-    @Override
-    public IEditorPart openEntryForm(boolean hasPreviousForm) {
-        eventBus.fireEvent(new StudyEditEvent(study.getId()));
-        return null; // TODO: problem !?
-    }
-
-    @Override
-    public void openViewForm() {
-        super.openViewForm();
-        // eventBus.fireEvent(new StudyViewEvent(study.getId()));
-    }
+    // Uncomment when we start using MVP again
+    //
+    // public IEditorPart openEntryForm(boolean hasPreviousForm) {
+    // eventBus.fireEvent(new StudyEditEvent(study.getId()));
+    // return null; // TODO: problem !?
+    // }
+    //
+    // @Override
+    // public void openViewForm() {
+    // super.openViewForm();
+    // @Override
+    // // eventBus.fireEvent(new StudyViewEvent(study.getId()));
+    // }
 }

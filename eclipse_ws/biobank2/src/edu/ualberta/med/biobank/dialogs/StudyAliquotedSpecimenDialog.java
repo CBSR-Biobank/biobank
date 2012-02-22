@@ -12,7 +12,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -128,25 +127,27 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
             }
         });
 
-        activityStatus = getWidgetCreator().createComboViewer(
-            contents,
-            Messages.StudyAliquotedSpecimenDialog_label_activity,
-            ActivityStatus.valuesList(), newAliquotedSpecimen.getActivityStatus(),
-            Messages.StudyAliquotedSpecimenDialog_validation_activity,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    try {
-                        newAliquotedSpecimen
-                            .setActivityStatus((ActivityStatus) selectedObject);
-                    } catch (Exception e) {
-                        BgcPlugin
-                            .openAsyncError(
-                                Messages.StudyAliquotedSpecimenDialog_activityStatus_error_title,
-                                e);
+        activityStatus =
+            getWidgetCreator().createComboViewer(
+                contents,
+                Messages.StudyAliquotedSpecimenDialog_label_activity,
+                ActivityStatus.valuesList(),
+                newAliquotedSpecimen.getActivityStatus(),
+                Messages.StudyAliquotedSpecimenDialog_validation_activity,
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        try {
+                            newAliquotedSpecimen
+                                .setActivityStatus((ActivityStatus) selectedObject);
+                        } catch (Exception e) {
+                            BgcPlugin
+                                .openAsyncError(
+                                    Messages.StudyAliquotedSpecimenDialog_activityStatus_error_title,
+                                    e);
+                        }
                     }
-                }
-            }, new BiobankLabelProvider());
+                }, new BiobankLabelProvider());
 
         volume = (BgcBaseText) createBoundWidgetWithLabel(contents,
             BgcBaseText.class, SWT.BORDER,

@@ -17,6 +17,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
@@ -31,6 +33,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.EventAttrWidget;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
@@ -51,6 +54,11 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private static final String DATE_PROCESSED_INFO_FIELD_NAME =
         Messages.study_visit_info_dateProcessed;
+
+    private static class StudyEventAttrCustom extends EventAttrCustom {
+        public EventAttrWidget widget;
+        public boolean inStudy;
+    }
 
     private StudyAdapter studyAdapter;
 
@@ -76,10 +84,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private CommentCollectionInfoTable commentEntryTable;
 
-    private static class StudyEventAttrCustom extends EventAttrCustom {
-        public EventAttrWidget widget;
-        public boolean inStudy;
-    }
+    private StudyInfo studyInfo;
 
     public StudyEntryForm() {
         super();
@@ -104,6 +109,20 @@ public class StudyEntryForm extends BiobankEntryForm {
                 study.getNameShort());
         }
         setPartName(tabName);
+    }
+
+    private void updateStudyInfo(Integer id) throws Exception {
+        if (id != null) {
+            studyInfo = SessionManager.getAppService().doAction(
+                new StudyGetInfoAction(id));
+            study =
+                new StudyWrapper(SessionManager.getAppService(),
+                    studyInfo.study);
+        } else {
+            studyInfo = new StudyInfo();
+            study = new StudyWrapper(SessionManager.getAppService());
+        }
+        ((AdapterBase) adapter).setModelObject(study);
     }
 
     @Override

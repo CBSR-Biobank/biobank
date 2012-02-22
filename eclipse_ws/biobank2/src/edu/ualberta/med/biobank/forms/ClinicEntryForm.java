@@ -221,11 +221,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     @Override
     public void saveForm() throws Exception {
-        clinic.addToContactCollection(contactEntryWidget
-            .getAddedOrModifedContacts());
-        clinic.removeFromContactCollection(contactEntryWidget
-            .getDeletedContacts());
-
         ClinicSaveAction saveClinic = new ClinicSaveAction();
         saveClinic.setId(clinic.getId());
         saveClinic.setName(clinic.getName());
