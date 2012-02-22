@@ -895,6 +895,7 @@
            includes="*.jar">
         <exclude name="${read-api-exclude-list}" />
       </lib>
+      <lib dir="${req.jars.dir}" includes="commons-io-1.4.jar" />
       <lib dir="${cacore.sdk.dir}/${build.jar.dir}" includes="${bean.file}" />
       <lib dir="${cacore.sdk.dir}/${build.jar.dir}" includes="${orm.file}" />
       <lib dir="${cacore.sdk.dir}/${system.dir}/${system.lib.dir}"
