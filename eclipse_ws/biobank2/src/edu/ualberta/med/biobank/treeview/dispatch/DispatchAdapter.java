@@ -8,6 +8,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -166,12 +167,24 @@ public class DispatchAdapter extends AdapterBase {
 
     public void doReceive() {
         setDispatchAsReceived();
-        openViewForm();
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                openViewForm();
+            }
+        });
+
     }
 
     public void doSend() {
         setDispatchAsSent();
-        openViewForm();
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                openViewForm();
+            }
+        });
+
     }
 
     private void setDispatchAsSent() {
@@ -219,7 +232,13 @@ public class DispatchAdapter extends AdapterBase {
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Unable to save changes", e);
         }
-        SpecimenTransitView.reloadCurrent();
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                SpecimenTransitView.reloadCurrent();
+            }
+        });
+
     }
 
     private void setDispatchAsCreation() {

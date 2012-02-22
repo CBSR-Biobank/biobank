@@ -11,25 +11,27 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchRetrievalAction;
+import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class InCreationDispatchGroup extends AbstractDispatchGroup {
 
-    public InCreationDispatchGroup(AdapterBase parent, int id,
-        CenterWrapper<?> center) {
-        super(parent, id, Messages.InCreationDispatchGroup_creation_node_label,
-            center);
+    public InCreationDispatchGroup(AdapterBase parent, int id) {
+        super(parent, id, Messages.InCreationDispatchGroup_creation_node_label);
     }
 
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return SiteWrapper.getInCreationDispatchCollection(center);
+        return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+            SessionManager.getAppService().doAction(
+                new DispatchRetrievalAction(DispatchState.CREATION,
+                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                    true, true)).getList(), DispatchWrapper.class);
     }
 
     @Override

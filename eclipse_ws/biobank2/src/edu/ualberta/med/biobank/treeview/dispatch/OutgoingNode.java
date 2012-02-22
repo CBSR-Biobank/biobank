@@ -24,11 +24,11 @@ public class OutgoingNode extends AdapterBase {
 
     public OutgoingNode(AdapterBase parent, int id, CenterWrapper<?> center) {
         super(parent, id, Messages.OutgoingNode_outgoing_node_label, true);
-        creationNode = new InCreationDispatchGroup(this, 0, center);
+        creationNode = new InCreationDispatchGroup(this, 0);
         creationNode.setParent(this);
         addChild(creationNode);
 
-        sentTransitNode = new SentInTransitDispatchGroup(this, 1, center);
+        sentTransitNode = new SentInTransitDispatchGroup(this, 1);
         sentTransitNode.setParent(this);
         addChild(sentTransitNode);
     }

@@ -21,21 +21,19 @@ public class IncomingNode extends AdapterBase {
 
     public IncomingNode(AdapterBase parent, int id, CenterWrapper<?> center) {
         super(parent, id, Messages.IncomingNode_incoming_node_label, true);
-        receivedTransitNode = new ReceivingInTransitDispatchGroup(this, 0,
-            center);
+        receivedTransitNode = new ReceivingInTransitDispatchGroup(this, 0);
         receivedTransitNode.setParent(this);
         addChild(receivedTransitNode);
 
-        receivingNode = new ReceivingNoErrorsDispatchGroup(this, 1, center);
+        receivingNode = new ReceivingNoErrorsDispatchGroup(this, 1);
         receivingNode.setParent(this);
         addChild(receivingNode);
 
-        receivingWithErrorsNode = new ReceivingWithErrorsDispatchGroup(this, 2,
-            center);
+        receivingWithErrorsNode = new ReceivingWithErrorsDispatchGroup(this, 2);
         receivingWithErrorsNode.setParent(this);
         addChild(receivingWithErrorsNode);
 
-        requestNode = new ReceivingRequestGroup(this, 3, center);
+        requestNode = new ReceivingRequestGroup(this, 3);
         requestNode.setParent(this);
         addChild(requestNode);
 
