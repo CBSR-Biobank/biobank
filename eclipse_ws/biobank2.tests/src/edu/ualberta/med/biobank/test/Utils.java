@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test;
 
+import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,10 @@ public class Utils {
 
     public static String getRandomString(int maxlen) {
         return getRandomString(0, maxlen);
+    }
+
+    protected static String getRandomString() {
+        return new BigInteger(130, R).toString(32);
     }
 
     public static String getRandomNumericString(int maxlen) {

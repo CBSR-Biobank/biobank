@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.test.action;
 
-import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +25,7 @@ import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.SessionProvider.Mode;
 
 public class TestAction {
@@ -76,13 +76,12 @@ public class TestAction {
 
         session.beginTransaction();
 
-
         User superAdmin = new User();
         superAdmin.setLogin(SUPER_ADMIN_LOGIN);
         superAdmin.setCsmUserId(0L);
         superAdmin.setRecvBulkEmails(false);
         superAdmin.setFullName("super admin");
-        superAdmin.setEmail(randString());
+        superAdmin.setEmail(Utils.getRandomString(5, 10));
         superAdmin.setNeedPwdChange(false);
         superAdmin.setNeedPwdChange(false);
         superAdmin.setActivityStatus(ActivityStatus.ACTIVE);
@@ -185,9 +184,5 @@ public class TestAction {
 
     protected String getMethodNameR() {
         return testName.getMethodName() + R.nextInt();
-    }
-
-    protected static String randString() {
-        return new BigInteger(130, R).toString(32);
     }
 }
