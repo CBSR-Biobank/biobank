@@ -11,6 +11,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -41,6 +42,7 @@ public class Role extends AbstractBiobankModel {
     @CollectionTable(name = "ROLE_PERMISSION",
         joinColumns = @JoinColumn(name = "ID"))
     @Column(name = "PERMISSION_ID", nullable = false)
+    @Type(type = "permissionEnum")
     public Set<PermissionEnum> getPermissionCollection() {
         return this.permissionCollection;
     }

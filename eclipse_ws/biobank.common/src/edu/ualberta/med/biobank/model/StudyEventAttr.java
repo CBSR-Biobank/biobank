@@ -8,6 +8,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Type;
+
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
@@ -66,6 +68,7 @@ public class StudyEventAttr extends AbstractBiobankModel {
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.StudyEventAttr.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
+    @Type(type = "activityStatus")
     public ActivityStatus getActivityStatus() {
         return this.activityStatus;
     }

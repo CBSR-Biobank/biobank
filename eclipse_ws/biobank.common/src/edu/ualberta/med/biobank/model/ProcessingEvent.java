@@ -17,6 +17,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
@@ -84,6 +85,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
+    @Type(type = "activityStatus")
     public ActivityStatus getActivityStatus() {
         return this.activityStatus;
     }

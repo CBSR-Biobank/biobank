@@ -11,6 +11,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Type;
+
 @Entity
 @Table(name = "ALIQUOTED_SPECIMEN")
 public class AliquotedSpecimen extends AbstractBiobankModel {
@@ -63,6 +65,7 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
+    @Type(type = "activityStatus")
     public ActivityStatus getActivityStatus() {
         return this.activityStatus;
     }

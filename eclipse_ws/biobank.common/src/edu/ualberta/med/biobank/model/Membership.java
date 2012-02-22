@@ -18,6 +18,8 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Type;
+
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
@@ -43,6 +45,7 @@ public class Membership extends AbstractBiobankModel {
     @CollectionTable(name = "MEMBERSHIP_PERMISSION",
         joinColumns = @JoinColumn(name = "ID"))
     @Column(name = "PERMISSION_ID", nullable = false)
+    @Type(type = "permissionEnum")
     public Set<PermissionEnum> getPermissionCollection() {
         return this.permissionCollection;
     }
