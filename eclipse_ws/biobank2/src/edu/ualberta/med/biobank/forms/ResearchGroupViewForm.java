@@ -21,6 +21,7 @@ import org.supercsv.io.ICsvBeanReader;
 import org.supercsv.prefs.CsvPreference;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
@@ -29,16 +30,20 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcFileBrowser;
 import edu.ualberta.med.biobank.gui.common.widgets.IBgcFileBrowserListener;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ResearchGroupViewForm extends AddressViewFormCommon implements
     IBgcFileBrowserListener {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ResearchGroupViewForm"; //$NON-NLS-1$
 
-    private ResearchGroupWrapper researchGroup;
+    private ResearchGroupWrapper researchGroup = new ResearchGroupWrapper(
+        SessionManager.getAppService());
 
     private BgcBaseText nameLabel;
 
@@ -60,16 +65,22 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        if (adapter.getId() != null)
-            researchGroup =
-                new ResearchGroupWrapper(SessionManager.getAppService(),
-                    SessionManager.getAppService().doAction(
-                        new ResearchGroupGetInfoAction(adapter.getId())).rg);
-        else
-            researchGroup =
-                new ResearchGroupWrapper(SessionManager.getAppService());
+        setRgInfo(adapter.getId());
         setPartName(NLS.bind(Messages.ResearchGroupViewForm_title,
             researchGroup.getNameShort()));
+    }
+
+    private void setRgInfo(Integer id) throws ApplicationException {
+        if (id == null) {
+            ResearchGroup rg = new ResearchGroup();
+            researchGroup.setWrappedObject(rg);
+            researchGroup.setActivityStatus(ActivityStatus.ACTIVE);
+        } else {
+            ResearchGroupReadInfo read =
+                SessionManager.getAppService().doAction(
+                    new ResearchGroupGetInfoAction(id));
+            researchGroup.setWrappedObject(read.rg);
+        }
     }
 
     @Override
