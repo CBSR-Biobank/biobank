@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
@@ -52,10 +53,12 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
     private ResearchGroupAdapter researchGroupAdapter;
 
-    private ResearchGroupWrapper researchGroup;
+    private ResearchGroupWrapper researchGroup = new ResearchGroupWrapper(
+        SessionManager.getAppService());
 
     private BgcBaseText commentWidget;
-    private CommentWrapper comment;
+    private CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
 
     private BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
@@ -77,24 +80,29 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
         researchGroupAdapter = (ResearchGroupAdapter) adapter;
-        comment = new CommentWrapper(SessionManager.getAppService());
 
-        if (adapter.getId() != null)
-            researchGroup =
-                new ResearchGroupWrapper(SessionManager.getAppService(),
-                    SessionManager.getAppService().doAction(
-                        new ResearchGroupGetInfoAction(adapter.getId())).rg);
-        else
-            researchGroup =
-                new ResearchGroupWrapper(SessionManager.getAppService());
+        setRgInfo(adapter.getId());
+
         String tabName;
         if (researchGroup.isNew()) {
             tabName = Messages.ResearchGroupEntryForm_title_new;
-            researchGroup.setActivityStatus(ActivityStatus.ACTIVE);
         } else
             tabName = NLS.bind(Messages.ResearchGroupEntryForm_title_edit,
                 researchGroup.getNameShort());
         setPartName(tabName);
+    }
+
+    private void setRgInfo(Integer id) throws ApplicationException {
+        if (id == null) {
+            ResearchGroup rg = new ResearchGroup();
+            researchGroup.setWrappedObject(rg);
+            researchGroup.setActivityStatus(ActivityStatus.ACTIVE);
+        } else {
+            ResearchGroupReadInfo read =
+                SessionManager.getAppService().doAction(
+                    new ResearchGroupGetInfoAction(id));
+            researchGroup.setWrappedObject(read.rg);
+        }
     }
 
     @Override

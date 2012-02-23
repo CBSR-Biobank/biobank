@@ -25,4 +25,8 @@ insert into membership (id, version, center_id, principal_id)
        from csm_user as u, membership as ms
        where login_name = 'testuser';
 
-
+insert into membership_permission (id, permission_id)
+       select mem.id,1
+       from principal pr
+       join membership mem on mem.principal_id=pr.id
+       where pr.login='testuser';

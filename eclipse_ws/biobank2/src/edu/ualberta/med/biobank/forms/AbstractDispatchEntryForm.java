@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -25,7 +23,6 @@ import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -63,8 +60,6 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     protected Set<Integer> oldSpecIds;
 
-    protected List<DispatchSpecimenWrapper> specimens;
-
     @Override
     protected void init() throws Exception {
         Assert.isNotNull(adapter, "Adapter should be no null"); //$NON-NLS-1$
@@ -83,16 +78,13 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         if (id == null) {
             Dispatch d = new Dispatch();
             dispatch.setWrappedObject(d);
-            specimens = new ArrayList<DispatchSpecimenWrapper>();
         } else {
             DispatchReadInfo read =
                 SessionManager.getAppService().doAction(
                     new DispatchGetInfoAction(adapter.getId()));
+            read.dispatch
+                .setDispatchSpecimenCollection(read.specimens);
             dispatch.setWrappedObject(read.dispatch);
-            specimens =
-                ModelWrapper.wrapModelCollection(
-                    SessionManager.getAppService(), read.specimens,
-                    DispatchSpecimenWrapper.class);
         }
     }
 

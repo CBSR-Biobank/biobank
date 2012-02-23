@@ -3,7 +3,10 @@ package edu.ualberta.med.biobank.forms.utils;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.forms.utils.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME =
+        "edu.ualberta.med.biobank.forms.utils.messages"; //$NON-NLS-1$
+
+    public static String DispatchTableGroup_error_title;
 
     public static String DispatchTableGroup_added_label;
 
@@ -34,6 +37,8 @@ public class Messages extends NLS {
     public static String RequestTableGroup_data_error_msg;
 
     public static String RequestTableGroup_error_title;
+
+    public static String DispatchTableGroup_data_error_msg;
 
     static {
         // initialize resource bundle

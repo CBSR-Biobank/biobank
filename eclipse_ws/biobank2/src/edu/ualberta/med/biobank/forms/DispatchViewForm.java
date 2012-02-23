@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -92,15 +92,13 @@ public class DispatchViewForm extends BiobankViewForm {
     private void setDispatchInfo(Integer id) throws Exception {
         if (id == null) {
             Dispatch d = new Dispatch();
-            d.setDispatchSpecimenCollection(new HashSet<DispatchSpecimen>());
             dispatch.setWrappedObject(d);
         } else {
             DispatchReadInfo read =
                 SessionManager.getAppService().doAction(
                     new DispatchGetInfoAction(adapter.getId()));
             read.dispatch
-                .setDispatchSpecimenCollection(new HashSet<DispatchSpecimen>(
-                    read.specimens));
+                .setDispatchSpecimenCollection((Set<DispatchSpecimen>) read.specimens);
             dispatch.setWrappedObject(read.dispatch);
         }
     }
@@ -169,8 +167,7 @@ public class DispatchViewForm extends BiobankViewForm {
                 new DispatchSpecimenListInfoTable(parent, dispatch, false) {
                     @Override
                     public List<DispatchSpecimenWrapper> getInternalDispatchSpecimens() {
-                        return dispatch
-                            .getNonProcessedDispatchSpecimenCollection();
+                        return dispatch.getDispatchSpecimenCollection(false);
                     }
 
                 };
@@ -202,7 +199,8 @@ public class DispatchViewForm extends BiobankViewForm {
             specimensNonProcessedTable.createDefaultEditItem();
         } else {
             specimensTree =
-                new DispatchSpecimensTreeTable(page, dispatch, false, false);
+                new DispatchSpecimensTreeTable(page, dispatch,
+                    false, false);
             specimensTree.addClickListener();
         }
     }

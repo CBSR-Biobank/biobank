@@ -216,8 +216,10 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 createSpecimensNonProcessedSection(true);
             }
         } else {
-            specimensTreeTable = new DispatchSpecimensTreeTable(page, dispatch,
-                !dispatch.isInClosedState() && !dispatch.isInLostState(), true);
+            specimensTreeTable =
+                new DispatchSpecimensTreeTable(page, dispatch,
+                    !dispatch.isInClosedState() && !dispatch.isInLostState(),
+                    true);
             specimensTreeTable.addSelectionChangedListener(biobankListener);
             specimensTreeTable.addClickListener();
         }
@@ -233,7 +235,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             dispatch, edit) {
             @Override
             public List<DispatchSpecimenWrapper> getInternalDispatchSpecimens() {
-                return specimens;
+                return dispatch.getDispatchSpecimenCollection(false);
             }
         };
         specimensNonProcessedTable.adaptToToolkit(toolkit, true);

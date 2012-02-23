@@ -54,7 +54,8 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     private Menu menu;
 
     public DispatchSpecimensTreeTable(Composite parent,
-        final DispatchWrapper shipment, final boolean editSpecimensState,
+        final DispatchWrapper shipment,
+        final boolean editSpecimensState,
         final boolean editSpecimensComment) {
         super(parent, SWT.NONE);
 
@@ -106,7 +107,8 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                 Object newInput) {
                 groups =
                     DispatchTableGroup
-                        .getGroupsForShipment(DispatchSpecimensTreeTable.this.shipment);
+                        .getGroupsForShipment(
+                        DispatchSpecimensTreeTable.this.shipment);
             }
 
             @Override

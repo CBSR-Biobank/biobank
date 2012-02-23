@@ -1629,7 +1629,7 @@
             name="%ClinicView.editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.StudyEntryFormView"
+            class="edu.ualberta.med.biobank.forms.StudyEntryForm"
             default="false"
             icon="icons/study.png"
             id="edu.ualberta.med.biobank.forms.StudyEntryForm"

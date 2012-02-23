@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
  * 
  * @author delphine
  */
+@Deprecated
 public class SessionSecurityHelper {
 
     public static final String PRINT_LABEL_KEY_DESC = "print-labels"; //$NON-NLS-1$

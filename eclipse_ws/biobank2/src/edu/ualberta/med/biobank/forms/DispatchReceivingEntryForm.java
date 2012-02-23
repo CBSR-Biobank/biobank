@@ -35,17 +35,20 @@ import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
 public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm"; //$NON-NLS-1$
     private DispatchSpecimensTreeTable specimensTree;
-    private List<SpecimenWrapper> receivedOrExtraSpecimens = new ArrayList<SpecimenWrapper>();
+    private List<SpecimenWrapper> receivedOrExtraSpecimens =
+        new ArrayList<SpecimenWrapper>();
     private CommentCollectionInfoTable commentEntryTable;
 
-    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BgcEntryFormWidgetListener listener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     @Override
     protected void createFormContent() throws Exception {
@@ -63,8 +66,9 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
         if (editSpecimens)
             createSpecimensSelectionActions(page, true);
-        specimensTree = new DispatchSpecimensTreeTable(page, dispatch,
-            editSpecimens, true);
+        specimensTree =
+            new DispatchSpecimensTreeTable(page, dispatch,
+                editSpecimens, true);
         specimensTree.addSelectionChangedListener(biobankListener);
         specimensTree.addClickListener();
     }
@@ -253,8 +257,9 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         dispatch.reloadDispatchSpecimens();
         Map<String, String> problems = new HashMap<String, String>();
         // work on a copy of the list to avoid concurrency pb on list
-        List<SpecimenWrapper> receveidOrExtrasCopy = new ArrayList<SpecimenWrapper>(
-            receivedOrExtraSpecimens);
+        List<SpecimenWrapper> receveidOrExtrasCopy =
+            new ArrayList<SpecimenWrapper>(
+                receivedOrExtraSpecimens);
         receivedOrExtraSpecimens.clear();
         for (SpecimenWrapper spec : receveidOrExtrasCopy) {
             try {
@@ -289,6 +294,5 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                 Messages.BiobankEntryForm_access_denied_error_msg);
         }
     }
-    
-    
+
 }

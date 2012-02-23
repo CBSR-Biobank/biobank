@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,10 +23,12 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -79,9 +82,13 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             }
         };
 
-    private PEventInfo peventInfo;
+    private ProcessingEventWrapper pevent = new ProcessingEventWrapper(
+        SessionManager.getAppService());
 
-    private ProcessingEventWrapper pevent;
+    private CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
+
+    private List<SpecimenInfo> specimens;
 
     @Override
     protected void init() throws Exception {
@@ -90,16 +97,12 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         pEventAdapter = (ProcessingEventAdapter) adapter;
-        ProcessingEvent pe;
+        setPEventInfo(adapter.getId());
         String tabName;
         if (pEventAdapter.getId() == null) {
-            pe = new ProcessingEvent();
             tabName = Messages.ProcessingEventEntryForm_title_new;
-            pe.setActivityStatus(ActivityStatus.ACTIVE);
         } else {
-            updatePEventInfo();
-            pe = peventInfo.pevent;
-            if (pe.getWorksheet() == null)
+            if (pevent.getWorksheet() == null)
                 tabName =
                     NLS.bind(
                         Messages.ProcessingEventEntryForm_title_edit_worksheet,
@@ -108,21 +111,26 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                 tabName =
                     NLS.bind(
                         Messages.ProcessingEventEntryForm_title_edit_noworksheet,
-                        DateFormatter.formatAsDateTime(pe.getCreatedAt()));
+                        DateFormatter.formatAsDateTime(pevent.getCreatedAt()));
         }
-
-        pevent =
-            new ProcessingEventWrapper(SessionManager.getAppService(),
-                pe);
 
         closedActivityStatus = ActivityStatus.CLOSED;
         setPartName(tabName);
     }
 
-    private void updatePEventInfo() throws Exception {
-        peventInfo =
-            SessionManager.getAppService().doAction(
-                new ProcessingEventGetInfoAction(adapter.getId()));
+    private void setPEventInfo(Integer id) throws Exception {
+        if (id == null) {
+            ProcessingEvent p = new ProcessingEvent();
+            p.setActivityStatus(ActivityStatus.ACTIVE);
+            pevent.setWrappedObject(p);
+            specimens = new ArrayList<SpecimenInfo>();
+        } else {
+            PEventInfo read =
+                SessionManager.getAppService().doAction(
+                    new ProcessingEventGetInfoAction(adapter.getId()));
+            pevent.setWrappedObject(read.pevent);
+            specimens = read.sourceSpecimenInfos;
+        }
     }
 
     @Override

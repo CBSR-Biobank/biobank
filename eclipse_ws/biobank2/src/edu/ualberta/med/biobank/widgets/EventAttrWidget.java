@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 
-public class StudyEventAttrWidget extends BgcBaseWidget {
+public class EventAttrWidget extends BgcBaseWidget {
     private Button checkButton;
     private Button addButton;
     private Button removeButton;
@@ -68,7 +68,7 @@ public class StudyEventAttrWidget extends BgcBaseWidget {
             }
         };
 
-    public StudyEventAttrWidget(Composite parent, int style,
+    public EventAttrWidget(Composite parent, int style,
         final EventAttrCustom customInfo, boolean selected) {
         super(parent, style);
         setLayout(new GridLayout(1, false));

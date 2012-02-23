@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.model.StudyEventAttr;
 public class StudyEventAttrSelectionWidget extends BgcBaseWidget {
 
     private static class StudyEventAttrCustom extends EventAttrCustom {
-        public StudyEventAttrWidget widget;
+        public EventAttrWidget widget;
         public GlobalEventAttr geAttr;
         public boolean selected;
     }
@@ -56,7 +56,7 @@ public class StudyEventAttrSelectionWidget extends BgcBaseWidget {
 
         for (GlobalEventAttr geAttr : globalEventAttrs) {
             seAttrCustom = seAttrSettings.get(geAttr.getLabel());
-            seAttrCustom.widget = new StudyEventAttrWidget(this, SWT.NONE,
+            seAttrCustom.widget = new EventAttrWidget(this, SWT.NONE,
                 seAttrCustom, seAttrCustom.selected);
             seAttrCustom.widget.addSelectionChangedListener(listener);
         }

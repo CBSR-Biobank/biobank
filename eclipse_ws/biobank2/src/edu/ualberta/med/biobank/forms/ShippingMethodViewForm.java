@@ -9,9 +9,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodGetInfoAction;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ShippingMethodEntryInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShippingMethodViewForm extends BiobankFormBase {
 
@@ -22,30 +24,37 @@ public class ShippingMethodViewForm extends BiobankFormBase {
         Messages.ShippingMethodViewForm_ok_msg;
 
     private ShippingMethodEntryInfoTable statusWidget;
+    private List<ShippingMethodWrapper> globalShippingMethods;
 
     @Override
     public void init() throws Exception {
         setPartName(Messages.ShippingMethodViewForm_title);
-        checkEditAccess();
+        setShippingMethodInfo();
+    }
+
+    private void setShippingMethodInfo() throws ApplicationException {
+        globalShippingMethods =
+            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+                SessionManager.getAppService()
+                    .doAction(
+                        new ShippingMethodGetInfoAction()).getList(),
+                ShippingMethodWrapper.class);
     }
 
     @Override
     protected void createFormContent() throws Exception {
         form.setText(Messages.ShippingMethodViewForm_title);
         page.setLayout(new GridLayout(1, false));
-        createGlobalSampleTypeSection();
+        createGlobalShippingMethodSection();
     }
 
-    private void createGlobalSampleTypeSection() throws Exception {
+    private void createGlobalShippingMethodSection() throws Exception {
         Section section = createSection(Messages.ShippingMethodViewForm_title);
-        List<ShippingMethodWrapper> globalShippingMethod =
-            ShippingMethodWrapper
-                .getShippingMethods(SessionManager.getAppService());
-        if (globalShippingMethod == null) {
-            globalShippingMethod = new ArrayList<ShippingMethodWrapper>();
+        if (globalShippingMethods == null) {
+            globalShippingMethods = new ArrayList<ShippingMethodWrapper>();
         }
         statusWidget = new ShippingMethodEntryInfoTable(section,
-            globalShippingMethod, Messages.ShippingMethodViewForm_add_msg,
+            globalShippingMethods, Messages.ShippingMethodViewForm_add_msg,
             Messages.ShippingMethodViewForm_edit_msg);
         statusWidget.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(statusWidget);
@@ -59,16 +68,6 @@ public class ShippingMethodViewForm extends BiobankFormBase {
                 }
             }, ShippingMethodWrapper.class);
         section.setClient(statusWidget);
-    }
-
-    protected void checkEditAccess() {
-        if (!SessionManager.canUpdate(ShippingMethodWrapper.class)
-            && !SessionManager.canCreate(ShippingMethodWrapper.class)
-            && !SessionManager.canDelete(ShippingMethodWrapper.class)) {
-            BgcPlugin.openAccessDeniedErrorMessage();
-            throw new RuntimeException(
-                Messages.ShippingMethodViewForm_access_denied_error_msg);
-        }
     }
 
     @Override

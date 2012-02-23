@@ -7,7 +7,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.RolePeer;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -66,7 +65,9 @@ public class RoleEditDialog extends BgcBaseDialog {
             RolePeer.NAME.getName(), new NonEmptyStringValidator(
                 Messages.RoleEditDialog_msg_name_required));
 
-        tree = new PermissionCheckTreeWidget(contents, true, PermissionEnum.valuesList());
+        tree =
+            new PermissionCheckTreeWidget(contents, true,
+                PermissionEnum.valuesList());
         tree.setSelections(role.getPermissionCollection());
 
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);

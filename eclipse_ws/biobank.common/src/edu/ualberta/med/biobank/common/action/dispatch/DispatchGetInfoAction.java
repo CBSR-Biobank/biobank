@@ -52,7 +52,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
             sInfo.dispatch = (Dispatch) row;
             sInfo.specimens =
                 new DispatchGetSpecimenInfosAction(id).run(context)
-                    .getList();
+                    .getSet();
 
         } else {
             throw new ActionException(

@@ -89,13 +89,10 @@ CREATE TABLE `membership` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 CREATE TABLE `membership_permission` (
-  `MEMBERSHIP_ID` int(11) NOT NULL,
+  `ID` int(11) NOT NULL,
   `PERMISSION_ID` int(11) NOT NULL,
-  PRIMARY KEY (`MEMBERSHIP_ID`,`PERMISSION_ID`),
-  KEY `FK1350F1D8F196CF45` (`PERMISSION_ID`),
-  KEY `FK1350F1D8D26ABDE5` (`MEMBERSHIP_ID`),
-  CONSTRAINT `FK1350F1D8D26ABDE5` FOREIGN KEY (`MEMBERSHIP_ID`) REFERENCES `membership` (`ID`),
-  CONSTRAINT `FK1350F1D8F196CF45` FOREIGN KEY (`PERMISSION_ID`) REFERENCES `permission` (`ID`)
+  PRIMARY KEY (`ID`,`PERMISSION_ID`),
+  KEY `FK1350F1D815E6F8DC` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 CREATE TABLE `permission` (
@@ -131,13 +128,10 @@ CREATE TABLE `role` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 CREATE TABLE `role_permission` (
-  `ROLE_ID` int(11) NOT NULL,
+  `ID` int(11) NOT NULL,
   `PERMISSION_ID` int(11) NOT NULL,
-  PRIMARY KEY (`ROLE_ID`,`PERMISSION_ID`),
-  KEY `FK9C6EC93814388625` (`ROLE_ID`),
-  KEY `FK9C6EC938F196CF45` (`PERMISSION_ID`),
-  CONSTRAINT `FK9C6EC938F196CF45` FOREIGN KEY (`PERMISSION_ID`) REFERENCES `permission` (`ID`),
-  CONSTRAINT `FK9C6EC93814388625` FOREIGN KEY (`ROLE_ID`) REFERENCES `role` (`ID`)
+  PRIMARY KEY (`ID`,`PERMISSION_ID`),
+  KEY `FK9C6EC938C226FDBC` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 -- *****************************************************************
@@ -591,8 +585,6 @@ ALTER TABLE bb_group DROP FOREIGN KEY FK119439A0FF154DAF;
 ALTER TABLE user DROP FOREIGN KEY FK27E3CBC449A4, DROP FOREIGN KEY FK27E3CBFF154DAF;
 ALTER TABLE comment DROP FOREIGN KEY FK63717A3FB9634A05;
 ALTER TABLE group_user DROP FOREIGN KEY FK6B1EC1AB691634EF, DROP FOREIGN KEY FK6B1EC1ABB9634A05;
-ALTER TABLE membership_permission DROP FOREIGN KEY FK1350F1D8D26ABDE5, DROP FOREIGN KEY FK1350F1D8F196CF45;
-ALTER TABLE role_permission DROP FOREIGN KEY FK9C6EC938F196CF45, DROP FOREIGN KEY FK9C6EC93814388625;
 DROP TABLE bb_group;
 DROP TABLE user;
 DROP TABLE permission;
@@ -601,29 +593,6 @@ ALTER TABLE collection_event DROP KEY uc_ce_visit_number;
 ALTER TABLE container DROP KEY uc_c_label, DROP KEY uc_c_productbarcode;
 ALTER TABLE container_type DROP KEY uc_ct_nameshort, DROP KEY uc_ct_name;
 ALTER TABLE membership DROP KEY uc_membership;
-
-ALTER TABLE membership_permission
-      ADD COLUMN ID INT(11) NOT NULL COMMENT '',
-      ADD COLUMN PERMISSION_NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '',
-      ADD INDEX FK1350F1D815E6F8DC (ID);
-
-ALTER TABLE membership_permission
-      DROP INDEX FK1350F1D8F196CF45,
-      DROP INDEX FK1350F1D8D26ABDE5,
-      DROP PRIMARY KEY,
-      DROP COLUMN MEMBERSHIP_ID,
-      DROP COLUMN PERMISSION_ID;
-
-ALTER TABLE role_permission
-      ADD COLUMN ID INT(11) NOT NULL COMMENT '',
-      ADD COLUMN PERMISSION_NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '',
-      ADD INDEX FK9C6EC938C226FDBC (ID);
-
-ALTER TABLE role_permission
-      DROP INDEX FK9C6EC93814388625,
-      DROP INDEX FK9C6EC938F196CF45,
-      DROP PRIMARY KEY, DROP COLUMN ROLE_ID,
-      DROP COLUMN PERMISSION_ID;
 
 ALTER TABLE center MODIFY COLUMN DISCRIMINATOR VARCHAR(31) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL;
 ALTER TABLE container MODIFY COLUMN PATH VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL;
@@ -730,22 +699,48 @@ ALTER TABLE aliquoted_specimen MODIFY COLUMN VOLUME DECIMAL(20, 10) NULL DEFAULT
 ALTER TABLE principal ADD CONSTRAINT CSM_USER_ID UNIQUE KEY(CSM_USER_ID), ADD CONSTRAINT EMAIL UNIQUE KEY(EMAIL);
 ALTER TABLE specimen MODIFY COLUMN QUANTITY DECIMAL(20, 10) NULL DEFAULT NULL;
 
--- make processing_event.worksheet unique
+-- merge processing_events that share the same worksheet and created_at time
 
-set @dwct = null;
-set @cworksheet = null;
+CREATE TABLE `new_processing_event` (
+  `ID` int(11) NOT NULL auto_increment,
+  `WORKSHEET` varchar(150) COLLATE latin1_general_cs NOT NULL,
+  `CREATED_AT` datetime NOT NULL,
+  `CENTER_ID` int(11) NOT NULL,
+  `ACTIVITY_STATUS_ID` int(11) NOT NULL,
+  `VERSION` int(11) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK327B1E4E92FAA70E` (`CENTER_ID`),
+  KEY `CREATED_AT_IDX` (`CREATED_AT`),
+  CONSTRAINT `FK327B1E4E92FAA70E` FOREIGN KEY (`CENTER_ID`) REFERENCES `center` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
-update processing_event set worksheet = 'NOT_ASSIGNED' where worksheet is null;
+insert into new_processing_event (worksheet, created_at, center_id, activity_status_id, version)
+select worksheet, created_at, center_id, activity_status_id, 0 from processing_event
+group by worksheet,created_at;
 
--- append _X to duplicates where X is a count
-update processing_event
-       set worksheet = if(@cworksheet <> worksheet or @cworksheet is null,
-           if(@cworksheet := worksheet,if(@dwct := 1, worksheet,worksheet),if(@dwct := 1, worksheet,worksheet)),
-           if(@dwct := @dwct + 1, concat(@cworksheet, '_', @dwct), concat(@cworksheet, '_', @dwct)))
-       order by worksheet, created_at;
+update processing_event_comment pec, processing_event pe, new_processing_event npe
+set pec.processing_event_id=npe.id
+where pec.processing_event_id=pe.id
+and npe.worksheet=pe.worksheet
+and npe.created_at=pe.created_at;
 
-ALTER TABLE processing_event ADD CONSTRAINT WORKSHEET UNIQUE KEY(WORKSHEET);
+update specimen spc, processing_event pe, new_processing_event npe
+set spc.processing_event_id=npe.id
+where spc.processing_event_id=pe.id
+and npe.worksheet=pe.worksheet
+and npe.created_at=pe.created_at;
 
+SET FOREIGN_KEY_CHECKS = 0;
+drop table processing_event;
+rename table new_processing_event to processing_event;
+ALTER TABLE new_processing_event DROP FOREIGN KEY FK327B1E4E92FAA70E;
+ALTER TABLE new_processing_event DROP INDEX FK327B1E4E92FAA70E;
+
+ALTER TABLE new_processing_event ADD INDEX FK327B1E4E92FAA705 (CENTER_ID);
+ALTER TABLE new_processing_event
+      ADD CONSTRAINT FK327B1E4E92FAA705 FOREIGN KEY FK3A16800EC449A4 (CENTER_ID) REFERENCES center (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+SET FOREIGN_KEY_CHECKS = 1;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

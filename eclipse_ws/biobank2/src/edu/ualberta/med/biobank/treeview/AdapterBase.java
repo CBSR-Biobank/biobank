@@ -218,9 +218,11 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     public static boolean closeEditor(FormInput input) {
         IWorkbenchPage page = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getActivePage();
-        IEditorPart part = page.findEditor(input);
-        if (part != null) {
-            return page.closeEditor(part, true);
+        if (page != null) {
+            IEditorPart part = page.findEditor(input);
+            if (part != null) {
+                return page.closeEditor(part, true);
+            }
         }
         return false;
     }

@@ -119,6 +119,7 @@ public class TestClinic extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
+        // TODO: get collection event info instead
         EXECUTOR.exec(
             new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
             .getList();
