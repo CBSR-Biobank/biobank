@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -33,7 +32,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
@@ -238,30 +236,19 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     private HashSet<ContactSaveInfo> getNewContactInfo() {
-        HashMap<Integer, ContactSaveInfo> allContacts =
-            new HashMap<Integer, ContactSaveInfo>();
-
-        for (Contact contact : clinicInfo.contacts) {
-            allContacts.put(contact.getId(), new ContactSaveInfo(contact));
-        }
+        clinic.addToContactCollection(contactEntryWidget
+            .getAddedOrModifedContacts());
+        clinic.removeFromContactCollection(contactEntryWidget
+            .getDeletedContacts());
 
         HashSet<ContactSaveInfo> contactSaveInfos =
             new HashSet<ContactSaveInfo>();
-        for (ContactWrapper contactWrapper : contactEntryWidget
-            .getAddedOrModifedContacts()) {
-            if (contactWrapper.getId() == null) {
-                contactSaveInfos.add(new ContactSaveInfo(contactWrapper
+
+        for (ContactWrapper wrapper : clinic.getContactCollection(false)) {
+            contactSaveInfos.add(new ContactSaveInfo(
+                wrapper
                     .getWrappedObject()));
-            } else {
-                allContacts.put(contactWrapper.getId(),
-                    new ContactSaveInfo(contactWrapper.getWrappedObject()));
-            }
         }
-        for (ContactWrapper contactWrapper : contactEntryWidget
-            .getDeletedContacts()) {
-            allContacts.remove(contactWrapper.getId());
-        }
-        contactSaveInfos.addAll(allContacts.values());
         return contactSaveInfos;
     }
 

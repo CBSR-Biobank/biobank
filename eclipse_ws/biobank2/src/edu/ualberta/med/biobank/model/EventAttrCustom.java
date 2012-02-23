@@ -16,9 +16,11 @@ public class EventAttrCustom {
     private EventAttrTypeEnum type;
     private String[] allowedValues;
     private String value;
+    private GlobalEventAttr globalEventAttr;
 
-    protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-        this);
+    protected PropertyChangeSupport propertyChangeSupport =
+        new PropertyChangeSupport(
+            this);
 
     public Boolean getIsDefault() {
         return isDefault;
@@ -84,6 +86,14 @@ public class EventAttrCustom {
 
     public void setStudyEventAttrId(Integer studyEventAttrId) {
         this.studyEventAttrId = studyEventAttrId;
+    }
+
+    public void setGlobalEventAttr(GlobalEventAttr globalEventAttr) {
+        this.globalEventAttr = globalEventAttr;
+    }
+
+    public Integer getGlobalEventAttrId() {
+        return globalEventAttr.getId();
     }
 
 };

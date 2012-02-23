@@ -143,8 +143,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         doSaveInternal(monitor);
     }
 
-    protected void doSaveInternal(
-        @SuppressWarnings("unused") final IProgressMonitor monitor) {
+    protected void doSaveInternal(final IProgressMonitor monitor) {
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
         try {

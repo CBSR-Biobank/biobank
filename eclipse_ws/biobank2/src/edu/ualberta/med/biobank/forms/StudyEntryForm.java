@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -16,6 +15,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -25,13 +25,11 @@ import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecimenSaveInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.StudyEventAttrSaveInfo;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.GlobalEventAttrWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.exception.UserUIException;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
@@ -39,7 +37,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
-import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.EventAttrWidget;
@@ -250,27 +247,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         GridLayout gl = (GridLayout) client.getLayout();
         gl.numColumns = 1;
 
-        // START KLUDGE
-        //
-        // create "date processed" attribute - actually an attribute in
-        // PatientVisit - but we just want to show the user that this
-        // information is collected by default.
-        String[] defaultFields =
-            new String[] { DATE_PROCESSED_INFO_FIELD_NAME };
         StudyEventAttrCustom studyPvAttrCustom;
-
-        for (String field : defaultFields) {
-            studyPvAttrCustom = new StudyEventAttrCustom();
-            studyPvAttrCustom.setLabel(field);
-            studyPvAttrCustom.setType(EventAttrTypeEnum.DATE_TIME);
-            studyPvAttrCustom.setIsDefault(true);
-            studyPvAttrCustom.widget = new EventAttrWidget(client, SWT.NONE,
-                studyPvAttrCustom, true);
-            studyPvAttrCustom.inStudy = false;
-            pvCustomInfoList.add(studyPvAttrCustom);
-        }
-        //
-        // END KLUDGE
 
         List<String> studyEventInfoLabels = Arrays.asList(study
             .getStudyEventAttrLabels());
@@ -280,6 +257,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             String label = geAttr.getLabel();
             boolean selected = false;
             studyPvAttrCustom = new StudyEventAttrCustom();
+            studyPvAttrCustom.setGlobalEventAttr(geAttr.getWrappedObject());
             studyPvAttrCustom.setLabel(label);
             studyPvAttrCustom.setType(geAttr.getTypeName());
             if (studyEventInfoLabels.contains(label)) {
@@ -314,19 +292,8 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void doBeforeSave() throws Exception {
-        setStudyPvAttr();
-    }
-
-    @Override
     protected void saveForm() throws Exception {
         // save of source specimen is made inside the entryinfotable
-
-        // aliquoted Specimen :
-        study.addToAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
-            .getAddedOrModifiedAliquotedSpecimens());
-        study.removeFromAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
-            .getDeletedAliquotedSpecimens());
 
         StudySaveAction saveAction = new StudySaveAction();
         saveAction.setId(study.getId());
@@ -335,82 +302,85 @@ public class StudyEntryForm extends BiobankEntryForm {
         saveAction.setActivityStatus(study.getActivityStatus());
         saveAction.setSiteIds(new HashSet<Integer>());
         saveAction.setContactIds(new HashSet<Integer>());
-        saveAction
-            .setSourceSpecimenSaveInfo(new HashSet<SourceSpecimenSaveInfo>());
-        saveAction
-            .setAliquotSpecimenSaveInfo(new HashSet<AliquotedSpecimenSaveInfo>());
-        saveAction
-            .setStudyEventAttrSaveInfo(new HashSet<StudyEventAttrSaveInfo>());
-
-        SessionManager.updateAllSimilarNodes(studyAdapter, true);
+        saveAction.setSourceSpecimenSaveInfo(getSourceSpecimenInfos());
+        saveAction.setAliquotSpecimenSaveInfo(getAliquotedSpecimenInfos());
+        saveAction.setStudyEventAttrSaveInfo(getStudyEventAttrInfos());
+        Integer id =
+            SessionManager.getAppService().doAction(saveAction).getId();
+        updateStudyInfo(id);
     }
 
-    private HashSet<SourceSpecimenSaveInfo> getNewSourceSpecimenInfo() {
-        HashMap<Integer, SourceSpecimenSaveInfo> allSourceSpecimens =
-            new HashMap<Integer, SourceSpecimenSaveInfo>();
-
-        for (SourceSpecimen sourceSpecimen : studyInfo.getSourceSpecimens()) {
-            allSourceSpecimens.put(sourceSpecimen.getId(),
-                new SourceSpecimenSaveInfo(sourceSpecimen));
-        }
-
+    private HashSet<SourceSpecimenSaveInfo> getSourceSpecimenInfos() {
         HashSet<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos =
             new HashSet<SourceSpecimenSaveInfo>();
-        // for (SourceSpecimenWrapper sourceSpecimenWrapper :
-        // sourceSpecimenEntryTable
-        // .getAddedOrModifedSourceSpecimens()) {
-        // if (sourceSpecimenWrapper.getId() == null) {
-        // sourceSpecimenSaveInfos.add(new SourceSpecimenSaveInfo(
-        // sourceSpecimenWrapper
-        // .getWrappedObject()));
-        // } else {
-        // allSourceSpecimens.put(
-        // sourceSpecimenWrapper.getId(),
-        // new SourceSpecimenSaveInfo(sourceSpecimenWrapper
-        // .getWrappedObject()));
-        // }
-        // }
-        // sourceSpecimenSaveInfos.addAll(allSourceSpecimens.values());
+
+        for (SourceSpecimenWrapper wrapper : study
+            .getSourceSpecimenCollection(false)) {
+            sourceSpecimenSaveInfos.add(new SourceSpecimenSaveInfo(wrapper
+                .getWrappedObject()));
+        }
         return sourceSpecimenSaveInfos;
     }
 
-    private void setStudyPvAttr() throws Exception, UserUIException {
-        List<String> newPvInfoLabels = new ArrayList<String>();
-        for (StudyEventAttrCustom studyPvAttrCustom : pvCustomInfoList) {
-            String label = studyPvAttrCustom.getLabel();
-            if (label.equals(DATE_PROCESSED_INFO_FIELD_NAME))
-                continue;
+    private HashSet<AliquotedSpecimenSaveInfo> getAliquotedSpecimenInfos() {
+        // aliquoted Specimen :
+        study.addToAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
+            .getAddedOrModifiedAliquotedSpecimens());
+        study.removeFromAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
+            .getDeletedAliquotedSpecimens());
 
-            if (!studyPvAttrCustom.widget.getSelected()
-                && studyPvAttrCustom.inStudy) {
-                try {
-                    study.deleteStudyEventAttr(studyPvAttrCustom.getLabel());
-                } catch (BiobankCheckException e) {
-                    throw new UserUIException(NLS.bind(
-                        Messages.StudyEntryForm_delete_error_msg, label), e);
-                }
-            } else if (studyPvAttrCustom.widget.getSelected()) {
-                newPvInfoLabels.add(studyPvAttrCustom.getLabel());
-                String value = studyPvAttrCustom.widget.getValues();
-                if (studyPvAttrCustom.getType() == EventAttrTypeEnum.SELECT_SINGLE
-                    || studyPvAttrCustom.getType() == EventAttrTypeEnum.SELECT_MULTIPLE) {
-                    if (value.length() > 0) {
-                        study
-                            .setStudyEventAttr(
-                                studyPvAttrCustom.getLabel(),
-                                studyPvAttrCustom.getType(),
-                                value
-                                    .split(EventAttrCustom.VALUE_MULTIPLE_SEPARATOR));
-                    } else if (value.length() == 0) {
-                        study.setStudyEventAttr(studyPvAttrCustom.getLabel(),
-                            studyPvAttrCustom.getType(), null);
+        HashSet<AliquotedSpecimenSaveInfo> aliquotedSpecimenSaveInfos =
+            new HashSet<AliquotedSpecimenSaveInfo>();
+
+        for (AliquotedSpecimenWrapper wrapper : study
+            .getAliquotedSpecimenCollection(false)) {
+            aliquotedSpecimenSaveInfos.add(new AliquotedSpecimenSaveInfo(
+                wrapper.getWrappedObject()));
+        }
+        return aliquotedSpecimenSaveInfos;
+    }
+
+    private HashSet<StudyEventAttrSaveInfo> getStudyEventAttrInfos() {
+        final HashSet<StudyEventAttrSaveInfo> studyEventAttrSaveInfos =
+            new HashSet<StudyEventAttrSaveInfo>();
+
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+
+                for (StudyEventAttrCustom studyEventAttrCustom : pvCustomInfoList) {
+                    String label = studyEventAttrCustom.getLabel();
+                    if (label.equals(DATE_PROCESSED_INFO_FIELD_NAME)
+                        || (!studyEventAttrCustom.widget.getSelected() && !studyEventAttrCustom.inStudy))
+                        continue;
+
+                    StudyEventAttrSaveInfo studyEventAttrSaveInfo =
+                        new StudyEventAttrSaveInfo();
+
+                    studyEventAttrSaveInfo.id =
+                        studyEventAttrCustom.getStudyEventAttrId();
+                    studyEventAttrSaveInfo.globalEventAttrId =
+                        studyEventAttrCustom.getGlobalEventAttrId();
+                    studyEventAttrSaveInfo.permissible =
+                        studyEventAttrCustom.widget.getValues();
+
+                    // TODO: required not used at the moment
+                    studyEventAttrSaveInfo.required = false;
+
+                    if (!studyEventAttrCustom.widget.getSelected()
+                        && studyEventAttrCustom.inStudy) {
+                        studyEventAttrSaveInfo.activityStatus =
+                            ActivityStatus.CLOSED;
+                    } else if (studyEventAttrCustom.widget.getSelected()) {
+                        studyEventAttrSaveInfo.activityStatus =
+                            ActivityStatus.ACTIVE;
                     }
-                } else {
-                    study.setStudyEventAttr(studyPvAttrCustom.getLabel(),
-                        studyPvAttrCustom.getType());
+
+                    studyEventAttrSaveInfos.add(studyEventAttrSaveInfo);
                 }
             }
-        }
+        });
+        return studyEventAttrSaveInfos;
     }
 
     @Override
