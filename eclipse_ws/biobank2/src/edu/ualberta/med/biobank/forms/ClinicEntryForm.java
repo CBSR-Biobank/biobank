@@ -257,6 +257,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                     new ContactSaveInfo(contactWrapper.getWrappedObject()));
             }
         }
+        for (ContactWrapper contactWrapper : contactEntryWidget
+            .getDeletedContacts()) {
+            allContacts.remove(contactWrapper.getId());
+        }
         contactSaveInfos.addAll(allContacts.values());
         return contactSaveInfos;
     }

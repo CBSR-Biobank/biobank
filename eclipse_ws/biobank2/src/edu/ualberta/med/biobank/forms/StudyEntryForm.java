@@ -30,7 +30,6 @@ import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.GlobalEventAttrWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.exception.UserUIException;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -357,20 +356,21 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         HashSet<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos =
             new HashSet<SourceSpecimenSaveInfo>();
-        for (SourceSpecimenWrapper sourceSpecimenWrapper : sourceSpecimenEntryTable
-            .getAddedOrModifedSourceSpecimens()) {
-            if (sourceSpecimenWrapper.getId() == null) {
-                sourceSpecimenSaveInfos.add(new SourceSpecimenSaveInfo(
-                    sourceSpecimenWrapper
-                        .getWrappedObject()));
-            } else {
-                allSourceSpecimens.put(
-                    sourceSpecimenWrapper.getId(),
-                    new SourceSpecimenSaveInfo(sourceSpecimenWrapper
-                        .getWrappedObject()));
-            }
-        }
-        sourceSpecimenSaveInfos.addAll(allSourceSpecimens.values());
+        // for (SourceSpecimenWrapper sourceSpecimenWrapper :
+        // sourceSpecimenEntryTable
+        // .getAddedOrModifedSourceSpecimens()) {
+        // if (sourceSpecimenWrapper.getId() == null) {
+        // sourceSpecimenSaveInfos.add(new SourceSpecimenSaveInfo(
+        // sourceSpecimenWrapper
+        // .getWrappedObject()));
+        // } else {
+        // allSourceSpecimens.put(
+        // sourceSpecimenWrapper.getId(),
+        // new SourceSpecimenSaveInfo(sourceSpecimenWrapper
+        // .getWrappedObject()));
+        // }
+        // }
+        // sourceSpecimenSaveInfos.addAll(allSourceSpecimens.values());
         return sourceSpecimenSaveInfos;
     }
 
