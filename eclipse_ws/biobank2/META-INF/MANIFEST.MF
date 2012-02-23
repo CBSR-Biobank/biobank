@@ -23,7 +23,7 @@ Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.eclipse.co
  nox.security.ui;bundle-version="1.1.0",org.eclipse.equinox.p2.core;bu
  ndle-version="2.1.0",org.eclipse.equinox.p2.operations;bundle-version
  ="2.1.0"
-Bundle-Version: 3.0.2.a
+Bundle-Version: 3.0.2.b
 Bundle-Vendor: AICML
 Bundle-Localization: plugin
 Export-Package: edu.ualberta.med.biobank

@@ -78,7 +78,6 @@ public class TestModelWrapper extends TestDatabase {
     public void testPropertyChangeListener() throws Exception {
         TestSiteWrapper wrapper = new TestSiteWrapper(appService);
         PropertyChangeListener listener = new PropertyChangeListener() {
-            @Override
             public void propertyChange(PropertyChangeEvent arg0) {
             }
         };

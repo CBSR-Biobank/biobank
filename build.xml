@@ -16,8 +16,8 @@
     <arg value="-f" />
   </exec>
 
-  <property name="server.version.num" value="3.0.2.a" />
-  <property name="java.client.version.num" value="3.0.2.a" />
+  <property name="server.version.num" value="3.0.2.b" />
+  <property name="java.client.version.num" value="3.0.2.b" />
 
   <property environment="env" />
   <property name="host" value="aicml-med.cs.ualberta.ca" />
@@ -421,7 +421,7 @@
           message="JBOSS_HOME environment variable not defined" />
   </target>
   <target name="deploy-jboss"
-          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostAicml5,hostCbsr,hostCbsrTraining,hostLocal,server-manifest"
+          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostAicml5,hostCbsr,hostCbsrTraining,hostLocal"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
@@ -729,7 +729,7 @@
   </target>
 
   <target name="build-common-project"
-          depends="sdk-files,prepare-webapp-orm,package-codegen-orm,modelextender">
+          depends="sdk-files,server-manifest,prepare-webapp-orm,package-codegen-orm,modelextender">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
