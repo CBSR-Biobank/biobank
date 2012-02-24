@@ -29,6 +29,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.search.SpecimenByInventorySearchAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -36,6 +39,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenEntryInfoTable;
@@ -144,11 +148,18 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
     }
 
     private void addSpecimen() {
+        BiobankApplicationService appService = SessionManager.getAppService();
         String inventoryId = newSpecimenInventoryId.getText().trim();
         if (!inventoryId.isEmpty()) {
             SpecimenWrapper specimen = null;
             try {
-                specimen = SpecimenWrapper.getSpecimen(appService, inventoryId);
+                Integer specId = appService.doAction(
+                    new SpecimenByInventorySearchAction(inventoryId,
+                        SessionManager.getUser().getCurrentWorkingCenter()
+                            .getId())).getList().get(0);
+                specimen = new SpecimenWrapper(appService,
+                    appService.doAction(
+                        new SpecimenGetInfoAction(specId)).getSpecimen());
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
                     Messages.SpecimenEntryWidget_retrieve_error_title, e);

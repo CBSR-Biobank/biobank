@@ -124,7 +124,7 @@ public class SpecimenViewForm extends BiobankViewForm {
                 new SpecimenGetDispatchesAction(specimenWrapper.getId()));
 
         dispatchInfoTable =
-            new DispatchInfoTable(client, specimenWrapper,
+            new DispatchInfoTable(client,
                 specimenDispatchesInfo.getDispatches());
     }
 

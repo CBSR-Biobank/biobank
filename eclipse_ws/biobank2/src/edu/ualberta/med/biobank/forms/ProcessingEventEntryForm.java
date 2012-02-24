@@ -2,11 +2,8 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -24,7 +21,6 @@ import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGet
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -123,6 +119,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             ProcessingEvent p = new ProcessingEvent();
             p.setActivityStatus(ActivityStatus.ACTIVE);
             pevent.setWrappedObject(p);
+            pevent
+                .setCenter(SessionManager.getUser().getCurrentWorkingCenter());
             specimens = new ArrayList<SpecimenInfo>();
         } else {
             PEventInfo read =
@@ -223,7 +221,10 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
         toolkit.paintBordersFor(client);
 
-        List<SpecimenWrapper> specimens = pevent.getSpecimenCollection(true);
+        List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>();
+        for (SpecimenInfo info : specimens)
+            specs.add(new SpecimenWrapper(SessionManager.getAppService(),
+                info.specimen));
 
         specimenEntryWidget =
             new SpecimenEntryWidget(client, SWT.NONE, toolkit,
@@ -339,7 +340,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         specimenEntryWidget.addVetoListener(ItemAction.POST_DELETE,
             vetoListener);
 
-        specimenEntryWidget.setSpecimens(specimens);
+        specimenEntryWidget.setSpecimens(specs);
     }
 
     @Override
@@ -362,63 +363,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     @Override
     protected void doAfterSave() throws Exception {
         SessionManager.updateAllSimilarNodes(pEventAdapter, true);
-    }
-
-    protected void doTrySettingAgain() throws Exception {
-        // remove added specimens and add removed specimens and try to
-        // add/remove them again (after reloading them) through the
-        // SpecimenEntryWidget to check again if can perform the action
-
-        List<SpecimenWrapper> addedSpecimens =
-            specimenEntryWidget.getAddedSpecimens();
-
-        List<SpecimenWrapper> removedSpecimens =
-            specimenEntryWidget.getRemovedSpecimens();
-        List<SpecimenWrapper> pEventSpecs = pevent.getSpecimenCollection(false);
-        pEventSpecs.removeAll(addedSpecimens);
-        pEventSpecs.addAll(removedSpecimens);
-        for (SpecimenWrapper sp : pEventSpecs) {
-            sp.reload();
-        }
-        pevent.setSpecimenWrapperCollection(pEventSpecs);
-        specimenEntryWidget.setSpecimens(pEventSpecs);
-
-        Map<String, String> problems = new HashMap<String, String>();
-        for (SpecimenWrapper spec : addedSpecimens) {
-            String inventoryId = spec.getInventoryId();
-            try {
-                spec.reload();
-                specimenEntryWidget.addSpecimen(spec);
-            } catch (Exception ex) {
-                problems
-                    .put(
-                        Messages.ProcessingEventEntryForm_try_again_adding_error_label
-                            + " " + inventoryId, ex.getMessage()); //$NON-NLS-1$
-            }
-        }
-        for (SpecimenWrapper spec : removedSpecimens) {
-            String inventoryId = spec.getInventoryId();
-            try {
-                spec.reload();
-                specimenEntryWidget.removeSpecimen(spec);
-            } catch (Exception ex) {
-                problems
-                    .put(
-                        Messages.ProcessingEventEntryForm_try_again_removing_error_label
-                            + " " + inventoryId, ex.getMessage()); //$NON-NLS-1$
-            }
-        }
-        if (problems.size() != 0) {
-            StringBuffer msg = new StringBuffer();
-            for (Entry<String, String> entry : problems.entrySet()) {
-                if (msg.length() > 0) msg.append("\n"); //$NON-NLS-1$
-                msg.append(entry.getKey()).append(": ") //$NON-NLS-1$
-                    .append(entry.getValue());
-            }
-            throw new BiobankException(
-                Messages.ProcessingEventEntryForm_try_again_error_msg
-                    + msg.toString());
-        }
     }
 
     @Override

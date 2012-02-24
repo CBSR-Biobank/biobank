@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -38,6 +39,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
@@ -285,12 +287,11 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             switch (res.getProcessStatus()) {
             case FILLED:
                 // ok
-                SpecimenWrapper specimen = new SpecimenWrapper(
-                    SessionManager.getAppService());
-                specimen.getWrappedObject()
-                    .setId(res.getCell().getSpecimenId());
-                specimen.reload();
-                dispatch.addSpecimens(Arrays.asList(specimen),
+                Specimen spec = SessionManager.getAppService()
+                    .doAction(new SpecimenGetInfoAction(res
+                        .getCell().getSpecimenId())).getSpecimen();
+                dispatch.addSpecimens(Arrays.asList(new SpecimenWrapper(
+                    SessionManager.getAppService(), spec)),
                     DispatchSpecimenState.NONE);
                 reloadSpecimens();
                 setDirty(true);

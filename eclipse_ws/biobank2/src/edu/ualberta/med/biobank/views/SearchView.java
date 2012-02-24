@@ -126,7 +126,7 @@ public class SearchView extends ViewPart {
                     (SearchType) ((IStructuredSelection) searchTypeCombo
                         .getSelection()).getFirstElement();
                 try {
-                    List<? extends ModelWrapper<?>> res = type.search(
+                    List<ModelWrapper<?>> res = type.search(
                         searchString, SessionManager.getUser()
                             .getCurrentWorkingCenter());
                     if (res != null && res.size() > 0) {

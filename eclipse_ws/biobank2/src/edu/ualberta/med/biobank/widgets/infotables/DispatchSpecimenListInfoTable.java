@@ -58,7 +58,8 @@ public abstract class DispatchSpecimenListInfoTable extends
                     @Override
                     public void deleteItem(
                         InfoTableEvent<DispatchSpecimenWrapper> event) {
-                        List<DispatchSpecimenWrapper> dsaList = getSelectedItems();
+                        List<DispatchSpecimenWrapper> dsaList =
+                            getSelectedItems();
                         if (dsaList.size() > 0) {
                             if (dsaList.size() == 1
                                 && !BgcPlugin
@@ -106,7 +107,8 @@ public abstract class DispatchSpecimenListInfoTable extends
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -142,7 +144,9 @@ public abstract class DispatchSpecimenListInfoTable extends
         Assert.isNotNull(type, Messages.DispatchSpecimenListInfoTable_16);
         info.type = type.getName();
         info.status = info.dsa.getSpecimen().getActivityStatus().toString();
-        info.comment = CommentWrapper.commentListToString(info.dsa.getCommentCollection(false));
+        info.comment =
+            CommentWrapper.commentListToString(info.dsa
+                .getCommentCollection(false));
         return info;
     }
 
@@ -181,7 +185,8 @@ public abstract class DispatchSpecimenListInfoTable extends
             Messages.DispatchSpecimenListInfoTable_17);
         IStructuredSelection stSelection = (IStructuredSelection) tableViewer
             .getSelection();
-        List<DispatchSpecimenWrapper> dsaList = new ArrayList<DispatchSpecimenWrapper>();
+        List<DispatchSpecimenWrapper> dsaList =
+            new ArrayList<DispatchSpecimenWrapper>();
 
         for (Iterator<?> iter = stSelection.iterator(); iter.hasNext();) {
             BiobankCollectionModel bcm = (BiobankCollectionModel) iter.next();
