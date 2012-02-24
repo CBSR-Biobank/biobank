@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.model.Container;
 public class ContainerGetInfoAction implements Action<ContainerInfo> {
     private static final long serialVersionUID = 1L;
 
+    // this query is ridiculous!
     @SuppressWarnings("nls")
     private static final String CONTAINER_INFO_HQL =
         "SELECT DISTINCT container"
@@ -24,14 +25,26 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
             + " INNER JOIN FETCH ctype.capacity"
             + " LEFT JOIN FETCH ctype.childContainerTypeCollection"
             + " LEFT JOIN FETCH ctype.specimenTypeCollection"
+            + " INNER JOIN FETCH ctype.childLabelingScheme"
             + " LEFT JOIN FETCH container.position"
-            + " INNER JOIN FETCH container.topContainer"
+            + " INNER JOIN FETCH container.topContainer topContainer"
+            + " INNER JOIN FETCH topContainer.containerType topContainerType"
+            + " INNER JOIN FETCH topContainerType.childLabelingScheme"
             + " INNER JOIN FETCH container.site"
             + " LEFT JOIN FETCH container.childPositionCollection childPos"
             + " LEFT JOIN FETCH childPos.container"
-            + " LEFT JOIN FETCH container.specimenPositionCollection"
-            + " LEFT JOIN FETCH container.commentCollection comments"
-            + " LEFT JOIN FETCH comments.user"
+            + " LEFT JOIN FETCH container.specimenPositionCollection spcPos"
+            + " LEFT JOIN FETCH spcPos.specimen specimen"
+            + " LEFT JOIN FETCH specimen.parentSpecimen parentSpecimen"
+            + " LEFT JOIN FETCH specimen.collectionEvent cevent"
+            + " LEFT JOIN FETCH cevent.patient patient"
+            + " LEFT JOIN FETCH patient.study"
+            + " LEFT JOIN FETCH parentSpecimen.processingEvent"
+            + " LEFT JOIN FETCH container.commentCollection containerComments"
+            + " LEFT JOIN FETCH containerComments.user"
+            + " LEFT JOIN FETCH specimen.commentCollection"
+            + " LEFT JOIN FETCH specimen.originInfo spcOriginInfo"
+            + " LEFT JOIN FETCH spcOriginInfo.center"
             + " WHERE container.id = ?";
 
     public static class ContainerInfo implements ActionResult {
