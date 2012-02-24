@@ -22,7 +22,6 @@ import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -89,7 +88,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         return studyEventAttrMap.keySet().toArray(new String[] {});
     }
 
-    protected StudyEventAttrWrapper getStudyEventAttr(String label)
+    public StudyEventAttrWrapper getStudyEventAttr(String label)
         throws Exception {
         getStudyEventAttrMap();
         StudyEventAttrWrapper studyEventAttr = studyEventAttrMap.get(label);

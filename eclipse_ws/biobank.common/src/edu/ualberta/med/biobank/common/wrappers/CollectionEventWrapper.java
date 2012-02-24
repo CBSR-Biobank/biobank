@@ -22,7 +22,6 @@ import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.loggers.CollectionEventLogProvider;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;

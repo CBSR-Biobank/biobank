@@ -126,6 +126,17 @@ public class StudySaveAction implements Action<IdResult> {
             studyEventAttr.setStudy(study);
             return studyEventAttr;
         }
+
+        @Override
+        public String toString() {
+            StringBuffer sb = new StringBuffer();
+            sb.append("id/").append(id);
+            sb.append(" globalEventAttrId/").append(globalEventAttrId);
+            sb.append(" required/").append(required);
+            sb.append(" permissible/").append(permissible);
+            sb.append(" activityStatus/").append(activityStatus);
+            return sb.toString();
+        }
     }
 
     private Integer id = null;

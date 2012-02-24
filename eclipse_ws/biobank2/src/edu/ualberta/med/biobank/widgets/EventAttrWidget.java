@@ -76,7 +76,7 @@ public class EventAttrWidget extends BgcBaseWidget {
 
         hasListValues = customInfo.getType() == EventAttrTypeEnum.SELECT_SINGLE
             || customInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE;
-        selected |= (customInfo.getAllowedValues() != null);
+        // selected |= (customInfo.getAllowedValues() != null);
 
         if (hasListValues) {
             labelDlgInfo = LABEL_DLG_INFO.get(customInfo.getLabel());

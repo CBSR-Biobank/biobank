@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
@@ -203,6 +204,10 @@ public class StudyViewForm extends BiobankViewForm {
         pvCustomInfoList.add(combinedPvInfo);
 
         for (String label : study.getStudyEventAttrLabels()) {
+            if (!study.getStudyEventAttrActivityStatus(label).equals(
+                ActivityStatus.ACTIVE)) {
+                continue;
+            }
             combinedPvInfo = new StudyPvCustomInfo();
             combinedPvInfo.setLabel(label);
             combinedPvInfo.setType(study.getStudyEventAttrType(label));

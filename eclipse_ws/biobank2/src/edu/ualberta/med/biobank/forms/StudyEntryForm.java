@@ -166,7 +166,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         createClinicSection();
         createSourceSpecimensSection();
         createAliquotedSpecimensSection();
-        createPvCustomInfoSection();
+        createEventAttrSection();
         createButtonsSection();
     }
 
@@ -241,13 +241,13 @@ public class StudyEntryForm extends BiobankEntryForm {
         section.setClient(sourceSpecimenEntryTable);
     }
 
-    private void createPvCustomInfoSection() throws Exception {
+    private void createEventAttrSection() throws Exception {
         Composite client =
             createSectionWithClient(Messages.StudyEntryForm_visit_info_title);
         GridLayout gl = (GridLayout) client.getLayout();
         gl.numColumns = 1;
 
-        StudyEventAttrCustom studyPvAttrCustom;
+        StudyEventAttrCustom studyEventAttrCustom;
 
         List<String> studyEventInfoLabels = Arrays.asList(study
             .getStudyEventAttrLabels());
@@ -256,21 +256,24 @@ public class StudyEntryForm extends BiobankEntryForm {
             .getAllGlobalEventAttrs(SessionManager.getAppService())) {
             String label = geAttr.getLabel();
             boolean selected = false;
-            studyPvAttrCustom = new StudyEventAttrCustom();
-            studyPvAttrCustom.setGlobalEventAttr(geAttr.getWrappedObject());
-            studyPvAttrCustom.setLabel(label);
-            studyPvAttrCustom.setType(geAttr.getTypeName());
+            studyEventAttrCustom = new StudyEventAttrCustom();
+            studyEventAttrCustom.setGlobalEventAttr(geAttr.getWrappedObject());
+            studyEventAttrCustom.setLabel(label);
+            studyEventAttrCustom.setType(geAttr.getTypeName());
             if (studyEventInfoLabels.contains(label)) {
-                studyPvAttrCustom.setAllowedValues(study
+                studyEventAttrCustom.setStudyEventAttrId(study
+                    .getStudyEventAttr(label).getId());
+                studyEventAttrCustom.setAllowedValues(study
                     .getStudyEventAttrPermissible(label));
-                selected = true;
+                selected = study.getStudyEventAttrActivityStatus(label).equals(
+                    ActivityStatus.ACTIVE);
             }
-            studyPvAttrCustom.setIsDefault(false);
-            studyPvAttrCustom.widget = new EventAttrWidget(client, SWT.NONE,
-                studyPvAttrCustom, selected);
-            studyPvAttrCustom.widget.addSelectionChangedListener(listener);
-            studyPvAttrCustom.inStudy = studyEventInfoLabels.contains(label);
-            pvCustomInfoList.add(studyPvAttrCustom);
+            studyEventAttrCustom.setIsDefault(false);
+            studyEventAttrCustom.widget = new EventAttrWidget(client, SWT.NONE,
+                studyEventAttrCustom, selected);
+            studyEventAttrCustom.widget.addSelectionChangedListener(listener);
+            studyEventAttrCustom.inStudy = studyEventInfoLabels.contains(label);
+            pvCustomInfoList.add(studyEventAttrCustom);
         }
     }
 
@@ -375,6 +378,8 @@ public class StudyEntryForm extends BiobankEntryForm {
                         studyEventAttrSaveInfo.activityStatus =
                             ActivityStatus.ACTIVE;
                     }
+
+                    System.out.println(studyEventAttrSaveInfo);
 
                     studyEventAttrSaveInfos.add(studyEventAttrSaveInfo);
                 }

@@ -1,11 +1,10 @@
-package edu.ualberta.med.biobank.common.wrappers.internal;
+package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.EventAttrPeer;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyEventAttrBaseWrapper;
 import edu.ualberta.med.biobank.model.EventAttr;
