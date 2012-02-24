@@ -16,6 +16,7 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     private static final String STUDY_INFO_HQL =
         "SELECT DISTINCT study"
             + " FROM " + Study.class.getName() + " study"
+            + " LEFT JOIN FETCH study.siteCollection"
             + " LEFT JOIN FETCH study.contactCollection"
             + " LEFT JOIN FETCH study.sourceSpecimenCollection srcSpc"
             + " LEFT JOIN FETCH srcSpc.specimenType"

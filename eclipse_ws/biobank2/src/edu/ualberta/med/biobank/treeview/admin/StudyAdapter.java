@@ -54,7 +54,8 @@ public class StudyAdapter extends AdapterBase {
 
     @Override
     public boolean isDeletable() {
-        return internalIsDeletable();
+        // TODO: this needs to be implemented correctly
+        return true;
     }
 
     @Override

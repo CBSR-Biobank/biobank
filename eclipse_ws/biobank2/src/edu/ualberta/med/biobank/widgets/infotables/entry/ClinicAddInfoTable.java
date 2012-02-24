@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,9 +45,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
                 notifyListeners();
                 ContactWrapper contact = dlg.getSelection();
                 if (contact != null) {
-                    List<ContactWrapper> dummyList = new ArrayList<ContactWrapper>();
-                    dummyList.add(contact);
-                    study.addToContactCollection(dummyList);
+                    study.addToContactCollection(Arrays.asList(contact));
                     setList(study.getContactCollection(true));
                 }
             }

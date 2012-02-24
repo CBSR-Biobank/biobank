@@ -28,8 +28,10 @@ import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecim
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.StudyEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.GlobalEventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -81,6 +83,8 @@ public class StudyEntryForm extends BiobankEntryForm {
     private List<StudyEventAttrCustom> pvCustomInfoList;
 
     private AliquotedSpecimenEntryInfoTable aliquotedSpecimenEntryTable;
+
+    private BgcBaseText commentText;
 
     private BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
@@ -216,8 +220,8 @@ public class StudyEntryForm extends BiobankEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add);
+        commentText = (BgcBaseText) createLabelledWidget(
+            client, BgcBaseText.class, SWT.MULTI, Messages.Comments_add);
     }
 
     private void createSourceSpecimensSection() {
@@ -263,6 +267,9 @@ public class StudyEntryForm extends BiobankEntryForm {
             createSectionWithClient(Messages.StudyEntryForm_visit_info_title);
         GridLayout gl = (GridLayout) client.getLayout();
         gl.numColumns = 1;
+
+        toolkit.createLabel(client, "Date Processed is collected by default.",
+            SWT.LEFT);
 
         StudyEventAttrCustom studyEventAttrCustom;
 
@@ -315,19 +322,45 @@ public class StudyEntryForm extends BiobankEntryForm {
     protected void saveForm() throws Exception {
         // save of source specimen is made inside the entryinfotable
 
-        StudySaveAction saveAction = new StudySaveAction();
+        final StudySaveAction saveAction = new StudySaveAction();
         saveAction.setId(study.getId());
         saveAction.setName(study.getName());
         saveAction.setNameShort(study.getNameShort());
         saveAction.setActivityStatus(study.getActivityStatus());
-        saveAction.setSiteIds(new HashSet<Integer>());
-        saveAction.setContactIds(new HashSet<Integer>());
+        saveAction.setSiteIds(getSiteInfos());
+        saveAction.setContactIds(getContactInfos());
         saveAction.setSourceSpecimenSaveInfo(getSourceSpecimenInfos());
         saveAction.setAliquotSpecimenSaveInfo(getAliquotedSpecimenInfos());
         saveAction.setStudyEventAttrSaveInfo(getStudyEventAttrInfos());
+
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                saveAction.setCommentText(commentText.getText());
+            }
+        });
+
         Integer id =
             SessionManager.getAppService().doAction(saveAction).getId();
         updateStudyInfo(id);
+    }
+
+    private HashSet<Integer> getSiteInfos() {
+        HashSet<Integer> siteIds = new HashSet<Integer>();
+
+        for (SiteWrapper wrapper : study.getSiteCollection(false)) {
+            siteIds.add(wrapper.getId());
+        }
+        return siteIds;
+    }
+
+    private HashSet<Integer> getContactInfos() {
+        HashSet<Integer> contactIds = new HashSet<Integer>();
+
+        for (ContactWrapper wrapper : study.getContactCollection(false)) {
+            contactIds.add(wrapper.getId());
+        }
+        return contactIds;
     }
 
     private HashSet<SourceSpecimenSaveInfo> getSourceSpecimenInfos() {
@@ -427,6 +460,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         contactEntryTable.reload();
         aliquotedSpecimenEntryTable.reload();
         sourceSpecimenEntryTable.reload();
+        commentText.setText(null);
         resetPvCustomInfo();
     }
 

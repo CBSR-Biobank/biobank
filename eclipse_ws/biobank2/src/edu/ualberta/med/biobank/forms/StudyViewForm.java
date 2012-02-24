@@ -48,11 +48,11 @@ public class StudyViewForm extends BiobankViewForm {
 
     private StudyInfo studyInfo;
 
-    private static class StudyPvCustomInfo extends EventAttrCustom {
+    private static class StudyEventAttrCustomInfo extends EventAttrCustom {
         public BgcBaseText widget;
     }
 
-    private List<StudyPvCustomInfo> pvCustomInfoList;
+    private List<StudyEventAttrCustomInfo> pvCustomInfoList;
 
     private CommentCollectionInfoTable commentTable;
 
@@ -65,7 +65,7 @@ public class StudyViewForm extends BiobankViewForm {
         updateStudyInfo();
         setPartName(NLS
             .bind(Messages.StudyViewForm_title, study.getNameShort()));
-        pvCustomInfoList = new ArrayList<StudyPvCustomInfo>();
+        pvCustomInfoList = new ArrayList<StudyEventAttrCustomInfo>();
     }
 
     private void updateStudyInfo() throws Exception {
@@ -110,9 +110,9 @@ public class StudyViewForm extends BiobankViewForm {
         createClinicSection();
         createSourceSpecimenSection();
         createAliquotedSpecimenSection();
-        createPvCustomInfoSection();
+        createStudyEventAttrSection();
         setStudySectionValues();
-        setPvDataSectionValues();
+        setStudyEventAttrValues();
     }
 
     private void createCommentsSection() {
@@ -191,29 +191,29 @@ public class StudyViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(sourceSpecimenTable);
     }
 
-    private void createPvCustomInfoSection() throws Exception {
+    private void createStudyEventAttrSection() throws Exception {
         Composite client =
             createSectionWithClient(Messages.StudyViewForm_visit_info_attributes_title);
         client.setLayout(new GridLayout(1, false));
 
-        StudyPvCustomInfo combinedPvInfo;
+        StudyEventAttrCustomInfo combinedStudyEventAttrInfo;
 
-        combinedPvInfo = new StudyPvCustomInfo();
-        combinedPvInfo.setLabel(DATE_PROCESSED_INFO_FIELD_NAME);
-        combinedPvInfo.setType(EventAttrTypeEnum.DATE_TIME);
-        pvCustomInfoList.add(combinedPvInfo);
+        combinedStudyEventAttrInfo = new StudyEventAttrCustomInfo();
+        combinedStudyEventAttrInfo.setLabel(DATE_PROCESSED_INFO_FIELD_NAME);
+        combinedStudyEventAttrInfo.setType(EventAttrTypeEnum.DATE_TIME);
+        pvCustomInfoList.add(combinedStudyEventAttrInfo);
 
         for (String label : study.getStudyEventAttrLabels()) {
             if (!study.getStudyEventAttrActivityStatus(label).equals(
                 ActivityStatus.ACTIVE)) {
                 continue;
             }
-            combinedPvInfo = new StudyPvCustomInfo();
-            combinedPvInfo.setLabel(label);
-            combinedPvInfo.setType(study.getStudyEventAttrType(label));
-            combinedPvInfo.setAllowedValues(study
+            combinedStudyEventAttrInfo = new StudyEventAttrCustomInfo();
+            combinedStudyEventAttrInfo.setLabel(label);
+            combinedStudyEventAttrInfo.setType(study.getStudyEventAttrType(label));
+            combinedStudyEventAttrInfo.setAllowedValues(study
                 .getStudyEventAttrPermissible(label));
-            pvCustomInfoList.add(combinedPvInfo);
+            pvCustomInfoList.add(combinedStudyEventAttrInfo);
         }
 
         if (pvCustomInfoList.size() == 0) {
@@ -222,7 +222,7 @@ public class StudyViewForm extends BiobankViewForm {
         }
 
         Composite subcomp;
-        for (StudyPvCustomInfo pvCustomInfo : pvCustomInfoList) {
+        for (StudyEventAttrCustomInfo pvCustomInfo : pvCustomInfoList) {
             subcomp = toolkit.createComposite(client);
             subcomp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -239,8 +239,8 @@ public class StudyViewForm extends BiobankViewForm {
         }
     }
 
-    private void setPvDataSectionValues() throws Exception {
-        for (StudyPvCustomInfo pvCustomInfo : pvCustomInfoList) {
+    private void setStudyEventAttrValues() throws Exception {
+        for (StudyEventAttrCustomInfo pvCustomInfo : pvCustomInfoList) {
             String label = pvCustomInfo.getLabel();
             if (label.equals(DATE_PROCESSED_INFO_FIELD_NAME)) {
                 // skip this attribute since its already part of PatientVisit
@@ -257,7 +257,7 @@ public class StudyViewForm extends BiobankViewForm {
             .bind(Messages.StudyViewForm_title, study.getNameShort()));
         form.setText(NLS.bind(Messages.StudyViewForm_title, study.getName()));
         setStudySectionValues();
-        setPvDataSectionValues();
+        setStudyEventAttrValues();
         aliquotedSpecimenTable.setList(study
             .getAliquotedSpecimenCollection(true));
         sourceSpecimenTable

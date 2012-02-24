@@ -47,7 +47,8 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     public boolean isDeletable() {
-        return internalIsDeletable();
+        // TODO: this needs to be implemented correctly
+        return true;
     }
 
     @Override
@@ -86,6 +87,12 @@ public class ClinicAdapter extends AdapterBase {
         if (o instanceof ClinicAdapter)
             return internalCompareTo(o);
         return 0;
+    }
+
+    @Override
+    public boolean isEditable() {
+        // TODO: this needs to be implemented correctly
+        return true;
     }
 
 }
