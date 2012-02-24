@@ -78,7 +78,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         addOrEditStudySourceSpecimen(true, newSourceSpecimen);
     }
 
-    private void addOrEditStudySourceSpecimen(boolean add,
+    private void addOrEditStudySourceSpecimen(final boolean add,
         final SourceSpecimenWrapper sourceSpecimen) {
         List<SpecimenTypeWrapper> dialogSpecimenTypes = availableSpecimenTypes;
         if (!add) {

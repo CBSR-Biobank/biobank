@@ -51,7 +51,7 @@ import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
  */
 public abstract class BiobankFormBase extends BgcFormBase {
 
-    protected static BgcLogger logger = BgcLogger
+    protected static BgcLogger LOGGER = BgcLogger
         .getLogger(BiobankEntryForm.class.getName());
     protected AbstractAdapterBase adapter;
 
@@ -241,7 +241,7 @@ public abstract class BiobankFormBase extends BgcFormBase {
             cancelSave(monitor);
         } else {
             cancelSave(monitor);
-            logger.error("Unknown error", ex);
+            LOGGER.error("Unknown error", ex);
             if (lastThrowException) {
                 BgcPlugin
                     .openAsyncError(

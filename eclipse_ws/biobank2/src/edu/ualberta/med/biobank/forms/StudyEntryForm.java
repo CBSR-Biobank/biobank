@@ -30,6 +30,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.GlobalEventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
@@ -58,6 +59,9 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private static final String DATE_PROCESSED_INFO_FIELD_NAME =
         Messages.study_visit_info_dateProcessed;
+
+    protected static BgcLogger LOGGER = BgcLogger
+        .getLogger(StudyEntryForm.class.getName());
 
     private static class StudyEventAttrCustom extends EventAttrCustom {
         public EventAttrWidget widget;
@@ -200,26 +204,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         commentEntryTable.setLayoutData(gd);
         createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
             Messages.Comments_add);
-
-    }
-
-    private void createAliquotedSpecimensSection() {
-        Section section =
-            createSection(Messages.StudyEntryForm_aliquoted_specimens_title);
-        aliquotedSpecimenEntryTable = new AliquotedSpecimenEntryInfoTable(
-            section, study);
-        aliquotedSpecimenEntryTable.adaptToToolkit(toolkit, true);
-        aliquotedSpecimenEntryTable.addSelectionChangedListener(listener);
-
-        addSectionToolbar(section,
-            Messages.StudyEntryForm_aliquoted_specimens_button_add,
-            new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    aliquotedSpecimenEntryTable.addAliquotedSpecimen();
-                }
-            }, AliquotedSpecimenWrapper.class);
-        section.setClient(aliquotedSpecimenEntryTable);
     }
 
     private void createSourceSpecimensSection() {
@@ -239,6 +223,25 @@ public class StudyEntryForm extends BiobankEntryForm {
                 }
             });
         section.setClient(sourceSpecimenEntryTable);
+    }
+
+    private void createAliquotedSpecimensSection() {
+        Section section =
+            createSection(Messages.StudyEntryForm_aliquoted_specimens_title);
+        aliquotedSpecimenEntryTable = new AliquotedSpecimenEntryInfoTable(
+            section, study);
+        aliquotedSpecimenEntryTable.adaptToToolkit(toolkit, true);
+        aliquotedSpecimenEntryTable.addSelectionChangedListener(listener);
+
+        addSectionToolbar(section,
+            Messages.StudyEntryForm_aliquoted_specimens_button_add,
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    aliquotedSpecimenEntryTable.addAliquotedSpecimen();
+                }
+            }, AliquotedSpecimenWrapper.class);
+        section.setClient(aliquotedSpecimenEntryTable);
     }
 
     private void createEventAttrSection() throws Exception {
@@ -319,8 +322,10 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         for (SourceSpecimenWrapper wrapper : study
             .getSourceSpecimenCollection(false)) {
-            sourceSpecimenSaveInfos.add(new SourceSpecimenSaveInfo(wrapper
-                .getWrappedObject()));
+            SourceSpecimenSaveInfo sourceSpecimenSaveInfo =
+                new SourceSpecimenSaveInfo(wrapper.getWrappedObject());
+            LOGGER.debug(sourceSpecimenSaveInfo.toString());
+            sourceSpecimenSaveInfos.add(sourceSpecimenSaveInfo);
         }
         return sourceSpecimenSaveInfos;
     }
@@ -337,8 +342,10 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         for (AliquotedSpecimenWrapper wrapper : study
             .getAliquotedSpecimenCollection(false)) {
-            aliquotedSpecimenSaveInfos.add(new AliquotedSpecimenSaveInfo(
-                wrapper.getWrappedObject()));
+            AliquotedSpecimenSaveInfo aliquotedSpecimenSaveInfo =
+                new AliquotedSpecimenSaveInfo(wrapper.getWrappedObject());
+            LOGGER.debug(aliquotedSpecimenSaveInfo.toString());
+            aliquotedSpecimenSaveInfos.add(aliquotedSpecimenSaveInfo);
         }
         return aliquotedSpecimenSaveInfos;
     }
@@ -379,8 +386,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                             ActivityStatus.ACTIVE;
                     }
 
-                    System.out.println(studyEventAttrSaveInfo);
-
+                    LOGGER.debug(studyEventAttrSaveInfo.toString());
                     studyEventAttrSaveInfos.add(studyEventAttrSaveInfo);
                 }
             }

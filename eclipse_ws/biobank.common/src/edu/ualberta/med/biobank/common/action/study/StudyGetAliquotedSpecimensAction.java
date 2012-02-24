@@ -16,14 +16,13 @@ public class StudyGetAliquotedSpecimensAction implements
     Action<ListResult<AliquotedSpecimen>> {
     private static final long serialVersionUID = 1L;
 
-    // @formatter:off
     @SuppressWarnings("nls")
-    private static final String SELECT_ALIQUOTED_SPCS_HQL = 
-    "SELECT srcspc"
-    + " FROM " + AliquotedSpecimen.class.getName() + " srcspc"
-    + " INNER JOIN FETCH srcspc.specimenType"
-    + " WHERE srcspc.study.id = ?";
-    // @formatter:on
+    private static final String SELECT_ALIQUOTED_SPCS_HQL =
+        "SELECT srcspc"
+            + " FROM " + AliquotedSpecimen.class.getName() + " srcspc"
+            + " INNER JOIN FETCH srcspc.specimenType specimenType"
+            // + " LEFT JOIN FETCH specimenType.childSpecimenTypeCollection"
+            + " WHERE srcspc.study.id = ?";
 
     private final Integer studyId;
 

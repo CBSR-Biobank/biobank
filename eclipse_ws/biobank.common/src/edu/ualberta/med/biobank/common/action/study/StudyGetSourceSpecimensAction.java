@@ -16,13 +16,12 @@ public class StudyGetSourceSpecimensAction implements
 
     private static final long serialVersionUID = 1L;
 
-    // @formatter:off
     @SuppressWarnings("nls")
     private static final String SELECT_SOURCE_SPCS_HQL =
         " FROM " + SourceSpecimen.class.getName() + " AS srce"
-        + " INNER JOIN FETCH srce.specimenType"
-        + " WHERE srce.study.id=?";
-    // @formatter:on
+            + " INNER JOIN FETCH srce.specimenType specimenType"
+            + " LEFT JOIN FETCH specimenType.childSpecimenTypeCollection"
+            + " WHERE srce.study.id=?";
 
     private final Integer studyId;
 

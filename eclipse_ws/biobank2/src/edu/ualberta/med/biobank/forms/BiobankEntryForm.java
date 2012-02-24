@@ -440,7 +440,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                 closeEntryOpenView(true, openViewAfterSaving());
             }
         } catch (Exception e) {
-            logger.error("Can't save the form", e); //$NON-NLS-1$
+            LOGGER.error("Can't save the form", e); //$NON-NLS-1$
         }
     }
 
@@ -475,7 +475,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                 openView &= !((AdapterBase) adapter).getModelObject().isNew();
             closeEntryOpenView(true, openView);
         } catch (Exception e) {
-            logger.error("Can't cancel the form", e); //$NON-NLS-1$
+            LOGGER.error("Can't cancel the form", e); //$NON-NLS-1$
         }
     }
 

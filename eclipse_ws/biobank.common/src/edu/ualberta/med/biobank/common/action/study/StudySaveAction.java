@@ -57,6 +57,15 @@ public class StudySaveAction implements Action<IdResult> {
             sourceSpecimen.setStudy(study);
             return sourceSpecimen;
         }
+
+        @Override
+        public String toString() {
+            StringBuffer sb = new StringBuffer();
+            sb.append("SourceSpecimenSaveInfo: id/").append(id);
+            sb.append(" needOriginalVolume/").append(needOriginalVolume);
+            sb.append(" specimenTypeId/").append(specimenTypeId);
+            return sb.toString();
+        }
     }
 
     public static class AliquotedSpecimenSaveInfo implements ActionResult {
@@ -90,6 +99,17 @@ public class StudySaveAction implements Action<IdResult> {
             aliquotedSpecimen.setSpecimenType(specimenType);
             aliquotedSpecimen.setStudy(study);
             return aliquotedSpecimen;
+        }
+
+        @Override
+        public String toString() {
+            StringBuffer sb = new StringBuffer();
+            sb.append("AliquotedSpecimenSaveInfo: id/").append(id);
+            sb.append(" quantity/").append(quantity);
+            sb.append(" volume/").append(volume);
+            sb.append(" activityStatus/").append(activityStatus);
+            sb.append(" specimenTypeId/").append(specimenTypeId);
+            return sb.toString();
         }
     }
 

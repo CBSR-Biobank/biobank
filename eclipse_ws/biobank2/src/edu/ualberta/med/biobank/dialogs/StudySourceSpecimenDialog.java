@@ -104,6 +104,10 @@ public class StudySourceSpecimenDialog extends PagedDialog {
     @Override
     protected void okPressed() {
         copy(origSourceSpecimen);
+
+        // set the study to NULL, or else internalSourceSpecimen is saved
+        // when the study is saved
+        internalSourceSpecimen.setStudy(null);
         super.okPressed();
     }
 
