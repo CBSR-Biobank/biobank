@@ -325,28 +325,28 @@ public abstract class AbstractAdapterBase implements
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
                 public void run() {
+                    if (getId() == null) return;
+
                     // the order is very important
-                    if (getId() != null) {
-                        IWorkbenchPage page = PlatformUI.getWorkbench()
-                            .getActiveWorkbenchWindow().getActivePage();
-                        IEditorPart part = page.findEditor(new FormInput(
-                            AbstractAdapterBase.this));
-                        getParent().removeChild(AbstractAdapterBase.this,
-                            false, false);
-                        try {
-                            runDelete();
-                            page.closeEditor(part, true);
-                        } catch (Exception e) {
-                            BgcPlugin.openAsyncError(
-                                Messages.AdapterBase_delete_error_title, e);
-                            getParent().addChild(AbstractAdapterBase.this);
-                            return;
-                        }
-                        getParent().rebuild();
-                        getParent().notifyListeners();
-                        notifyListeners();
-                        additionalRefreshAfterDelete();
+                    IWorkbenchPage page = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getActivePage();
+                    IEditorPart part = page.findEditor(new FormInput(
+                        AbstractAdapterBase.this));
+                    getParent().removeChild(AbstractAdapterBase.this,
+                        false, false);
+                    try {
+                        runDelete();
+                        page.closeEditor(part, true);
+                    } catch (Exception e) {
+                        BgcPlugin.openAsyncError(
+                            Messages.AdapterBase_delete_error_title, e);
+                        getParent().addChild(AbstractAdapterBase.this);
+                        return;
                     }
+                    getParent().rebuild();
+                    getParent().notifyListeners();
+                    notifyListeners();
+                    additionalRefreshAfterDelete();
                 }
             });
         }

@@ -6,6 +6,8 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.study.StudyDeleteAction;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
@@ -94,6 +96,13 @@ public class StudyAdapter extends AdapterBase {
         if (o instanceof StudyAdapter)
             return internalCompareTo(o);
         return 0;
+    }
+
+    @Override
+    protected void runDelete() throws Exception {
+        // TODO: feedback to the user if this action fails
+        SessionManager.getAppService().doAction(new StudyDeleteAction(getId()));
+        SessionManager.updateAllSimilarNodes(getParent(), true);
     }
 
     // Uncomment when we start using MVP again
