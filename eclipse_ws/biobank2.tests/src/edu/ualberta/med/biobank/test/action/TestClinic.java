@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
-import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -113,8 +112,7 @@ public class TestClinic extends TestAction {
 
     @Test
     public void checkGetAction() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
 
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
@@ -297,8 +295,7 @@ public class TestClinic extends TestAction {
 
     @Test
     public void deleteWithStudies() throws ApplicationException {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
         try {
             EXECUTOR.exec(new ClinicDeleteAction(
                 provisioning.clinicId));
@@ -311,8 +308,7 @@ public class TestClinic extends TestAction {
 
     @Test
     public void deleteWithSrcDispatch() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
 
         DispatchHelper.createDispatch(EXECUTOR, provisioning.clinicId,
             provisioning.siteId,
@@ -331,8 +327,7 @@ public class TestClinic extends TestAction {
 
     @Test
     public void deleteWithDstDispatch() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
 
         // add second clinic to be the destination of the dispatch
 

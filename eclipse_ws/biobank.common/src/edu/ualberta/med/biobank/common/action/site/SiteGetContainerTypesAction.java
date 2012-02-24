@@ -21,7 +21,6 @@ public class SiteGetContainerTypesAction implements
     private static final String SELECT_CONTAINER_TYPES_HQL =
         "SELECT ctype"
             + " FROM " + ContainerType.class.getName() + " ctype"
-            + " INNER JOIN FETCH ctype.activityStatus activityStatus"
             + " INNER JOIN FETCH ctype.site site"
             + " WHERE site.id = ?";
 

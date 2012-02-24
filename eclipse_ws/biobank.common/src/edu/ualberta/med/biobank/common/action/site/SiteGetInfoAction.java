@@ -81,11 +81,9 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
         builder.setAliquotedSpecimenCount(l);
 
         builder.setTopContainers(
-            new SiteGetTopContainersAction(siteId).run(context)
-                .getTopContainers());
+            new SiteGetTopContainersAction(siteId).run(context).getList());
         builder.setContainerTypes(
-            new SiteGetContainerTypeInfoAction(siteId).run(context)
-                .getContainerTypeInfoCollection());
+            new SiteGetContainerTypeInfoAction(siteId).run(context).getList());
         builder
             .setStudies(
             new SiteGetStudyInfoAction(siteId).run(context).getList());

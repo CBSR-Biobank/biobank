@@ -20,7 +20,11 @@ public class ClinicHelper extends Helper {
         ActivityStatus activityStatus, Boolean sendsShipments) {
 
         Address address = new Address();
-        address.setCity(name);
+        String city = name + "_city";
+        if (city.length() > 50) {
+            city = city.substring(city.length() - 50);
+        }
+        address.setCity(city);
 
         ClinicSaveAction saveClinic = new ClinicSaveAction();
         saveClinic.setName(name);

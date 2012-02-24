@@ -16,24 +16,27 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.action.SetResult;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
-import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
+import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.common.action.site.SiteDeleteAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypeInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenDeleteAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Site;
@@ -125,8 +128,7 @@ public class TestSite extends TestAction {
 
     @Test
     public void checkGetAction() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
 
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
@@ -367,17 +369,33 @@ public class TestSite extends TestAction {
 
     private Provisioning createSiteWithContainerType()
         throws ApplicationException {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
-
-        ContainerTypeSaveAction ctSaveAction =
-            ContainerTypeHelper.getSaveAction(name, name, provisioning.siteId,
-                true, 3, 10,
-                getContainerLabelingSchemes().values().iterator().next()
-                    .getId(), R.nextDouble());
-        Integer containerTypeId = EXECUTOR.exec(ctSaveAction).getId();
-        provisioning.containerTypeIds.add(containerTypeId);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        provisioning.addContainerType(EXECUTOR, name,
+            getContainerLabelingSchemes().values().iterator().next()
+                .getId(), R.nextDouble());
         return provisioning;
+    }
+
+    @Test
+    public void checkSiteGetCtypeInfoAction() throws Exception {
+        Provisioning provisioning = createSiteWithContainerType();
+
+        List<SiteContainerTypeInfo> ctypeInfo = EXECUTOR.exec(
+            new SiteGetContainerTypeInfoAction(provisioning.siteId))
+            .getList();
+
+        Assert.assertEquals(0L, ctypeInfo.get(0).getContainerCount()
+            .longValue());
+
+        Integer containerTypeId = provisioning.containerTypeIds.get(0);
+        provisioning.addContainer(EXECUTOR, containerTypeId, "01");
+
+        ctypeInfo = EXECUTOR.exec(
+            new SiteGetContainerTypeInfoAction(provisioning.siteId))
+            .getList();
+
+        Assert.assertEquals(1L, ctypeInfo.get(0).getContainerCount()
+            .longValue());
     }
 
     @Test
@@ -401,16 +419,9 @@ public class TestSite extends TestAction {
     @Test
     public void deleteWithContainers() throws ApplicationException {
         Provisioning provisioning = createSiteWithContainerType();
-
         Integer containerTypeId = provisioning.containerTypeIds.get(0);
-
-        ContainerSaveAction containerSaveAction = new ContainerSaveAction();
-        containerSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
-        containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
-        containerSaveAction.setLabel("01");
-        containerSaveAction.setSiteId(provisioning.siteId);
-        containerSaveAction.setTypeId(containerTypeId);
-        Integer containerId = EXECUTOR.exec(containerSaveAction).getId();
+        Integer containerId =
+            provisioning.addContainer(EXECUTOR, containerTypeId, "01");
 
         try {
             EXECUTOR.exec(new SiteDeleteAction(provisioning.siteId));
@@ -421,6 +432,11 @@ public class TestSite extends TestAction {
             Assert.assertTrue(true);
         }
 
+        List<Container> topContainers =
+            EXECUTOR.exec(new SiteGetTopContainersAction(provisioning.siteId))
+                .getList();
+        Assert.assertEquals(1, topContainers.size());
+
         // delete container followed by site - should work now
         EXECUTOR.exec(new ContainerDeleteAction(containerId));
         EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeId));
@@ -429,8 +445,7 @@ public class TestSite extends TestAction {
 
     @Test
     public void deleteWithProcessingEvents() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
 
         // create a collection event
         Integer ceventId = CollectionEventHelper
@@ -466,8 +481,7 @@ public class TestSite extends TestAction {
 
     @Test
     public void deleteWithSrcDispatch() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
 
         Integer dispatchId1 =
             DispatchHelper.createDispatch(EXECUTOR, provisioning.clinicId,
@@ -521,8 +535,7 @@ public class TestSite extends TestAction {
 
     @Test
     public void deleteWithDstDispatch() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
 
         Integer dispatchId =
             DispatchHelper.createDispatch(EXECUTOR, provisioning.clinicId,

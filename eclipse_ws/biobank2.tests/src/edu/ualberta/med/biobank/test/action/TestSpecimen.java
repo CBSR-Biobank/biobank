@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.Spe
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 
 public class TestSpecimen extends TestAction {
@@ -31,8 +30,7 @@ public class TestSpecimen extends TestAction {
     public void setUp() throws Exception {
         super.setUp();
         name = getMethodNameR();
-        provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        provisioning = new Provisioning(EXECUTOR, name);
     }
 
     @Test

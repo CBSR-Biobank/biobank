@@ -107,7 +107,7 @@ public class ContainerSaveAction implements Action<IdResult> {
             container.setLabel(parent.getContainerType().getPositionString(
                 position));
         } else {
-            setLabel(label);
+            container.setLabel(label);
         }
 
         ContainerActionHelper.setPosition(context, container, position,

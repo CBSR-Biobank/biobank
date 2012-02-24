@@ -42,7 +42,6 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -63,8 +62,7 @@ public class TestPatient extends TestAction {
 
     @Test
     public void saveNew() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
         final Integer id = EXECUTOR.exec(new PatientSaveAction(null,
@@ -79,8 +77,7 @@ public class TestPatient extends TestAction {
 
     @Test
     public void update() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
         // create a new patient
@@ -101,14 +98,15 @@ public class TestPatient extends TestAction {
 
     @Test
     public void checkGetAction() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
 
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
-        List<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
-            new CollectionEventGetSourceSpecimenListInfoAction(ceventId)).getList();
+        List<SpecimenInfo> sourceSpecs =
+            EXECUTOR.exec(
+                new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
+                .getList();
 
         // save some comments on the colection event
         CEventInfo ceventInfo =
@@ -144,8 +142,7 @@ public class TestPatient extends TestAction {
 
     @Test
     public void saveSamePnumber() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
         final Integer id = EXECUTOR.exec(new PatientSaveAction(null,
@@ -167,8 +164,7 @@ public class TestPatient extends TestAction {
 
     @Test
     public void delete() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
         // create a new patient
@@ -184,8 +180,7 @@ public class TestPatient extends TestAction {
 
     @Test
     public void deleteWithCevents() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
         // create a new patient
@@ -210,8 +205,7 @@ public class TestPatient extends TestAction {
 
     @Test
     public void merge() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
         final String string = name;
 
         // add specimen type
@@ -264,8 +258,7 @@ public class TestPatient extends TestAction {
 
     @Test
     public void mergeDifferentStudies() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
         // add specimen type
         final Integer typeId =
             EXECUTOR.exec(new SpecimenTypeSaveAction(name, name)).getId();
@@ -312,8 +305,7 @@ public class TestPatient extends TestAction {
 
     @Test
     public void patientGetSimpleCEventInfoAction() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
         final Integer patientId = provisioning.patientIds.get(0);
 
         // add specimen type
@@ -352,8 +344,7 @@ public class TestPatient extends TestAction {
 
     @Test
     public void patientGetCEventInfoAction() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
         final Integer patientId = provisioning.patientIds.get(0);
 
         // add specimen type
@@ -393,8 +384,7 @@ public class TestPatient extends TestAction {
 
     @Test
     public void nextVisitNumber() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
         final Integer patientId = provisioning.patientIds.get(0);
 
         Integer visitNumber = R.nextInt(20);
@@ -408,8 +398,7 @@ public class TestPatient extends TestAction {
 
     @Test
     public void search() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
         final Integer patientId = EXECUTOR.exec(new PatientSaveAction(

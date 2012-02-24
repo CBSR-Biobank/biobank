@@ -15,7 +15,6 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersAction;
-import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersResult;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -33,7 +32,7 @@ public class ContainerGroup extends AdapterBase {
     private static BgcLogger LOGGER = BgcLogger.getLogger(ContainerGroup.class
         .getName());
 
-    private SiteGetTopContainersResult topContainerResult = null;
+    private List<Container> topContainers = null;
 
     public ContainerGroup(SiteAdapter parent, int id) {
         super(parent, id, Messages.ContainerGroup_containers_node_label, true);
@@ -53,8 +52,8 @@ public class ContainerGroup extends AdapterBase {
     public void performExpand() {
         SiteAdapter siteAdapter = (SiteAdapter) getParent();
         try {
-            topContainerResult = SessionManager.getAppService().doAction(
-                new SiteGetTopContainersAction(siteAdapter.getId()));
+            topContainers = SessionManager.getAppService().doAction(
+                new SiteGetTopContainersAction(siteAdapter.getId())).getList();
             super.performExpand();
         } catch (ApplicationException e) {
             // TODO: open an error dialog here?
@@ -138,9 +137,9 @@ public class ContainerGroup extends AdapterBase {
         throws Exception {
         List<ContainerWrapper> result = new ArrayList<ContainerWrapper>();
 
-        if (topContainerResult != null) {
+        if (topContainers != null) {
             // return results only if this node has been expanded
-            for (Container container : topContainerResult.getTopContainers()) {
+            for (Container container : topContainers) {
                 ContainerWrapper wrapper =
                     new ContainerWrapper(SessionManager.getAppService(),
                         container);
@@ -153,7 +152,7 @@ public class ContainerGroup extends AdapterBase {
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        return topContainerResult.getTopContainers().size();
+        return topContainers.size();
     }
 
     @Override

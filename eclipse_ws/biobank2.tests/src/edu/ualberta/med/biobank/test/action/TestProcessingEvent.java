@@ -40,7 +40,6 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 
 public class TestProcessingEvent extends TestAction {
@@ -56,8 +55,7 @@ public class TestProcessingEvent extends TestAction {
     public void setUp() throws Exception {
         super.setUp();
         name = getMethodNameR();
-        provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        provisioning = new Provisioning(EXECUTOR, name);
     }
 
     @Test
@@ -93,8 +91,10 @@ public class TestProcessingEvent extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
-        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
-            new CollectionEventGetSourceSpecimenListInfoAction(ceventId)).getList();
+        ArrayList<SpecimenInfo> sourceSpecs =
+            EXECUTOR.exec(
+                new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
+                .getList();
 
         // ship the specimens to the site
         OriginInfoSaveInfo oiSaveInfo = new OriginInfoSaveInfo(
@@ -228,7 +228,8 @@ public class TestProcessingEvent extends TestAction {
                 provisioning.patientIds.get(0), provisioning.siteId);
         ArrayList<SpecimenInfo> sourceSpecs =
             EXECUTOR
-                .exec(new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
+                .exec(
+                    new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
                 .getList();
         Integer spcId = sourceSpecs.get(0).specimen.getId();
 

@@ -45,7 +45,6 @@ import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -163,13 +162,13 @@ public class TestStudy extends TestAction {
 
     @Test
     public void checkGetAction() throws Exception {
-        Provisioning provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
 
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
-        EXECUTOR.exec(new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
+        EXECUTOR.exec(
+            new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
             .getList();
 
         Set<SourceSpecimenSaveInfo> ssSaveInfosAll =

@@ -7,13 +7,14 @@ import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
 
 public class SiteGetTopContainersAction implements
-    Action<SiteGetTopContainersResult> {
+    Action<ListResult<Container>> {
     private static final long serialVersionUID = 1L;
 
     // This query has to initialise specimenPositionCollection due to the
@@ -49,7 +50,7 @@ public class SiteGetTopContainersAction implements
     }
 
     @Override
-    public SiteGetTopContainersResult run(ActionContext context)
+    public ListResult<Container> run(ActionContext context)
         throws ActionException {
         ArrayList<Container> topContainers = new ArrayList<Container>(0);
 
@@ -63,6 +64,6 @@ public class SiteGetTopContainersAction implements
             topContainers.addAll(results);
         }
 
-        return new SiteGetTopContainersResult(topContainers);
+        return new ListResult<Container>(topContainers);
     }
 }

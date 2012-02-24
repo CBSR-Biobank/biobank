@@ -43,7 +43,6 @@ import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.util.MathUtil;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 
 public class TestCollectionEvent extends TestAction {
@@ -59,8 +58,7 @@ public class TestCollectionEvent extends TestAction {
     public void setUp() throws Exception {
         super.setUp();
         name = getMethodNameR();
-        provisioning =
-            SiteHelper.provisionProcessingConfiguration(EXECUTOR, name);
+        provisioning = new Provisioning(EXECUTOR, name);
     }
 
     @Test
