@@ -122,7 +122,8 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
             @Override
             public Image getColumnImage(SpecimenInfo row, int columnIndex) {
                 if (columnIndex == 5
-                    && ActivityStatus.FLAGGED == row.specimen.getActivityStatus())
+                    && ActivityStatus.FLAGGED == row.specimen
+                        .getActivityStatus())
                     return BgcPlugin.getDefault().getImageRegistry()
                         .get(BgcPlugin.IMG_ERROR);
                 return null;
@@ -174,7 +175,8 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
             public Image getColumnImage(SpecimenInfo row, int columnIndex) {
                 // FIXME retrieve this info as an enum in SpecimenInfo ?
                 if (columnIndex == 5
-                    && ActivityStatus.FLAGGED == row.specimen.getActivityStatus())
+                    && ActivityStatus.FLAGGED == row.specimen
+                        .getActivityStatus())
                     return BgcPlugin.getDefault().getImageRegistry()
                         .get(BgcPlugin.IMG_ERROR);
                 return null;
@@ -227,7 +229,8 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
             public Image getColumnImage(SpecimenInfo row, int columnIndex) {
                 // FIXME retrieve this info as an enum in SpecimenInfo ?
                 if (columnIndex == 5
-                    && ActivityStatus.FLAGGED == row.specimen.getActivityStatus())
+                    && ActivityStatus.FLAGGED == row.specimen
+                        .getActivityStatus())
                     return BgcPlugin.getDefault().getImageRegistry()
                         .get(BgcPlugin.IMG_ERROR);
                 return null;
@@ -327,7 +330,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                     new SpecimenWrapper(SessionManager.getAppService(),
                         specimenInfo.specimen);
                 try {
-                    specimen.reload();
+                    // specimen.reload();
                 } catch (Exception e) {
                 }
                 AbstractAdapterBase adapter =

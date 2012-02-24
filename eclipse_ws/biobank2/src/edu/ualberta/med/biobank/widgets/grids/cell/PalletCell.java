@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -36,7 +37,8 @@ public class PalletCell extends AbstractUICell {
 
     public static Map<RowColPos, PalletCell> convertArray(
         List<ScanCell> scancells) {
-        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletCell> palletScanned =
+            new TreeMap<RowColPos, PalletCell>();
         for (ScanCell cell : scancells) {
             palletScanned.put(new RowColPos(cell.getRow(), cell.getColumn()),
                 new PalletCell(cell));
@@ -61,7 +63,8 @@ public class PalletCell extends AbstractUICell {
             cells.put(new RowColPos(row, col), new PalletCell(scanCell));
             row = 3;
             col = 1;
-            scanCell = new ScanCell(row, col, specimens.get(1).getInventoryId());
+            scanCell =
+                new ScanCell(row, col, specimens.get(1).getInventoryId());
             cells.put(new RowColPos(row, col), new PalletCell(scanCell));
         }
         return cells;
@@ -75,7 +78,8 @@ public class PalletCell extends AbstractUICell {
     public static Map<RowColPos, PalletCell> getRandomSpecimensAlreadyAssigned(
         WritableApplicationService appService, Integer siteId, Integer studyId)
         throws Exception {
-        Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletCell> palletScanned =
+            new HashMap<RowColPos, PalletCell>();
         List<SpecimenWrapper> specimens = DebugUtil.getRandomAssignedSpecimens(
             appService, siteId, studyId);
         if (specimens.size() > 0) {
@@ -92,7 +96,8 @@ public class PalletCell extends AbstractUICell {
     public static Map<RowColPos, PalletCell> getRandomSpecimensNotAssigned(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
-        Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletCell> palletScanned =
+            new HashMap<RowColPos, PalletCell>();
         List<SpecimenWrapper> specimens = DebugUtil
             .getRandomNonAssignedNonDispatchedSpecimens(appService, siteId, 30);
         int i = 0;
@@ -109,7 +114,8 @@ public class PalletCell extends AbstractUICell {
     public static Map<RowColPos, PalletCell> getRandomNonDispatchedSpecimens(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
-        Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletCell> palletScanned =
+            new HashMap<RowColPos, PalletCell>();
         List<SpecimenWrapper> randomSpecimens = DebugUtil
             .getRandomNonDispatchedSpecimens(appService, siteId, 30);
         int i = 0;
@@ -240,7 +246,8 @@ public class PalletCell extends AbstractUICell {
     }
 
     public void merge(WritableApplicationService appService,
-        edu.ualberta.med.biobank.common.action.scanprocess.CellInfo cell) throws Exception {
+        edu.ualberta.med.biobank.common.action.scanprocess.CellInfo cell)
+        throws Exception {
         setStatus(cell.getStatus());
         setInformation(cell.getInformation());
         setValue(cell.getValue());
@@ -256,8 +263,9 @@ public class PalletCell extends AbstractUICell {
         SpecimenWrapper specimen = null;
         if (cell.getSpecimenId() != null) {
             specimen = new SpecimenWrapper(appService);
-            specimen.getWrappedObject().setId(cell.getSpecimenId());
-            specimen.reload();
+            specimen.setWrappedObject(SessionManager.getAppService()
+                .doAction(new SpecimenGetInfoAction(cell.getSpecimenId()))
+                .getSpecimen());
         }
         setSpecimen(specimen);
     }
@@ -268,8 +276,10 @@ public class PalletCell extends AbstractUICell {
     }
 
     public CellInfo transformIntoServerCell() {
-        CellInfo serverCell = new CellInfo(getRow(), getCol(), getValue(),
-            getStatus() == null ? null : CellInfoStatus.valueOf(getStatus().name()));
+        CellInfo serverCell =
+            new CellInfo(getRow(), getCol(), getValue(),
+                getStatus() == null ? null : CellInfoStatus.valueOf(getStatus()
+                    .name()));
         serverCell.setExpectedSpecimenId(getExpectedSpecimen() == null ? null
             : getExpectedSpecimen().getId());
         if (getStatus() != null)

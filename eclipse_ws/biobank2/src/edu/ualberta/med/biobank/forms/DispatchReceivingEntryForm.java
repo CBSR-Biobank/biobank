@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -29,6 +30,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
@@ -162,10 +164,11 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                         Locale.getDefault()));
             SpecimenWrapper specimen = null;
             if (res.getCell().getSpecimenId() != null) {
-                specimen = new SpecimenWrapper(SessionManager.getAppService());
-                specimen.getWrappedObject()
-                    .setId(res.getCell().getSpecimenId());
-                specimen.reload();
+                Specimen spec = SessionManager.getAppService()
+                    .doAction(new SpecimenGetInfoAction(res
+                        .getCell().getSpecimenId())).getSpecimen();
+                specimen =
+                    new SpecimenWrapper(SessionManager.getAppService(), spec);
             }
             switch (res.getCell().getStatus()) {
             case IN_SHIPMENT_EXPECTED:

@@ -41,7 +41,8 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     private CommentCollectionInfoTable commentTable;
 
-    private ProcessingEventWrapper pevent;
+    private ProcessingEventWrapper pevent = new ProcessingEventWrapper(
+        SessionManager.getAppService());
 
     private List<SpecimenInfo> specimens;
 
