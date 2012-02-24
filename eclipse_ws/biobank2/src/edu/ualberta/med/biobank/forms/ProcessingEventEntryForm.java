@@ -123,6 +123,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             ProcessingEvent p = new ProcessingEvent();
             p.setActivityStatus(ActivityStatus.ACTIVE);
             pevent.setWrappedObject(p);
+            pevent
+                .setCenter(SessionManager.getUser().getCurrentWorkingCenter());
             specimens = new ArrayList<SpecimenInfo>();
         } else {
             PEventInfo read =
@@ -223,7 +225,10 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
         toolkit.paintBordersFor(client);
 
-        List<SpecimenWrapper> specimens = pevent.getSpecimenCollection(true);
+        List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>();
+        for (SpecimenInfo info : specimens)
+            specs.add(new SpecimenWrapper(SessionManager.getAppService(),
+                info.specimen));
 
         specimenEntryWidget =
             new SpecimenEntryWidget(client, SWT.NONE, toolkit,
@@ -339,7 +344,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         specimenEntryWidget.addVetoListener(ItemAction.POST_DELETE,
             vetoListener);
 
-        specimenEntryWidget.setSpecimens(specimens);
+        specimenEntryWidget.setSpecimens(specs);
     }
 
     @Override

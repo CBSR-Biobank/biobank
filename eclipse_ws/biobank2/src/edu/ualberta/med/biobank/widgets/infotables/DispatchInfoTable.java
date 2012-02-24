@@ -12,13 +12,11 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.Dispatch;
 
 public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
-    private SpecimenWrapper specimen;
     private List<DispatchWrapper> dispatches;
 
     protected static class TableRowData {
@@ -29,15 +27,15 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         Date dateReceived;
         String waybill;
         String dstatus;
-        String astatus;
 
         @Override
         public String toString() {
-            return StringUtils.join(
-                new String[] { sender,
-                    DateFormatter.formatAsDate(dispatchTime), receiver,
-                    DateFormatter.formatAsDate(dateReceived), waybill, dstatus,
-                    astatus }, "\t"); //$NON-NLS-1$
+            return StringUtils
+                .join(
+                    new String[] { sender,
+                        DateFormatter.formatAsDate(dispatchTime), receiver,
+                        DateFormatter.formatAsDate(dateReceived), waybill,
+                        dstatus }, "\t"); //$NON-NLS-1$
         }
     }
 
@@ -47,15 +45,13 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         Messages.DispatchInfoTable_receiver_label,
         Messages.DispatchInfoTable_received_label,
         Messages.DispatchInfoTable_waybill_label,
-        Messages.DispatchInfoTable_state_label,
-        Messages.DispatchInfoTable_spec_state_label };
+        Messages.DispatchInfoTable_state_label };
 
     private boolean editMode = false;
 
-    public DispatchInfoTable(Composite parent, SpecimenWrapper specimen,
+    public DispatchInfoTable(Composite parent,
         List<Dispatch> dispatchesRaw) {
         super(parent, null, HEADINGS, 15, DispatchWrapper.class);
-        this.specimen = specimen;
         this.dispatches = new ArrayList<DispatchWrapper>();
         for (Dispatch dispatch : dispatchesRaw) {
             dispatches.add(new DispatchWrapper(SessionManager.getAppService(),
@@ -95,8 +91,6 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                     return info.waybill;
                 case 5:
                     return info.dstatus;
-                case 6:
-                    return info.astatus;
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -117,9 +111,6 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
             info.dispatch.getShipmentInfo() == null ? null : info.dispatch
                 .getShipmentInfo().getReceivedAt();
         info.dstatus = info.dispatch.getStateDescription();
-        info.astatus =
-            info.dispatch.getDispatchSpecimen(specimen.getInventoryId())
-                .getStateDescription();
         info.waybill =
             info.dispatch.getShipmentInfo() == null ? null : info.dispatch
                 .getShipmentInfo().getWaybill();
@@ -162,7 +153,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     }
 
     public void reloadCollection() {
-        reloadCollection(specimen.getDispatches());
+        reloadCollection(dispatches);
     }
 
 }

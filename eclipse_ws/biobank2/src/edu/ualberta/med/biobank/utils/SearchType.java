@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.utils;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,6 +12,11 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.search.ContainerByBarcodeSearchAction;
+import edu.ualberta.med.biobank.common.action.search.ContainerByLabelSearchAction;
+import edu.ualberta.med.biobank.common.action.search.PEventByWSSearchAction;
+import edu.ualberta.med.biobank.common.action.search.SpecimenByInventorySearchAction;
+import edu.ualberta.med.biobank.common.action.search.SpecimenByPositionSearchAction;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -23,59 +28,62 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public enum SearchType {
     INVENTORY_ID(Messages.SearchType_inventoryid_label) {
         @Override
-        public List<? extends ModelWrapper<?>> search(String searchString,
+        public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
-            List<SpecimenWrapper> res = new ArrayList<SpecimenWrapper>();
-            SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
-                SessionManager.getAppService(), searchString);
-            if (specimen != null) {
-                res.add(specimen);
-            }
-            return res;
+            SpecimenByInventorySearchAction action =
+                new SpecimenByInventorySearchAction(searchString,
+                    center.getId());
+            return wrapIds(SessionManager.getAppService()
+                .doAction(action).getList(), SpecimenWrapper.class);
         }
 
     },
 
     SPECIMEN_POSITION(Messages.SearchType_position_spec_label) {
         @Override
-        public List<? extends ModelWrapper<?>> search(String searchString,
+        public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
-            if (center instanceof SiteWrapper)
-                return SpecimenWrapper.getSpecimensInSiteWithPositionLabel(
-                    SessionManager.getAppService(), (SiteWrapper) center,
-                    searchString);
+            if (center instanceof SiteWrapper) {
+                SpecimenByPositionSearchAction action =
+                    new SpecimenByPositionSearchAction(searchString,
+                        center.getId());
+                return wrapIds(SessionManager.getAppService()
+                    .doAction(action).getList(), SpecimenWrapper.class);
+            }
             return Collections.emptyList();
         }
     },
 
     CONTAINER_LABEL(Messages.SearchType_label_cont_label) {
         @Override
-        public List<? extends ModelWrapper<?>> search(String searchString,
+        public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
-            if (center instanceof SiteWrapper)
-                return ContainerWrapper.getContainersInSite(
-                    SessionManager.getAppService(), (SiteWrapper) center,
-                    searchString);
+            if (center instanceof SiteWrapper) {
+                ContainerByLabelSearchAction action =
+                    new ContainerByLabelSearchAction(searchString,
+                        center.getId());
+                return wrapIds(SessionManager.getAppService()
+                    .doAction(action).getList(), ContainerWrapper.class);
+            }
             return Collections.emptyList();
         }
     },
 
     CONTAINER_PRODUCT_BARCODE(Messages.SearchType_barcode_cont_label) {
         @Override
-        public List<? extends ModelWrapper<?>> search(String searchString,
+        public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
             if (center instanceof SiteWrapper) {
-                ContainerWrapper container = ContainerWrapper
-                    .getContainerWithProductBarcodeInSite(
-                        SessionManager.getAppService(), (SiteWrapper) center,
-                        searchString);
-                if (container != null) {
-                    return Arrays.asList(container);
-                }
+                ContainerByBarcodeSearchAction action =
+                    new ContainerByBarcodeSearchAction(searchString,
+                        center.getId());
+                return wrapIds(SessionManager.getAppService()
+                    .doAction(action).getList(), ContainerWrapper.class);
             }
             return null;
         }
@@ -83,20 +91,17 @@ public enum SearchType {
 
     WORKSHEET(Messages.SearchType_worksheet_label) {
         @Override
-        public List<? extends ModelWrapper<?>> search(String searchString,
+        public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
-            List<ProcessingEventWrapper> pvs = ProcessingEventWrapper
-                .getProcessingEventsWithWorksheet(
-                    SessionManager.getAppService(), searchString);
-
-            if (pvs == null)
-                return null;
-            return pvs;
-
+            PEventByWSSearchAction action =
+                new PEventByWSSearchAction(searchString,
+                    center.getId());
+            return wrapIds(SessionManager.getAppService()
+                .doAction(action).getList(), ProcessingEventWrapper.class);
         }
 
         @Override
-        public void processResults(List<? extends ModelWrapper<?>> res) {
+        public void processResults(List<ModelWrapper<?>> res) {
             Assert.isNotNull(res);
             FormInput input = new FormInput(res,
                 Messages.SearchType_pEvent_list_title);
@@ -129,10 +134,10 @@ public enum SearchType {
         return label;
     }
 
-    public abstract List<? extends ModelWrapper<?>> search(String searchString,
+    public abstract List<ModelWrapper<?>> search(String searchString,
         CenterWrapper<?> center) throws Exception;
 
-    public void processResults(List<? extends ModelWrapper<?>> res) {
+    public void processResults(List<ModelWrapper<?>> res) {
         Assert.isNotNull(res);
         int size = res.size();
         if (size == 1) {
@@ -148,6 +153,20 @@ public enum SearchType {
                 }
             }
         }
+    }
+
+    private static List<ModelWrapper<?>> wrapIds(List<Integer> ids,
+        Class<?> wrapperKlazz) throws Exception {
+        List<ModelWrapper<?>> list = new ArrayList<ModelWrapper<?>>();
+        for (Integer id : ids) {
+            Constructor<?> c =
+                wrapperKlazz.getConstructor(WritableApplicationService.class);
+            ModelWrapper<?> wrapper =
+                (ModelWrapper<?>) c.newInstance(SessionManager.getAppService());
+            wrapper.setId(id);
+            list.add(wrapper);
+        }
+        return list;
     }
 
     protected void openResult(ModelWrapper<?> wrapper) {
