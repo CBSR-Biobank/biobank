@@ -31,10 +31,10 @@ public class PatientGetSimpleCollectionEventInfosAction implements
             + " left join cevent."
             + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
             + " as sourcesSpecs"
+            + " inner join fetch cevent.patient"
             + " where cevent."
             + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
-            + "=?"
-            + " GROUP BY cevent";
+            + "=? group by cevent";
     // @formatter:on
 
     private final Integer patientId;
