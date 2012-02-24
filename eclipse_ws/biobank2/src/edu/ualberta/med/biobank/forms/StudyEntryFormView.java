@@ -198,7 +198,7 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
             baseForm
                 .createSection(Messages.StudyEntryForm_source_specimens_title);
         final SourceSpecimenEntryInfoTable sourceSpecimenTable =
-            new SourceSpecimenEntryInfoTable(section, studyWrapper);
+            new SourceSpecimenEntryInfoTable(section, studyWrapper, null);
         section.setClient(sourceSpecimenTable);
         if (isSuperAdmin) {
             BaseForm.addSectionToolbar(section,

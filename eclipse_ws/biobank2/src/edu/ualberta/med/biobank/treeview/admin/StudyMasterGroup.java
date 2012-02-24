@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.mvp.event.model.study.StudyCreateEvent;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -82,7 +81,12 @@ public class StudyMasterGroup extends AbstractStudyGroup {
     }
 
     public void addStudy() {
-        eventBus.fireEvent(new StudyCreateEvent());
+        // commenting out MVP for now
+        // eventBus.fireEvent(new StudyCreateEvent());
+
+        StudyWrapper study = new StudyWrapper(SessionManager.getAppService());
+        StudyAdapter adapter = new StudyAdapter(this, study);
+        adapter.openEntryForm();
     }
 
 }

@@ -77,6 +77,8 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
     public void addSourceSpecimen() {
         SourceSpecimenWrapper newSourceSpecimen = new SourceSpecimenWrapper(
             SessionManager.getAppService());
+        // DO NOT set the study on newSourceSpecimen - if it was done
+        // then it would have to be unset if the user presses the Cancel button
         addOrEditStudySourceSpecimen(true, newSourceSpecimen);
     }
 

@@ -47,10 +47,12 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
         this.study = study;
         selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection(true);
         if (selectedAliquotedSpecimen == null) {
-            selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
+            selectedAliquotedSpecimen =
+                new ArrayList<AliquotedSpecimenWrapper>();
         }
         setList(selectedAliquotedSpecimen);
-        addedOrModifiedAliquotedSpecimens = new ArrayList<AliquotedSpecimenWrapper>();
+        addedOrModifiedAliquotedSpecimens =
+            new ArrayList<AliquotedSpecimenWrapper>();
         deletedAliquotedSpecimens = new ArrayList<AliquotedSpecimenWrapper>();
 
         setLayout(new GridLayout(1, false));
@@ -67,13 +69,15 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     public void addAliquotedSpecimen() {
         AliquotedSpecimenWrapper asw = new AliquotedSpecimenWrapper(
             SessionManager.getAppService());
-        asw.setStudy(study);
+        // DO NOT set the study on asw - if it was done then it would have to be
+        // unset if the user presses the Cancel button
         addOrEditAliquotedSpecimen(true, asw);
     }
 
     private void addOrEditAliquotedSpecimen(boolean add,
         final AliquotedSpecimenWrapper aliquotedSpecimen) {
-        final Collection<SpecimenTypeWrapper> availableSpecimenTypes = getAvailableSpecimenTypes();
+        final Collection<SpecimenTypeWrapper> availableSpecimenTypes =
+            getAvailableSpecimenTypes();
         if (!add) {
             availableSpecimenTypes.add(aliquotedSpecimen.getSpecimenType());
         }
@@ -107,7 +111,8 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     private Collection<SpecimenTypeWrapper> getAvailableSpecimenTypes() {
-        Set<SpecimenTypeWrapper> availableSpecimenTypes = new HashSet<SpecimenTypeWrapper>();
+        Set<SpecimenTypeWrapper> availableSpecimenTypes =
+            new HashSet<SpecimenTypeWrapper>();
         for (SourceSpecimenWrapper ssw : study
             .getSourceSpecimenCollection(false)) {
             availableSpecimenTypes.addAll(ssw.getSpecimenType()
@@ -178,10 +183,12 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     public void reload() {
         selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection(true);
         if (selectedAliquotedSpecimen == null) {
-            selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
+            selectedAliquotedSpecimen =
+                new ArrayList<AliquotedSpecimenWrapper>();
         }
         reloadCollection(selectedAliquotedSpecimen);
-        addedOrModifiedAliquotedSpecimens = new ArrayList<AliquotedSpecimenWrapper>();
+        addedOrModifiedAliquotedSpecimens =
+            new ArrayList<AliquotedSpecimenWrapper>();
         deletedAliquotedSpecimens = new ArrayList<AliquotedSpecimenWrapper>();
     }
 

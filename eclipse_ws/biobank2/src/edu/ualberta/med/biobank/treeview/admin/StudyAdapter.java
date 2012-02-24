@@ -108,4 +108,10 @@ public class StudyAdapter extends AdapterBase {
     // @Override
     // // eventBus.fireEvent(new StudyViewEvent(study.getId()));
     // }
+
+    @Override
+    public boolean isEditable() {
+        // TODO: this needs to be implemented correctly
+        return true;
+    }
 }
