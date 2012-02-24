@@ -20,8 +20,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientMergeAction;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -40,9 +44,11 @@ public class PatientMergeForm extends BiobankEntryForm {
     public static final String MSG_PATIENT_NOT_VALID =
         Messages.PatientMergeForm_notValid_msg;
 
-    private PatientWrapper patient1;
+    private PatientWrapper patient1 = new PatientWrapper(
+        SessionManager.getAppService());
 
-    private PatientWrapper patient2;
+    private PatientWrapper patient2 = new PatientWrapper(
+        SessionManager.getAppService());
 
     private BgcBaseText study2Text;
 
@@ -60,15 +66,20 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     private boolean canMerge;
 
+    private PatientInfo p;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof PatientAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        patient1 = new PatientWrapper(SessionManager.getAppService());
-        patient1.getWrappedObject().setId(adapter.getId());
-        patient1.reload();
+        p = SessionManager
+            .getAppService().doAction(
+                new PatientGetInfoAction(adapter.getId()));
+        patient1 =
+            new PatientWrapper(SessionManager.getAppService());
+        patient1.setWrappedObject(p.patient);
 
         String tabName = NLS.bind(Messages.PatientMergeForm_title,
             patient1.getPnumber());
@@ -164,7 +175,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             Messages.PatientMergeForm_study_label);
 
         patient1VisitsTable = new ClinicVisitInfoTable(patientArea1,
-            patient1.getCollectionEventCollection(true));
+            p.ceventInfos);
         GridData gd1 = new GridData();
         gd1.horizontalSpan = 2;
         gd1.grabExcessHorizontalSpace = true;
@@ -173,7 +184,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         patient1VisitsTable.adaptToToolkit(toolkit, true);
 
         patient2VisitsTable = new ClinicVisitInfoTable(patientArea2,
-            new ArrayList<CollectionEventWrapper>());
+            new ArrayList<PatientCEventInfo>());
         GridData gd2 = new GridData();
         gd2.horizontalSpan = 2;
         gd2.grabExcessHorizontalSpace = true;
@@ -183,11 +194,21 @@ public class PatientMergeForm extends BiobankEntryForm {
     }
 
     protected void populateFields(String pnumber) {
-        List<CollectionEventWrapper> newContents =
-            new ArrayList<CollectionEventWrapper>();
+        PatientInfo p2;
+        List<PatientCEventInfo> newContents =
+            new ArrayList<PatientCEventInfo>();
         try {
-            patient2 = PatientWrapper.getPatient(
-                SessionManager.getAppService(), pnumber);
+            SearchedPatientInfo pinfo =
+                SessionManager.getAppService().doAction(
+                    new PatientSearchAction(pnumber));
+            if (pinfo == null)
+                throw new ApplicationException("Patient not found");
+            p2 = SessionManager
+                .getAppService().doAction(
+                    new PatientGetInfoAction(pinfo.patient.getId()));
+            patient2 =
+                new PatientWrapper(SessionManager.getAppService());
+            patient2.setWrappedObject(p2.patient);
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
                 Messages.PatientMergeForm_retrieve_error_title, e);
@@ -220,8 +241,7 @@ public class PatientMergeForm extends BiobankEntryForm {
                 Messages.PatientMergeForm_pnber_invalid_error_title,
                 Messages.PatientMergeForm_studies_error_msg);
         } else {
-            patient2VisitsTable.setList(patient2
-                .getCollectionEventCollection(true));
+            patient2VisitsTable.setList(p2.ceventInfos);
             patientNotNullValue.setValue(Boolean.TRUE);
         }
     }
@@ -282,12 +302,11 @@ public class PatientMergeForm extends BiobankEntryForm {
     public void setValues() throws Exception {
         pnumber1Text.setText(patient1.getPnumber());
         study1Text.setText(patient1.getStudy().getNameShort());
-        patient1VisitsTable.setList(patient1
-            .getCollectionEventCollection(true));
+        patient1VisitsTable.setList(p.ceventInfos);
         pnumber2Text.setText(""); //$NON-NLS-1$
         study2Text.setText(""); //$NON-NLS-1$
         patient2VisitsTable
-            .setList(new ArrayList<CollectionEventWrapper>());
+            .setList(new ArrayList<PatientCEventInfo>());
         patient2 = null;
     }
 
