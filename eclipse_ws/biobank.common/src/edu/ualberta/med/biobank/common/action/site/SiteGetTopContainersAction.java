@@ -28,7 +28,7 @@ public class SiteGetTopContainersAction implements
             + " FROM " + Container.class.getName() + " container"
             + " INNER JOIN FETCH container.containerType containerType"
             + " INNER JOIN FETCH container.site site"
-            + " LEFT JOIN container.specimenPositionCollection"
+            + " LEFT JOIN FETCH container.specimenPositionCollection"
             + " WHERE site.id = ?"
             + " AND containerType.topLevel IS TRUE"; // only select top-level
                                                      // Container-s

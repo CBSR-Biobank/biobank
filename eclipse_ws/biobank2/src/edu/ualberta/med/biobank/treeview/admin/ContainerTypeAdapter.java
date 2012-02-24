@@ -24,7 +24,8 @@ public class ContainerTypeAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        ContainerTypeWrapper containerType = (ContainerTypeWrapper) getModelObject();
+        ContainerTypeWrapper containerType =
+            (ContainerTypeWrapper) getModelObject();
         Assert.isNotNull(containerType, "container type is null"); //$NON-NLS-1$
         return containerType.getName();
     }
@@ -56,8 +57,15 @@ public class ContainerTypeAdapter extends AdapterBase {
     }
 
     @Override
+    public boolean isEditable() {
+        // TODO: this needs to be implemented correctly
+        return true;
+    }
+
+    @Override
     public boolean isDeletable() {
-        return internalIsDeletable();
+        // TODO: this needs to be implemented correctly
+        return true;
     }
 
     @Override

@@ -7,12 +7,13 @@ import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.model.Container;
 
 public class ContainerGetChildrenAction implements
-    Action<ContainerChildrenResult> {
+    Action<ListResult<Container>> {
     private static final long serialVersionUID = 1L;
 
     // This query has to initialise specimenPositionCollection due to the
@@ -24,7 +25,7 @@ public class ContainerGetChildrenAction implements
             + " FROM " + Container.class.getName() + " container"
             + " INNER JOIN FETCH container.containerType containerType"
             + " INNER JOIN FETCH container.site site"
-            + " LEFT JOIN container.specimenPositionCollection"
+            + " LEFT JOIN FETCH container.specimenPositionCollection"
             + " WHERE container.position.parentContainer.id = ?";
 
     private final Integer parentContainerId;
@@ -40,7 +41,7 @@ public class ContainerGetChildrenAction implements
     }
 
     @Override
-    public ContainerChildrenResult run(ActionContext context)
+    public ListResult<Container> run(ActionContext context)
         throws ActionException {
         ArrayList<Container> childContainers = new ArrayList<Container>(0);
 
@@ -54,7 +55,7 @@ public class ContainerGetChildrenAction implements
             childContainers.addAll(results);
         }
 
-        return new ContainerChildrenResult(childContainers);
+        return new ListResult<Container>(childContainers);
     }
 
 }

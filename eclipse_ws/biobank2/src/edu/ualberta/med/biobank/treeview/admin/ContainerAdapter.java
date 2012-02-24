@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.container.ContainerChildrenResult;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetChildrenAction;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -43,7 +42,7 @@ public class ContainerAdapter extends AdapterBase {
     private static BgcLogger LOGGER = BgcLogger
         .getLogger(ContainerAdapter.class.getName());
 
-    private ContainerChildrenResult childrenResult = null;
+    private List<Container> childContainers = null;
 
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
         super(parent, container);
@@ -63,8 +62,8 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public void performExpand() {
         try {
-            childrenResult = SessionManager.getAppService().doAction(
-                new ContainerGetChildrenAction(getId()));
+            childContainers = SessionManager.getAppService().doAction(
+                new ContainerGetChildrenAction(getId())).getList();
             super.performExpand();
         } catch (ApplicationException e) {
             // TODO: open an error dialog here?
@@ -197,8 +196,15 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
+    public boolean isEditable() {
+        // TODO: this needs to be implemented correctly
+        return true;
+    }
+
+    @Override
     public boolean isDeletable() {
-        return internalIsDeletable();
+        // TODO: this needs to be implemented correctly
+        return true;
     }
 
     public void moveContainer(ContainerWrapper destParentContainer) {
@@ -338,9 +344,9 @@ public class ContainerAdapter extends AdapterBase {
         throws Exception {
         List<ContainerWrapper> result = new ArrayList<ContainerWrapper>();
 
-        if (childrenResult != null) {
+        if (childContainers != null) {
             // return results only if this node has been expanded
-            for (Container container : childrenResult.getChildContainers()) {
+            for (Container container : childContainers) {
                 ContainerWrapper wrapper =
                     new ContainerWrapper(SessionManager.getAppService(),
                         container);
