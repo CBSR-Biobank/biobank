@@ -118,20 +118,21 @@ public class BiobankLabelProvider extends LabelProvider implements
             if (columnIndex == 0)
                 return dsa.getSpecimen().getInventoryId();
             if (columnIndex == 1)
-                return dsa.getSpecimen().getSpecimenType().getNameShort();
+                return dsa.getSpecimen().getSpecimenType().getName();
             if (columnIndex == 2)
                 return dsa.getSpecimen().getCollectionEvent().getPatient()
                     .getPnumber();
             if (columnIndex == 3)
                 return dsa.getSpecimen().getActivityStatus().toString();
             if (columnIndex == 4)
-                return CommentWrapper.commentListToString(dsa.getCommentCollection(false));
+                return CommentWrapper.commentListToString(dsa
+                    .getCommentCollection(false));
         } else if (element instanceof RequestSpecimenWrapper) {
             RequestSpecimenWrapper dsa = (RequestSpecimenWrapper) element;
             if (columnIndex == 0)
                 return dsa.getSpecimen().getInventoryId();
             if (columnIndex == 1)
-                return dsa.getSpecimen().getSpecimenType().getNameShort();
+                return dsa.getSpecimen().getSpecimenType().getName();
             if (columnIndex == 2)
                 return dsa.getSpecimen().getPositionString(true, true);
             if (columnIndex == 3)
@@ -168,7 +169,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                 res.append(" - ").append(pevent.getWorksheet()); //$NON-NLS-1$
             return res.toString();
         } else if (element instanceof SpecimenTypeWrapper) {
-            return ((SpecimenTypeWrapper) element).getNameShort();
+            return ((SpecimenTypeWrapper) element).getName();
         } else if (element instanceof SourceSpecimenWrapper) {
             return ((SourceSpecimenWrapper) element).getSpecimenType()
                 .getNameShort();

@@ -36,9 +36,9 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
 
     private List<AliquotedSpecimenWrapper> selectedAliquotedSpecimen;
 
-    private List<AliquotedSpecimenWrapper> addedOrModifiedAliquotedSpecimen;
+    private List<AliquotedSpecimenWrapper> addedOrModifiedAliquotedSpecimens;
 
-    private List<AliquotedSpecimenWrapper> deletedAliquotedSpecimen;
+    private List<AliquotedSpecimenWrapper> deletedAliquotedSpecimens;
 
     private StudyWrapper study;
 
@@ -50,8 +50,8 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
             selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         }
         setList(selectedAliquotedSpecimen);
-        addedOrModifiedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
-        deletedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
+        addedOrModifiedAliquotedSpecimens = new ArrayList<AliquotedSpecimenWrapper>();
+        deletedAliquotedSpecimens = new ArrayList<AliquotedSpecimenWrapper>();
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -88,7 +88,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                         .getSpecimenType());
                     selectedAliquotedSpecimen
                         .add((AliquotedSpecimenWrapper) spec);
-                    addedOrModifiedAliquotedSpecimen
+                    addedOrModifiedAliquotedSpecimens
                         .add((AliquotedSpecimenWrapper) spec);
                     reloadCollection(selectedAliquotedSpecimen);
                     notifyListeners();
@@ -158,7 +158,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
 
                         selectedAliquotedSpecimen.remove(aliquotedSpecimen);
                         setList(selectedAliquotedSpecimen);
-                        deletedAliquotedSpecimen.add(aliquotedSpecimen);
+                        deletedAliquotedSpecimens.add(aliquotedSpecimen);
                         notifyListeners();
                     }
                 }
@@ -167,11 +167,11 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     public List<AliquotedSpecimenWrapper> getAddedOrModifiedAliquotedSpecimens() {
-        return addedOrModifiedAliquotedSpecimen;
+        return addedOrModifiedAliquotedSpecimens;
     }
 
     public List<AliquotedSpecimenWrapper> getDeletedAliquotedSpecimens() {
-        return deletedAliquotedSpecimen;
+        return deletedAliquotedSpecimens;
     }
 
     @Override
@@ -181,8 +181,8 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
             selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         }
         reloadCollection(selectedAliquotedSpecimen);
-        addedOrModifiedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
-        deletedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
+        addedOrModifiedAliquotedSpecimens = new ArrayList<AliquotedSpecimenWrapper>();
+        deletedAliquotedSpecimens = new ArrayList<AliquotedSpecimenWrapper>();
     }
 
     @Override

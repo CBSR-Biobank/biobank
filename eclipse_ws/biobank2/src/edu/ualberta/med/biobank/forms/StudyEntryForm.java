@@ -20,6 +20,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
@@ -28,7 +29,9 @@ import edu.ualberta.med.biobank.common.action.study.StudySaveAction.StudyEventAt
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.GlobalEventAttrWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -38,6 +41,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.EventAttrWidget;
@@ -94,6 +98,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private StudyInfo studyInfo;
 
+    private List<SpecimenTypeWrapper> specimenTypeWrappers;
+
     public StudyEntryForm() {
         super();
         pvCustomInfoList = new ArrayList<StudyEventAttrCustom>();
@@ -129,6 +135,14 @@ public class StudyEntryForm extends BiobankEntryForm {
             studyInfo = new StudyInfo();
             study = new StudyWrapper(SessionManager.getAppService());
         }
+
+        List<SpecimenType> specimenTypes =
+            SessionManager.getAppService().doAction(
+                new SpecimenTypeGetAllAction()).getList();
+        specimenTypeWrappers =
+            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+                specimenTypes, SpecimenTypeWrapper.class);
+
         ((AdapterBase) adapter).setModelObject(study);
     }
 
@@ -210,7 +224,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         Section section =
             createSection(Messages.StudyEntryForm_source_specimens_title);
         sourceSpecimenEntryTable = new SourceSpecimenEntryInfoTable(section,
-            study);
+            study, specimenTypeWrappers);
         sourceSpecimenEntryTable.adaptToToolkit(toolkit, true);
         sourceSpecimenEntryTable.addSelectionChangedListener(listener);
 
@@ -317,6 +331,11 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private HashSet<SourceSpecimenSaveInfo> getSourceSpecimenInfos() {
+        study.addToSourceSpecimenCollection(sourceSpecimenEntryTable
+            .getAddedOrModifiedSourceSpecimens());
+        study.removeFromSourceSpecimenCollection(sourceSpecimenEntryTable
+            .getDeletedSourceSpecimens());
+
         HashSet<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos =
             new HashSet<SourceSpecimenSaveInfo>();
 
@@ -331,7 +350,6 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private HashSet<AliquotedSpecimenSaveInfo> getAliquotedSpecimenInfos() {
-        // aliquoted Specimen :
         study.addToAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
             .getAddedOrModifiedAliquotedSpecimens());
         study.removeFromAliquotedSpecimenCollection(aliquotedSpecimenEntryTable

@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -10,7 +9,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
@@ -19,23 +17,25 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.dialogs.StudySourceSpecimenDialog;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.SourceSpecimenInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
 
-    private static BgcLogger logger = BgcLogger
+    private static BgcLogger LOGGER = BgcLogger
         .getLogger(SourceSpecimenEntryInfoTable.class.getName());
 
     private List<SpecimenTypeWrapper> availableSpecimenTypes;
 
-    private List<SourceSpecimenWrapper> selectedSourceSpecimen;
+    private List<SourceSpecimenWrapper> selectedSourceSpecimens;
+
+    private List<SourceSpecimenWrapper> addedOrModifiedSourceSpecimens;
+
+    private List<SourceSpecimenWrapper> deletedSourceSpecimen;
 
     private StudyWrapper study;
 
@@ -50,15 +50,18 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
      *            instance (cannot be null)
      * @param study the study the source specimens belong to.
      */
-    public SourceSpecimenEntryInfoTable(Composite parent, StudyWrapper study) {
+    public SourceSpecimenEntryInfoTable(Composite parent, StudyWrapper study,
+        List<SpecimenTypeWrapper> specimenTypes) {
         super(parent, null);
         this.study = study;
-        initSpecimenTypes();
-        selectedSourceSpecimen = study.getSourceSpecimenCollection(true);
-        if (selectedSourceSpecimen == null) {
-            selectedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
+        availableSpecimenTypes = specimenTypes;
+        selectedSourceSpecimens = study.getSourceSpecimenCollection(true);
+        if (selectedSourceSpecimens == null) {
+            selectedSourceSpecimens = new ArrayList<SourceSpecimenWrapper>();
         }
-        setList(selectedSourceSpecimen);
+        setList(selectedSourceSpecimens);
+        addedOrModifiedSourceSpecimens = new ArrayList<SourceSpecimenWrapper>();
+        deletedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -74,7 +77,6 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
     public void addSourceSpecimen() {
         SourceSpecimenWrapper newSourceSpecimen = new SourceSpecimenWrapper(
             SessionManager.getAppService());
-        newSourceSpecimen.setStudy(study);
         addOrEditStudySourceSpecimen(true, newSourceSpecimen);
     }
 
@@ -90,25 +92,31 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
             newListener = new NewListener() {
                 @Override
                 public void newAdded(Object spec) {
-                    ((SourceSpecimenWrapper) spec).setStudy(study);
+                    SourceSpecimenWrapper ss = (SourceSpecimenWrapper) spec;
                     availableSpecimenTypes.remove(sourceSpecimen
                         .getSpecimenType());
-                    selectedSourceSpecimen.add((SourceSpecimenWrapper) spec);
-                    study.addToSourceSpecimenCollection((Arrays
-                        .asList((SourceSpecimenWrapper) spec)));
-                    reloadCollection(selectedSourceSpecimen);
+                    selectedSourceSpecimens.add((SourceSpecimenWrapper) spec);
+                    addedOrModifiedSourceSpecimens.add(ss);
+                    reloadCollection(selectedSourceSpecimens);
                     notifyListeners();
                 }
             };
         }
-        StudySourceSpecimenDialog dlg = new StudySourceSpecimenDialog(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            sourceSpecimen, newListener, dialogSpecimenTypes);
+        StudySourceSpecimenDialog dlg =
+            new StudySourceSpecimenDialog(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                sourceSpecimen.getNeedOriginalVolume(), sourceSpecimen
+                    .getSpecimenType(), dialogSpecimenTypes, newListener);
 
         int res = dlg.open();
-        if (!add && res == Dialog.OK) {
-            reloadCollection(selectedSourceSpecimen);
-            notifyListeners();
+        if (res == Dialog.OK) {
+            sourceSpecimen.setNeedOriginalVolume(dlg.getNeedOriginalVolume());
+            sourceSpecimen.setSpecimenType(dlg.getSpecimenType());
+
+            if (!add) {
+                reloadCollection(selectedSourceSpecimens);
+                notifyListeners();
+            }
         }
     }
 
@@ -147,10 +155,9 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
                             return;
                         }
 
-                        selectedSourceSpecimen.remove(sourceSpecimen);
-                        setList(selectedSourceSpecimen);
-                        study.removeFromSourceSpecimenCollection(Arrays
-                            .asList(sourceSpecimen));
+                        selectedSourceSpecimens.remove(sourceSpecimen);
+                        setList(selectedSourceSpecimens);
+                        deletedSourceSpecimen.add(sourceSpecimen);
                         availableSpecimenTypes.add(sourceSpecimen
                             .getSpecimenType());
                         notifyListeners();
@@ -160,31 +167,23 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         }
     }
 
-    private void initSpecimenTypes() {
-        try {
-            availableSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(
-                SessionManager.getAppService(), false);
-            List<SourceSpecimenWrapper> sourceSpecimen = study
-                .getSourceSpecimenCollection(false);
-            if (sourceSpecimen != null) {
-                for (SourceSpecimenWrapper ssw : sourceSpecimen) {
-                    availableSpecimenTypes.remove(ssw.getSpecimenType());
-                }
-            }
-        } catch (final RemoteConnectFailureException exp) {
-            BgcPlugin.openRemoteConnectErrorMessage(exp);
-        } catch (ApplicationException e) {
-            logger.error("initSpecimenTypes", e); //$NON-NLS-1$
-        }
+    public List<SourceSpecimenWrapper> getAddedOrModifiedSourceSpecimens() {
+        return addedOrModifiedSourceSpecimens;
+    }
+
+    public List<SourceSpecimenWrapper> getDeletedSourceSpecimens() {
+        return deletedSourceSpecimen;
     }
 
     @Override
     public void reload() {
-        selectedSourceSpecimen = study.getSourceSpecimenCollection(true);
-        if (selectedSourceSpecimen == null) {
-            selectedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
+        selectedSourceSpecimens = study.getSourceSpecimenCollection(true);
+        if (selectedSourceSpecimens == null) {
+            selectedSourceSpecimens = new ArrayList<SourceSpecimenWrapper>();
         }
-        reloadCollection(selectedSourceSpecimen);
+        reloadCollection(selectedSourceSpecimens);
+        addedOrModifiedSourceSpecimens = new ArrayList<SourceSpecimenWrapper>();
+        deletedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
     }
 
     @SuppressWarnings("serial")

@@ -15,16 +15,15 @@ import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class StudySourceSpecimenDialog extends PagedDialog {
 
-    private SourceSpecimenWrapper origSourceSpecimen;
+    private SourceSpecimenWrapper defaultSourceSpecimen;
 
-    private List<SpecimenTypeWrapper> allSpecimenTypes;
+    private List<SpecimenTypeWrapper> specimenTypes;
 
     private String currentTitle;
 
@@ -34,30 +33,30 @@ public class StudySourceSpecimenDialog extends PagedDialog {
 
     private Button volume;
 
-    private SourceSpecimenWrapper internalSourceSpecimen;
+    private SourceSpecimenWrapper userSourceSpecimen;
 
     public StudySourceSpecimenDialog(Shell parent,
-        SourceSpecimenWrapper origSourceSpecimen, NewListener newListener,
-        List<SpecimenTypeWrapper> allSpecimenTypes) {
-        super(parent, newListener, origSourceSpecimen.getSpecimenType() == null);
-        Assert.isNotNull(origSourceSpecimen);
-        Assert.isNotNull(allSpecimenTypes);
-        this.origSourceSpecimen = origSourceSpecimen;
-        this.allSpecimenTypes = allSpecimenTypes;
-        internalSourceSpecimen = new SourceSpecimenWrapper(null);
-        if (origSourceSpecimen.getSpecimenType() == null) {
+        boolean defaultNeedOrigVolume, SpecimenTypeWrapper defaultSpecimenType,
+        List<SpecimenTypeWrapper> specimenTypes, NewListener newListener) {
+        super(parent, newListener, defaultSpecimenType == null);
+        Assert.isNotNull(specimenTypes);
+
+        defaultSourceSpecimen = new SourceSpecimenWrapper(null);
+        defaultSourceSpecimen.setNeedOriginalVolume(defaultNeedOrigVolume);
+        defaultSourceSpecimen.setSpecimenType(defaultSpecimenType);
+
+        userSourceSpecimen = new SourceSpecimenWrapper(null);
+        userSourceSpecimen.setNeedOriginalVolume(defaultNeedOrigVolume);
+        userSourceSpecimen.setSpecimenType(defaultSpecimenType);
+
+        if (defaultSpecimenType == null) {
             currentTitle = Messages.StudySourceSpecimenDialog_Dialog_add_title;
             message = Messages.StudySourceSpecimenDialog_Dialog_add_msg;
         } else {
             currentTitle = Messages.StudySourceSpecimenDialog_Dialog_edit_title;
             message = Messages.StudySourceSpecimenDialog_Dialog_edit_msg;
-            internalSourceSpecimen = new SourceSpecimenWrapper(null);
         }
-        internalSourceSpecimen.setStudy(origSourceSpecimen.getStudy());
-        internalSourceSpecimen.setSpecimenType(origSourceSpecimen
-            .getSpecimenType());
-        internalSourceSpecimen.setNeedOriginalVolume(origSourceSpecimen
-            .getNeedOriginalVolume());
+        this.specimenTypes = specimenTypes;
     }
 
     @Override
@@ -83,12 +82,12 @@ public class StudySourceSpecimenDialog extends PagedDialog {
 
         typeName = getWidgetCreator().createComboViewer(contents,
             Messages.StudySourceSpecimenDialog_field_type_label,
-            allSpecimenTypes, internalSourceSpecimen.getSpecimenType(),
+            specimenTypes, userSourceSpecimen.getSpecimenType(),
             Messages.StudySourceSpecimenDialog_field_type_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    internalSourceSpecimen
+                    userSourceSpecimen
                         .setSpecimenType((SpecimenTypeWrapper) selectedObject);
                 }
             }, new BiobankLabelProvider());
@@ -96,19 +95,9 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         volume = (Button) createBoundWidgetWithLabel(contents, Button.class,
             SWT.BORDER,
             Messages.StudySourceSpecimenDialog_field_originalVolume_label,
-            new String[0], internalSourceSpecimen,
+            new String[0], userSourceSpecimen,
             SourceSpecimenPeer.NEED_ORIGINAL_VOLUME.getName(), null);
 
-    }
-
-    @Override
-    protected void okPressed() {
-        copy(origSourceSpecimen);
-
-        // set the study to NULL, or else internalSourceSpecimen is saved
-        // when the study is saved
-        internalSourceSpecimen.setStudy(null);
-        super.okPressed();
     }
 
     @Override
@@ -118,22 +107,28 @@ public class StudySourceSpecimenDialog extends PagedDialog {
 
     @Override
     protected void resetFields() {
-        try {
-            internalSourceSpecimen.reset();
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError(
-                Messages.StudySourceSpecimenDialog_error_title, e);
-        }
+        userSourceSpecimen.setNeedOriginalVolume(defaultSourceSpecimen
+            .getNeedOriginalVolume());
+        userSourceSpecimen.setSpecimenType(defaultSourceSpecimen
+            .getSpecimenType());
         typeName.getCombo().deselectAll();
         volume.setSelection(false);
     }
 
     @Override
     protected void copy(Object newModelObject) {
-        ((SourceSpecimenWrapper) newModelObject)
-            .setSpecimenType((internalSourceSpecimen).getSpecimenType());
-        ((SourceSpecimenWrapper) newModelObject)
-            .setNeedOriginalVolume((internalSourceSpecimen)
-                .getNeedOriginalVolume());
+        SourceSpecimenWrapper sourceSpecimen =
+            (SourceSpecimenWrapper) newModelObject;
+        sourceSpecimen.setNeedOriginalVolume(userSourceSpecimen
+            .getNeedOriginalVolume());
+        sourceSpecimen.setSpecimenType(userSourceSpecimen.getSpecimenType());
+    }
+
+    public boolean getNeedOriginalVolume() {
+        return userSourceSpecimen.getNeedOriginalVolume();
+    }
+
+    public SpecimenTypeWrapper getSpecimenType() {
+        return userSourceSpecimen.getSpecimenType();
     }
 }
