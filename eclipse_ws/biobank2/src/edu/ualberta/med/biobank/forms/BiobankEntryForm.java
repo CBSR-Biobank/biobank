@@ -119,10 +119,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         if (adapter instanceof AdapterBase)
             if ((adapter != null)
                 && (((AdapterBase) adapter).getModelObject() != null)) {
-                // NL - we are no longer using wrappers -> so no reason to
-                // reload anymore
-                // ((AdapterBase) adapter).getModelObject().reload();
-        }
+                ((AdapterBase) adapter).getModelObject().reload();
+            }
 
         // not everything is well initialized on the adapter before it is really
         // saved. Should not do that now..
