@@ -14,6 +14,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
+import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -27,11 +30,13 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerEntryForm extends BiobankEntryForm {
     public static final String ID =
@@ -70,6 +75,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private boolean renamingChildren;
 
+    private ContainerInfo containerInfo;
+
     private BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
             @Override
@@ -86,7 +93,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
         containerAdapter = (ContainerAdapter) adapter;
-        container = (ContainerWrapper) getModelObject();
+        updateContainerInfo(adapter.getId());
 
         String tabName;
         if (container.isNew()) {
@@ -110,6 +117,21 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 .getContainersGroupNode());
 
         setPartName(tabName);
+    }
+
+    private void updateContainerInfo(Integer id) throws ApplicationException {
+        if (id != null) {
+            containerInfo = SessionManager.getAppService().doAction(
+                new ContainerGetInfoAction(id));
+            container = new ContainerWrapper(SessionManager.getAppService(),
+                containerInfo.container);
+        } else {
+            containerInfo = new ContainerInfo();
+            container = new ContainerWrapper(SessionManager.getAppService());
+            container.setSite(SessionManager.getUser().getCurrentWorkingSite());
+        }
+
+        ((AdapterBase) adapter).setModelObject(container);
     }
 
     @Override
@@ -292,7 +314,23 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         if (doSave) {
-            container.persist();
+            final ContainerSaveAction saveAction = new ContainerSaveAction();
+            saveAction.setId(container.getId());
+            saveAction.setLabel(container.getLabel());
+            saveAction.setBarcode(container.getProductBarcode());
+            saveAction.setActivityStatus(container.getActivityStatus());
+            saveAction.setSiteId(container.getSite().getId());
+            saveAction.setTypeId(container.getContainerType().getId());
+            saveAction.setPosition(container.getPositionAsRowCol());
+            if (container.getParentContainer() != null) {
+                saveAction.setParentId(container.getParentContainer().getId());
+            }
+
+            Integer id =
+                SessionManager.getAppService().doAction(saveAction).getId();
+
+            updateContainerInfo(id);
+
             SessionManager.updateAllSimilarNodes(containerAdapter, true);
             if (renamingChildren)
                 Display.getDefault().asyncExec(new Runnable() {
