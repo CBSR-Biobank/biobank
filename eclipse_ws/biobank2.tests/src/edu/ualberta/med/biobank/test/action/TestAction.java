@@ -78,7 +78,7 @@ public class TestAction {
 
         User superAdmin = new User();
         superAdmin.setLogin(SUPER_ADMIN_LOGIN);
-        superAdmin.setCsmUserId(0L);
+        superAdmin.setCsmUserId(-1L);
         superAdmin.setRecvBulkEmails(false);
         superAdmin.setFullName("super admin");
         superAdmin.setEmail(Utils.getRandomString(5, 10));

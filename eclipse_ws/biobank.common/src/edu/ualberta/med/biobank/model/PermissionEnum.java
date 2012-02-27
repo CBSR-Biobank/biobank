@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.common.util.NotAProxy;
+
 /**
  * The id of these enumerations are saved in the database. Therefore, DO NOT
  * CHANGE THESE ENUM IDS (unless you are prepared to write an upgrade script).
@@ -20,7 +22,7 @@ import java.util.Set;
  * @author Jonathan Ferland
  * 
  */
-public enum PermissionEnum implements Serializable {
+public enum PermissionEnum implements NotAProxy, Serializable {
     ADMINISTRATION(1),
 
     SPECIMEN_CREATE(2),

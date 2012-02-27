@@ -177,13 +177,6 @@
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
-				
-	<cache name="edu.ualberta.med.biobank.model.ActivityStatus"
-		maxElementsInMemory="500"
-		eternal="false"
-		timeToIdleSeconds="1800"
-		timeToLiveSeconds="100000"
-		overflowToDisk="true"/>
 		
 	<cache name="edu.ualberta.med.biobank.model.Study"
 		maxElementsInMemory="500"
