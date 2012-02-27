@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.validator.engine;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serializable;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator.Context;
@@ -19,7 +21,10 @@ import edu.ualberta.med.biobank.validator.messageinterpolator.OgnlMessageInterpo
  * 
  * @author Jonathan Ferland
  */
-public class LocalizedConstraintViolation<T> implements ConstraintViolation<T> {
+public class LocalizedConstraintViolation<T> implements ConstraintViolation<T>,
+    Serializable {
+    private static final long serialVersionUID = 1L;
+
     private static final OgnlMessageInterpolator MESSAGE_INTERPOLATOR =
         new OgnlMessageInterpolator();
 
@@ -72,7 +77,9 @@ public class LocalizedConstraintViolation<T> implements ConstraintViolation<T> {
         return delegate.getConstraintDescriptor();
     }
 
-    private void readObject(ObjectInputStream s) {
+    private void readObject(ObjectInputStream s) throws IOException,
+        ClassNotFoundException {
+        s.defaultReadObject();
         interpolateMessage();
     }
 
