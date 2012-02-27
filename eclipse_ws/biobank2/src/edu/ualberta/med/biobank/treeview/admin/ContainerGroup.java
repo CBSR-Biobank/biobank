@@ -6,8 +6,10 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -50,15 +52,24 @@ public class ContainerGroup extends AdapterBase {
 
     @Override
     public void performExpand() {
-        SiteAdapter siteAdapter = (SiteAdapter) getParent();
-        try {
-            topContainers = SessionManager.getAppService().doAction(
-                new SiteGetTopContainersAction(siteAdapter.getId())).getList();
-            super.performExpand();
-        } catch (ApplicationException e) {
-            // TODO: open an error dialog here?
-            LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
-        }
+        final SiteAdapter siteAdapter = (SiteAdapter) getParent();
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    topContainers =
+                        SessionManager
+                            .getAppService()
+                            .doAction(
+                                new SiteGetTopContainersAction(siteAdapter
+                                    .getId())).getList();
+                    ContainerGroup.super.performExpand();
+                } catch (ApplicationException e) {
+                    // TODO: open an error dialog here?
+                    LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
+                }
+            }
+        });
     }
 
     @Override

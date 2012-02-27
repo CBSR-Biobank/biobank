@@ -12,6 +12,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
@@ -22,6 +23,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetChildrenAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerMoveSpecimensAction;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -61,14 +63,19 @@ public class ContainerAdapter extends AdapterBase {
 
     @Override
     public void performExpand() {
-        try {
-            childContainers = SessionManager.getAppService().doAction(
-                new ContainerGetChildrenAction(getId())).getList();
-            super.performExpand();
-        } catch (ApplicationException e) {
-            // TODO: open an error dialog here?
-            LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
-        }
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    childContainers = SessionManager.getAppService().doAction(
+                        new ContainerGetChildrenAction(getId())).getList();
+                    ContainerAdapter.super.performExpand();
+                } catch (ApplicationException e) {
+                    // TODO: open an error dialog here?
+                    LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
+                }
+            }
+        });
     }
 
     @Override
@@ -138,12 +145,14 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     public void moveSpecimens() {
-        final MoveSpecimensToDialog mc = new MoveSpecimensToDialog(PlatformUI
-            .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            getContainer());
-        if (mc.open() == Dialog.OK) {
+        final MoveSpecimensToDialog msDlg =
+            new MoveSpecimensToDialog(PlatformUI
+                .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                getContainer());
+        if (msDlg.open() == Dialog.OK) {
             try {
-                final ContainerWrapper newContainer = mc.getNewContainer();
+                final Integer toContainerId = msDlg.getNewContainer().getId();
+                final ContainerWrapper newContainer = msDlg.getNewContainer();
                 IRunnableContext context = new ProgressMonitorDialog(Display
                     .getDefault().getActiveShell());
                 context.run(true, false, new IRunnableWithProgress() {
@@ -155,9 +164,9 @@ public class ContainerAdapter extends AdapterBase {
                             newContainer.getFullInfoLabel()),
                             IProgressMonitor.UNKNOWN);
                         try {
-                            getContainer().moveSpecimens(newContainer);
-                            // newContainer.persist();
-                            newContainer.reload();
+                            SessionManager.getAppService().doAction(
+                                new ContainerMoveSpecimensAction(getContainer()
+                                    .getId(), toContainerId));
                             monitor.done();
                             BgcPlugin
                                 .openAsyncInformation(

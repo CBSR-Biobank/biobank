@@ -589,30 +589,31 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return filteredWrappers;
     }
 
+    @SuppressWarnings("nls")
     private static final String EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY =
-        "from " //$NON-NLS-1$
+        "from "
             + Container.class.getName()
-            + " where " //$NON-NLS-1$
+            + " where "
             + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
-            + "=? and " //$NON-NLS-1$
+            + "=? and "
             + ContainerPeer.SPECIMEN_POSITION_COLLECTION.getName()
-            + ".size = 0 and " //$NON-NLS-1$
+            + ".size = 0 and "
             + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
                 ContainerTypePeer.CAPACITY, CapacityPeer.ROW_CAPACITY)
-            + " >= ? and " //$NON-NLS-1$
+            + " >= ? and "
             + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
                 ContainerTypePeer.CAPACITY, CapacityPeer.COL_CAPACITY)
-            + " >= ? and " //$NON-NLS-1$
+            + " >= ? and "
             + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
                 ContainerTypePeer.ID)
-            + " in (select ct." //$NON-NLS-1$
+            + " in (select ct."
             + ContainerTypePeer.ID.getName()
-            + " from " //$NON-NLS-1$
+            + " from "
             + ContainerType.class.getName()
-            + " as ct left join ct." //$NON-NLS-1$
+            + " as ct left join ct."
             + ContainerTypePeer.SPECIMEN_TYPE_COLLECTION.getName()
-            + " as sampleType where sampleType." //$NON-NLS-1$
-            + SpecimenTypePeer.ID.getName() + " in ("; //$NON-NLS-1$
+            + " as sampleType where sampleType."
+            + SpecimenTypePeer.ID.getName() + " in (";
 
     /**
      * Retrieve a list of empty containers in a specific site. These containers
