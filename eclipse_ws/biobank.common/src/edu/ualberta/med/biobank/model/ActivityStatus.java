@@ -10,6 +10,10 @@ public enum ActivityStatus {
     // TODO: comment on NOT CHANGING THE ID!!!
     ACTIVE(1, "Active"),
     CLOSED(2, "Closed"),
+    // TODO: why can't there be a closed and flagged item or an active but flagged
+    // item? Especially for users that are mean to be enabled or disabled.
+    // When is ActivityStatus.FLAGGED even used in the source code? Can a flagged
+    // user log in? What is the point of flagged? Shouldn't it be separate?
     FLAGGED(4, "Flagged");
 
     private static final List<ActivityStatus> VALUES_LIST = Collections
