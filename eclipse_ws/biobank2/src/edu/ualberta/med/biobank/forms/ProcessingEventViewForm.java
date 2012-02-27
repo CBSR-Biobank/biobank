@@ -80,6 +80,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
         createSourceSpecimensSection();
+        setValues();
     }
 
     private void createMainSection() {
@@ -104,13 +105,6 @@ public class ProcessingEventViewForm extends BiobankViewForm {
                 Messages.label_activity);
 
         createCommentsSection();
-
-        try {
-
-            setValues();
-        } catch (Exception e) {
-            // TODO: ??
-        }
     }
 
     private void createCommentsSection() {
