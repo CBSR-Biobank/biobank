@@ -8,6 +8,7 @@ import gov.nih.nci.system.client.proxy.ProxyHelperImpl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -32,10 +33,12 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
         if (obj instanceof AbstractBiobankListProxy) {
             return convertListProxyToProxy(as,
                 (AbstractBiobankListProxy<?>) obj);
-        }
-        if (obj instanceof NotAProxy) {
+        } else if (obj instanceof NotAProxy) {
+            return obj;
+        } else if (obj instanceof BigDecimal) {
             return obj;
         }
+
         return super.convertToProxy(as, obj);
     }
 
@@ -60,6 +63,8 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
     @SuppressWarnings("unchecked")
     public Object convertToObject(Object proxyObject) throws Throwable {
         if (proxyObject instanceof NotAProxy) {
+            return proxyObject;
+        } else if (proxyObject instanceof BigDecimal) {
             return proxyObject;
         }
 
