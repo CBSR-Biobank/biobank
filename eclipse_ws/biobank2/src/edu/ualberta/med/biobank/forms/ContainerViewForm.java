@@ -131,6 +131,7 @@ public class ContainerViewForm extends BiobankViewForm {
         containerInfo = SessionManager.getAppService().doAction(
             new ContainerGetInfoAction(adapter.getId()));
         Assert.isNotNull(containerInfo);
+        Assert.isNotNull(containerInfo.container);
     }
 
     @Override

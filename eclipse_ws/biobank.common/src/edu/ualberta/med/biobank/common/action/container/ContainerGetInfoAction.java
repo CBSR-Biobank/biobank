@@ -45,6 +45,12 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
             + " LEFT JOIN FETCH specimen.commentCollection"
             + " LEFT JOIN FETCH specimen.originInfo spcOriginInfo"
             + " LEFT JOIN FETCH spcOriginInfo.center"
+            + " INNER JOIN FETCH container.position position"
+            + " LEFT JOIN FETCH position.parentContainer parentContainer"
+            + " LEFT JOIN FETCH parentContainer.containerType parentCtype"
+            + " LEFT JOIN FETCH parentCtype.capacity"
+            + " LEFT JOIN FETCH parentCtype.childLabelingScheme"
+            + " LEFT JOIN FETCH parentCtype.childContainerTypeCollection"
             + " WHERE container.id = ?";
 
     public static class ContainerInfo implements ActionResult {

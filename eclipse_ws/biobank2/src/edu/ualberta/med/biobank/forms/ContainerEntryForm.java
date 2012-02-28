@@ -316,7 +316,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (doSave) {
             final ContainerSaveAction saveAction = new ContainerSaveAction();
             saveAction.setId(container.getId());
-            saveAction.setLabel(container.getLabel());
             saveAction.setBarcode(container.getProductBarcode());
             saveAction.setActivityStatus(container.getActivityStatus());
             saveAction.setSiteId(container.getSite().getId());
@@ -324,6 +323,11 @@ public class ContainerEntryForm extends BiobankEntryForm {
             saveAction.setPosition(container.getPositionAsRowCol());
             if (container.getParentContainer() != null) {
                 saveAction.setParentId(container.getParentContainer().getId());
+            }
+
+            // only set the label on top level containers
+            if (container.getContainerType().getTopLevel()) {
+                saveAction.setLabel(container.getLabel());
             }
 
             Integer id =
