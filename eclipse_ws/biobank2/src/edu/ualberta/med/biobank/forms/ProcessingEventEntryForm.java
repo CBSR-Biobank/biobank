@@ -36,6 +36,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
@@ -351,13 +352,16 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         }
 
         Integer peventId =
-            SessionManager.getAppService().doAction(
-                new ProcessingEventSaveAction(pevent.getId(), pevent
-                    .getCenter().getId(), pevent.getCreatedAt(), pevent
-                    .getWorksheet(), pevent.getActivityStatus(), null,
-                    specimens)).getId();
-        ((ProcessingEventWrapper) pEventAdapter.getModelObject())
-            .getWrappedObject().setId(peventId);
+            SessionManager
+                .getAppService()
+                .doAction(
+                    new ProcessingEventSaveAction(pevent.getId(), pevent
+                        .getCenter().getId(), pevent.getCreatedAt(), pevent
+                        .getWorksheet(), pevent.getActivityStatus(), comment
+                        .getMessage(),
+                        specimens)).getId();
+        pevent.setId(peventId);
+        ((AdapterBase) adapter).setModelObject(pevent);
     }
 
     @Override

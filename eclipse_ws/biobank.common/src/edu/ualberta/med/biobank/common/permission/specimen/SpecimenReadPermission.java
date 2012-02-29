@@ -25,7 +25,7 @@ public class SpecimenReadPermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        Specimen specimen;
+        Specimen specimen = null;
         if (specimenId != null)
             specimen = context.get(Specimen.class, specimenId);
         else {
@@ -39,9 +39,11 @@ public class SpecimenReadPermission implements Permission {
                             + "spec.collectionEvent ce inner join fetch"
                             + " ce.patient p inner join fetch p.study where spec.inventoryId=?");
             q.setParameter(0, inventoryId);
-            specimen = (Specimen) q.list().get(0);
+            if (q.list().size() > 0)
+                specimen = (Specimen) q.list().get(0);
         }
 
+        if (specimen == null) return true;
         Center center = specimen.getCurrentCenter();
         Study study = specimen.getCollectionEvent().getPatient().getStudy();
 
