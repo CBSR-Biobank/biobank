@@ -472,6 +472,7 @@ End:
 
   <!-- JUnit -->
 
+  <property name="doxygen.output" location="docs/doxygen" />
   <property name="test.output" location="testing" />
   <property name="test.output.raw" value="${test.output}/raw" />
   <property name="test.build.dir" value="${eclipse.proj.dir.tests}/output" />
@@ -763,6 +764,13 @@ End:
       <arg line="-metadataRepository file:${updateSiteFolder}" />
     </java>
   </target>
+
+  <target name="doxygen" description="generates documentation for the model classes">
+    <exec command="doxygen docs/doxygen/doxygen.cfg" />
+    <echo message="point your browser to: file://${doxygen.output}/html/index.html" />
+  </target>
+
+<!-- (setq nxml-slash-auto-complete-flag t) -->
 
 
 </project>
