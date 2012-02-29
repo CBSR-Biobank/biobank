@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.containerType;
 
-import java.util.List;
-
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -9,7 +7,6 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeReadPermission;
 import edu.ualberta.med.biobank.model.ContainerType;
 
@@ -57,16 +54,8 @@ public class ContainerTypeGetInfoAction implements Action<ContainerTypeInfo> {
         throws ActionException {
         Query query = context.getSession().createQuery(CTYPE_INFO_HQL);
         query.setParameter(0, ctypeId);
-
-        @SuppressWarnings("unchecked")
-        List<ContainerType> containerTypes = query.list();
-
-        if (containerTypes.size() != 1) {
-            throw new ModelNotFoundException(ContainerType.class, ctypeId);
-        }
-
         ContainerTypeInfo containerTypeInfo =
-            new ContainerTypeInfo(containerTypes.get(0));
+            new ContainerTypeInfo((ContainerType) query.uniqueResult());
         return containerTypeInfo;
     }
 }
