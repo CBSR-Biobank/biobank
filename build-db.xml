@@ -36,8 +36,8 @@
 
   <!-- hibernatetool is much faster and more powerful than schemaexport and
        works with jpa annotations -->
-  <taskdef name="hibernatetool" 
-           classname="org.hibernate.tool.ant.HibernateToolTask" 
+  <taskdef name="hibernatetool"
+           classname="org.hibernate.tool.ant.HibernateToolTask"
            classpathref="hibernatetool.lib" />
 
 <!-- was to generate java files from hbm.xml files
@@ -92,7 +92,7 @@
   </target>
 
   <target name="dbcreate-add-testuser" if="debug">
-    <sql driver="${database.name}"
+    <sql driver="${database.driver}"
          url="${database.url}"
          userid="${database.username}"
          password="${database.password}"
