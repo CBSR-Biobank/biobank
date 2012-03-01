@@ -86,7 +86,7 @@ public class DispatchAdapter extends AdapterBase {
     @Override
     public boolean isDeletable() {
         try {
-            return SessionManager.getAppService().isAllowed(
+            return SessionManager.isAllowed(
                 new DispatchDeletePermission(getDispatchWrapper().getId()));
         } catch (Exception e) {
             BgcPlugin.openAsyncError("Delete failed", e);
