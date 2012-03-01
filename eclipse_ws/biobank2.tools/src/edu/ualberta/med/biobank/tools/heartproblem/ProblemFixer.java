@@ -37,6 +37,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * be copied over.
  * 
  */
+@Deprecated
 public class ProblemFixer {
 
     private static String USAGE = "Usage: heartprobfix [options]\n\n"
@@ -46,7 +47,9 @@ public class ProblemFixer {
         .getName());
 
     private static class AppArgs {
+        @SuppressWarnings("unused")
         public boolean verbose = false;
+
         public String username = null;
         public String password = null;
     }
@@ -282,7 +285,7 @@ public class ProblemFixer {
 
                 peventOnProduction.setCenter(calgarySiteOnProduction);
                 peventOnProduction.setActivityStatus(peventOnTraining
-                        .getActivityStatus());
+                    .getActivityStatus());
                 peventOnProduction.persist();
                 peventOnProduction.reload();
 
