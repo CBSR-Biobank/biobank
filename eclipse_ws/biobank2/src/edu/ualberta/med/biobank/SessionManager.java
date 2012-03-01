@@ -245,15 +245,16 @@ public class SessionManager {
     }
 
     public static boolean isAllowed(Permission perm) {
-        try {
-            if (!getInstance().permissionMap.containsKey(perm))
-                getInstance().permissionMap.put(perm,
-                    getAppService().isAllowed(perm));
-            return getInstance().permissionMap.get(perm);
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error checking permission",
-                "There has been an error retrieving your permissions");
-        }
+        if (perm != null)
+            try {
+                if (!getInstance().permissionMap.containsKey(perm))
+                    getInstance().permissionMap.put(perm,
+                        getAppService().isAllowed(perm));
+                return getInstance().permissionMap.get(perm);
+            } catch (Exception e) {
+                BgcPlugin.openAsyncError("Error checking permission",
+                    "There has been an error retrieving your permissions");
+            }
         return false;
     }
 

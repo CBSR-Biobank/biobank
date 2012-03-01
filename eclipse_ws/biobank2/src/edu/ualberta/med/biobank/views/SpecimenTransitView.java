@@ -321,7 +321,6 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             else if (originInfo.getCenter() instanceof ClinicWrapper) {
                 centerAdapter = new ClinicWithShipmentAdapter(topNode,
                     (ClinicWrapper) originInfo.getCenter());
-                centerAdapter.setEditable(false);
                 topNode.addChild(centerAdapter);
             }
 

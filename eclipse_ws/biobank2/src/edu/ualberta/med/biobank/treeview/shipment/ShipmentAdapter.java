@@ -107,11 +107,6 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public boolean isDeletable() {
-        return internalIsDeletable();
-    }
-
-    @Override
     protected void additionalRefreshAfterDelete() {
         getParent().getParent().rebuild();
     }

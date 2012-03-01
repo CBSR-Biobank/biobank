@@ -274,25 +274,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         }
     }
 
-    @Override
-    protected void runDelete() throws Exception {
-        // getModelObject().delete();
-    }
-
-    @Override
-    protected boolean internalIsDeletable() {
-        return false;
-        // return super.internalIsDeletable() && getModelObject() != null
-        // && SessionManager.canDelete(getModelObject());
-    }
-
-    @Override
-    public boolean isEditable() {
-        return false;
-        // return super.isEditable() &&
-        // SessionManager.canUpdate(getModelObject());
-    }
-
     protected List<AbstractAdapterBase> searchChildContainers(
         Class<?> searchedClass, Integer objectId, ContainerAdapter container,
         final List<ContainerWrapper> parents) {

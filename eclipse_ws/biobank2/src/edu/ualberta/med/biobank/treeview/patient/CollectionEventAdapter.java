@@ -28,7 +28,6 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
         super(parent, ceventInfo == null ? null : ceventInfo.cevent.getId(),
             null, null, false);
         this.ceventInfo = ceventInfo;
-        setEditable(parent instanceof PatientAdapter || parent == null);
     }
 
     @Override
@@ -62,11 +61,11 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
                 // Messages.CollectionEventAdapter_error_title,
                 // Messages.CollectionEventAdapter_create_error_msg);
                 // }
-            } else {
-                tabName = NLS.bind(
-                    Messages.CollectionEventEntryForm_title_edit,
-                    ceventInfo.cevent.getVisitNumber());
-            }
+        } else {
+            tabName = NLS.bind(
+                Messages.CollectionEventEntryForm_title_edit,
+                ceventInfo.cevent.getVisitNumber());
+        }
         return tabName;
     }
 
@@ -110,11 +109,6 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     @Override
     public String getViewFormId() {
         return CollectionEventViewForm.ID;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return internalIsDeletable();
     }
 
     public Patient getPatient() {

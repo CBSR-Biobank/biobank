@@ -73,19 +73,6 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    public boolean isDeletable() {
-        // TODO: this needs to be implemented correctly
-        // return internalIsDeletable();
-        return true;
-    }
-
-    @Override
-    public boolean isEditable() {
-        // TODO: this needs to be implemented correctly
-        return true;
-    }
-
-    @Override
     public List<AbstractAdapterBase> search(Class<?> searchedClass,
         Integer objectId) {
         if (SiteWrapper.class.isAssignableFrom(searchedClass))

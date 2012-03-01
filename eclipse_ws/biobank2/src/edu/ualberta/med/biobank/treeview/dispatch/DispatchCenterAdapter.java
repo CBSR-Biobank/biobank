@@ -51,11 +51,6 @@ public class DispatchCenterAdapter extends AdapterBase {
     }
 
     @Override
-    public boolean isDeletable() {
-        return internalIsDeletable();
-    }
-
-    @Override
     public List<AbstractAdapterBase> search(Class<?> searchedClass,
         Integer objectId) {
         return searchChildren(searchedClass, objectId);

@@ -134,11 +134,6 @@ public class PatientAdapter extends AbstractNewAdapterBase {
         return Messages.PatientAdapter_delete_confirm_msg;
     }
 
-    @Override
-    public boolean isDeletable() {
-        return internalIsDeletable();
-    }
-
     public Patient getPatient() {
         return patient;
     }

@@ -25,6 +25,7 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -65,10 +66,11 @@ public abstract class AbstractAdapterBase implements
     // FIXME can we merge this list of listeners with the DeltaListener ?
     private List<AdapterChangedListener> listeners;
 
-    /**
-     * if true, edit button and actions will be visible
-     */
-    private boolean editable = true;
+    protected Permission isDeletable;
+
+    protected Permission isEditable;
+
+    protected Permission isReadable;
 
     public AbstractAdapterBase(AbstractAdapterBase parent, Integer id,
         String label, String tooltip, boolean hasChildren) {
@@ -352,7 +354,9 @@ public abstract class AbstractAdapterBase implements
         }
     }
 
-    protected abstract void runDelete() throws Exception;
+    protected void runDelete() throws Exception {
+        // donothing
+    }
 
     /**
      * Create a adequate child node for this node
@@ -493,20 +497,30 @@ public abstract class AbstractAdapterBase implements
     }
 
     public boolean isDeletable() {
-        // should override it to activate deletion
+        try {
+            return SessionManager.isAllowed(isDeletable);
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError("Delete failed", e);
+        }
         return false;
     }
 
-    protected boolean internalIsDeletable() {
-        return editable && SessionManager.getInstance().isConnected();
-    }
-
     public boolean isEditable() {
-        return editable && SessionManager.getInstance().isConnected();
+        try {
+            return SessionManager.isAllowed(isEditable);
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError("Edit failed", e);
+        }
+        return false;
     }
 
-    public void setEditable(boolean editable) {
-        this.editable = editable;
+    public boolean isReadable() {
+        try {
+            return SessionManager.isAllowed(isReadable);
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError("Read failed", e);
+        }
+        return false;
     }
 
     protected String getConfirmDeleteMessage() {

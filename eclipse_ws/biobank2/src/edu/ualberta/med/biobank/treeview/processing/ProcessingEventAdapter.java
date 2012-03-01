@@ -35,7 +35,8 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        ProcessingEventWrapper pevent = (ProcessingEventWrapper) getModelObject();
+        ProcessingEventWrapper pevent =
+            (ProcessingEventWrapper) getModelObject();
         Assert.isNotNull(pevent, "processing event is null"); //$NON-NLS-1$
         String worksheet = pevent.getWorksheet();
         String name = pevent.getFormattedCreatedAt()
@@ -52,7 +53,8 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     @Override
     public String getTooltipTextInternal() {
-        ProcessingEventWrapper pevent = (ProcessingEventWrapper) getModelObject();
+        ProcessingEventWrapper pevent =
+            (ProcessingEventWrapper) getModelObject();
         if (pevent == null)
             return Messages.ProvessingEventAdapter_tooltiptext;
         return NLS.bind(Messages.ProvessingEventAdapter_tooltiptext_withdate,
@@ -64,11 +66,6 @@ public class ProcessingEventAdapter extends AdapterBase {
         addEditMenu(menu, Messages.ProcessingEventAdapter_pevent_label);
         addViewMenu(menu, Messages.ProcessingEventAdapter_pevent_label);
         addDeleteMenu(menu, Messages.ProcessingEventAdapter_pevent_label);
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return internalIsDeletable();
     }
 
     @Override

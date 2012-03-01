@@ -18,6 +18,8 @@ import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchSavePermission;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -36,6 +38,9 @@ public class DispatchAdapter extends AdapterBase {
 
     public DispatchAdapter(AdapterBase parent, DispatchWrapper ship) {
         super(parent, ship);
+        this.isDeletable = new DispatchDeletePermission(ship.getId());
+        this.isReadable = new DispatchReadPermission(ship.getId());
+        this.isEditable = new DispatchSavePermission(ship.getId());
     }
 
     private DispatchWrapper getDispatchWrapper() {
@@ -81,17 +86,6 @@ public class DispatchAdapter extends AdapterBase {
     @Override
     public String getTooltipTextInternal() {
         return getTooltipText(Messages.DispatchAdapter_dispatch_label);
-    }
-
-    @Override
-    public boolean isDeletable() {
-        try {
-            return SessionManager.isAllowed(
-                new DispatchDeletePermission(getDispatchWrapper().getId()));
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError("Delete failed", e);
-        }
-        return false;
     }
 
     @Override

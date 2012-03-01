@@ -18,7 +18,6 @@ public class ClinicAdapter extends AdapterBase {
 
     public ClinicAdapter(AdapterBase parent, ClinicWrapper clinicWrapper) {
         super(parent, clinicWrapper);
-        setEditable(parent instanceof ClinicMasterGroup || parent == null);
     }
 
     @Override
