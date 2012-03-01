@@ -40,6 +40,7 @@ public class RequestRetrievalAction implements Action<ListResult<Request>> {
         ArrayList<Request> requests = new ArrayList<Request>();
 
         Query query = context.getSession().createQuery(REQUEST_HQL);
+        query.setParameter(0, centerId);
 
         @SuppressWarnings("unchecked")
         List<Request> results = query.list();

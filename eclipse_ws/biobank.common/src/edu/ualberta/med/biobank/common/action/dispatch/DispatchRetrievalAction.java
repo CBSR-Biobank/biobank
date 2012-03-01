@@ -81,6 +81,8 @@ public class DispatchRetrievalAction implements Action<ListResult<Dispatch>> {
         ArrayList<Dispatch> dispatches = new ArrayList<Dispatch>();
 
         Query query = context.getSession().createQuery(qryBuf.toString());
+        query.setParameter(0, state.getId());
+        query.setParameter(1, centerId);
 
         @SuppressWarnings("unchecked")
         List<Dispatch> results = query.list();
