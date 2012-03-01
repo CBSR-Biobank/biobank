@@ -742,7 +742,15 @@ ALTER TABLE processing_event
 SET FOREIGN_KEY_CHECKS = 1;
 
 ALTER TABLE processing_event MODIFY COLUMN ID INT(11) NOT NULL;
+
+-- TODO: this has to be added back in once we get feedback from Elizabeth
 -- ALTER TABLE processing_event ADD CONSTRAINT WORKSHEET UNIQUE KEY(WORKSHEET);
+
+update report r set r.IS_COUNT=b'1' where IS_COUNT is null;
+update report r set r.IS_PUBLIC=b'1' where IS_COUNT is null;
+alter table report modify is_count bit(1) NOT NULL;
+alter table report modify is_public bit(1) NOT NULL;
+
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

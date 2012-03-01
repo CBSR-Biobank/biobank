@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.tools.utils.HostUrl;
  * Taylor on Dec 2, 2011.
  * 
  */
+@Deprecated
 public class CalgaryPaxgeneFix {
 
     private static String USAGE = "Usage: calgarypaxgenefix [options]\n\n"

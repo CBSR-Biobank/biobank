@@ -447,7 +447,6 @@ public class TestContainer extends TestDatabase {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Test
     public void testGetPath() throws Exception {
         ContainerWrapper top, child;

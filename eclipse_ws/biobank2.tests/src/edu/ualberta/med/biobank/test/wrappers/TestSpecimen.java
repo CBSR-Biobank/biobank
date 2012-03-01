@@ -526,7 +526,6 @@ public class TestSpecimen extends TestDatabase {
             .getSpecimenTypeCollection(false).get(0);
         Assert.assertNotNull(sampleType);
 
-        ActivityStatus activityStatusActive = ActivityStatus.ACTIVE;
         ActivityStatus activityStatusNonActive = ActivityStatus.CLOSED;
 
         List<SpecimenWrapper> activeSpecimens =
@@ -848,7 +847,6 @@ public class TestSpecimen extends TestDatabase {
         Assert.fail("to be implemented");
     }
 
-    @SuppressWarnings("deprecation")
     @Test(expected = UnsupportedOperationException.class)
     public void testToSpecimen() {
         childSpc.setTopSpecimen(null);

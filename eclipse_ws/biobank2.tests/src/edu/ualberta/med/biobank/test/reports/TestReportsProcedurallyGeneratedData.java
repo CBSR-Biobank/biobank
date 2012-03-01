@@ -480,7 +480,6 @@ public final class TestReportsProcedurallyGeneratedData implements
         return patients;
     }
 
-    @SuppressWarnings("unused")
     private static List<CollectionEventWrapper> generateShipments(
         SiteWrapper site, final int shipmentLimit, List<ClinicWrapper> clinics)
         throws ApplicationException, Exception {
