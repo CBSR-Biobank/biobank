@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -70,8 +69,7 @@ public class PatientAdapter extends AbstractNewAdapterBase {
         addViewMenu(menu, Messages.PatientAdapter_patient_label);
         addDeleteMenu(menu, Messages.PatientAdapter_patient_label);
 
-        if (isEditable()
-            && SessionManager.canCreate(CollectionEventWrapper.class)) {
+        if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(Messages.PatientAdapter_add_cevent_label);
             mi.addSelectionListener(new SelectionAdapter() {

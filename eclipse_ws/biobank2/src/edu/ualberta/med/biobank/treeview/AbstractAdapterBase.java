@@ -24,8 +24,6 @@ import com.google.inject.Injector;
 import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -66,11 +64,11 @@ public abstract class AbstractAdapterBase implements
     // FIXME can we merge this list of listeners with the DeltaListener ?
     private List<AdapterChangedListener> listeners;
 
-    protected Permission isDeletable;
+    protected boolean isDeletable;
 
-    protected Permission isEditable;
+    protected boolean isEditable;
 
-    protected Permission isReadable;
+    protected boolean isReadable;
 
     public AbstractAdapterBase(AbstractAdapterBase parent, Integer id,
         String label, String tooltip, boolean hasChildren) {
@@ -291,14 +289,16 @@ public abstract class AbstractAdapterBase implements
     }
 
     protected void addViewMenu(Menu menu, String objectName) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText(Messages.AdapterBase_view_label + objectName);
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                AbstractAdapterBase.this.openViewForm();
-            }
-        });
+        if (isReadable()) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText(Messages.AdapterBase_view_label + objectName);
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    AbstractAdapterBase.this.openViewForm();
+                }
+            });
+        }
     }
 
     protected void addDeleteMenu(Menu menu, String objectName) {
@@ -497,30 +497,15 @@ public abstract class AbstractAdapterBase implements
     }
 
     public boolean isDeletable() {
-        try {
-            return SessionManager.isAllowed(isDeletable);
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError("Delete failed", e);
-        }
-        return false;
+        return isDeletable;
     }
 
     public boolean isEditable() {
-        try {
-            return SessionManager.isAllowed(isEditable);
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError("Edit failed", e);
-        }
-        return false;
+        return isEditable;
     }
 
     public boolean isReadable() {
-        try {
-            return SessionManager.isAllowed(isReadable);
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError("Read failed", e);
-        }
-        return false;
+        return isReadable;
     }
 
     protected String getConfirmDeleteMessage() {

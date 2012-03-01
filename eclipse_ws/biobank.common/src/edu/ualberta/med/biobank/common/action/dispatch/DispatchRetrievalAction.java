@@ -29,7 +29,8 @@ public class DispatchRetrievalAction implements Action<ListResult<Dispatch>> {
             + " LEFT JOIN FETCH d.dispatchSpecimenCollection"
             + " INNER JOIN FETCH d.senderCenter"
             + " INNER JOIN FETCH d.receiverCenter"
-            + " LEFT JOIN FETCH d.shipmentInfo"
+            + " LEFT JOIN FETCH d.shipmentInfo si"
+            + " INNER JOIN FETCH si.shippingMethod"
             + " WHERE d.state=? AND ";
 
     private static String SENDER_HQL = "d.senderCenter.id=?";

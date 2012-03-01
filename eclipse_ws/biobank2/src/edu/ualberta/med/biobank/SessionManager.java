@@ -17,7 +17,6 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -63,9 +62,6 @@ public class SessionManager {
     private String currentAdministrationViewId;
 
     private Map<String, Boolean> perspectivesUpdateDone;
-
-    public Map<Permission, Boolean> permissionMap =
-        new HashMap<Permission, Boolean>();
 
     private SessionManager() {
         super();
@@ -242,20 +238,6 @@ public class SessionManager {
 
     public static String getServer() {
         return getInstance().getSession().getServerName();
-    }
-
-    public static boolean isAllowed(Permission perm) {
-        if (perm != null)
-            try {
-                if (!getInstance().permissionMap.containsKey(perm))
-                    getInstance().permissionMap.put(perm,
-                        getAppService().isAllowed(perm));
-                return getInstance().permissionMap.get(perm);
-            } catch (Exception e) {
-                BgcPlugin.openAsyncError("Error checking permission",
-                    "There has been an error retrieving your permissions");
-            }
-        return false;
     }
 
     @Deprecated
