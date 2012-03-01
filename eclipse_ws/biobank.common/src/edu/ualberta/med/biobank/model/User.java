@@ -113,4 +113,13 @@ public class User extends Principal {
     public void setGroupCollection(Set<BbGroup> groupCollection) {
         this.groupCollection = groupCollection;
     }
+
+    @Override
+    public boolean isRemovable(User user) {
+        if (!super.isRemovable(user)) return false;
+        for (BbGroup group : getGroupCollection()) {
+            if (!group.isRemovable(user)) return false;
+        }
+        return true;
+    }
 }

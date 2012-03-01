@@ -13,6 +13,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
@@ -93,5 +94,38 @@ public class Membership extends AbstractBiobankModel {
 
     public void setPrincipal(Principal principal) {
         this.principal = principal;
+    }
+
+    /**
+     * Returns a {@link Set} of all the {@link PermissionEnum}-s on this
+     * {@link Membership} that the given {@link User} is allowed to manage (add
+     * or remove from this {@link Membership}).
+     * 
+     * @param user the manager, who is allowed to modify the returned
+     *            {@link PermissionEnum}-s
+     * @return the {@link PermissionEnum}-s that the manager can manipulate
+     */
+    @Transient
+    public Set<PermissionEnum> getManageablePermissions(User user) {
+        // THIS IS WRONG!!! Need to collect the sister properties where
+        // USER_MANAGEMENT is given.
+        Set<PermissionEnum> permissions = new HashSet<PermissionEnum>();
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            // There is probably a much more efficient way to do this, only, I
+            // don't have the time right now, so, clearer is better.
+            permission.isAllowed(user, center, study);
+        }
+        return permissions;
+    }
+
+    @Transient
+    public boolean isRemovable(User user) {
+        for (PermissionEnum permission : getPermissionCollection()) {
+            // for (Membership)
+        }
+        for (Role role : getRoleCollection()) {
+
+        }
+        return true;
     }
 }

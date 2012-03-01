@@ -158,7 +158,6 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     }
 
     public boolean isAllowed(User user, Center center, Study study) {
-
         if (isPrincipalAllowed(user, center, study)) {
             return true;
         }

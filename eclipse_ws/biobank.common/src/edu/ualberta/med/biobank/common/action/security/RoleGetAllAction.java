@@ -8,15 +8,17 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
 import edu.ualberta.med.biobank.model.Role;
 
 public class RoleGetAllAction implements Action<ListResult<Role>> {
     private static final long serialVersionUID = 1L;
+    private static final Permission PERMISSION = new UserManagementPermission();
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new UserManagementPermission().isAllowed(context);
+        return PERMISSION.isAllowed(context);
     }
 
     @Override
@@ -26,7 +28,7 @@ public class RoleGetAllAction implements Action<ListResult<Role>> {
             .createCriteria(Role.class)
             .setFetchMode("permissionCollection", FetchMode.JOIN)
             .list();
+
         return new ListResult<Role>(roles);
     }
-
 }
