@@ -58,8 +58,7 @@ public class Report extends AbstractBiobankModel {
         this.userId = userId;
     }
 
-    @Column(name = "IS_PUBLIC")
-    // TODO: rename to isPublic
+    @Column(name = "IS_PUBLIC", nullable = false)
     public boolean getIsPublic() {
         return this.isPublic;
     }
@@ -68,8 +67,7 @@ public class Report extends AbstractBiobankModel {
         this.isPublic = isPublic;
     }
 
-    @Column(name = "IS_COUNT")
-    // TODO: rename to isCount
+    @Column(name = "IS_COUNT", nullable = false)
     public boolean getIsCount() {
         return this.isCount;
     }
