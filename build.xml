@@ -459,7 +459,7 @@
     <ant dir="${schema.dir}" target="schemaexport" inheritRefs="false" />
   </target>
   <target name="dbcreate-add-tables" depends="sdk,package-webapp-orm">
-    <!--sql driver="${DB_DRIVER}"
+    <sql driver="${DB_DRIVER}"
          url="${DB_CONNECTION_URL}"
          userid="${DB_USERNAME}"
          password="${DB_PASSWORD}">
@@ -471,7 +471,7 @@
           <include name="*.jar" />
         </fileset>
       </classpath>
-    </sql-->
+    </sql>
     <antcall target="schema" />
     <sql driver="${DB_DRIVER}"
          url="${DB_CONNECTION_URL}"
@@ -1028,7 +1028,7 @@
     <exclude name="**/AllTests.java" />
   </fileset>
 
-  <target name="test" depends="tests-compile" description="executes test cases">
+  <target name="test" depends="clean,tests-compile" description="executes test cases">
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
       <classpath refid="test.class.path" />
       <classpath refid="biobank.common.run.classpath" />
