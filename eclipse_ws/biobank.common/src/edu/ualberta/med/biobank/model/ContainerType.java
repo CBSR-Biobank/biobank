@@ -195,12 +195,12 @@ public class ContainerType extends AbstractBiobankModel {
 
     @Transient
     public Integer getRowCapacity() {
-        return this.capacity.getRowCapacity();
+        return this.getCapacity().getRowCapacity();
     }
 
     @Transient
     public Integer getColCapacity() {
-        return this.capacity.getColCapacity();
+        return this.getCapacity().getColCapacity();
     }
 
     @Transient
