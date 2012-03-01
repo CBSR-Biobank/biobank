@@ -63,7 +63,6 @@ public class ContainerSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        // FIXME add specific permission for this?
         Permission permission;
         if (containerId == null)
             permission = new ContainerCreatePermission();
@@ -74,8 +73,6 @@ public class ContainerSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        // FIXME logging
-
         Container container;
         if (containerId != null) {
             container = context.load(Container.class, containerId);

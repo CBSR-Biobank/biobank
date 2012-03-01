@@ -10,8 +10,6 @@ public enum Messages implements IFormattable {
 
     private static final String BUNDLE_NAME =
         Messages.class.getName().toLowerCase();
-    private static final ResourceBundle RESOURCE_BUNDLE =
-        ResourceBundle.getBundle(BUNDLE_NAME);
     private static final String VALUE_NOT_FOUND =
         "Cannot find value for {0}.{1} with key {2} in bundle {3}.";
 
@@ -25,6 +23,7 @@ public enum Messages implements IFormattable {
         this.string = getString(key);
     }
 
+    @Override
     public String toString() {
         return string;
     }

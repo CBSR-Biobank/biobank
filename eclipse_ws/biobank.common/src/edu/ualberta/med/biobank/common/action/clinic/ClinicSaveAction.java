@@ -60,6 +60,10 @@ public class ClinicSaveAction extends CenterSaveAction {
             contact.setEmailAddress(this.emailAddress);
             return contact;
         }
+
+        public void setName(String name) {
+            this.name = name;
+        }
     }
 
     private Boolean sendsShipments;

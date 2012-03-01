@@ -138,12 +138,14 @@ public class ContainerLabelingSchemeWrapper extends
         return 0;
     }
 
+    @Deprecated
     @Override
     public void persist() throws Exception {
         super.persist();
         resetAllSchemes();
     }
 
+    @Deprecated
     @Override
     public void delete() throws Exception {
         super.delete();

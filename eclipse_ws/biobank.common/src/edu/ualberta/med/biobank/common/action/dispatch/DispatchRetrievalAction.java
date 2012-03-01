@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.common.action.dispatch;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -14,34 +17,32 @@ import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 
 public class DispatchRetrievalAction implements Action<ListResult<Dispatch>> {
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -5948955536772801969L;
     private DispatchState state;
     private Integer centerId;
     private Boolean isSender;
     private Boolean noErrors;
 
     private static String DISPATCH_HQL_STATE_SELECT =
-        "select distinct d from "
-            + Dispatch.class.getName()
-            + " d left join fetch d.dispatchSpecimenCollection "
-            + "inner join fetch d.senderCenter inner join fetch d.receiverCenter "
-            + "left join fetch d.shipmentInfo where d.state=? and ";
+        "SELECT DISTINCT d FROM " + Dispatch.class.getName() + " d"
+            + " LEFT JOIN FETCH d.dispatchSpecimenCollection"
+            + " INNER JOIN FETCH d.senderCenter"
+            + " INNER JOIN FETCH d.receiverCenter"
+            + " LEFT JOIN FETCH d.shipmentInfo"
+            + " WHERE d.state=? AND ";
 
-    private static String sender_HQL = "d.senderCenter.id=?";
-    private static String receiver_HQL = "d.receiverCenter.id=?";
+    private static String SENDER_HQL = "d.senderCenter.id=?";
+    private static String RECEIVER_HQL = "d.receiverCenter.id=?";
 
-    private static String NOTEMPTY_HQL = " and exists ";
-    private static String EMPTY_HQL = " and not exists ";
+    private static String NOTEMPTY_HQL = " AND EXISTS ";
+    private static String EMPTY_HQL = " AND NOT EXISTS ";
 
-    private static String noErrors_HQL = "(from "
-        + DispatchSpecimen.class.getName() + " ds where (ds.state="
-        + DispatchSpecimenState.MISSING.getId()
-        + " or ds.state=" + DispatchSpecimenState.EXTRA.getId()
-        + ") and ds.dispatch.id=d.id) ";
+    private static String NO_ERRORS_HQL = "(FROM "
+        + DispatchSpecimen.class.getName() + " ds"
+        + " WHERE (ds.state=" + DispatchSpecimenState.MISSING.getId()
+        + " OR ds.state=" + DispatchSpecimenState.EXTRA.getId()
+        + ") AND ds.dispatch.id=d.id) ";
 
     public DispatchRetrievalAction(DispatchState state, Integer centerId,
         Boolean isSender, Boolean noErrors) {
@@ -60,19 +61,33 @@ public class DispatchRetrievalAction implements Action<ListResult<Dispatch>> {
     @Override
     public ListResult<Dispatch> run(ActionContext context)
         throws ActionException {
-        String QRY = DISPATCH_HQL_STATE_SELECT;
+        StringBuffer qryBuf = new StringBuffer(DISPATCH_HQL_STATE_SELECT);
         if (isSender)
-            QRY += sender_HQL;
+            qryBuf.append(SENDER_HQL);
         else
-            QRY += receiver_HQL;
+            qryBuf.append(RECEIVER_HQL);
+
         if (noErrors)
-            QRY += EMPTY_HQL;
+            qryBuf.append(EMPTY_HQL);
         else
-            QRY += NOTEMPTY_HQL;
-        QRY += noErrors_HQL;
-        Query q = context.getSession().createQuery(QRY);
+            qryBuf.append(NOTEMPTY_HQL);
+
+        qryBuf.append(NO_ERRORS_HQL);
+
+        Query q = context.getSession().createQuery(qryBuf.toString());
         q.setParameter(0, state.getId());
         q.setParameter(1, centerId);
-        return new ListResult<Dispatch>(q.list());
+
+        ArrayList<Dispatch> dispatches = new ArrayList<Dispatch>();
+
+        Query query = context.getSession().createQuery(qryBuf.toString());
+
+        @SuppressWarnings("unchecked")
+        List<Dispatch> results = query.list();
+        if (results != null) {
+            dispatches.addAll(results);
+        }
+
+        return new ListResult<Dispatch>(dispatches);
     }
 }

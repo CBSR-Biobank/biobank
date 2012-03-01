@@ -76,6 +76,7 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
     }
 
     // TODO: is this needed anymore?
+    @Deprecated
     public static void persistShippingMethods(
         List<ShippingMethodWrapper> addedOrModifiedTypes,
         List<ShippingMethodWrapper> typesToDelete)

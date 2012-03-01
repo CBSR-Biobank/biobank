@@ -213,6 +213,7 @@ public class PatientWrapper extends PatientBaseWrapper {
     /**
      * merge patient2 into this patient
      */
+    @Deprecated
     public void merge(PatientWrapper patient2) throws Exception {
         reload();
         patient2.reload();

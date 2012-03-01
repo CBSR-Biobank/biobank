@@ -21,10 +21,13 @@ public class LogAction<E> extends LoadModelAction<E> {
 
     private final Type type;
     private final WrapperLogProvider<E> logProvider;
+
+    @SuppressWarnings("unused")
     private final LogGroup logGroup;
 
     public enum Type {
-        PERSIST, DELETE;
+        PERSIST,
+        DELETE;
     }
 
     public LogAction(Type type, ModelWrapper<E> wrapper,
