@@ -20,17 +20,24 @@ MYSQL=/usr/bin/mysql
 MYSQLDUMP=/usr/bin/mysqldump
 SED=/bin/sed
 DBHOST="localhost"
-DBNAME=biobank
 
-while getopts "e:d:hH:u:p:o:" OPTION
+while getopts "d:hH:u:p:o:" OPTION
 do
-  case $OPTION in
-        d) DBDUMP=$OPTARG;;
-        H) DBHOST=$OPTARG;;
-        u) DBUSER=$OPTARG;;
-        p) DBPWD=$OPTARG;;
+    case $OPTION in
+        d) DBDUMP=$OPTARG
+            shift $((OPTIND-1)); OPTIND=1
+            ;;
+        H) DBHOST=$OPTARG
+            shift $((OPTIND-1)); OPTIND=1
+            ;;
+        u) DBUSER=$OPTARG
+            shift $((OPTIND-1)); OPTIND=1
+            ;;
+        p) DBPWD=$OPTARG
+            shift $((OPTIND-1)); OPTIND=1
+            ;;
         h) echo "$USAGE"; exit;;
-  esac
+    esac
 done
 
 if [ -z "$DBDUMP" ]; then

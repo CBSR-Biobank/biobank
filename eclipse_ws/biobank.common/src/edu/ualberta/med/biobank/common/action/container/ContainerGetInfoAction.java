@@ -24,10 +24,10 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
             + " LEFT JOIN FETCH ctype.specimenTypeCollection"
             + " INNER JOIN FETCH ctype.childLabelingScheme"
             + " LEFT JOIN FETCH container.position"
-            + " INNER JOIN FETCH container.topContainer topContainer"
-            + " INNER JOIN FETCH topContainer.containerType topContainerType"
-            + " INNER JOIN FETCH topContainerType.childLabelingScheme"
-            + " INNER JOIN FETCH container.site"
+            + " LEFT JOIN FETCH container.topContainer topContainer"
+            + " LEFT JOIN FETCH topContainer.containerType topContainerType"
+            + " LEFT JOIN FETCH topContainerType.childLabelingScheme"
+            + " LEFT JOIN FETCH container.site"
             + " LEFT JOIN FETCH container.childPositionCollection childPos"
             + " LEFT JOIN FETCH childPos.container"
             + " LEFT JOIN FETCH container.specimenPositionCollection spcPos"
@@ -58,6 +58,9 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
     private final Integer containerId;
 
     public ContainerGetInfoAction(Integer containerId) {
+        if (containerId == null) {
+            throw new IllegalArgumentException();
+        }
         this.containerId = containerId;
     }
 

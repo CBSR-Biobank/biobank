@@ -364,7 +364,6 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     @Override
-    // FIXME need to call super method ?
     public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
         StudyWrapper study) {
         return super.canUpdate(user, center, study)

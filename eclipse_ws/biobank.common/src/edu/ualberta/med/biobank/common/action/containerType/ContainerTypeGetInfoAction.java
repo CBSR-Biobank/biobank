@@ -41,6 +41,9 @@ public class ContainerTypeGetInfoAction implements Action<ContainerTypeInfo> {
     private final Integer ctypeId;
 
     public ContainerTypeGetInfoAction(Integer ctypeId) {
+        if (ctypeId == null) {
+            throw new IllegalArgumentException();
+        }
         this.ctypeId = ctypeId;
     }
 
