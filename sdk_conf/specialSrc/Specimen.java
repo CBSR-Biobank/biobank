@@ -406,4 +406,15 @@ public class Specimen  implements Serializable
 	public void setTopSpecimen(Specimen topSpecimen){
 		this.topSpecimen = topSpecimen;
 	}
+    
+    
+	private Collection<SpecimenAttr> specimenAttrCollection;
+
+	public Collection<SpecimenAttr> getSpecimenAttrCollection(){
+	    return specimenAttrCollection;
+	}
+
+	public void setSpecimenAttrCollection(Collection<SpecimenAttr> specimenAttrCollection){
+	    this.specimenAttrCollection = specimenAttrCollection;
+	}
 }

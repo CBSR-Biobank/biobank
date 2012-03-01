@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +29,7 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.StudySpecimenAttrWrapper;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Contact;
@@ -40,6 +43,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class StudyWrapper extends StudyBaseWrapper {
 
     private Map<String, StudyEventAttrWrapper> studyEventAttrMap;
+    private Map<String, StudySpecimenAttrWrapper> studySpecimenAttrMap;
 
     private Set<AliquotedSpecimenWrapper> deletedAliquotedSpecimens = new HashSet<AliquotedSpecimenWrapper>();
 
@@ -309,6 +313,102 @@ public class StudyWrapper extends StudyBaseWrapper {
         deletedStudyEventAttr.add(studyEventAttr);
     }
 
+    // DFE
+
+    protected Collection<StudySpecimenAttrWrapper> getStudySpecimenAttrCollection() {
+        Map<String, StudySpecimenAttrWrapper> map = getStudySpecimenAttrMap();
+        if (map == null) {
+            return null;
+        }
+        return map.values();
+    }
+
+    private Map<String, StudySpecimenAttrWrapper> getStudySpecimenAttrMap() {
+        if (studySpecimenAttrMap != null)
+            return studySpecimenAttrMap;
+
+        studySpecimenAttrMap = new LinkedHashMap<String, StudySpecimenAttrWrapper>();
+
+        List<StudySpecimenAttrWrapper> specimenAttrList = getStudySpecimenAttrCollection(false);
+        // StudySpecimenAttrWrapper.getStudySpecimenAttrCollection(this);
+
+        for (StudySpecimenAttrWrapper studySpecimenAttr : specimenAttrList) {
+            String TEMP = studySpecimenAttr.getLabel();
+            System.out.println("TEMP: " + TEMP);
+            studySpecimenAttrMap.put(studySpecimenAttr.getLabel(),
+                studySpecimenAttr);
+            System.out.println("BOOOGEER  " + studySpecimenAttrMap.toString());
+        }
+        return studySpecimenAttrMap;
+    }
+
+    // DFEDFE
+    public String[] getStudySpecimenAttrLabels() {
+        getStudySpecimenAttrMap();
+        String[] strLabels = new String[] {};
+        Iterator it = studySpecimenAttrMap.entrySet().iterator();
+        int i = 0;
+        while (it.hasNext()) {
+            Map.Entry pairs = (Map.Entry) it.next();
+            strLabels[i] = ((StudySpecimenAttrWrapper) pairs.getValue())
+                .getLabel();
+            System.out.println(pairs.getKey() + " = " + pairs.getValue());
+            it.remove(); // avoids a ConcurrentModificationException
+        }
+
+        return studySpecimenAttrMap.keySet().toArray(new String[] {});
+    }
+
+    public StudySpecimenAttrWrapper getStudySpecimenAttr(String label)
+        throws Exception {
+        getStudySpecimenAttrMap();
+        StudySpecimenAttrWrapper studySpecimenAttr = studySpecimenAttrMap
+            .get(label);
+        if (studySpecimenAttr == null) {
+            throw new Exception("StudySpecimenAttr with label \"" + label
+                + "\" is invalid");
+        }
+        return studySpecimenAttr;
+    }
+
+    public SpecimenAttrTypeEnum getStudySpecimenAttrType(String label)
+        throws Exception {
+        return SpecimenAttrTypeEnum.getSpecimenAttrType(getStudySpecimenAttr(
+            label).getSpecimenAttrType().getName());
+    }
+
+    /**
+     * Retrieves the permissible values for a Specimen attribute.
+     * 
+     * @param label The label to be used by the attribute.
+     * @return Semicolon separated list of allowed values.
+     * @throws Exception thrown if there is no patient visit information item
+     *             with the label specified.
+     */
+    public String[] getStudySpecimenAttrPermissible(String label)
+        throws Exception {
+        String joinedPossibleValues = getStudySpecimenAttr(label)
+            .getPermissible();
+        if (joinedPossibleValues == null)
+            return null;
+        return joinedPossibleValues.split(";");
+    }
+
+    /**
+     * Retrieves the activity status for a Specimen attribute. If locked,
+     * patient visits will not allow information to be saved for this attribute.
+     * 
+     * @param label
+     * @return True if the attribute is locked. False otherwise.
+     * @throws Exception
+     */
+    public ActivityStatusWrapper getStudySpecimenAttrActivityStatus(String label)
+        throws Exception {
+        return getStudySpecimenAttr(label).getActivityStatus();
+    }
+
+    // DFE
+
     public List<ClinicWrapper> getClinicCollection() {
         // unique clinics
         List<ContactWrapper> contacts = getContactCollection(false);
@@ -447,6 +547,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         deletedAliquotedSpecimens.clear();
         deletedSourceSpecimens.clear();
         deletedStudyEventAttr.clear();
+        studySpecimenAttrMap = null; // DFE
     }
 
     public static final String ALL_STUDIES_QRY = "from "

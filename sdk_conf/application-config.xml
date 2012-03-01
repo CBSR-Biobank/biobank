@@ -98,7 +98,26 @@
 				<prop key="execute*">
 					PROPAGATION_REQUIRED,-gov.nih.nci.system.applicationservice.ApplicationException,-gov.nih.nci.system.dao.DAOException,-edu.ualberta.med.biobank.common.exception.BiobankException
 				</prop>
+                		<prop key="wrapperExample">
+			               PROPAGATION_REQUIRED,-gov.nih.nci.system.applicationservice.ApplicationException,-gov.nih.nci.system.dao.DAOException,-edu.ualberta.med.biobank.common.exception.BiobankException
+		               </prop>
+
+                		<prop key="sessionExample">
+			                PROPAGATION_REQUIRED,-gov.nih.nci.system.applicationservice.ApplicationException,-gov.nih.nci.system.dao.DAOException,-edu.ualberta.med.biobank.common.exception.BiobankException
+		                </prop>
+
+                                <prop key="TecanProcessCVS">
+                                        PROPAGATION_REQUIRED,-gov.nih.nci.system.applicationservice.ApplicationException,-gov.nih.nci.system.dao.DAOException,-edu.ualberta.med.biobank.common.exception.BiobankException
+                                </prop>
+
+                                <prop key="tecanloadFile">
+                                        PROPAGATION_REQUIRED,-gov.nih.nci.system.applicationservice.ApplicationException,-gov.nih.nci.system.dao.DAOException,-edu.ualberta.med.biobank.common.exception.BiobankException
+                                </prop>
+
 				<prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+
+
+
 			</props>
 		</property>
 	</bean>

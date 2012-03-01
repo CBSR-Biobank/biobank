@@ -11,7 +11,6 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/gluegen.jar"/>
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
-	<classpathentry kind="lib" path="lib/SuperCSV-1.52.jar"/>
 	<classpathentry kind="lib" path="lib/spiffy-all-0.05.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

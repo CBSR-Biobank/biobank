@@ -2,15 +2,15 @@
 <project name="biobank" basedir="." default="deploy">
 
   <!--
-  Overall build file
-  use command "ant -projecthelp" to display the targets.
+      Overall build file
+      use command "ant -projecthelp" to display the targets.
   -->
 
-<!--
-  Local Variables:
-  compile-command: "export JBOSS_HOME=$HOME/apps/jboss-4.0.5.GA"
-  End:
--->
+  <!--
+      Local Variables:
+      compile-command: "export JBOSS_HOME=$HOME/apps/jboss-4.0.5.GA"
+      End:
+  -->
 
   <exec executable="hostname" outputproperty="host.name">
     <arg value="-f" />
@@ -49,13 +49,13 @@
   <property name="req.jars.dir" value="jars" />
   <property name="lib-sources.dir" value="lib-sources" />
   <property name="biobank.gui.common.jar.files"
-            value="commons-beanutils-1.8.0.jar,commons-io-1.4.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.1.jar,jdt-compiler-3.1.1.jar,DynamicJasper-3.0.14.jar" />
+            value="commons-beanutils-1.8.0.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.1.jar,jdt-compiler-3.1.1.jar,DynamicJasper-3.0.14.jar" />
   <property name="biobank.jar.files"
-            value="gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
+            value="gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar" />
   <property name="biobank.common.jar.files"
-            value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar,commons-io-1.4.jar" />
+            value="xpp3-1.1.3.4.C.jar,commons-lang-2.4.jar,commons-io-1.4.jar,SuperCSV-1.52.jar,xstream-1.3.1.jar,spiffy-all-0.05.jar" />
   <property name="biobank.tools.jar.files"
-            value="commons-io-1.4.jar, jargs.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar,mysql-connector-java-5.1.15-bin.jar" />
+            value="commons-io-1.4.jar, jargs.jar,spiffy-all-0.05.jar,mysql-connector-java-5.1.15-bin.jar" />
   <property name="cacore.system.jar.files"
             value="commons-collections-3.2.jar,commons-logging-1.1.jar,hibernate-validator.jar" />
   <property name="converage.output" location="coverage" />
@@ -69,7 +69,7 @@
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
   <condition property="LOG4J_LEVEL_DEBUG" value="debug" else="error">
-	<equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
+    <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
   <condition property="isHostAicmlMed">
     <equals arg1="${host.name}"
@@ -215,16 +215,16 @@
       <include name="*.jar" />
     </fileset>
     <pathconvert pathsep="," property="sdk.jar.files.basename"
-      refid="sdk.jar.files">
+                 refid="sdk.jar.files">
       <map from="${cacore.sdk.dir}/output/biobank/package/remote-client/lib/"
-        to="" />
+           to="" />
     </pathconvert>
     <fileset dir="${cacore.sdk.dir}/output/biobank/package/local-client/lib"
              id="sdk.local.jar.files">
       <include name="*.jar" />
     </fileset>
     <pathconvert pathsep="," property="sdk.local.jar.files.basename"
-      refid="sdk.local.jar.files">
+                 refid="sdk.local.jar.files">
       <map from="${cacore.sdk.dir}/output/biobank/package/local-client/lib/"
            to="" />
     </pathconvert>
@@ -233,36 +233,36 @@
   <!-- Eclipse -->
   <target name="biobank-product-version-modify">
     <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
-      prefix="biobank2.product" />
+              prefix="biobank2.product" />
     <xslt in="${eclipse.proj.dir}/biobank2.product" out="${tmp.file}"
-      style="scripts/biobank-product.xsl">
+          style="scripts/biobank-product.xsl">
       <param name="version" expression="${java.client.version.num}" />
     </xslt>
     <copy file="${tmp.file}" tofile="${eclipse.proj.dir}/biobank2.product"
-      overwrite="true"/>
+          overwrite="true"/>
   </target>
 
 
   <target name="biobank-feature-core-version-modify">
     <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
-      prefix="biobank2.feature.core" />
+              prefix="biobank2.feature.core" />
     <xslt in="${eclipse.workspace.dir}/biobank2.feature.core/feature.xml" out="${tmp.file}"
-      style="scripts/biobank-feature.xsl">
+          style="scripts/biobank-feature.xsl">
       <param name="version" expression="${java.client.version.num}" />
     </xslt>
     <copy file="${tmp.file}" tofile="${eclipse.workspace.dir}/biobank2.feature.core/feature.xml"
-      overwrite="true"/>
+          overwrite="true"/>
   </target>
 
   <target name="biobank-feature-platform-version-modify">
     <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
-    prefix="biobank2.feature.platform" />
+              prefix="biobank2.feature.platform" />
     <xslt in="${eclipse.workspace.dir}/biobank2.feature.platform/feature.xml" out="${tmp.file}"
-      style="scripts/biobank-feature.xsl">
+          style="scripts/biobank-feature.xsl">
       <param name="version" expression="${java.client.version.num}" />
     </xslt>
     <copy file="${tmp.file}" tofile="${eclipse.workspace.dir}/biobank2.feature.platform/feature.xml"
-      overwrite="true"/>
+          overwrite="true"/>
   </target>
 
   <target name="biobank-version-modify">
@@ -345,6 +345,9 @@
       <fileset file="${cacore.sdk.dir}/system/dist/sdk-core.jar" />
       <fileset file="${cacore.sdk.dir}/system/lib/csmapi-4.1.jar" />
       <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-core.jar" />
+      <fileset file="${req.jars.dir}/SuperCSV-1.52.jar" />
+      <fileset file="${req.jars.dir}/spiffy-all-0.05.jar" />
+      <fileset file="${req.jars.dir}/commons-lang-2.4.jar" />
     </copy>
     <copy todir="${eclipse.proj.dir.common}/conf" overwrite="true">
       <filelist dir="${cacore.sdk.dir}/output/biobank/package/remote-client/conf"
@@ -363,9 +366,9 @@
       <filelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}" />
     </copy>
     <!--copy todir="${eclipse.workspace.dir}/biobank2.ws-client/lib">
-      <filelist dir="${cacore.sdk.dir}/output/biobank/package/ws-client/lib"
-                files="biobank-beans.jar" />
-    </copy-->
+        <filelist dir="${cacore.sdk.dir}/output/biobank/package/ws-client/lib"
+        files="biobank-beans.jar" />
+        </copy-->
     <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
       <fileset file="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
     </copy>
@@ -468,7 +471,7 @@
       ALTER DATABASE `${PROJECT_NAME}` DEFAULT CHARACTER SET latin1 COLLATE latin1_general_cs;
       <classpath>
         <fileset dir="${cacore.sdk.dir}/system/lib">
-          <include name="*.jar" />
+        <include name="*.jar" />
         </fileset>
       </classpath>
     </sql>
@@ -595,8 +598,8 @@
   </fileset>
 
   <!--
-    build-validators uses a different destination directory from build-hbmpostproc and
-    build-modelextender due to dependency restrictions
+      build-validators uses a different destination directory from build-hbmpostproc and
+      build-modelextender due to dependency restrictions
   -->
   <target name="build-validators" depends="cacore-untar">
     <echo message="Building hibernate validators generation tool" />
@@ -750,10 +753,10 @@
   </target>
 
   <target name="compile-generated-beans"
-    depends="prepare-webapp-orm"
-    description="REDO:: Compiles the generated beans">
+          depends="prepare-webapp-orm"
+          description="REDO:: Compiles the generated beans">
     <copy todir="${cacore.sdk.dir}/${output.src.dir}/edu/ualberta/med/biobank/model"
-      overwrite="true">
+          overwrite="true">
       <fileset dir="sdk_conf/specialSrc" />
     </copy>
     <antcall target="hbmpostproc" />
@@ -762,7 +765,7 @@
     </delete>
 
     <javac srcdir="${cacore.sdk.dir}/${output.src.dir}" destdir="${cacore.sdk.dir}/${build.classes.dir}"
-      debug="true" includeantruntime="false" >
+           debug="true" includeantruntime="false" >
       <classpath >
         <fileset dir="${cacore.sdk.dir}/${system.dir}/${system.lib.dir}">
           <include name="*.jar"/>
@@ -773,7 +776,7 @@
   </target>
 
   <target name="package-codegen-orm" depends="compile-generated-beans"
-    description="REDO:: Packages the generated ORM and bean artifacts">
+          description="REDO:: Packages the generated ORM and bean artifacts">
     <jar destfile="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}" basedir="${cacore.sdk.dir}/${build.classes.dir}">
       <manifest>
         <attribute name="Generated-By" value="caCORE SDK Code Generator"/>
@@ -782,13 +785,13 @@
       <fileset dir="${cacore.sdk.dir}/${output.src.dir}" includes="**/*.java" />
     </jar>
     <copy overwrite="true" file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
-      tofile="${cacore.sdk.dir}/output/biobank/package/remote-client/lib/${bean.file}"/>
+          tofile="${cacore.sdk.dir}/output/biobank/package/remote-client/lib/${bean.file}"/>
     <copy overwrite="true" file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
-      tofile="${cacore.sdk.dir}/output/biobank/package/ws-client/lib/${bean.file}"/>
+          tofile="${cacore.sdk.dir}/output/biobank/package/ws-client/lib/${bean.file}"/>
     <copy overwrite="true" file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
-      tofile="${cacore.sdk.dir}/output/biobank/package/local-client/lib/${bean.file}"/>
+          tofile="${cacore.sdk.dir}/output/biobank/package/local-client/lib/${bean.file}"/>
     <jar destfile="${cacore.sdk.dir}/${build.jar.dir}/${orm.file}"
-      basedir="${cacore.sdk.dir}/${output.src.dir}">
+         basedir="${cacore.sdk.dir}/${output.src.dir}">
       <manifest>
         <attribute name="Generated-By" value="caCORE SDK Code Generator" />
         <attribute name="Version" value="${VERSION}" />
@@ -802,77 +805,77 @@
 
   <target name="prepare-webapp-orm" >
     <!--
-    files included in the sdk build.xml - necessary to be sure that we have
-    all the keys for the target we redefined
+        files included in the sdk build.xml - necessary to be sure that we have
+        all the keys for the target we redefined
     -->
     <property file="${cacore.sdk.dir}/installer.properties" />
     <property file="${cacore.sdk.dir}/local.properties" />
     <property file="sdk_conf/deploy.properties" />
     <property file="sdk_conf/build.properties" />
     <property file="${cacore.sdk.dir}/${codegen.dir}/build.properties"
-      prefix="codegen" />
+              prefix="codegen" />
     <property file="${cacore.sdk.dir}/${codegen.validator.dir}/build.properties"
-      prefix="validator" />
+              prefix="validator" />
     <property file="${cacore.sdk.dir}/${system.dir}/build.properties"
-      prefix="system" />
+              prefix="system" />
     <property file="${cacore.sdk.dir}/${writable-api.dir}/build.properties"
-      prefix="writable-api" />
+              prefix="writable-api" />
     <property file="${cacore.sdk.dir}/${security.dir}/build.properties"
-      prefix="security" />
+              prefix="security" />
     <property file="${cacore.sdk.dir}/${grid-remoting.dir}/build.properties"
-      prefix="grid-remoting" />
+              prefix="grid-remoting" />
     <property file="${cacore.sdk.dir}/${grid-jaas.dir}/build.properties"
-      prefix="grid-jaas" />
+              prefix="grid-jaas" />
     <condition property="server-exclude-commons-logging"
-      value="commons-logging*.*"
-      else="">
+               value="commons-logging*.*"
+               else="">
       <equals arg1="${SERVER_TYPE}"
-        arg2="jboss"
-        casesensitive="false"
-        trim="true" />
+              arg2="jboss"
+              casesensitive="false"
+              trim="true" />
     </condition>
     <condition property="server-exclude-log4j" value="log4j*.*" else="">
       <equals arg1="${SERVER_TYPE}"
-        arg2="jboss"
-        casesensitive="false"
-        trim="true" />
+              arg2="jboss"
+              casesensitive="false"
+              trim="true" />
     </condition>
     <condition property="server-exclude-classes-list" value="**/log4j*.*" else="">
       <equals arg1="${SERVER_TYPE}"
-        arg2="jboss"
-        casesensitive="false"
-        trim="true" />
+              arg2="jboss"
+              casesensitive="false"
+              trim="true" />
     </condition>
     <condition property="WRITABLE_API_EXTENSION_ENABLED"
-      value="true"
-      else="false">
+               value="true"
+               else="false">
       <or>
         <equals arg1="${ENABLE_WRITABLE_API_EXTENSION}"
-          arg2="true"
-          casesensitive="false"
-          trim="true" />
+                arg2="true"
+                casesensitive="false"
+                trim="true" />
         <equals arg1="${ENABLE_WRITABLE_API_EXTENSION}"
-          arg2="yes"
-          casesensitive="false"
-          trim="true" />
+                arg2="yes"
+                casesensitive="false"
+                trim="true" />
       </or>
     </condition>
     <condition property="read-api-exclude-list" value="" else="*.jar">
       <equals arg1="${WRITABLE_API_EXTENSION_ENABLED}"
-        arg2="true"
-        casesensitive="false"
-        trim="true" />
+              arg2="true"
+              casesensitive="false"
+              trim="true" />
     </condition>
     <condition property="SECURITY_ENABLED" value="true" else="false">
       <or>
         <equals arg1="${ENABLE_SECURITY}"
-          arg2="true"
-          casesensitive="false"
-          trim="true" />
+                arg2="true"
+                casesensitive="false"
+                trim="true" />
         <equals arg1="${ENABLE_SECURITY}"
-          arg2="yes"
-          casesensitive="false"
-          trim="true" />
+                arg2="yes"
+                casesensitive="false"
+                trim="true" />
       </or>
     </condition>
     <!-- end of copied part -->
@@ -909,6 +912,8 @@
       <lib dir="${cacore.sdk.dir}/${grid-jaas.dir}/${grid-jaas.dist.dir}"
            includes="*.*"
            excludes="${grid-jaas.file.output.jaas.jndibinder.name}" />
+      <lib dir="${req.jars.dir}" includes="SuperCSV-1.52.jar,spiffy-all-0.05.jar" />
+      <lib dir="${req.jars.dir}" includes="SuperCSV-1.52.jar,spiffy-all-0.05.jar,commons-lang-2.4.jar" />
       <fileset dir="${cacore.sdk.dir}/${build.conf.system.web.dir}">
         <include name="**/*" />
         <exclude name="**/web.xml" />
@@ -951,11 +956,11 @@
     <delete file="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
     <delete>
       <fileset dir="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer"
-      includes="*Peer.java"/>
+               includes="*Peer.java"/>
     </delete>
     <delete>
       <fileset dir="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/wrappers/base"
-      includes="*BaseWrapper.java"/>
+               includes="*BaseWrapper.java"/>
     </delete>
   </target>
 
@@ -964,7 +969,7 @@
   </target>
 
   <target name="clean-all"
-          depends="clean-tests,clean-jars"
+          depends="clean-tests,clean-jars,clean"
           description="deletes caCORE SDK directory and deletes jars from eclipse projects">
     <delete dir="${cacore.sdk.dir}" />
     <delete dir="${buildDirectory}" />
@@ -1113,10 +1118,10 @@
 
 
   <target name="product" depends="biobank-version-modify,eclipse.home.env,deploy" description="build the product">
-  	<!-- buildDirectory is the folder where the plugins and products are found and build -->
+    <!-- buildDirectory is the folder where the plugins and products are found and build -->
     <property name="buildDirectory" value="${product.dir}/buildDirectory" />
     <delete dir="${buildDirectory}" />
-  	<!-- plugins and features are copied into the buildDirectory -->
+    <!-- plugins and features are copied into the buildDirectory -->
     <copy todir="${buildDirectory}/plugins/biobank2">
       <fileset dir="${eclipse.workspace.dir}/biobank2" />
     </copy>
@@ -1171,7 +1176,7 @@
       <arg line="-DbaseLocation=${env.ECLIPSE_HOME}" />
       <arg line="-Djava.client.version.num=${java.client.version.num}" />
 
-	  <!-- uncomment line below to build a single executable product -->
+      <!-- uncomment line below to build a single executable product -->
       <!-- arg line="-Dconfigs='linux, gtk, x86_64'" / -->
     </java>
     <antcall target="updateSiteMetadata" />
@@ -1228,6 +1233,4 @@
       <arg line="-metadataRepository file:${updateSiteFolder}" />
     </java>
   </target>
-
-
 </project>

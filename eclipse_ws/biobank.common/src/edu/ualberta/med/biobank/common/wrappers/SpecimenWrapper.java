@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -18,7 +20,9 @@ import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.StudySpecimenAttrWrapper;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
@@ -30,6 +34,10 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
     private static final String DISPATCHS_CACHE_KEY = "dispatchs";
     private AbstractObjectWithPositionManagement<SpecimenPosition, SpecimenWrapper> objectWithPositionManagement;
+
+    private LinkedHashMap<String, StudySpecimenAttrWrapper> studySpecimenAttrMap;
+    private LinkedHashMap<String, SpecimenAttrWrapper> specimenAttrMap;
+    private SpecimenAttrWrapper specimenAttr;
 
     public SpecimenWrapper(WritableApplicationService appService,
         Specimen wrappedObject) {
@@ -456,6 +464,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         objectWithPositionManagement.resetInternalFields();
         if (isNew())
             setTopSpecimenInternal(this);
+        specimenAttrMap = null;
+        studySpecimenAttrMap = null;
     }
 
     @Override
@@ -469,6 +479,11 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         if (isNew() || parentChanged) {
             updateChildren();
         }
+        if (specimenAttrMap != null) {
+            setWrapperCollection(SpecimenPeer.SPECIMEN_ATTR_COLLECTION,
+                specimenAttrMap.values());
+        }
+
     }
 
     private void updateChildren() throws Exception {
@@ -523,4 +538,209 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public boolean hasUnknownImportType() {
         return getSpecimenType() != null && getSpecimenType().isUnknownImport();
     }
+
+    // DFE
+    private Map<String, StudySpecimenAttrWrapper> getStudySpecimenAttrMap() {
+        if (studySpecimenAttrMap != null)
+            return studySpecimenAttrMap;
+
+        CollectionEventWrapper collectionEvent = getCollectionEvent();
+        PatientWrapper patient = collectionEvent.getPatient();
+
+        studySpecimenAttrMap = new LinkedHashMap<String, StudySpecimenAttrWrapper>();
+        if (patient != null && patient.getStudy() != null) {
+            Collection<StudySpecimenAttrWrapper> studySpecimenAttrCollection = patient
+                .getStudy().getStudySpecimenAttrCollection();
+            if (studySpecimenAttrCollection != null) {
+                for (StudySpecimenAttrWrapper studySpecimenAttr : studySpecimenAttrCollection) {
+                    studySpecimenAttrMap.put(studySpecimenAttr.getLabel(),
+                        studySpecimenAttr);
+                }
+            }
+        }
+        return studySpecimenAttrMap;
+    }
+
+    private Map<String, SpecimenAttrWrapper> getSpecimenAttrMap() {
+        getStudySpecimenAttrMap();
+        if (specimenAttrMap != null)
+            return specimenAttrMap;
+
+        specimenAttrMap = new LinkedHashMap<String, SpecimenAttrWrapper>();
+        List<SpecimenAttrWrapper> pvAttrCollection = getSpecimenAttrCollection(true);
+
+        if (pvAttrCollection != null) {
+            for (SpecimenAttrWrapper pvAttr : pvAttrCollection) {
+                specimenAttrMap.put(pvAttr.getStudySpecimenAttr().getLabel(),
+                    pvAttr);
+            }
+        }
+        return specimenAttrMap;
+    }
+
+    public String[] getSpecimenAttrLabels() {
+        getSpecimenAttrMap();
+        return specimenAttrMap.keySet().toArray(new String[] {});
+    }
+
+    public String getSpecimenAttrValue(String label) throws Exception {
+        getSpecimenAttrMap();
+        SpecimenAttrWrapper pvAttr = specimenAttrMap.get(label);
+        if (pvAttr == null) {
+            StudySpecimenAttrWrapper studySpecimenAttr = studySpecimenAttrMap
+                .get(label);
+            // make sure "label" is a valid study pv attr
+            if (studySpecimenAttr == null) {
+                throw new Exception("StudySpecimenAttr with label \"" + label
+                    + "\" is invalid");
+            }
+            // not assigned yet so return null
+            return null;
+        }
+        return pvAttr.getValue();
+    }
+
+    public String getSpecimenAttrTypeName(String label) throws Exception {
+        getSpecimenAttrMap();
+        SpecimenAttrWrapper pvAttr = specimenAttrMap.get(label);
+        StudySpecimenAttrWrapper studySpecimenAttr = null;
+        if (pvAttr != null) {
+            studySpecimenAttr = pvAttr.getStudySpecimenAttr();
+        } else {
+            studySpecimenAttr = studySpecimenAttrMap.get(label);
+            // make sure "label" is a valid study pv attr
+            if (studySpecimenAttr == null) {
+                throw new Exception("StudySpecimenAttr withr label \"" + label
+                    + "\" does not exist");
+            }
+        }
+        return studySpecimenAttr.getSpecimenAttrType().getName();
+    }
+
+    public String[] getSpecimenAttrPermissible(String label) throws Exception {
+        getSpecimenAttrMap();
+        SpecimenAttrWrapper pvAttr = specimenAttrMap.get(label);
+        StudySpecimenAttrWrapper studySpecimenAttr = null;
+        if (pvAttr != null) {
+            studySpecimenAttr = pvAttr.getStudySpecimenAttr();
+        } else {
+            studySpecimenAttr = studySpecimenAttrMap.get(label);
+            // make sure "label" is a valid study pv attr
+            if (studySpecimenAttr == null) {
+                throw new Exception("SpecimenAttr for label \"" + label
+                    + "\" does not exist");
+            }
+        }
+        String permissible = studySpecimenAttr.getPermissible();
+        if (permissible == null) {
+            return null;
+        }
+        return permissible.split(";");
+    }
+
+    protected SpecimenAttrWrapper getSpecimenAttr(String label)
+        throws Exception {
+        getStudySpecimenAttrMap();
+        SpecimenAttrWrapper studySpecimenAttr = specimenAttrMap.get(label);
+        if (specimenAttr == null) {
+            throw new Exception("StudyEventAttr with label \"" + label
+                + "\" is invalid");
+        }
+        return studySpecimenAttr;
+    }
+
+    public SpecimenAttrTypeEnum getSpecimenAttrType(String label)
+        throws Exception {
+        return SpecimenAttrTypeEnum.getSpecimenAttrType(getSpecimenAttrType(
+            label).getName());
+    }
+
+    /**
+     * Assigns a value to a patient visit attribute. The value is parsed for
+     * correctness.
+     * 
+     * @param label The attribute's label.
+     * @param value The value to assign.
+     * @throws Exception when assigning a label of type "select_single" or
+     *             "select_multiple" and the value is not one of the permissible
+     *             ones.
+     * @throws NumberFormatException when assigning a label of type "number" and
+     *             the value is not a valid double number.
+     * @throws ParseException when assigning a label of type "date_time" and the
+     *             value is not a valid date and time.
+     * @see edu.ualberta.med.biobank
+     *      .common.formatters.DateFormatter.DATE_TIME_FORMAT
+     */
+    public void setSpecimenAttrValue(String label, String value)
+        throws Exception {
+        getSpecimenAttrMap();
+        SpecimenAttrWrapper pvAttr = specimenAttrMap.get(label);
+        StudySpecimenAttrWrapper studySpecimenAttr = null;
+
+        if (pvAttr != null) {
+            studySpecimenAttr = pvAttr.getStudySpecimenAttr();
+        } else {
+            studySpecimenAttr = studySpecimenAttrMap.get(label);
+            if (studySpecimenAttr == null) {
+                throw new Exception("no StudySpecimenAttr found for label \""
+                    + label + "\"");
+            }
+        }
+
+        if (!studySpecimenAttr.getActivityStatus().isActive()) {
+            throw new Exception("attribute for label \"" + label
+                + "\" is locked, changes not premitted");
+        }
+
+        if (value != null) {
+            // validate the value
+            value = value.trim();
+            if (value.length() > 0) {
+                String type = studySpecimenAttr.getSpecimenAttrType().getName();
+                List<String> permissibleSplit = null;
+
+                if (SpecimenAttrTypeEnum.SELECT_SINGLE.isSameType(type)
+                    || SpecimenAttrTypeEnum.SELECT_MULTIPLE.isSameType(type)) {
+                    String permissible = studySpecimenAttr.getPermissible();
+                    if (permissible != null) {
+                        permissibleSplit = Arrays
+                            .asList(permissible.split(";"));
+                    }
+                }
+
+                if (SpecimenAttrTypeEnum.SELECT_SINGLE.isSameType(type)) {
+                    if (!permissibleSplit.contains(value)) {
+                        throw new Exception("value " + value
+                            + "is invalid for label \"" + label + "\"");
+                    }
+                } else if (SpecimenAttrTypeEnum.SELECT_MULTIPLE
+                    .isSameType(type)) {
+                    for (String singleVal : value.split(";")) {
+                        if (!permissibleSplit.contains(singleVal)) {
+                            throw new Exception("value " + singleVal + " ("
+                                + value + ") is invalid for label \"" + label
+                                + "\"");
+                        }
+                    }
+                } else if (SpecimenAttrTypeEnum.NUMBER.isSameType(type)) {
+                    Double.parseDouble(value);
+                } else if (SpecimenAttrTypeEnum.DATE_TIME.isSameType(type)) {
+                    DateFormatter.dateFormatter.parse(value);
+                } else if (SpecimenAttrTypeEnum.TEXT.isSameType(type)) {
+                    // do nothing
+                } else {
+                    throw new Exception("type \"" + type + "\" not tested");
+                }
+            }
+        }
+
+        if (pvAttr == null) {
+            pvAttr = new SpecimenAttrWrapper(appService);
+            pvAttr.setSpecimen(this);
+            pvAttr.setStudySpecimenAttr(studySpecimenAttr);
+            specimenAttrMap.put(label, pvAttr);
+        }
+        pvAttr.setValue(value);
+    }
+
 }

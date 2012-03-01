@@ -21,64 +21,114 @@ Bundle-ClassPath: conf/,lib/client/acegi-security-1.0.4.jar,lib/client
  nf/,lib/client/mysql-connector-java-5.1.15-bin.jar,lib/client/commons
  -io-1.4.jar
 Bundle-Vendor: AICML
-Export-Package: antlr; uses:="antlr.collections.impl,  antlr.debug,  a
- ntlr.ASdebug,  antlr.collections",antlr.ASdebug;uses:="antlr",antlr.a
- ctions.cpp;uses:="antlr.collections.impl,antlr",antlr.actions.csharp;
- uses:="antlr.collections.impl,antlr",antlr.actions.java;uses:="antlr.
- collections.impl,antlr",antlr.actions.python;uses:="antlr.collections
- .impl,antlr",antlr.build,antlr.collections;uses:="antlr",antlr.collec
- tions.impl;uses:="antlr.collections,antlr",antlr.debug;uses:="antlr.c
- ollections.impl,antlr",antlr.debug.misc; uses:="javax.swing.tree,  ja
- vax.swing,  antlr.collections,  javax.swing.event",antlr.preprocessor
- ;uses:="antlr.collections.impl,antlr",com.thoughtworks.xstream; uses:
- ="com.thoughtworks.xstream.converters,  com.thoughtworks.xstream.io, 
-  com.thoughtworks.xstream.converters.reflection,  com.thoughtworks.xs
- tream.mapper,  com.thoughtworks.xstream.core,  com.thoughtworks.xstre
- am.core.util,  com.thoughtworks.xstream.alias",edu.ualberta.med.bioba
- nk.client.util,edu.ualberta.med.biobank.common; uses:="edu.ualberta.m
- ed.biobank.model,  edu.ualberta.med.biobank.server.applicationservice
- ,  gov.nih.nci.system.applicationservice,  edu.ualberta.med.biobank.c
- ommon.wrappers",edu.ualberta.med.biobank.common.debug;uses:="gov.nih.
- nci.system.applicationservice",edu.ualberta.med.biobank.common.except
- ion,edu.ualberta.med.biobank.common.formatters,edu.ualberta.med.bioba
- nk.common.peer,edu.ualberta.med.biobank.common.reports,edu.ualberta.m
- ed.biobank.common.reports.filters,edu.ualberta.med.biobank.common.sca
- nprocess,edu.ualberta.med.biobank.common.scanprocess.data,edu.ualbert
- a.med.biobank.common.scanprocess.result,edu.ualberta.med.biobank.comm
- on.security;uses:="gov.nih.nci.system.applicationservice",edu.ualbert
- a.med.biobank.common.util,edu.ualberta.med.biobank.common.wrappers; u
- ses:="edu.ualberta.med.biobank.common,  edu.ualberta.med.biobank.mode
- l,  edu.ualberta.med.biobank.common.wrappers.internal,  gov.nih.nci.s
- ystem.applicationservice,  edu.ualberta.med.biobank.common.wrappers.l
- istener",edu.ualberta.med.biobank.common.wrappers.base,edu.ualberta.m
- ed.biobank.common.wrappers.listener,edu.ualberta.med.biobank.model,ed
- u.ualberta.med.biobank.server.applicationservice;uses:="edu.ualberta.
- med.biobank.server.query,gov.nih.nci.system.applicationservice",edu.u
- alberta.med.biobank.server.applicationservice.exceptions,edu.ualberta
- .med.biobank.server.query,edu.ualberta.med.biobank.server.reports,gov
- .nih.nci.system.applicationservice; uses:="gov.nih.nci.system.query, 
-  gov.nih.nci.system.query.hibernate,  org.hibernate.criterion,  gov.n
- ih.nci.system.query.cql,  gov.nih.nci.cagrid.cqlquery",gov.nih.nci.sy
- stem.client;uses:="org.globus.gsi,gov.nih.nci.system.applicationservi
- ce",gov.nih.nci.system.query,gov.nih.nci.system.query.example;uses:="
- gov.nih.nci.system.query",gov.nih.nci.system.query.hibernate,org.aceg
- isecurity;uses:="org.springframework.core,org.springframework.context
- .support",org.acegisecurity.providers.rcp; uses:="org.springframework
- .core,  org.acegisecurity.providers,  org.acegisecurity,  org.springf
- ramework.beans.factory",org.apache.commons.collections;uses:="org.apa
- che.commons.collections.keyvalue,new org.apache.commons.collections",
- org.apache.commons.collections.list; uses:="org.apache.commons.collec
- tions.iterators,  org.apache.commons.collections,  new org.apache.com
- mons.collections.list,  org.apache.commons.collections.collection",or
- g.apache.commons.collections.map; uses:="org.apache.commons.collectio
- ns.iterators,  org.apache.commons.collections.keyvalue,  org.apache.c
- ommons.collections,  org.apache.commons.collections.set",org.apache.c
- ommons.lang;uses:="org.apache.commons.lang.exception",org.apache.comm
- ons.logging,org.apache.commons.logging.impl; uses:="javax.servlet,  o
- rg.apache.log,  org.apache.commons.logging,  org.apache.log4j,  org.a
- pache.avalon.framework.logger",org.apache.log4j;uses:="org.apache.log
- 4j.helpers,org.apache.log4j.or,org.apache.log4j.spi",org.apache.log4j
- .spi;uses:="org.apache.log4j,org.apache.log4j.or",org.springframework
- .remoting;uses:="org.springframework.core"
+Export-Package: antlr;
+  uses:="antlr.collections.impl,
+   antlr.debug,
+   antlr.ASdebug,
+   antlr.collections",
+ antlr.ASdebug;uses:="antlr",
+ antlr.actions.cpp;uses:="antlr.collections.impl,antlr",
+ antlr.actions.csharp;uses:="antlr.collections.impl,antlr",
+ antlr.actions.java;uses:="antlr.collections.impl,antlr",
+ antlr.actions.python;uses:="antlr.collections.impl,antlr",
+ antlr.build,
+ antlr.collections;uses:="antlr",
+ antlr.collections.impl;uses:="antlr.collections,antlr",
+ antlr.debug;uses:="antlr.collections.impl,antlr",
+ antlr.debug.misc;
+  uses:="javax.swing.tree,
+   javax.swing,
+   antlr.collections,
+   javax.swing.event",
+ antlr.preprocessor;uses:="antlr.collections.impl,antlr",
+ com.thoughtworks.xstream;
+  uses:="com.thoughtworks.xstream.converters,
+   com.thoughtworks.xstream.io,
+   com.thoughtworks.xstream.converters.reflection,
+   com.thoughtworks.xstream.mapper,
+   com.thoughtworks.xstream.core,
+   com.thoughtworks.xstream.core.util,
+   com.thoughtworks.xstream.alias",
+ edu.ualberta.med.biobank.client.util,
+ edu.ualberta.med.biobank.common;
+  uses:="edu.ualberta.med.biobank.model,
+   edu.ualberta.med.biobank.server.applicationservice,
+   gov.nih.nci.system.applicationservice,
+   edu.ualberta.med.biobank.common.wrappers",
+ edu.ualberta.med.biobank.common.debug;uses:="gov.nih.nci.system.applicationservice",
+ edu.ualberta.med.biobank.common.exception,
+ edu.ualberta.med.biobank.common.formatters,
+ edu.ualberta.med.biobank.common.peer,
+ edu.ualberta.med.biobank.common.reports,
+ edu.ualberta.med.biobank.common.reports.filters,
+ edu.ualberta.med.biobank.common.scanprocess,
+ edu.ualberta.med.biobank.common.scanprocess.data,
+ edu.ualberta.med.biobank.common.scanprocess.result,
+ edu.ualberta.med.biobank.common.security;uses:="gov.nih.nci.system.applicationservice",
+ edu.ualberta.med.biobank.common.util,
+ edu.ualberta.med.biobank.common.wrappers;
+  uses:="edu.ualberta.med.biobank.common,
+   edu.ualberta.med.biobank.model,
+   edu.ualberta.med.biobank.common.wrappers.internal,
+   gov.nih.nci.system.applicationservice,
+   edu.ualberta.med.biobank.common.wrappers.listener",
+ edu.ualberta.med.biobank.common.wrappers.base,
+ edu.ualberta.med.biobank.common.wrappers.listener,
+ edu.ualberta.med.biobank.model,
+ edu.ualberta.med.biobank.server.applicationservice;uses:="edu.ualberta.med.biobank.server.query,gov.nih.nci.system.applicationservice",
+ edu.ualberta.med.biobank.server.applicationservice.exceptions,
+ edu.ualberta.med.biobank.server.query,
+ edu.ualberta.med.biobank.server.reports,
+ gov.nih.nci.system.applicationservice;
+  uses:="gov.nih.nci.system.query,
+   gov.nih.nci.system.query.hibernate,
+   org.hibernate.criterion,
+   gov.nih.nci.system.query.cql,
+   gov.nih.nci.cagrid.cqlquery",
+ gov.nih.nci.system.client;uses:="org.globus.gsi,gov.nih.nci.system.applicationservice",
+ gov.nih.nci.system.query,
+ gov.nih.nci.system.query.example;uses:="gov.nih.nci.system.query",
+ gov.nih.nci.system.query.hibernate,
+ org.acegisecurity;uses:="org.springframework.core,org.springframework.context.support",
+ org.acegisecurity.providers.rcp;
+  uses:="org.springframework.core,
+   org.acegisecurity.providers,
+   org.acegisecurity,
+   org.springframework.beans.factory",
+ org.apache.commons.collections;uses:="org.apache.commons.collections.keyvalue,new org.apache.commons.collections",
+ org.apache.commons.collections.list;
+  uses:="org.apache.commons.collections.iterators,
+   org.apache.commons.collections,
+   new org.apache.commons.collections.list,
+   org.apache.commons.collections.collection",
+ org.apache.commons.collections.map;
+  uses:="org.apache.commons.collections.iterators,
+   org.apache.commons.collections.keyvalue,
+   org.apache.commons.collections,
+   org.apache.commons.collections.set",
+ org.apache.commons.io,
+ org.apache.commons.io.comparator,
+ org.apache.commons.io.filefilter,
+ org.apache.commons.io.input,
+ org.apache.commons.io.output,
+ org.apache.commons.lang;uses:="org.apache.commons.lang.exception",
+ org.apache.commons.logging,
+ org.apache.commons.logging.impl;
+  uses:="javax.servlet,
+   org.apache.log,
+   org.apache.commons.logging,
+   org.apache.log4j,
+   org.apache.avalon.framework.logger",
+ org.apache.log4j;uses:="org.apache.log4j.helpers,org.apache.log4j.or,org.apache.log4j.spi",
+ org.apache.log4j.spi;uses:="org.apache.log4j,org.apache.log4j.or",
+ org.springframework.remoting;uses:="org.springframework.core",
+ org.supercsv.cellprocessor,
+ org.supercsv.cellprocessor.constraint,
+ org.supercsv.cellprocessor.ift,
+ org.supercsv.exception,
+ org.supercsv.io,
+ org.supercsv.prefs,
+ org.supercsv.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: edu.ualberta.med.biobank.model
 

@@ -98,7 +98,7 @@ import ar.com.fdvs.dj.util.LayoutUtils;
  * can't find the url for the jasper file that is in this plugin. Since this
  * class is in biobank2 plugin then the url is found. (see issue #1239)
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
+@SuppressWarnings({ "unchecked", "rawtypes", "unused" })
 public class DynamicJasperHelper {
 
     private static final Log log = LogFactory.getLog(DynamicJasperHelper.class);
