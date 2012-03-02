@@ -25,11 +25,9 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "MEMBERSHIP",
     uniqueConstraints = {
-        // this unique constraint only works when no value is null
-        // TODO: could fix the null problem by having an in-between table?
-        @UniqueConstraint(columnNames = { "PRINCIPAL_ID", "CENTER_ID",
-            "STUDY_ID" }) })
-@Unique(properties = { "principal", "center", "study" }, groups = PrePersist.class)
+        @UniqueConstraint(columnNames = { "PRINCIPAL_ID", "NOT_NULL_CENTER_ID",
+            "NOT_NULL_STUDY_ID" }) })
+@Unique(properties = { "principal", "notNullCenterId", "notNullStudyId" }, groups = PrePersist.class)
 public class Membership extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -127,5 +125,40 @@ public class Membership extends AbstractBiobankModel {
 
         }
         return true;
+    }
+
+    /**
+     * Provides a never-null {@link Center} identifier that can be used to
+     * create a unique index on. This allows a unique index to be created on (
+     * {@link #getPrincipal()}, {@link #getNotNullCenterId()}) since a null
+     * {@link Center} is converted to zero value. This is particularly important
+     * for MySQL, which would allow multiple {@link Membership} instances for
+     * the same {@link Principal} that have a null {@link Center}.
+     * 
+     * @see {@link http://bugs.mysql.com/bug.php?id=17825}
+     * @see {@link #getNotNullStudyId()}
+     * @author Jonathan Ferland
+     * @return the {@link Center} id, or null if no {@link Center}.
+     */
+    @Column(name = "NOT_NULL_CENTER_ID", nullable = false)
+    Integer getNotNullCenterId() {
+        return getCenter() != null ? getCenter().getId() : 0;
+    }
+
+    void setNotNullCenterId(Integer centerId) {
+    }
+
+    /**
+     * Functions similar to {@link #getNotNullCenterId()} for the same reason.
+     * 
+     * @see {@link #getNotNullCenterId()}
+     * @return
+     */
+    @Column(name = "NOT_NULL_STUDY_ID", nullable = false)
+    Integer getNotNullStudyId() {
+        return getStudy() != null ? getStudy().getId() : 0;
+    }
+
+    void setNotNullStudyId(Integer studyId) {
     }
 }

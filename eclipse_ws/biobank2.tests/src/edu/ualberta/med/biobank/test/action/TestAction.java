@@ -90,6 +90,7 @@ public class TestAction {
 
         Membership membership = new Membership();
         membership.setPrincipal(superAdmin);
+        superAdmin.getMembershipCollection().add(membership);
         membership.getPermissionCollection().add(PermissionEnum.ADMINISTRATION);
 
         session.save(membership);
