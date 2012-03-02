@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hibernate.criterion.DetachedCriteria;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
@@ -48,8 +50,8 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
 
     public static List<ShippingMethodWrapper> getShippingMethods(
         WritableApplicationService appService) throws ApplicationException {
-        List<ShippingMethod> objects = appService.search(ShippingMethod.class,
-            new ShippingMethod());
+        List<ShippingMethod> objects = appService.query(DetachedCriteria
+            .forClass(ShippingMethod.class));
         List<ShippingMethodWrapper> wrappers =
             new ArrayList<ShippingMethodWrapper>();
         for (ShippingMethod sm : objects) {
