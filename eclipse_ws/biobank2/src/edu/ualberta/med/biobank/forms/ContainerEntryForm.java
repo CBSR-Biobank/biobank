@@ -111,10 +111,13 @@ public class ContainerEntryForm extends BiobankEntryForm {
             oldContainerLabel = container.getLabel();
         }
 
-        if (adapter.getParent() == null)
-            adapter.setParent(((SiteAdapter) SessionManager.searchFirstNode(
-                Site.class, container.getSite().getId()))
-                .getContainersGroupNode());
+        if (adapter.getParent() == null) {
+            SiteAdapter siteAdapter = (SiteAdapter) SessionManager
+                .searchFirstNode(Site.class, container.getSite().getId());
+            if (siteAdapter != null) {
+                adapter.setParent(siteAdapter.getContainersGroupNode());
+            }
+        }
 
         setPartName(tabName);
     }

@@ -10,17 +10,13 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.peer.LogPeer;
 import edu.ualberta.med.biobank.common.permission.logging.LoggingPermission;
 import edu.ualberta.med.biobank.model.Log;
 
 public class LogQueryAction implements Action<ListResult<Log>> {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 8892328030007487709L;
+
     private String center;
     private String username;
     private Date startDate;
@@ -53,6 +49,7 @@ public class LogQueryAction implements Action<ListResult<Log>> {
         return new LoggingPermission().isAllowed(context);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ListResult<Log> run(ActionContext context) throws ActionException {
         StringBuffer parametersString = new StringBuffer();
@@ -102,11 +99,9 @@ public class LogQueryAction implements Action<ListResult<Log>> {
         if (parametersString.length() > 0) {
             qry.append(" where").append(parametersString.toString());
         }
-        ShipmentReadInfo sInfo = new ShipmentReadInfo();
 
         Query query = context.getSession().createQuery(qry.toString());
-        int i = 0;
-        for (Object o : parametersArgs) {
+        for (int i = 0, n = parametersArgs.size(); i < n; i++) {
             query.setParameter(i, parametersArgs.get(i++));
         }
 

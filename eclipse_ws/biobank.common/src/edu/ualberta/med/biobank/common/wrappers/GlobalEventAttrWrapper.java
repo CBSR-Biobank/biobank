@@ -59,7 +59,6 @@ public class GlobalEventAttrWrapper extends GlobalEventAttrBaseWrapper {
     @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
-        // FIXME if used by any study then it cannot be deleted
         super.addDeleteTasks(tasks);
     }
 }

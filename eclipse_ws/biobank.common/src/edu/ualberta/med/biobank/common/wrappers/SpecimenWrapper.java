@@ -125,7 +125,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         if (center != null) {
             return center.getNameShort();
         }
-        // FIXME should never see that ? should never retrieve a Specimen which
+        // TODO should never see that ? should never retrieve a Specimen which
         // site cannot be displayed ?
         return "CANNOT DISPLAY INFORMATION"; //$NON-NLS-1$
     }

@@ -31,6 +31,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * This class fixes this problem in the current BioBank database.
  * 
  */
+@Deprecated
 public class BbpdbConsent {
 
     // @formatter:off

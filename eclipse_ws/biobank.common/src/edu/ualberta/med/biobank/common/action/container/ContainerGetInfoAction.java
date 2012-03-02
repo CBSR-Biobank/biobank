@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.container;
 
-import java.util.List;
-
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -9,7 +7,6 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.model.Container;
 
@@ -27,10 +24,10 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
             + " LEFT JOIN FETCH ctype.specimenTypeCollection"
             + " INNER JOIN FETCH ctype.childLabelingScheme"
             + " LEFT JOIN FETCH container.position"
-            + " INNER JOIN FETCH container.topContainer topContainer"
-            + " INNER JOIN FETCH topContainer.containerType topContainerType"
-            + " INNER JOIN FETCH topContainerType.childLabelingScheme"
-            + " INNER JOIN FETCH container.site"
+            + " LEFT JOIN FETCH container.topContainer topContainer"
+            + " LEFT JOIN FETCH topContainer.containerType topContainerType"
+            + " LEFT JOIN FETCH topContainerType.childLabelingScheme"
+            + " LEFT JOIN FETCH container.site"
             + " LEFT JOIN FETCH container.childPositionCollection childPos"
             + " LEFT JOIN FETCH childPos.container"
             + " LEFT JOIN FETCH container.specimenPositionCollection spcPos"
@@ -45,7 +42,7 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
             + " LEFT JOIN FETCH specimen.commentCollection"
             + " LEFT JOIN FETCH specimen.originInfo spcOriginInfo"
             + " LEFT JOIN FETCH spcOriginInfo.center"
-            + " INNER JOIN FETCH container.position position"
+            + " LEFT JOIN FETCH container.position position"
             + " LEFT JOIN FETCH position.parentContainer parentContainer"
             + " LEFT JOIN FETCH parentContainer.containerType parentCtype"
             + " LEFT JOIN FETCH parentCtype.capacity"
@@ -61,6 +58,9 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
     private final Integer containerId;
 
     public ContainerGetInfoAction(Integer containerId) {
+        if (containerId == null) {
+            throw new IllegalArgumentException();
+        }
         this.containerId = containerId;
     }
 
@@ -71,19 +71,11 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
 
     @Override
     public ContainerInfo run(ActionContext context) throws ActionException {
+        ContainerInfo containerInfo = new ContainerInfo();
         Query query = context.getSession().createQuery(CONTAINER_INFO_HQL);
         query.setParameter(0, containerId);
 
-        @SuppressWarnings("unchecked")
-        List<Container> containers = query.list();
-
-        if (containers.size() != 1) {
-            throw new ModelNotFoundException(Container.class, containerId);
-        }
-
-        ContainerInfo containerInfo = new ContainerInfo();
-        containerInfo.container = containers.get(0);
-
+        containerInfo.container = (Container) query.uniqueResult();
         return containerInfo;
     }
 

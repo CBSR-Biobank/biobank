@@ -6,7 +6,6 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
-import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Contact;
@@ -52,27 +51,6 @@ public class ClinicHelper extends Helper {
         clinicSave.setAddress(address);
 
         return actionExecutor.exec(clinicSave).getId();
-    }
-
-    public static Integer createContact(IActionExecutor actionExecutor,
-        String name, Integer clinicId) throws ApplicationException {
-        ContactSaveAction contactSave = new ContactSaveAction();
-
-        contactSave.setName(name);
-        contactSave.setClinicId(clinicId);
-
-        return actionExecutor.exec(contactSave).getId();
-    }
-
-    public static Set<Integer> createContacts(IActionExecutor actionExecutor,
-        Integer clinicId, String basename, int numContacts)
-        throws ApplicationException {
-        Set<Integer> result = new HashSet<Integer>();
-        for (int j = 0; j < numContacts; ++j) {
-            result.add(createContact(actionExecutor, basename + "_contact" + j,
-                clinicId));
-        }
-        return result;
     }
 
     public static Integer createClinicWithContacts(

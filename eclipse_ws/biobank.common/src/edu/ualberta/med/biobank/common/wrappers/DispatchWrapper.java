@@ -356,6 +356,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return getDispatchSpecimenCollectionWithState(DispatchSpecimenState.RECEIVED);
     }
 
+    @SuppressWarnings("unused")
     private static final String FAST_DISPATCH_SPECIMEN_QRY = "select ra from " //$NON-NLS-1$
         + DispatchSpecimen.class.getName()
         + " ra inner join fetch ra." //$NON-NLS-1$

@@ -1,7 +1,6 @@
 *.jasper
 backup/
-lib-sources/
-lib-sources.tar.bz2
+docs/doxygen
 eclipse_ws/.metadata
 eclipse_ws/biobank.common/bin
 eclipse_ws/biobank.common/output
@@ -36,6 +35,8 @@ eclipse_ws/biobank2/dmscanlib.txt
 eclipse_ws/biobank.mvp/lib/*.jar
 eclipse_ws/biobank.mvp/bin
 eclipse_ws/biobank.mvp/output
+lib-sources/
+lib-sources.tar.bz2
 log/
 model/*.png
 model/biobank.uml~

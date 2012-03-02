@@ -500,6 +500,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             type);
     }
 
+    @Deprecated
     public void moveSpecimens(ContainerWrapper destination) throws Exception {
         Map<RowColPos, SpecimenWrapper> aliquots = getSpecimens();
         for (Entry<RowColPos, SpecimenWrapper> e : aliquots.entrySet()) {
@@ -740,6 +741,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         reload();
     }
 
+    @Deprecated
     private void initPositionIfEmpty(ContainerTypeWrapper type, int i, int j)
         throws Exception {
         if (type == null) {
@@ -786,6 +788,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return oneChildrenDeleted;
     }
 
+    @Deprecated
     private boolean deleteChild(ContainerTypeWrapper type,
         ContainerWrapper child) throws Exception {
         if (type == null || child.getContainerType().equals(type)) {

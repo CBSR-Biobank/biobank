@@ -165,6 +165,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
             ProcessingEventWrapper.class);
     }
 
+    @Deprecated
     @SuppressWarnings("unchecked")
     @Override
     public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {

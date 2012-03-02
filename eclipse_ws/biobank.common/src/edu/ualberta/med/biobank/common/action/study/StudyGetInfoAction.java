@@ -43,6 +43,9 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     private final StudyGetStudyEventAttrsAction getStudyEventAttrs;
 
     public StudyGetInfoAction(Integer studyId) {
+        if (studyId == null) {
+            throw new IllegalArgumentException();
+        }
         this.studyId = studyId;
 
         getClinicInfo = new StudyGetClinicInfoAction(studyId);

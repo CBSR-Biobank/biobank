@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.common.action.request;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -13,9 +16,9 @@ import edu.ualberta.med.biobank.model.Request;
 public class RequestRetrievalAction implements Action<ListResult<Request>> {
 
     private static final String REQUEST_HQL =
-        "select r from "
-            + Request.class.getName()
-            + " r inner join fetch r.requestSpecimenCollection rs where rs.specimen.currentCenter.id=?";
+        "SELECT r FROM " + Request.class.getName() + " r"
+            + " INNER JOIN FETCH r.requestSpecimenCollection rs"
+            + " WHERE rs.specimen.currentCenter.id=?";
 
     private static final long serialVersionUID = 5306372891238576571L;
 
@@ -34,9 +37,18 @@ public class RequestRetrievalAction implements Action<ListResult<Request>> {
     @Override
     public ListResult<Request> run(ActionContext context)
         throws ActionException {
-        Query q = context.getSession().createQuery(REQUEST_HQL);
-        q.setParameter(0, centerId);
-        return new ListResult<Request>(q.list());
+        ArrayList<Request> requests = new ArrayList<Request>();
+
+        Query query = context.getSession().createQuery(REQUEST_HQL);
+        query.setParameter(0, centerId);
+
+        @SuppressWarnings("unchecked")
+        List<Request> results = query.list();
+        if (results != null) {
+            requests.addAll(results);
+        }
+
+        return new ListResult<Request>(requests);
     }
 
 }

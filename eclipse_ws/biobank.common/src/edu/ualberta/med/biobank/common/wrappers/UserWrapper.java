@@ -40,7 +40,7 @@ public class UserWrapper extends UserBaseWrapper {
     @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        // FIXME problem= if persist fail, then the csm user is created anyway
+        // TODO problem= if persist fail, then the csm user is created anyway
         tasks.add(new QueryTask() {
             @Override
             public SDKQuery getSDKQuery() {

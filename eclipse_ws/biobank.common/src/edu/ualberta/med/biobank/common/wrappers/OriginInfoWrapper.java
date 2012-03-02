@@ -53,13 +53,8 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return patients;
     }
 
+    @Deprecated
     public void checkAtLeastOneSpecimen() {
-        // FIXME don't want that when create from collection event
-        // List<SpecimenWrapper> spc = getSpecimenCollection(false);
-        // if (spc == null || spc.isEmpty()) {
-        // throw new BiobankCheckException(
-        // "At least one specimen should be added to this Collection Event.");
-        // }
     }
 
     public static List<OriginInfoWrapper> getTodayShipments(
