@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.HashSet;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.osgi.util.NLS;
@@ -13,15 +15,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.info.SiteInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
+import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
@@ -47,6 +54,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private StudyAddInfoTable studiesTable;
 
+    private SiteInfo siteInfo;
+
     private BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
             @Override
@@ -62,7 +71,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
-        site = (SiteWrapper) getModelObject();
+        updateSiteInfo(adapter.getId());
 
         String tabName;
         if (site.isNew()) {
@@ -73,6 +82,20 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 site.getNameShort());
         }
         setPartName(tabName);
+    }
+
+    private void updateSiteInfo(Integer id) throws Exception {
+        if (id != null) {
+            siteInfo = SessionManager.getAppService().doAction(
+                new SiteGetInfoAction(id));
+            site = new SiteWrapper(SessionManager.getAppService(),
+                siteInfo.site);
+        } else {
+            siteInfo = new SiteInfo.Builder().build();
+            site = new SiteWrapper(SessionManager.getAppService());
+        }
+
+        ((AdapterBase) adapter).setModelObject(site);
     }
 
     @Override
@@ -154,7 +177,23 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void saveForm() throws Exception {
-        site.persist();
+        SiteSaveAction siteSaveAction = new SiteSaveAction();
+        siteSaveAction.setId(site.getId());
+        siteSaveAction.setName(site.getName());
+        siteSaveAction.setNameShort(site.getNameShort());
+        siteSaveAction.setActivityStatus(site.getActivityStatus());
+        siteSaveAction.setAddress(site.getAddress().getWrappedObject());
+
+        HashSet<Integer> studyIds = new HashSet<Integer>();
+        for (StudyWrapper study : site.getStudyCollection(false)) {
+            studyIds.add(study.getId());
+        }
+        siteSaveAction.setStudyIds(studyIds);
+
+        Integer id =
+            SessionManager.getAppService().doAction(siteSaveAction).getId();
+        updateSiteInfo(id);
+
         siteAdapter.getParent().performExpand();
         SessionManager.getUser().updateCurrentCenter(site);
     }

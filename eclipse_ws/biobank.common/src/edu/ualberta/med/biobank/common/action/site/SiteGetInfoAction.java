@@ -28,7 +28,7 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
         "SELECT site, COUNT(DISTINCT patients), "
             + "COUNT(DISTINCT collectionEvents) "
             + " FROM " + Site.class.getName() + " site"
-            + " LEFT JOIN site.studyCollection studies"
+            + " LEFT JOIN FETCH site.studyCollection studies"
             + " LEFT JOIN studies.patientCollection patients"
             + " LEFT JOIN patients.collectionEventCollection collectionEvents"
             + " WHERE site.id = ?"

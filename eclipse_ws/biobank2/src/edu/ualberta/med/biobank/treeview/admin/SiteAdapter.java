@@ -74,7 +74,15 @@ public class SiteAdapter extends AdapterBase {
 
     @Override
     public boolean isDeletable() {
-        return internalIsDeletable();
+        // TODO: this needs to be implemented correctly
+        // return internalIsDeletable();
+        return true;
+    }
+
+    @Override
+    public boolean isEditable() {
+        // TODO: this needs to be implemented correctly
+        return true;
     }
 
     @Override
