@@ -13,11 +13,19 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
 
+/**
+ * @brief The specimen types, derived from source specimens, that are collected
+ *        for a particular study.
+ * 
+ */
 @Entity
 @Table(name = "ALIQUOTED_SPECIMEN")
 public class AliquotedSpecimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The number of aliquoted tubes to be collected.
+     */
     private int quantity;
     private BigDecimal volume;
     private SpecimenType specimenType;

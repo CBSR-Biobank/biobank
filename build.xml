@@ -14,6 +14,8 @@ End:
   </exec>
 
   <property environment="env" />
+  <property name="doxygen" location="/usr/bin/doxygen" />
+  <property name="xsltproc" location="/usr/bin/xsltproc" />
 
   <!-- TODO: move as many properties as possible into build.properties -->
   <!-- TODO: add tasks to push database properties to various files -->
@@ -766,8 +768,14 @@ End:
   </target>
 
   <target name="doxygen" description="generates documentation for the model classes">
-    <exec command="doxygen docs/doxygen/doxygen.cfg" />
+    <exec command="${doxygen}">
+      <arg value="docs/doxygen/doxygen.cfg" />
+    </exec>
     <echo message="point your browser to: file://${doxygen.output}/html/index.html" />
+    <exec command="${xsltproc}" dir="docs/doxygen/xml" output="docs/doxygen/xml/all.xml">
+      <arg value="combine.xslt" />
+      <arg value="index.xml" />
+    </exec>
   </target>
 
 <!-- (setq nxml-slash-auto-complete-flag t) -->
