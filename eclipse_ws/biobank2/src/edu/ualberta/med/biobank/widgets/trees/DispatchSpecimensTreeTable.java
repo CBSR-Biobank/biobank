@@ -32,7 +32,6 @@ import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchDialog;
 import edu.ualberta.med.biobank.forms.utils.DispatchTableGroup;
 import edu.ualberta.med.biobank.forms.utils.TableGroup;
@@ -275,21 +274,19 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                 }
             }
         });
-        if (SessionManager.canUpdate(SpecimenWrapper.class)) {
-            editItem = new MenuItem(getMenu(), SWT.PUSH);
-            editItem.setText(Messages.DispatchSpecimensTreeTable_edit_label);
-            editItem.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    DispatchSpecimenWrapper selection = getSelectedSpecimen();
-                    if (selection != null) {
-                        AbstractAdapterBase adapter = AdapterFactory
-                            .getAdapter(selection.getSpecimen());
-                        adapter.openEntryForm();
-                    }
+        editItem = new MenuItem(getMenu(), SWT.PUSH);
+        editItem.setText(Messages.DispatchSpecimensTreeTable_edit_label);
+        editItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                DispatchSpecimenWrapper selection = getSelectedSpecimen();
+                if (selection != null) {
+                    AbstractAdapterBase adapter = AdapterFactory
+                        .getAdapter(selection.getSpecimen());
+                    adapter.openEntryForm();
                 }
-            });
-        }
+            }
+        });
     }
 
     @Override

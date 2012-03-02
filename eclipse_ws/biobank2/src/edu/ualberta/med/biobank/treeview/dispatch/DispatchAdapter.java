@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
-import edu.ualberta.med.biobank.common.permission.dispatch.DispatchSavePermission;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -47,7 +47,7 @@ public class DispatchAdapter extends AdapterBase {
                     new DispatchReadPermission(ship.getId()));
             this.isEditable =
                 SessionManager.getAppService().isAllowed(
-                    new DispatchSavePermission(ship.getId()));
+                    new DispatchUpdatePermission(ship.getId()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Permission Error",
                 "Unable to retrieve user permissions");
@@ -109,7 +109,7 @@ public class DispatchAdapter extends AdapterBase {
                 addDeleteMenu(menu, Messages.DispatchAdapter_dispatch_label);
             }
             if (siteParent.equals(getDispatchWrapper().getSenderCenter())
-                && SessionManager.canUpdate(getDispatchWrapper())
+                && isEditable
                 && getDispatchWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText(Messages.DispatchAdapter_move_creation_label);
@@ -155,14 +155,10 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     @Override
-    public void runDelete() {
+    public void runDelete() throws Exception {
         DispatchDeleteAction delete =
             new DispatchDeleteAction(getDispatchWrapper().getId());
-        try {
-            SessionManager.getAppService().doAction(delete);
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Delete failed", e);
-        }
+        SessionManager.getAppService().doAction(delete);
     }
 
     @Override

@@ -9,9 +9,6 @@ import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.SessionSecurityHelper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 
@@ -35,22 +32,6 @@ public class ProcessingAdministrationHandler extends AbstractHandler implements
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.getInstance().isConnected()
-            && SessionManager.getUser().getCurrentWorkingCenter() != null
-            // FIXME do we want this test on research groups or do we just test
-            // the privileges ?
-            && !(SessionManager.getUser().getCurrentWorkingCenter() instanceof ResearchGroupWrapper)
-            && SessionManager.isAllowed(
-                SessionSecurityHelper.SPECIMEN_ASSIGN_KEY_DESC,
-                SessionSecurityHelper.CLINIC_SHIPMENT_KEY_DESC,
-                SessionSecurityHelper.DISPATCH_RECEIVE_KEY_DESC,
-                SessionSecurityHelper.DISPATCH_SEND_KEY_DESC,
-                SessionSecurityHelper.REQUEST_RECEIVE_DESC,
-                SessionSecurityHelper.SPECIMEN_LINK_KEY_DESC,
-                // FIXME this is not very nice when we need to check access to a
-                // class...
-                new CollectionEventWrapper(null).getWrappedClass()
-                    .getSimpleName(), new ProcessingEventWrapper(null)
-                    .getWrappedClass().getSimpleName());
+        return !(SessionManager.getUser().getCurrentWorkingCenter() instanceof ResearchGroupWrapper);
     }
 }

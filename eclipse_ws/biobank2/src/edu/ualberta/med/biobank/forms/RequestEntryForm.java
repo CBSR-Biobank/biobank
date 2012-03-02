@@ -27,6 +27,7 @@ import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
+import edu.ualberta.med.biobank.common.action.request.RequestClaimAction;
 import edu.ualberta.med.biobank.common.action.request.RequestDispatchAction;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -276,7 +277,9 @@ public class RequestEntryForm extends BiobankViewForm {
                                     SessionManager.getUser().getLogin()))
                                 throw new Exception(
                                     Messages.RequestEntryForm_claim_error_msg);
-                            request.flagSpecimens(Arrays.asList(spec));
+                            SessionManager.getAppService().doAction(
+                                new RequestClaimAction(Arrays.asList(spec
+                                    .getId())));
                             specimensTree.pull(updateNode);
                         }
                     } else

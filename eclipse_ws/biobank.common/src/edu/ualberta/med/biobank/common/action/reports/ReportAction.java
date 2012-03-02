@@ -6,8 +6,8 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
 
 public class ReportAction implements Action<ListResult<Object>> {
@@ -24,7 +24,7 @@ public class ReportAction implements Action<ListResult<Object>> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return PermissionEnum.REPORTS.isAllowed(context.getUser());
+        return new ReportsPermission().isAllowed(context);
     }
 
     @Override

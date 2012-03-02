@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.select.ContactAddDialog;
@@ -19,6 +20,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContactEntryInfoTable extends ContactInfoTable {
 
@@ -39,8 +41,16 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         }
         addedOrModifiedContacts = new ArrayList<ContactWrapper>();
         deletedContacts = new ArrayList<ContactWrapper>();
+        Boolean contactsAddEditDeleteAllowed = false;
+        try {
+            contactsAddEditDeleteAllowed =
+                SessionManager.getAppService().isAllowed(
+                    new ClinicUpdatePermission(clinic.getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+        }
 
-        if (SessionManager.canCreate(ContactWrapper.class)) {
+        if (contactsAddEditDeleteAllowed) {
             addAddItemListener(new IInfoTableAddItemListener<ContactWrapper>() {
                 @Override
                 public void addItem(InfoTableEvent<ContactWrapper> event) {
@@ -48,7 +58,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                 }
             });
         }
-        if (SessionManager.canUpdate(ContactWrapper.class)) {
+        if (contactsAddEditDeleteAllowed) {
             addEditItemListener(new IInfoTableEditItemListener<ContactWrapper>() {
                 @Override
                 public void editItem(InfoTableEvent<ContactWrapper> event) {
@@ -58,7 +68,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                 }
             });
         }
-        if (SessionManager.canDelete(ContactWrapper.class)) {
+        if (contactsAddEditDeleteAllowed) {
             addDeleteItemListener(new IInfoTableDeleteItemListener<ContactWrapper>() {
                 @Override
                 public void deleteItem(InfoTableEvent<ContactWrapper> event) {

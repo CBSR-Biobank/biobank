@@ -11,11 +11,13 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
+import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.widgets.trees.infos.SpecimenTypeEntryInfoTree;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenTypesViewForm extends BiobankFormBase {
 
@@ -32,9 +34,17 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
 
     private List<SpecimenType> globalSpecimenTypes;
 
+    private Boolean createAllowed;
+
     @Override
     public void init() throws Exception {
         setPartName(Messages.SpecimenTypesViewForm_title);
+        try {
+            this.createAllowed = SessionManager.getAppService().isAllowed(
+                new SpecimenTypeCreatePermission());
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+        }
     }
 
     @Override
@@ -77,9 +87,7 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
     }
 
     protected void checkEditAccess() {
-        if (!SessionManager.canUpdate(SpecimenTypeWrapper.class)
-            && !SessionManager.canCreate(SpecimenTypeWrapper.class)
-            && !SessionManager.canDelete(SpecimenTypeWrapper.class)) {
+        if (!createAllowed) {
             BgcPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 Messages.SpecimenTypesViewForm_access_denied_error_msg);

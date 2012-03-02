@@ -40,6 +40,8 @@ import edu.ualberta.med.biobank.common.action.container.ContainerDeleteChildrenA
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
+import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -123,8 +125,11 @@ public class ContainerViewForm extends BiobankViewForm {
             containerInfo.container.getLabel(), containerInfo.container
                 .getContainerType().getNameShort()));
         initCells();
-        canCreate = SessionManager.canCreate(ContainerWrapper.class);
-        canDelete = SessionManager.canDelete(ContainerWrapper.class);
+        canCreate =
+            SessionManager.getAppService().isAllowed(new
+                ContainerCreatePermission());
+        canDelete = SessionManager.getAppService().isAllowed(new
+            ContainerDeletePermission());
     }
 
     private void updateContainerInfo() throws ApplicationException {

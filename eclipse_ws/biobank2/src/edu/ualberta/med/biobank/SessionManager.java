@@ -240,69 +240,6 @@ public class SessionManager {
         return getInstance().getSession().getServerName();
     }
 
-    @Deprecated
-    public static boolean canCreate(Class<?> clazz) {
-        return SessionSecurityHelper.canCreate(getAppService(), getUser(),
-            clazz);
-    }
-
-    @Deprecated
-    public static boolean canDelete(Class<?> clazz) {
-        return SessionSecurityHelper.canDelete(getAppService(), getUser(),
-            clazz);
-    }
-
-    @Deprecated
-    public static boolean canDelete(ModelWrapper<?> wrapper) {
-        return SessionSecurityHelper.canDelete(getUser(), wrapper);
-    }
-
-    @Deprecated
-    public static boolean canView(Class<?> clazz) {
-        try {
-            return SessionSecurityHelper.canView(getAppService(), getUser(),
-                clazz);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // FIXME is using current working center and no study
-    @Deprecated
-    public static boolean isAllowed(String... keyDesc) {
-        try {
-            return SessionSecurityHelper.isAllowed(getAppService(), getUser(),
-                keyDesc);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Deprecated
-    public static boolean isAllowedorCanRead(String... keyDesc) {
-        try {
-            return SessionSecurityHelper.isAllowedorCanRead(getAppService(),
-                getUser(), keyDesc);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Deprecated
-    public static boolean canUpdate(Class<?> clazz) {
-        try {
-            return SessionSecurityHelper.canUpdate(getAppService(), getUser(),
-                clazz);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Deprecated
-    public static boolean canUpdate(ModelWrapper<?> wrapper) {
-        return SessionSecurityHelper.canUpdate(getUser(), wrapper);
-    }
-
     public boolean isConnected() {
         return sessionAdapter != null;
     }

@@ -35,9 +35,12 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
+@SuppressWarnings("all")
+// outdated tests
 public class TestAdvancedReports extends TestDatabase {
-    private static final SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat SQL_DATE_FORMAT =
+        new SimpleDateFormat(
+            "yyyy-MM-dd HH:mm:ss");
     private final Map<String, Entity> entityMap = new HashMap<String, Entity>();
 
     @Before
@@ -150,7 +153,8 @@ public class TestAdvancedReports extends TestDatabase {
 
             Set<ReportFilterValue> values = new HashSet<ReportFilterValue>();
             if (op.isValueRequired()) {
-                ReportFilterValue value = getReportFilterValue(op, propertyType);
+                ReportFilterValue value =
+                    getReportFilterValue(op, propertyType);
                 values.add(value);
             }
 

@@ -9,14 +9,17 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.permission.site.SiteCreatePermission;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteAddHandler extends AbstractHandler {
     @SuppressWarnings("unused")
     private static BgcLogger LOGGER = BgcLogger.getLogger(SiteAddHandler.class
         .getName());
+    private Boolean createAllowed;
 
     // private EventBus eventBus;
 
@@ -47,8 +50,17 @@ public class SiteAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.isSuperAdminMode()
-            && SessionManager.canCreate(SiteWrapper.class)
-            && SessionManager.getInstance().getSession() != null;
+        try {
+            if (createAllowed == null)
+                createAllowed =
+                    SessionManager.getAppService().isAllowed(
+                        new SiteCreatePermission());
+            return SessionManager.isSuperAdminMode()
+                && createAllowed
+                && SessionManager.getInstance().getSession() != null;
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            return false;
+        }
     }
 }

@@ -15,10 +15,12 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypesAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypesAction.SiteGetContainerTypesResult;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -32,8 +34,16 @@ public class ContainerTypeGroup extends AdapterBase {
 
     private SiteGetContainerTypesResult containerTypesResult = null;
 
+    private Boolean createAllowed;
+
     public ContainerTypeGroup(SiteAdapter parent, int id) {
         super(parent, id, Messages.ContainerTypeGroup_types_node_label, true);
+        try {
+            this.createAllowed = SessionManager.getAppService().isAllowed(
+                new ContainerTypeCreatePermission());
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+        }
     }
 
     @Override
@@ -61,7 +71,7 @@ public class ContainerTypeGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(ContainerTypeWrapper.class)) {
+        if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(Messages.ContainerTypeGroup_add_label);
             mi.addSelectionListener(new SelectionAdapter() {

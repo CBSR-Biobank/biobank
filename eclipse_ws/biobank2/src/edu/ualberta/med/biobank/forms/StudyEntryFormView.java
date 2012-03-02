@@ -188,7 +188,7 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
                     public void widgetSelected(SelectionEvent e) {
                         clinicsTable.createClinicContact();
                     }
-                }, ContactWrapper.class, null);
+                }, null);
         }
         contactWrappers.setTable(clinicsTable);
     }
@@ -207,7 +207,7 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
                     public void widgetSelected(SelectionEvent e) {
                         sourceSpecimenTable.addSourceSpecimen();
                     }
-                }, SourceSpecimenWrapper.class, null);
+                }, null);
         }
         srcSpcWrappers.setTable(sourceSpecimenTable);
     }
@@ -225,7 +225,7 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
                     public void widgetSelected(SelectionEvent e) {
                         aliquotedSpecimenTable.addAliquotedSpecimen();
                     }
-                }, SourceSpecimenWrapper.class, null);
+                }, null);
         }
         aqSpcWrappers.setTable(aliquotedSpecimenTable);
     }

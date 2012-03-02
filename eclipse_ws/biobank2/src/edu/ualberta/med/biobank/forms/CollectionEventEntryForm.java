@@ -258,6 +258,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             createSection(Messages.CollectionEventEntryForm_specimens_title);
         specimensTable =
             new CEventSpecimenEntryInfoTable(section, sourceSpecimens,
+                ceventCopy,
                 ColumnsShown.CEVENT_SOURCE_SPECIMENS);
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);

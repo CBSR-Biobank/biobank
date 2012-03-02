@@ -8,10 +8,12 @@ import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.SessionSecurityHelper;
+import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
 
 public class ReportsHandler extends AbstractHandler {
+
+    private Boolean reportsAllowed;
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -30,13 +32,16 @@ public class ReportsHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        try {
-            return SessionManager.getInstance().isConnected()
-                && SessionManager.isAllowed(
-                    SessionSecurityHelper.REPORTS_KEY_DESC,
-                    SessionSecurityHelper.LOGGING_KEY_DESC);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        if (reportsAllowed == null)
+            try {
+                if (!SessionManager.getInstance().isConnected())
+                    return false;
+                reportsAllowed =
+                    SessionManager.getAppService().isAllowed(
+                        new ReportsPermission());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        return reportsAllowed;
     }
 }

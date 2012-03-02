@@ -8,14 +8,20 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventDeletePermission;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.forms.ProcessingEventEntryForm;
 import edu.ualberta.med.biobank.forms.ProcessingEventViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingEventAdapter extends AdapterBase {
 
@@ -25,6 +31,21 @@ public class ProcessingEventAdapter extends AdapterBase {
     public ProcessingEventAdapter(AdapterBase parent,
         ProcessingEventWrapper pEvent) {
         super(parent, pEvent);
+
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new ProcessingEventDeletePermission(pEvent.getId()));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new ProcessingEventReadPermission(pEvent.getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new ProcessingEventUpdatePermission(pEvent.getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     @Override

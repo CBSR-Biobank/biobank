@@ -49,6 +49,8 @@ import org.junit.runners.Suite.SuiteClasses;
     QaSpecimensTest.class, SpecimenTypePvCountTest.class,
     SpecimenTypeSUsageTest.class })
 @Deprecated
+@SuppressWarnings("all")
+// old tests
 public final class TestReportsProcedurallyGeneratedData implements
     ReportDataSource {
     private static TestReportsProcedurallyGeneratedData instance = null;

@@ -10,7 +10,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 
 public class PerspectiveSecurity {
@@ -24,8 +23,6 @@ public class PerspectiveSecurity {
 
     static {
         rightsEnablements = new HashMap<String, Map<String, List<String>>>();
-        ProcessingPerspective.appendRightsEnablements(rightsEnablements);
-        ReportsPerspective.appendRightsEnablements(rightsEnablements);
         preferredViews = new HashMap<String, String>();
         ProcessingPerspective.appendPreferredView(preferredViews);
         ReportsPerspective.appendPreferredView(preferredViews);
@@ -48,14 +45,7 @@ public class PerspectiveSecurity {
                     page.hideView(ref);
                 }
                 for (Entry<String, List<String>> entry : map.entrySet()) {
-                    boolean show;
-                    try {
-                        String[] keyDescs = entry.getValue().toArray(
-                            new String[entry.getValue().size()]);
-                        show = SessionManager.isAllowedorCanRead(keyDescs);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
+                    boolean show = true;
                     if (user.getCurrentWorkingCenter() == null
                         && user.isInSuperAdminMode()
                         && ProcessingPerspective.ID.equals(perspectiveId)) {

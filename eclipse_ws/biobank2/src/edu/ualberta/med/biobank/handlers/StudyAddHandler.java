@@ -6,11 +6,15 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyAddHandler extends AbstractHandler {
-    public static final String ID = "edu.ualberta.med.biobank.commands.addStudy"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.commands.addStudy"; //$NON-NLS-1$
+    private Boolean createAllowed;
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -23,8 +27,17 @@ public class StudyAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.isSuperAdminMode()
-            && SessionManager.canCreate(StudyWrapper.class)
-            && SessionManager.getInstance().getSession() != null;
+        try {
+            if (createAllowed == null)
+                createAllowed =
+                    SessionManager.getAppService().isAllowed(
+                        new StudyCreatePermission());
+            return SessionManager.isSuperAdminMode()
+                && createAllowed
+                && SessionManager.getInstance().getSession() != null;
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            return false;
+        }
     }
 }

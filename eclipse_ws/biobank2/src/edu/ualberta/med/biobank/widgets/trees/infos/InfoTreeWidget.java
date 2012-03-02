@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -125,10 +124,8 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
 
                 if (getSelection() instanceof ModelWrapper<?>
                     && !(getSelection() instanceof DispatchSpecimenWrapper))
-                    editItem.setEnabled(SessionManager
-                        .canUpdate((ModelWrapper<?>) getSelection()));
-                else
-                    editItem.setEnabled(false);
+                    editItem.setEnabled(true);
+                // TODO: cant check permission on unknown type! what to do?
             }
         });
     }

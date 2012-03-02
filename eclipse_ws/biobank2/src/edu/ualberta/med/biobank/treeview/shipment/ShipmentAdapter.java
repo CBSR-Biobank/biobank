@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.shipment.ShipmentDeleteAction;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoSavePermission;
 import edu.ualberta.med.biobank.common.permission.shipment.ShipmentDeletePermission;
@@ -35,7 +36,8 @@ public class ShipmentAdapter extends AdapterBase {
         try {
             this.isDeletable =
                 SessionManager.getAppService().isAllowed(
-                    new ShipmentDeletePermission(originInfo.getId(),
+                    new ShipmentDeletePermission(originInfo.getReceiverSite()
+                        .getId(),
                         SessionManager.getUser().getCurrentWorkingCenter()
                             .getId()));
             this.isReadable =
@@ -141,4 +143,13 @@ public class ShipmentAdapter extends AdapterBase {
             return internalCompareTo(o);
         return 0;
     }
+
+    @Override
+    public void runDelete() throws ApplicationException {
+        ShipmentDeleteAction action =
+            new ShipmentDeleteAction(getId(), SessionManager.getUser()
+                .getCurrentWorkingCenter().getId());
+        SessionManager.getAppService().doAction(action);
+    }
+
 }
