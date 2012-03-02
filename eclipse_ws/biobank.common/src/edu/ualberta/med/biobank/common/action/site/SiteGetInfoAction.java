@@ -16,9 +16,10 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
 
     @SuppressWarnings("nls")
     private static final String SITE_INFO_HQL =
-        "SELECT DISTINCT site"
+        "SELECT site"
             + " FROM " + Site.class.getName() + " site"
             + " INNER JOIN FETCH site.address address"
+            + " LEFT JOIN FETCH site.studyCollection studies"
             + " LEFT JOIN FETCH site.commentCollection comments"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE site.id = ?";
@@ -28,7 +29,7 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
         "SELECT site, COUNT(DISTINCT patients), "
             + "COUNT(DISTINCT collectionEvents) "
             + " FROM " + Site.class.getName() + " site"
-            + " LEFT JOIN FETCH site.studyCollection studies"
+            + " LEFT JOIN site.studyCollection studies"
             + " LEFT JOIN studies.patientCollection patients"
             + " LEFT JOIN patients.collectionEventCollection collectionEvents"
             + " WHERE site.id = ?"

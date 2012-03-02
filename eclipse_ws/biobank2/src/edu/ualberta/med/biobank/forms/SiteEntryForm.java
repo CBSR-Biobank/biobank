@@ -12,6 +12,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -30,6 +31,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -55,6 +57,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     private StudyAddInfoTable studiesTable;
 
     private SiteInfo siteInfo;
+
+    private CommentCollectionInfoTable commentEntryTable;
+
+    private BgcBaseText commentText;
 
     private BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
@@ -103,12 +109,29 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         form.setText(Messages.SiteEntryForm_main_title);
         page.setLayout(new GridLayout(1, false));
         createSiteSection();
+        createCommentSection();
         createAddressArea(site);
         createStudySection();
 
         // When adding help uncomment line below
         // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite,
         // IJavaHelpContextIds.XXXXX);
+    }
+
+    private void createCommentSection() {
+        Composite client = createSectionWithClient(Messages.Comments_title);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable = new CommentCollectionInfoTable(client,
+            site.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        commentText = (BgcBaseText) createLabelledWidget(
+            client, BgcBaseText.class, SWT.MULTI, Messages.Comments_add);
     }
 
     private void createSiteSection() throws ApplicationException {
@@ -177,7 +200,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void saveForm() throws Exception {
-        SiteSaveAction siteSaveAction = new SiteSaveAction();
+        final SiteSaveAction siteSaveAction = new SiteSaveAction();
         siteSaveAction.setId(site.getId());
         siteSaveAction.setName(site.getName());
         siteSaveAction.setNameShort(site.getNameShort());
@@ -189,6 +212,13 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             studyIds.add(study.getId());
         }
         siteSaveAction.setStudyIds(studyIds);
+
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                siteSaveAction.setCommentText(commentText.getText());
+            }
+        });
 
         Integer id =
             SessionManager.getAppService().doAction(siteSaveAction).getId();
@@ -209,7 +239,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             site.setActivityStatus(ActivityStatus.ACTIVE);
         }
         GuiUtil.reset(activityStatusComboViewer, site.getActivityStatus());
-
+        commentText.setText(null);
         studiesTable.reload();
     }
 }

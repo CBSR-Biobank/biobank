@@ -4,25 +4,39 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
+/**
+ * TODO: it would be nice to set the cells that contain the comment message to
+ * automatically wrap the text.
+ * 
+ */
 public class CommentCollectionInfoTable extends InfoTableWidget<CommentWrapper> {
+
+    final int TEXT_MARGIN = 3;
 
     protected static class TableRowData {
         public CommentWrapper comment;
-        public String message;
         public UserWrapper user;
         public Date date;
+        public String message;
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { message.toString(),
-                user.toString(), date.toString() });
+            return StringUtils.join(new String[] { user.toString(),
+                date.toString(), message.toString()
+            });
         }
     }
 
@@ -34,6 +48,42 @@ public class CommentCollectionInfoTable extends InfoTableWidget<CommentWrapper> 
     public CommentCollectionInfoTable(Composite parent,
         List<CommentWrapper> collection) {
         super(parent, collection, HEADINGS, CommentWrapper.class);
+
+        Table table = getTableViewer().getTable();
+
+        /*
+         * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly.
+         * Therefore, it is critical for performance that these methods be as
+         * efficient as possible.
+         */
+        table.addListener(SWT.MeasureItem, new Listener() {
+            public void handleEvent(Event event) {
+                TableItem item = (TableItem) event.item;
+                String text = item.getText(event.index);
+                Point size = event.gc.textExtent(text);
+                event.width = size.x + 2 * TEXT_MARGIN;
+                event.height = Math.max(event.height, size.y + TEXT_MARGIN);
+            }
+        });
+        table.addListener(SWT.EraseItem, new Listener() {
+            public void handleEvent(Event event) {
+                event.detail &= ~SWT.FOREGROUND;
+            }
+        });
+        table.addListener(SWT.PaintItem, new Listener() {
+            public void handleEvent(Event event) {
+                TableItem item = (TableItem) event.item;
+                String text = item.getText(event.index);
+                /* center column 1 vertically */
+                int yOffset = 0;
+                if (event.index == 1) {
+                    Point size = event.gc.textExtent(text);
+                    yOffset = Math.max(0, (event.height - size.y) / 2);
+                }
+                event.gc.drawText(text, event.x + TEXT_MARGIN, event.y
+                    + yOffset, true);
+            }
+        });
     }
 
     @Override
@@ -51,11 +101,12 @@ public class CommentCollectionInfoTable extends InfoTableWidget<CommentWrapper> 
                 }
                 switch (columnIndex) {
                 case 0:
-                    return item.message;
+                    return StringUtils.join(wrapText(item.user.getLogin(), 10),
+                        "\n");
                 case 1:
-                    return item.user.getLogin();
-                case 2:
                     return DateFormatter.formatAsDateTime(item.date);
+                case 2:
+                    return StringUtils.join(wrapText(item.message, 80), "\n");
                 default:
                     return ""; //$NON-NLS-1$
                 }
