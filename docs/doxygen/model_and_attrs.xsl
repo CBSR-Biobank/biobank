@@ -1,4 +1,9 @@
 <?xml version="1.0" ?>
+<!--
+  Use the following command to generate HTML documentation:
+
+  xsltproc model_and_attrs.xsl xml/all.xml > FILE
+-->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <xsl:param name="XmlPath" />
@@ -16,9 +21,8 @@
   </xsl:template>
 
   <xsl:template match="*">
-    <p>Name: <xsl:value-of select="name"/></p><xsl:text>&#10;</xsl:text>
-    <p>Type: <xsl:value-of select="type"/></p><xsl:text>&#10;</xsl:text>
-    <p>Brief: <xsl:value-of select="briefdescription"/></p><xsl:text>&#10;</xsl:text>
+    <p>Attribute: <xsl:value-of select="name"/>, Type: <xsl:value-of select="type"/></p><xsl:text>&#10;</xsl:text>
+    <p><xsl:value-of select="briefdescription"/></p><xsl:text>&#10;</xsl:text>
     <p><xsl:value-of select="detaileddescription"/></p><xsl:text>&#10;</xsl:text>
   </xsl:template>
 

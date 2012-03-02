@@ -15,7 +15,7 @@ import org.hibernate.annotations.Type;
 
 /**
  * @brief The specimen types, derived from source specimens, that are collected
- *        for a particular study.
+ *        for a study.
  * 
  */
 @Entity
@@ -24,12 +24,32 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The number of aliquoted tubes to be collected.
+     * @brief The specimen type that has to be collected for the study.
+     */
+    private SpecimenType specimenType;
+
+    /**
+     * @brief The number of aliquoted tubes to be collected.
+     * 
+     *        yadda yadda yadda.
      */
     private int quantity;
+
+    /**
+     * @brief The volume to be collected in each tube.
+     */
     private BigDecimal volume;
-    private SpecimenType specimenType;
+
+    /**
+     * The study that this aliquoted specimen belongs to.
+     */
     private Study study;
+
+    /**
+     * If activity status is ACTIVE then this type of specimen has to be
+     * collected. If the activity status is closed then this specimen type is no
+     * longer being collected for this study.
+     */
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
 
     @Column(name = "QUANTITY")
