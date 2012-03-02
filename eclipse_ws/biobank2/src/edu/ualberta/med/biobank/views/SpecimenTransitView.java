@@ -298,8 +298,10 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 c.set(Calendar.MINUTE, 0);
                 c.set(Calendar.HOUR_OF_DAY, 0);
                 date = c.getTime();
-                List<AbstractAdapterBase> dateNodeRes = parentNode.search(
-                    date.getClass(), (int) date.getTime() + text.hashCode());
+                List<AbstractAdapterBase> dateNodeRes =
+                    parentNode.search(
+                        date.getClass(), DateNode.idBuilder(text, date)
+                        );
                 AbstractAdapterBase dateNode = null;
                 if (dateNodeRes.size() > 0)
                     dateNode = dateNodeRes.get(0);

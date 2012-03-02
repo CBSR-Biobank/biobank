@@ -6,6 +6,10 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
+import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoSavePermission;
+import edu.ualberta.med.biobank.common.permission.shipment.ShipmentDeletePermission;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
@@ -13,8 +17,10 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentAdapter extends AdapterBase {
 
@@ -24,6 +30,24 @@ public class ShipmentAdapter extends AdapterBase {
         if (originInfo.getShipmentInfo() == null) {
             throw new NullPointerException(
                 Messages.ShipmentAdapter_noShipment_error_msg);
+        }
+
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new ShipmentDeletePermission(originInfo.getId(),
+                        SessionManager.getUser().getCurrentWorkingCenter()
+                            .getId()));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new OriginInfoReadPermission(originInfo.getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new OriginInfoSavePermission(originInfo.getReceiverSite()
+                        .getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
         }
 
         setHasChildren(false);

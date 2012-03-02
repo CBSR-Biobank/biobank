@@ -17,7 +17,8 @@ public class DateNode extends AdapterBase {
     private Date date;
 
     public DateNode(AdapterBase parent, String text, Date date) {
-        super(parent, (int) date.getTime() + text.hashCode(), text + ": " //$NON-NLS-1$
+        super(parent, DateNode.idBuilder(text, date), text
+            + ": " //$NON-NLS-1$
             + DateFormatter.formatAsDate(date), true);
         this.setDate(date);
     }
@@ -95,5 +96,13 @@ public class DateNode extends AdapterBase {
         if (o instanceof DateNode)
             return date.compareTo(((DateNode) o).date);
         return 0;
+    }
+
+    public static Integer idBuilder(String text, Date date) {
+        // horrible crap, will be fixed when we get rid of stupid ID
+        return (int) ((int) date.getTime()
+        / 1000
+        + (text.length() == 8 ? date.getTime() / 1000
+            : date.getTime() / 1000 + 1));
     }
 }
