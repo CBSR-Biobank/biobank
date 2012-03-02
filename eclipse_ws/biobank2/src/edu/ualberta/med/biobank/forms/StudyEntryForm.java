@@ -74,8 +74,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         public boolean inStudy;
     }
 
-    private StudyAdapter studyAdapter;
-
     private StudyWrapper study;
 
     private ClinicAddInfoTable contactEntryTable;
@@ -115,7 +113,6 @@ public class StudyEntryForm extends BiobankEntryForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        studyAdapter = (StudyAdapter) adapter;
         updateStudyInfo(adapter.getId());
 
         String tabName;

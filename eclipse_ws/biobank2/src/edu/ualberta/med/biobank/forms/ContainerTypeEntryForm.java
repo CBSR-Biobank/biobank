@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -32,6 +36,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -84,6 +89,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private CommentCollectionInfoTable commentEntryTable;
 
+    private ContainerTypeInfo containerTypeInfo;
+
     private BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
             @Override
@@ -109,7 +116,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
-        containerType = (ContainerTypeWrapper) getModelObject();
+        updateContainerTypeInfo(adapter.getId());
 
         String tabName;
         if (containerType.isNew()) {
@@ -120,6 +127,25 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 containerType.getName());
         }
         setPartName(tabName);
+    }
+
+    private void updateContainerTypeInfo(Integer id)
+        throws ApplicationException {
+        if (id != null) {
+            containerTypeInfo = SessionManager.getAppService().doAction(
+                new ContainerTypeGetInfoAction(id));
+            containerType =
+                new ContainerTypeWrapper(SessionManager.getAppService(),
+                    containerTypeInfo.getContainerType());
+        } else {
+            containerTypeInfo = new ContainerTypeInfo();
+            containerType =
+                new ContainerTypeWrapper(SessionManager.getAppService());
+            containerType.setSite(SessionManager.getUser()
+                .getCurrentWorkingSite());
+        }
+
+        ((AdapterBase) adapter).setModelObject(containerType);
     }
 
     @Override
@@ -362,14 +388,33 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
      */
     @Override
     protected void saveForm() throws Exception {
-        setSpecimenTypes();
-        setChildContainerTypes();
-        containerType.persist();
+
+        ContainerTypeSaveAction ctSaveAction = new ContainerTypeSaveAction();
+        ctSaveAction.setId(containerType.getId());
+        ctSaveAction.setName(containerType.getName());
+        ctSaveAction.setNameShort(containerType.getNameShort());
+        ctSaveAction.setSiteId(containerType.getSite().getId());
+        ctSaveAction.setTopLevel(containerType.getTopLevel());
+        ctSaveAction.setRowCapacity(containerType.getRowCapacity());
+        ctSaveAction.setColCapacity(containerType.getColCapacity());
+        ctSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
+        ctSaveAction.setDefaultTemperature(containerType
+            .getDefaultTemperature());
+        ctSaveAction.setChildLabelingSchemeId(containerType
+            .getChildLabelingSchemeId());
+
+        ctSaveAction.setSpecimenTypeIds(getSpecimenTypeIds());
+        ctSaveAction.setChildContainerTypeIds(getChildContainerTypeIds());
+
+        Integer id =
+            SessionManager.getAppService().doAction(ctSaveAction).getId();
+        updateContainerTypeInfo(id);
+
         SessionManager.updateAllSimilarNodes(containerTypeAdapter, true);
 
     }
 
-    private void setSpecimenTypes() {
+    private HashSet<Integer> getSpecimenTypeIds() {
         if (hasSpecimens) {
             List<SpecimenTypeWrapper> addedSpcTypes = specimensMultiSelect
                 .getAddedToSelection();
@@ -381,9 +426,16 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             containerType.removeFromSpecimenTypeCollection(containerType
                 .getSpecimenTypeCollection());
         }
+
+        HashSet<Integer> result = new HashSet<Integer>();
+        for (SpecimenTypeWrapper spcType : containerType
+            .getSpecimenTypeCollection()) {
+            result.add(spcType.getId());
+        }
+        return result;
     }
 
-    private void setChildContainerTypes() {
+    private HashSet<Integer> getChildContainerTypeIds() {
         if (!hasSpecimens) {
             List<ContainerTypeWrapper> addedTypes =
                 childContainerTypesMultiSelect
@@ -397,6 +449,13 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             containerType.removeFromChildContainerTypeCollection(containerType
                 .getChildContainerTypeCollection());
         }
+
+        HashSet<Integer> result = new HashSet<Integer>();
+        for (ContainerTypeWrapper childContainerType : containerType
+            .getChildContainerTypeCollection()) {
+            result.add(childContainerType.getId());
+        }
+        return result;
     }
 
     @Override

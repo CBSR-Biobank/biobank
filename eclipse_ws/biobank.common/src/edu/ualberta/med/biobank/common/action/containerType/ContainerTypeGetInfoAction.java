@@ -22,12 +22,17 @@ public class ContainerTypeGetInfoAction implements Action<ContainerTypeInfo> {
             + " LEFT JOIN FETCH ctype.childContainerTypeCollection"
             + " LEFT JOIN FETCH ctype.specimenTypeCollection"
             + " LEFT JOIN FETCH ctype.commentCollection comments"
+            + " INNER JOIN FETCH ctype.site site"
+            + " LEFT JOIN FETCH site.containerTypeCollection"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE ctype.id = ?";
 
     public static class ContainerTypeInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
         private ContainerType containerType;
+
+        public ContainerTypeInfo() {
+        }
 
         public ContainerTypeInfo(ContainerType containerType) {
             this.containerType = containerType;
