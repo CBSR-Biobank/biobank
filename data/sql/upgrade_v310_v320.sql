@@ -600,7 +600,6 @@ ALTER TABLE container_type MODIFY COLUMN NAME VARCHAR(255) CHARACTER SET latin1 
 ALTER TABLE printer_label_template MODIFY COLUMN PRINTER_NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL;
 ALTER TABLE request MODIFY COLUMN CREATED DATETIME NOT NULL;
 ALTER TABLE request_specimen MODIFY COLUMN STATE INT(11) NOT NULL;
-ALTER TABLE shipment_info MODIFY COLUMN PACKED_AT DATETIME NOT NULL;
 ALTER TABLE specimen MODIFY COLUMN CURRENT_CENTER_ID INT(11) NOT NULL;
 ALTER TABLE specimen_type MODIFY COLUMN NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, MODIFY COLUMN NAME_SHORT VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL;
 ALTER TABLE study_event_attr MODIFY COLUMN PERMISSIBLE VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL;
@@ -746,11 +745,10 @@ ALTER TABLE processing_event MODIFY COLUMN ID INT(11) NOT NULL;
 -- TODO: this has to be added back in once we get feedback from Elizabeth
 -- ALTER TABLE processing_event ADD CONSTRAINT WORKSHEET UNIQUE KEY(WORKSHEET);
 
-update report r set r.IS_COUNT=b'1' where IS_COUNT is null;
-update report r set r.IS_PUBLIC=b'1' where IS_COUNT is null;
-alter table report modify is_count bit(1) NOT NULL;
-alter table report modify is_public bit(1) NOT NULL;
-
+update report r set r.IS_COUNT=b'0' where IS_COUNT is null;
+update report r set r.IS_PUBLIC=b'0' where IS_PUBLIC is null;
+alter table report change is_count IS_COUNT bit(1) NOT NULL;
+alter table report change is_public IS_PUBLIC bit(1) NOT NULL;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
