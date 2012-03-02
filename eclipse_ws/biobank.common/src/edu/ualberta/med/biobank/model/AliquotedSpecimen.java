@@ -29,9 +29,8 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
     private SpecimenType specimenType;
 
     /**
-     * @brief The number of aliquoted tubes to be collected.
-     * 
-     *        yadda yadda yadda.
+     * @brief The number of aliquoted tubes to be collected of this specimen
+     *        type.
      */
     private int quantity;
 
