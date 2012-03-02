@@ -70,10 +70,12 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void updateSiteInfo() throws Exception {
+        Assert.isNotNull(adapter.getId());
         siteInfo = SessionManager.getAppService().doAction(
             new SiteGetInfoAction(adapter.getId()));
-        site =
-            new SiteWrapper(SessionManager.getAppService(), siteInfo.getSite());
+        Assert.isNotNull(siteInfo.getSite());
+        site = new SiteWrapper(SessionManager.getAppService(),
+            siteInfo.getSite());
     }
 
     @Override

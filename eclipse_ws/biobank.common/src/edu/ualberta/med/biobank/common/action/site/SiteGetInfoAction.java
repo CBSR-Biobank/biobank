@@ -26,20 +26,24 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
 
     @SuppressWarnings("nls")
     private static final String SITE_COUNT_INFO_HQL =
-        "SELECT site, COUNT(DISTINCT patients), "
-            + "COUNT(DISTINCT collectionEvents) "
+        "SELECT site, COUNT(DISTINCT patients), COUNT(DISTINCT pevents) "
             + " FROM " + Site.class.getName() + " site"
+            + " LEFT JOIN site.processingEventCollection pevents"
             + " LEFT JOIN site.studyCollection studies"
             + " LEFT JOIN studies.patientCollection patients"
-            + " LEFT JOIN patients.collectionEventCollection collectionEvents"
-            + " WHERE site.id = ?"
+            + " LEFT JOIN patients.collectionEventCollection cevents"
+            + " LEFT JOIN cevents.allSpecimenCollection allSpecimens"
+            + " LEFT JOIN allSpecimens.currentCenter.id currentCenter"
+            + " WITH currentCenter=site"
+            + " WHERE site.id=?"
+            + " AND allSpecimens.activityStatus=?"
             + " GROUP BY site";
 
     private static final String SITE_COUNT_INFO_2_HQL =
         "SELECT count(*) "
             + " FROM " + Specimen.class.getName() + " s"
-            + " WHERE s.activityStatus = ?"
-            + " AND s.currentCenter.id = ?";
+            + " WHERE s.activityStatus=?"
+            + " AND s.currentCenter.id=?";
 
     private final Integer siteId;
 
@@ -68,6 +72,7 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
 
         query = context.getSession().createQuery(SITE_COUNT_INFO_HQL);
         query.setParameter(0, siteId);
+        query.setParameter(1, ActivityStatus.ACTIVE);
 
         Object[] items = (Object[]) query.uniqueResult();
 
@@ -75,8 +80,8 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
         builder.setCollectionEventCount((Long) items[2]);
 
         query = context.getSession().createQuery(SITE_COUNT_INFO_2_HQL);
-        query.setParameter(0, ActivityStatus.ACTIVE);
-        query.setParameter(1, siteId);
+        query.setParameter(0, siteId);
+        query.setParameter(1, ActivityStatus.ACTIVE);
 
         Long l = (Long) query.uniqueResult();
         builder.setAliquotedSpecimenCount(l);
