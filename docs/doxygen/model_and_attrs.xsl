@@ -12,7 +12,10 @@
   <xsl:param name="XmlPath" />
 
   <xsl:template match="compoundname">
-    <h2>Class: <xsl:value-of select="substring-after(.,'edu::ualberta::med::biobank::model::')" /></h2><xsl:text>&#10;</xsl:text>
+    <h2>
+      <xsl:number level="multiple" format="1. " count ="compounddef" />Class: <xsl:value-of select="substring-after(.,'edu::ualberta::med::biobank::model::')" />
+    </h2>
+    <xsl:text>&#10;</xsl:text>
   </xsl:template>
 
   <xsl:template match='briefdescription | detaileddescription'>
@@ -24,7 +27,7 @@
   <xsl:template match="sectiondef[@kind='public-func']">
     <xsl:for-each select="memberdef[@kind='function']/name">
       <xsl:if test="starts-with(., 'get')">
-        <p>Attribute: <xsl:value-of select="substring-after(../name,'get')"/>, Type: <xsl:value-of select="../type"/></p><xsl:text>&#10;</xsl:text>
+        <p><xsl:number level="multiple" format="1. " count ="compounddef|memberdef" />Attribute: <xsl:value-of select="substring-after(../name,'get')"/>, Type: <xsl:value-of select="../type"/></p><xsl:text>&#10;</xsl:text>
         <xsl:apply-templates select="../briefdescription"/>
         <xsl:apply-templates select="../detaileddescription"/>
       </xsl:if>
