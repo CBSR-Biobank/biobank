@@ -465,7 +465,7 @@ End:
   </target>
 
   <target name="clean"
-          depends="clean-tests,clean-jars,clean-product"
+          depends="clean-tests,clean-jars,clean-product,clean-doxygen"
           description="cleans project output, tests, and jars">
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output-validators" />
@@ -776,6 +776,11 @@ End:
       <arg value="combine.xslt" />
       <arg value="index.xml" />
     </exec>
+  </target>
+
+  <target name="clean-doxygen">
+    <delete dir="docs/doxygen/html" />
+    <delete dir="docs/doxygen/xml" />
   </target>
 
 <!-- (setq nxml-slash-auto-complete-flag t) -->
