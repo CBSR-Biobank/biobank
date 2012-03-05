@@ -9,11 +9,14 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <xsl:output indent="no" method="html" />
-  <xsl:param name="XmlPath" />
 
-  <xsl:template match="compoundname">
+  <xsl:variable name="classCount" select="1"/>
+
+  <xsl:template name="compoundname">
+    <xsl:param name="classNum" />
+    <xsl:param name="className" />
     <h2>
-      <xsl:number level="multiple" format="1. " count ="compounddef" />Class: <xsl:value-of select="substring-after(.,'edu::ualberta::med::biobank::model::')" />
+      <xsl:value-of select="$classNum" />. Class: <xsl:value-of select="substring-after($className,'edu::ualberta::med::biobank::model::')" />
     </h2>
     <xsl:text>&#10;</xsl:text>
   </xsl:template>
@@ -24,20 +27,27 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="name">
+      <p><xsl:number level="multiple" format="1.1. " value="position()" />Attribute: <xsl:value-of select="substring-after(../name,'get')"/>, Type: <xsl:value-of select="../type"/></p><xsl:text>&#10;</xsl:text>
+      <xsl:apply-templates select="../briefdescription"/>
+      <xsl:apply-templates select="../detaileddescription"/>
+  </xsl:template>
+
   <xsl:template match="sectiondef[@kind='public-func']">
-    <xsl:for-each select="memberdef[@kind='function']/name">
-      <xsl:if test="starts-with(., 'get')">
-        <p><xsl:number level="multiple" format="1. " count ="compounddef|memberdef" />Attribute: <xsl:value-of select="substring-after(../name,'get')"/>, Type: <xsl:value-of select="../type"/></p><xsl:text>&#10;</xsl:text>
-        <xsl:apply-templates select="../briefdescription"/>
-        <xsl:apply-templates select="../detaileddescription"/>
-      </xsl:if>
+    <xsl:param name="classNum" />
+    <xsl:for-each select="memberdef[@kind='function']/name[starts-with(.,'get')]" >
+      <xsl:sort select="../name" data-type="text" />
+      <xsl:apply-templates select="../name" />
     </xsl:for-each>
   </xsl:template>
 
   <xsl:template match="/*">
     <xsl:for-each select="/doxygen/compounddef[@kind='class']">
       <div>
-        <xsl:apply-templates select="compoundname" />
+        <xsl:call-template name="compoundname">
+          <xsl:with-param name="classNum" select="position()"/>
+          <xsl:with-param name="className" select="compoundname"/>
+        </xsl:call-template>
         <xsl:apply-templates select="briefdescription" />
         <xsl:apply-templates select="detaileddescription" />
         <xsl:apply-templates select="sectiondef[@kind='public-func']" />
