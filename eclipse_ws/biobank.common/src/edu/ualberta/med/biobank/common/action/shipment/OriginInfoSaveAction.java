@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
-import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoSavePermission;
+import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
@@ -36,7 +36,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new OriginInfoSavePermission(oiInfo.siteId)
+        return new OriginInfoUpdatePermission(oiInfo.siteId)
             .isAllowed(context);
     }
 

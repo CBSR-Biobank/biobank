@@ -27,11 +27,17 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     private static BgcLogger logger = BgcLogger
         .getLogger(ProcessingEventAdapter.class.getName());
+    private ProcessingEventWrapper pEvent;
 
     public ProcessingEventAdapter(AdapterBase parent,
         ProcessingEventWrapper pEvent) {
         super(parent, pEvent);
+        this.pEvent = pEvent;
+        if (pEvent.getId() != null) init();
+    }
 
+    @Override
+    public void init() {
         try {
             this.isDeletable =
                 SessionManager.getAppService().isAllowed(

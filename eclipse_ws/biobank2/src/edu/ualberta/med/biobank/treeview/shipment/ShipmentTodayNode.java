@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoSavePermission;
+import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
@@ -35,7 +35,7 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
         try {
             this.createAllowed =
                 SessionManager.getAppService().isAllowed(
-                    new OriginInfoSavePermission(SessionManager.getUser()
+                    new OriginInfoUpdatePermission(SessionManager.getUser()
                         .getCurrentWorkingCenter().getId()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");

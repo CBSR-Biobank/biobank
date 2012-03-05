@@ -40,27 +40,28 @@ public class PatientAdapter extends AbstractNewAdapterBase {
         super(parent, pinfo == null ? null : pinfo.patient.getId(), null, null,
             (pinfo == null || pinfo.ceventsCount == null) ? false
                 : pinfo.ceventsCount > 0);
-        if (pinfo != null) {
-            this.patient = pinfo.patient;
-            this.study = pinfo.study;
-            this.ceventsCount = pinfo.ceventsCount;
-
-            try {
-                this.isDeletable =
-                    SessionManager.getAppService().isAllowed(
-                        new PatientDeletePermission(patient.getId()));
-                this.isReadable =
-                    SessionManager.getAppService().isAllowed(
-                        new PatientReadPermission(patient.getId()));
-                this.isEditable =
-                    SessionManager.getAppService().isAllowed(
-                        new PatientUpdatePermission(patient.getId()));
-            } catch (ApplicationException e) {
-                BgcPlugin.openAsyncError("Permission Error",
-                    "Unable to retrieve user permissions");
-            }
+        if (pinfo.patient.getId() != null) {
+            setValue(pinfo);
         }
 
+    }
+
+    @Override
+    public void init() {
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new PatientDeletePermission(patient.getId()));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new PatientReadPermission(patient.getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new PatientUpdatePermission(patient.getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     @Override
@@ -173,6 +174,7 @@ public class PatientAdapter extends AbstractNewAdapterBase {
             this.study = pinfo.study;
             this.ceventsCount = pinfo.ceventsCount;
         }
+        init();
     }
 
     @Override
@@ -180,4 +182,5 @@ public class PatientAdapter extends AbstractNewAdapterBase {
         SessionManager.getAppService().doAction(
             new PatientDeleteAction(getId()));
     }
+
 }

@@ -88,10 +88,4 @@ public class ClinicAdapter extends AdapterBase {
         return 0;
     }
 
-    @Override
-    public boolean isEditable() {
-        // TODO: this needs to be implemented correctly
-        return true;
-    }
-
 }

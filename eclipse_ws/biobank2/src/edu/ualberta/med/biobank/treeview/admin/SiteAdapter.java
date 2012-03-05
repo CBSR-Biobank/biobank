@@ -33,9 +33,13 @@ public class SiteAdapter extends AdapterBase {
         this.site = site;
         if (site != null && site.getId() != null) {
             nodeIdOffset *= site.getId();
+            init();
         }
         createNodes();
+    }
 
+    @Override
+    public void init() {
         try {
             this.isDeletable =
                 SessionManager.getAppService().isAllowed(

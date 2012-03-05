@@ -49,6 +49,10 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
     public SourceSpecimenEntryInfoTable(Composite parent,
         List<SourceSpecimenWrapper> collection) {
         super(parent, collection);
+        init();
+    }
+
+    private void init() {
         try {
             this.isEditable =
                 SessionManager.getAppService().isAllowed(
@@ -219,6 +223,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         reloadCollection(selectedSourceSpecimens);
         addedOrModifiedSourceSpecimens = new ArrayList<SourceSpecimenWrapper>();
         deletedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
+        init();
     }
 
     @SuppressWarnings("serial")

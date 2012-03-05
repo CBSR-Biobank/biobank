@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentDeleteAction;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
-import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoSavePermission;
+import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
 import edu.ualberta.med.biobank.common.permission.shipment.ShipmentDeletePermission;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -25,18 +25,30 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentAdapter extends AdapterBase {
 
+    private OriginInfoWrapper originInfo;
+
     public ShipmentAdapter(AdapterBase parent, OriginInfoWrapper originInfo) {
         super(parent, originInfo);
-
+        this.originInfo = originInfo;
         if (originInfo.getShipmentInfo() == null) {
             throw new NullPointerException(
                 Messages.ShipmentAdapter_noShipment_error_msg);
         }
 
+        if (originInfo.getId() != null) {
+            init();
+        }
+
+        setHasChildren(false);
+    }
+
+    @Override
+    public void init() {
         try {
             this.isDeletable =
                 SessionManager.getAppService().isAllowed(
-                    new ShipmentDeletePermission(originInfo.getReceiverSite()
+                    new ShipmentDeletePermission(originInfo
+                        .getReceiverSite()
                         .getId(),
                         SessionManager.getUser().getCurrentWorkingCenter()
                             .getId()));
@@ -45,14 +57,13 @@ public class ShipmentAdapter extends AdapterBase {
                     new OriginInfoReadPermission(originInfo.getId()));
             this.isEditable =
                 SessionManager.getAppService().isAllowed(
-                    new OriginInfoSavePermission(originInfo.getReceiverSite()
+                    new OriginInfoUpdatePermission(originInfo
+                        .getReceiverSite()
                         .getId()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Permission Error",
                 "Unable to retrieve user permissions");
         }
-
-        setHasChildren(false);
     }
 
     @Override

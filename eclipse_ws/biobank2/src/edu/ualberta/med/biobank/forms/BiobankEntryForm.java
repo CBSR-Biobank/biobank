@@ -205,20 +205,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         throws PartInitException {
         super.init(editorSite, input);
         setDirty(false);
-        checkEditAccess();
-    }
-
-    protected void checkEditAccess() {
-        // FIXME what should be done for new adapters?
-        if (adapter instanceof AdapterBase) {
-            if (adapter != null
-                && ((AdapterBase) adapter).getObjectClazz() != null
-                && !adapter.isEditable()) {
-                BgcPlugin.openAccessDeniedErrorMessage();
-                throw new RuntimeException(
-                    Messages.BiobankEntryForm_access_denied_error_msg);
-            }
-        }
     }
 
     @Override

@@ -36,8 +36,20 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchAdapter extends AdapterBase {
 
+    private DispatchWrapper ship;
+
     public DispatchAdapter(AdapterBase parent, DispatchWrapper ship) {
         super(parent, ship);
+        this.ship = ship;
+        if (ship.getId() != null) init();
+    }
+
+    private DispatchWrapper getDispatchWrapper() {
+        return (DispatchWrapper) getModelObject();
+    }
+
+    @Override
+    public void init() {
         try {
             this.isDeletable =
                 SessionManager.getAppService().isAllowed(
@@ -52,10 +64,6 @@ public class DispatchAdapter extends AdapterBase {
             BgcPlugin.openAsyncError("Permission Error",
                 "Unable to retrieve user permissions");
         }
-    }
-
-    private DispatchWrapper getDispatchWrapper() {
-        return (DispatchWrapper) getModelObject();
     }
 
     @Override
