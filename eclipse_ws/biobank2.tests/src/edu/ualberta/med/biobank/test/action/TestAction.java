@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.User;
@@ -89,6 +90,7 @@ public class TestAction {
         session.save(superAdmin);
 
         Membership membership = new Membership();
+        membership.setRank(Rank.ADMINISTRATOR);
         membership.setPrincipal(superAdmin);
         superAdmin.getMembershipCollection().add(membership);
         membership.getPermissionCollection().add(PermissionEnum.ADMINISTRATION);

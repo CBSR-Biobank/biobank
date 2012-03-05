@@ -44,7 +44,7 @@ public class GroupGetAllAction implements Action<ListResult<BbGroup>> {
         @SuppressWarnings("unchecked")
         List<BbGroup> allGroups = c.list();
         for (BbGroup group : allGroups) {
-            if (group.isRemovable(user)) {
+            if (group.isFullyManageable(user)) {
                 groups.add(group);
             }
         }

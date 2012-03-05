@@ -10,6 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -115,11 +116,29 @@ public class User extends Principal {
     }
 
     @Override
-    public boolean isRemovable(User user) {
-        if (!super.isRemovable(user)) return false;
+    public boolean isFullyManageable(User user) {
+        if (!super.isFullyManageable(user)) return false;
         for (BbGroup group : getGroupCollection()) {
-            if (!group.isRemovable(user)) return false;
+            if (!group.isFullyManageable(user)) return false;
         }
         return true;
+    }
+
+    /**
+     * Retuns all of this {@link User}'s {@link Memberships}, i.e. from both the
+     * {@link User} directly and from the {@link BbGroup}-s.
+     * 
+     * @return
+     */
+    @Transient
+    public Set<Membership> getAllMemberships() {
+        Set<Membership> memberships = new HashSet<Membership>();
+        memberships.addAll(getMembershipCollection());
+
+        for (BbGroup group : getGroupCollection()) {
+            memberships.addAll(group.getMembershipCollection());
+        }
+
+        return memberships;
     }
 }

@@ -62,13 +62,14 @@ public class Principal extends AbstractBiobankModel {
      * {@link User}, i.e. if the given {@link User} is of <em>equal</em> or
      * greater power.
      * 
-     * @param user potential (co?)-manager
-     * @return true if this is subordinate to the given {@link User} user.
+     * @param user
+     * @return true if this {@link Principal} is subordinate to the given
+     *         {@link User}.
      */
     @Transient
-    public boolean isRemovable(User user) {
+    public boolean isFullyManageable(User user) {
         for (Membership membership : getMembershipCollection()) {
-            if (!membership.isRemovable(user)) return false;
+            if (!membership.isFullyManageable(user)) return false;
         }
         return true;
     }

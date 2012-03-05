@@ -1,6 +1,6 @@
 @TypeDefs({
     @TypeDef(
-        name = "activityStatus", 
+        name = "activityStatus",
         typeClass = GenericEnumUserType.class,
         defaultForType = ActivityStatus.class,
         parameters = {
@@ -12,13 +12,20 @@
         defaultForType = PermissionEnum.class,
         parameters = {
             @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.PermissionEnum")
+        }),
+    @TypeDef(
+        name = "rank",
+        typeClass = GenericEnumUserType.class,
+        defaultForType = Rank.class,
+        parameters = {
+            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.Rank")
         })
 })
 package edu.ualberta.med.biobank.model;
 
-import edu.ualberta.med.biobank.model.util.GenericEnumUserType;
-
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
+
+import edu.ualberta.med.biobank.model.util.GenericEnumUserType;
 

@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 
@@ -23,6 +22,10 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
  * 
  */
 public enum PermissionEnum implements NotAProxy, Serializable {
+    /**
+     * @deprecated use {@link Membership#setRank(Rank)} with
+     *             {@link Rank#ADMINISTRATOR} instead.
+     */
     ADMINISTRATION(1),
 
     SPECIMEN_CREATE(2),
@@ -86,6 +89,10 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     CLINIC_UPDATE(49),
     CLINIC_DELETE(50),
 
+    /**
+     * @deprecated use {@link Membership#setRank(Rank)} with
+     *             {@link Rank#USER_MANAGER} instead.
+     */
     USER_MANAGEMENT(51),
 
     CONTAINER_TYPE_CREATE(52),
@@ -158,62 +165,21 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     }
 
     public boolean isAllowed(User user, Center center, Study study) {
-        if (isPrincipalAllowed(user, center, study)) {
-            return true;
-        }
-
-        Set<BbGroup> groups = user.getGroupCollection();
-        if (groups != null) {
-            for (BbGroup group : groups) {
-                if (isPrincipalAllowed(group, center, study)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private boolean isPrincipalAllowed(Principal principal, Center center,
-        Study study) {
-        Set<Membership> membs = principal.getMembershipCollection();
-        if (membs != null) {
-            for (Membership memb : membs) {
-                boolean allowed = isMembershipAllowed(memb, center, study);
-                if (allowed) {
-                    return true;
-                }
-            }
+        for (Membership m : user.getAllMemberships()) {
+            if (isMembershipAllowed(m, center, study)) return true;
         }
         return false;
     }
 
     private boolean isMembershipAllowed(Membership membership, Center center,
         Study study) {
+        boolean hasCenter = membership.getCenter() == null
+            || membership.getCenter().equals(center);
+        boolean hasStudy = membership.getStudy() == null
+            || membership.getStudy().equals(study);
+        boolean hasPermission = membership.getAllPermissions().contains(this);
 
-        boolean hasCenter =
-            center == null || membership.getCenter() == null
-                || membership.getCenter().equals(center);
-        boolean hasStudy =
-            study == null || membership.getStudy() == null
-                || membership.getStudy().equals(study);
-
-        Set<PermissionEnum> permissions =
-            membership.getPermissionCollection();
-        boolean hasPermission =
-            ((permissions != null) && isPermissionAllowed(permissions));
-
-        boolean result = hasCenter && hasStudy && hasPermission;
-
-        return result;
-    }
-
-    private boolean isPermissionAllowed(Set<PermissionEnum> permissions) {
-        for (PermissionEnum permission : permissions) {
-            if (equals(permission) || ADMINISTRATION.equals(permission)) {
-                return true;
-            }
-        }
-        return false;
+        boolean isAllowed = hasCenter && hasStudy && hasPermission;
+        return isAllowed;
     }
 }
