@@ -30,6 +30,16 @@ import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+/**
+ * caTissue Term - Aliquot: Pertaining to a portion of the whole; any one of two
+ * or more samples of something, of the same volume or weight.
+ * 
+ * NCI Term - Specimen: A part of a thing, or of several things, taken to
+ * demonstrate or to determine the character of the whole, e.g. a substance, or
+ * portion of material obtained for use in testing, examination, or study;
+ * particularly, a preparation of tissue or bodily fluid taken for examination
+ * or diagnosis.
+ */
 @Entity
 @Table(name = "SPECIMEN")
 @Unique(properties = "inventoryId", groups = PrePersist.class)

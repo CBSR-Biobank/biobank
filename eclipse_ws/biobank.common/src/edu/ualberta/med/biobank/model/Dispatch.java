@@ -15,6 +15,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+/**
+ * caTissue Term - Transfer Event: Event that refers to moving specimen from one
+ * storage location to another storage location.
+ * 
+ */
 @Entity
 @Table(name = "DISPATCH")
 public class Dispatch extends AbstractBiobankModel {

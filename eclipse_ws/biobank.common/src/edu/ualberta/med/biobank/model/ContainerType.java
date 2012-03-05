@@ -26,6 +26,15 @@ import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+/**
+ * Describes a container configuration which may hold other child containers or
+ * specimens. Container types are used to create a representation of a physical
+ * container
+ * 
+ * ET: Describes various containers that can hold specimens, these container
+ * types are used to build a container.
+ * 
+ */
 @Entity
 @Table(name = "CONTAINER_TYPE",
     uniqueConstraints = {

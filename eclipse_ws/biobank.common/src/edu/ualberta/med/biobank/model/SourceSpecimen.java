@@ -8,6 +8,21 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+/**
+ * caTissue Term - Specimen: A single unit of tissue or body fluid collected
+ * from a participant as part of a specimen collection event. A new specimen can
+ * be created as a derivative of an existing specimen or by dividing it into
+ * small pieces.
+ * 
+ * NCI Term - Biospecimen: Any material sample taken from a biological entity
+ * for testing, diagnostic, propagation, treatment or research purposes,
+ * including a sample obtained from a living organism or taken from the
+ * biological object after halting of all its life functions. Biospecimen can
+ * contain one or more components including but not limited to cellular
+ * molecules, cells, tissues, organs, body fluids, embryos, and body excretory
+ * products.
+ * 
+ */
 @Entity
 @Table(name = "SOURCE_SPECIMEN")
 public class SourceSpecimen extends AbstractBiobankModel {

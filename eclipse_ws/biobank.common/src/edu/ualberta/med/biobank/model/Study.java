@@ -24,6 +24,14 @@ import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+/**
+ * ET: Research conducted on a specific group of people to discover a determined
+ * result; has one specific protocol
+ * 
+ * caTissue Term - Collection Protocol: A set of written procedures that
+ * describe how a biospecimen is collected.
+ * 
+ */
 @Entity
 @Table(name = "STUDY")
 @Unique.List({

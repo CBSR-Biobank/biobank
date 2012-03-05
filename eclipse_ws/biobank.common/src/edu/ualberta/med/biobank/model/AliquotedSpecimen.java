@@ -14,9 +14,11 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Type;
 
 /**
- * @brief The specimen types, derived from source specimens, that are collected
- *        for a study.
+ * The specimens, derived from source specimens, that are collected for a study.
  * 
+ * A study can be configured to have as many aliquoted specimens as are
+ * required. The aliquoted specimen states the specimen types collected by a
+ * study, the number of tubes and the required volume in each tube.
  */
 @Entity
 @Table(name = "ALIQUOTED_SPECIMEN")

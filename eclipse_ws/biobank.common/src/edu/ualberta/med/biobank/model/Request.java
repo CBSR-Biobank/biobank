@@ -17,6 +17,11 @@ import javax.validation.constraints.Null;
 
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
+/**
+ * caTissue Term - Specimen Distribution: An event that results in transfer of a
+ * specimen from a Repository to a Laboratory
+ * 
+ */
 @Entity
 @Table(name = "REQUEST")
 public class Request extends AbstractBiobankModel {

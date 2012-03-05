@@ -5,30 +5,44 @@
   xsltproc model_and_attrs.xsl xml/all.xml > FILE
 
   TO INSERT NEW LINE: <xsl:text>&#10;</xsl:text>
+
+  USAGE:
+     cd ~/proj/cbsr/biobank2/docs/doxygen && java -jar ~/apps/saxon9he.jar -xsl:model_and_attrs.xsl -s:xml/all.xml
+
 -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <xsl:output indent="no" method="html" />
 
-  <xsl:variable name="classCount" select="1"/>
-
-  <xsl:template name="compoundname">
-    <xsl:param name="classNum" />
-    <xsl:param name="className" />
-    <h2>
-      <xsl:value-of select="$classNum" />. Class: <xsl:value-of select="substring-after($className,'edu::ualberta::med::biobank::model::')" />
-    </h2>
-    <xsl:text>&#10;</xsl:text>
+  <xsl:template match="compoundname">
+    <h2>Class: <a><xsl:attribute name="name"><xsl:value-of select="../@id" /></xsl:attribute><xsl:value-of select="substring-after(.,'edu::ualberta::med::biobank::model::')" /></a></h2>
   </xsl:template>
 
-  <xsl:template match='briefdescription | detaileddescription'>
-    <xsl:if test="normalize-space(para)!=''">
-        <p><xsl:apply-templates /></p><xsl:text>&#10;</xsl:text>
+  <xsl:template match='ref'>
+    <a><xsl:attribute name="href">#<xsl:value-of select="@refid" /></xsl:attribute><xsl:value-of select="." /></a>
+  </xsl:template>
+
+  <xsl:template match='para'>
+    <xsl:if test="normalize-space(.)!=''">
+      <p><xsl:apply-templates /></p>
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match='briefdescription | detaileddescription'>
+    <xsl:apply-templates />
+  </xsl:template>
+
   <xsl:template match="name">
-      <p><xsl:number level="multiple" format="1.1. " value="position()" />Attribute: <xsl:value-of select="substring-after(../name,'get')"/>, Type: <xsl:value-of select="../type"/></p><xsl:text>&#10;</xsl:text>
+      <h4>Attribute: <xsl:value-of select="lower-case(substring(substring-after(../name,'get'),1,1))"/><xsl:value-of select="substring(substring-after(../name,'get'),2)"/>
+      <xsl:choose>
+        <xsl:when test="../type = 'ActivityStatus'">
+          <xsl:text>(type: one of: ACTIVE, FLAGGED, CLOSED)</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          (type: <xsl:value-of select="../type" />)
+        </xsl:otherwise>
+      </xsl:choose>
+      </h4>
       <xsl:apply-templates select="../briefdescription"/>
       <xsl:apply-templates select="../detaileddescription"/>
   </xsl:template>
@@ -42,17 +56,20 @@
   </xsl:template>
 
   <xsl:template match="/*">
-    <xsl:for-each select="/doxygen/compounddef[@kind='class']">
-      <div>
-        <xsl:call-template name="compoundname">
-          <xsl:with-param name="classNum" select="position()"/>
-          <xsl:with-param name="className" select="compoundname"/>
-        </xsl:call-template>
-        <xsl:apply-templates select="briefdescription" />
-        <xsl:apply-templates select="detaileddescription" />
-        <xsl:apply-templates select="sectiondef[@kind='public-func']" />
-      </div><xsl:text>&#10;</xsl:text>
-    </xsl:for-each>
+    <html>
+      <body>
+        <xsl:for-each select="/doxygen/compounddef[@kind='class']">
+          <div>
+            <xsl:apply-templates select="compoundname" />
+            <xsl:apply-templates select="briefdescription" />
+            <xsl:apply-templates select="detaileddescription" />
+            <div><h3>Attributes</h3>
+            <xsl:apply-templates select="sectiondef[@kind='public-func']" />
+            </div>
+          </div>
+        </xsl:for-each>
+      </body>
+    </html>
   </xsl:template>
 
 </xsl:stylesheet>
