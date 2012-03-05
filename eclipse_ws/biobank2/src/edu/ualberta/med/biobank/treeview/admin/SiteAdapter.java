@@ -9,12 +9,17 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.site.SiteDeletePermission;
+import edu.ualberta.med.biobank.common.permission.site.SiteReadPermission;
+import edu.ualberta.med.biobank.common.permission.site.SiteUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteAdapter extends AdapterBase {
 
@@ -30,6 +35,21 @@ public class SiteAdapter extends AdapterBase {
             nodeIdOffset *= site.getId();
         }
         createNodes();
+
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new SiteDeletePermission(site.getId()));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new SiteReadPermission(site.getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new SiteUpdatePermission(site.getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     public ContainerTypeGroup getContainerTypesGroupNode() {

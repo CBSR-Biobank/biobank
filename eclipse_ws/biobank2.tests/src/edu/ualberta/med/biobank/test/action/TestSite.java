@@ -14,6 +14,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.SetResult;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
@@ -133,9 +135,17 @@ public class TestSite extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
-        EXECUTOR.exec(
-            new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
-            .getList();
+        CEventInfo ceventInfo =
+            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+        List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
+
+        Integer pEventId = EXECUTOR.exec(
+            new ProcessingEventSaveAction(
+                null, provisioning.siteId, Utils.getRandomDate(), Utils
+                    .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
+                new HashSet<Integer>(
+                    Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
+            .getId();
 
         SiteInfo siteInfo =
             EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
@@ -145,8 +155,8 @@ public class TestSite extends TestAction {
         Assert.assertEquals(ActivityStatus.ACTIVE,
             siteInfo.site.getActivityStatus());
         Assert.assertEquals(new Long(1), siteInfo.patientCount);
-        Assert.assertEquals(new Long(1), siteInfo.collectionEventCount);
-        Assert.assertEquals(new Long(0), siteInfo.aliquotedSpecimenCount);
+        Assert.assertEquals(new Long(1), siteInfo.processingEventCount);
+        Assert.assertEquals(new Long(1), siteInfo.specimenCount);
     }
 
     @Test
