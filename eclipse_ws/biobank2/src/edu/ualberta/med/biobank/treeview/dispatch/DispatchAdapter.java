@@ -36,12 +36,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchAdapter extends AdapterBase {
 
-    private DispatchWrapper ship;
-
     public DispatchAdapter(AdapterBase parent, DispatchWrapper ship) {
         super(parent, ship);
-        this.ship = ship;
-        if (ship.getId() != null) init();
     }
 
     private DispatchWrapper getDispatchWrapper() {
@@ -53,13 +49,13 @@ public class DispatchAdapter extends AdapterBase {
         try {
             this.isDeletable =
                 SessionManager.getAppService().isAllowed(
-                    new DispatchDeletePermission(ship.getId()));
+                    new DispatchDeletePermission(getModelObject().getId()));
             this.isReadable =
                 SessionManager.getAppService().isAllowed(
-                    new DispatchReadPermission(ship.getId()));
+                    new DispatchReadPermission(getModelObject().getId()));
             this.isEditable =
                 SessionManager.getAppService().isAllowed(
-                    new DispatchUpdatePermission(ship.getId()));
+                    new DispatchUpdatePermission(getModelObject().getId()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Permission Error",
                 "Unable to retrieve user permissions");

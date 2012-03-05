@@ -40,9 +40,7 @@ public class PatientAdapter extends AbstractNewAdapterBase {
         super(parent, pinfo == null ? null : pinfo.patient.getId(), null, null,
             (pinfo == null || pinfo.ceventsCount == null) ? false
                 : pinfo.ceventsCount > 0);
-        if (pinfo.patient.getId() != null) {
-            setValue(pinfo);
-        }
+        setValue(pinfo);
 
     }
 
@@ -173,8 +171,9 @@ public class PatientAdapter extends AbstractNewAdapterBase {
             this.patient = pinfo.patient;
             this.study = pinfo.study;
             this.ceventsCount = pinfo.ceventsCount;
+            if (patient.getId() != null) init();
         }
-        init();
+
     }
 
     @Override

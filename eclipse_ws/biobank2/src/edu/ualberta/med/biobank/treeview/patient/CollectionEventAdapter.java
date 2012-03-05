@@ -34,9 +34,7 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
             null, null, false);
         this.ceventInfo = ceventInfo;
 
-        if (ceventInfo.cevent.getId() != null) {
-            init();
-        }
+        init();
     }
 
     @Override
@@ -181,6 +179,6 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     @Override
     public void setValue(Object val) {
         this.ceventInfo = (SimpleCEventInfo) val;
-        init();
+        if (ceventInfo.cevent.getId() != null) init();
     }
 }

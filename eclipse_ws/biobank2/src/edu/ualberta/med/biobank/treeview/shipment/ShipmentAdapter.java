@@ -25,18 +25,11 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentAdapter extends AdapterBase {
 
-    private OriginInfoWrapper originInfo;
-
     public ShipmentAdapter(AdapterBase parent, OriginInfoWrapper originInfo) {
         super(parent, originInfo);
-        this.originInfo = originInfo;
         if (originInfo.getShipmentInfo() == null) {
             throw new NullPointerException(
                 Messages.ShipmentAdapter_noShipment_error_msg);
-        }
-
-        if (originInfo.getId() != null) {
-            init();
         }
 
         setHasChildren(false);
@@ -47,19 +40,21 @@ public class ShipmentAdapter extends AdapterBase {
         try {
             this.isDeletable =
                 SessionManager.getAppService().isAllowed(
-                    new ShipmentDeletePermission(originInfo
-                        .getReceiverSite()
-                        .getId(),
+                    new ShipmentDeletePermission(
+                        ((OriginInfoWrapper) getModelObject())
+                            .getReceiverSite()
+                            .getId(),
                         SessionManager.getUser().getCurrentWorkingCenter()
                             .getId()));
             this.isReadable =
                 SessionManager.getAppService().isAllowed(
-                    new OriginInfoReadPermission(originInfo.getId()));
+                    new OriginInfoReadPermission(getModelObject().getId()));
             this.isEditable =
                 SessionManager.getAppService().isAllowed(
-                    new OriginInfoUpdatePermission(originInfo
-                        .getReceiverSite()
-                        .getId()));
+                    new OriginInfoUpdatePermission(
+                        ((OriginInfoWrapper) getModelObject())
+                            .getReceiverSite()
+                            .getId()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Permission Error",
                 "Unable to retrieve user permissions");

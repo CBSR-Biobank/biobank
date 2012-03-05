@@ -24,16 +24,13 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class SiteAdapter extends AdapterBase {
 
     private int nodeIdOffset = 100;
-    private final SiteWrapper site;
     public static final int CONTAINER_TYPES_BASE_NODE_ID = 0;
     public static final int CONTAINERS_BASE_NODE_ID = 1;
 
     public SiteAdapter(AdapterBase parent, SiteWrapper site) {
         super(parent, site);
-        this.site = site;
         if (site != null && site.getId() != null) {
             nodeIdOffset *= site.getId();
-            init();
         }
         createNodes();
     }
@@ -43,13 +40,13 @@ public class SiteAdapter extends AdapterBase {
         try {
             this.isDeletable =
                 SessionManager.getAppService().isAllowed(
-                    new SiteDeletePermission(site.getId()));
+                    new SiteDeletePermission(getModelObject().getId()));
             this.isReadable =
                 SessionManager.getAppService().isAllowed(
-                    new SiteReadPermission(site.getId()));
+                    new SiteReadPermission(getModelObject().getId()));
             this.isEditable =
                 SessionManager.getAppService().isAllowed(
-                    new SiteUpdatePermission(site.getId()));
+                    new SiteUpdatePermission(getModelObject().getId()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Permission Error",
                 "Unable to retrieve user permissions");

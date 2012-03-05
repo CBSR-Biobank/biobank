@@ -27,13 +27,10 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     private static BgcLogger logger = BgcLogger
         .getLogger(ProcessingEventAdapter.class.getName());
-    private ProcessingEventWrapper pEvent;
 
     public ProcessingEventAdapter(AdapterBase parent,
         ProcessingEventWrapper pEvent) {
         super(parent, pEvent);
-        this.pEvent = pEvent;
-        if (pEvent.getId() != null) init();
     }
 
     @Override
@@ -41,13 +38,17 @@ public class ProcessingEventAdapter extends AdapterBase {
         try {
             this.isDeletable =
                 SessionManager.getAppService().isAllowed(
-                    new ProcessingEventDeletePermission(pEvent.getId()));
+                    new ProcessingEventDeletePermission(getModelObject()
+                        .getId()));
             this.isReadable =
-                SessionManager.getAppService().isAllowed(
-                    new ProcessingEventReadPermission(pEvent.getId()));
+                SessionManager.getAppService()
+                    .isAllowed(
+                        new ProcessingEventReadPermission(getModelObject()
+                            .getId()));
             this.isEditable =
                 SessionManager.getAppService().isAllowed(
-                    new ProcessingEventUpdatePermission(pEvent.getId()));
+                    new ProcessingEventUpdatePermission(getModelObject()
+                        .getId()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Permission Error",
                 "Unable to retrieve user permissions");
