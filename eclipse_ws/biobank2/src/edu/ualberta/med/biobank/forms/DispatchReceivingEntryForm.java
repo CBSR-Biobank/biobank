@@ -16,13 +16,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.SessionSecurityHelper;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchChangeStatePermission;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
@@ -288,14 +289,17 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
     @Override
     protected void checkEditAccess() {
-        if (adapter != null
-            && ((AdapterBase) adapter).getId() != null
-            && !SessionManager
-                .isAllowed(SessionSecurityHelper.DISPATCH_RECEIVE_KEY_DESC)) {
-            BgcPlugin.openAccessDeniedErrorMessage();
-            throw new RuntimeException(
-                Messages.BiobankEntryForm_access_denied_error_msg);
+        try {
+            if (adapter != null
+                && ((AdapterBase) adapter).getId() != null
+                && !SessionManager.getAppService().isAllowed(
+                    new DispatchChangeStatePermission(((AdapterBase) adapter)
+                        .getId()))) {
+                BgcPlugin.openAccessDeniedErrorMessage();
+            }
+        } catch (ApplicationException e) {
         }
+        throw new RuntimeException(
+            Messages.BiobankEntryForm_access_denied_error_msg);
     }
-
 }

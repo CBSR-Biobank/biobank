@@ -5,13 +5,13 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 
-public class ResearchGroupSavePermission implements Permission {
+public class ResearchGroupUpdatePermission implements Permission {
 
     private static final long serialVersionUID = 1L;
 
     private Integer id;
 
-    public ResearchGroupSavePermission(Integer id) {
+    public ResearchGroupUpdatePermission(Integer id) {
         this.id = id;
     }
 

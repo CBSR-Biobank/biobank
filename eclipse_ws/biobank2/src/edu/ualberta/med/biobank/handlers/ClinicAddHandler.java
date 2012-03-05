@@ -6,11 +6,16 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicCreatePermission;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicAddHandler extends AbstractHandler {
-    public static final String ID = "edu.ualberta.med.biobank.commands.addClinic"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.commands.addClinic"; //$NON-NLS-1$
+
+    private Boolean createAllowed;
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -22,8 +27,17 @@ public class ClinicAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.isSuperAdminMode()
-            && SessionManager.canCreate(ClinicWrapper.class)
-            && SessionManager.getInstance().getSession() != null;
+        try {
+            if (createAllowed == null)
+                createAllowed =
+                    SessionManager.getAppService().isAllowed(
+                        new ClinicCreatePermission());
+            return SessionManager.isSuperAdminMode()
+                && SessionManager.getInstance().getSession() != null &&
+                createAllowed;
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            return false;
+        }
     }
 }

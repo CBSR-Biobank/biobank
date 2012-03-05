@@ -5,11 +5,16 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeAddHandler extends AbstractHandler {
-    public static final String ID = "edu.ualberta.med.biobank.commands.containerTypeAdd"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.commands.containerTypeAdd"; //$NON-NLS-1$
+    private Boolean createAllowed;
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -28,9 +33,17 @@ public class ContainerTypeAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.getUser() != null
-            // only for sites, not all centers
-            && SessionManager.getUser().getCurrentWorkingSite() != null
-            && SessionManager.canCreate(ContainerTypeWrapper.class);
+        try {
+            if (createAllowed == null)
+                createAllowed =
+                    SessionManager.getAppService().isAllowed(
+                        new ContainerTypeCreatePermission());
+            return SessionManager.getUser().getCurrentWorkingSite() != null
+                && SessionManager.getInstance().getSession() != null &&
+                createAllowed;
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            return false;
+        }
     }
 }

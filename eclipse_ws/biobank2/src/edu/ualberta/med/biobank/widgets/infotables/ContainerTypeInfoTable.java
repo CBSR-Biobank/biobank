@@ -11,6 +11,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -20,7 +21,8 @@ import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
-public class ContainerTypeInfoTable extends InfoTableWidget<SiteContainerTypeInfo> {
+public class ContainerTypeInfoTable extends
+    InfoTableWidget<SiteContainerTypeInfo> {
 
     private static class TableRowData {
         ContainerTypeWrapper containerType;
@@ -96,8 +98,10 @@ public class ContainerTypeInfoTable extends InfoTableWidget<SiteContainerTypeInf
 
         SiteContainerTypeInfo containerTypeInfo = (SiteContainerTypeInfo) type;
 
-        info.containerType = new ContainerTypeWrapper(
-            siteAdapter.getAppService(), containerTypeInfo.getContainerType());
+        info.containerType =
+            new ContainerTypeWrapper(
+                SessionManager.getAppService(),
+                containerTypeInfo.getContainerType());
         Integer rowCapacity = info.containerType.getRowCapacity();
         Integer colCapacity = info.containerType.getColCapacity();
 

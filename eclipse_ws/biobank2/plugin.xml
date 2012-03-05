@@ -488,9 +488,6 @@
               <reference
                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
               </reference>
-              <reference
-                    definitionId="biobank.hasClinicShipmentRights">
-              </reference>
             </and>
          </activeWhen>
          <enabledWhen>
@@ -541,8 +538,6 @@
                      </instanceof>
                   </iterate>
           	  </with>
-              <reference definitionId="biobank.canUpdate">
-              </reference>
             </and>
          </enabledWhen>
       </handler>
@@ -593,8 +588,6 @@
                      </instanceof>
                   </iterate>
           	  </with>
-      		  <reference definitionId="biobank.canUpdate">
-      		  </reference>
             </and>
          </enabledWhen>
       </handler>
@@ -610,11 +603,6 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.DeleteSelectionHandler"      
             commandId="edu.ualberta.med.biobank.commands.deleteSelection">
-         <enabledWhen>
-            <reference
-                  definitionId="biobank.canDelete">
-            </reference>
-         </enabledWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.SearchHandler"
@@ -646,17 +634,6 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.DecodeImageHandler"
             commandId="edu.ualberta.med.biobank.commands.scanner.decodeImage">
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.LoggingHandler"
-            commandId="edu.ualberta.med.biobank.commands.logging">
-         <enabledWhen>
-            <and>
-               <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
-               </reference>
-            </and>
-         </enabledWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.EditHandler"
@@ -724,9 +701,6 @@
               </reference>
               <reference
                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
-              </reference>
-              <reference
-                    definitionId="biobank.hasDispatchRights">
               </reference>
             </and>
          </activeWhen>
@@ -1017,23 +991,11 @@
                   commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
                   icon="icons/dispatch_add.png"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank.hasDispatchRights">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
                   icon="icons/shipment_add.png"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank.hasClinicShipmentRights">
-                  </reference>
-               </visibleWhen>
             </command>
             <separator
                   name="biobank.separator3"
@@ -1378,14 +1340,9 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <and>
                   <reference
                         definitionId="biobank.processingPerspectiveSelected">
                   </reference>
-                  <reference
-                        definitionId="biobank.hasDispatchRights">
-                  </reference>
-                  </and>
                </visibleWhen>
             </command>
             <command
@@ -1394,14 +1351,9 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <and>
                   <reference
                         definitionId="biobank.processingPerspectiveSelected">
                   </reference>
-				  <reference
-                        definitionId="biobank.hasClinicShipmentRights">
-                  </reference>
-                  </and>
                </visibleWhen>
             </command>
             <command
@@ -2362,19 +2314,6 @@
          </with>
       </definition>
        <definition
-           id="biobank.canDelete">
-        <with
-              variable="selection">
-           <iterate
-                 ifEmpty="false"
-                 operator="and">
-              <test
-                    property="biobank.canDelete">
-              </test>
-           </iterate>
-        </with>
-     </definition>
-       <definition
              id="biobank.hasWorkingCenter">
           <with
                 variable="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
@@ -2383,37 +2322,6 @@
              </equals>
           </with>
        </definition>
-       <definition
-             id="biobank.hasClinicShipmentRights">
-          <with
-                variable="edu.ualberta.med.biobank.sourceprovider.clinicShipmentRights">
-             <equals
-                   value="true">
-             </equals>
-          </with>
-       </definition>
-  	   <definition
-             id="biobank.hasDispatchRights">
-          <with
-                variable="edu.ualberta.med.biobank.sourceprovider.dispatchRights">
-             <equals
-                   value="true">
-             </equals>
-          </with>
-       </definition>
-      <definition
-            id="biobank.canUpdate">
-         <with
-               variable="selection">
-            <iterate
-                  ifEmpty="false"
-                  operator="and">
-               <test
-                     property="biobank.canUpdate">
-               </test>
-            </iterate>
-         </with>
-      </definition>
       <definition
             id="biobank.hasPrinterLabelsRights">
          <with
@@ -2465,16 +2373,6 @@
       <startup
             class="edu.ualberta.med.biobank.rcp.BiobankStartup">
       </startup>
-   </extension>
-   <extension
-         point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-            class="edu.ualberta.med.biobank.expressions.AdapterBasePropertyTester"
-            id="biobank.adapterBasePropertyTester"
-            namespace="biobank"
-            properties="canDelete,canUpdate"
-            type="edu.ualberta.med.biobank.treeview.AbstractAdapterBase">
-      </propertyTester>
    </extension>
    <extension
          point="org.eclipse.ui.contexts">

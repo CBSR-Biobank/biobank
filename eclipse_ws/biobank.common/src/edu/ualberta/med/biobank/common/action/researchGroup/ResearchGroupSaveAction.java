@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
-import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupSavePermission;
+import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupUpdatePermission;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ResearchGroup;
@@ -29,7 +29,7 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ResearchGroupSavePermission(rgInfo.id).isAllowed(context);
+        return new ResearchGroupUpdatePermission(rgInfo.id).isAllowed(context);
     }
 
     @Override

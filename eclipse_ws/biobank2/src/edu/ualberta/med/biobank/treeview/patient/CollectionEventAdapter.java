@@ -12,12 +12,17 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventDeletePermission;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
@@ -28,6 +33,26 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
         super(parent, ceventInfo == null ? null : ceventInfo.cevent.getId(),
             null, null, false);
         this.ceventInfo = ceventInfo;
+
+        if (ceventInfo != null) {
+            try {
+                this.isDeletable =
+                    SessionManager.getAppService().isAllowed(
+                        new CollectionEventDeletePermission(ceventInfo.cevent
+                            .getId()));
+                this.isReadable =
+                    SessionManager.getAppService().isAllowed(
+                        new CollectionEventReadPermission(ceventInfo.cevent
+                            .getId()));
+                this.isEditable =
+                    SessionManager.getAppService().isAllowed(
+                        new CollectionEventUpdatePermission(ceventInfo.cevent
+                            .getId()));
+            } catch (ApplicationException e) {
+                BgcPlugin.openAsyncError("Permission Error",
+                    "Unable to retrieve user permissions");
+            }
+        }
     }
 
     @Override

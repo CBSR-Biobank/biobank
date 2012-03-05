@@ -5,13 +5,13 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 
-public class DispatchSavePermission implements Permission {
+public class DispatchUpdatePermission implements Permission {
 
     private static final long serialVersionUID = 1L;
 
     private Integer dispatchId;
 
-    public DispatchSavePermission(Integer id) {
+    public DispatchUpdatePermission(Integer id) {
         this.dispatchId = id;
     }
 

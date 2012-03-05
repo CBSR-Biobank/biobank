@@ -5,21 +5,21 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerAddHandler extends AbstractHandler {
     public static final String ID =
         "edu.ualberta.med.biobank.commands.containerAdd"; //$NON-NLS-1$
 
+    private Boolean createAllowed;
+
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         ContainerAdapter containerAdapter = new ContainerAdapter(null, null);
-        try {
-            SessionManager.getUser().getCurrentWorkingSite().reload();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         ((ContainerWrapper) containerAdapter.getModelObject())
             .setSite(SessionManager.getUser().getCurrentWorkingSite());
         containerAdapter.openEntryForm(false);
@@ -28,9 +28,17 @@ public class ContainerAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.getUser() != null
-            // only for sites, not all centers
-            && SessionManager.getUser().getCurrentWorkingSite() != null
-            && SessionManager.canCreate(ContainerWrapper.class);
+        try {
+            if (createAllowed == null)
+                createAllowed =
+                    SessionManager.getAppService().isAllowed(
+                        new ContainerCreatePermission());
+            return SessionManager.getUser().getCurrentWorkingSite() != null
+                && SessionManager.getInstance().getSession() != null &&
+                createAllowed;
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            return false;
+        }
     }
 }

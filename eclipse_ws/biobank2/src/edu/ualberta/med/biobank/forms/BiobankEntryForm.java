@@ -213,8 +213,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         if (adapter instanceof AdapterBase) {
             if (adapter != null
                 && ((AdapterBase) adapter).getObjectClazz() != null
-                && !SessionManager.canUpdate(((AdapterBase) adapter)
-                    .getObjectClazz())) {
+                && !adapter.isEditable()) {
                 BgcPlugin.openAccessDeniedErrorMessage();
                 throw new RuntimeException(
                     Messages.BiobankEntryForm_access_denied_error_msg);

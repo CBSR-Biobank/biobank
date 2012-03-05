@@ -17,13 +17,18 @@ import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
+import edu.ualberta.med.biobank.common.permission.patient.PatientDeletePermission;
+import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
+import edu.ualberta.med.biobank.common.permission.patient.PatientUpdatePermission;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientAdapter extends AbstractNewAdapterBase {
 
@@ -39,7 +44,23 @@ public class PatientAdapter extends AbstractNewAdapterBase {
             this.patient = pinfo.patient;
             this.study = pinfo.study;
             this.ceventsCount = pinfo.ceventsCount;
+
+            try {
+                this.isDeletable =
+                    SessionManager.getAppService().isAllowed(
+                        new PatientDeletePermission(patient.getId()));
+                this.isReadable =
+                    SessionManager.getAppService().isAllowed(
+                        new PatientReadPermission(patient.getId()));
+                this.isEditable =
+                    SessionManager.getAppService().isAllowed(
+                        new PatientUpdatePermission(patient.getId()));
+            } catch (ApplicationException e) {
+                BgcPlugin.openAsyncError("Permission Error",
+                    "Unable to retrieve user permissions");
+            }
         }
+
     }
 
     @Override

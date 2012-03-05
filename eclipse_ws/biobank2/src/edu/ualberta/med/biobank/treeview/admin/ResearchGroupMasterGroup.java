@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupAdapterInfo;
+import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.ResearchGroup;
@@ -23,6 +24,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
 
     private Map<Integer, ResearchGroup> rgs;
+    private Boolean createAllowed;
 
     public ResearchGroupMasterGroup(SessionAdapter sessionAdapter, int id) {
         super(sessionAdapter, id,
@@ -37,11 +39,18 @@ public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Unable to retrieve research groups", e);
         }
+        try {
+            this.createAllowed = SessionManager.getAppService().isAllowed(
+                new ResearchGroupCreatePermission());
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+        }
+
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(ResearchGroupWrapper.class)) {
+        if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(Messages.ResearchGroupMasterGroup_add_rgroup_menu);
             mi.addSelectionListener(new SelectionAdapter() {

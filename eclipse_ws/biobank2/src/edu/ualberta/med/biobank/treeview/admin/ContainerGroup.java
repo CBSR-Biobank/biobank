@@ -17,6 +17,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersAction;
+import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -36,8 +37,17 @@ public class ContainerGroup extends AdapterBase {
 
     private List<Container> topContainers = null;
 
+    private boolean createAllowed;
+
     public ContainerGroup(SiteAdapter parent, int id) {
         super(parent, id, Messages.ContainerGroup_containers_node_label, true);
+        try {
+            this.createAllowed =
+                SessionManager.getAppService().isAllowed(
+                    new ContainerCreatePermission());
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+        }
     }
 
     @Override
@@ -74,7 +84,7 @@ public class ContainerGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(ContainerWrapper.class)) {
+        if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(Messages.ContainerGroup_add_label);
             mi.addSelectionListener(new SelectionAdapter() {
