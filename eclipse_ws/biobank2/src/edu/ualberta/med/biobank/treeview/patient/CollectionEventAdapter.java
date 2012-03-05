@@ -34,24 +34,27 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
             null, null, false);
         this.ceventInfo = ceventInfo;
 
-        if (ceventInfo != null) {
-            try {
-                this.isDeletable =
-                    SessionManager.getAppService().isAllowed(
-                        new CollectionEventDeletePermission(ceventInfo.cevent
-                            .getId()));
-                this.isReadable =
-                    SessionManager.getAppService().isAllowed(
-                        new CollectionEventReadPermission(ceventInfo.cevent
-                            .getId()));
-                this.isEditable =
-                    SessionManager.getAppService().isAllowed(
-                        new CollectionEventUpdatePermission(ceventInfo.cevent
-                            .getId()));
-            } catch (ApplicationException e) {
-                BgcPlugin.openAsyncError("Permission Error",
-                    "Unable to retrieve user permissions");
-            }
+        init();
+    }
+
+    @Override
+    public void init() {
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new CollectionEventDeletePermission(ceventInfo.cevent
+                        .getId()));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new CollectionEventReadPermission(ceventInfo.cevent
+                        .getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new CollectionEventUpdatePermission(ceventInfo.cevent
+                        .getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
         }
     }
 
@@ -168,14 +171,14 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     }
 
     @Override
-    public void setValue(Object value) {
-        if (value instanceof SimpleCEventInfo)
-            ceventInfo = (SimpleCEventInfo) value;
-    }
-
-    @Override
     protected void runDelete() throws Exception {
         SessionManager.getAppService().doAction(
             new CollectionEventDeleteAction(getId()));
+    }
+
+    @Override
+    public void setValue(Object val) {
+        this.ceventInfo = (SimpleCEventInfo) val;
+        if (ceventInfo.cevent.getId() != null) init();
     }
 }

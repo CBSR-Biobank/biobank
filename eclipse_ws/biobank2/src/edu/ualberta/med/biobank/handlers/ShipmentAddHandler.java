@@ -5,7 +5,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoSavePermission;
+import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -36,7 +36,7 @@ public class ShipmentAddHandler extends AbstractHandler {
             if (createAllowed == null)
                 createAllowed = SessionManager.getAppService().isAllowed(
                     new
-                    OriginInfoSavePermission(SessionManager.getUser()
+                    OriginInfoUpdatePermission(SessionManager.getUser()
                         .getCurrentWorkingCenter().getId()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");

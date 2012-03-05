@@ -39,7 +39,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
         super(parent, object == null ? null : object.getId(), null, null, false);
-        this.modelObject = object;
+        setModelObject(object);
     }
 
     public AdapterBase(AdapterBase parent, Integer id, String label,
@@ -61,6 +61,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     public void setModelObject(ModelWrapper<?> object) {
         this.modelObject = object;
+        if (getId() != null) init();
     }
 
     @Override

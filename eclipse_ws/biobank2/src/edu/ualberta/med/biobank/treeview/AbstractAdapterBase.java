@@ -64,11 +64,11 @@ public abstract class AbstractAdapterBase implements
     // FIXME can we merge this list of listeners with the DeltaListener ?
     private List<AdapterChangedListener> listeners;
 
-    protected boolean isDeletable;
+    protected boolean isDeletable = false;
 
-    protected boolean isEditable;
+    protected boolean isEditable = false;
 
-    protected boolean isReadable;
+    protected boolean isReadable = false;
 
     public AbstractAdapterBase(AbstractAdapterBase parent, Integer id,
         String label, String tooltip, boolean hasChildren) {
@@ -85,8 +85,6 @@ public abstract class AbstractAdapterBase implements
         // itself upon instantiation?
         Injector injector = BiobankPlugin.getInjector();
         injector.injectMembers(this);
-
-        init();
     }
 
     @Inject
@@ -94,7 +92,7 @@ public abstract class AbstractAdapterBase implements
         this.eventBus = eventBus;
     }
 
-    protected void init() {
+    public void init() {
         // TODO Auto-generated method stub
     }
 

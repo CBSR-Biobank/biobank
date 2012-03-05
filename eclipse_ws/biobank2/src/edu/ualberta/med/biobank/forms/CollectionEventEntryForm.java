@@ -28,6 +28,8 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientNextVisitNumberAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
@@ -423,7 +425,12 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 ceventCopy.getPatient().getId(), ceventCopy.getVisitNumber(),
                 ceventCopy.getActivityStatus(), comment.getMessage(),
                 cevents, ceventAttrList)).getId();
-        ((CollectionEventAdapter) adapter).setId(savedCeventId);
+        PatientGetSimpleCollectionEventInfosAction action =
+            new PatientGetSimpleCollectionEventInfosAction(savedCeventId);
+        Map<Integer, SimpleCEventInfo> infos =
+            SessionManager.getAppService().doAction(action).getMap();
+        ((CollectionEventAdapter) adapter).setValue(
+            infos.get(savedCeventId));
     }
 
     @Override

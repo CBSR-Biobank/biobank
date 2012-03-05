@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetListForSiteAction;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
@@ -234,13 +235,8 @@ public class PatientEntryForm extends BiobankEntryForm {
                 new PatientSaveAction(patientCopy.getId(), patientCopy
                     .getStudy().getId(), patientCopy.getPnumber(), patientCopy
                     .getCreatedAt(), comment.getMessage())).getId();
-        adapter.setId(patientId);
-
-        // FIXME the tree needs to get the new value from the patien in case it
-        // has been modified (like de pnumber for instance), but the studynode
-        // contains and old version of the patient... Rebuild should rebuild
-        // this but this is not that nice...
-        // SessionManager.getCurrentAdapterViewWithTree().reload();
+        ((PatientAdapter) adapter).setValue(SessionManager.getAppService()
+            .doAction(new PatientSearchAction(patientCopy.getPnumber())));
     }
 
     @Override

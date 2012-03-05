@@ -38,24 +38,28 @@ public class DispatchAdapter extends AdapterBase {
 
     public DispatchAdapter(AdapterBase parent, DispatchWrapper ship) {
         super(parent, ship);
-        try {
-            this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new DispatchDeletePermission(ship.getId()));
-            this.isReadable =
-                SessionManager.getAppService().isAllowed(
-                    new DispatchReadPermission(ship.getId()));
-            this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new DispatchUpdatePermission(ship.getId()));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
-        }
     }
 
     private DispatchWrapper getDispatchWrapper() {
         return (DispatchWrapper) getModelObject();
+    }
+
+    @Override
+    public void init() {
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new DispatchDeletePermission(getModelObject().getId()));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new DispatchReadPermission(getModelObject().getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new DispatchUpdatePermission(getModelObject().getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     @Override

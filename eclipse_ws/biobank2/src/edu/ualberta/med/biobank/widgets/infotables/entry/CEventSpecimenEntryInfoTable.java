@@ -39,13 +39,14 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
         ColumnsShown columnsShowns) {
         super(parent, specs, columnsShowns);
         try {
-            this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new CollectionEventUpdatePermission(cevent.getId()));
-            this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new CollectionEventUpdatePermission(cevent.getId()));
-
+            if (cevent.getId() != null) {
+                this.isEditable =
+                    SessionManager.getAppService().isAllowed(
+                        new CollectionEventUpdatePermission(cevent.getId()));
+                this.isDeletable =
+                    SessionManager.getAppService().isAllowed(
+                        new CollectionEventUpdatePermission(cevent.getId()));
+            }
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Permission Error",
                 "Unable to retrieve user permissions");

@@ -62,6 +62,15 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
             new ArrayList<AliquotedSpecimenWrapper>();
         deletedAliquotedSpecimens = new ArrayList<AliquotedSpecimenWrapper>();
 
+        init();
+
+        setLayout(new GridLayout(1, false));
+        setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        addEditSupport();
+    }
+
+    private void init() {
         try {
             this.isEditable =
                 SessionManager.getAppService().isAllowed(
@@ -75,10 +84,6 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                 "Unable to retrieve user permissions");
         }
 
-        setLayout(new GridLayout(1, false));
-        setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        addEditSupport();
     }
 
     @Override
@@ -210,6 +215,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
         addedOrModifiedAliquotedSpecimens =
             new ArrayList<AliquotedSpecimenWrapper>();
         deletedAliquotedSpecimens = new ArrayList<AliquotedSpecimenWrapper>();
+        init();
     }
 
     @Override
