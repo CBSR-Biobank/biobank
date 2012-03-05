@@ -21,8 +21,8 @@ public class SiteInfo implements ActionResult {
     public final List<StudyCountInfo> studyCountInfo;
     public final List<Container> topContainers;
     public final Long patientCount;
-    public final Long collectionEventCount;
-    public final Long aliquotedSpecimenCount;
+    public final Long processingEventCount;
+    public final Long specimenCount;
 
     public Site getSite() {
         return site;
@@ -56,12 +56,12 @@ public class SiteInfo implements ActionResult {
         return patientCount;
     }
 
-    public Long getCollectionEventCount() {
-        return collectionEventCount;
+    public Long getProcessingEventCount() {
+        return processingEventCount;
     }
 
-    public Long getAliquotedSpecimenCount() {
-        return aliquotedSpecimenCount;
+    public Long getSpecimenCount() {
+        return specimenCount;
     }
 
     @Override
@@ -86,15 +86,15 @@ public class SiteInfo implements ActionResult {
 
     private SiteInfo(Site site, List<SiteContainerTypeInfo> containerTypes,
         List<StudyCountInfo> studies, List<Container> topContainers,
-        Long patientCount, Long collectionEventCount,
+        Long patientCount, Long processingEventCount,
         Long aliquotedSpecimenCount) {
         this.site = site;
         this.containerTypes = containerTypes;
         this.studyCountInfo = studies;
         this.topContainers = topContainers;
         this.patientCount = patientCount;
-        this.collectionEventCount = collectionEventCount;
-        this.aliquotedSpecimenCount = aliquotedSpecimenCount;
+        this.processingEventCount = processingEventCount;
+        this.specimenCount = aliquotedSpecimenCount;
     }
 
     public static class Builder {
@@ -104,8 +104,8 @@ public class SiteInfo implements ActionResult {
         private List<StudyCountInfo> studies = new ArrayList<StudyCountInfo>();
         private List<Container> topContainers = new ArrayList<Container>();
         private Long patientCount;
-        private Long collectionEventCount;
-        private Long aliquotedSpecimenCount;
+        private Long processingEventCount;
+        private Long specimenCount;
 
         public Builder() {
             site.setAddress(new Address());
@@ -136,19 +136,19 @@ public class SiteInfo implements ActionResult {
             return this;
         }
 
-        public Builder setCollectionEventCount(Long collectionEventCount) {
-            this.collectionEventCount = collectionEventCount;
+        public Builder setProcessingEventCount(Long processingEventCount) {
+            this.processingEventCount = processingEventCount;
             return this;
         }
 
-        public Builder setAliquotedSpecimenCount(Long aliquotedSpecimenCount) {
-            this.aliquotedSpecimenCount = aliquotedSpecimenCount;
+        public Builder setSpecimenCount(Long specimenCount) {
+            this.specimenCount = specimenCount;
             return this;
         }
 
         public SiteInfo build() {
             return new SiteInfo(site, containerTypes, studies, topContainers,
-                patientCount, collectionEventCount, aliquotedSpecimenCount);
+                patientCount, processingEventCount, specimenCount);
         }
     }
 }

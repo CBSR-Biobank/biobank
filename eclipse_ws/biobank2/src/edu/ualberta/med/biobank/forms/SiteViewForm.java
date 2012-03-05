@@ -45,7 +45,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private BgcBaseText patientCountLabel;
 
-    private BgcBaseText patientVisitCountLabel;
+    private BgcBaseText processingEventCountLabel;
 
     private BgcBaseText specimenCountLabel;
 
@@ -116,9 +116,9 @@ public class SiteViewForm extends AddressViewFormCommon {
         patientCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
                 Messages.SiteViewForm_field_patientCount_label);
-        patientVisitCountLabel =
+        processingEventCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.SiteViewForm_field_pvCount_label);
+                Messages.SiteViewForm_field_peventCount_label);
         specimenCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
                 Messages.SiteViewForm_field_totalSpecimen);
@@ -135,8 +135,8 @@ public class SiteViewForm extends AddressViewFormCommon {
         setTextValue(containerTypeCountLabel, siteInfo.containerTypes.size());
         setTextValue(topContainerCountLabel, siteInfo.topContainers.size());
         setTextValue(patientCountLabel, siteInfo.patientCount);
-        setTextValue(patientVisitCountLabel, siteInfo.collectionEventCount);
-        setTextValue(specimenCountLabel, siteInfo.aliquotedSpecimenCount);
+        setTextValue(processingEventCountLabel, siteInfo.processingEventCount);
+        setTextValue(specimenCountLabel, siteInfo.specimenCount);
         setTextValue(activityStatusLabel, siteInfo.site.getActivityStatus()
             .getName());
     }
