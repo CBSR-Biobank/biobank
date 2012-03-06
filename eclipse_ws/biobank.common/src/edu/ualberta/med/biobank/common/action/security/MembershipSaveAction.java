@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.util.ModelUtil;
 
 /**
@@ -32,7 +33,7 @@ public class MembershipSaveAction implements Action<IdResult> {
     private final Set<PermissionEnum> permissions;
     private final Set<Integer> roleIds;
 
-    public MembershipSaveAction(Membership m) {
+    public MembershipSaveAction(Membership m, User manager) {
         this.id = m.getId();
         this.centerId = m.getCenter().getId();
         this.studyId = m.getStudy().getId();
@@ -40,7 +41,9 @@ public class MembershipSaveAction implements Action<IdResult> {
         this.level = m.getLevel();
 
         this.permissions = m.getPermissions();
-        // this.manageablePermissions = m.getManageablePermissions(user);
+        // this.manageablePermissions =
+        m.getManageablePermissions(manager);
+        m.getManageableRoles(manager);
 
         this.roleIds = ModelUtil.getIds(m.getRoles());
     }
