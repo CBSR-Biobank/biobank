@@ -14,10 +14,6 @@
 
   <xsl:output indent="no" method="html" />
 
-  <xsl:template match="compoundname">
-    <h2>Class: <a><xsl:attribute name="name"><xsl:value-of select="../@id" /></xsl:attribute><xsl:value-of select="substring-after(.,'edu::ualberta::med::biobank::model::')" /></a></h2>
-  </xsl:template>
-
   <xsl:template match='ref'>
     <a><xsl:attribute name="href">#<xsl:value-of select="@refid" /></xsl:attribute><xsl:value-of select="." /></a>
   </xsl:template>
@@ -55,10 +51,14 @@
     </xsl:for-each>
   </xsl:template>
 
+  <xsl:template match="compoundname">
+      <h2>Class: <a><xsl:attribute name="name"><xsl:value-of select="../@id" /></xsl:attribute><xsl:value-of select="substring-after(.,'edu::ualberta::med::biobank::model::')" /></a></h2>
+  </xsl:template>
+
   <xsl:template match="/*">
     <html>
       <body>
-        <xsl:for-each select="/doxygen/compounddef[@kind='class']">
+        <xsl:for-each select="compounddef[@kind='class'][not(contains(@id,'AbstractBiobankModel'))]">
           <div>
             <xsl:apply-templates select="compoundname" />
             <xsl:apply-templates select="briefdescription" />
