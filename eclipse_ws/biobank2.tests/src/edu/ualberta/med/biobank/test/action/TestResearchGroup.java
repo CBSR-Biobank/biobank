@@ -123,7 +123,7 @@ public class TestResearchGroup extends TestAction {
             ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
                 name,
                 studyId);
-        Integer rId = RequestHelper.createRequest(session = SESSION_PROVIDER.openSession(), EXECUTOR, rgId);
+        Integer rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
         ResearchGroupDeleteAction delete =
             new ResearchGroupDeleteAction(rgId);
         try {
@@ -132,7 +132,8 @@ public class TestResearchGroup extends TestAction {
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
-
+        session.close();
+        session = SESSION_PROVIDER.openSession();
         session.beginTransaction();
 
         Request r = (Request) session.load(Request.class, rId);

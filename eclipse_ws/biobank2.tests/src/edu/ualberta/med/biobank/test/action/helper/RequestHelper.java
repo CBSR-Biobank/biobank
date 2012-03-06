@@ -26,6 +26,7 @@ public class RequestHelper extends Helper {
     public static Integer createRequest(Session session, 
         IActionExecutor actionExecutor, Integer rgId) throws Exception {
 
+    	session.beginTransaction();
         String name = Utils.getRandomString(5);
 
         ResearchGroupGetInfoAction reader =
@@ -77,6 +78,7 @@ public class RequestHelper extends Helper {
             r.setSpecimen(spec);
             session.saveOrUpdate(r);
         }
+        session.getTransaction().commit();
         session.flush();
         return request.getId();
 
