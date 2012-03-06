@@ -18,7 +18,6 @@ public class NewStudyAdapter extends AbstractNewAdapterBase {
     public NewStudyAdapter(AbstractAdapterBase parent, Study study) {
         super(parent, study.getId(), null, null, false);
         this.study = study;
-        setEditable(parent instanceof StudyMasterGroup || parent == null);
     }
 
     @Override
@@ -41,11 +40,6 @@ public class NewStudyAdapter extends AbstractNewAdapterBase {
     @Override
     protected String getConfirmDeleteMessage() {
         return Messages.StudyAdapter_delete_confirm_msg;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return internalIsDeletable();
     }
 
     @Override

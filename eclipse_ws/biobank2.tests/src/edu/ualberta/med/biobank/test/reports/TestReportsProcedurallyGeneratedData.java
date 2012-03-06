@@ -49,6 +49,8 @@ import org.junit.runners.Suite.SuiteClasses;
     QaSpecimensTest.class, SpecimenTypePvCountTest.class,
     SpecimenTypeSUsageTest.class })
 @Deprecated
+@SuppressWarnings("all")
+// old tests
 public final class TestReportsProcedurallyGeneratedData implements
     ReportDataSource {
     private static TestReportsProcedurallyGeneratedData instance = null;
@@ -480,7 +482,6 @@ public final class TestReportsProcedurallyGeneratedData implements
         return patients;
     }
 
-    @SuppressWarnings("unused")
     private static List<CollectionEventWrapper> generateShipments(
         SiteWrapper site, final int shipmentLimit, List<ClinicWrapper> clinics)
         throws ApplicationException, Exception {

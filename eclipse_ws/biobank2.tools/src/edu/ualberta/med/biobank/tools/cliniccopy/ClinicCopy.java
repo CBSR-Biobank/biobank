@@ -28,6 +28,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * This class fixes copies clinics from one BioBank database to another.
  * 
  */
+@Deprecated
+@SuppressWarnings("unused")
 public class ClinicCopy {
 
     // @formatter:off
@@ -113,6 +115,7 @@ public class ClinicCopy {
         addContacts();
     }
 
+    @Deprecated
     private void addClinics(BiobankApplicationService tsAppService2)
         throws Exception {
         clinicsOnTest = new HashMap<String, ClinicWrapper>();

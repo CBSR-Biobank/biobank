@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.criterion.DetachedCriteria;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -60,8 +62,9 @@ public class ContainerLabelingSchemeWrapper extends
         WritableApplicationService appService) throws ApplicationException {
         if (allSchemes == null) {
             allSchemes = new HashMap<Integer, ContainerLabelingSchemeWrapper>();
-            List<ContainerLabelingScheme> list = appService.search(
-                ContainerLabelingScheme.class, new ContainerLabelingScheme());
+            List<ContainerLabelingScheme> list =
+                appService.query(DetachedCriteria
+                    .forClass(ContainerLabelingScheme.class));
             if (list != null) {
                 for (ContainerLabelingScheme scheme : list) {
                     Integer id = scheme.getId();
@@ -138,12 +141,14 @@ public class ContainerLabelingSchemeWrapper extends
         return 0;
     }
 
+    @Deprecated
     @Override
     public void persist() throws Exception {
         super.persist();
         resetAllSchemes();
     }
 
+    @Deprecated
     @Override
     public void delete() throws Exception {
         super.delete();

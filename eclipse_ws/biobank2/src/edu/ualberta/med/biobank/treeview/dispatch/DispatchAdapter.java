@@ -18,6 +18,8 @@ import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -40,6 +42,24 @@ public class DispatchAdapter extends AdapterBase {
 
     private DispatchWrapper getDispatchWrapper() {
         return (DispatchWrapper) getModelObject();
+    }
+
+    @Override
+    public void init() {
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new DispatchDeletePermission(getModelObject().getId()));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new DispatchReadPermission(getModelObject().getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new DispatchUpdatePermission(getModelObject().getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     @Override
@@ -84,17 +104,6 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     @Override
-    public boolean isDeletable() {
-        try {
-            return SessionManager.getAppService().isAllowed(
-                new DispatchDeletePermission(getDispatchWrapper().getId()));
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError("Delete failed", e);
-        }
-        return false;
-    }
-
-    @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         CenterWrapper<?> siteParent = SessionManager.getUser()
             .getCurrentWorkingCenter();
@@ -104,7 +113,7 @@ public class DispatchAdapter extends AdapterBase {
                 addDeleteMenu(menu, Messages.DispatchAdapter_dispatch_label);
             }
             if (siteParent.equals(getDispatchWrapper().getSenderCenter())
-                && SessionManager.canUpdate(getDispatchWrapper())
+                && isEditable
                 && getDispatchWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText(Messages.DispatchAdapter_move_creation_label);
@@ -150,14 +159,10 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     @Override
-    public void runDelete() {
+    public void runDelete() throws Exception {
         DispatchDeleteAction delete =
             new DispatchDeleteAction(getDispatchWrapper().getId());
-        try {
-            SessionManager.getAppService().doAction(delete);
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Delete failed", e);
-        }
+        SessionManager.getAppService().doAction(delete);
     }
 
     @Override

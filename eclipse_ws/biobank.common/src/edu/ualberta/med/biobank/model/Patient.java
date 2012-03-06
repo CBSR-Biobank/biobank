@@ -24,6 +24,18 @@ import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+/**
+ * Note: since this application will be used for inventory control of non human
+ * participants, this class should be renamed to Participant.
+ * 
+ * caTissue Term - Participant: An individual from which a biospecimen is
+ * collected.
+ * 
+ * NCI Term - Patient: A person who receives medical attention, care, or
+ * treatment, or who is registered with medical professional or institution with
+ * the purpose to receive medical care when necessary.
+ * 
+ */
 @Entity
 @Table(name = "PATIENT")
 @Unique(properties = "pnumber", groups = PrePersist.class)

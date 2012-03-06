@@ -19,7 +19,9 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.clinic.ClinicDeleteAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
-import edu.ualberta.med.biobank.common.action.clinic.ContactSaveAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
@@ -743,12 +745,21 @@ public class TestStudy extends TestAction {
         Integer studyId = EXECUTOR.exec(studySaveAction).getId();
         StudyInfo studyInfo =
             EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        Integer clinicId = ClinicHelper.createClinic(EXECUTOR,
-            name + "_clinic", ActivityStatus.ACTIVE);
-        ContactSaveAction contactSave = new ContactSaveAction();
-        contactSave.setName(name + "_contact");
-        contactSave.setClinicId(clinicId);
-        Integer contactId = EXECUTOR.exec(contactSave).getId();
+        ClinicSaveAction clinicSaveAction = ClinicHelper.getSaveAction(
+            name + "_clinic", name + "_clinic", ActivityStatus.ACTIVE, true);
+        ContactSaveInfo contactSaveInfo = new ContactSaveInfo();
+        contactSaveInfo.setName(name + "_contact");
+        HashSet<ContactSaveInfo> contactSaveInfos =
+            new HashSet<ContactSaveInfo>();
+        contactSaveInfos.add(contactSaveInfo);
+        clinicSaveAction.setContactSaveInfos(contactSaveInfos);
+        Integer clinicId = EXECUTOR.exec(clinicSaveAction).getId();
+
+        edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo clinicInfo =
+            EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
+        Assert.assertEquals(1, clinicInfo.contacts.size());
+        Integer contactId = clinicInfo.contacts.get(0).getId();
+
         StudySaveAction studySaveAction =
             StudyHelper.getSaveAction(studyInfo);
         studySaveAction.setContactIds(new HashSet<Integer>(contactId));

@@ -6,12 +6,17 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.views.ProcessingView;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingEventAddHandler extends AbstractHandler {
+
+    private Boolean createAllowed;
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -29,7 +34,15 @@ public class ProcessingEventAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(ProcessingEventWrapper.class);
+        try {
+            if (createAllowed == null)
+                createAllowed =
+                    SessionManager.getAppService().isAllowed(
+                        new ProcessingEventCreatePermission());
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+        }
+        return createAllowed;
     }
 
 }

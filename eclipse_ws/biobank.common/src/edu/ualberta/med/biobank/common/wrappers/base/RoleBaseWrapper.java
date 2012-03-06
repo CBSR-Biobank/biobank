@@ -5,12 +5,12 @@
 package edu.ualberta.med.biobank.common.wrappers.base;
 
 import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+
 import edu.ualberta.med.biobank.common.peer.RolePeer;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.model.Role;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class RoleBaseWrapper extends ModelWrapper<Role> {
 

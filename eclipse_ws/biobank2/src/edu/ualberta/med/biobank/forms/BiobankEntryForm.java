@@ -119,10 +119,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         if (adapter instanceof AdapterBase)
             if ((adapter != null)
                 && (((AdapterBase) adapter).getModelObject() != null)) {
-                // NL - we are no longer using wrappers -> so no reason to
-                // reload anymore
-                // ((AdapterBase) adapter).getModelObject().reload();
-        }
+                ((AdapterBase) adapter).getModelObject().reload();
+            }
 
         // not everything is well initialized on the adapter before it is really
         // saved. Should not do that now..
@@ -207,21 +205,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         throws PartInitException {
         super.init(editorSite, input);
         setDirty(false);
-        checkEditAccess();
-    }
-
-    protected void checkEditAccess() {
-        // FIXME what should be done for new adapters?
-        if (adapter instanceof AdapterBase) {
-            if (adapter != null
-                && ((AdapterBase) adapter).getObjectClazz() != null
-                && !SessionManager.canUpdate(((AdapterBase) adapter)
-                    .getObjectClazz())) {
-                BgcPlugin.openAccessDeniedErrorMessage();
-                throw new RuntimeException(
-                    Messages.BiobankEntryForm_access_denied_error_msg);
-            }
-        }
     }
 
     @Override

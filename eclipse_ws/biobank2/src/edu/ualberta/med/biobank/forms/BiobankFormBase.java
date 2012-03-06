@@ -168,7 +168,7 @@ public abstract class BiobankFormBase extends BgcFormBase {
     protected void addSectionToolbar(Section section, String tooltip,
         SelectionListener listener, Class<?> wrapperTypeToAdd, String imageKey) {
         ((WidgetCreator) widgetCreator).addSectionToolbar(section, tooltip,
-            listener, wrapperTypeToAdd, imageKey);
+            listener, imageKey);
     }
 
     public AbstractAdapterBase getAdapter() {

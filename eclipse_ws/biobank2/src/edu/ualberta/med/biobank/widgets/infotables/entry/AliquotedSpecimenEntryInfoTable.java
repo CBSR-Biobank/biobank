@@ -15,18 +15,21 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.dialogs.StudyAliquotedSpecimenDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Displays the current aliquoted specimen collection and allows the user to add
@@ -42,6 +45,10 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
 
     private StudyWrapper study;
 
+    private boolean isDeletable;
+
+    private boolean isEditable;
+
     public AliquotedSpecimenEntryInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null);
         this.study = study;
@@ -55,10 +62,28 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
             new ArrayList<AliquotedSpecimenWrapper>();
         deletedAliquotedSpecimens = new ArrayList<AliquotedSpecimenWrapper>();
 
+        init();
+
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         addEditSupport();
+    }
+
+    private void init() {
+        try {
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new StudyUpdatePermission(study.getId()));
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new StudyUpdatePermission(study.getId()));
+
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
+
     }
 
     @Override
@@ -122,7 +147,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     private void addEditSupport() {
-        if (SessionManager.canCreate(AliquotedSpecimenWrapper.class)) {
+        if (isEditable) {
             addAddItemListener(new IInfoTableAddItemListener<AliquotedSpecimenWrapper>() {
                 @Override
                 public void addItem(
@@ -131,7 +156,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                 }
             });
         }
-        if (SessionManager.canUpdate(AliquotedSpecimenWrapper.class)) {
+        if (isEditable) {
             addEditItemListener(new IInfoTableEditItemListener<AliquotedSpecimenWrapper>() {
                 @Override
                 public void editItem(
@@ -142,7 +167,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                 }
             });
         }
-        if (SessionManager.canDelete(AliquotedSpecimenWrapper.class)) {
+        if (isDeletable) {
             addDeleteItemListener(new IInfoTableDeleteItemListener<AliquotedSpecimenWrapper>() {
                 @Override
                 public void deleteItem(
@@ -190,6 +215,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
         addedOrModifiedAliquotedSpecimens =
             new ArrayList<AliquotedSpecimenWrapper>();
         deletedAliquotedSpecimens = new ArrayList<AliquotedSpecimenWrapper>();
+        init();
     }
 
     @Override

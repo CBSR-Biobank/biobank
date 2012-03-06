@@ -43,7 +43,8 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
 
     private ContainerWrapper oldContainer;
 
-    private HashMap<String, ContainerWrapper> map = new HashMap<String, ContainerWrapper>();
+    private HashMap<String, ContainerWrapper> map =
+        new HashMap<String, ContainerWrapper>();
 
     private ListViewer lv;
 
@@ -77,18 +78,10 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
 
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
+        buildContainersMap();
         Composite contents = new Composite(parent, SWT.NONE);
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-        Label siteLabel = widgetCreator.createLabel(contents,
-            Messages.MoveSpecimensToDialog_site_label);
-        siteLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_CENTER));
-        buildContainersMap();
-        if (!SessionManager.getUser().isSuperAdmin()) {
-            siteLabel
-                .setToolTipText(Messages.MoveSpecimensToDialog_site_tooltip);
-        }
 
         newLabelText = (BgcBaseText) createBoundWidgetWithLabel(contents,
             BgcBaseText.class, SWT.FILL,
@@ -137,7 +130,8 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
         // + "must be initialized but empty, "
         // + " and as big as the previous one.") {
 
-        String errorMessage = Messages.MoveSpecimensToDialog_newLabel_validation_msg;
+        String errorMessage =
+            Messages.MoveSpecimensToDialog_newLabel_validation_msg;
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
             errorMessage);
         validator.setControlDecoration(BgcBaseWidget.createDecorator(listLabel,
@@ -174,15 +168,6 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
 
     public ContainerWrapper getNewContainer() {
         return map.get(selectedValue.getValue());
-    }
-
-    @Override
-    public void okPressed() {
-        boolean sure = BgcPlugin.openConfirm(
-            Messages.MoveSpecimensToDialog_move_confirm_title,
-            Messages.MoveSpecimensToDialog_move_confirm_msg);
-        if (sure)
-            super.okPressed();
     }
 
 }

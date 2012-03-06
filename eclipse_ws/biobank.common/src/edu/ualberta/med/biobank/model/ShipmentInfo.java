@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -29,8 +30,7 @@ public class ShipmentInfo extends AbstractBiobankModel {
         this.receivedAt = receivedAt;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.ShipmentInfo.packedAt.NotNull}")
-    @Column(name = "PACKED_AT", nullable = false)
+    @Column(name = "PACKED_AT")
     public Date getPackedAt() {
         return this.packedAt;
     }

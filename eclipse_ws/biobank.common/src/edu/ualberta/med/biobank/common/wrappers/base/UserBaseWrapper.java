@@ -15,8 +15,8 @@ import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.CommentBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.BbGroupBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.GroupBaseWrapper;
 import java.util.Arrays;
 
 public abstract class UserBaseWrapper extends PrincipalWrapper<User> {
@@ -168,25 +168,25 @@ public abstract class UserBaseWrapper extends PrincipalWrapper<User> {
         wrappedObject.setActivityStatus(activityStatus);
     }
 
-    public List<BbGroupWrapper> getGroupCollection(boolean sort) {
+    public List<GroupWrapper> getGroupCollection(boolean sort) {
         boolean notCached = !isPropertyCached(UserPeer.GROUPS);
-        List<BbGroupWrapper> groupCollection = getWrapperCollection(UserPeer.GROUPS, BbGroupWrapper.class, sort);
+        List<GroupWrapper> groupCollection = getWrapperCollection(UserPeer.GROUPS, GroupWrapper.class, sort);
         if (notCached) {
-            for (BbGroupBaseWrapper e : groupCollection) {
+            for (GroupBaseWrapper e : groupCollection) {
                 e.addToUserCollectionInternal(Arrays.asList(this));
             }
         }
         return groupCollection;
     }
 
-    public void addToGroupCollection(List<? extends BbGroupBaseWrapper> groupCollection) {
+    public void addToGroupCollection(List<? extends GroupBaseWrapper> groupCollection) {
         addToWrapperCollection(UserPeer.GROUPS, groupCollection);
-        for (BbGroupBaseWrapper e : groupCollection) {
+        for (GroupBaseWrapper e : groupCollection) {
             e.addToUserCollectionInternal(Arrays.asList(this));
         }
     }
 
-    void addToGroupCollectionInternal(List<? extends BbGroupBaseWrapper> groupCollection) {
+    void addToGroupCollectionInternal(List<? extends GroupBaseWrapper> groupCollection) {
         if (isInitialized(UserPeer.GROUPS)) {
             addToWrapperCollection(UserPeer.GROUPS, groupCollection);
         } else {
@@ -194,14 +194,14 @@ public abstract class UserBaseWrapper extends PrincipalWrapper<User> {
         }
     }
 
-    public void removeFromGroupCollection(List<? extends BbGroupBaseWrapper> groupCollection) {
+    public void removeFromGroupCollection(List<? extends GroupBaseWrapper> groupCollection) {
         removeFromWrapperCollection(UserPeer.GROUPS, groupCollection);
-        for (BbGroupBaseWrapper e : groupCollection) {
+        for (GroupBaseWrapper e : groupCollection) {
             e.removeFromUserCollectionInternal(Arrays.asList(this));
         }
     }
 
-    void removeFromGroupCollectionInternal(List<? extends BbGroupBaseWrapper> groupCollection) {
+    void removeFromGroupCollectionInternal(List<? extends GroupBaseWrapper> groupCollection) {
         if (isPropertyCached(UserPeer.GROUPS)) {
             removeFromWrapperCollection(UserPeer.GROUPS, groupCollection);
         } else {
@@ -209,14 +209,14 @@ public abstract class UserBaseWrapper extends PrincipalWrapper<User> {
         }
     }
 
-    public void removeFromGroupCollectionWithCheck(List<? extends BbGroupBaseWrapper> groupCollection) throws BiobankCheckException {
+    public void removeFromGroupCollectionWithCheck(List<? extends GroupBaseWrapper> groupCollection) throws BiobankCheckException {
         removeFromWrapperCollectionWithCheck(UserPeer.GROUPS, groupCollection);
-        for (BbGroupBaseWrapper e : groupCollection) {
+        for (GroupBaseWrapper e : groupCollection) {
             e.removeFromUserCollectionInternal(Arrays.asList(this));
         }
     }
 
-    void removeFromGroupCollectionWithCheckInternal(List<? extends BbGroupBaseWrapper> groupCollection) throws BiobankCheckException {
+    void removeFromGroupCollectionWithCheckInternal(List<? extends GroupBaseWrapper> groupCollection) throws BiobankCheckException {
         removeFromWrapperCollectionWithCheck(UserPeer.GROUPS, groupCollection);
     }
 

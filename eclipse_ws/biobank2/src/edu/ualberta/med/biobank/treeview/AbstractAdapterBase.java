@@ -24,7 +24,6 @@ import com.google.inject.Injector;
 import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -65,10 +64,11 @@ public abstract class AbstractAdapterBase implements
     // FIXME can we merge this list of listeners with the DeltaListener ?
     private List<AdapterChangedListener> listeners;
 
-    /**
-     * if true, edit button and actions will be visible
-     */
-    private boolean editable = true;
+    protected boolean isDeletable = false;
+
+    protected boolean isEditable = false;
+
+    protected boolean isReadable = false;
 
     public AbstractAdapterBase(AbstractAdapterBase parent, Integer id,
         String label, String tooltip, boolean hasChildren) {
@@ -85,8 +85,6 @@ public abstract class AbstractAdapterBase implements
         // itself upon instantiation?
         Injector injector = BiobankPlugin.getInjector();
         injector.injectMembers(this);
-
-        init();
     }
 
     @Inject
@@ -94,7 +92,7 @@ public abstract class AbstractAdapterBase implements
         this.eventBus = eventBus;
     }
 
-    protected void init() {
+    public void init() {
         // TODO Auto-generated method stub
     }
 
@@ -289,14 +287,16 @@ public abstract class AbstractAdapterBase implements
     }
 
     protected void addViewMenu(Menu menu, String objectName) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText(Messages.AdapterBase_view_label + objectName);
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                AbstractAdapterBase.this.openViewForm();
-            }
-        });
+        if (isReadable()) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText(Messages.AdapterBase_view_label + objectName);
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    AbstractAdapterBase.this.openViewForm();
+                }
+            });
+        }
     }
 
     protected void addDeleteMenu(Menu menu, String objectName) {
@@ -352,7 +352,9 @@ public abstract class AbstractAdapterBase implements
         }
     }
 
-    protected abstract void runDelete() throws Exception;
+    protected void runDelete() throws Exception {
+        // donothing
+    }
 
     /**
      * Create a adequate child node for this node
@@ -493,20 +495,15 @@ public abstract class AbstractAdapterBase implements
     }
 
     public boolean isDeletable() {
-        // should override it to activate deletion
-        return false;
-    }
-
-    protected boolean internalIsDeletable() {
-        return editable && SessionManager.getInstance().isConnected();
+        return isDeletable;
     }
 
     public boolean isEditable() {
-        return editable && SessionManager.getInstance().isConnected();
+        return isEditable;
     }
 
-    public void setEditable(boolean editable) {
-        this.editable = editable;
+    public boolean isReadable() {
+        return isReadable;
     }
 
     protected String getConfirmDeleteMessage() {

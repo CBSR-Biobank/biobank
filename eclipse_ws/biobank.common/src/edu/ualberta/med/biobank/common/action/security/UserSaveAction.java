@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.BbGroup;
+import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.User;
 
 public class UserSaveAction extends PrincipalSaveAction {
@@ -76,16 +76,16 @@ public class UserSaveAction extends PrincipalSaveAction {
     }
 
     private void saveGroups(ActionContext context) {
-        Map<Integer, BbGroup> groups =
-            context.load(BbGroup.class, groupIds);
+        Map<Integer, Group> groups =
+            context.load(Group.class, groupIds);
 
-        SetDifference<BbGroup> groupsDiff =
-            new SetDifference<BbGroup>(newUser.getGroups(),
+        SetDifference<Group> groupsDiff =
+            new SetDifference<Group>(newUser.getGroups(),
                 groups.values());
         newUser.setGroups(groupsDiff.getNewSet());
 
         // remove newUser from groups in removed list
-        for (BbGroup group : groupsDiff.getRemoveSet()) {
+        for (Group group : groupsDiff.getRemoveSet()) {
             Set<User> groupUsers = group.getUsers();
             if (groupUsers.remove(newUser)) {
                 group.setUsers(groupUsers);

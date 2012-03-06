@@ -11,18 +11,21 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.dialogs.StudySourceSpecimenDialog;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.SourceSpecimenInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
 
@@ -39,9 +42,29 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
 
     private StudyWrapper study;
 
+    private boolean isEditable;
+
+    private boolean isDeletable;
+
     public SourceSpecimenEntryInfoTable(Composite parent,
         List<SourceSpecimenWrapper> collection) {
         super(parent, collection);
+        init();
+    }
+
+    private void init() {
+        try {
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new StudyUpdatePermission(study.getId()));
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new StudyUpdatePermission(study.getId()));
+
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     /**
@@ -67,6 +90,20 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         addEditSupport();
+
+        try {
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new StudyUpdatePermission(study.getId()));
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new StudyUpdatePermission(study.getId()));
+
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
+
     }
 
     @Override
@@ -123,7 +160,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
     }
 
     private void addEditSupport() {
-        if (SessionManager.canCreate(SourceSpecimenWrapper.class)) {
+        if (isEditable) {
             addAddItemListener(new IInfoTableAddItemListener<SourceSpecimenWrapper>() {
                 @Override
                 public void addItem(InfoTableEvent<SourceSpecimenWrapper> event) {
@@ -131,7 +168,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
                 }
             });
         }
-        if (SessionManager.canUpdate(SourceSpecimenWrapper.class)) {
+        if (isEditable) {
             addEditItemListener(new IInfoTableEditItemListener<SourceSpecimenWrapper>() {
                 @Override
                 public void editItem(InfoTableEvent<SourceSpecimenWrapper> event) {
@@ -141,7 +178,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
                 }
             });
         }
-        if (SessionManager.canDelete(SourceSpecimenWrapper.class)) {
+        if (isDeletable) {
             addDeleteItemListener(new IInfoTableDeleteItemListener<SourceSpecimenWrapper>() {
                 @Override
                 public void deleteItem(
@@ -186,6 +223,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         reloadCollection(selectedSourceSpecimens);
         addedOrModifiedSourceSpecimens = new ArrayList<SourceSpecimenWrapper>();
         deletedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
+        init();
     }
 
     @SuppressWarnings("serial")

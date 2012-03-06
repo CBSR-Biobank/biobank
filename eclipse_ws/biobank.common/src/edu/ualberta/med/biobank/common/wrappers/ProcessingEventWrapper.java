@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.criterion.DetachedCriteria;
+
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -161,10 +163,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     public static Collection<? extends ModelWrapper<?>> getAllProcessingEvents(
         BiobankApplicationService appService) throws ApplicationException {
         return ModelWrapper.wrapModelCollection(appService,
-            appService.search(ProcessingEvent.class, new ProcessingEvent()),
+            appService.query(DetachedCriteria.forClass(ProcessingEvent.class)),
             ProcessingEventWrapper.class);
     }
 
+    @Deprecated
     @SuppressWarnings("unchecked")
     @Override
     public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {

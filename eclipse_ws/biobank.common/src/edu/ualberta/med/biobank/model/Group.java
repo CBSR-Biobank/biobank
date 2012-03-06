@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @DiscriminatorValue("BbGroup")
 @Unique(properties = "name", groups = PrePersist.class)
-public class BbGroup extends Principal {
+public class Group extends Principal {
     private static final long serialVersionUID = 1L;
 
     private String name;

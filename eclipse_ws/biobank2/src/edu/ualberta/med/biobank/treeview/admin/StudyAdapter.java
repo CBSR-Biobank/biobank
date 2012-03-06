@@ -22,7 +22,6 @@ public class StudyAdapter extends AdapterBase {
     public StudyAdapter(AdapterBase parent, StudyWrapper study) {
         super(parent, study);
         this.study = study;
-        setEditable(parent instanceof StudyMasterGroup || parent == null);
     }
 
     @Override

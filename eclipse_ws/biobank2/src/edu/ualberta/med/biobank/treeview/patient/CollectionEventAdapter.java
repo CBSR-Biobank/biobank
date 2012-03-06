@@ -12,12 +12,17 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventDeletePermission;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
@@ -28,7 +33,29 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
         super(parent, ceventInfo == null ? null : ceventInfo.cevent.getId(),
             null, null, false);
         this.ceventInfo = ceventInfo;
-        setEditable(parent instanceof PatientAdapter || parent == null);
+
+        init();
+    }
+
+    @Override
+    public void init() {
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new CollectionEventDeletePermission(ceventInfo.cevent
+                        .getId()));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new CollectionEventReadPermission(ceventInfo.cevent
+                        .getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new CollectionEventUpdatePermission(ceventInfo.cevent
+                        .getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     @Override
@@ -62,11 +89,11 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
                 // Messages.CollectionEventAdapter_error_title,
                 // Messages.CollectionEventAdapter_create_error_msg);
                 // }
-            } else {
-                tabName = NLS.bind(
-                    Messages.CollectionEventEntryForm_title_edit,
-                    ceventInfo.cevent.getVisitNumber());
-            }
+        } else {
+            tabName = NLS.bind(
+                Messages.CollectionEventEntryForm_title_edit,
+                ceventInfo.cevent.getVisitNumber());
+        }
         return tabName;
     }
 
@@ -112,11 +139,6 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
         return CollectionEventViewForm.ID;
     }
 
-    @Override
-    public boolean isDeletable() {
-        return internalIsDeletable();
-    }
-
     public Patient getPatient() {
         if (ceventInfo != null && ceventInfo.cevent != null)
             return ceventInfo.cevent.getPatient();
@@ -149,14 +171,14 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     }
 
     @Override
-    public void setValue(Object value) {
-        if (value instanceof SimpleCEventInfo)
-            ceventInfo = (SimpleCEventInfo) value;
-    }
-
-    @Override
     protected void runDelete() throws Exception {
         SessionManager.getAppService().doAction(
             new CollectionEventDeleteAction(getId()));
+    }
+
+    @Override
+    public void setValue(Object val) {
+        this.ceventInfo = (SimpleCEventInfo) val;
+        if (ceventInfo.cevent.getId() != null) init();
     }
 }

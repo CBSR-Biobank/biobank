@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
@@ -86,18 +85,16 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
     }
 
     public void createDefaultEditItem() {
-        if (SessionManager.canUpdate(wrapperClass)) {
-            useDefaultEditItem = true;
-            // IMPORTANT! call our super classes addEditItemListener() here
-            //
-            // if not, then the default edit item behaviour will not work
-            super.addEditItemListener(new IInfoTableEditItemListener<T>() {
-                @Override
-                public void editItem(InfoTableEvent<T> event) {
-                    // do nothing
-                }
-            });
-        }
+        useDefaultEditItem = true;
+        // IMPORTANT! call our super classes addEditItemListener() here
+        //
+        // if not, then the default edit item behaviour will not work
+        super.addEditItemListener(new IInfoTableEditItemListener<T>() {
+            @Override
+            public void editItem(InfoTableEvent<T> event) {
+                // do nothing
+            }
+        });
     }
 
     @Override

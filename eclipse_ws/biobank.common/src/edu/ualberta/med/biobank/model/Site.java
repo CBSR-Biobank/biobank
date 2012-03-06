@@ -15,6 +15,17 @@ import javax.persistence.OneToMany;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
+/**
+ * A storage location
+ * 
+ * ET: The laboratory hosting the storage facilities
+ * 
+ * caTissue Term - Site: A physical location involved in biospecimen collection,
+ * storage, processing, or utilization.
+ * 
+ * NCI Term - Repository: A facility where things can be deposited for storage
+ * or safekeeping.
+ */
 @Entity
 @DiscriminatorValue("Site")
 @Empty.List({

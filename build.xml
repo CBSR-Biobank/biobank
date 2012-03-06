@@ -14,6 +14,8 @@ End:
   </exec>
 
   <property environment="env" />
+  <property name="doxygen" location="/usr/bin/doxygen" />
+  <property name="xsltproc" location="/usr/bin/xsltproc" />
 
   <!-- TODO: move as many properties as possible into build.properties -->
   <!-- TODO: add tasks to push database properties to various files -->
@@ -463,7 +465,7 @@ End:
   </target>
 
   <target name="clean"
-          depends="clean-tests,clean-jars,clean-product"
+          depends="clean-tests,clean-jars,clean-product,clean-doxygen"
           description="cleans project output, tests, and jars">
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output-validators" />
@@ -472,6 +474,7 @@ End:
 
   <!-- JUnit -->
 
+  <property name="doxygen.output" location="docs/doxygen" />
   <property name="test.output" location="testing" />
   <property name="test.output.raw" value="${test.output}/raw" />
   <property name="test.build.dir" value="${eclipse.proj.dir.tests}/output" />
@@ -763,6 +766,24 @@ End:
       <arg line="-metadataRepository file:${updateSiteFolder}" />
     </java>
   </target>
+
+  <target name="doxygen" description="generates documentation for the model classes">
+    <exec command="${doxygen}">
+      <arg value="docs/doxygen/doxygen.cfg" />
+    </exec>
+    <echo message="point your browser to: file://${doxygen.output}/html/index.html" />
+    <exec command="${xsltproc}" dir="docs/doxygen/xml" output="docs/doxygen/xml/all.xml">
+      <arg value="combine.xslt" />
+      <arg value="index.xml" />
+    </exec>
+  </target>
+
+  <target name="clean-doxygen">
+    <delete dir="docs/doxygen/html" />
+    <delete dir="docs/doxygen/xml" />
+  </target>
+
+<!-- (setq nxml-slash-auto-complete-flag t) -->
 
 
 </project>

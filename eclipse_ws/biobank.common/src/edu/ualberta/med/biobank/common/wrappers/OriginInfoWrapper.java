@@ -8,9 +8,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
-import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.OriginInfoFromClinicCheck;
 import edu.ualberta.med.biobank.common.wrappers.loggers.OriginInfoLogProvider;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -51,15 +49,6 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         }
 
         return patients;
-    }
-
-    public void checkAtLeastOneSpecimen() {
-        // FIXME don't want that when create from collection event
-        // List<SpecimenWrapper> spc = getSpecimenCollection(false);
-        // if (spc == null || spc.isEmpty()) {
-        // throw new BiobankCheckException(
-        // "At least one specimen should be added to this Collection Event.");
-        // }
     }
 
     public static List<OriginInfoWrapper> getTodayShipments(
@@ -167,39 +156,6 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     @Override
     public OriginInfoLogProvider getLogProvider() {
         return LOG_PROVIDER;
-    }
-
-    @Deprecated
-    @Override
-    protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().notNull(OriginInfoPeer.CENTER));
-
-        super.addPersistTasks(tasks);
-
-        tasks.add(new OriginInfoFromClinicCheck(this));
-    }
-
-    @Deprecated
-    @Override
-    protected void addDeleteTasks(TaskList tasks) {
-        // TODO: this SHOULD NOT be done in the wrappers. It should be done in
-        // some other method because this is a highly customized action and is
-        // not always correct. For example, if a shipment is deleted after a
-        // dispatch, then it will appear that the specimen came from the place
-        // it was dispatched to.
-
-        // all specimen should be linked to another origin info. This origin
-        // info center will be the specimen current center.
-        for (SpecimenWrapper spc : getSpecimenCollection()) {
-            OriginInfoWrapper oi = new OriginInfoWrapper(appService);
-            oi.setCenter(spc.getCurrentCenter());
-            spc.setOriginInfo(oi);
-
-            oi.addPersistAndLogTasks(tasks);
-            spc.addPersistAndLogTasks(tasks);
-        }
-
-        super.addDeleteTasks(tasks);
     }
 
     /**

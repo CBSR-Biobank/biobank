@@ -69,7 +69,7 @@ public class SiteViewFormView extends AbstractViewFormView
         table.addLabel(Messages.SiteViewForm_field_patientCount_label);
         patientCount.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.SiteViewForm_field_pvCount_label);
+        table.addLabel(Messages.SiteViewForm_field_peventCount_label);
         collectionEventCount.setText(table.addReadOnlyText());
 
         table.addLabel(Messages.SiteViewForm_field_totalSpecimen);

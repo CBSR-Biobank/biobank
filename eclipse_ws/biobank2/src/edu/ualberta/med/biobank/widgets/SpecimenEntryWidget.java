@@ -162,7 +162,8 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                         new SpecimenGetInfoAction(specId)).getSpecimen());
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
-                    Messages.SpecimenEntryWidget_retrieve_error_title, e);
+                    Messages.SpecimenEntryWidget_retrieve_error_title,
+                    "Specimen not found.");
             }
             if (specimen != null)
                 try {

@@ -44,6 +44,9 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
     private final ClinicGetStudyInfoAction getStudyInfo;
 
     public ClinicGetInfoAction(Integer clinicId) {
+        if (clinicId == null) {
+            throw new IllegalArgumentException();
+        }
         this.clinicId = clinicId;
         this.getContacts = new ClinicGetContactsAction(clinicId);
         this.getStudyInfo = new ClinicGetStudyInfoAction(clinicId);

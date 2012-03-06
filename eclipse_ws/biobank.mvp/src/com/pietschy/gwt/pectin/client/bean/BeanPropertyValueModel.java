@@ -23,7 +23,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.pietschy.gwt.pectin.client.value.AbstractMutableValueModel;
 import com.pietschy.gwt.pectin.client.value.ValueHolder;
 import com.pietschy.gwt.pectin.client.value.ValueModel;
-
+@SuppressWarnings("all")
 /**
  *
  */

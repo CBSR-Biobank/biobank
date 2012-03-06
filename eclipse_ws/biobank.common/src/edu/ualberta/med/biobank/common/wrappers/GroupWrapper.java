@@ -3,41 +3,41 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.base.BbGroupBaseWrapper;
-import edu.ualberta.med.biobank.model.BbGroup;
+import edu.ualberta.med.biobank.common.wrappers.base.GroupBaseWrapper;
+import edu.ualberta.med.biobank.model.Group;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class BbGroupWrapper extends BbGroupBaseWrapper {
+public class GroupWrapper extends GroupBaseWrapper {
 
-    public BbGroupWrapper(WritableApplicationService appService,
-        BbGroup wrappedObject) {
+    public GroupWrapper(WritableApplicationService appService,
+        Group wrappedObject) {
         super(appService, wrappedObject);
     }
 
-    public BbGroupWrapper(WritableApplicationService appService) {
+    public GroupWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
     private static final String ALL_GROUPS_QRY = " from " //$NON-NLS-1$
-        + BbGroup.class.getName();
+        + Group.class.getName();
 
-    public static final List<BbGroupWrapper> getAllGroups(
+    public static final List<GroupWrapper> getAllGroups(
         WritableApplicationService appService) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(ALL_GROUPS_QRY,
             new ArrayList<Object>());
 
-        List<BbGroup> groups = appService.query(criteria);
+        List<Group> groups = appService.query(criteria);
         return ModelWrapper.wrapModelCollection(appService, groups,
-            BbGroupWrapper.class);
+            GroupWrapper.class);
     }
 
     @Override
-    public int compareTo(ModelWrapper<BbGroup> group2) {
-        if (group2 instanceof BbGroupWrapper) {
+    public int compareTo(ModelWrapper<Group> group2) {
+        if (group2 instanceof GroupWrapper) {
             String name1 = getName();
-            String name2 = ((BbGroupWrapper) group2).getName();
+            String name2 = ((GroupWrapper) group2).getName();
 
             if (name1 == null || name2 == null)
                 return 0;
@@ -47,8 +47,8 @@ public class BbGroupWrapper extends BbGroupBaseWrapper {
     }
 
     @Override
-    public BbGroupWrapper duplicate() {
-        return (BbGroupWrapper) super.duplicate();
+    public GroupWrapper duplicate() {
+        return (GroupWrapper) super.duplicate();
     }
 
     /**
@@ -56,8 +56,8 @@ public class BbGroupWrapper extends BbGroupBaseWrapper {
      * relations. This duplicated group is not yet saved into the DB.
      */
     @Override
-    public BbGroupWrapper createDuplicate() {
-        BbGroupWrapper newGroup = new BbGroupWrapper(appService);
+    public GroupWrapper createDuplicate() {
+        GroupWrapper newGroup = new GroupWrapper(appService);
         newGroup.setName(getName());
         return newGroup;
     }

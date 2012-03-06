@@ -69,7 +69,7 @@ public class Messages extends NLS {
     public static String site_field_type_label;
     public static String SiteViewForm_field_topLevelCount_label;
     public static String SiteViewForm_field_patientCount_label;
-    public static String SiteViewForm_field_pvCount_label;
+    public static String SiteViewForm_field_peventCount_label;
     public static String SiteViewForm_field_totalSpecimen;
     public static String SiteViewForm_types_title;
     public static String SiteViewForm_type_add;

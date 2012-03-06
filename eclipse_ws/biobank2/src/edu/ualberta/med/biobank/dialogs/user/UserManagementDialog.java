@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -19,7 +19,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class UserManagementDialog extends BgcDialogWithPages {
 
     private List<UserWrapper> currentAllUsersList;
-    private List<BbGroupWrapper> currentAllGroupsList;
+    private List<GroupWrapper> currentAllGroupsList;
     private List<RoleWrapper> currentAllRolesList;
 
     public UserManagementDialog(Shell parentShell) {
@@ -59,7 +59,7 @@ public class UserManagementDialog extends BgcDialogWithPages {
         });
         nodes.add(new GroupsPage(this) {
             @Override
-            protected List<BbGroupWrapper> getCurrentAllGroupsList() {
+            protected List<GroupWrapper> getCurrentAllGroupsList() {
                 return getGroups();
             }
         });
@@ -90,10 +90,10 @@ public class UserManagementDialog extends BgcDialogWithPages {
         return currentAllUsersList;
     }
 
-    protected List<BbGroupWrapper> getGroups() {
+    protected List<GroupWrapper> getGroups() {
         if (currentAllGroupsList == null)
             try {
-                currentAllGroupsList = BbGroupWrapper
+                currentAllGroupsList = GroupWrapper
                     .getAllGroups(SessionManager.getAppService());
             } catch (ApplicationException e) {
                 BgcPlugin.openAsyncError(

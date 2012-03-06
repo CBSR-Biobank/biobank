@@ -8,14 +8,20 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventDeletePermission;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.forms.ProcessingEventEntryForm;
 import edu.ualberta.med.biobank.forms.ProcessingEventViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingEventAdapter extends AdapterBase {
 
@@ -28,6 +34,28 @@ public class ProcessingEventAdapter extends AdapterBase {
     }
 
     @Override
+    public void init() {
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new ProcessingEventDeletePermission(getModelObject()
+                        .getId()));
+            this.isReadable =
+                SessionManager.getAppService()
+                    .isAllowed(
+                        new ProcessingEventReadPermission(getModelObject()
+                            .getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new ProcessingEventUpdatePermission(getModelObject()
+                        .getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
+    }
+
+    @Override
     public void executeDoubleClick() {
         performExpand();
         openViewForm();
@@ -35,7 +63,8 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        ProcessingEventWrapper pevent = (ProcessingEventWrapper) getModelObject();
+        ProcessingEventWrapper pevent =
+            (ProcessingEventWrapper) getModelObject();
         Assert.isNotNull(pevent, "processing event is null"); //$NON-NLS-1$
         String worksheet = pevent.getWorksheet();
         String name = pevent.getFormattedCreatedAt()
@@ -52,7 +81,8 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     @Override
     public String getTooltipTextInternal() {
-        ProcessingEventWrapper pevent = (ProcessingEventWrapper) getModelObject();
+        ProcessingEventWrapper pevent =
+            (ProcessingEventWrapper) getModelObject();
         if (pevent == null)
             return Messages.ProvessingEventAdapter_tooltiptext;
         return NLS.bind(Messages.ProvessingEventAdapter_tooltiptext_withdate,
@@ -64,11 +94,6 @@ public class ProcessingEventAdapter extends AdapterBase {
         addEditMenu(menu, Messages.ProcessingEventAdapter_pevent_label);
         addViewMenu(menu, Messages.ProcessingEventAdapter_pevent_label);
         addDeleteMenu(menu, Messages.ProcessingEventAdapter_pevent_label);
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return internalIsDeletable();
     }
 
     @Override

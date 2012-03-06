@@ -19,7 +19,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.SessionSecurityHelper;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
@@ -361,17 +360,4 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             specimensTreeTable.refresh();
         }
     }
-
-    @Override
-    protected void checkEditAccess() {
-        if (adapter != null
-            && adapter.getId() != null
-            && !SessionManager
-                .isAllowed(SessionSecurityHelper.DISPATCH_SEND_KEY_DESC)) {
-            BgcPlugin.openAccessDeniedErrorMessage();
-            throw new RuntimeException(
-                Messages.BiobankEntryForm_access_denied_error_msg);
-        }
-    }
-
 }

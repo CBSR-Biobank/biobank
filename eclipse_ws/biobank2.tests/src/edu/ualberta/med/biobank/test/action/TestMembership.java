@@ -6,7 +6,7 @@ import org.hibernate.Transaction;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.BbGroup;
+import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -40,7 +40,7 @@ public class TestMembership extends TestAction {
         membership2.setCenter(site);
         membership2.setStudy(study);
 
-        BbGroup group = new BbGroup();
+        Group group = new Group();
         group.setName(name);
         group.setDescription(name);
 

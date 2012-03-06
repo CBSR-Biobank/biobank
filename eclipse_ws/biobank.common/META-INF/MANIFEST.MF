@@ -117,6 +117,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.common.permission.logging,
  edu.ualberta.med.biobank.common.permission.patient,
  edu.ualberta.med.biobank.common.permission.processingEvent,
+ edu.ualberta.med.biobank.common.permission.reports,
  edu.ualberta.med.biobank.common.permission.request,
  edu.ualberta.med.biobank.common.permission.researchGroup,
  edu.ualberta.med.biobank.common.permission.security,
@@ -182,6 +183,7 @@ Export-Package: antlr;
    org.apache.avalon.framework.logger",
  org.apache.log4j;uses:="org.apache.log4j.helpers,org.apache.log4j.or,org.apache.log4j.spi",
  org.apache.log4j.spi;uses:="org.apache.log4j,org.apache.log4j.or",
+ org.hibernate.criterion,
  org.springframework.remoting;uses:="org.springframework.core"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: edu.ualberta.med.biobank.common,

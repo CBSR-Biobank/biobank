@@ -35,6 +35,8 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
+@SuppressWarnings("all")
+// outdated tests
 public class TestAdvancedReports extends TestDatabase {
     private static final SimpleDateFormat SQL_DATE_FORMAT =
         new SimpleDateFormat(

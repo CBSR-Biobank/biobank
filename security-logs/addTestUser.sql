@@ -17,4 +17,4 @@ insert into group_user(user_id, group_id)
        where u.login='testuser'
        and g.name='Super Administrators'
        and u.discriminator = 'User'
-       and g.discriminator = 'BbGroup';
+       and g.discriminator = 'Group';

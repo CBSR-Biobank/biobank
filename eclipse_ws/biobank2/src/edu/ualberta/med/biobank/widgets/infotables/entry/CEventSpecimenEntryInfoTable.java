@@ -14,9 +14,10 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.dialogs.CEventSourceSpecimenDialog;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
@@ -24,15 +25,32 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
 
     protected IObservableValue specimensAdded = new WritableValue(
         Boolean.FALSE, Boolean.class);
+    private boolean isEditable;
+    private boolean isDeletable;
 
     public CEventSpecimenEntryInfoTable(Composite parent,
-        List<SpecimenInfo> specs, ColumnsShown columnsShowns) {
+        List<SpecimenInfo> specs, CollectionEvent cevent,
+        ColumnsShown columnsShowns) {
         super(parent, specs, columnsShowns);
+        try {
+            if (cevent.getId() != null) {
+                this.isEditable =
+                    SessionManager.getAppService().isAllowed(
+                        new CollectionEventUpdatePermission(cevent.getId()));
+                this.isDeletable =
+                    SessionManager.getAppService().isAllowed(
+                        new CollectionEventUpdatePermission(cevent.getId()));
+            }
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     @Override
@@ -84,7 +102,7 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
 
     public void addEditSupport(final List<SourceSpecimen> studySourceTypes,
         final List<SpecimenType> allSpecimenTypes) {
-        if (SessionManager.canUpdate(SpecimenWrapper.class)) {
+        if (isEditable) {
             addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {
                 @Override
                 public void editItem(InfoTableEvent<SpecimenInfo> event) {
@@ -95,7 +113,7 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                 }
             });
         }
-        if (SessionManager.canDelete(SpecimenWrapper.class)) {
+        if (isDeletable) {
             addDeleteItemListener(new IInfoTableDeleteItemListener<SpecimenInfo>() {
                 @Override
                 public void deleteItem(InfoTableEvent<SpecimenInfo> event) {

@@ -17,14 +17,18 @@ import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.permission.patient.PatientDeletePermission;
+import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
+import edu.ualberta.med.biobank.common.permission.patient.PatientUpdatePermission;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientAdapter extends AbstractNewAdapterBase {
 
@@ -36,10 +40,25 @@ public class PatientAdapter extends AbstractNewAdapterBase {
         super(parent, pinfo == null ? null : pinfo.patient.getId(), null, null,
             (pinfo == null || pinfo.ceventsCount == null) ? false
                 : pinfo.ceventsCount > 0);
-        if (pinfo != null) {
-            this.patient = pinfo.patient;
-            this.study = pinfo.study;
-            this.ceventsCount = pinfo.ceventsCount;
+        setValue(pinfo);
+
+    }
+
+    @Override
+    public void init() {
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new PatientDeletePermission(patient.getId()));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new PatientReadPermission(patient.getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new PatientUpdatePermission(patient.getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
         }
     }
 
@@ -70,8 +89,7 @@ public class PatientAdapter extends AbstractNewAdapterBase {
         addViewMenu(menu, Messages.PatientAdapter_patient_label);
         addDeleteMenu(menu, Messages.PatientAdapter_patient_label);
 
-        if (isEditable()
-            && SessionManager.canCreate(CollectionEventWrapper.class)) {
+        if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(Messages.PatientAdapter_add_cevent_label);
             mi.addSelectionListener(new SelectionAdapter() {
@@ -134,11 +152,6 @@ public class PatientAdapter extends AbstractNewAdapterBase {
         return Messages.PatientAdapter_delete_confirm_msg;
     }
 
-    @Override
-    public boolean isDeletable() {
-        return internalIsDeletable();
-    }
-
     public Patient getPatient() {
         return patient;
     }
@@ -158,7 +171,9 @@ public class PatientAdapter extends AbstractNewAdapterBase {
             this.patient = pinfo.patient;
             this.study = pinfo.study;
             this.ceventsCount = pinfo.ceventsCount;
+            if (patient.getId() != null) init();
         }
+
     }
 
     @Override
@@ -166,4 +181,5 @@ public class PatientAdapter extends AbstractNewAdapterBase {
         SessionManager.getAppService().doAction(
             new PatientDeleteAction(getId()));
     }
+
 }

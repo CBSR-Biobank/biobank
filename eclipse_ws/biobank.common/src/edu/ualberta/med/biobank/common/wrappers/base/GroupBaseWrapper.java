@@ -6,67 +6,67 @@ package edu.ualberta.med.biobank.common.wrappers.base;
 
 import java.util.List;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.BbGroup;
+import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import java.util.ArrayList;
-import edu.ualberta.med.biobank.common.peer.BbGroupPeer;
+import edu.ualberta.med.biobank.common.peer.GroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.UserBaseWrapper;
 import java.util.Arrays;
 
-public abstract class BbGroupBaseWrapper extends PrincipalWrapper<BbGroup> {
+public abstract class GroupBaseWrapper extends PrincipalWrapper<Group> {
 
-    public BbGroupBaseWrapper(WritableApplicationService appService) {
+    public GroupBaseWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
-    public BbGroupBaseWrapper(WritableApplicationService appService,
-        BbGroup wrappedObject) {
+    public GroupBaseWrapper(WritableApplicationService appService,
+        Group wrappedObject) {
         super(appService, wrappedObject);
     }
 
     @Override
-    public final Class<BbGroup> getWrappedClass() {
-        return BbGroup.class;
+    public final Class<Group> getWrappedClass() {
+        return Group.class;
     }
 
     @Override
-    public Property<Integer, ? super BbGroup> getIdProperty() {
-        return BbGroupPeer.ID;
+    public Property<Integer, ? super Group> getIdProperty() {
+        return GroupPeer.ID;
     }
 
     @Override
-    protected List<Property<?, ? super BbGroup>> getProperties() {
-        List<Property<?, ? super BbGroup>> superNames = super.getProperties();
-        List<Property<?, ? super BbGroup>> all = new ArrayList<Property<?, ? super BbGroup>>();
+    protected List<Property<?, ? super Group>> getProperties() {
+        List<Property<?, ? super Group>> superNames = super.getProperties();
+        List<Property<?, ? super Group>> all = new ArrayList<Property<?, ? super Group>>();
         all.addAll(superNames);
-        all.addAll(BbGroupPeer.PROPERTIES);
+        all.addAll(GroupPeer.PROPERTIES);
         return all;
     }
 
     public String getDescription() {
-        return getProperty(BbGroupPeer.DESCRIPTION);
+        return getProperty(GroupPeer.DESCRIPTION);
     }
 
     public void setDescription(String description) {
         String trimmed = description == null ? null : description.trim();
-        setProperty(BbGroupPeer.DESCRIPTION, trimmed);
+        setProperty(GroupPeer.DESCRIPTION, trimmed);
     }
 
     public String getName() {
-        return getProperty(BbGroupPeer.NAME);
+        return getProperty(GroupPeer.NAME);
     }
 
     public void setName(String name) {
         String trimmed = name == null ? null : name.trim();
-        setProperty(BbGroupPeer.NAME, trimmed);
+        setProperty(GroupPeer.NAME, trimmed);
     }
 
     public List<UserWrapper> getUserCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(BbGroupPeer.USERS);
-        List<UserWrapper> userCollection = getWrapperCollection(BbGroupPeer.USERS, UserWrapper.class, sort);
+        boolean notCached = !isPropertyCached(GroupPeer.USERS);
+        List<UserWrapper> userCollection = getWrapperCollection(GroupPeer.USERS, UserWrapper.class, sort);
         if (notCached) {
             for (UserBaseWrapper e : userCollection) {
                 e.addToGroupCollectionInternal(Arrays.asList(this));
@@ -76,44 +76,44 @@ public abstract class BbGroupBaseWrapper extends PrincipalWrapper<BbGroup> {
     }
 
     public void addToUserCollection(List<? extends UserBaseWrapper> userCollection) {
-        addToWrapperCollection(BbGroupPeer.USERS, userCollection);
+        addToWrapperCollection(GroupPeer.USERS, userCollection);
         for (UserBaseWrapper e : userCollection) {
             e.addToGroupCollectionInternal(Arrays.asList(this));
         }
     }
 
     void addToUserCollectionInternal(List<? extends UserBaseWrapper> userCollection) {
-        if (isInitialized(BbGroupPeer.USERS)) {
-            addToWrapperCollection(BbGroupPeer.USERS, userCollection);
+        if (isInitialized(GroupPeer.USERS)) {
+            addToWrapperCollection(GroupPeer.USERS, userCollection);
         } else {
-            getElementQueue().add(BbGroupPeer.USERS, userCollection);
+            getElementQueue().add(GroupPeer.USERS, userCollection);
         }
     }
 
     public void removeFromUserCollection(List<? extends UserBaseWrapper> userCollection) {
-        removeFromWrapperCollection(BbGroupPeer.USERS, userCollection);
+        removeFromWrapperCollection(GroupPeer.USERS, userCollection);
         for (UserBaseWrapper e : userCollection) {
             e.removeFromGroupCollectionInternal(Arrays.asList(this));
         }
     }
 
     void removeFromUserCollectionInternal(List<? extends UserBaseWrapper> userCollection) {
-        if (isPropertyCached(BbGroupPeer.USERS)) {
-            removeFromWrapperCollection(BbGroupPeer.USERS, userCollection);
+        if (isPropertyCached(GroupPeer.USERS)) {
+            removeFromWrapperCollection(GroupPeer.USERS, userCollection);
         } else {
-            getElementQueue().remove(BbGroupPeer.USERS, userCollection);
+            getElementQueue().remove(GroupPeer.USERS, userCollection);
         }
     }
 
     public void removeFromUserCollectionWithCheck(List<? extends UserBaseWrapper> userCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(BbGroupPeer.USERS, userCollection);
+        removeFromWrapperCollectionWithCheck(GroupPeer.USERS, userCollection);
         for (UserBaseWrapper e : userCollection) {
             e.removeFromGroupCollectionInternal(Arrays.asList(this));
         }
     }
 
     void removeFromUserCollectionWithCheckInternal(List<? extends UserBaseWrapper> userCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(BbGroupPeer.USERS, userCollection);
+        removeFromWrapperCollectionWithCheck(GroupPeer.USERS, userCollection);
     }
 
 }

@@ -7,30 +7,32 @@ import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.SessionSecurityHelper;
+import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 
 public class SessionState extends AbstractSourceProvider {
 
-    public final static String SESSION_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.loginState"; //$NON-NLS-1$
+    public final static String SESSION_STATE_SOURCE_NAME =
+        "edu.ualberta.med.biobank.sourceprovider.loginState"; //$NON-NLS-1$
 
     private static BgcLogger logger = BgcLogger.getLogger(SessionState.class
         .getName());
 
-    public final static String IS_SUPER_ADMIN_MODE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.isSuperAdminMode"; //$NON-NLS-1$
-    public final static String HAS_WORKING_CENTER_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter"; //$NON-NLS-1$
-    public final static String HAS_CLINIC_SHIPMENT_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.clinicShipmentRights"; //$NON-NLS-1$
-    public final static String HAS_DISPATCH_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.dispatchRights"; //$NON-NLS-1$
-    public final static String HAS_PRINTER_LABELS_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.hasPrinterLabelsRights"; //$NON-NLS-1$
-    public final static String HAS_USER_MANAGEMENT_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.hasUserManagementRights"; //$NON-NLS-1$
-    public final static String CURRENT_CENTER_TYPE = "edu.ualberta.med.biobank.sourceprovider.currentCenterType"; //$NON-NLS-1$
+    public final static String IS_SUPER_ADMIN_MODE_SOURCE_NAME =
+        "edu.ualberta.med.biobank.sourceprovider.isSuperAdminMode"; //$NON-NLS-1$
+    public final static String HAS_WORKING_CENTER_SOURCE_NAME =
+        "edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter"; //$NON-NLS-1$
+    public final static String HAS_PRINTER_LABELS_RIGHTS =
+        "edu.ualberta.med.biobank.sourceprovider.hasPrinterLabelsRights"; //$NON-NLS-1$
+    public final static String HAS_USER_MANAGEMENT_RIGHTS =
+        "edu.ualberta.med.biobank.sourceprovider.hasUserManagementRights"; //$NON-NLS-1$
+    public final static String CURRENT_CENTER_TYPE =
+        "edu.ualberta.med.biobank.sourceprovider.currentCenterType"; //$NON-NLS-1$
 
     private boolean isSuperAdminMode;
     private boolean hasWorkingCenter;
-    private boolean hasClinicShipmentRights;
-    private boolean hasDispatchRights;
     private boolean hasPrinterLabelsRights;
     private boolean hasUserManagementRights;
     private String currentCenterType = ""; //$NON-NLS-1$
@@ -39,7 +41,6 @@ public class SessionState extends AbstractSourceProvider {
     public String[] getProvidedSourceNames() {
         return new String[] { SESSION_STATE_SOURCE_NAME,
             IS_SUPER_ADMIN_MODE_SOURCE_NAME, HAS_WORKING_CENTER_SOURCE_NAME,
-            HAS_CLINIC_SHIPMENT_RIGHTS, HAS_DISPATCH_RIGHTS,
             HAS_PRINTER_LABELS_RIGHTS, CURRENT_CENTER_TYPE };
     }
 
@@ -50,10 +51,6 @@ public class SessionState extends AbstractSourceProvider {
             Boolean.toString((isSuperAdminMode)));
         currentStateMap.put(HAS_WORKING_CENTER_SOURCE_NAME,
             Boolean.toString(hasWorkingCenter));
-        currentStateMap.put(HAS_CLINIC_SHIPMENT_RIGHTS,
-            Boolean.toString(hasClinicShipmentRights));
-        currentStateMap.put(HAS_DISPATCH_RIGHTS,
-            Boolean.toString(hasDispatchRights));
         currentStateMap.put(HAS_PRINTER_LABELS_RIGHTS,
             Boolean.toString(hasPrinterLabelsRights));
         currentStateMap.put(CURRENT_CENTER_TYPE, currentCenterType);
@@ -82,22 +79,6 @@ public class SessionState extends AbstractSourceProvider {
         this.hasWorkingCenter = hasWorkingCenter;
         fireSourceChanged(ISources.WORKBENCH, HAS_WORKING_CENTER_SOURCE_NAME,
             hasWorkingCenter);
-    }
-
-    private void setHasClinicShipmentRights(boolean hasClinicShipmentRights) {
-        if (this.hasClinicShipmentRights == hasClinicShipmentRights)
-            return; // no change
-        this.hasClinicShipmentRights = hasClinicShipmentRights;
-        fireSourceChanged(ISources.WORKBENCH, HAS_CLINIC_SHIPMENT_RIGHTS,
-            hasClinicShipmentRights);
-    }
-
-    private void setDispatchRights(boolean hasDispatchRights) {
-        if (this.hasDispatchRights == hasDispatchRights)
-            return; // no change
-        this.hasDispatchRights = hasDispatchRights;
-        fireSourceChanged(ISources.WORKBENCH, HAS_DISPATCH_RIGHTS,
-            hasDispatchRights);
     }
 
     private void setHasPrinterLabelsRights(boolean hasPrinterLabelsRights) {
@@ -135,22 +116,13 @@ public class SessionState extends AbstractSourceProvider {
                 && user.getCurrentWorkingCenter() != null);
             setCurrentCenterType((user == null) ? null : user
                 .getCurrentWorkingCenter());
-            setHasClinicShipmentRights(user != null
-                && SessionManager
-                    .isAllowed(SessionSecurityHelper.CLINIC_SHIPMENT_KEY_DESC));
-            setDispatchRights(user != null
-                && SessionManager.isAllowed(
-                    SessionSecurityHelper.DISPATCH_RECEIVE_KEY_DESC,
-                    SessionSecurityHelper.DISPATCH_SEND_KEY_DESC));
-            setHasPrinterLabelsRights(user != null
-                && SessionManager
-                    .isAllowed(SessionSecurityHelper.PRINT_LABEL_KEY_DESC));
-            // FIXME for user management, should be able to access even if user
-            // is not connected to the right center? Right now can access only
-            // if connected to same center on which has user mgt access
+            // setHasPrinterLabelsRights(user != null
+            // && SessionManager.getAppService().isAllowed(
+            // new PrinterLabelPermission()));
+            // FIXME need this permission implemented
             setHasUserManagementRights(user != null
-                && SessionManager
-                    .isAllowed(SessionSecurityHelper.USER_MANAGEMENT_DESC));
+                && SessionManager.getAppService().isAllowed(
+                    new UserManagementPermission()));
         } catch (Exception e) {
             logger.error("Error setting session state", e); //$NON-NLS-1$
         }

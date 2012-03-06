@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.container;
 
-import java.util.List;
-
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -9,7 +7,6 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.model.Container;
 
@@ -45,6 +42,12 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
             + " LEFT JOIN FETCH specimen.comments"
             + " LEFT JOIN FETCH specimen.originInfo spcOriginInfo"
             + " LEFT JOIN FETCH spcOriginInfo.center"
+            + " LEFT JOIN FETCH container.position position"
+            + " LEFT JOIN FETCH position.parentContainer parentContainer"
+            + " LEFT JOIN FETCH parentContainer.containerType parentCtype"
+            + " LEFT JOIN FETCH parentCtype.capacity"
+            + " LEFT JOIN FETCH parentCtype.childLabelingScheme"
+            + " LEFT JOIN FETCH parentCtype.childContainerTypeCollection"
             + " WHERE container.id = ?";
 
     public static class ContainerInfo implements ActionResult {
@@ -55,6 +58,9 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
     private final Integer containerId;
 
     public ContainerGetInfoAction(Integer containerId) {
+        if (containerId == null) {
+            throw new IllegalArgumentException();
+        }
         this.containerId = containerId;
     }
 
@@ -65,19 +71,11 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
 
     @Override
     public ContainerInfo run(ActionContext context) throws ActionException {
+        ContainerInfo containerInfo = new ContainerInfo();
         Query query = context.getSession().createQuery(CONTAINER_INFO_HQL);
         query.setParameter(0, containerId);
 
-        @SuppressWarnings("unchecked")
-        List<Container> containers = query.list();
-
-        if (containers.size() != 1) {
-            throw new ModelNotFoundException(Container.class, containerId);
-        }
-
-        ContainerInfo containerInfo = new ContainerInfo();
-        containerInfo.container = containers.get(0);
-
+        containerInfo.container = (Container) query.uniqueResult();
         return containerInfo;
     }
 

@@ -13,6 +13,14 @@ import javax.persistence.OneToMany;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
+/**
+ * A collection site that collects biospecimens and transports them to a
+ * repository site. Biospecimens are collected from patients that are
+ * participating in a study.
+ * 
+ * NCI Term: Collecting laboratory. The laboratory that collects specimens from
+ * a study subject.
+ */
 @Entity
 @DiscriminatorValue("Clinic")
 @NotUsed(by = Contact.class, property = "clinic", groups = PreDelete.class)

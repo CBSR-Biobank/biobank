@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
+
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.request.RequestGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.util.ItemState;
@@ -14,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
@@ -74,12 +78,13 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
                     RequestContainerAdapter adapter = null;
                     if (!adapters.containsKey(id)) {
                         // add adapter
-                        Container c = new Container();
-                        c.setId(id);
+                        DetachedCriteria c = DetachedCriteria
+                            .forClass(ContainerLabelingScheme.class)
+                            .add(Restrictions.idEq(id));
                         ContainerWrapper cw = new ContainerWrapper(
                             SessionManager.getAppService(),
                             (Container) SessionManager.getAppService()
-                                .search(Container.class, c).get(0));
+                                .query(c).get(0));
                         adapter = new RequestContainerAdapter(this, cw);
                         if (i == 0)
                             tops.add(adapter);

@@ -6,6 +6,11 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.shipment.ShipmentDeleteAction;
+import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
+import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
+import edu.ualberta.med.biobank.common.permission.shipment.ShipmentDeletePermission;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
@@ -13,20 +18,47 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentAdapter extends AdapterBase {
 
     public ShipmentAdapter(AdapterBase parent, OriginInfoWrapper originInfo) {
         super(parent, originInfo);
-
         if (originInfo.getShipmentInfo() == null) {
             throw new NullPointerException(
                 Messages.ShipmentAdapter_noShipment_error_msg);
         }
 
         setHasChildren(false);
+    }
+
+    @Override
+    public void init() {
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new ShipmentDeletePermission(
+                        ((OriginInfoWrapper) getModelObject())
+                            .getReceiverSite()
+                            .getId(),
+                        SessionManager.getUser().getCurrentWorkingCenter()
+                            .getId()));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new OriginInfoReadPermission(getModelObject().getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new OriginInfoUpdatePermission(
+                        ((OriginInfoWrapper) getModelObject())
+                            .getReceiverSite()
+                            .getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     @Override
@@ -107,11 +139,6 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public boolean isDeletable() {
-        return internalIsDeletable();
-    }
-
-    @Override
     protected void additionalRefreshAfterDelete() {
         getParent().getParent().rebuild();
     }
@@ -122,4 +149,13 @@ public class ShipmentAdapter extends AdapterBase {
             return internalCompareTo(o);
         return 0;
     }
+
+    @Override
+    public void runDelete() throws ApplicationException {
+        ShipmentDeleteAction action =
+            new ShipmentDeleteAction(getId(), SessionManager.getUser()
+                .getCurrentWorkingCenter().getId());
+        SessionManager.getAppService().doAction(action);
+    }
+
 }

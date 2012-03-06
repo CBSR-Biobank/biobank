@@ -35,7 +35,7 @@ public class User extends Principal {
     private String email;
     private boolean needPwdChange = true;
     private Set<Comment> comments = new HashSet<Comment>(0);
-    private Set<BbGroup> groups = new HashSet<BbGroup>(0);
+    private Set<Group> groups = new HashSet<Group>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.User.login.NotEmpty}")
     @Column(name = "LOGIN", unique = true)
@@ -107,18 +107,18 @@ public class User extends Principal {
     }
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "users")
-    public Set<BbGroup> getGroups() {
+    public Set<Group> getGroups() {
         return this.groups;
     }
 
-    public void setGroups(Set<BbGroup> groups) {
+    public void setGroups(Set<Group> groups) {
         this.groups = groups;
     }
 
     @Override
     public boolean isFullyManageable(User user) {
         if (!super.isFullyManageable(user)) return false;
-        for (BbGroup group : getGroups()) {
+        for (Group group : getGroups()) {
             if (!group.isFullyManageable(user)) return false;
         }
         return true;
@@ -126,7 +126,7 @@ public class User extends Principal {
 
     /**
      * Retuns all of this {@link User}'s {@link Memberships}, i.e. from both the
-     * {@link User} directly and from the {@link BbGroup}-s.
+     * {@link User} directly and from the {@link Group}-s.
      * 
      * @return
      */
@@ -135,7 +135,7 @@ public class User extends Principal {
         Set<Membership> memberships = new HashSet<Membership>();
         memberships.addAll(getMemberships());
 
-        for (BbGroup group : getGroups()) {
+        for (Group group : getGroups()) {
             memberships.addAll(group.getMemberships());
         }
 

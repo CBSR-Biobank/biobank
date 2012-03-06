@@ -21,4 +21,12 @@ public class ClinicWithShipmentAdapter extends ClinicAdapter {
         return findChildFromClass(searchedClass, objectId,
             OriginInfoWrapper.class);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        return false;
+    }
+
 }

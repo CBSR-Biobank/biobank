@@ -12,10 +12,12 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -25,9 +27,19 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
 
+    private Boolean createAllowed;
+
     public ShipmentTodayNode(AdapterBase parent, int id) {
         super(parent, id);
         setLabel(Messages.ShipmentTodayNode_today_label);
+        try {
+            this.createAllowed =
+                SessionManager.getAppService().isAllowed(
+                    new OriginInfoUpdatePermission(SessionManager.getUser()
+                        .getCurrentWorkingCenter().getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+        }
     }
 
     @Override
@@ -73,7 +85,7 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(OriginInfoWrapper.class)) {
+        if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(Messages.ShipmentTodayNode_add_label);
             mi.addSelectionListener(new SelectionAdapter() {

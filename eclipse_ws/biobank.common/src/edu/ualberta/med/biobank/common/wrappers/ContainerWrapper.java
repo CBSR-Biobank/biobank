@@ -500,6 +500,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             type);
     }
 
+    @Deprecated
     public void moveSpecimens(ContainerWrapper destination) throws Exception {
         Map<RowColPos, SpecimenWrapper> aliquots = getSpecimens();
         for (Entry<RowColPos, SpecimenWrapper> e : aliquots.entrySet()) {
@@ -589,25 +590,26 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return filteredWrappers;
     }
 
+    @SuppressWarnings("nls")
     private static final String EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY =
-        "from " //$NON-NLS-1$
+        "from "
             + Container.class.getName()
-            + " where " //$NON-NLS-1$
+            + " where "
             + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
             + "=? and " //$NON-NLS-1$
             + ContainerPeer.SPECIMEN_POSITIONS.getName()
             + ".size = 0 and " //$NON-NLS-1$
             + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
                 ContainerTypePeer.CAPACITY, CapacityPeer.ROW_CAPACITY)
-            + " >= ? and " //$NON-NLS-1$
+            + " >= ? and "
             + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
                 ContainerTypePeer.CAPACITY, CapacityPeer.COL_CAPACITY)
-            + " >= ? and " //$NON-NLS-1$
+            + " >= ? and "
             + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
                 ContainerTypePeer.ID)
-            + " in (select ct." //$NON-NLS-1$
+            + " in (select ct."
             + ContainerTypePeer.ID.getName()
-            + " from " //$NON-NLS-1$
+            + " from "
             + ContainerType.class.getName()
             + " as ct left join ct." //$NON-NLS-1$
             + ContainerTypePeer.SPECIMEN_TYPES.getName()
@@ -739,6 +741,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         reload();
     }
 
+    @Deprecated
     private void initPositionIfEmpty(ContainerTypeWrapper type, int i, int j)
         throws Exception {
         if (type == null) {
@@ -785,6 +788,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return oneChildrenDeleted;
     }
 
+    @Deprecated
     private boolean deleteChild(ContainerTypeWrapper type,
         ContainerWrapper child) throws Exception {
         if (type == null || child.getContainerType().equals(type)) {

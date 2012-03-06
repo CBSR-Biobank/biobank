@@ -71,7 +71,6 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     public void createNodes() throws Exception {
         if (SessionManager.getUser().getCurrentWorkingCenter() != null) {
-            SessionManager.getUser().getCurrentWorkingCenter().reload();
             centerNode = new DispatchCenterAdapter((RootNode) rootNode,
                 SessionManager.getUser().getCurrentWorkingCenter());
             centerNode.setParent(rootNode);
@@ -299,8 +298,10 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 c.set(Calendar.MINUTE, 0);
                 c.set(Calendar.HOUR_OF_DAY, 0);
                 date = c.getTime();
-                List<AbstractAdapterBase> dateNodeRes = parentNode.search(
-                    date.getClass(), (int) date.getTime() + text.hashCode());
+                List<AbstractAdapterBase> dateNodeRes =
+                    parentNode.search(
+                        date.getClass(), DateNode.idBuilder(text, date)
+                        );
                 AbstractAdapterBase dateNode = null;
                 if (dateNodeRes.size() > 0)
                     dateNode = dateNodeRes.get(0);
@@ -321,7 +322,6 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             else if (originInfo.getCenter() instanceof ClinicWrapper) {
                 centerAdapter = new ClinicWithShipmentAdapter(topNode,
                     (ClinicWrapper) originInfo.getCenter());
-                centerAdapter.setEditable(false);
                 topNode.addChild(centerAdapter);
             }
 

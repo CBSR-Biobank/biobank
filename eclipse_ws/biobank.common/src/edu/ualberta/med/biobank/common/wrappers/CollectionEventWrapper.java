@@ -487,6 +487,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         super.addDeleteTasks(tasks);
     }
 
+    @Deprecated
     public void merge(CollectionEventWrapper p2event) throws Exception {
         List<SpecimenWrapper> ospecs = p2event
             .getOriginalSpecimenCollection(false);

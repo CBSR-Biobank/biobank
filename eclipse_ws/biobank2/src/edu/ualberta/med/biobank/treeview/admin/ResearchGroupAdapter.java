@@ -56,11 +56,6 @@ public class ResearchGroupAdapter extends AbstractNewAdapterBase {
     }
 
     @Override
-    public boolean isDeletable() {
-        return internalIsDeletable();
-    }
-
-    @Override
     protected AdapterBase createChildNode() {
         return null;
     }

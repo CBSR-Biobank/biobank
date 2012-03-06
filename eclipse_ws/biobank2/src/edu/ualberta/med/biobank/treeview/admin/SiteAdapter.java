@@ -9,27 +9,48 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.site.SiteDeletePermission;
+import edu.ualberta.med.biobank.common.permission.site.SiteReadPermission;
+import edu.ualberta.med.biobank.common.permission.site.SiteUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteAdapter extends AdapterBase {
 
     private int nodeIdOffset = 100;
-    private final SiteWrapper site;
     public static final int CONTAINER_TYPES_BASE_NODE_ID = 0;
     public static final int CONTAINERS_BASE_NODE_ID = 1;
 
     public SiteAdapter(AdapterBase parent, SiteWrapper site) {
         super(parent, site);
-        this.site = site;
         if (site != null && site.getId() != null) {
             nodeIdOffset *= site.getId();
         }
         createNodes();
+    }
+
+    @Override
+    public void init() {
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new SiteDeletePermission(getModelObject().getId()));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new SiteReadPermission(getModelObject().getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new SiteUpdatePermission(getModelObject().getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     public ContainerTypeGroup getContainerTypesGroupNode() {
@@ -70,11 +91,6 @@ public class SiteAdapter extends AdapterBase {
     @Override
     protected String getConfirmDeleteMessage() {
         return Messages.SiteAdapter_delete_confirm_msg;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return internalIsDeletable();
     }
 
     @Override

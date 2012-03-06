@@ -85,9 +85,9 @@ public class SiteViewPresenter extends AbstractViewFormPresenter<View> {
         view.getPatientCount()
             .setValue(siteInfo.getPatientCount());
         view.getAliquotedSpecimenCount()
-            .setValue(siteInfo.getAliquotedSpecimenCount());
+            .setValue(siteInfo.getSpecimenCount());
         view.getCollectionEventCount()
-            .setValue(siteInfo.getCollectionEventCount());
+            .setValue(siteInfo.getProcessingEventCount());
 
         // TODO: set comment collection
         // view.getCommentCollection()

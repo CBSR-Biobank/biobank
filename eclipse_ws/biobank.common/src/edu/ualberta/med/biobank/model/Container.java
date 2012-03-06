@@ -27,6 +27,11 @@ import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+/**
+ * A specifically built physical unit that can hold child containers, or can be
+ * contained in a parent container.
+ * 
+ */
 @Entity
 @Table(name = "CONTAINER",
     uniqueConstraints = {

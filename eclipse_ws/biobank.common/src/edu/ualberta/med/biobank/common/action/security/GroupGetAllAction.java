@@ -12,16 +12,16 @@ import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
-import edu.ualberta.med.biobank.model.BbGroup;
+import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.User;
 
 /**
- * Returns a list of {@link BbGroup}-s that the executing user has
+ * Returns a list of {@link Group}-s that the executing user has
  * <em>complete</em> control over.
  * 
  * @author Jonathan Ferland
  */
-public class GroupGetAllAction implements Action<ListResult<BbGroup>> {
+public class GroupGetAllAction implements Action<ListResult<Group>> {
     private static final long serialVersionUID = 1L;
     private static final Permission PERMISSION = new UserManagementPermission();
 
@@ -31,24 +31,24 @@ public class GroupGetAllAction implements Action<ListResult<BbGroup>> {
     }
 
     @Override
-    public ListResult<BbGroup> run(ActionContext context)
+    public ListResult<Group> run(ActionContext context)
         throws ActionException {
-        Criteria c = context.getSession().createCriteria(BbGroup.class, "g")
+        Criteria c = context.getSession().createCriteria(Group.class, "g")
             .createAlias("g.memberships", "m", Criteria.LEFT_JOIN)
             .createAlias("m.roles", "r", Criteria.LEFT_JOIN)
             .addOrder(Order.asc("name"));
 
         User user = context.getUser();
-        List<BbGroup> groups = new ArrayList<BbGroup>();
+        List<Group> groups = new ArrayList<Group>();
 
         @SuppressWarnings("unchecked")
-        List<BbGroup> allGroups = c.list();
-        for (BbGroup group : allGroups) {
+        List<Group> allGroups = c.list();
+        for (Group group : allGroups) {
             if (group.isFullyManageable(user)) {
                 groups.add(group);
             }
         }
 
-        return new ListResult<BbGroup>(groups);
+        return new ListResult<Group>(groups);
     }
 }

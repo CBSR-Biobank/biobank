@@ -261,7 +261,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         int totalWidths = 0;
         table.setVisible(false);
         for (int i = 0; i < table.getColumnCount(); i++) {
-            int width = (int) (((double) maxCellContentsWidths[i] / sumOfMaxTextWidths) * tableWidth);
+            int width =
+                (int) (((double) maxCellContentsWidths[i] / sumOfMaxTextWidths) * tableWidth);
             if (i == (table.getColumnCount() - 1))
                 table.getColumn(i).setWidth(tableWidth - totalWidths - 5);
             else
@@ -388,7 +389,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         Object[] listeners = addItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
             @SuppressWarnings("unchecked")
-            final IInfoTableAddItemListener<T> l = (IInfoTableAddItemListener<T>) listeners[i];
+            final IInfoTableAddItemListener<T> l =
+                (IInfoTableAddItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -409,7 +411,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         Object[] listeners = editItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
             @SuppressWarnings("unchecked")
-            final IInfoTableEditItemListener<T> l = (IInfoTableEditItemListener<T>) listeners[i];
+            final IInfoTableEditItemListener<T> l =
+                (IInfoTableEditItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -430,7 +433,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         Object[] listeners = deleteItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
             @SuppressWarnings("unchecked")
-            final IInfoTableDeleteItemListener<T> l = (IInfoTableDeleteItemListener<T>) listeners[i];
+            final IInfoTableDeleteItemListener<T> l =
+                (IInfoTableDeleteItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {

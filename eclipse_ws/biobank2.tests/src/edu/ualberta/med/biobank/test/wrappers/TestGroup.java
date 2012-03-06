@@ -6,11 +6,11 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
-import edu.ualberta.med.biobank.model.BbGroup;
+import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -24,14 +24,14 @@ public class TestGroup extends TestDatabase {
     @Test
     public void testGettersAndSetters() throws Exception {
         String name = "testGettersAndSetters" + r.nextInt();
-        BbGroupWrapper g = GroupHelper.addGroup(name, true);
+        GroupWrapper g = GroupHelper.addGroup(name, true);
         testGettersAndSetters(g);
     }
 
     @Test
     public void testAddUsers() throws Exception {
         String name = "addUsers" + r.nextInt();
-        BbGroupWrapper group = GroupHelper.addGroup(name, true);
+        GroupWrapper group = GroupHelper.addGroup(name, true);
 
         Assert.assertEquals(0, group.getUserCollection(false).size());
 
@@ -52,7 +52,7 @@ public class TestGroup extends TestDatabase {
     public void testCascadeWithMembershipRole() throws Exception {
         String name = "testCascadeWithMembershipRole" + r.nextInt();
 
-        BbGroupWrapper group = GroupHelper.addGroup(name, false);
+        GroupWrapper group = GroupHelper.addGroup(name, false);
         Assert.assertEquals(0, group.getMembershipCollection(false).size());
 
         RoleWrapper role = RoleHelper.addRole(name, true);
@@ -77,7 +77,7 @@ public class TestGroup extends TestDatabase {
         group.delete();
 
         // check group is deleted
-        BbGroup dbGroup = ModelUtils.getObjectWithId(appService, BbGroup.class,
+        Group dbGroup = ModelUtils.getObjectWithId(appService, Group.class,
             idGroup);
         Assert.assertNull(dbGroup);
 

@@ -6,8 +6,10 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -15,6 +17,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersAction;
+import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -34,8 +37,17 @@ public class ContainerGroup extends AdapterBase {
 
     private List<Container> topContainers = null;
 
+    private boolean createAllowed;
+
     public ContainerGroup(SiteAdapter parent, int id) {
         super(parent, id, Messages.ContainerGroup_containers_node_label, true);
+        try {
+            this.createAllowed =
+                SessionManager.getAppService().isAllowed(
+                    new ContainerCreatePermission());
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+        }
     }
 
     @Override
@@ -50,20 +62,29 @@ public class ContainerGroup extends AdapterBase {
 
     @Override
     public void performExpand() {
-        SiteAdapter siteAdapter = (SiteAdapter) getParent();
-        try {
-            topContainers = SessionManager.getAppService().doAction(
-                new SiteGetTopContainersAction(siteAdapter.getId())).getList();
-            super.performExpand();
-        } catch (ApplicationException e) {
-            // TODO: open an error dialog here?
-            LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
-        }
+        final SiteAdapter siteAdapter = (SiteAdapter) getParent();
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    topContainers =
+                        SessionManager
+                            .getAppService()
+                            .doAction(
+                                new SiteGetTopContainersAction(siteAdapter
+                                    .getId())).getList();
+                    ContainerGroup.super.performExpand();
+                } catch (ApplicationException e) {
+                    // TODO: open an error dialog here?
+                    LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
+                }
+            }
+        });
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(ContainerWrapper.class)) {
+        if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(Messages.ContainerGroup_add_label);
             mi.addSelectionListener(new SelectionAdapter() {

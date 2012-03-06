@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Hibernate;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     final Map<Property<?, ?>, Object> propertyCache =
@@ -290,18 +292,15 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * using this wrapper id, retrieve the object from the database
      */
     protected E getObjectFromDatabase() throws BiobankException {
-        Class<E> classType = null;
         Integer id = null;
         List<E> list = null;
         try {
-            classType = getWrappedClass();
-            Constructor<E> constructor = classType.getConstructor();
-            Object instance = constructor.newInstance();
-            Method setIdMethod = classType.getMethod("setId", Integer.class); //$NON-NLS-1$
             id = getId();
-            setIdMethod.invoke(instance, id);
 
-            list = appService.search(classType, instance);
+            DetachedCriteria c = DetachedCriteria.forClass(getWrappedClass())
+                .add(Restrictions.idEq(id));
+
+            list = appService.query(c);
         } catch (Exception ex) {
             throw new BiobankException(ex);
         }
@@ -312,7 +311,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
         throw new BiobankException(MessageFormat.format(
             "Found {0} objects of type {1} with id={2}" + list.size(), //$NON-NLS-1$
-            classType.getName(), id));
+            getWrappedClass().getName(), id));
     }
 
     public abstract Class<E> getWrappedClass();

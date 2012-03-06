@@ -13,17 +13,27 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.site.SiteCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
-import edu.ualberta.med.biobank.mvp.event.model.site.SiteCreateEvent;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteGroup extends AdapterBase {
+    private Boolean createAllowed;
+
     public SiteGroup(SessionAdapter parent, int id) {
         super(parent, id, Messages.SiteGroup_sites_node_label, true);
+        try {
+            this.createAllowed = SessionManager.getAppService().isAllowed(
+                new SiteCreatePermission());
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+        }
     }
 
     @Override
@@ -43,7 +53,7 @@ public class SiteGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(SiteWrapper.class)) {
+        if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(Messages.SiteGroup_add_label);
             mi.addSelectionListener(new SelectionAdapter() {
@@ -97,7 +107,11 @@ public class SiteGroup extends AdapterBase {
     }
 
     public void addSite() {
-        eventBus.fireEvent(new SiteCreateEvent());
+        SiteWrapper site = new SiteWrapper(SessionManager.getAppService());
+        SiteAdapter adapter = new SiteAdapter(this, site);
+        adapter.openEntryForm();
+
+        // eventBus.fireEvent(new SiteCreateEvent());
     }
 
     @Override

@@ -7,7 +7,6 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.Messages;
@@ -118,7 +117,7 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
                     public void widgetSelected(SelectionEvent e) {
                         studiesTable.createStudyDlg();
                     }
-                }, ContactWrapper.class, null);
+                }, null);
         }
         studyWrappers.setTable(studiesTable);
 

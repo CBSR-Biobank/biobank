@@ -215,7 +215,7 @@ INSERT INTO `csm_protection_element` VALUES (195,'edu.ualberta.med.biobank.model
 INSERT INTO `csm_protection_element` VALUES (196,'edu.ualberta.med.biobank.model.PrinterLabelTemplate','','edu.ualberta.med.biobank.model.PrinterLabelTemplate','','','',2,'2011-06-06');
 INSERT INTO `csm_protection_element` VALUES (197,'edu.ualberta.med.biobank.model.JasperTemplate','','edu.ualberta.med.biobank.model.JasperTemplate','','','',2,'2011-06-07');
 INSERT INTO `csm_protection_element` VALUES (198,'edu.ualberta.med.biobank.model.User','','edu.ualberta.med.biobank.model.User','','','',2,'2011-08-15');
-INSERT INTO `csm_protection_element` VALUES (199,'edu.ualberta.med.biobank.model.BbGroup','','edu.ualberta.med.biobank.model.BbGroup','','','',2,'2011-08-15');
+INSERT INTO `csm_protection_element` VALUES (199,'edu.ualberta.med.biobank.model.Group','','edu.ualberta.med.biobank.model.Group','','','',2,'2011-08-15');
 INSERT INTO `csm_protection_element` VALUES (200,'edu.ualberta.med.biobank.model.Principal','','edu.ualberta.med.biobank.model.Principal','','','',2,'2011-08-15');
 INSERT INTO `csm_protection_element` VALUES (201,'edu.ualberta.med.biobank.model.Membership','','edu.ualberta.med.biobank.model.Membership','','','',2,'2011-08-15');
 INSERT INTO `csm_protection_element` VALUES (202,'edu.ualberta.med.biobank.model.Permission','','edu.ualberta.med.biobank.model.Permission','','','',2,'2011-08-15');

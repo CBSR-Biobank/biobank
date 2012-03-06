@@ -70,6 +70,8 @@ public abstract class BgcFormBase extends EditorPart implements
 
     public List<BgcFormBase> linkedForms;
 
+    protected boolean isEditable;
+
     protected IDoubleClickListener collectionDoubleClickListener =
         new IDoubleClickListener() {
             @Override

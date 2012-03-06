@@ -27,6 +27,11 @@ import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+/**
+ * An abstract class that represents either a collection location, a research
+ * location, or repository site. See \ref Clinic, \ref Site and \ref
+ * ResearchGroup.
+ */
 @Entity
 @Table(name = "CENTER")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

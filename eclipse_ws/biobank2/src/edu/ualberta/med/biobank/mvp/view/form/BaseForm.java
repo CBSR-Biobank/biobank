@@ -18,7 +18,6 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.ScrolledPageBook;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class BaseForm {
@@ -121,26 +120,21 @@ public class BaseForm {
     }
 
     public static void addSectionToolbar(Section section,
-        String tooltip, SelectionListener listener,
-        Class<?> wrapperTypeToAdd, String imageKey) {
-        // TODO: remove canCreate stuff? Ungh...
-        if (wrapperTypeToAdd == null
-            || SessionManager.canCreate(wrapperTypeToAdd)) {
-            ToolBar tbar = (ToolBar) section.getTextClient();
-            if (tbar == null) {
-                tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
-                section.setTextClient(tbar);
-            }
-
-            ToolItem titem = new ToolItem(tbar, SWT.NULL);
-            if (imageKey == null) {
-                imageKey = BgcPlugin.IMG_ADD;
-            }
-            titem.setImage(BgcPlugin.getDefault().getImageRegistry()
-                .get(imageKey));
-            titem.setToolTipText(tooltip);
-            titem.addSelectionListener(listener);
+        String tooltip, SelectionListener listener, String imageKey) {
+        ToolBar tbar = (ToolBar) section.getTextClient();
+        if (tbar == null) {
+            tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
+            section.setTextClient(tbar);
         }
+
+        ToolItem titem = new ToolItem(tbar, SWT.NULL);
+        if (imageKey == null) {
+            imageKey = BgcPlugin.IMG_ADD;
+        }
+        titem.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(imageKey));
+        titem.setToolTipText(tooltip);
+        titem.addSelectionListener(listener);
     }
 
     private Section createSection(String title, Composite parent, int style) {

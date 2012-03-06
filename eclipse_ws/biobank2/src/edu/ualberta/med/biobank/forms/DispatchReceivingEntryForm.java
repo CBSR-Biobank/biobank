@@ -16,7 +16,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.SessionSecurityHelper;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
@@ -31,7 +30,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
@@ -283,18 +281,6 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             throw new BiobankException(
                 Messages.ProcessingEventEntryForm_try_again_error_msg
                     + msg.toString());
-        }
-    }
-
-    @Override
-    protected void checkEditAccess() {
-        if (adapter != null
-            && ((AdapterBase) adapter).getId() != null
-            && !SessionManager
-                .isAllowed(SessionSecurityHelper.DISPATCH_RECEIVE_KEY_DESC)) {
-            BgcPlugin.openAccessDeniedErrorMessage();
-            throw new RuntimeException(
-                Messages.BiobankEntryForm_access_denied_error_msg);
         }
     }
 

@@ -5,6 +5,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 
 public class ModelDiff<E> {
+    @SuppressWarnings("unused")
     private final E oldModel, newModel;
 
     public ModelDiff(Session session, E newModel) {

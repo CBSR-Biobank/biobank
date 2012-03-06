@@ -18,7 +18,6 @@ public class ClinicAdapter extends AdapterBase {
 
     public ClinicAdapter(AdapterBase parent, ClinicWrapper clinicWrapper) {
         super(parent, clinicWrapper);
-        setEditable(parent instanceof ClinicMasterGroup || parent == null);
     }
 
     @Override
@@ -87,12 +86,6 @@ public class ClinicAdapter extends AdapterBase {
         if (o instanceof ClinicAdapter)
             return internalCompareTo(o);
         return 0;
-    }
-
-    @Override
-    public boolean isEditable() {
-        // TODO: this needs to be implemented correctly
-        return true;
     }
 
 }

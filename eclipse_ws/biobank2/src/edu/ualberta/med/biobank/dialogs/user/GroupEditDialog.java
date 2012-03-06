@@ -17,8 +17,8 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.peer.BbGroupPeer;
-import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
+import edu.ualberta.med.biobank.common.peer.GroupPeer;
+import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -33,11 +33,11 @@ public class GroupEditDialog extends BgcBaseDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
 
-    private BbGroupWrapper originalGroup;
+    private GroupWrapper originalGroup;
     private MembershipInfoTable membershipInfoTable;
     private MultiSelectWidget<UserWrapper> usersWidget;
 
-    public GroupEditDialog(Shell parent, BbGroupWrapper originalGroup) {
+    public GroupEditDialog(Shell parent, GroupWrapper originalGroup) {
         super(parent);
         Assert.isNotNull(originalGroup);
         this.originalGroup = originalGroup;
@@ -89,7 +89,7 @@ public class GroupEditDialog extends BgcBaseDialog {
     private void createGeneralFields(Composite createTabItem) {
         createBoundWidgetWithLabel(createTabItem, BgcBaseText.class,
             SWT.BORDER, Messages.GroupEditDialog_property_title_name, null,
-            originalGroup, BbGroupPeer.NAME.getName(),
+            originalGroup, GroupPeer.NAME.getName(),
             new NonEmptyStringValidator(
                 Messages.GroupEditDialog_msg_name_required));
     }

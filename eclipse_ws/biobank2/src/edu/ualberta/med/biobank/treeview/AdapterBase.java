@@ -39,7 +39,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
         super(parent, object == null ? null : object.getId(), null, null, false);
-        this.modelObject = object;
+        setModelObject(object);
     }
 
     public AdapterBase(AdapterBase parent, Integer id, String label,
@@ -61,6 +61,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     public void setModelObject(ModelWrapper<?> object) {
         this.modelObject = object;
+        if (getId() != null) init();
     }
 
     @Override
@@ -272,25 +273,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         if (getModelObject() != null) {
             getModelObject().reset();
         }
-    }
-
-    @Override
-    protected void runDelete() throws Exception {
-        // getModelObject().delete();
-    }
-
-    @Override
-    protected boolean internalIsDeletable() {
-        return false;
-        // return super.internalIsDeletable() && getModelObject() != null
-        // && SessionManager.canDelete(getModelObject());
-    }
-
-    @Override
-    public boolean isEditable() {
-        return false;
-        // return super.isEditable() &&
-        // SessionManager.canUpdate(getModelObject());
     }
 
     protected List<AbstractAdapterBase> searchChildContainers(

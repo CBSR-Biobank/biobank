@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-
 /**
  * Convenience class for defining cascade-type methods to be performed.
  * 
@@ -9,6 +8,7 @@ package edu.ualberta.med.biobank.common.wrappers;
  * @param <E> wrapped object
  */
 public class WrapperCascader<E> {
+    @SuppressWarnings("unused")
     private final ModelWrapper<E> wrapper;
 
     /**

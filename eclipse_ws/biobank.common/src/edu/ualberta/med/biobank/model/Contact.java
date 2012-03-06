@@ -16,6 +16,18 @@ import org.hibernate.validator.constraints.NotEmpty;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
+/**
+ * A contact person associated with a collecting location. This person should be
+ * the point of contact for any inquiries.
+ * 
+ * ET: The name of the person the Techs will contact when there is an incident
+ * 
+ * JM: Person that CBSR is to contact in case of an incident
+ * 
+ * NCI Term - Contact Person: A person acting as a channel for communication
+ * between groups or on behalf of a group.
+ * 
+ */
 @Entity
 @Table(name = "CONTACT")
 @Empty(property = "studies", groups = PreDelete.class)
