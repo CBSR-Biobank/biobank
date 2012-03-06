@@ -102,7 +102,7 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testClaim() throws Exception {
-        Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
+        Integer rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
 
         RequestGetSpecimenInfosAction specAction =
             new RequestGetSpecimenInfosAction(rId);
@@ -129,7 +129,7 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testStateChanges() throws Exception {
-        Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
+        Integer rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
 
         RequestGetSpecimenInfosAction specAction =
             new RequestGetSpecimenInfosAction(rId);
@@ -156,12 +156,12 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testDelete() throws Exception {
-        Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
+        Integer rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
 
         RequestDeleteAction delete = new RequestDeleteAction(rId);
         EXECUTOR.exec(delete);
 
-        rId = RequestHelper.createRequest(EXECUTOR, rgId);
+        rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
         session.beginTransaction();
         Request r = (Request) session.get(Request.class, rId);
         r.setSubmitted(new Date());
