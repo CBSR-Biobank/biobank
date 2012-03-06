@@ -34,8 +34,8 @@ public class User extends Principal {
     private String fullName;
     private String email;
     private boolean needPwdChange = true;
-    private Set<Comment> commentCollection = new HashSet<Comment>(0);
-    private Set<BbGroup> groupCollection = new HashSet<BbGroup>(0);
+    private Set<Comment> comments = new HashSet<Comment>(0);
+    private Set<BbGroup> groups = new HashSet<BbGroup>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.User.login.NotEmpty}")
     @Column(name = "LOGIN", unique = true)
@@ -98,27 +98,27 @@ public class User extends Principal {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID", updatable = false)
-    public Set<Comment> getCommentCollection() {
-        return this.commentCollection;
+    public Set<Comment> getComments() {
+        return this.comments;
     }
 
-    public void setCommentCollection(Set<Comment> commentCollection) {
-        this.commentCollection = commentCollection;
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "userCollection")
-    public Set<BbGroup> getGroupCollection() {
-        return this.groupCollection;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "users")
+    public Set<BbGroup> getGroups() {
+        return this.groups;
     }
 
-    public void setGroupCollection(Set<BbGroup> groupCollection) {
-        this.groupCollection = groupCollection;
+    public void setGroups(Set<BbGroup> groups) {
+        this.groups = groups;
     }
 
     @Override
     public boolean isFullyManageable(User user) {
         if (!super.isFullyManageable(user)) return false;
-        for (BbGroup group : getGroupCollection()) {
+        for (BbGroup group : getGroups()) {
             if (!group.isFullyManageable(user)) return false;
         }
         return true;
@@ -133,10 +133,10 @@ public class User extends Principal {
     @Transient
     public Set<Membership> getAllMemberships() {
         Set<Membership> memberships = new HashSet<Membership>();
-        memberships.addAll(getMembershipCollection());
+        memberships.addAll(getMemberships());
 
-        for (BbGroup group : getGroupCollection()) {
-            memberships.addAll(group.getMembershipCollection());
+        for (BbGroup group : getGroups()) {
+            memberships.addAll(group.getMemberships());
         }
 
         return memberships;

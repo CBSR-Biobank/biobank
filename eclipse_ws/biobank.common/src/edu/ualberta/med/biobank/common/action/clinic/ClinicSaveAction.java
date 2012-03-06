@@ -118,10 +118,10 @@ public class ClinicSaveAction extends CenterSaveAction {
         // delete contacts no longer in use
         SetDifference<Contact> contactsDiff =
             new SetDifference<Contact>(
-                clinic.getContactCollection(), newContactCollection);
-        clinic.setContactCollection(contactsDiff.getNewSet());
+                clinic.getContacts(), newContactCollection);
+        clinic.setContacts(contactsDiff.getNewSet());
         for (Contact contact : contactsDiff.getRemoveSet()) {
-            Collection<Study> studyCollection = contact.getStudyCollection();
+            Collection<Study> studyCollection = contact.getStudies();
             if ((studyCollection != null) && !studyCollection.isEmpty()) {
                 throw new ActionException("canot delete contact "
                     + contact.getName());

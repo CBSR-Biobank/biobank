@@ -80,15 +80,15 @@ public class UserSaveAction extends PrincipalSaveAction {
             context.load(BbGroup.class, groupIds);
 
         SetDifference<BbGroup> groupsDiff =
-            new SetDifference<BbGroup>(newUser.getGroupCollection(),
+            new SetDifference<BbGroup>(newUser.getGroups(),
                 groups.values());
-        newUser.setGroupCollection(groupsDiff.getNewSet());
+        newUser.setGroups(groupsDiff.getNewSet());
 
         // remove newUser from groups in removed list
         for (BbGroup group : groupsDiff.getRemoveSet()) {
-            Set<User> groupUsers = group.getUserCollection();
+            Set<User> groupUsers = group.getUsers();
             if (groupUsers.remove(newUser)) {
-                group.setUserCollection(groupUsers);
+                group.setUsers(groupUsers);
             } else {
                 throw new ActionException(
                     "user not found in group's collection");

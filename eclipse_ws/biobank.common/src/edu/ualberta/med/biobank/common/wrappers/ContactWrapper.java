@@ -74,7 +74,7 @@ public class ContactWrapper extends ContactBaseWrapper {
     protected void addDeleteTasks(TaskList tasks) {
         String hasStudiesMsg = MessageFormat.format(HAS_STUDIES_MSG, getName());
 
-        tasks.add(check().empty(ContactPeer.STUDY_COLLECTION, hasStudiesMsg));
+        tasks.add(check().empty(ContactPeer.STUDIES, hasStudiesMsg));
 
         super.addDeleteTasks(tasks);
     }

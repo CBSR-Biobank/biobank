@@ -58,35 +58,35 @@ public class PatientPeer {
 			}
 		});
 
-	public static final Property<Collection<Comment>, Patient> COMMENT_COLLECTION = Property.create(
-		"commentCollection" //$NON-NLS-1$
+	public static final Property<Collection<Comment>, Patient> COMMENTS = Property.create(
+		"comments" //$NON-NLS-1$
 		, Patient.class
 		, new TypeReference<Collection<Comment>>() {}
 		, new Property.Accessor<Collection<Comment>, Patient>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(Patient model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(Patient model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<CollectionEvent>, Patient> COLLECTION_EVENT_COLLECTION = Property.create(
-		"collectionEventCollection" //$NON-NLS-1$
+	public static final Property<Collection<CollectionEvent>, Patient> COLLECTION_EVENTS = Property.create(
+		"collectionEvents" //$NON-NLS-1$
 		, Patient.class
 		, new TypeReference<Collection<CollectionEvent>>() {}
 		, new Property.Accessor<Collection<CollectionEvent>, Patient>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<CollectionEvent> get(Patient model) {
-				return model.getCollectionEventCollection();
+				return model.getCollectionEvents();
 			}
 			@Override
 			public void set(Patient model, Collection<CollectionEvent> value) {
-				model.getCollectionEventCollection().clear();
-				model.getCollectionEventCollection().addAll(value);
+				model.getCollectionEvents().clear();
+				model.getCollectionEvents().addAll(value);
 			}
 		});
 
@@ -111,8 +111,8 @@ public class PatientPeer {
       aList.add(ID);
       aList.add(CREATED_AT);
       aList.add(PNUMBER);
-      aList.add(COMMENT_COLLECTION);
-      aList.add(COLLECTION_EVENT_COLLECTION);
+      aList.add(COMMENTS);
+      aList.add(COLLECTION_EVENTS);
       aList.add(STUDY);
       PROPERTIES = Collections.unmodifiableList(aList);
    };

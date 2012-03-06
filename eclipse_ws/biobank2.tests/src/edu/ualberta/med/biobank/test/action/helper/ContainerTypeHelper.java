@@ -64,7 +64,7 @@ public class ContainerTypeHelper {
 
         HashSet<Integer> ids = new HashSet<Integer>();
         for (SpecimenType specimenType : containerTypeInfo.getContainerType()
-            .getSpecimenTypeCollection()) {
+            .getSpecimenTypes()) {
             ids.add(specimenType.getId());
         }
         containerTypeSaveAction.setSpecimenTypeIds(ids);
@@ -72,7 +72,7 @@ public class ContainerTypeHelper {
         ids = new HashSet<Integer>();
         for (ContainerType childContainerType : containerTypeInfo
             .getContainerType()
-            .getChildContainerTypeCollection()) {
+            .getChildContainerTypes()) {
             ids.add(childContainerType.getId());
         }
         containerTypeSaveAction.setChildContainerTypeIds(ids);

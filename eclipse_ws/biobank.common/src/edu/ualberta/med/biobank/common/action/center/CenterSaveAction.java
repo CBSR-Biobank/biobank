@@ -81,7 +81,7 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         Comment comment = CommentUtil.create(context.getUser(), commentText);
         if (comment != null) {
             context.getSession().save(comment);
-            center.getCommentCollection().add(comment);
+            center.getComments().add(comment);
         }
     }
 }

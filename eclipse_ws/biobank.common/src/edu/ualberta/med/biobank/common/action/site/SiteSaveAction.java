@@ -43,8 +43,8 @@ public class SiteSaveAction extends CenterSaveAction {
         // removing or adding?
         Map<Integer, Study> studies = context.load(Study.class, studyIds);
         SetDifference<Study> sitesDiff = new SetDifference<Study>(
-            site.getStudyCollection(), studies.values());
-        site.setStudyCollection(sitesDiff.getNewSet());
+            site.getStudies(), studies.values());
+        site.setStudies(sitesDiff.getNewSet());
         for (Study study : sitesDiff.getRemoveSet()) {
             context.getSession().delete(study);
         }

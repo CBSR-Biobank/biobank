@@ -89,35 +89,35 @@ public class RequestPeer {
 			}
 		});
 
-	public static final Property<Collection<Dispatch>, Request> DISPATCH_COLLECTION = Property.create(
-		"dispatchCollection" //$NON-NLS-1$
+	public static final Property<Collection<Dispatch>, Request> DISPATCHES = Property.create(
+		"dispatches" //$NON-NLS-1$
 		, Request.class
 		, new TypeReference<Collection<Dispatch>>() {}
 		, new Property.Accessor<Collection<Dispatch>, Request>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Dispatch> get(Request model) {
-				return model.getDispatchCollection();
+				return model.getDispatches();
 			}
 			@Override
 			public void set(Request model, Collection<Dispatch> value) {
-				model.getDispatchCollection().clear();
-				model.getDispatchCollection().addAll(value);
+				model.getDispatches().clear();
+				model.getDispatches().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<RequestSpecimen>, Request> REQUEST_SPECIMEN_COLLECTION = Property.create(
-		"requestSpecimenCollection" //$NON-NLS-1$
+	public static final Property<Collection<RequestSpecimen>, Request> REQUEST_SPECIMENS = Property.create(
+		"requestSpecimens" //$NON-NLS-1$
 		, Request.class
 		, new TypeReference<Collection<RequestSpecimen>>() {}
 		, new Property.Accessor<Collection<RequestSpecimen>, Request>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<RequestSpecimen> get(Request model) {
-				return model.getRequestSpecimenCollection();
+				return model.getRequestSpecimens();
 			}
 			@Override
 			public void set(Request model, Collection<RequestSpecimen> value) {
-				model.getRequestSpecimenCollection().clear();
-				model.getRequestSpecimenCollection().addAll(value);
+				model.getRequestSpecimens().clear();
+				model.getRequestSpecimens().addAll(value);
 			}
 		});
 
@@ -129,8 +129,8 @@ public class RequestPeer {
       aList.add(SUBMITTED);
       aList.add(RESEARCH_GROUP);
       aList.add(ADDRESS);
-      aList.add(DISPATCH_COLLECTION);
-      aList.add(REQUEST_SPECIMEN_COLLECTION);
+      aList.add(DISPATCHES);
+      aList.add(REQUEST_SPECIMENS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

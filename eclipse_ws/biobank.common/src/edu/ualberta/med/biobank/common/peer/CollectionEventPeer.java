@@ -44,19 +44,19 @@ public class CollectionEventPeer {
 			}
 		});
 
-	public static final Property<Collection<Specimen>, CollectionEvent> ALL_SPECIMEN_COLLECTION = Property.create(
-		"allSpecimenCollection" //$NON-NLS-1$
+	public static final Property<Collection<Specimen>, CollectionEvent> ALL_SPECIMENS = Property.create(
+		"allSpecimens" //$NON-NLS-1$
 		, CollectionEvent.class
 		, new TypeReference<Collection<Specimen>>() {}
 		, new Property.Accessor<Collection<Specimen>, CollectionEvent>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Specimen> get(CollectionEvent model) {
-				return model.getAllSpecimenCollection();
+				return model.getAllSpecimens();
 			}
 			@Override
 			public void set(CollectionEvent model, Collection<Specimen> value) {
-				model.getAllSpecimenCollection().clear();
-				model.getAllSpecimenCollection().addAll(value);
+				model.getAllSpecimens().clear();
+				model.getAllSpecimens().addAll(value);
 			}
 		});
 
@@ -75,35 +75,35 @@ public class CollectionEventPeer {
 			}
 		});
 
-	public static final Property<Collection<EventAttr>, CollectionEvent> EVENT_ATTR_COLLECTION = Property.create(
-		"eventAttrCollection" //$NON-NLS-1$
+	public static final Property<Collection<EventAttr>, CollectionEvent> EVENT_ATTRS = Property.create(
+		"eventAttrs" //$NON-NLS-1$
 		, CollectionEvent.class
 		, new TypeReference<Collection<EventAttr>>() {}
 		, new Property.Accessor<Collection<EventAttr>, CollectionEvent>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<EventAttr> get(CollectionEvent model) {
-				return model.getEventAttrCollection();
+				return model.getEventAttrs();
 			}
 			@Override
 			public void set(CollectionEvent model, Collection<EventAttr> value) {
-				model.getEventAttrCollection().clear();
-				model.getEventAttrCollection().addAll(value);
+				model.getEventAttrs().clear();
+				model.getEventAttrs().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<Comment>, CollectionEvent> COMMENT_COLLECTION = Property.create(
-		"commentCollection" //$NON-NLS-1$
+	public static final Property<Collection<Comment>, CollectionEvent> COMMENTS = Property.create(
+		"comments" //$NON-NLS-1$
 		, CollectionEvent.class
 		, new TypeReference<Collection<Comment>>() {}
 		, new Property.Accessor<Collection<Comment>, CollectionEvent>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(CollectionEvent model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(CollectionEvent model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -122,19 +122,19 @@ public class CollectionEventPeer {
 			}
 		});
 
-	public static final Property<Collection<Specimen>, CollectionEvent> ORIGINAL_SPECIMEN_COLLECTION = Property.create(
-		"originalSpecimenCollection" //$NON-NLS-1$
+	public static final Property<Collection<Specimen>, CollectionEvent> ORIGINAL_SPECIMENS = Property.create(
+		"originalSpecimens" //$NON-NLS-1$
 		, CollectionEvent.class
 		, new TypeReference<Collection<Specimen>>() {}
 		, new Property.Accessor<Collection<Specimen>, CollectionEvent>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Specimen> get(CollectionEvent model) {
-				return model.getOriginalSpecimenCollection();
+				return model.getOriginalSpecimens();
 			}
 			@Override
 			public void set(CollectionEvent model, Collection<Specimen> value) {
-				model.getOriginalSpecimenCollection().clear();
-				model.getOriginalSpecimenCollection().addAll(value);
+				model.getOriginalSpecimens().clear();
+				model.getOriginalSpecimens().addAll(value);
 			}
 		});
 
@@ -143,12 +143,12 @@ public class CollectionEventPeer {
       List<Property<?, ? super CollectionEvent>> aList = new ArrayList<Property<?, ? super CollectionEvent>>();
       aList.add(ID);
       aList.add(VISIT_NUMBER);
-      aList.add(ALL_SPECIMEN_COLLECTION);
+      aList.add(ALL_SPECIMENS);
       aList.add(PATIENT);
-      aList.add(EVENT_ATTR_COLLECTION);
-      aList.add(COMMENT_COLLECTION);
+      aList.add(EVENT_ATTRS);
+      aList.add(COMMENTS);
       aList.add(ACTIVITY_STATUS);
-      aList.add(ORIGINAL_SPECIMEN_COLLECTION);
+      aList.add(ORIGINAL_SPECIMENS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

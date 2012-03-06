@@ -156,10 +156,10 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         Set<Specimen> newSsCollection = new HashSet<Specimen>();
 
         Set<Specimen> newAllSpecCollection = new HashSet<Specimen>();
-        newAllSpecCollection.addAll(ceventToSave.getAllSpecimenCollection());
+        newAllSpecCollection.addAll(ceventToSave.getAllSpecimens());
 
         Collection<Specimen> originalSpecimens =
-            ceventToSave.getOriginalSpecimenCollection();
+            ceventToSave.getOriginalSpecimens();
 
         if (sourceSpecimenInfos != null) {
             OriginInfo oi = null;
@@ -202,9 +202,9 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
         SetDifference<Specimen> origSpecDiff = new SetDifference<Specimen>(
             originalSpecimens, newSsCollection);
-        ceventToSave.setOriginalSpecimenCollection(newSsCollection);
+        ceventToSave.setOriginalSpecimens(newSsCollection);
         newAllSpecCollection.removeAll(origSpecDiff.getRemoveSet());
-        ceventToSave.setAllSpecimenCollection(newAllSpecCollection);
+        ceventToSave.setAllSpecimens(newAllSpecCollection);
         for (Specimen srcSpc : origSpecDiff.getRemoveSet()) {
             context.getSession().delete(srcSpc);
         }
@@ -299,7 +299,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 EventAttr eventAttr;
                 if (ceventAttrInfo == null) {
                     eventAttr = new EventAttr();
-                    cevent.getEventAttrCollection().add(eventAttr);
+                    cevent.getEventAttrs().add(eventAttr);
                     eventAttr.setCollectionEvent(cevent);
                     eventAttr.setStudyEventAttr(sAttr);
                 } else {
@@ -317,7 +317,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         Comment comment = CommentUtil.create(context.getUser(), commentText);
         if (comment != null) {
             context.getSession().save(comment);
-            ceventToSave.getCommentCollection().add(comment);
+            ceventToSave.getComments().add(comment);
         }
     }
 
@@ -326,7 +326,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         Comment comment = CommentUtil.create(context.getUser(), commentText);
         if (comment != null) {
             context.getSession().save(comment);
-            specimenToSave.getCommentCollection().add(comment);
+            specimenToSave.getComments().add(comment);
         }
     }
 

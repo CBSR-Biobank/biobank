@@ -59,19 +59,19 @@ public class OriginInfoPeer {
 			}
 		});
 
-	public static final Property<Collection<Comment>, OriginInfo> COMMENT_COLLECTION = Property.create(
-		"commentCollection" //$NON-NLS-1$
+	public static final Property<Collection<Comment>, OriginInfo> COMMENTS = Property.create(
+		"comments" //$NON-NLS-1$
 		, OriginInfo.class
 		, new TypeReference<Collection<Comment>>() {}
 		, new Property.Accessor<Collection<Comment>, OriginInfo>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(OriginInfo model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(OriginInfo model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -90,19 +90,19 @@ public class OriginInfoPeer {
 			}
 		});
 
-	public static final Property<Collection<Specimen>, OriginInfo> SPECIMEN_COLLECTION = Property.create(
-		"specimenCollection" //$NON-NLS-1$
+	public static final Property<Collection<Specimen>, OriginInfo> SPECIMENS = Property.create(
+		"specimens" //$NON-NLS-1$
 		, OriginInfo.class
 		, new TypeReference<Collection<Specimen>>() {}
 		, new Property.Accessor<Collection<Specimen>, OriginInfo>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Specimen> get(OriginInfo model) {
-				return model.getSpecimenCollection();
+				return model.getSpecimens();
 			}
 			@Override
 			public void set(OriginInfo model, Collection<Specimen> value) {
-				model.getSpecimenCollection().clear();
-				model.getSpecimenCollection().addAll(value);
+				model.getSpecimens().clear();
+				model.getSpecimens().addAll(value);
 			}
 		});
 
@@ -112,9 +112,9 @@ public class OriginInfoPeer {
       aList.add(ID);
       aList.add(CENTER);
       aList.add(SHIPMENT_INFO);
-      aList.add(COMMENT_COLLECTION);
+      aList.add(COMMENTS);
       aList.add(RECEIVER_SITE);
-      aList.add(SPECIMEN_COLLECTION);
+      aList.add(SPECIMENS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

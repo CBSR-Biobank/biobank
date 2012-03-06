@@ -68,8 +68,8 @@ public abstract class ResearchGroupBaseWrapper extends CenterWrapper<ResearchGro
     }
 
     public List<RequestWrapper> getRequestCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(ResearchGroupPeer.REQUEST_COLLECTION);
-        List<RequestWrapper> requestCollection = getWrapperCollection(ResearchGroupPeer.REQUEST_COLLECTION, RequestWrapper.class, sort);
+        boolean notCached = !isPropertyCached(ResearchGroupPeer.REQUESTS);
+        List<RequestWrapper> requestCollection = getWrapperCollection(ResearchGroupPeer.REQUESTS, RequestWrapper.class, sort);
         if (notCached) {
             for (RequestBaseWrapper e : requestCollection) {
                 e.setResearchGroupInternal(this);
@@ -79,44 +79,44 @@ public abstract class ResearchGroupBaseWrapper extends CenterWrapper<ResearchGro
     }
 
     public void addToRequestCollection(List<? extends RequestBaseWrapper> requestCollection) {
-        addToWrapperCollection(ResearchGroupPeer.REQUEST_COLLECTION, requestCollection);
+        addToWrapperCollection(ResearchGroupPeer.REQUESTS, requestCollection);
         for (RequestBaseWrapper e : requestCollection) {
             e.setResearchGroupInternal(this);
         }
     }
 
     void addToRequestCollectionInternal(List<? extends RequestBaseWrapper> requestCollection) {
-        if (isInitialized(ResearchGroupPeer.REQUEST_COLLECTION)) {
-            addToWrapperCollection(ResearchGroupPeer.REQUEST_COLLECTION, requestCollection);
+        if (isInitialized(ResearchGroupPeer.REQUESTS)) {
+            addToWrapperCollection(ResearchGroupPeer.REQUESTS, requestCollection);
         } else {
-            getElementQueue().add(ResearchGroupPeer.REQUEST_COLLECTION, requestCollection);
+            getElementQueue().add(ResearchGroupPeer.REQUESTS, requestCollection);
         }
     }
 
     public void removeFromRequestCollection(List<? extends RequestBaseWrapper> requestCollection) {
-        removeFromWrapperCollection(ResearchGroupPeer.REQUEST_COLLECTION, requestCollection);
+        removeFromWrapperCollection(ResearchGroupPeer.REQUESTS, requestCollection);
         for (RequestBaseWrapper e : requestCollection) {
             e.setResearchGroupInternal(null);
         }
     }
 
     void removeFromRequestCollectionInternal(List<? extends RequestBaseWrapper> requestCollection) {
-        if (isPropertyCached(ResearchGroupPeer.REQUEST_COLLECTION)) {
-            removeFromWrapperCollection(ResearchGroupPeer.REQUEST_COLLECTION, requestCollection);
+        if (isPropertyCached(ResearchGroupPeer.REQUESTS)) {
+            removeFromWrapperCollection(ResearchGroupPeer.REQUESTS, requestCollection);
         } else {
-            getElementQueue().remove(ResearchGroupPeer.REQUEST_COLLECTION, requestCollection);
+            getElementQueue().remove(ResearchGroupPeer.REQUESTS, requestCollection);
         }
     }
 
     public void removeFromRequestCollectionWithCheck(List<? extends RequestBaseWrapper> requestCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(ResearchGroupPeer.REQUEST_COLLECTION, requestCollection);
+        removeFromWrapperCollectionWithCheck(ResearchGroupPeer.REQUESTS, requestCollection);
         for (RequestBaseWrapper e : requestCollection) {
             e.setResearchGroupInternal(null);
         }
     }
 
     void removeFromRequestCollectionWithCheckInternal(List<? extends RequestBaseWrapper> requestCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(ResearchGroupPeer.REQUEST_COLLECTION, requestCollection);
+        removeFromWrapperCollectionWithCheck(ResearchGroupPeer.REQUESTS, requestCollection);
     }
 
 }

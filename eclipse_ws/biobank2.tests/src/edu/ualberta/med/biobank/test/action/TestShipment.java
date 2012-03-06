@@ -192,16 +192,16 @@ public class TestShipment extends TestAction {
         ShipmentReadInfo info =
             EXECUTOR.exec(new ShipmentGetInfoAction(id));
 
-        Assert.assertEquals(1, info.oi.getCommentCollection().size());
+        Assert.assertEquals(1, info.oi.getComments().size());
         EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
             .getId();
         info =
             EXECUTOR.exec(new ShipmentGetInfoAction(id));
-        Assert.assertEquals(2, info.oi.getCommentCollection().size());
+        Assert.assertEquals(2, info.oi.getComments().size());
         EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
             .getId();
         info =
             EXECUTOR.exec(new ShipmentGetInfoAction(id));
-        Assert.assertEquals(3, info.oi.getCommentCollection().size());
+        Assert.assertEquals(3, info.oi.getComments().size());
     }
 }

@@ -24,11 +24,9 @@ public class Report extends AbstractBiobankModel {
     private Integer userId;
     private boolean isPublic;
     private boolean isCount;
-    private Set<ReportColumn> reportColumnCollection =
-        new HashSet<ReportColumn>(0);
+    private Set<ReportColumn> reportColumns = new HashSet<ReportColumn>(0);
     private Entity entity;
-    private Set<ReportFilter> reportFilterCollection =
-        new HashSet<ReportFilter>(0);
+    private Set<ReportFilter> reportFilters = new HashSet<ReportFilter>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Report.name.NotEmpty}")
     @Column(name = "NAME")
@@ -78,13 +76,12 @@ public class Report extends AbstractBiobankModel {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "REPORT_ID", updatable = false)
-    public Set<ReportColumn> getReportColumnCollection() {
-        return this.reportColumnCollection;
+    public Set<ReportColumn> getReportColumns() {
+        return this.reportColumns;
     }
 
-    public void setReportColumnCollection(
-        Set<ReportColumn> reportColumnCollection) {
-        this.reportColumnCollection = reportColumnCollection;
+    public void setReportColumns(Set<ReportColumn> reportColumns) {
+        this.reportColumns = reportColumns;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Report.entity.NotNull}")
@@ -100,12 +97,11 @@ public class Report extends AbstractBiobankModel {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "REPORT_ID", updatable = false)
-    public Set<ReportFilter> getReportFilterCollection() {
-        return this.reportFilterCollection;
+    public Set<ReportFilter> getReportFilters() {
+        return this.reportFilters;
     }
 
-    public void setReportFilterCollection(
-        Set<ReportFilter> reportFilterCollection) {
-        this.reportFilterCollection = reportFilterCollection;
+    public void setReportFilters(Set<ReportFilter> reportFilters) {
+        this.reportFilters = reportFilters;
     }
 }

@@ -36,14 +36,14 @@ public class ContainerDeleteChildrenAction extends ContainerChildAction {
 
         if (positions == null) {
             for (ContainerPosition pos : parentContainer
-                .getChildPositionCollection()) {
+                .getChildPositions()) {
                 result |= deleteChild(context, pos.getContainer());
             }
         } else {
             Map<RowColPos, Container> children =
                 new HashMap<RowColPos, Container>();
             for (ContainerPosition pos : parentContainer
-                .getChildPositionCollection()) {
+                .getChildPositions()) {
                 children.put(new RowColPos(pos.getRow(), pos.getCol()),
                     pos.getContainer());
             }

@@ -44,8 +44,8 @@ public class TestMembership extends TestAction {
         group.setName(name);
         group.setDescription(name);
 
-        group.getMembershipCollection().add(membership1);
-        group.getMembershipCollection().add(membership2);
+        group.getMemberships().add(membership1);
+        group.getMemberships().add(membership2);
 
         membership1.setPrincipal(group);
         membership2.setPrincipal(group);
@@ -62,7 +62,7 @@ public class TestMembership extends TestAction {
 
         Membership membership3 = new Membership();
         membership3.setPrincipal(group);
-        group.getMembershipCollection().add(membership3);
+        group.getMemberships().add(membership3);
 
         session.save(membership3);
 

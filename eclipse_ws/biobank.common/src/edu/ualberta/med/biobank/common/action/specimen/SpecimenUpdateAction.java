@@ -66,7 +66,7 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
         Comment comment = CommentUtil.create(context.getUser(), commentMessage);
         if (comment != null) {
             context.getSession().save(comment);
-            specimen.getCommentCollection().add(comment);
+            specimen.getComments().add(comment);
         }
         return comment;
     }
@@ -89,11 +89,11 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
 
     private void updateChildSpecimensCEvent(Specimen specimen,
         CollectionEvent cEvent, Comment comment) {
-        for (Specimen childSpecimen : specimen.getChildSpecimenCollection()) {
+        for (Specimen childSpecimen : specimen.getChildSpecimens()) {
             specimen.setCollectionEvent(cEvent);
 
             if (comment != null) {
-                specimen.getCommentCollection().add(comment);
+                specimen.getComments().add(comment);
             }
 
             updateChildSpecimensCEvent(childSpecimen, cEvent, comment);

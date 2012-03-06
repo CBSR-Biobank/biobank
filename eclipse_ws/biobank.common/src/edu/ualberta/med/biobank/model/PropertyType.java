@@ -18,7 +18,7 @@ public class PropertyType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private Set<PropertyModifier> propertyModifierCollection =
+    private Set<PropertyModifier> propertyModifiers =
         new HashSet<PropertyModifier>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.PropertyType.name.NotEmpty}")
@@ -33,12 +33,11 @@ public class PropertyType extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "PROPERTY_TYPE_ID", updatable = false)
-    public Set<PropertyModifier> getPropertyModifierCollection() {
-        return this.propertyModifierCollection;
+    public Set<PropertyModifier> getPropertyModifiers() {
+        return this.propertyModifiers;
     }
 
-    public void setPropertyModifierCollection(
-        Set<PropertyModifier> propertyModifierCollection) {
-        this.propertyModifierCollection = propertyModifierCollection;
+    public void setPropertyModifiers(Set<PropertyModifier> propertyModifiers) {
+        this.propertyModifiers = propertyModifiers;
     }
 }

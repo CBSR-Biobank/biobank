@@ -36,7 +36,7 @@ public class ProcessingEventLogProvider implements
 
     private int getSpecimenCount(ProcessingEvent processingEvent) {
         Collection<Specimen> specimens = processingEvent
-            .getSpecimenCollection();
+            .getSpecimens();
         return specimens == null ? 0 : specimens.size();
     }
 

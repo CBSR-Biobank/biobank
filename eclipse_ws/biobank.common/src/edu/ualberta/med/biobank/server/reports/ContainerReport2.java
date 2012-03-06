@@ -23,10 +23,10 @@ public class ContainerReport2 extends AbstractReport {
         + "    and (c.path LIKE if(length(parent.path),parent.path || '/','') || parent.id || '/%' "  //$NON-NLS-1$
         + "         OR c.id=parent.id) " //$NON-NLS-1$
         + "    and c.label LIKE ? || '%' " //$NON-NLS-1$
-        + "    and c.containerType.specimenTypeCollection.size > 0" //$NON-NLS-1$
+        + "    and c.containerType.specimenTypes.size > 0" //$NON-NLS-1$
         + "    and (c.containerType.capacity.rowCapacity "  //$NON-NLS-1$
         + "         * c.containerType.capacity.colCapacity)" //$NON-NLS-1$
-        + "        > c.specimenPositionCollection.size"; //$NON-NLS-1$
+        + "        > c.specimenPositions.size"; //$NON-NLS-1$
     // @formatter:on 
 
     public ContainerReport2(BiobankReport report) {

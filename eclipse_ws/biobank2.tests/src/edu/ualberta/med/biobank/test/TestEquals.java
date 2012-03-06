@@ -154,7 +154,7 @@ public class TestEquals extends TestAction {
         // + " INNER JOIN FETCH spec.collectionEvent cevent"
         // + " INNER JOIN FETCH spec.originInfo originInfo"
         // + " INNER JOIN FETCH originInfo.center"
-        // + " LEFT JOIN FETCH spec.commentCollection"
+        // + " LEFT JOIN FETCH spec.comments"
         // + " INNER JOIN FETCH cevent.patient patient"
         // + " INNER JOIN FETCH patient.study study"
 

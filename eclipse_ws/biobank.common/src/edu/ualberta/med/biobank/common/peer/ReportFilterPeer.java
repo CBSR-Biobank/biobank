@@ -56,19 +56,19 @@ public class ReportFilterPeer {
 			}
 		});
 
-	public static final Property<Collection<ReportFilterValue>, ReportFilter> REPORT_FILTER_VALUE_COLLECTION = Property.create(
-		"reportFilterValueCollection" //$NON-NLS-1$
+	public static final Property<Collection<ReportFilterValue>, ReportFilter> REPORT_FILTER_VALUES = Property.create(
+		"reportFilterValues" //$NON-NLS-1$
 		, ReportFilter.class
 		, new TypeReference<Collection<ReportFilterValue>>() {}
 		, new Property.Accessor<Collection<ReportFilterValue>, ReportFilter>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<ReportFilterValue> get(ReportFilter model) {
-				return model.getReportFilterValueCollection();
+				return model.getReportFilterValues();
 			}
 			@Override
 			public void set(ReportFilter model, Collection<ReportFilterValue> value) {
-				model.getReportFilterValueCollection().clear();
-				model.getReportFilterValueCollection().addAll(value);
+				model.getReportFilterValues().clear();
+				model.getReportFilterValues().addAll(value);
 			}
 		});
 
@@ -93,7 +93,7 @@ public class ReportFilterPeer {
       aList.add(POSITION);
       aList.add(ID);
       aList.add(OPERATOR);
-      aList.add(REPORT_FILTER_VALUE_COLLECTION);
+      aList.add(REPORT_FILTER_VALUES);
       aList.add(ENTITY_FILTER);
       PROPERTIES = Collections.unmodifiableList(aList);
    };

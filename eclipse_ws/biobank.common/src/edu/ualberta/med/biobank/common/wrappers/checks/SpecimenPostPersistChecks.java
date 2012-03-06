@@ -58,7 +58,7 @@ public class SpecimenPostPersistChecks extends LoadModelAction<Specimen> {
     @SuppressWarnings("unused")
     private static void checkHasProcessingEventIfHasChildren(Specimen specimen)
         throws BiobankSessionException {
-        if (!specimen.getChildSpecimenCollection().isEmpty()
+        if (!specimen.getChildSpecimens().isEmpty()
             && specimen.getProcessingEvent() == null) {
             String msg = MessageFormat.format(
                 CHILDREN_WITHOUT_PROCESSING_EVENT, specimen.getInventoryId());

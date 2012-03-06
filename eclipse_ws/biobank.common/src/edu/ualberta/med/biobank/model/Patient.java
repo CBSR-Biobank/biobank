@@ -40,16 +40,16 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "PATIENT")
 @Unique(properties = "pnumber", groups = PrePersist.class)
 @NotUsed(by = Specimen.class, property = "collectionEvent.patient", groups = PreDelete.class)
-@Empty(property = "collectionEventCollection", groups = PreDelete.class)
+@Empty(property = "collectionEvents", groups = PreDelete.class)
 public class Patient extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String pnumber;
     private Date createdAt;
-    private Set<CollectionEvent> collectionEventCollection =
+    private Set<CollectionEvent> collectionEvents =
         new HashSet<CollectionEvent>(0);
     private Study study;
-    private Set<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<Comment> comments = new HashSet<Comment>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Patient.pnumber.NotEmpty}")
     @Column(name = "PNUMBER", unique = true, nullable = false, length = 100)
@@ -72,13 +72,12 @@ public class Patient extends AbstractBiobankModel {
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "patient")
-    public Set<CollectionEvent> getCollectionEventCollection() {
-        return this.collectionEventCollection;
+    public Set<CollectionEvent> getCollectionEvents() {
+        return this.collectionEvents;
     }
 
-    public void setCollectionEventCollection(
-        Set<CollectionEvent> collectionEventCollection) {
-        this.collectionEventCollection = collectionEventCollection;
+    public void setCollectionEvents(Set<CollectionEvent> collectionEvents) {
+        this.collectionEvents = collectionEvents;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Patient.study.NotNull}")
@@ -96,11 +95,11 @@ public class Patient extends AbstractBiobankModel {
     @JoinTable(name = "PATIENT_COMMENT",
         joinColumns = { @JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Set<Comment> getCommentCollection() {
-        return this.commentCollection;
+    public Set<Comment> getComments() {
+        return this.comments;
     }
 
-    public void setCommentCollection(Set<Comment> commentCollection) {
-        this.commentCollection = commentCollection;
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
     }
 }

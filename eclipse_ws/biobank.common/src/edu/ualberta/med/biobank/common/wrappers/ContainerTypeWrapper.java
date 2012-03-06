@@ -238,9 +238,9 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
             + "=? and cap." //$NON-NLS-1$
             + CapacityPeer.COL_CAPACITY.getName()
             + "=? and ct." //$NON-NLS-1$
-            + ContainerTypePeer.SPECIMEN_TYPE_COLLECTION.getName()
+            + ContainerTypePeer.SPECIMEN_TYPES.getName()
             + " is not empty and ct." //$NON-NLS-1$
-            + ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION.getName()
+            + ContainerTypePeer.CHILD_CONTAINER_TYPES.getName()
             + " is empty"; //$NON-NLS-1$
 
     /**

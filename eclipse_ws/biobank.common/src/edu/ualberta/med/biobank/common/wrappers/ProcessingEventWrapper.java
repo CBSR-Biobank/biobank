@@ -50,7 +50,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     public long getSpecimenCount(boolean fast) throws BiobankException,
         ApplicationException {
-        return getPropertyCount(ProcessingEventPeer.SPECIMEN_COLLECTION, fast);
+        return getPropertyCount(ProcessingEventPeer.SPECIMENS, fast);
     }
 
     public List<SpecimenWrapper> getDerivedSpecimenCollection(boolean sort) {
@@ -188,7 +188,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         "select distinct(cEvent) from " //$NON-NLS-1$
             + CollectionEvent.class.getName()
             + " as cEvent join cEvent." //$NON-NLS-1$
-            + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
+            + CollectionEventPeer.ALL_SPECIMENS.getName()
             + " as specs where cEvent." //$NON-NLS-1$
             + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
             + "=? and specs." //$NON-NLS-1$
@@ -212,13 +212,13 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
         super.addPersistTasks(tasks);
 
-        tasks.persistAdded(this, ProcessingEventPeer.SPECIMEN_COLLECTION);
+        tasks.persistAdded(this, ProcessingEventPeer.SPECIMENS);
     }
 
     @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
-        tasks.persistRemoved(this, ProcessingEventPeer.SPECIMEN_COLLECTION);
+        tasks.persistRemoved(this, ProcessingEventPeer.SPECIMENS);
 
         String hasDerivedSpecimensMsg = MessageFormat.format(
             HAS_DERIVED_SPECIMENS_MSG, getWorksheet(), getFormattedCreatedAt());
@@ -281,6 +281,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
      * when want to try to re-add the specimens)
      */
     public void setSpecimenWrapperCollection(List<SpecimenWrapper> specs) {
-        setWrapperCollection(ProcessingEventPeer.SPECIMEN_COLLECTION, specs);
+        setWrapperCollection(ProcessingEventPeer.SPECIMENS, specs);
     }
 }

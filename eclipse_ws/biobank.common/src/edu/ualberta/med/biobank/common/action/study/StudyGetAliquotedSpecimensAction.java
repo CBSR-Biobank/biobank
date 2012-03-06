@@ -21,7 +21,7 @@ public class StudyGetAliquotedSpecimensAction implements
         "SELECT srcspc"
             + " FROM " + AliquotedSpecimen.class.getName() + " srcspc"
             + " INNER JOIN FETCH srcspc.specimenType specimenType"
-            // + " LEFT JOIN FETCH specimenType.childSpecimenTypeCollection"
+            // + " LEFT JOIN FETCH specimenType.childSpecimenTypes"
             + " WHERE srcspc.study.id = ?";
 
     private final Integer studyId;

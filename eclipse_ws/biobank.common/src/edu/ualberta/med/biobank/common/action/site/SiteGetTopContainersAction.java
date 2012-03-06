@@ -17,7 +17,7 @@ public class SiteGetTopContainersAction implements
     Action<ListResult<Container>> {
     private static final long serialVersionUID = 1L;
 
-    // This query has to initialise specimenPositionCollection due to the
+    // This query has to initialise specimenPositions due to the
     // tree adapter needing to know this to display additional menu selections
     // when a right click is done on a container node.
     //
@@ -28,7 +28,7 @@ public class SiteGetTopContainersAction implements
             + " FROM " + Container.class.getName() + " container"
             + " INNER JOIN FETCH container.containerType containerType"
             + " INNER JOIN FETCH container.site site"
-            + " LEFT JOIN FETCH container.specimenPositionCollection"
+            + " LEFT JOIN FETCH container.specimenPositions"
             + " WHERE site.id = ?"
             + " AND containerType.topLevel IS TRUE"; // only select top-level
                                                      // Container-s

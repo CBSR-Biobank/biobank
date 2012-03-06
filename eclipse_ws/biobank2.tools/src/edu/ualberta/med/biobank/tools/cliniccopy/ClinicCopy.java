@@ -56,8 +56,8 @@ public class ClinicCopy {
 
     public static final String CLINICS_QUERY = "select clinics from "
         + Clinic.class.getName() + " clinics"
-        + " inner join clinics.contactCollection contacts"
-        + " inner join contacts.studyCollection studies"
+        + " inner join clinics.contacts contacts"
+        + " inner join contacts.studies studies"
         + " where clinics.nameShort = ?";
 
     private BiobankApplicationService tsAppService;

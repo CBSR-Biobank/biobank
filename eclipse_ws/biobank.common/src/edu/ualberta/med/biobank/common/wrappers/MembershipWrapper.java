@@ -67,15 +67,15 @@ public class MembershipWrapper extends MembershipBaseWrapper {
     }
 
     public void addToPermissionCollection(Collection<PermissionEnum> addedPermissions) {
-        wrappedObject.getPermissionCollection().addAll(addedPermissions);
+        wrappedObject.getPermissions().addAll(addedPermissions);
     }
 
     public void removeFromPermissionCollection(
         Collection<PermissionEnum> removedPermissions) {
-        wrappedObject.getPermissionCollection().removeAll(removedPermissions);
+        wrappedObject.getPermissions().removeAll(removedPermissions);
     }
 
     public Collection<PermissionEnum> getPermissionCollection() {
-        return wrappedObject.getPermissionCollection();
+        return wrappedObject.getPermissions();
     }
 }

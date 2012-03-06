@@ -81,8 +81,8 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         Map<Integer, Specimen> specimens =
             context.load(Specimen.class, specimenIds);
         SetDifference<Specimen> specimensDiff = new SetDifference<Specimen>(
-            peventToSave.getSpecimenCollection(), specimens.values());
-        peventToSave.setSpecimenCollection(specimensDiff.getNewSet());
+            peventToSave.getSpecimens(), specimens.values());
+        peventToSave.setSpecimens(specimensDiff.getNewSet());
 
         // set processing event on added specimens
         for (Specimen specimen : specimensDiff.getAddSet()) {
@@ -103,7 +103,7 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         Comment comment = CommentUtil.create(context.getUser(), commentText);
         if (comment != null) {
             context.getSession().save(comment);
-            peventToSave.getCommentCollection().add(comment);
+            peventToSave.getComments().add(comment);
         }
     }
 }

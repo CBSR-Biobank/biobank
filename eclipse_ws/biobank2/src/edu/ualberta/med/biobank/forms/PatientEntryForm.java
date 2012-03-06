@@ -88,7 +88,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         comment = new CommentWrapper(SessionManager.getAppService());
 
         patientCopy = new Patient();
-        patientCopy.setCommentCollection(new HashSet<Comment>());
+        patientCopy.setComments(new HashSet<Comment>());
         if (adapter.getId() != null) {
             pInfo =
                 SessionManager.getAppService().doAction(
@@ -119,8 +119,8 @@ public class PatientEntryForm extends BiobankEntryForm {
             patientCopy.setCreatedAt(pInfo.patient.getCreatedAt());
             patientCopy.setPnumber(pInfo.patient.getPnumber());
             patientCopy.setStudy(pInfo.patient.getStudy());
-            patientCopy.setCommentCollection(pInfo.patient
-                .getCommentCollection());
+            patientCopy.setComments(pInfo.patient
+                .getComments());
         }
     }
 
@@ -207,7 +207,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             new CommentCollectionInfoTable(client,
                 ModelWrapper.wrapModelCollection(
                     SessionManager.getAppService(),
-                    patientCopy.getCommentCollection(), CommentWrapper.class));
+                    patientCopy.getComments(), CommentWrapper.class));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;

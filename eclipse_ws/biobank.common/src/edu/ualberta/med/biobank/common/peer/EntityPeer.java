@@ -56,35 +56,35 @@ public class EntityPeer {
 			}
 		});
 
-	public static final Property<Collection<EntityProperty>, Entity> ENTITY_PROPERTY_COLLECTION = Property.create(
-		"entityPropertyCollection" //$NON-NLS-1$
+	public static final Property<Collection<EntityProperty>, Entity> ENTITY_PROPERTIES = Property.create(
+		"entityProperties" //$NON-NLS-1$
 		, Entity.class
 		, new TypeReference<Collection<EntityProperty>>() {}
 		, new Property.Accessor<Collection<EntityProperty>, Entity>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<EntityProperty> get(Entity model) {
-				return model.getEntityPropertyCollection();
+				return model.getEntityProperties();
 			}
 			@Override
 			public void set(Entity model, Collection<EntityProperty> value) {
-				model.getEntityPropertyCollection().clear();
-				model.getEntityPropertyCollection().addAll(value);
+				model.getEntityProperties().clear();
+				model.getEntityProperties().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<Report>, Entity> REPORT_COLLECTION = Property.create(
-		"reportCollection" //$NON-NLS-1$
+	public static final Property<Collection<Report>, Entity> REPORTS = Property.create(
+		"reports" //$NON-NLS-1$
 		, Entity.class
 		, new TypeReference<Collection<Report>>() {}
 		, new Property.Accessor<Collection<Report>, Entity>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Report> get(Entity model) {
-				return model.getReportCollection();
+				return model.getReports();
 			}
 			@Override
 			public void set(Entity model, Collection<Report> value) {
-				model.getReportCollection().clear();
-				model.getReportCollection().addAll(value);
+				model.getReports().clear();
+				model.getReports().addAll(value);
 			}
 		});
 
@@ -94,8 +94,8 @@ public class EntityPeer {
       aList.add(ID);
       aList.add(NAME);
       aList.add(CLASS_NAME);
-      aList.add(ENTITY_PROPERTY_COLLECTION);
-      aList.add(REPORT_COLLECTION);
+      aList.add(ENTITY_PROPERTIES);
+      aList.add(REPORTS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

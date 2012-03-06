@@ -24,8 +24,10 @@ public class ReportWrapper extends ReportBaseWrapper {
     public static final String PROPERTY_IS_COUNT = "isCount"; //$NON-NLS-1$
     public static final String PROPERTY_IS_PUBLIC = "isPublic"; //$NON-NLS-1$
     public static final String PROPERTY_USER_ID = "userId"; //$NON-NLS-1$
-    public static final String REPORT_COLUMN_COLLECTION_CACHE_KEY = "reportColumnCollection"; //$NON-NLS-1$
-    public static final String REPORT_FILTER_COLLECTION_CACHE_KEY = "reportFilterCollection"; //$NON-NLS-1$
+    public static final String REPORT_COLUMN_COLLECTION_CACHE_KEY =
+        "reportColumnCollection"; //$NON-NLS-1$
+    public static final String REPORT_FILTER_COLLECTION_CACHE_KEY =
+        "reportFilterCollection"; //$NON-NLS-1$
 
     public ReportWrapper(WritableApplicationService appService, Report report) {
         super(appService, report);
@@ -56,7 +58,7 @@ public class ReportWrapper extends ReportBaseWrapper {
 
         Collection<ReportColumn> reportColumns = new ArrayList<ReportColumn>();
         for (ReportColumn column : notNull(report.wrappedObject
-            .getReportColumnCollection())) {
+            .getReportColumns())) {
             ReportColumn columnCopy = new ReportColumn();
             columnCopy.setEntityColumn(column.getEntityColumn());
             columnCopy.setPosition(column.getPosition());
@@ -68,7 +70,7 @@ public class ReportWrapper extends ReportBaseWrapper {
 
         Collection<ReportFilter> reportFilters = new ArrayList<ReportFilter>();
         for (ReportFilter filter : notNull(report.wrappedObject
-            .getReportFilterCollection())) {
+            .getReportFilters())) {
             ReportFilter filterCopy = new ReportFilter();
             filterCopy.setEntityFilter(filter.getEntityFilter());
             filterCopy.setOperator(filter.getOperator());
@@ -76,7 +78,7 @@ public class ReportWrapper extends ReportBaseWrapper {
 
             Set<ReportFilterValue> values = new HashSet<ReportFilterValue>();
             for (ReportFilterValue value : notNull(filter
-                .getReportFilterValueCollection())) {
+                .getReportFilterValues())) {
                 ReportFilterValue valueCopy = new ReportFilterValue();
                 valueCopy.setPosition(value.getPosition());
                 valueCopy.setValue(value.getValue());
@@ -84,7 +86,7 @@ public class ReportWrapper extends ReportBaseWrapper {
 
                 values.add(valueCopy);
             }
-            filterCopy.setReportFilterValueCollection(values);
+            filterCopy.setReportFilterValues(values);
 
             reportFilters.add(filterCopy);
         }
@@ -100,7 +102,7 @@ public class ReportWrapper extends ReportBaseWrapper {
             columns = new ArrayList<ReportColumn>();
 
             Collection<ReportColumn> rcc = wrappedObject
-                .getReportColumnCollection();
+                .getReportColumns();
             if (rcc != null) {
                 columns.addAll(rcc);
             }
@@ -120,12 +122,12 @@ public class ReportWrapper extends ReportBaseWrapper {
 
     public void setReportColumnCollection(Collection<ReportColumn> reportColumns) {
         Collection<ReportColumn> oldReportColumns = wrappedObject
-            .getReportColumnCollection();
+            .getReportColumns();
 
         Set<ReportColumn> newReportColumns = new HashSet<ReportColumn>();
         newReportColumns.addAll(reportColumns);
 
-        wrappedObject.setReportColumnCollection(newReportColumns);
+        wrappedObject.setReportColumns(newReportColumns);
         cache.remove(REPORT_COLUMN_COLLECTION_CACHE_KEY);
         propertyChangeSupport
             .firePropertyChange(REPORT_COLUMN_COLLECTION_CACHE_KEY,
@@ -141,7 +143,7 @@ public class ReportWrapper extends ReportBaseWrapper {
             filters = new ArrayList<ReportFilter>();
 
             Collection<ReportFilter> rfc = wrappedObject
-                .getReportFilterCollection();
+                .getReportFilters();
             if (rfc != null) {
                 filters.addAll(rfc);
             }
@@ -161,12 +163,12 @@ public class ReportWrapper extends ReportBaseWrapper {
 
     public void setReportFilterCollection(Collection<ReportFilter> reportFilters) {
         Collection<ReportFilter> oldReportFilters = wrappedObject
-            .getReportFilterCollection();
+            .getReportFilters();
 
         Set<ReportFilter> newReportFilters = new HashSet<ReportFilter>();
         newReportFilters.addAll(reportFilters);
 
-        wrappedObject.setReportFilterCollection(newReportFilters);
+        wrappedObject.setReportFilters(newReportFilters);
         cache.remove(REPORT_FILTER_COLLECTION_CACHE_KEY);
         propertyChangeSupport
             .firePropertyChange(REPORT_FILTER_COLLECTION_CACHE_KEY,
@@ -177,7 +179,7 @@ public class ReportWrapper extends ReportBaseWrapper {
         ReportFilter reportFilter) {
         Collection<String> strings = new ArrayList<String>();
         Collection<ReportFilterValue> rfvCollection = reportFilter
-            .getReportFilterValueCollection();
+            .getReportFilterValues();
 
         if (rfvCollection != null) {
             for (ReportFilterValue rfv : rfvCollection) {

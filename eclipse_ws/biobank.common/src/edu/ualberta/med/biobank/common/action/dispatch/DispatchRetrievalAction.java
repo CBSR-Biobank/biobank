@@ -26,7 +26,7 @@ public class DispatchRetrievalAction implements Action<ListResult<Dispatch>> {
 
     private static String DISPATCH_HQL_STATE_SELECT =
         "SELECT DISTINCT d FROM " + Dispatch.class.getName() + " d"
-            + " LEFT JOIN FETCH d.dispatchSpecimenCollection"
+            + " LEFT JOIN FETCH d.dispatchSpecimens"
             + " INNER JOIN FETCH d.senderCenter"
             + " INNER JOIN FETCH d.receiverCenter"
             + " LEFT JOIN FETCH d.shipmentInfo si"

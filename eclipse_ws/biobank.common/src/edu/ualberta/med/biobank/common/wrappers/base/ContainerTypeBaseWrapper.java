@@ -127,8 +127,8 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
     }
 
     public List<SpecimenTypeWrapper> getSpecimenTypeCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION);
-        List<SpecimenTypeWrapper> specimenTypeCollection = getWrapperCollection(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION, SpecimenTypeWrapper.class, sort);
+        boolean notCached = !isPropertyCached(ContainerTypePeer.SPECIMEN_TYPES);
+        List<SpecimenTypeWrapper> specimenTypeCollection = getWrapperCollection(ContainerTypePeer.SPECIMEN_TYPES, SpecimenTypeWrapper.class, sort);
         if (notCached) {
             for (SpecimenTypeBaseWrapper e : specimenTypeCollection) {
                 e.addToContainerTypeCollectionInternal(Arrays.asList(this));
@@ -138,81 +138,81 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
     }
 
     public void addToSpecimenTypeCollection(List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) {
-        addToWrapperCollection(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION, specimenTypeCollection);
+        addToWrapperCollection(ContainerTypePeer.SPECIMEN_TYPES, specimenTypeCollection);
         for (SpecimenTypeBaseWrapper e : specimenTypeCollection) {
             e.addToContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
     void addToSpecimenTypeCollectionInternal(List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) {
-        if (isInitialized(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION)) {
-            addToWrapperCollection(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION, specimenTypeCollection);
+        if (isInitialized(ContainerTypePeer.SPECIMEN_TYPES)) {
+            addToWrapperCollection(ContainerTypePeer.SPECIMEN_TYPES, specimenTypeCollection);
         } else {
-            getElementQueue().add(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION, specimenTypeCollection);
+            getElementQueue().add(ContainerTypePeer.SPECIMEN_TYPES, specimenTypeCollection);
         }
     }
 
     public void removeFromSpecimenTypeCollection(List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) {
-        removeFromWrapperCollection(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION, specimenTypeCollection);
+        removeFromWrapperCollection(ContainerTypePeer.SPECIMEN_TYPES, specimenTypeCollection);
         for (SpecimenTypeBaseWrapper e : specimenTypeCollection) {
             e.removeFromContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
     void removeFromSpecimenTypeCollectionInternal(List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) {
-        if (isPropertyCached(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION)) {
-            removeFromWrapperCollection(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION, specimenTypeCollection);
+        if (isPropertyCached(ContainerTypePeer.SPECIMEN_TYPES)) {
+            removeFromWrapperCollection(ContainerTypePeer.SPECIMEN_TYPES, specimenTypeCollection);
         } else {
-            getElementQueue().remove(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION, specimenTypeCollection);
+            getElementQueue().remove(ContainerTypePeer.SPECIMEN_TYPES, specimenTypeCollection);
         }
     }
 
     public void removeFromSpecimenTypeCollectionWithCheck(List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION, specimenTypeCollection);
+        removeFromWrapperCollectionWithCheck(ContainerTypePeer.SPECIMEN_TYPES, specimenTypeCollection);
         for (SpecimenTypeBaseWrapper e : specimenTypeCollection) {
             e.removeFromContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
     void removeFromSpecimenTypeCollectionWithCheckInternal(List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION, specimenTypeCollection);
+        removeFromWrapperCollectionWithCheck(ContainerTypePeer.SPECIMEN_TYPES, specimenTypeCollection);
     }
 
     public List<CommentWrapper> getCommentCollection(boolean sort) {
-        List<CommentWrapper> commentCollection = getWrapperCollection(ContainerTypePeer.COMMENT_COLLECTION, CommentWrapper.class, sort);
+        List<CommentWrapper> commentCollection = getWrapperCollection(ContainerTypePeer.COMMENTS, CommentWrapper.class, sort);
         return commentCollection;
     }
 
     public void addToCommentCollection(List<? extends CommentBaseWrapper> commentCollection) {
-        addToWrapperCollection(ContainerTypePeer.COMMENT_COLLECTION, commentCollection);
+        addToWrapperCollection(ContainerTypePeer.COMMENTS, commentCollection);
     }
 
     void addToCommentCollectionInternal(List<? extends CommentBaseWrapper> commentCollection) {
-        if (isInitialized(ContainerTypePeer.COMMENT_COLLECTION)) {
-            addToWrapperCollection(ContainerTypePeer.COMMENT_COLLECTION, commentCollection);
+        if (isInitialized(ContainerTypePeer.COMMENTS)) {
+            addToWrapperCollection(ContainerTypePeer.COMMENTS, commentCollection);
         } else {
-            getElementQueue().add(ContainerTypePeer.COMMENT_COLLECTION, commentCollection);
+            getElementQueue().add(ContainerTypePeer.COMMENTS, commentCollection);
         }
     }
 
     public void removeFromCommentCollection(List<? extends CommentBaseWrapper> commentCollection) {
-        removeFromWrapperCollection(ContainerTypePeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollection(ContainerTypePeer.COMMENTS, commentCollection);
     }
 
     void removeFromCommentCollectionInternal(List<? extends CommentBaseWrapper> commentCollection) {
-        if (isPropertyCached(ContainerTypePeer.COMMENT_COLLECTION)) {
-            removeFromWrapperCollection(ContainerTypePeer.COMMENT_COLLECTION, commentCollection);
+        if (isPropertyCached(ContainerTypePeer.COMMENTS)) {
+            removeFromWrapperCollection(ContainerTypePeer.COMMENTS, commentCollection);
         } else {
-            getElementQueue().remove(ContainerTypePeer.COMMENT_COLLECTION, commentCollection);
+            getElementQueue().remove(ContainerTypePeer.COMMENTS, commentCollection);
         }
     }
 
     public void removeFromCommentCollectionWithCheck(List<? extends CommentBaseWrapper> commentCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(ContainerTypePeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollectionWithCheck(ContainerTypePeer.COMMENTS, commentCollection);
     }
 
     void removeFromCommentCollectionWithCheckInternal(List<? extends CommentBaseWrapper> commentCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(ContainerTypePeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollectionWithCheck(ContainerTypePeer.COMMENTS, commentCollection);
     }
 
     public ActivityStatus getActivityStatus() {
@@ -237,8 +237,8 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
     }
 
     public List<ContainerTypeWrapper> getChildContainerTypeCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION);
-        List<ContainerTypeWrapper> childContainerTypeCollection = getWrapperCollection(ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION, ContainerTypeWrapper.class, sort);
+        boolean notCached = !isPropertyCached(ContainerTypePeer.CHILD_CONTAINER_TYPES);
+        List<ContainerTypeWrapper> childContainerTypeCollection = getWrapperCollection(ContainerTypePeer.CHILD_CONTAINER_TYPES, ContainerTypeWrapper.class, sort);
         if (notCached) {
             for (ContainerTypeBaseWrapper e : childContainerTypeCollection) {
                 e.addToParentContainerTypeCollectionInternal(Arrays.asList(this));
@@ -248,49 +248,49 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
     }
 
     public void addToChildContainerTypeCollection(List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) {
-        addToWrapperCollection(ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION, childContainerTypeCollection);
+        addToWrapperCollection(ContainerTypePeer.CHILD_CONTAINER_TYPES, childContainerTypeCollection);
         for (ContainerTypeBaseWrapper e : childContainerTypeCollection) {
             e.addToParentContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
     void addToChildContainerTypeCollectionInternal(List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) {
-        if (isInitialized(ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION)) {
-            addToWrapperCollection(ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION, childContainerTypeCollection);
+        if (isInitialized(ContainerTypePeer.CHILD_CONTAINER_TYPES)) {
+            addToWrapperCollection(ContainerTypePeer.CHILD_CONTAINER_TYPES, childContainerTypeCollection);
         } else {
-            getElementQueue().add(ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION, childContainerTypeCollection);
+            getElementQueue().add(ContainerTypePeer.CHILD_CONTAINER_TYPES, childContainerTypeCollection);
         }
     }
 
     public void removeFromChildContainerTypeCollection(List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) {
-        removeFromWrapperCollection(ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION, childContainerTypeCollection);
+        removeFromWrapperCollection(ContainerTypePeer.CHILD_CONTAINER_TYPES, childContainerTypeCollection);
         for (ContainerTypeBaseWrapper e : childContainerTypeCollection) {
             e.removeFromParentContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
     void removeFromChildContainerTypeCollectionInternal(List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) {
-        if (isPropertyCached(ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION)) {
-            removeFromWrapperCollection(ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION, childContainerTypeCollection);
+        if (isPropertyCached(ContainerTypePeer.CHILD_CONTAINER_TYPES)) {
+            removeFromWrapperCollection(ContainerTypePeer.CHILD_CONTAINER_TYPES, childContainerTypeCollection);
         } else {
-            getElementQueue().remove(ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION, childContainerTypeCollection);
+            getElementQueue().remove(ContainerTypePeer.CHILD_CONTAINER_TYPES, childContainerTypeCollection);
         }
     }
 
     public void removeFromChildContainerTypeCollectionWithCheck(List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION, childContainerTypeCollection);
+        removeFromWrapperCollectionWithCheck(ContainerTypePeer.CHILD_CONTAINER_TYPES, childContainerTypeCollection);
         for (ContainerTypeBaseWrapper e : childContainerTypeCollection) {
             e.removeFromParentContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
     void removeFromChildContainerTypeCollectionWithCheckInternal(List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION, childContainerTypeCollection);
+        removeFromWrapperCollectionWithCheck(ContainerTypePeer.CHILD_CONTAINER_TYPES, childContainerTypeCollection);
     }
 
     public List<ContainerTypeWrapper> getParentContainerTypeCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(ContainerTypePeer.PARENT_CONTAINER_TYPE_COLLECTION);
-        List<ContainerTypeWrapper> parentContainerTypeCollection = getWrapperCollection(ContainerTypePeer.PARENT_CONTAINER_TYPE_COLLECTION, ContainerTypeWrapper.class, sort);
+        boolean notCached = !isPropertyCached(ContainerTypePeer.PARENT_CONTAINER_TYPES);
+        List<ContainerTypeWrapper> parentContainerTypeCollection = getWrapperCollection(ContainerTypePeer.PARENT_CONTAINER_TYPES, ContainerTypeWrapper.class, sort);
         if (notCached) {
             for (ContainerTypeBaseWrapper e : parentContainerTypeCollection) {
                 e.addToChildContainerTypeCollectionInternal(Arrays.asList(this));
@@ -300,44 +300,44 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
     }
 
     public void addToParentContainerTypeCollection(List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) {
-        addToWrapperCollection(ContainerTypePeer.PARENT_CONTAINER_TYPE_COLLECTION, parentContainerTypeCollection);
+        addToWrapperCollection(ContainerTypePeer.PARENT_CONTAINER_TYPES, parentContainerTypeCollection);
         for (ContainerTypeBaseWrapper e : parentContainerTypeCollection) {
             e.addToChildContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
     void addToParentContainerTypeCollectionInternal(List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) {
-        if (isInitialized(ContainerTypePeer.PARENT_CONTAINER_TYPE_COLLECTION)) {
-            addToWrapperCollection(ContainerTypePeer.PARENT_CONTAINER_TYPE_COLLECTION, parentContainerTypeCollection);
+        if (isInitialized(ContainerTypePeer.PARENT_CONTAINER_TYPES)) {
+            addToWrapperCollection(ContainerTypePeer.PARENT_CONTAINER_TYPES, parentContainerTypeCollection);
         } else {
-            getElementQueue().add(ContainerTypePeer.PARENT_CONTAINER_TYPE_COLLECTION, parentContainerTypeCollection);
+            getElementQueue().add(ContainerTypePeer.PARENT_CONTAINER_TYPES, parentContainerTypeCollection);
         }
     }
 
     public void removeFromParentContainerTypeCollection(List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) {
-        removeFromWrapperCollection(ContainerTypePeer.PARENT_CONTAINER_TYPE_COLLECTION, parentContainerTypeCollection);
+        removeFromWrapperCollection(ContainerTypePeer.PARENT_CONTAINER_TYPES, parentContainerTypeCollection);
         for (ContainerTypeBaseWrapper e : parentContainerTypeCollection) {
             e.removeFromChildContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
     void removeFromParentContainerTypeCollectionInternal(List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) {
-        if (isPropertyCached(ContainerTypePeer.PARENT_CONTAINER_TYPE_COLLECTION)) {
-            removeFromWrapperCollection(ContainerTypePeer.PARENT_CONTAINER_TYPE_COLLECTION, parentContainerTypeCollection);
+        if (isPropertyCached(ContainerTypePeer.PARENT_CONTAINER_TYPES)) {
+            removeFromWrapperCollection(ContainerTypePeer.PARENT_CONTAINER_TYPES, parentContainerTypeCollection);
         } else {
-            getElementQueue().remove(ContainerTypePeer.PARENT_CONTAINER_TYPE_COLLECTION, parentContainerTypeCollection);
+            getElementQueue().remove(ContainerTypePeer.PARENT_CONTAINER_TYPES, parentContainerTypeCollection);
         }
     }
 
     public void removeFromParentContainerTypeCollectionWithCheck(List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(ContainerTypePeer.PARENT_CONTAINER_TYPE_COLLECTION, parentContainerTypeCollection);
+        removeFromWrapperCollectionWithCheck(ContainerTypePeer.PARENT_CONTAINER_TYPES, parentContainerTypeCollection);
         for (ContainerTypeBaseWrapper e : parentContainerTypeCollection) {
             e.removeFromChildContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
     void removeFromParentContainerTypeCollectionWithCheckInternal(List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(ContainerTypePeer.PARENT_CONTAINER_TYPE_COLLECTION, parentContainerTypeCollection);
+        removeFromWrapperCollectionWithCheck(ContainerTypePeer.PARENT_CONTAINER_TYPES, parentContainerTypeCollection);
     }
 
 }

@@ -25,8 +25,8 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
     private static final String REQUEST_HQL = "select distinct request from "
     + Request.class.getName() 
     + " request join fetch request." + RequestPeer.RESEARCH_GROUP.getName()
-    + " rg left join fetch request.dispatchCollection " 
-    + " dispatchCollection left join fetch dispatchCollection.dispatchSpecimenCollection ds join fetch request." + RequestPeer.ADDRESS.getName()
+    + " rg left join fetch request.dispatches " 
+    + " dispatches left join fetch dispatches.dispatchSpecimens ds join fetch request." + RequestPeer.ADDRESS.getName()
     + " where request." + DispatchPeer.ID.getName()
     +"=?";
     // @formatter:on

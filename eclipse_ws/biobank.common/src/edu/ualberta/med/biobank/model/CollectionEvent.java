@@ -30,20 +30,17 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "PATIENT_ID", "VISIT_NUMBER" }) })
 @Unique(properties = { "patient", "visitNumber" }, groups = PrePersist.class)
-@Empty(property = "allSpecimenCollection", groups = PreDelete.class)
+@Empty(property = "allSpecimens", groups = PreDelete.class)
 public class CollectionEvent extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private Integer visitNumber;
-    private Set<Specimen> allSpecimenCollection = new HashSet<Specimen>(
-        0);
+    private Set<Specimen> allSpecimens = new HashSet<Specimen>(0);
     private Patient patient;
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
-    private Set<EventAttr> eventAttrCollection = new HashSet<EventAttr>(
-        0);
-    private Set<Comment> commentCollection = new HashSet<Comment>(0);
-    private Set<Specimen> originalSpecimenCollection =
-        new HashSet<Specimen>(0);
+    private Set<EventAttr> eventAttrs = new HashSet<EventAttr>(0);
+    private Set<Comment> comments = new HashSet<Comment>(0);
+    private Set<Specimen> originalSpecimens = new HashSet<Specimen>(0);
 
     @Min(value = 1, message = "{edu.ualberta.med.biobank.model.CollectionEvent.visitNumber.Min}")
     @NotNull(message = "{edu.ualberta.med.biobank.model.CollectionEvent.visitNumber.NotNull}")
@@ -58,13 +55,12 @@ public class CollectionEvent extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "collectionEvent")
     @Cascade({ CascadeType.SAVE_UPDATE })
-    public Set<Specimen> getAllSpecimenCollection() {
-        return this.allSpecimenCollection;
+    public Set<Specimen> getAllSpecimens() {
+        return this.allSpecimens;
     }
 
-    public void setAllSpecimenCollection(
-        Set<Specimen> allSpecimenCollection) {
-        this.allSpecimenCollection = allSpecimenCollection;
+    public void setAllSpecimens(Set<Specimen> allSpecimens) {
+        this.allSpecimens = allSpecimens;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.CollectionEvent.patient.NotNull}")
@@ -91,33 +87,32 @@ public class CollectionEvent extends AbstractBiobankModel {
 
     @OneToMany(cascade = javax.persistence.CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "collectionEvent")
     @Cascade({ CascadeType.SAVE_UPDATE })
-    public Set<EventAttr> getEventAttrCollection() {
-        return this.eventAttrCollection;
+    public Set<EventAttr> getEventAttrs() {
+        return this.eventAttrs;
     }
 
-    public void setEventAttrCollection(Set<EventAttr> eventAttrCollection) {
-        this.eventAttrCollection = eventAttrCollection;
+    public void setEventAttrs(Set<EventAttr> eventAttrs) {
+        this.eventAttrs = eventAttrs;
     }
 
     @ManyToMany(cascade = javax.persistence.CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "COLLECTION_EVENT_COMMENT",
         joinColumns = { @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Set<Comment> getCommentCollection() {
-        return this.commentCollection;
+    public Set<Comment> getComments() {
+        return this.comments;
     }
 
-    public void setCommentCollection(Set<Comment> commentCollection) {
-        this.commentCollection = commentCollection;
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "originalCollectionEvent")
-    public Set<Specimen> getOriginalSpecimenCollection() {
-        return this.originalSpecimenCollection;
+    public Set<Specimen> getOriginalSpecimens() {
+        return this.originalSpecimens;
     }
 
-    public void setOriginalSpecimenCollection(
-        Set<Specimen> originalSpecimenCollection) {
-        this.originalSpecimenCollection = originalSpecimenCollection;
+    public void setOriginalSpecimens(Set<Specimen> originalSpecimens) {
+        this.originalSpecimens = originalSpecimens;
     }
 }

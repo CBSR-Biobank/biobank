@@ -83,7 +83,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
                 SessionManager.getAppService().doAction(
                     new DispatchGetInfoAction(adapter.getId()));
             read.dispatch
-                .setDispatchSpecimenCollection(read.specimens);
+                .setDispatchSpecimens(read.specimens);
             dispatch.setWrappedObject(read.dispatch);
         }
     }

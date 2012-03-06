@@ -89,7 +89,7 @@ public class TestAdvancedReports extends TestDatabase {
         report.setIsPublic(true);
 
         try {
-            for (EntityProperty property : entity.getEntityPropertyCollection()) {
+            for (EntityProperty property : entity.getEntityProperties()) {
                 testColumns(report, property);
                 testFilters(report, property);
             }
@@ -102,7 +102,7 @@ public class TestAdvancedReports extends TestDatabase {
     private void testColumns(Report report, EntityProperty property)
         throws ApplicationException {
         Collection<EntityColumn> entityColumns = property
-            .getEntityColumnCollection();
+            .getEntityColumns();
 
         for (EntityColumn entityColumn : entityColumns) {
             ReportColumn column = new ReportColumn();
@@ -111,7 +111,7 @@ public class TestAdvancedReports extends TestDatabase {
 
             // TODO: add modifiers?
 
-            report.setReportColumnCollection(asSet(column));
+            report.setReportColumns(asSet(column));
 
             runReport(report);
         }
@@ -120,13 +120,13 @@ public class TestAdvancedReports extends TestDatabase {
     private void testFilters(Report report, EntityProperty property)
         throws ApplicationException {
         Collection<EntityFilter> entityFilters = property
-            .getEntityFilterCollection();
+            .getEntityFilters();
         for (EntityFilter entityFilter : entityFilters) {
             ReportFilter filter = new ReportFilter();
             filter.setEntityFilter(entityFilter);
             filter.setPosition(0);
 
-            report.setReportFilterCollection(asSet(filter));
+            report.setReportFilters(asSet(filter));
 
             testFilter(report, filter);
         }
@@ -158,7 +158,7 @@ public class TestAdvancedReports extends TestDatabase {
                 values.add(value);
             }
 
-            filter.setReportFilterValueCollection(values);
+            filter.setReportFilterValues(values);
 
             runReport(report);
         }

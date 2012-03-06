@@ -66,8 +66,8 @@ public abstract class CenterBaseWrapper<E extends Center> extends ModelWrapper<E
     }
 
     public List<DispatchWrapper> getDstDispatchCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(CenterPeer.DST_DISPATCH_COLLECTION);
-        List<DispatchWrapper> dstDispatchCollection = getWrapperCollection(CenterPeer.DST_DISPATCH_COLLECTION, DispatchWrapper.class, sort);
+        boolean notCached = !isPropertyCached(CenterPeer.DST_DISPATCHES);
+        List<DispatchWrapper> dstDispatchCollection = getWrapperCollection(CenterPeer.DST_DISPATCHES, DispatchWrapper.class, sort);
         if (notCached) {
             for (DispatchBaseWrapper e : dstDispatchCollection) {
                 e.setReceiverCenterInternal(this);
@@ -77,49 +77,49 @@ public abstract class CenterBaseWrapper<E extends Center> extends ModelWrapper<E
     }
 
     public void addToDstDispatchCollection(List<? extends DispatchBaseWrapper> dstDispatchCollection) {
-        addToWrapperCollection(CenterPeer.DST_DISPATCH_COLLECTION, dstDispatchCollection);
+        addToWrapperCollection(CenterPeer.DST_DISPATCHES, dstDispatchCollection);
         for (DispatchBaseWrapper e : dstDispatchCollection) {
             e.setReceiverCenterInternal(this);
         }
     }
 
     void addToDstDispatchCollectionInternal(List<? extends DispatchBaseWrapper> dstDispatchCollection) {
-        if (isInitialized(CenterPeer.DST_DISPATCH_COLLECTION)) {
-            addToWrapperCollection(CenterPeer.DST_DISPATCH_COLLECTION, dstDispatchCollection);
+        if (isInitialized(CenterPeer.DST_DISPATCHES)) {
+            addToWrapperCollection(CenterPeer.DST_DISPATCHES, dstDispatchCollection);
         } else {
-            getElementQueue().add(CenterPeer.DST_DISPATCH_COLLECTION, dstDispatchCollection);
+            getElementQueue().add(CenterPeer.DST_DISPATCHES, dstDispatchCollection);
         }
     }
 
     public void removeFromDstDispatchCollection(List<? extends DispatchBaseWrapper> dstDispatchCollection) {
-        removeFromWrapperCollection(CenterPeer.DST_DISPATCH_COLLECTION, dstDispatchCollection);
+        removeFromWrapperCollection(CenterPeer.DST_DISPATCHES, dstDispatchCollection);
         for (DispatchBaseWrapper e : dstDispatchCollection) {
             e.setReceiverCenterInternal(null);
         }
     }
 
     void removeFromDstDispatchCollectionInternal(List<? extends DispatchBaseWrapper> dstDispatchCollection) {
-        if (isPropertyCached(CenterPeer.DST_DISPATCH_COLLECTION)) {
-            removeFromWrapperCollection(CenterPeer.DST_DISPATCH_COLLECTION, dstDispatchCollection);
+        if (isPropertyCached(CenterPeer.DST_DISPATCHES)) {
+            removeFromWrapperCollection(CenterPeer.DST_DISPATCHES, dstDispatchCollection);
         } else {
-            getElementQueue().remove(CenterPeer.DST_DISPATCH_COLLECTION, dstDispatchCollection);
+            getElementQueue().remove(CenterPeer.DST_DISPATCHES, dstDispatchCollection);
         }
     }
 
     public void removeFromDstDispatchCollectionWithCheck(List<? extends DispatchBaseWrapper> dstDispatchCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(CenterPeer.DST_DISPATCH_COLLECTION, dstDispatchCollection);
+        removeFromWrapperCollectionWithCheck(CenterPeer.DST_DISPATCHES, dstDispatchCollection);
         for (DispatchBaseWrapper e : dstDispatchCollection) {
             e.setReceiverCenterInternal(null);
         }
     }
 
     void removeFromDstDispatchCollectionWithCheckInternal(List<? extends DispatchBaseWrapper> dstDispatchCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(CenterPeer.DST_DISPATCH_COLLECTION, dstDispatchCollection);
+        removeFromWrapperCollectionWithCheck(CenterPeer.DST_DISPATCHES, dstDispatchCollection);
     }
 
     public List<DispatchWrapper> getSrcDispatchCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(CenterPeer.SRC_DISPATCH_COLLECTION);
-        List<DispatchWrapper> srcDispatchCollection = getWrapperCollection(CenterPeer.SRC_DISPATCH_COLLECTION, DispatchWrapper.class, sort);
+        boolean notCached = !isPropertyCached(CenterPeer.SRC_DISPATCHES);
+        List<DispatchWrapper> srcDispatchCollection = getWrapperCollection(CenterPeer.SRC_DISPATCHES, DispatchWrapper.class, sort);
         if (notCached) {
             for (DispatchBaseWrapper e : srcDispatchCollection) {
                 e.setSenderCenterInternal(this);
@@ -129,81 +129,81 @@ public abstract class CenterBaseWrapper<E extends Center> extends ModelWrapper<E
     }
 
     public void addToSrcDispatchCollection(List<? extends DispatchBaseWrapper> srcDispatchCollection) {
-        addToWrapperCollection(CenterPeer.SRC_DISPATCH_COLLECTION, srcDispatchCollection);
+        addToWrapperCollection(CenterPeer.SRC_DISPATCHES, srcDispatchCollection);
         for (DispatchBaseWrapper e : srcDispatchCollection) {
             e.setSenderCenterInternal(this);
         }
     }
 
     void addToSrcDispatchCollectionInternal(List<? extends DispatchBaseWrapper> srcDispatchCollection) {
-        if (isInitialized(CenterPeer.SRC_DISPATCH_COLLECTION)) {
-            addToWrapperCollection(CenterPeer.SRC_DISPATCH_COLLECTION, srcDispatchCollection);
+        if (isInitialized(CenterPeer.SRC_DISPATCHES)) {
+            addToWrapperCollection(CenterPeer.SRC_DISPATCHES, srcDispatchCollection);
         } else {
-            getElementQueue().add(CenterPeer.SRC_DISPATCH_COLLECTION, srcDispatchCollection);
+            getElementQueue().add(CenterPeer.SRC_DISPATCHES, srcDispatchCollection);
         }
     }
 
     public void removeFromSrcDispatchCollection(List<? extends DispatchBaseWrapper> srcDispatchCollection) {
-        removeFromWrapperCollection(CenterPeer.SRC_DISPATCH_COLLECTION, srcDispatchCollection);
+        removeFromWrapperCollection(CenterPeer.SRC_DISPATCHES, srcDispatchCollection);
         for (DispatchBaseWrapper e : srcDispatchCollection) {
             e.setSenderCenterInternal(null);
         }
     }
 
     void removeFromSrcDispatchCollectionInternal(List<? extends DispatchBaseWrapper> srcDispatchCollection) {
-        if (isPropertyCached(CenterPeer.SRC_DISPATCH_COLLECTION)) {
-            removeFromWrapperCollection(CenterPeer.SRC_DISPATCH_COLLECTION, srcDispatchCollection);
+        if (isPropertyCached(CenterPeer.SRC_DISPATCHES)) {
+            removeFromWrapperCollection(CenterPeer.SRC_DISPATCHES, srcDispatchCollection);
         } else {
-            getElementQueue().remove(CenterPeer.SRC_DISPATCH_COLLECTION, srcDispatchCollection);
+            getElementQueue().remove(CenterPeer.SRC_DISPATCHES, srcDispatchCollection);
         }
     }
 
     public void removeFromSrcDispatchCollectionWithCheck(List<? extends DispatchBaseWrapper> srcDispatchCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(CenterPeer.SRC_DISPATCH_COLLECTION, srcDispatchCollection);
+        removeFromWrapperCollectionWithCheck(CenterPeer.SRC_DISPATCHES, srcDispatchCollection);
         for (DispatchBaseWrapper e : srcDispatchCollection) {
             e.setSenderCenterInternal(null);
         }
     }
 
     void removeFromSrcDispatchCollectionWithCheckInternal(List<? extends DispatchBaseWrapper> srcDispatchCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(CenterPeer.SRC_DISPATCH_COLLECTION, srcDispatchCollection);
+        removeFromWrapperCollectionWithCheck(CenterPeer.SRC_DISPATCHES, srcDispatchCollection);
     }
 
     public List<CommentWrapper> getCommentCollection(boolean sort) {
-        List<CommentWrapper> commentCollection = getWrapperCollection(CenterPeer.COMMENT_COLLECTION, CommentWrapper.class, sort);
+        List<CommentWrapper> commentCollection = getWrapperCollection(CenterPeer.COMMENTS, CommentWrapper.class, sort);
         return commentCollection;
     }
 
     public void addToCommentCollection(List<? extends CommentBaseWrapper> commentCollection) {
-        addToWrapperCollection(CenterPeer.COMMENT_COLLECTION, commentCollection);
+        addToWrapperCollection(CenterPeer.COMMENTS, commentCollection);
     }
 
     void addToCommentCollectionInternal(List<? extends CommentBaseWrapper> commentCollection) {
-        if (isInitialized(CenterPeer.COMMENT_COLLECTION)) {
-            addToWrapperCollection(CenterPeer.COMMENT_COLLECTION, commentCollection);
+        if (isInitialized(CenterPeer.COMMENTS)) {
+            addToWrapperCollection(CenterPeer.COMMENTS, commentCollection);
         } else {
-            getElementQueue().add(CenterPeer.COMMENT_COLLECTION, commentCollection);
+            getElementQueue().add(CenterPeer.COMMENTS, commentCollection);
         }
     }
 
     public void removeFromCommentCollection(List<? extends CommentBaseWrapper> commentCollection) {
-        removeFromWrapperCollection(CenterPeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollection(CenterPeer.COMMENTS, commentCollection);
     }
 
     void removeFromCommentCollectionInternal(List<? extends CommentBaseWrapper> commentCollection) {
-        if (isPropertyCached(CenterPeer.COMMENT_COLLECTION)) {
-            removeFromWrapperCollection(CenterPeer.COMMENT_COLLECTION, commentCollection);
+        if (isPropertyCached(CenterPeer.COMMENTS)) {
+            removeFromWrapperCollection(CenterPeer.COMMENTS, commentCollection);
         } else {
-            getElementQueue().remove(CenterPeer.COMMENT_COLLECTION, commentCollection);
+            getElementQueue().remove(CenterPeer.COMMENTS, commentCollection);
         }
     }
 
     public void removeFromCommentCollectionWithCheck(List<? extends CommentBaseWrapper> commentCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(CenterPeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollectionWithCheck(CenterPeer.COMMENTS, commentCollection);
     }
 
     void removeFromCommentCollectionWithCheckInternal(List<? extends CommentBaseWrapper> commentCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(CenterPeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollectionWithCheck(CenterPeer.COMMENTS, commentCollection);
     }
 
     public AddressWrapper getAddress() {
@@ -220,8 +220,8 @@ public abstract class CenterBaseWrapper<E extends Center> extends ModelWrapper<E
     }
 
     public List<ProcessingEventWrapper> getProcessingEventCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(CenterPeer.PROCESSING_EVENT_COLLECTION);
-        List<ProcessingEventWrapper> processingEventCollection = getWrapperCollection(CenterPeer.PROCESSING_EVENT_COLLECTION, ProcessingEventWrapper.class, sort);
+        boolean notCached = !isPropertyCached(CenterPeer.PROCESSING_EVENTS);
+        List<ProcessingEventWrapper> processingEventCollection = getWrapperCollection(CenterPeer.PROCESSING_EVENTS, ProcessingEventWrapper.class, sort);
         if (notCached) {
             for (ProcessingEventBaseWrapper e : processingEventCollection) {
                 e.setCenterInternal(this);
@@ -231,49 +231,49 @@ public abstract class CenterBaseWrapper<E extends Center> extends ModelWrapper<E
     }
 
     public void addToProcessingEventCollection(List<? extends ProcessingEventBaseWrapper> processingEventCollection) {
-        addToWrapperCollection(CenterPeer.PROCESSING_EVENT_COLLECTION, processingEventCollection);
+        addToWrapperCollection(CenterPeer.PROCESSING_EVENTS, processingEventCollection);
         for (ProcessingEventBaseWrapper e : processingEventCollection) {
             e.setCenterInternal(this);
         }
     }
 
     void addToProcessingEventCollectionInternal(List<? extends ProcessingEventBaseWrapper> processingEventCollection) {
-        if (isInitialized(CenterPeer.PROCESSING_EVENT_COLLECTION)) {
-            addToWrapperCollection(CenterPeer.PROCESSING_EVENT_COLLECTION, processingEventCollection);
+        if (isInitialized(CenterPeer.PROCESSING_EVENTS)) {
+            addToWrapperCollection(CenterPeer.PROCESSING_EVENTS, processingEventCollection);
         } else {
-            getElementQueue().add(CenterPeer.PROCESSING_EVENT_COLLECTION, processingEventCollection);
+            getElementQueue().add(CenterPeer.PROCESSING_EVENTS, processingEventCollection);
         }
     }
 
     public void removeFromProcessingEventCollection(List<? extends ProcessingEventBaseWrapper> processingEventCollection) {
-        removeFromWrapperCollection(CenterPeer.PROCESSING_EVENT_COLLECTION, processingEventCollection);
+        removeFromWrapperCollection(CenterPeer.PROCESSING_EVENTS, processingEventCollection);
         for (ProcessingEventBaseWrapper e : processingEventCollection) {
             e.setCenterInternal(null);
         }
     }
 
     void removeFromProcessingEventCollectionInternal(List<? extends ProcessingEventBaseWrapper> processingEventCollection) {
-        if (isPropertyCached(CenterPeer.PROCESSING_EVENT_COLLECTION)) {
-            removeFromWrapperCollection(CenterPeer.PROCESSING_EVENT_COLLECTION, processingEventCollection);
+        if (isPropertyCached(CenterPeer.PROCESSING_EVENTS)) {
+            removeFromWrapperCollection(CenterPeer.PROCESSING_EVENTS, processingEventCollection);
         } else {
-            getElementQueue().remove(CenterPeer.PROCESSING_EVENT_COLLECTION, processingEventCollection);
+            getElementQueue().remove(CenterPeer.PROCESSING_EVENTS, processingEventCollection);
         }
     }
 
     public void removeFromProcessingEventCollectionWithCheck(List<? extends ProcessingEventBaseWrapper> processingEventCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(CenterPeer.PROCESSING_EVENT_COLLECTION, processingEventCollection);
+        removeFromWrapperCollectionWithCheck(CenterPeer.PROCESSING_EVENTS, processingEventCollection);
         for (ProcessingEventBaseWrapper e : processingEventCollection) {
             e.setCenterInternal(null);
         }
     }
 
     void removeFromProcessingEventCollectionWithCheckInternal(List<? extends ProcessingEventBaseWrapper> processingEventCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(CenterPeer.PROCESSING_EVENT_COLLECTION, processingEventCollection);
+        removeFromWrapperCollectionWithCheck(CenterPeer.PROCESSING_EVENTS, processingEventCollection);
     }
 
     public List<MembershipWrapper> getMembershipCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(CenterPeer.MEMBERSHIP_COLLECTION);
-        List<MembershipWrapper> membershipCollection = getWrapperCollection(CenterPeer.MEMBERSHIP_COLLECTION, MembershipWrapper.class, sort);
+        boolean notCached = !isPropertyCached(CenterPeer.MEMBERSHIPS);
+        List<MembershipWrapper> membershipCollection = getWrapperCollection(CenterPeer.MEMBERSHIPS, MembershipWrapper.class, sort);
         if (notCached) {
             for (MembershipBaseWrapper e : membershipCollection) {
                 e.setCenterInternal(this);
@@ -283,49 +283,49 @@ public abstract class CenterBaseWrapper<E extends Center> extends ModelWrapper<E
     }
 
     public void addToMembershipCollection(List<? extends MembershipBaseWrapper> membershipCollection) {
-        addToWrapperCollection(CenterPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+        addToWrapperCollection(CenterPeer.MEMBERSHIPS, membershipCollection);
         for (MembershipBaseWrapper e : membershipCollection) {
             e.setCenterInternal(this);
         }
     }
 
     void addToMembershipCollectionInternal(List<? extends MembershipBaseWrapper> membershipCollection) {
-        if (isInitialized(CenterPeer.MEMBERSHIP_COLLECTION)) {
-            addToWrapperCollection(CenterPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+        if (isInitialized(CenterPeer.MEMBERSHIPS)) {
+            addToWrapperCollection(CenterPeer.MEMBERSHIPS, membershipCollection);
         } else {
-            getElementQueue().add(CenterPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+            getElementQueue().add(CenterPeer.MEMBERSHIPS, membershipCollection);
         }
     }
 
     public void removeFromMembershipCollection(List<? extends MembershipBaseWrapper> membershipCollection) {
-        removeFromWrapperCollection(CenterPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+        removeFromWrapperCollection(CenterPeer.MEMBERSHIPS, membershipCollection);
         for (MembershipBaseWrapper e : membershipCollection) {
             e.setCenterInternal(null);
         }
     }
 
     void removeFromMembershipCollectionInternal(List<? extends MembershipBaseWrapper> membershipCollection) {
-        if (isPropertyCached(CenterPeer.MEMBERSHIP_COLLECTION)) {
-            removeFromWrapperCollection(CenterPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+        if (isPropertyCached(CenterPeer.MEMBERSHIPS)) {
+            removeFromWrapperCollection(CenterPeer.MEMBERSHIPS, membershipCollection);
         } else {
-            getElementQueue().remove(CenterPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+            getElementQueue().remove(CenterPeer.MEMBERSHIPS, membershipCollection);
         }
     }
 
     public void removeFromMembershipCollectionWithCheck(List<? extends MembershipBaseWrapper> membershipCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(CenterPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+        removeFromWrapperCollectionWithCheck(CenterPeer.MEMBERSHIPS, membershipCollection);
         for (MembershipBaseWrapper e : membershipCollection) {
             e.setCenterInternal(null);
         }
     }
 
     void removeFromMembershipCollectionWithCheckInternal(List<? extends MembershipBaseWrapper> membershipCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(CenterPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+        removeFromWrapperCollectionWithCheck(CenterPeer.MEMBERSHIPS, membershipCollection);
     }
 
     public List<OriginInfoWrapper> getOriginInfoCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(CenterPeer.ORIGIN_INFO_COLLECTION);
-        List<OriginInfoWrapper> originInfoCollection = getWrapperCollection(CenterPeer.ORIGIN_INFO_COLLECTION, OriginInfoWrapper.class, sort);
+        boolean notCached = !isPropertyCached(CenterPeer.ORIGIN_INFOS);
+        List<OriginInfoWrapper> originInfoCollection = getWrapperCollection(CenterPeer.ORIGIN_INFOS, OriginInfoWrapper.class, sort);
         if (notCached) {
             for (OriginInfoBaseWrapper e : originInfoCollection) {
                 e.setCenterInternal(this);
@@ -335,44 +335,44 @@ public abstract class CenterBaseWrapper<E extends Center> extends ModelWrapper<E
     }
 
     public void addToOriginInfoCollection(List<? extends OriginInfoBaseWrapper> originInfoCollection) {
-        addToWrapperCollection(CenterPeer.ORIGIN_INFO_COLLECTION, originInfoCollection);
+        addToWrapperCollection(CenterPeer.ORIGIN_INFOS, originInfoCollection);
         for (OriginInfoBaseWrapper e : originInfoCollection) {
             e.setCenterInternal(this);
         }
     }
 
     void addToOriginInfoCollectionInternal(List<? extends OriginInfoBaseWrapper> originInfoCollection) {
-        if (isInitialized(CenterPeer.ORIGIN_INFO_COLLECTION)) {
-            addToWrapperCollection(CenterPeer.ORIGIN_INFO_COLLECTION, originInfoCollection);
+        if (isInitialized(CenterPeer.ORIGIN_INFOS)) {
+            addToWrapperCollection(CenterPeer.ORIGIN_INFOS, originInfoCollection);
         } else {
-            getElementQueue().add(CenterPeer.ORIGIN_INFO_COLLECTION, originInfoCollection);
+            getElementQueue().add(CenterPeer.ORIGIN_INFOS, originInfoCollection);
         }
     }
 
     public void removeFromOriginInfoCollection(List<? extends OriginInfoBaseWrapper> originInfoCollection) {
-        removeFromWrapperCollection(CenterPeer.ORIGIN_INFO_COLLECTION, originInfoCollection);
+        removeFromWrapperCollection(CenterPeer.ORIGIN_INFOS, originInfoCollection);
         for (OriginInfoBaseWrapper e : originInfoCollection) {
             e.setCenterInternal(null);
         }
     }
 
     void removeFromOriginInfoCollectionInternal(List<? extends OriginInfoBaseWrapper> originInfoCollection) {
-        if (isPropertyCached(CenterPeer.ORIGIN_INFO_COLLECTION)) {
-            removeFromWrapperCollection(CenterPeer.ORIGIN_INFO_COLLECTION, originInfoCollection);
+        if (isPropertyCached(CenterPeer.ORIGIN_INFOS)) {
+            removeFromWrapperCollection(CenterPeer.ORIGIN_INFOS, originInfoCollection);
         } else {
-            getElementQueue().remove(CenterPeer.ORIGIN_INFO_COLLECTION, originInfoCollection);
+            getElementQueue().remove(CenterPeer.ORIGIN_INFOS, originInfoCollection);
         }
     }
 
     public void removeFromOriginInfoCollectionWithCheck(List<? extends OriginInfoBaseWrapper> originInfoCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(CenterPeer.ORIGIN_INFO_COLLECTION, originInfoCollection);
+        removeFromWrapperCollectionWithCheck(CenterPeer.ORIGIN_INFOS, originInfoCollection);
         for (OriginInfoBaseWrapper e : originInfoCollection) {
             e.setCenterInternal(null);
         }
     }
 
     void removeFromOriginInfoCollectionWithCheckInternal(List<? extends OriginInfoBaseWrapper> originInfoCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(CenterPeer.ORIGIN_INFO_COLLECTION, originInfoCollection);
+        removeFromWrapperCollectionWithCheck(CenterPeer.ORIGIN_INFOS, originInfoCollection);
     }
 
     public ActivityStatus getActivityStatus() {

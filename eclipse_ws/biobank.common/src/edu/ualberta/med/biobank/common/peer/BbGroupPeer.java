@@ -40,19 +40,19 @@ public class BbGroupPeer  extends PrincipalPeer {
 			}
 		});
 
-	public static final Property<Collection<User>, BbGroup> USER_COLLECTION = Property.create(
-		"userCollection" //$NON-NLS-1$
+	public static final Property<Collection<User>, BbGroup> USERS = Property.create(
+		"users" //$NON-NLS-1$
 		, BbGroup.class
 		, new TypeReference<Collection<User>>() {}
 		, new Property.Accessor<Collection<User>, BbGroup>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<User> get(BbGroup model) {
-				return model.getUserCollection();
+				return model.getUsers();
 			}
 			@Override
 			public void set(BbGroup model, Collection<User> value) {
-				model.getUserCollection().clear();
-				model.getUserCollection().addAll(value);
+				model.getUsers().clear();
+				model.getUsers().addAll(value);
 			}
 		});
 
@@ -61,7 +61,7 @@ public class BbGroupPeer  extends PrincipalPeer {
       List<Property<?, ? super BbGroup>> aList = new ArrayList<Property<?, ? super BbGroup>>();
       aList.add(DESCRIPTION);
       aList.add(NAME);
-      aList.add(USER_COLLECTION);
+      aList.add(USERS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

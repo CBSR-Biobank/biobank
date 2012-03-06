@@ -51,9 +51,9 @@ public class PatientMergeAction implements Action<BooleanResult> {
         }
 
         Set<CollectionEvent> c1events =
-            patient1.getCollectionEventCollection();
+            patient1.getCollectionEvents();
         Set<CollectionEvent> c2events =
-            patient2.getCollectionEventCollection();
+            patient2.getCollectionEvents();
         if (!c2events.isEmpty()) {
             boolean merged = false;
             // for loop on a different list.
@@ -111,14 +111,14 @@ public class PatientMergeAction implements Action<BooleanResult> {
         CollectionEvent c2event) {
         if (c1event.getVisitNumber().equals(c2event.getVisitNumber())) {
             Collection<Specimen> c2Origspecs =
-                c2event.getOriginalSpecimenCollection();
+                c2event.getOriginalSpecimens();
             Collection<Specimen> c2AllSpecs =
-                c2event.getAllSpecimenCollection();
+                c2event.getAllSpecimens();
 
             Collection<Specimen> c1OrigSpecs =
-                c1event.getOriginalSpecimenCollection();
+                c1event.getOriginalSpecimens();
             Collection<Specimen> c1AllSpecs =
-                c1event.getAllSpecimenCollection();
+                c1event.getAllSpecimens();
 
             for (Specimen spec : c2AllSpecs) {
                 if (c2Origspecs.contains(spec)) {

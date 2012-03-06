@@ -46,18 +46,18 @@ public class MembershipPeer {
 			}
 		});
 
-	public static final Property<Set<PermissionEnum>, Membership> PERMISSION_COLLECTION = Property.create(
-		"permissionCollection" //$NON-NLS-1$
+	public static final Property<Set<PermissionEnum>, Membership> PERMISSIONS = Property.create(
+		"permissions" //$NON-NLS-1$
 		, Membership.class
 		, new TypeReference<Set<PermissionEnum>>() {}
 		, new Property.Accessor<Set<PermissionEnum>, Membership>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Set<PermissionEnum> get(Membership model) {
-				return model.getPermissionCollection();
+				return model.getPermissions();
 			}
 			@Override
 			public void set(Membership model, Set<PermissionEnum> value) {
-				model.setPermissionCollection(value);
+				model.setPermissions(value);
 			}
 		});
 
@@ -91,19 +91,19 @@ public class MembershipPeer {
 			}
 		});
 
-	public static final Property<Collection<Role>, Membership> ROLE_COLLECTION = Property.create(
-		"roleCollection" //$NON-NLS-1$
+	public static final Property<Collection<Role>, Membership> ROLES = Property.create(
+		"roles" //$NON-NLS-1$
 		, Membership.class
 		, new TypeReference<Collection<Role>>() {}
 		, new Property.Accessor<Collection<Role>, Membership>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Role> get(Membership model) {
-				return model.getRoleCollection();
+				return model.getRoles();
 			}
 			@Override
 			public void set(Membership model, Collection<Role> value) {
-				model.getRoleCollection().clear();
-				model.getRoleCollection().addAll(value);
+				model.getRoles().clear();
+				model.getRoles().addAll(value);
 			}
 		});
 
@@ -112,10 +112,10 @@ public class MembershipPeer {
       List<Property<?, ? super Membership>> aList = new ArrayList<Property<?, ? super Membership>>();
       aList.add(ID);
       aList.add(CENTER);
-      aList.add(PERMISSION_COLLECTION);
+      aList.add(PERMISSIONS);
       aList.add(PRINCIPAL);
       aList.add(STUDY);
-      aList.add(ROLE_COLLECTION);
+      aList.add(ROLES);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

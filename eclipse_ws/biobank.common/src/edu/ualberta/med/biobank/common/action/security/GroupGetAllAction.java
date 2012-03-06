@@ -34,8 +34,8 @@ public class GroupGetAllAction implements Action<ListResult<BbGroup>> {
     public ListResult<BbGroup> run(ActionContext context)
         throws ActionException {
         Criteria c = context.getSession().createCriteria(BbGroup.class, "g")
-            .createAlias("g.membershipCollection", "m", Criteria.LEFT_JOIN)
-            .createAlias("m.roleCollection", "r", Criteria.LEFT_JOIN)
+            .createAlias("g.memberships", "m", Criteria.LEFT_JOIN)
+            .createAlias("m.roles", "r", Criteria.LEFT_JOIN)
             .addOrder(Order.asc("name"));
 
         User user = context.getUser();

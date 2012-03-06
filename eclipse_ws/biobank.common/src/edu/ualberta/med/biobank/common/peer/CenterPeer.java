@@ -61,51 +61,51 @@ public class CenterPeer {
 			}
 		});
 
-	public static final Property<Collection<Dispatch>, Center> DST_DISPATCH_COLLECTION = Property.create(
-		"dstDispatchCollection" //$NON-NLS-1$
+	public static final Property<Collection<Dispatch>, Center> DST_DISPATCHES = Property.create(
+		"dstDispatches" //$NON-NLS-1$
 		, Center.class
 		, new TypeReference<Collection<Dispatch>>() {}
 		, new Property.Accessor<Collection<Dispatch>, Center>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Dispatch> get(Center model) {
-				return model.getDstDispatchCollection();
+				return model.getDstDispatches();
 			}
 			@Override
 			public void set(Center model, Collection<Dispatch> value) {
-				model.getDstDispatchCollection().clear();
-				model.getDstDispatchCollection().addAll(value);
+				model.getDstDispatches().clear();
+				model.getDstDispatches().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<Dispatch>, Center> SRC_DISPATCH_COLLECTION = Property.create(
-		"srcDispatchCollection" //$NON-NLS-1$
+	public static final Property<Collection<Dispatch>, Center> SRC_DISPATCHES = Property.create(
+		"srcDispatches" //$NON-NLS-1$
 		, Center.class
 		, new TypeReference<Collection<Dispatch>>() {}
 		, new Property.Accessor<Collection<Dispatch>, Center>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Dispatch> get(Center model) {
-				return model.getSrcDispatchCollection();
+				return model.getSrcDispatches();
 			}
 			@Override
 			public void set(Center model, Collection<Dispatch> value) {
-				model.getSrcDispatchCollection().clear();
-				model.getSrcDispatchCollection().addAll(value);
+				model.getSrcDispatches().clear();
+				model.getSrcDispatches().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<Comment>, Center> COMMENT_COLLECTION = Property.create(
-		"commentCollection" //$NON-NLS-1$
+	public static final Property<Collection<Comment>, Center> COMMENTS = Property.create(
+		"comments" //$NON-NLS-1$
 		, Center.class
 		, new TypeReference<Collection<Comment>>() {}
 		, new Property.Accessor<Collection<Comment>, Center>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(Center model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(Center model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -124,51 +124,51 @@ public class CenterPeer {
 			}
 		});
 
-	public static final Property<Collection<ProcessingEvent>, Center> PROCESSING_EVENT_COLLECTION = Property.create(
-		"processingEventCollection" //$NON-NLS-1$
+	public static final Property<Collection<ProcessingEvent>, Center> PROCESSING_EVENTS = Property.create(
+		"processingEvents" //$NON-NLS-1$
 		, Center.class
 		, new TypeReference<Collection<ProcessingEvent>>() {}
 		, new Property.Accessor<Collection<ProcessingEvent>, Center>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<ProcessingEvent> get(Center model) {
-				return model.getProcessingEventCollection();
+				return model.getProcessingEvents();
 			}
 			@Override
 			public void set(Center model, Collection<ProcessingEvent> value) {
-				model.getProcessingEventCollection().clear();
-				model.getProcessingEventCollection().addAll(value);
+				model.getProcessingEvents().clear();
+				model.getProcessingEvents().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<Membership>, Center> MEMBERSHIP_COLLECTION = Property.create(
-		"membershipCollection" //$NON-NLS-1$
+	public static final Property<Collection<Membership>, Center> MEMBERSHIPS = Property.create(
+		"memberships" //$NON-NLS-1$
 		, Center.class
 		, new TypeReference<Collection<Membership>>() {}
 		, new Property.Accessor<Collection<Membership>, Center>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Membership> get(Center model) {
-				return model.getMembershipCollection();
+				return model.getMemberships();
 			}
 			@Override
 			public void set(Center model, Collection<Membership> value) {
-				model.getMembershipCollection().clear();
-				model.getMembershipCollection().addAll(value);
+				model.getMemberships().clear();
+				model.getMemberships().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<OriginInfo>, Center> ORIGIN_INFO_COLLECTION = Property.create(
-		"originInfoCollection" //$NON-NLS-1$
+	public static final Property<Collection<OriginInfo>, Center> ORIGIN_INFOS = Property.create(
+		"originInfos" //$NON-NLS-1$
 		, Center.class
 		, new TypeReference<Collection<OriginInfo>>() {}
 		, new Property.Accessor<Collection<OriginInfo>, Center>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<OriginInfo> get(Center model) {
-				return model.getOriginInfoCollection();
+				return model.getOriginInfos();
 			}
 			@Override
 			public void set(Center model, Collection<OriginInfo> value) {
-				model.getOriginInfoCollection().clear();
-				model.getOriginInfoCollection().addAll(value);
+				model.getOriginInfos().clear();
+				model.getOriginInfos().addAll(value);
 			}
 		});
 
@@ -193,13 +193,13 @@ public class CenterPeer {
       aList.add(ID);
       aList.add(NAME);
       aList.add(NAME_SHORT);
-      aList.add(DST_DISPATCH_COLLECTION);
-      aList.add(SRC_DISPATCH_COLLECTION);
-      aList.add(COMMENT_COLLECTION);
+      aList.add(DST_DISPATCHES);
+      aList.add(SRC_DISPATCHES);
+      aList.add(COMMENTS);
       aList.add(ADDRESS);
-      aList.add(PROCESSING_EVENT_COLLECTION);
-      aList.add(MEMBERSHIP_COLLECTION);
-      aList.add(ORIGIN_INFO_COLLECTION);
+      aList.add(PROCESSING_EVENTS);
+      aList.add(MEMBERSHIPS);
+      aList.add(ORIGIN_INFOS);
       aList.add(ACTIVITY_STATUS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };

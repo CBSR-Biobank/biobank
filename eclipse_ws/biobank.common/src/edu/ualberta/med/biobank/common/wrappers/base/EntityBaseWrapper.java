@@ -59,8 +59,8 @@ public class EntityBaseWrapper extends ModelWrapper<Entity> {
     }
 
     public List<ReportWrapper> getReportCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(EntityPeer.REPORT_COLLECTION);
-        List<ReportWrapper> reportCollection = getWrapperCollection(EntityPeer.REPORT_COLLECTION, ReportWrapper.class, sort);
+        boolean notCached = !isPropertyCached(EntityPeer.REPORTS);
+        List<ReportWrapper> reportCollection = getWrapperCollection(EntityPeer.REPORTS, ReportWrapper.class, sort);
         if (notCached) {
             for (ReportBaseWrapper e : reportCollection) {
                 e.setEntityInternal(this);
@@ -70,44 +70,44 @@ public class EntityBaseWrapper extends ModelWrapper<Entity> {
     }
 
     public void addToReportCollection(List<? extends ReportBaseWrapper> reportCollection) {
-        addToWrapperCollection(EntityPeer.REPORT_COLLECTION, reportCollection);
+        addToWrapperCollection(EntityPeer.REPORTS, reportCollection);
         for (ReportBaseWrapper e : reportCollection) {
             e.setEntityInternal(this);
         }
     }
 
     void addToReportCollectionInternal(List<? extends ReportBaseWrapper> reportCollection) {
-        if (isInitialized(EntityPeer.REPORT_COLLECTION)) {
-            addToWrapperCollection(EntityPeer.REPORT_COLLECTION, reportCollection);
+        if (isInitialized(EntityPeer.REPORTS)) {
+            addToWrapperCollection(EntityPeer.REPORTS, reportCollection);
         } else {
-            getElementQueue().add(EntityPeer.REPORT_COLLECTION, reportCollection);
+            getElementQueue().add(EntityPeer.REPORTS, reportCollection);
         }
     }
 
     public void removeFromReportCollection(List<? extends ReportBaseWrapper> reportCollection) {
-        removeFromWrapperCollection(EntityPeer.REPORT_COLLECTION, reportCollection);
+        removeFromWrapperCollection(EntityPeer.REPORTS, reportCollection);
         for (ReportBaseWrapper e : reportCollection) {
             e.setEntityInternal(null);
         }
     }
 
     void removeFromReportCollectionInternal(List<? extends ReportBaseWrapper> reportCollection) {
-        if (isPropertyCached(EntityPeer.REPORT_COLLECTION)) {
-            removeFromWrapperCollection(EntityPeer.REPORT_COLLECTION, reportCollection);
+        if (isPropertyCached(EntityPeer.REPORTS)) {
+            removeFromWrapperCollection(EntityPeer.REPORTS, reportCollection);
         } else {
-            getElementQueue().remove(EntityPeer.REPORT_COLLECTION, reportCollection);
+            getElementQueue().remove(EntityPeer.REPORTS, reportCollection);
         }
     }
 
     public void removeFromReportCollectionWithCheck(List<? extends ReportBaseWrapper> reportCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(EntityPeer.REPORT_COLLECTION, reportCollection);
+        removeFromWrapperCollectionWithCheck(EntityPeer.REPORTS, reportCollection);
         for (ReportBaseWrapper e : reportCollection) {
             e.setEntityInternal(null);
         }
     }
 
     void removeFromReportCollectionWithCheckInternal(List<? extends ReportBaseWrapper> reportCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(EntityPeer.REPORT_COLLECTION, reportCollection);
+        removeFromWrapperCollectionWithCheck(EntityPeer.REPORTS, reportCollection);
     }
 
 }

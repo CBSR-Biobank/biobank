@@ -136,7 +136,7 @@ public class TestResearchGroup extends TestAction {
         session.beginTransaction();
 
         Request r = (Request) session.load(Request.class, rId);
-        for (RequestSpecimen rs : r.getRequestSpecimenCollection()) {
+        for (RequestSpecimen rs : r.getRequestSpecimens()) {
             Specimen spec = rs.getSpecimen();
             session.delete(rs);
             session.delete(spec);
@@ -167,12 +167,12 @@ public class TestResearchGroup extends TestAction {
 
         save.id = rgId;
 
-        Assert.assertEquals(1, rg.rg.getCommentCollection().size());
+        Assert.assertEquals(1, rg.rg.getComments().size());
         EXECUTOR.exec(rgSave);
         rg = EXECUTOR.exec(reader);
-        Assert.assertEquals(2, rg.rg.getCommentCollection().size());
+        Assert.assertEquals(2, rg.rg.getComments().size());
         EXECUTOR.exec(rgSave);
         rg = EXECUTOR.exec(reader);
-        Assert.assertEquals(3, rg.rg.getCommentCollection().size());
+        Assert.assertEquals(3, rg.rg.getComments().size());
     }
 }

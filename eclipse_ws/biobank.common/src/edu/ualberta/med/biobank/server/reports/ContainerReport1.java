@@ -16,9 +16,9 @@ public class ContainerReport1 extends AbstractReport {
         + " c where c.id=substr(c2.path, 1, locate('/', c2.path)-1)), " //$NON-NLS-1$
         + "sum(c2.containerType.capacity.rowCapacity " //$NON-NLS-1$
         + "* c2.containerType.capacity.colCapacity), " //$NON-NLS-1$
-        + "sum(c2.specimenPositionCollection.size) from " //$NON-NLS-1$
+        + "sum(c2.specimenPositions.size) from " //$NON-NLS-1$
         + Container.class.getName()
-        + " c2 where c2.containerType.specimenTypeCollection.size > 0 " //$NON-NLS-1$
+        + " c2 where c2.containerType.specimenTypes.size > 0 " //$NON-NLS-1$
         + " group by substr(c2.path, 1, locate('/', c2.path)-1)"; //$NON-NLS-1$
     // @formatter:on
 

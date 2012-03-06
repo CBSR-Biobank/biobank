@@ -61,7 +61,7 @@ public class FilterSelectWidget extends Composite {
             ReportFilter reportFilter = new ReportFilter();
             reportFilter.setPosition(filterPosition);
             reportFilter.setEntityFilter(entityFilter);
-            reportFilter.setReportFilterValueCollection(filterRow.getValues());
+            reportFilter.setReportFilterValues(filterRow.getValues());
 
             if (filterRow.getOperator() != null) {
                 reportFilter.setOperator(filterRow.getOperator().getId());
@@ -194,7 +194,7 @@ public class FilterSelectWidget extends Composite {
             if (reportFilter.getOperator() != null) {
                 filterRow.setOperatorId(reportFilter.getOperator());
             }
-            filterRow.setValues(reportFilter.getReportFilterValueCollection());
+            filterRow.setValues(reportFilter.getReportFilterValues());
         }
         return filterRow;
     }

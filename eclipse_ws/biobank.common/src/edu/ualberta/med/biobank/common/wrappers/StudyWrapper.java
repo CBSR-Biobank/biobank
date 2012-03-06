@@ -78,7 +78,7 @@ public class StudyWrapper extends StudyBaseWrapper {
             for (StudyEventAttrWrapper ss : studyEventAttrMap.values()) {
                 allStudyEventAttrWrappers.add(ss);
             }
-            setWrapperCollection(StudyPeer.STUDY_EVENT_ATTR_COLLECTION,
+            setWrapperCollection(StudyPeer.STUDY_EVENT_ATTRS,
                 allStudyEventAttrWrappers);
         }
     }
@@ -250,7 +250,7 @@ public class StudyWrapper extends StudyBaseWrapper {
     @SuppressWarnings("nls")
     private static final String PATIENT_QRY = "select patients from "
         + Study.class.getName() + " as study inner join study."
-        + StudyPeer.PATIENT_COLLECTION.getName()
+        + StudyPeer.PATIENTS.getName()
         + " as patients where patients." + PatientPeer.PNUMBER.getName()
         + " = ? and study." + StudyPeer.ID.getName() + " = ?";
 
@@ -272,7 +272,7 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     public long getPatientCount(boolean fast) throws ApplicationException,
         BiobankException {
-        return getPropertyCount(StudyPeer.PATIENT_COLLECTION, fast);
+        return getPropertyCount(StudyPeer.PATIENTS, fast);
     }
 
     @Override
@@ -303,7 +303,7 @@ public class StudyWrapper extends StudyBaseWrapper {
             + " as contacts join contacts."
             + ContactPeer.CLINIC.getName()
             + " as clinics where contacts."
-            + Property.concatNames(ContactPeer.STUDY_COLLECTION, StudyPeer.ID)
+            + Property.concatNames(ContactPeer.STUDIES, StudyPeer.ID)
             + " = ? and clinics." + ClinicPeer.ID.getName() + " = ?";
 
     /**
@@ -379,25 +379,25 @@ public class StudyWrapper extends StudyBaseWrapper {
         tasks.add(check().unique(StudyPeer.NAME));
         tasks.add(check().unique(StudyPeer.NAME_SHORT));
 
-        tasks.deleteRemoved(this, StudyPeer.STUDY_EVENT_ATTR_COLLECTION);
-        tasks.deleteRemoved(this, StudyPeer.SOURCE_SPECIMEN_COLLECTION);
-        tasks.deleteRemoved(this, StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION);
+        tasks.deleteRemoved(this, StudyPeer.STUDY_EVENT_ATTRS);
+        tasks.deleteRemoved(this, StudyPeer.SOURCE_SPECIMENS);
+        tasks.deleteRemoved(this, StudyPeer.ALIQUOTED_SPECIMENS);
 
         super.addPersistTasks(tasks);
 
-        tasks.persistAdded(this, StudyPeer.STUDY_EVENT_ATTR_COLLECTION);
-        tasks.persistAdded(this, StudyPeer.SOURCE_SPECIMEN_COLLECTION);
-        tasks.persistAdded(this, StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION);
+        tasks.persistAdded(this, StudyPeer.STUDY_EVENT_ATTRS);
+        tasks.persistAdded(this, StudyPeer.SOURCE_SPECIMENS);
+        tasks.persistAdded(this, StudyPeer.ALIQUOTED_SPECIMENS);
     }
 
     @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
-        tasks.add(check().empty(StudyPeer.PATIENT_COLLECTION));
+        tasks.add(check().empty(StudyPeer.PATIENTS));
 
-        tasks.delete(this, StudyPeer.STUDY_EVENT_ATTR_COLLECTION);
-        tasks.delete(this, StudyPeer.SOURCE_SPECIMEN_COLLECTION);
-        tasks.delete(this, StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION);
+        tasks.delete(this, StudyPeer.STUDY_EVENT_ATTRS);
+        tasks.delete(this, StudyPeer.SOURCE_SPECIMENS);
+        tasks.delete(this, StudyPeer.ALIQUOTED_SPECIMENS);
 
         super.addDeleteTasks(tasks);
     }

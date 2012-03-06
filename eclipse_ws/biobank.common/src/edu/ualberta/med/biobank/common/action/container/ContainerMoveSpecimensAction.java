@@ -37,8 +37,7 @@ public class ContainerMoveSpecimensAction implements Action<IdResult> {
         Container toContainer = context.load(Container.class, toContainerId);
         Session session = context.getSession();
 
-        for (SpecimenPosition pos : fromContainer
-            .getSpecimenPositionCollection()) {
+        for (SpecimenPosition pos : fromContainer.getSpecimenPositions()) {
             pos.setContainer(toContainer);
             session.saveOrUpdate(pos);
         }

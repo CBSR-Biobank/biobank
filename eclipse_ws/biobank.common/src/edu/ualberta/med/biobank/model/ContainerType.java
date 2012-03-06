@@ -46,9 +46,9 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @NotUsed(by = Container.class, property = "containerType", groups = PreDelete.class)
 @Empty.List({
-    @Empty(property = "childContainerTypeCollection", groups = PreDelete.class),
-    @Empty(property = "parentContainerTypeCollection", groups = PreDelete.class),
-    @Empty(property = "specimenTypeCollection", groups = PreDelete.class)
+    @Empty(property = "childContainerTypes", groups = PreDelete.class),
+    @Empty(property = "parentContainerTypes", groups = PreDelete.class),
+    @Empty(property = "specimenTypes", groups = PreDelete.class)
 })
 public class ContainerType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
@@ -57,16 +57,15 @@ public class ContainerType extends AbstractBiobankModel {
     private String nameShort;
     private boolean topLevel = false;
     private Double defaultTemperature;
-    private Set<SpecimenType> specimenTypeCollection =
-        new HashSet<SpecimenType>(0);
-    private Set<ContainerType> childContainerTypeCollection =
+    private Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>(0);
+    private Set<ContainerType> childContainerTypes =
         new HashSet<ContainerType>(0);
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
-    private Set<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<Comment> comments = new HashSet<Comment>(0);
     private Capacity capacity = new Capacity();
     private Site site;
     private ContainerLabelingScheme childLabelingScheme;
-    private Set<ContainerType> parentContainerTypeCollection =
+    private Set<ContainerType> parentContainerTypes =
         new HashSet<ContainerType>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ContainerType.name.NotEmpty}")
@@ -113,26 +112,24 @@ public class ContainerType extends AbstractBiobankModel {
     @JoinTable(name = "CONTAINER_TYPE_SPECIMEN_TYPE",
         joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false, updatable = false) })
-    public Set<SpecimenType> getSpecimenTypeCollection() {
-        return this.specimenTypeCollection;
+    public Set<SpecimenType> getSpecimenTypes() {
+        return this.specimenTypes;
     }
 
-    public void setSpecimenTypeCollection(
-        Set<SpecimenType> specimenTypeCollection) {
-        this.specimenTypeCollection = specimenTypeCollection;
+    public void setSpecimenTypes(Set<SpecimenType> specimenTypes) {
+        this.specimenTypes = specimenTypes;
     }
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
         joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false, updatable = false) })
-    public Set<ContainerType> getChildContainerTypeCollection() {
-        return this.childContainerTypeCollection;
+    public Set<ContainerType> getChildContainerTypes() {
+        return this.childContainerTypes;
     }
 
-    public void setChildContainerTypeCollection(
-        Set<ContainerType> childContainerTypeCollection) {
-        this.childContainerTypeCollection = childContainerTypeCollection;
+    public void setChildContainerTypes(Set<ContainerType> childContainerTypes) {
+        this.childContainerTypes = childContainerTypes;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.activityStatus.NotNull}")
@@ -150,12 +147,12 @@ public class ContainerType extends AbstractBiobankModel {
     @JoinTable(name = "CONTAINER_TYPE_COMMENT",
         joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Set<Comment> getCommentCollection() {
-        return this.commentCollection;
+    public Set<Comment> getComments() {
+        return this.comments;
     }
 
-    public void setCommentCollection(Set<Comment> commentCollection) {
-        this.commentCollection = commentCollection;
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.capacity.NotNull}")
@@ -192,14 +189,13 @@ public class ContainerType extends AbstractBiobankModel {
         this.childLabelingScheme = childLabelingScheme;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "childContainerTypeCollection")
-    public Set<ContainerType> getParentContainerTypeCollection() {
-        return this.parentContainerTypeCollection;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "childContainerTypes")
+    public Set<ContainerType> getParentContainerTypes() {
+        return this.parentContainerTypes;
     }
 
-    public void setParentContainerTypeCollection(
-        Set<ContainerType> parentContainerTypeCollection) {
-        this.parentContainerTypeCollection = parentContainerTypeCollection;
+    public void setParentContainerTypes(Set<ContainerType> parentContainerTypes) {
+        this.parentContainerTypes = parentContainerTypes;
     }
 
     @Transient

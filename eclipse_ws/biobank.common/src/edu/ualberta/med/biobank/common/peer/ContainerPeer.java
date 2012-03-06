@@ -135,35 +135,35 @@ public class ContainerPeer {
 			}
 		});
 
-	public static final Property<Collection<SpecimenPosition>, Container> SPECIMEN_POSITION_COLLECTION = Property.create(
-		"specimenPositionCollection" //$NON-NLS-1$
+	public static final Property<Collection<SpecimenPosition>, Container> SPECIMEN_POSITIONS = Property.create(
+		"specimenPositions" //$NON-NLS-1$
 		, Container.class
 		, new TypeReference<Collection<SpecimenPosition>>() {}
 		, new Property.Accessor<Collection<SpecimenPosition>, Container>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<SpecimenPosition> get(Container model) {
-				return model.getSpecimenPositionCollection();
+				return model.getSpecimenPositions();
 			}
 			@Override
 			public void set(Container model, Collection<SpecimenPosition> value) {
-				model.getSpecimenPositionCollection().clear();
-				model.getSpecimenPositionCollection().addAll(value);
+				model.getSpecimenPositions().clear();
+				model.getSpecimenPositions().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<ContainerPosition>, Container> CHILD_POSITION_COLLECTION = Property.create(
-		"childPositionCollection" //$NON-NLS-1$
+	public static final Property<Collection<ContainerPosition>, Container> CHILD_POSITIONS = Property.create(
+		"childPositions" //$NON-NLS-1$
 		, Container.class
 		, new TypeReference<Collection<ContainerPosition>>() {}
 		, new Property.Accessor<Collection<ContainerPosition>, Container>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<ContainerPosition> get(Container model) {
-				return model.getChildPositionCollection();
+				return model.getChildPositions();
 			}
 			@Override
 			public void set(Container model, Collection<ContainerPosition> value) {
-				model.getChildPositionCollection().clear();
-				model.getChildPositionCollection().addAll(value);
+				model.getChildPositions().clear();
+				model.getChildPositions().addAll(value);
 			}
 		});
 
@@ -182,19 +182,19 @@ public class ContainerPeer {
 			}
 		});
 
-	public static final Property<Collection<Comment>, Container> COMMENT_COLLECTION = Property.create(
-		"commentCollection" //$NON-NLS-1$
+	public static final Property<Collection<Comment>, Container> COMMENTS = Property.create(
+		"comments" //$NON-NLS-1$
 		, Container.class
 		, new TypeReference<Collection<Comment>>() {}
 		, new Property.Accessor<Collection<Comment>, Container>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(Container model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(Container model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -224,10 +224,10 @@ public class ContainerPeer {
       aList.add(SITE);
       aList.add(POSITION);
       aList.add(CONTAINER_TYPE);
-      aList.add(SPECIMEN_POSITION_COLLECTION);
-      aList.add(CHILD_POSITION_COLLECTION);
+      aList.add(SPECIMEN_POSITIONS);
+      aList.add(CHILD_POSITIONS);
       aList.add(TOP_CONTAINER);
-      aList.add(COMMENT_COLLECTION);
+      aList.add(COMMENTS);
       aList.add(ACTIVITY_STATUS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };

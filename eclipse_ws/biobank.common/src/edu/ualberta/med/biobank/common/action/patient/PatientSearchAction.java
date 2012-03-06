@@ -24,7 +24,7 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
             + " from " + Patient.class.getName() + " as p"
             + " LEFT JOIN p." + PatientPeer.STUDY.getName() + " as study"
             + " LEFT JOIN p."
-            + PatientPeer.COLLECTION_EVENT_COLLECTION.getName() + " as cevents"
+            + PatientPeer.COLLECTION_EVENTS.getName() + " as cevents"
             + " where {0} GROUP BY p";
     @SuppressWarnings("nls")
     private static final String WHERE_FOR_PNUMBER = "p."

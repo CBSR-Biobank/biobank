@@ -29,7 +29,7 @@ public abstract class PrincipalWrapper<T extends Principal> extends
     @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.deleteRemoved(this, PrincipalPeer.MEMBERSHIP_COLLECTION);
+        tasks.deleteRemoved(this, PrincipalPeer.MEMBERSHIPS);
         super.addPersistTasks(tasks);
     }
 

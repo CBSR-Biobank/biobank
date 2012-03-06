@@ -78,9 +78,9 @@ public class ReportRunner {
     private Collection<ReportColumn> getOrderedReportColumns() {
         List<ReportColumn> orderedCols = new ArrayList<ReportColumn>();
 
-        loadProperty(report, "reportColumnCollection"); //$NON-NLS-1$
+        loadProperty(report, "reportColumns"); //$NON-NLS-1$
         Collection<ReportColumn> reportCols = report
-            .getReportColumnCollection();
+            .getReportColumns();
         if (reportCols != null) {
             orderedCols.addAll(reportCols);
         }
@@ -96,8 +96,8 @@ public class ReportRunner {
     }
 
     private Criteria createCriteria() {
-        loadProperty(report, "reportColumnCollection"); //$NON-NLS-1$
-        if (!isCount() && report.getReportColumnCollection().isEmpty()) {
+        loadProperty(report, "reportColumns"); //$NON-NLS-1$
+        if (!isCount() && report.getReportColumns().isEmpty()) {
             return null;
         }
 
@@ -166,9 +166,9 @@ public class ReportRunner {
 
         criteria.setProjection(pList);
 
-        loadProperty(report, "reportFilterCollection"); //$NON-NLS-1$
+        loadProperty(report, "reportFilters"); //$NON-NLS-1$
         Collection<ReportFilter> rfCollection = report
-            .getReportFilterCollection();
+            .getReportFilters();
         if (rfCollection != null) {
             for (ReportFilter reportFilter : rfCollection) {
                 loadProperty(reportFilter, "entityFilter"); //$NON-NLS-1$
@@ -181,7 +181,7 @@ public class ReportRunner {
                 String aliasedProperty = getAliasedProperty(propertyPath);
 
                 Collection<ReportFilterValue> rfvCollection = reportFilter
-                    .getReportFilterValueCollection();
+                    .getReportFilterValues();
 
                 if (rfvCollection == null) {
                     rfvCollection = new HashSet<ReportFilterValue>();
@@ -249,8 +249,8 @@ public class ReportRunner {
     private void createAssociations(Criteria criteria) {
         Set<String> createdPoperties = new HashSet<String>();
 
-        loadProperty(report, "reportColumnCollection"); //$NON-NLS-1$
-        Collection<ReportColumn> cols = report.getReportColumnCollection();
+        loadProperty(report, "reportColumns"); //$NON-NLS-1$
+        Collection<ReportColumn> cols = report.getReportColumns();
         if (cols != null) {
             for (ReportColumn reportColumn : cols) {
                 loadProperty(reportColumn, "entityColumn"); //$NON-NLS-1$
@@ -262,8 +262,8 @@ public class ReportRunner {
             }
         }
 
-        loadProperty(report, "reportFilterCollection"); //$NON-NLS-1$
-        Collection<ReportFilter> filters = report.getReportFilterCollection();
+        loadProperty(report, "reportFilters"); //$NON-NLS-1$
+        Collection<ReportFilter> filters = report.getReportFilters();
         if (filters != null) {
             for (ReportFilter filter : filters) {
                 loadProperty(filter, "entityFilter"); //$NON-NLS-1$

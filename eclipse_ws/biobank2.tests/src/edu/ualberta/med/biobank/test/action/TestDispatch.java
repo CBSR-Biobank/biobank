@@ -227,16 +227,16 @@ public class TestDispatch extends TestAction {
 
         DispatchReadInfo info =
             EXECUTOR.exec(new DispatchGetInfoAction(id));
-        Assert.assertEquals(1, info.dispatch.getCommentCollection().size());
+        Assert.assertEquals(1, info.dispatch.getComments().size());
         EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
             .getId();
         info =
             EXECUTOR.exec(new DispatchGetInfoAction(id));
-        Assert.assertEquals(2, info.dispatch.getCommentCollection().size());
+        Assert.assertEquals(2, info.dispatch.getComments().size());
         EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
             .getId();
         info =
             EXECUTOR.exec(new DispatchGetInfoAction(id));
-        Assert.assertEquals(3, info.dispatch.getCommentCollection().size());
+        Assert.assertEquals(3, info.dispatch.getComments().size());
     }
 }

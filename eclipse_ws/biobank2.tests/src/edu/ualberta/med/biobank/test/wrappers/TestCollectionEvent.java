@@ -553,7 +553,7 @@ public class TestCollectionEvent extends TestDatabase {
                 "select eattr from "
                     + CollectionEvent.class.getName()
                     + " as ce "
-                    + "join ce.eventAttrCollection as eattr "
+                    + "join ce.eventAttrs as eattr "
                     + "join eattr.studyEventAttr as seattr where ce.id = ? and seattr.label= ?",
                 Arrays.asList(new Object[] { cevent.getId(), "Worksheet" }));
         List<EventAttr> results = appService.query(c);

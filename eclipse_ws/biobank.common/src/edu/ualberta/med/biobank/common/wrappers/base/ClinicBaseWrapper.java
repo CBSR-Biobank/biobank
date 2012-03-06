@@ -61,8 +61,8 @@ public abstract class ClinicBaseWrapper extends CenterWrapper<Clinic> {
     }
 
     public List<ContactWrapper> getContactCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(ClinicPeer.CONTACT_COLLECTION);
-        List<ContactWrapper> contactCollection = getWrapperCollection(ClinicPeer.CONTACT_COLLECTION, ContactWrapper.class, sort);
+        boolean notCached = !isPropertyCached(ClinicPeer.CONTACTS);
+        List<ContactWrapper> contactCollection = getWrapperCollection(ClinicPeer.CONTACTS, ContactWrapper.class, sort);
         if (notCached) {
             for (ContactBaseWrapper e : contactCollection) {
                 e.setClinicInternal(this);
@@ -72,44 +72,44 @@ public abstract class ClinicBaseWrapper extends CenterWrapper<Clinic> {
     }
 
     public void addToContactCollection(List<? extends ContactBaseWrapper> contactCollection) {
-        addToWrapperCollection(ClinicPeer.CONTACT_COLLECTION, contactCollection);
+        addToWrapperCollection(ClinicPeer.CONTACTS, contactCollection);
         for (ContactBaseWrapper e : contactCollection) {
             e.setClinicInternal(this);
         }
     }
 
     void addToContactCollectionInternal(List<? extends ContactBaseWrapper> contactCollection) {
-        if (isInitialized(ClinicPeer.CONTACT_COLLECTION)) {
-            addToWrapperCollection(ClinicPeer.CONTACT_COLLECTION, contactCollection);
+        if (isInitialized(ClinicPeer.CONTACTS)) {
+            addToWrapperCollection(ClinicPeer.CONTACTS, contactCollection);
         } else {
-            getElementQueue().add(ClinicPeer.CONTACT_COLLECTION, contactCollection);
+            getElementQueue().add(ClinicPeer.CONTACTS, contactCollection);
         }
     }
 
     public void removeFromContactCollection(List<? extends ContactBaseWrapper> contactCollection) {
-        removeFromWrapperCollection(ClinicPeer.CONTACT_COLLECTION, contactCollection);
+        removeFromWrapperCollection(ClinicPeer.CONTACTS, contactCollection);
         for (ContactBaseWrapper e : contactCollection) {
             e.setClinicInternal(null);
         }
     }
 
     void removeFromContactCollectionInternal(List<? extends ContactBaseWrapper> contactCollection) {
-        if (isPropertyCached(ClinicPeer.CONTACT_COLLECTION)) {
-            removeFromWrapperCollection(ClinicPeer.CONTACT_COLLECTION, contactCollection);
+        if (isPropertyCached(ClinicPeer.CONTACTS)) {
+            removeFromWrapperCollection(ClinicPeer.CONTACTS, contactCollection);
         } else {
-            getElementQueue().remove(ClinicPeer.CONTACT_COLLECTION, contactCollection);
+            getElementQueue().remove(ClinicPeer.CONTACTS, contactCollection);
         }
     }
 
     public void removeFromContactCollectionWithCheck(List<? extends ContactBaseWrapper> contactCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(ClinicPeer.CONTACT_COLLECTION, contactCollection);
+        removeFromWrapperCollectionWithCheck(ClinicPeer.CONTACTS, contactCollection);
         for (ContactBaseWrapper e : contactCollection) {
             e.setClinicInternal(null);
         }
     }
 
     void removeFromContactCollectionWithCheckInternal(List<? extends ContactBaseWrapper> contactCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(ClinicPeer.CONTACT_COLLECTION, contactCollection);
+        removeFromWrapperCollectionWithCheck(ClinicPeer.CONTACTS, contactCollection);
     }
 
 }

@@ -41,7 +41,7 @@ public class ContainerCreateChildrenAction extends ContainerChildAction {
 
         children = new HashMap<RowColPos, Container>();
         for (ContainerPosition pos : parentContainer
-            .getChildPositionCollection()) {
+            .getChildPositions()) {
             children.put(new RowColPos(pos.getRow(), pos.getCol()),
                 pos.getContainer());
         }

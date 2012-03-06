@@ -679,13 +679,13 @@ public class TestStudy extends TestAction {
         // save with no comments
         Integer studyId = EXECUTOR.exec(studySaveAction).getId();
         StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        Assert.assertEquals(0, studyInfo.study.getCommentCollection().size());
+        Assert.assertEquals(0, studyInfo.study.getComments().size());
 
         studyInfo = addComment(studyId);
-        Assert.assertEquals(1, studyInfo.study.getCommentCollection().size());
+        Assert.assertEquals(1, studyInfo.study.getComments().size());
 
         studyInfo = addComment(studyId);
-        Assert.assertEquals(2, studyInfo.study.getCommentCollection().size());
+        Assert.assertEquals(2, studyInfo.study.getComments().size());
 
         // TODO: check full name on each comment's user
         // for (Comment comment : studyInfo.study.getCommentCollection()) {

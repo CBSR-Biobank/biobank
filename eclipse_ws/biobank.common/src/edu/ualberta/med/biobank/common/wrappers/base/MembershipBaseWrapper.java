@@ -110,40 +110,40 @@ public class MembershipBaseWrapper extends ModelWrapper<Membership> {
     }
 
     public List<RoleWrapper> getRoleCollection(boolean sort) {
-        List<RoleWrapper> roleCollection = getWrapperCollection(MembershipPeer.ROLE_COLLECTION, RoleWrapper.class, sort);
+        List<RoleWrapper> roleCollection = getWrapperCollection(MembershipPeer.ROLES, RoleWrapper.class, sort);
         return roleCollection;
     }
 
     public void addToRoleCollection(List<? extends RoleBaseWrapper> roleCollection) {
-        addToWrapperCollection(MembershipPeer.ROLE_COLLECTION, roleCollection);
+        addToWrapperCollection(MembershipPeer.ROLES, roleCollection);
     }
 
     void addToRoleCollectionInternal(List<? extends RoleBaseWrapper> roleCollection) {
-        if (isInitialized(MembershipPeer.ROLE_COLLECTION)) {
-            addToWrapperCollection(MembershipPeer.ROLE_COLLECTION, roleCollection);
+        if (isInitialized(MembershipPeer.ROLES)) {
+            addToWrapperCollection(MembershipPeer.ROLES, roleCollection);
         } else {
-            getElementQueue().add(MembershipPeer.ROLE_COLLECTION, roleCollection);
+            getElementQueue().add(MembershipPeer.ROLES, roleCollection);
         }
     }
 
     public void removeFromRoleCollection(List<? extends RoleBaseWrapper> roleCollection) {
-        removeFromWrapperCollection(MembershipPeer.ROLE_COLLECTION, roleCollection);
+        removeFromWrapperCollection(MembershipPeer.ROLES, roleCollection);
     }
 
     void removeFromRoleCollectionInternal(List<? extends RoleBaseWrapper> roleCollection) {
-        if (isPropertyCached(MembershipPeer.ROLE_COLLECTION)) {
-            removeFromWrapperCollection(MembershipPeer.ROLE_COLLECTION, roleCollection);
+        if (isPropertyCached(MembershipPeer.ROLES)) {
+            removeFromWrapperCollection(MembershipPeer.ROLES, roleCollection);
         } else {
-            getElementQueue().remove(MembershipPeer.ROLE_COLLECTION, roleCollection);
+            getElementQueue().remove(MembershipPeer.ROLES, roleCollection);
         }
     }
 
     public void removeFromRoleCollectionWithCheck(List<? extends RoleBaseWrapper> roleCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(MembershipPeer.ROLE_COLLECTION, roleCollection);
+        removeFromWrapperCollectionWithCheck(MembershipPeer.ROLES, roleCollection);
     }
 
     void removeFromRoleCollectionWithCheckInternal(List<? extends RoleBaseWrapper> roleCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(MembershipPeer.ROLE_COLLECTION, roleCollection);
+        removeFromWrapperCollectionWithCheck(MembershipPeer.ROLES, roleCollection);
     }
 
 }

@@ -64,45 +64,45 @@ public class PatientBaseWrapper extends ModelWrapper<Patient> {
     }
 
     public List<CommentWrapper> getCommentCollection(boolean sort) {
-        List<CommentWrapper> commentCollection = getWrapperCollection(PatientPeer.COMMENT_COLLECTION, CommentWrapper.class, sort);
+        List<CommentWrapper> commentCollection = getWrapperCollection(PatientPeer.COMMENTS, CommentWrapper.class, sort);
         return commentCollection;
     }
 
     public void addToCommentCollection(List<? extends CommentBaseWrapper> commentCollection) {
-        addToWrapperCollection(PatientPeer.COMMENT_COLLECTION, commentCollection);
+        addToWrapperCollection(PatientPeer.COMMENTS, commentCollection);
     }
 
     void addToCommentCollectionInternal(List<? extends CommentBaseWrapper> commentCollection) {
-        if (isInitialized(PatientPeer.COMMENT_COLLECTION)) {
-            addToWrapperCollection(PatientPeer.COMMENT_COLLECTION, commentCollection);
+        if (isInitialized(PatientPeer.COMMENTS)) {
+            addToWrapperCollection(PatientPeer.COMMENTS, commentCollection);
         } else {
-            getElementQueue().add(PatientPeer.COMMENT_COLLECTION, commentCollection);
+            getElementQueue().add(PatientPeer.COMMENTS, commentCollection);
         }
     }
 
     public void removeFromCommentCollection(List<? extends CommentBaseWrapper> commentCollection) {
-        removeFromWrapperCollection(PatientPeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollection(PatientPeer.COMMENTS, commentCollection);
     }
 
     void removeFromCommentCollectionInternal(List<? extends CommentBaseWrapper> commentCollection) {
-        if (isPropertyCached(PatientPeer.COMMENT_COLLECTION)) {
-            removeFromWrapperCollection(PatientPeer.COMMENT_COLLECTION, commentCollection);
+        if (isPropertyCached(PatientPeer.COMMENTS)) {
+            removeFromWrapperCollection(PatientPeer.COMMENTS, commentCollection);
         } else {
-            getElementQueue().remove(PatientPeer.COMMENT_COLLECTION, commentCollection);
+            getElementQueue().remove(PatientPeer.COMMENTS, commentCollection);
         }
     }
 
     public void removeFromCommentCollectionWithCheck(List<? extends CommentBaseWrapper> commentCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(PatientPeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollectionWithCheck(PatientPeer.COMMENTS, commentCollection);
     }
 
     void removeFromCommentCollectionWithCheckInternal(List<? extends CommentBaseWrapper> commentCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(PatientPeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollectionWithCheck(PatientPeer.COMMENTS, commentCollection);
     }
 
     public List<CollectionEventWrapper> getCollectionEventCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(PatientPeer.COLLECTION_EVENT_COLLECTION);
-        List<CollectionEventWrapper> collectionEventCollection = getWrapperCollection(PatientPeer.COLLECTION_EVENT_COLLECTION, CollectionEventWrapper.class, sort);
+        boolean notCached = !isPropertyCached(PatientPeer.COLLECTION_EVENTS);
+        List<CollectionEventWrapper> collectionEventCollection = getWrapperCollection(PatientPeer.COLLECTION_EVENTS, CollectionEventWrapper.class, sort);
         if (notCached) {
             for (CollectionEventBaseWrapper e : collectionEventCollection) {
                 e.setPatientInternal(this);
@@ -112,44 +112,44 @@ public class PatientBaseWrapper extends ModelWrapper<Patient> {
     }
 
     public void addToCollectionEventCollection(List<? extends CollectionEventBaseWrapper> collectionEventCollection) {
-        addToWrapperCollection(PatientPeer.COLLECTION_EVENT_COLLECTION, collectionEventCollection);
+        addToWrapperCollection(PatientPeer.COLLECTION_EVENTS, collectionEventCollection);
         for (CollectionEventBaseWrapper e : collectionEventCollection) {
             e.setPatientInternal(this);
         }
     }
 
     void addToCollectionEventCollectionInternal(List<? extends CollectionEventBaseWrapper> collectionEventCollection) {
-        if (isInitialized(PatientPeer.COLLECTION_EVENT_COLLECTION)) {
-            addToWrapperCollection(PatientPeer.COLLECTION_EVENT_COLLECTION, collectionEventCollection);
+        if (isInitialized(PatientPeer.COLLECTION_EVENTS)) {
+            addToWrapperCollection(PatientPeer.COLLECTION_EVENTS, collectionEventCollection);
         } else {
-            getElementQueue().add(PatientPeer.COLLECTION_EVENT_COLLECTION, collectionEventCollection);
+            getElementQueue().add(PatientPeer.COLLECTION_EVENTS, collectionEventCollection);
         }
     }
 
     public void removeFromCollectionEventCollection(List<? extends CollectionEventBaseWrapper> collectionEventCollection) {
-        removeFromWrapperCollection(PatientPeer.COLLECTION_EVENT_COLLECTION, collectionEventCollection);
+        removeFromWrapperCollection(PatientPeer.COLLECTION_EVENTS, collectionEventCollection);
         for (CollectionEventBaseWrapper e : collectionEventCollection) {
             e.setPatientInternal(null);
         }
     }
 
     void removeFromCollectionEventCollectionInternal(List<? extends CollectionEventBaseWrapper> collectionEventCollection) {
-        if (isPropertyCached(PatientPeer.COLLECTION_EVENT_COLLECTION)) {
-            removeFromWrapperCollection(PatientPeer.COLLECTION_EVENT_COLLECTION, collectionEventCollection);
+        if (isPropertyCached(PatientPeer.COLLECTION_EVENTS)) {
+            removeFromWrapperCollection(PatientPeer.COLLECTION_EVENTS, collectionEventCollection);
         } else {
-            getElementQueue().remove(PatientPeer.COLLECTION_EVENT_COLLECTION, collectionEventCollection);
+            getElementQueue().remove(PatientPeer.COLLECTION_EVENTS, collectionEventCollection);
         }
     }
 
     public void removeFromCollectionEventCollectionWithCheck(List<? extends CollectionEventBaseWrapper> collectionEventCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(PatientPeer.COLLECTION_EVENT_COLLECTION, collectionEventCollection);
+        removeFromWrapperCollectionWithCheck(PatientPeer.COLLECTION_EVENTS, collectionEventCollection);
         for (CollectionEventBaseWrapper e : collectionEventCollection) {
             e.setPatientInternal(null);
         }
     }
 
     void removeFromCollectionEventCollectionWithCheckInternal(List<? extends CollectionEventBaseWrapper> collectionEventCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(PatientPeer.COLLECTION_EVENT_COLLECTION, collectionEventCollection);
+        removeFromWrapperCollectionWithCheck(PatientPeer.COLLECTION_EVENTS, collectionEventCollection);
     }
 
     public StudyWrapper getStudy() {

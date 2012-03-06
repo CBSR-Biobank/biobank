@@ -85,9 +85,9 @@ public class SiteWrapper extends SiteBaseWrapper {
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         String errMsg = MessageFormat.format(EXISTING_CHILDREN_MSG, getName());
-        tasks.add(check().empty(SitePeer.CONTAINER_COLLECTION, errMsg));
-        tasks.add(check().empty(SitePeer.CONTAINER_TYPE_COLLECTION, errMsg));
-        tasks.add(check().empty(SitePeer.PROCESSING_EVENT_COLLECTION, errMsg));
+        tasks.add(check().empty(SitePeer.CONTAINERS, errMsg));
+        tasks.add(check().empty(SitePeer.CONTAINER_TYPES, errMsg));
+        tasks.add(check().empty(SitePeer.PROCESSING_EVENTS, errMsg));
 
         super.addDeleteTasks(tasks);
     }

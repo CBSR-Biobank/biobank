@@ -99,7 +99,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
     public static final String ALL_SOURCE_ONLY_SPECIMEN_TYPES_QRY = "from " //$NON-NLS-1$
         + SpecimenType.class.getName() + " where " //$NON-NLS-1$
-        + SpecimenTypePeer.PARENT_SPECIMEN_TYPE_COLLECTION.getName()
+        + SpecimenTypePeer.PARENT_SPECIMEN_TYPES.getName()
         + ".size = 0"; //$NON-NLS-1$
 
     public static List<SpecimenTypeWrapper> getAllSourceOnlySpecimenTypes(

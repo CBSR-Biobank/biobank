@@ -60,9 +60,9 @@ public class ProblemFixer {
     public static final String CEVENTS_HQL_QUERY = "select cevents" + " from "
         + CollectionEvent.class.getName() + " cevents"
         + " inner join cevents.patient patients "
-        + " inner join fetch cevents.allSpecimenCollection as spcs"
+        + " inner join fetch cevents.allSpecimens as spcs"
         + " left outer join fetch spcs.processingEvent pevents "
-        + " left outer join fetch spcs.childSpecimenCollection childSpcs "
+        + " left outer join fetch spcs.childSpecimens childSpcs "
         + " inner join fetch spcs.specimenType "
         + " where spcs.createdAt > '2011-06-18' and patients.pnumber=?";
 
@@ -384,7 +384,7 @@ public class ProblemFixer {
 
     public static final String CEVENT_HQL_QUERY = "select cevents"
         + " from edu.ualberta.med.biobank.model.CollectionEvent cevents"
-        + " inner join cevents.allSpecimenCollection as spcs"
+        + " inner join cevents.allSpecimens as spcs"
         + " where spcs.inventoryId=?";
 
     private CollectionEventWrapper collectionEventExists(

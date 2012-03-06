@@ -144,9 +144,9 @@ public class ReportEntryForm extends BiobankEntryForm {
         // anything listening to the wrapper (for example, the
         // FilterSelectWidget and the ColumnSelectWidget).
         Report nakedReport = report.getWrappedObject();
-        nakedReport.setReportColumnCollection(new HashSet<ReportColumn>(
+        nakedReport.setReportColumns(new HashSet<ReportColumn>(
             columnsWidget.getReportColumns()));
-        nakedReport.setReportFilterCollection(new HashSet<ReportFilter>(
+        nakedReport.setReportFilters(new HashSet<ReportFilter>(
             filtersWidget.getReportFilters()));
     }
 
@@ -436,7 +436,7 @@ public class ReportEntryForm extends BiobankEntryForm {
     private String[] getHeaders() {
         Report nakedReport = report.getWrappedObject();
         List<ReportColumn> reportColumns = new ArrayList<ReportColumn>(
-            nakedReport.getReportColumnCollection());
+            nakedReport.getReportColumns());
 
         Collections.sort(reportColumns, new Comparator<ReportColumn>() {
             @Override
@@ -708,7 +708,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         Report nakedReport = report.getWrappedObject();
         List<ReportFilter> reportFilters = new ArrayList<ReportFilter>(
-            nakedReport.getReportFilterCollection());
+            nakedReport.getReportFilters());
 
         Collections.sort(reportFilters, new Comparator<ReportFilter>() {
             @Override
@@ -731,7 +731,7 @@ public class ReportEntryForm extends BiobankEntryForm {
             }
 
             Collection<ReportFilterValue> values = filter
-                .getReportFilterValueCollection();
+                .getReportFilterValues();
             if (values != null) {
                 sb.append(": "); //$NON-NLS-1$
                 for (ReportFilterValue value : values) {

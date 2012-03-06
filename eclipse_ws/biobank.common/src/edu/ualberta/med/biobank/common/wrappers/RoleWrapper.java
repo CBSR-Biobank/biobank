@@ -68,15 +68,15 @@ public class RoleWrapper extends RoleBaseWrapper {
     }
 
     public void addToPermissionCollection(Collection<PermissionEnum> addedPermissions) {
-        wrappedObject.getPermissionCollection().addAll(addedPermissions);
+        wrappedObject.getPermissions().addAll(addedPermissions);
     }
 
     public void removeFromPermissionCollection(
         List<PermissionEnum> removedPermissions) {
-        wrappedObject.getPermissionCollection().removeAll(removedPermissions);
+        wrappedObject.getPermissions().removeAll(removedPermissions);
     }
 
     public Collection<PermissionEnum> getPermissionCollection() {
-        return wrappedObject.getPermissionCollection();
+        return wrappedObject.getPermissions();
     }
 }

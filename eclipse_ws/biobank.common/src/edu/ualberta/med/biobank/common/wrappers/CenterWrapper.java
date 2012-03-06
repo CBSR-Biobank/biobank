@@ -171,7 +171,7 @@ public abstract class CenterWrapper<E extends Center> extends
 
     public long getProcessingEventCount(boolean fast)
         throws ApplicationException, BiobankException {
-        return getPropertyCount(CenterPeer.PROCESSING_EVENT_COLLECTION, fast);
+        return getPropertyCount(CenterPeer.PROCESSING_EVENTS, fast);
     }
 
     public static List<CenterWrapper<?>> getCenters(
@@ -330,7 +330,7 @@ public abstract class CenterWrapper<E extends Center> extends
         "select count(childSpcs) from "
             + Specimen.class.getName()
             + " sp join sp."
-            + SpecimenPeer.CHILD_SPECIMEN_COLLECTION.getName()
+            + SpecimenPeer.CHILD_SPECIMENS.getName()
             + " as childSpcs where childSpcs."
             + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
             + "=?";

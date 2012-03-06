@@ -164,7 +164,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
      * originInfo when want to try to re-add the specimens)
      */
     public void setSpecimenWrapperCollection(List<SpecimenWrapper> specs) {
-        setWrapperCollection(OriginInfoPeer.SPECIMEN_COLLECTION, specs);
+        setWrapperCollection(OriginInfoPeer.SPECIMENS, specs);
     }
 
 }

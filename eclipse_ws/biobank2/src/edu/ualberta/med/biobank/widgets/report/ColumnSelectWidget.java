@@ -589,7 +589,7 @@ public class ColumnSelectWidget extends Composite {
             List<PropertyModifierWrapper> result = new ArrayList<PropertyModifierWrapper>();
 
             for (PropertyModifier modifier : entityColumn.getEntityProperty()
-                .getPropertyType().getPropertyModifierCollection()) {
+                .getPropertyType().getPropertyModifiers()) {
                 PropertyModifierWrapper wrapper = new PropertyModifierWrapper(
                     this, modifier);
                 result.add(wrapper);

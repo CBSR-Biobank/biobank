@@ -33,13 +33,13 @@ public class TestCaCore extends TestDatabase {
         s2.setId(1);
         s1.setQuantity(new BigDecimal(0.2));
 
-        ce.setAllSpecimenCollection(new HashSet<Specimen>(Arrays.asList(s1)));
-        ce.setOriginalSpecimenCollection(new HashSet<Specimen>(Arrays.asList(s2)));
+        ce.setAllSpecimens(new HashSet<Specimen>(Arrays.asList(s1)));
+        ce.setOriginalSpecimens(new HashSet<Specimen>(Arrays.asList(s2)));
 
         appService.search(CollectionEvent.class, ce);
 
-        Specimen after1 = ce.getAllSpecimenCollection().iterator().next();
-        Specimen after2 = ce.getOriginalSpecimenCollection().iterator().next();
+        Specimen after1 = ce.getAllSpecimens().iterator().next();
+        Specimen after2 = ce.getOriginalSpecimens().iterator().next();
 
         Assert.assertTrue(after1 != after2);
         Assert.assertTrue(!after1.getQuantity().equals(after2.getQuantity()));

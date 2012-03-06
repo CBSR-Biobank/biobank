@@ -18,9 +18,9 @@ public class Entity extends AbstractBiobankModel {
 
     private String className;
     private String name;
-    private Set<Report> reportCollection = new HashSet<Report>(0);
-    private Set<EntityProperty> entityPropertyCollection =
-        new HashSet<EntityProperty>(0);
+    private Set<Report> reports = new HashSet<Report>(0);
+    private Set<EntityProperty> entityProperties = new HashSet<EntityProperty>(
+        0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Entity.className.NotEmpty}")
     @Column(name = "CLASS_NAME")
@@ -44,22 +44,21 @@ public class Entity extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "ENTITY_ID", updatable = false)
-    public Set<Report> getReportCollection() {
-        return this.reportCollection;
+    public Set<Report> getReports() {
+        return this.reports;
     }
 
-    public void setReportCollection(Set<Report> reportCollection) {
-        this.reportCollection = reportCollection;
+    public void setReports(Set<Report> reports) {
+        this.reports = reports;
     }
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "ENTITY_ID", updatable = false)
-    public Set<EntityProperty> getEntityPropertyCollection() {
-        return this.entityPropertyCollection;
+    public Set<EntityProperty> getEntityProperties() {
+        return this.entityProperties;
     }
 
-    public void setEntityPropertyCollection(
-        Set<EntityProperty> entityPropertyCollection) {
-        this.entityPropertyCollection = entityPropertyCollection;
+    public void setEntityProperties(Set<EntityProperty> entityProperties) {
+        this.entityProperties = entityProperties;
     }
 }

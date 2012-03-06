@@ -120,35 +120,35 @@ public class ContainerTypePeer {
 			}
 		});
 
-	public static final Property<Collection<SpecimenType>, ContainerType> SPECIMEN_TYPE_COLLECTION = Property.create(
-		"specimenTypeCollection" //$NON-NLS-1$
+	public static final Property<Collection<SpecimenType>, ContainerType> SPECIMEN_TYPES = Property.create(
+		"specimenTypes" //$NON-NLS-1$
 		, ContainerType.class
 		, new TypeReference<Collection<SpecimenType>>() {}
 		, new Property.Accessor<Collection<SpecimenType>, ContainerType>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<SpecimenType> get(ContainerType model) {
-				return model.getSpecimenTypeCollection();
+				return model.getSpecimenTypes();
 			}
 			@Override
 			public void set(ContainerType model, Collection<SpecimenType> value) {
-				model.getSpecimenTypeCollection().clear();
-				model.getSpecimenTypeCollection().addAll(value);
+				model.getSpecimenTypes().clear();
+				model.getSpecimenTypes().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<Comment>, ContainerType> COMMENT_COLLECTION = Property.create(
-		"commentCollection" //$NON-NLS-1$
+	public static final Property<Collection<Comment>, ContainerType> COMMENTS = Property.create(
+		"comments" //$NON-NLS-1$
 		, ContainerType.class
 		, new TypeReference<Collection<Comment>>() {}
 		, new Property.Accessor<Collection<Comment>, ContainerType>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(ContainerType model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(ContainerType model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -182,35 +182,35 @@ public class ContainerTypePeer {
 			}
 		});
 
-	public static final Property<Collection<ContainerType>, ContainerType> CHILD_CONTAINER_TYPE_COLLECTION = Property.create(
-		"childContainerTypeCollection" //$NON-NLS-1$
+	public static final Property<Collection<ContainerType>, ContainerType> CHILD_CONTAINER_TYPES = Property.create(
+		"childContainerTypes" //$NON-NLS-1$
 		, ContainerType.class
 		, new TypeReference<Collection<ContainerType>>() {}
 		, new Property.Accessor<Collection<ContainerType>, ContainerType>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<ContainerType> get(ContainerType model) {
-				return model.getChildContainerTypeCollection();
+				return model.getChildContainerTypes();
 			}
 			@Override
 			public void set(ContainerType model, Collection<ContainerType> value) {
-				model.getChildContainerTypeCollection().clear();
-				model.getChildContainerTypeCollection().addAll(value);
+				model.getChildContainerTypes().clear();
+				model.getChildContainerTypes().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<ContainerType>, ContainerType> PARENT_CONTAINER_TYPE_COLLECTION = Property.create(
-		"parentContainerTypeCollection" //$NON-NLS-1$
+	public static final Property<Collection<ContainerType>, ContainerType> PARENT_CONTAINER_TYPES = Property.create(
+		"parentContainerTypes" //$NON-NLS-1$
 		, ContainerType.class
 		, new TypeReference<Collection<ContainerType>>() {}
 		, new Property.Accessor<Collection<ContainerType>, ContainerType>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<ContainerType> get(ContainerType model) {
-				return model.getParentContainerTypeCollection();
+				return model.getParentContainerTypes();
 			}
 			@Override
 			public void set(ContainerType model, Collection<ContainerType> value) {
-				model.getParentContainerTypeCollection().clear();
-				model.getParentContainerTypeCollection().addAll(value);
+				model.getParentContainerTypes().clear();
+				model.getParentContainerTypes().addAll(value);
 			}
 		});
 
@@ -224,12 +224,12 @@ public class ContainerTypePeer {
       aList.add(NAME_SHORT);
       aList.add(SITE);
       aList.add(CHILD_LABELING_SCHEME);
-      aList.add(SPECIMEN_TYPE_COLLECTION);
-      aList.add(COMMENT_COLLECTION);
+      aList.add(SPECIMEN_TYPES);
+      aList.add(COMMENTS);
       aList.add(ACTIVITY_STATUS);
       aList.add(CAPACITY);
-      aList.add(CHILD_CONTAINER_TYPE_COLLECTION);
-      aList.add(PARENT_CONTAINER_TYPE_COLLECTION);
+      aList.add(CHILD_CONTAINER_TYPES);
+      aList.add(PARENT_CONTAINER_TYPES);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

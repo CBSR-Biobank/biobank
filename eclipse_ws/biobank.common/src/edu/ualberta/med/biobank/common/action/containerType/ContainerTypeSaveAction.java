@@ -140,7 +140,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         if (containerType == null) {
             containerType = new ContainerType();
             containerType.setCapacity(new Capacity());
-            containerType.setCommentCollection(new HashSet<Comment>());
+            containerType.setComments(new HashSet<Comment>());
         }
 
         return containerType;
@@ -150,7 +150,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         Comment comment = CommentUtil.create(context.getUser(), commentMessage);
         if (comment != null) {
             context.getSession().save(comment);
-            containerType.getCommentCollection().add(comment);
+            containerType.getComments().add(comment);
         }
     }
 
@@ -180,7 +180,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         ContainerType containerType) {
         Map<Integer, SpecimenType> specimenTypes =
             context.load(SpecimenType.class, specimenTypeIds);
-        containerType.setSpecimenTypeCollection(new HashSet<SpecimenType>(
+        containerType.setSpecimenTypes(new HashSet<SpecimenType>(
             specimenTypes.values()));
     }
 
@@ -188,7 +188,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         ContainerType containerType) {
         Map<Integer, ContainerType> childContainerTypes =
             context.load(ContainerType.class, childContainerTypeIds);
-        containerType.setChildContainerTypeCollection(
+        containerType.setChildContainerTypes(
             new HashSet<ContainerType>(childContainerTypes.values()));
     }
 }

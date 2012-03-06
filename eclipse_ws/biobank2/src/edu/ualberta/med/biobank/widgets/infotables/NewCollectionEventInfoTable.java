@@ -45,7 +45,7 @@ public class NewCollectionEventInfoTable extends
                 case 2:
                     return NumberFormatter.format(info.aliquotedSpecimenCount);
                 case 3:
-                    return info.cevent.getCommentCollection().size() == 0 ? "N"
+                    return info.cevent.getComments().size() == 0 ? "N"
                         : "Y";
 
                 default:

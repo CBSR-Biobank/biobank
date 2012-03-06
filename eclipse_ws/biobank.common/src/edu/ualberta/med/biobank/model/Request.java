@@ -29,8 +29,8 @@ public class Request extends AbstractBiobankModel {
 
     private Date submitted;
     private Date created;
-    private Set<Dispatch> dispatchCollection = new HashSet<Dispatch>(0);
-    private Set<RequestSpecimen> requestSpecimenCollection =
+    private Set<Dispatch> dispatches = new HashSet<Dispatch>(0);
+    private Set<RequestSpecimen> requestSpecimens =
         new HashSet<RequestSpecimen>(0);
     private Address address;
     private ResearchGroup researchGroup;
@@ -57,22 +57,21 @@ public class Request extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "REQUEST_ID", updatable = false)
-    public Set<Dispatch> getDispatchCollection() {
-        return this.dispatchCollection;
+    public Set<Dispatch> getDispatches() {
+        return this.dispatches;
     }
 
-    public void setDispatchCollection(Set<Dispatch> dispatchCollection) {
-        this.dispatchCollection = dispatchCollection;
+    public void setDispatches(Set<Dispatch> dispatches) {
+        this.dispatches = dispatches;
     }
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "request")
-    public Set<RequestSpecimen> getRequestSpecimenCollection() {
-        return this.requestSpecimenCollection;
+    public Set<RequestSpecimen> getRequestSpecimens() {
+        return this.requestSpecimens;
     }
 
-    public void setRequestSpecimenCollection(
-        Set<RequestSpecimen> requestSpecimenCollection) {
-        this.requestSpecimenCollection = requestSpecimenCollection;
+    public void setRequestSpecimens(Set<RequestSpecimen> requestSpecimens) {
+        this.requestSpecimens = requestSpecimens;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Request.address.NotNull}")

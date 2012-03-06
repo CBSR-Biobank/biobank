@@ -25,7 +25,7 @@ public class DispatchGetSpecimenInfosAction implements
             + " INNER JOIN FETCH spec.currentCenter center"
             + " INNER JOIN FETCH cevent.patient patient"
             + " INNER JOIN FETCH patient.study study"
-            + " LEFT JOIN FETCH dspec.commentCollection"
+            + " LEFT JOIN FETCH dspec.comments"
             + " WHERE dspec.dispatch.id=?";
 
     private static final long serialVersionUID = 1L;

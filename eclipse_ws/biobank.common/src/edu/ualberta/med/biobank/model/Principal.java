@@ -29,21 +29,19 @@ import edu.ualberta.med.biobank.validator.group.PreInsert;
 public class Principal extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
-    private Set<Membership> membershipCollection =
-        new HashSet<Membership>(0);
+    private Set<Membership> memberships = new HashSet<Membership>(0);
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
 
     // Require at least one membership on creation so there is some loose
     // association between the creator and the created user.
-    @NotEmpty(groups = PreInsert.class, message = "{edu.ualberta.med.biobank.model.Principal.membershipCollection.NotEmpty}")
+    @NotEmpty(groups = PreInsert.class, message = "{edu.ualberta.med.biobank.model.Principal.memberships.NotEmpty}")
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "principal")
-    public Set<Membership> getMembershipCollection() {
-        return this.membershipCollection;
+    public Set<Membership> getMemberships() {
+        return this.memberships;
     }
 
-    public void setMembershipCollection(
-        Set<Membership> membershipCollection) {
-        this.membershipCollection = membershipCollection;
+    public void setMemberships(Set<Membership> memberships) {
+        this.memberships = memberships;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Principal.activityStatus.NotNull}")
@@ -68,7 +66,7 @@ public class Principal extends AbstractBiobankModel {
      */
     @Transient
     public boolean isFullyManageable(User user) {
-        for (Membership membership : getMembershipCollection()) {
+        for (Membership membership : getMemberships()) {
             if (!membership.isFullyManageable(user)) return false;
         }
         return true;

@@ -29,11 +29,11 @@ public class DebugUtil {
         "select children from " //$NON-NLS-1$
             + Center.class.getName()
             + " as center join center." //$NON-NLS-1$
-            + CenterPeer.PROCESSING_EVENT_COLLECTION.getName()
+            + CenterPeer.PROCESSING_EVENTS.getName()
             + " as pevents join pevents." //$NON-NLS-1$
-            + ProcessingEventPeer.SPECIMEN_COLLECTION.getName()
+            + ProcessingEventPeer.SPECIMENS.getName()
             + " as srcSpcs join srcSpcs." //$NON-NLS-1$
-            + SpecimenPeer.CHILD_SPECIMEN_COLLECTION.getName()
+            + SpecimenPeer.CHILD_SPECIMENS.getName()
             + " as children where center." + CenterPeer.ID.getName() + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
     public static List<SpecimenWrapper> getRandomLinkedAliquotedSpecimens(
@@ -66,9 +66,9 @@ public class DebugUtil {
         "select specimen from " //$NON-NLS-1$
             + Site.class.getName()
             + " as site join site." //$NON-NLS-1$
-            + SitePeer.CONTAINER_COLLECTION.getName()
+            + SitePeer.CONTAINERS.getName()
             + " as cont join cont." //$NON-NLS-1$
-            + ContainerPeer.SPECIMEN_POSITION_COLLECTION.getName()
+            + ContainerPeer.SPECIMEN_POSITIONS.getName()
             + " as spcpos join spcpos." //$NON-NLS-1$
             + SpecimenPositionPeer.SPECIMEN.getName()
             + " as specimen where site." + SitePeer.ID.getName() + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -108,11 +108,11 @@ public class DebugUtil {
         "select spec from " //$NON-NLS-1$
             + Site.class.getName()
             + " as site left join site." //$NON-NLS-1$
-            + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
+            + SitePeer.PROCESSING_EVENTS.getName()
             + " as pe left join pe." //$NON-NLS-1$
-            + ProcessingEventPeer.SPECIMEN_COLLECTION.getName()
+            + ProcessingEventPeer.SPECIMENS.getName()
             + " as srcSpcs left join srcSpcs." //$NON-NLS-1$
-            + SpecimenPeer.CHILD_SPECIMEN_COLLECTION.getName()
+            + SpecimenPeer.CHILD_SPECIMENS.getName()
             + " as spec left join spec." //$NON-NLS-1$
             + SpecimenPeer.SPECIMEN_POSITION.getName()
             + " as spcpos where spcpos is null" //$NON-NLS-1$

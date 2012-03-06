@@ -28,8 +28,8 @@ public class PatientGetProcessingEventsByPNumberAction implements
     private static final String PROCESSING_EVENTS_GET_HQL =
         "SELECT distinct(processingEvent)" +
         " FROM " + Patient.class.getName() + " AS patient" +
-        " JOIN patient.collectionEventCollection AS collectionEvents" +
-        " JOIN collectionEvents.allSpecimenCollection AS specimens" +
+        " JOIN patient.collectionEvents AS collectionEvents" +
+        " JOIN collectionEvents.allSpecimens AS specimens" +
         " JOIN specimens.processingEvent AS processingEvent" +
         " WHERE patient.pnumber = ?" +
         " AND processingEvent.center.id = ?" +

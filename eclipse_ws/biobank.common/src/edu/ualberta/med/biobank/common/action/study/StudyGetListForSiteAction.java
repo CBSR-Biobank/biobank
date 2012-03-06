@@ -21,7 +21,7 @@ public class StudyGetListForSiteAction implements Action<ListResult<Study>> {
     private static final String STUDIES_QRY =
         "select study"
         + " from " + Study.class.getName() + " as study"
-        + " left join study." + StudyPeer.SITE_COLLECTION.getName()
+        + " left join study." + StudyPeer.SITES.getName()
         + " as site"
         + " where site." + SitePeer.ID.getName() + " =?";
 

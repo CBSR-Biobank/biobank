@@ -379,7 +379,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     public long getChildCount(boolean fast) throws BiobankException,
         ApplicationException {
-        return getPropertyCount(ContainerPeer.CHILD_POSITION_COLLECTION, fast);
+        return getPropertyCount(ContainerPeer.CHILD_POSITIONS, fast);
     }
 
     public Map<RowColPos, ContainerWrapper> getChildren() {
@@ -527,7 +527,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             + Container.class.getName()
             + " as c left join c." //$NON-NLS-1$
             + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
-                ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION)
+                ContainerTypePeer.CHILD_CONTAINER_TYPES)
             + " as ct where c." //$NON-NLS-1$
             + ContainerPeer.SITE.getName() + "=? and c." //$NON-NLS-1$
             + ContainerPeer.LABEL.getName() + " in ("; //$NON-NLS-1$
@@ -596,9 +596,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             + Container.class.getName()
             + " where "
             + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
-            + "=? and "
-            + ContainerPeer.SPECIMEN_POSITION_COLLECTION.getName()
-            + ".size = 0 and "
+            + "=? and " //$NON-NLS-1$
+            + ContainerPeer.SPECIMEN_POSITIONS.getName()
+            + ".size = 0 and " //$NON-NLS-1$
             + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
                 ContainerTypePeer.CAPACITY, CapacityPeer.ROW_CAPACITY)
             + " >= ? and "
@@ -611,10 +611,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             + ContainerTypePeer.ID.getName()
             + " from "
             + ContainerType.class.getName()
-            + " as ct left join ct."
-            + ContainerTypePeer.SPECIMEN_TYPE_COLLECTION.getName()
-            + " as sampleType where sampleType."
-            + SpecimenTypePeer.ID.getName() + " in (";
+            + " as ct left join ct." //$NON-NLS-1$
+            + ContainerTypePeer.SPECIMEN_TYPES.getName()
+            + " as sampleType where sampleType." //$NON-NLS-1$
+            + SpecimenTypePeer.ID.getName() + " in ("; //$NON-NLS-1$
 
     /**
      * Retrieve a list of empty containers in a specific site. These containers
@@ -928,7 +928,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public boolean isPositionFree(RowColPos position)
         throws ApplicationException {
         if (position != null) {
-            if (!isPropertyCached(ContainerPeer.CHILD_POSITION_COLLECTION)) {
+            if (!isPropertyCached(ContainerPeer.CHILD_POSITIONS)) {
                 HQLCriteria criteria = new HQLCriteria(POSITION_FREE_QRY,
                     Arrays.asList(new Object[] { position.getRow(),
                         position.getCol(), getWrappedObject() }));
@@ -966,8 +966,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         // on persistent (non-new) objects.
         tasks.add(new UpdateContainerPathAction(this));
 
-        tasks.persistAdded(this, ContainerPeer.SPECIMEN_POSITION_COLLECTION);
-        tasks.persistAdded(this, ContainerPeer.CHILD_POSITION_COLLECTION);
+        tasks.persistAdded(this, ContainerPeer.SPECIMEN_POSITIONS);
+        tasks.persistAdded(this, ContainerPeer.CHILD_POSITIONS);
 
         addTasksToUpdateChildren(tasks);
 
@@ -982,12 +982,12 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     protected void addDeleteTasks(TaskList tasks) {
         String hasSpecimensMsg = MessageFormat.format(HAS_SPECIMENS_MSG,
             getLabel());
-        tasks.add(check().empty(ContainerPeer.SPECIMEN_POSITION_COLLECTION,
+        tasks.add(check().empty(ContainerPeer.SPECIMEN_POSITIONS,
             hasSpecimensMsg));
 
         String hasChildrenMsg = MessageFormat.format(HAS_CHILD_CONTAINERS_MSG,
             getLabel());
-        tasks.add(check().empty(ContainerPeer.CHILD_POSITION_COLLECTION,
+        tasks.add(check().empty(ContainerPeer.CHILD_POSITIONS,
             hasChildrenMsg));
 
         // Count on Hibernate to delete-cascade this object. We can't because
@@ -1012,7 +1012,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             setLabel(getLabel());
 
             ContainerWrapper topContainer = getTopContainer();
-            if (isPropertyCached(ContainerPeer.CHILD_POSITION_COLLECTION)) {
+            if (isPropertyCached(ContainerPeer.CHILD_POSITIONS)) {
                 // if the children have already been loaded, then update their
                 // top Container so that they update their children, etc. so
                 // that the entire subtree is consistent.

@@ -82,7 +82,7 @@ public class PatientViewForm extends BiobankViewForm {
             new CommentCollectionInfoTable(client,
                 ModelWrapper.wrapModelCollection(
                     SessionManager.getAppService(),
-                    patientInfo.patient.getCommentCollection(),
+                    patientInfo.patient.getComments(),
                     CommentWrapper.class));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
@@ -142,7 +142,7 @@ public class PatientViewForm extends BiobankViewForm {
         setTextValue(sourceSpecimenCountLabel, patientInfo.sourceSpecimenCount);
         setTextValue(aliquotedSpecimenCountLabel,
             patientInfo.aliquotedSpecimenCount);
-        setTextValue(commentLabel, patientInfo.patient.getCommentCollection());
+        setTextValue(commentLabel, patientInfo.patient.getComments());
     }
 
 }

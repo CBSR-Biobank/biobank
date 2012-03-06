@@ -117,7 +117,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
             new CommentCollectionInfoTable(client,
                 ModelWrapper.wrapModelCollection(
                     SessionManager.getAppService(),
-                    ceventInfo.cevent.getCommentCollection(),
+                    ceventInfo.cevent.getComments(),
                     CommentWrapper.class));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
@@ -210,7 +210,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
         aliquotedSpcTable.setList(ceventInfo.aliquotedSpecimenInfos);
         commentTable.setList(ModelWrapper.wrapModelCollection(
             SessionManager.getAppService(),
-            ceventInfo.cevent.getCommentCollection(),
+            ceventInfo.cevent.getComments(),
             CommentWrapper.class));
     }
 

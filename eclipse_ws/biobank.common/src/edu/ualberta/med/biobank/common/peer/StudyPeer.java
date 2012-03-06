@@ -79,99 +79,99 @@ public class StudyPeer {
 			}
 		});
 
-	public static final Property<Collection<Contact>, Study> CONTACT_COLLECTION = Property.create(
-		"contactCollection" //$NON-NLS-1$
+	public static final Property<Collection<Contact>, Study> CONTACTS = Property.create(
+		"contacts" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<Contact>>() {}
 		, new Property.Accessor<Collection<Contact>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Contact> get(Study model) {
-				return model.getContactCollection();
+				return model.getContacts();
 			}
 			@Override
 			public void set(Study model, Collection<Contact> value) {
-				model.getContactCollection().clear();
-				model.getContactCollection().addAll(value);
+				model.getContacts().clear();
+				model.getContacts().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<Patient>, Study> PATIENT_COLLECTION = Property.create(
-		"patientCollection" //$NON-NLS-1$
+	public static final Property<Collection<Patient>, Study> PATIENTS = Property.create(
+		"patients" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<Patient>>() {}
 		, new Property.Accessor<Collection<Patient>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Patient> get(Study model) {
-				return model.getPatientCollection();
+				return model.getPatients();
 			}
 			@Override
 			public void set(Study model, Collection<Patient> value) {
-				model.getPatientCollection().clear();
-				model.getPatientCollection().addAll(value);
+				model.getPatients().clear();
+				model.getPatients().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<Comment>, Study> COMMENT_COLLECTION = Property.create(
-		"commentCollection" //$NON-NLS-1$
+	public static final Property<Collection<Comment>, Study> COMMENTS = Property.create(
+		"comments" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<Comment>>() {}
 		, new Property.Accessor<Collection<Comment>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(Study model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(Study model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<Membership>, Study> MEMBERSHIP_COLLECTION = Property.create(
-		"membershipCollection" //$NON-NLS-1$
+	public static final Property<Collection<Membership>, Study> MEMBERSHIPS = Property.create(
+		"memberships" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<Membership>>() {}
 		, new Property.Accessor<Collection<Membership>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Membership> get(Study model) {
-				return model.getMembershipCollection();
+				return model.getMemberships();
 			}
 			@Override
 			public void set(Study model, Collection<Membership> value) {
-				model.getMembershipCollection().clear();
-				model.getMembershipCollection().addAll(value);
+				model.getMemberships().clear();
+				model.getMemberships().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<Site>, Study> SITE_COLLECTION = Property.create(
-		"siteCollection" //$NON-NLS-1$
+	public static final Property<Collection<Site>, Study> SITES = Property.create(
+		"sites" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<Site>>() {}
 		, new Property.Accessor<Collection<Site>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Site> get(Study model) {
-				return model.getSiteCollection();
+				return model.getSites();
 			}
 			@Override
 			public void set(Study model, Collection<Site> value) {
-				model.getSiteCollection().clear();
-				model.getSiteCollection().addAll(value);
+				model.getSites().clear();
+				model.getSites().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<StudyEventAttr>, Study> STUDY_EVENT_ATTR_COLLECTION = Property.create(
-		"studyEventAttrCollection" //$NON-NLS-1$
+	public static final Property<Collection<StudyEventAttr>, Study> STUDY_EVENT_ATTRS = Property.create(
+		"studyEventAttrs" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<StudyEventAttr>>() {}
 		, new Property.Accessor<Collection<StudyEventAttr>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<StudyEventAttr> get(Study model) {
-				return model.getStudyEventAttrCollection();
+				return model.getStudyEventAttrs();
 			}
 			@Override
 			public void set(Study model, Collection<StudyEventAttr> value) {
-				model.getStudyEventAttrCollection().clear();
-				model.getStudyEventAttrCollection().addAll(value);
+				model.getStudyEventAttrs().clear();
+				model.getStudyEventAttrs().addAll(value);
 			}
 		});
 
@@ -190,35 +190,35 @@ public class StudyPeer {
 			}
 		});
 
-	public static final Property<Collection<AliquotedSpecimen>, Study> ALIQUOTED_SPECIMEN_COLLECTION = Property.create(
-		"aliquotedSpecimenCollection" //$NON-NLS-1$
+	public static final Property<Collection<AliquotedSpecimen>, Study> ALIQUOTED_SPECIMENS = Property.create(
+		"aliquotedSpecimens" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<AliquotedSpecimen>>() {}
 		, new Property.Accessor<Collection<AliquotedSpecimen>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<AliquotedSpecimen> get(Study model) {
-				return model.getAliquotedSpecimenCollection();
+				return model.getAliquotedSpecimens();
 			}
 			@Override
 			public void set(Study model, Collection<AliquotedSpecimen> value) {
-				model.getAliquotedSpecimenCollection().clear();
-				model.getAliquotedSpecimenCollection().addAll(value);
+				model.getAliquotedSpecimens().clear();
+				model.getAliquotedSpecimens().addAll(value);
 			}
 		});
 
-	public static final Property<Collection<SourceSpecimen>, Study> SOURCE_SPECIMEN_COLLECTION = Property.create(
-		"sourceSpecimenCollection" //$NON-NLS-1$
+	public static final Property<Collection<SourceSpecimen>, Study> SOURCE_SPECIMENS = Property.create(
+		"sourceSpecimens" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<SourceSpecimen>>() {}
 		, new Property.Accessor<Collection<SourceSpecimen>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<SourceSpecimen> get(Study model) {
-				return model.getSourceSpecimenCollection();
+				return model.getSourceSpecimens();
 			}
 			@Override
 			public void set(Study model, Collection<SourceSpecimen> value) {
-				model.getSourceSpecimenCollection().clear();
-				model.getSourceSpecimenCollection().addAll(value);
+				model.getSourceSpecimens().clear();
+				model.getSourceSpecimens().addAll(value);
 			}
 		});
 
@@ -229,15 +229,15 @@ public class StudyPeer {
       aList.add(NAME);
       aList.add(NAME_SHORT);
       aList.add(RESEARCH_GROUP);
-      aList.add(CONTACT_COLLECTION);
-      aList.add(PATIENT_COLLECTION);
-      aList.add(COMMENT_COLLECTION);
-      aList.add(MEMBERSHIP_COLLECTION);
-      aList.add(SITE_COLLECTION);
-      aList.add(STUDY_EVENT_ATTR_COLLECTION);
+      aList.add(CONTACTS);
+      aList.add(PATIENTS);
+      aList.add(COMMENTS);
+      aList.add(MEMBERSHIPS);
+      aList.add(SITES);
+      aList.add(STUDY_EVENT_ATTRS);
       aList.add(ACTIVITY_STATUS);
-      aList.add(ALIQUOTED_SPECIMEN_COLLECTION);
-      aList.add(SOURCE_SPECIMEN_COLLECTION);
+      aList.add(ALIQUOTED_SPECIMENS);
+      aList.add(SOURCE_SPECIMENS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

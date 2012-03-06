@@ -25,19 +25,19 @@ public class PrincipalPeer {
 			}
 		});
 
-	public static final Property<Collection<Membership>, Principal> MEMBERSHIP_COLLECTION = Property.create(
-		"membershipCollection" //$NON-NLS-1$
+	public static final Property<Collection<Membership>, Principal> MEMBERSHIPS = Property.create(
+		"memberships" //$NON-NLS-1$
 		, Principal.class
 		, new TypeReference<Collection<Membership>>() {}
 		, new Property.Accessor<Collection<Membership>, Principal>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Membership> get(Principal model) {
-				return model.getMembershipCollection();
+				return model.getMemberships();
 			}
 			@Override
 			public void set(Principal model, Collection<Membership> value) {
-				model.getMembershipCollection().clear();
-				model.getMembershipCollection().addAll(value);
+				model.getMemberships().clear();
+				model.getMemberships().addAll(value);
 			}
 		});
 
@@ -45,7 +45,7 @@ public class PrincipalPeer {
    static {
       List<Property<?, ? super Principal>> aList = new ArrayList<Property<?, ? super Principal>>();
       aList.add(ID);
-      aList.add(MEMBERSHIP_COLLECTION);
+      aList.add(MEMBERSHIPS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

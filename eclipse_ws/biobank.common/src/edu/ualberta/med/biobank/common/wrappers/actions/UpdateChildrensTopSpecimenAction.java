@@ -24,7 +24,7 @@ public class UpdateChildrensTopSpecimenAction extends WrapperAction<Specimen> {
         "WHERE s."+SpecimenPeer.PARENT_SPECIMEN.to(SpecimenPeer.ID).getName()+" IN ({0})";
     @SuppressWarnings("nls")
     private static final String SELECT_CHILDREN_HQL = 
-        "SELECT s."+Property.concatNames(SpecimenPeer.CHILD_SPECIMEN_COLLECTION, SpecimenPeer.ID)+" " +
+        "SELECT s."+Property.concatNames(SpecimenPeer.CHILD_SPECIMENS, SpecimenPeer.ID)+" " +
         "FROM "+Specimen.class.getName()+" s " +
         "WHERE s."+SpecimenPeer.ID.getName()+" IN ({0})";
     // @formatter:on

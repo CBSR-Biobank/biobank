@@ -20,9 +20,9 @@ public class SiteGetStudyInfoAction implements
     @SuppressWarnings("nls")
     private static final String STUDY_INFO_HQL = "SELECT studies, COUNT(DISTINCT patients), COUNT(DISTINCT collectionEvents)"
         + " FROM " + Site.class.getName() + " site"
-        + " INNER JOIN site.studyCollection AS studies"
-        + " LEFT JOIN studies.patientCollection AS patients"
-        + " LEFT JOIN patients.collectionEventCollection AS collectionEvents"
+        + " INNER JOIN site.studies AS studies"
+        + " LEFT JOIN studies.patients AS patients"
+        + " LEFT JOIN patients.collectionEvents AS collectionEvents"
         + " WHERE site.id = ?"
         + " GROUP BY studies"
         + " ORDER BY studies.nameShort";

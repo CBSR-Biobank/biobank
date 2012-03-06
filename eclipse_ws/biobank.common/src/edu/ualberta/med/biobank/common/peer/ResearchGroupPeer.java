@@ -26,19 +26,19 @@ public class ResearchGroupPeer  extends CenterPeer {
 			}
 		});
 
-	public static final Property<Collection<Request>, ResearchGroup> REQUEST_COLLECTION = Property.create(
-		"requestCollection" //$NON-NLS-1$
+	public static final Property<Collection<Request>, ResearchGroup> REQUESTS = Property.create(
+		"requests" //$NON-NLS-1$
 		, ResearchGroup.class
 		, new TypeReference<Collection<Request>>() {}
 		, new Property.Accessor<Collection<Request>, ResearchGroup>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Request> get(ResearchGroup model) {
-				return model.getRequestCollection();
+				return model.getRequests();
 			}
 			@Override
 			public void set(ResearchGroup model, Collection<Request> value) {
-				model.getRequestCollection().clear();
-				model.getRequestCollection().addAll(value);
+				model.getRequests().clear();
+				model.getRequests().addAll(value);
 			}
 		});
 
@@ -46,7 +46,7 @@ public class ResearchGroupPeer  extends CenterPeer {
    static {
       List<Property<?, ? super ResearchGroup>> aList = new ArrayList<Property<?, ? super ResearchGroup>>();
       aList.add(STUDY);
-      aList.add(REQUEST_COLLECTION);
+      aList.add(REQUESTS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

@@ -23,7 +23,7 @@ public class CollectionEventGetInfoAction implements Action<CEventInfo> {
         "SELECT distinct cevent"
             + " FROM " + CollectionEvent.class.getName() + " cevent"
             + " INNER JOIN FETCH cevent.patient patient"
-            + " LEFT JOIN FETCH cevent.commentCollection comments"
+            + " LEFT JOIN FETCH cevent.comments comments"
             + " LEFT JOIN FETCH comments.user commentsUser"
             + " INNER JOIN FETCH patient.study study"
             + " WHERE cevent.id=?";

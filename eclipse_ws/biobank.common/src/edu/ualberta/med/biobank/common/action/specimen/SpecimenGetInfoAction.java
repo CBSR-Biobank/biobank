@@ -31,10 +31,10 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
             + " INNER JOIN FETCH patient.study"
             + " LEFT JOIN FETCH spc.specimenPosition pos"
             + " LEFT JOIN FETCH pos.container"
-            + " LEFT JOIN FETCH spc.dispatchSpecimenCollection ds"
+            + " LEFT JOIN FETCH spc.dispatchSpecimens ds"
             + " LEFT JOIN FETCH ds.dispatch"
-            + " LEFT JOIN FETCH spc.childSpecimenCollection"
-            + " LEFT JOIN FETCH spc.commentCollection comment"
+            + " LEFT JOIN FETCH spc.childSpecimens"
+            + " LEFT JOIN FETCH spc.comments comment"
             + " LEFT JOIN FETCH comment.user"
             + " WHERE spc.id=?";
 

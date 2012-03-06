@@ -40,19 +40,19 @@ public class PropertyTypePeer {
 			}
 		});
 
-	public static final Property<Collection<PropertyModifier>, PropertyType> PROPERTY_MODIFIER_COLLECTION = Property.create(
-		"propertyModifierCollection" //$NON-NLS-1$
+	public static final Property<Collection<PropertyModifier>, PropertyType> PROPERTY_MODIFIERS = Property.create(
+		"propertyModifiers" //$NON-NLS-1$
 		, PropertyType.class
 		, new TypeReference<Collection<PropertyModifier>>() {}
 		, new Property.Accessor<Collection<PropertyModifier>, PropertyType>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<PropertyModifier> get(PropertyType model) {
-				return model.getPropertyModifierCollection();
+				return model.getPropertyModifiers();
 			}
 			@Override
 			public void set(PropertyType model, Collection<PropertyModifier> value) {
-				model.getPropertyModifierCollection().clear();
-				model.getPropertyModifierCollection().addAll(value);
+				model.getPropertyModifiers().clear();
+				model.getPropertyModifiers().addAll(value);
 			}
 		});
 
@@ -61,7 +61,7 @@ public class PropertyTypePeer {
       List<Property<?, ? super PropertyType>> aList = new ArrayList<Property<?, ? super PropertyType>>();
       aList.add(ID);
       aList.add(NAME);
-      aList.add(PROPERTY_MODIFIER_COLLECTION);
+      aList.add(PROPERTY_MODIFIERS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

@@ -64,7 +64,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
         // This stuff could be extracted to a util method. need to think about
         // how
         if ((oiInfo.comment != null) && !oiInfo.comment.trim().equals("")) {
-            Set<Comment> comments = oi.getCommentCollection();
+            Set<Comment> comments = oi.getComments();
             if (comments == null) comments = new HashSet<Comment>();
             Comment newComment = new Comment();
             newComment.setCreatedAt(new Date());
@@ -73,7 +73,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
             context.getSession().saveOrUpdate(newComment);
 
             comments.add(newComment);
-            oi.setCommentCollection(comments);
+            oi.setComments(comments);
         }
 
         oi.setShipmentInfo(si);

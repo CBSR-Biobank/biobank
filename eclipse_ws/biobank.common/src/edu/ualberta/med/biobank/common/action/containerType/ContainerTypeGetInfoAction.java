@@ -19,11 +19,11 @@ public class ContainerTypeGetInfoAction implements Action<ContainerTypeInfo> {
             + " FROM " + ContainerType.class.getName() + " ctype"
             + " INNER JOIN FETCH ctype.capacity"
             + " INNER JOIN FETCH ctype.childLabelingScheme"
-            + " LEFT JOIN FETCH ctype.childContainerTypeCollection"
-            + " LEFT JOIN FETCH ctype.specimenTypeCollection"
-            + " LEFT JOIN FETCH ctype.commentCollection comments"
+            + " LEFT JOIN FETCH ctype.childContainerTypes"
+            + " LEFT JOIN FETCH ctype.specimenTypes"
+            + " LEFT JOIN FETCH ctype.comments comments"
             + " INNER JOIN FETCH ctype.site site"
-            + " LEFT JOIN FETCH site.containerTypeCollection"
+            + " LEFT JOIN FETCH site.containerTypes"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE ctype.id = ?";
 
