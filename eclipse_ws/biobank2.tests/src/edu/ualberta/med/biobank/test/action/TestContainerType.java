@@ -141,7 +141,8 @@ public class TestContainerType extends TestAction {
 
         Assert.assertEquals("FREEZER_3x10",
             topContainerTypeInfo.getContainerType().getName());
-        Assert.assertEquals(ActivityStatus.ACTIVE, topContainerTypeInfo.getContainerType()
+        Assert.assertEquals(ActivityStatus.ACTIVE, topContainerTypeInfo
+            .getContainerType()
             .getActivityStatus());
         Assert.assertEquals(3, topContainerTypeInfo.getContainerType()
             .getCapacity().getRowCapacity().intValue());
@@ -536,7 +537,8 @@ public class TestContainerType extends TestAction {
             EXECUTOR.exec(new ContainerTypeDeleteAction(parentCtId));
             Assert
                 .fail(
-                "should not be allowed to delete a parent container type and linked to a children types");
+                "should not be allowed to delete a parent container type and "
+                    + "linked to children types");
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }

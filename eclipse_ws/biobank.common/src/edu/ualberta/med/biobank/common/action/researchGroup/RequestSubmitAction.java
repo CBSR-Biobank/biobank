@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Specimen;
 
-public class SubmitRequestAction implements Action<IdResult> {
+public class RequestSubmitAction implements Action<IdResult> {
     /**
      * 
      */
@@ -24,7 +24,7 @@ public class SubmitRequestAction implements Action<IdResult> {
     private Integer rgId;
     private List<String> specs;
 
-    public SubmitRequestAction(Integer rgId, List<String> specs) {
+    public RequestSubmitAction(Integer rgId, List<String> specs) {
         this.rgId = rgId;
         this.specs = specs;
     }

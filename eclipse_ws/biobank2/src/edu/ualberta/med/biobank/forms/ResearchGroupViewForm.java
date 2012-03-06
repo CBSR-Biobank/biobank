@@ -23,7 +23,7 @@ import org.supercsv.prefs.CsvPreference;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
-import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
+import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -177,8 +177,8 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             specs.add(ob.getInventoryID());
         }
 
-        SubmitRequestAction action =
-            new SubmitRequestAction(researchGroup.getId(), specs);
+        RequestSubmitAction action =
+            new RequestSubmitAction(researchGroup.getId(), specs);
         SessionManager.getAppService().doAction(action);
 
         BgcPlugin.openMessage(Messages.ResearchGroupViewForm_success_title,
