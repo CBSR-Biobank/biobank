@@ -7,3 +7,6 @@
 [submodule "eclipse_ws/barcodeGenerator"]
 	path = eclipse_ws/barcodeGenerator
 	url = ssh://biobank@aicml-med.cs.ualberta.ca/home/biobank/gitrepo/barcodeGenerator.git
+[submodule "eclipse_ws/labelPrinter"]
+	path = eclipse_ws/labelPrinter
+	url = ssh://biobank@aicml-med.cs.ualberta.ca/home/biobank/gitrepo/labelPrinter.git
