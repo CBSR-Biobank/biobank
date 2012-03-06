@@ -34,7 +34,7 @@
       <td>
         <xsl:choose>
           <xsl:when test="../type = 'ActivityStatus'">
-            <xsl:text>one of: ACTIVE, FLAGGED, CLOSED</xsl:text>
+            one of: ACTIVE,<br/>FLAGGED,<br/>CLOSED
           </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="../type" />
@@ -53,9 +53,9 @@
     <table>
       <thead>
         <tr>
-          <td>Name</td>
-          <td>Type</td>
-          <td>Description</td>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
       </thead>
       <tbody>
@@ -75,7 +75,9 @@
     <html>
       <head>
         <style type="text/css">
-          table td { }
+          body {font-family: Arial, Helvetica, sans-serif;}
+          table th {font-size:0.85em;font-weight: bold;text-align: left;}
+          table td {font-size:0.85em;vertical-align: top;}
         </style>
       </head>
       <body>

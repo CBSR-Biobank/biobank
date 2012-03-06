@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Transient;
+
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -101,7 +103,8 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
         Method[] methods = plainObject.getClass().getMethods();
         for (Method method : methods) {
             if (method.getName().startsWith("get")
-                && method.getParameterTypes().length == 0) {
+                && method.getParameterTypes().length == 0
+                && !method.isAnnotationPresent(Transient.class)) {
                 Object childObject = method.invoke(plainObject);
                 if (!(childObject == null || isPrimitiveObject(childObject) || childObject instanceof Class)
                     && Hibernate.isInitialized(childObject)) {
