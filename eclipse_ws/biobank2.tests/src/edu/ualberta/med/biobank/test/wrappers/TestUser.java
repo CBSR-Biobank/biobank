@@ -8,7 +8,7 @@ import org.acegisecurity.AccessDeniedException;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
@@ -120,7 +120,7 @@ public class TestUser extends TestDatabase {
         UserWrapper user1 = UserHelper.addUser(name + "_1", null, false);
         UserWrapper user2 = UserHelper.addUser(name + "_2", null, true);
 
-        BbGroupWrapper group = GroupHelper.addGroup(name, true);
+        GroupWrapper group = GroupHelper.addGroup(name, true);
         group.addToUserCollection(Arrays.asList(user1, user2));
         group.persist();
         user1.reload();
@@ -266,8 +266,8 @@ public class TestUser extends TestDatabase {
 
         Assert.assertEquals(0, user.getGroupCollection(false).size());
 
-        BbGroupWrapper group1 = GroupHelper.addGroup(name + "_1", true);
-        BbGroupWrapper group2 = GroupHelper.addGroup(name + "_2", true);
+        GroupWrapper group1 = GroupHelper.addGroup(name + "_1", true);
+        GroupWrapper group2 = GroupHelper.addGroup(name + "_2", true);
 
         user.addToGroupCollection(Arrays.asList(group1, group2));
         user.persist();

@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
-import edu.ualberta.med.biobank.model.BbGroup;
+import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
@@ -47,7 +47,7 @@ public class UserGetAction implements Action<UserGetResult> {
         private String email;
         private boolean needPwdChange = true;
 
-        private WorkingSet<BbGroup> groups;
+        private WorkingSet<Group> groups;
         private WorkingSet<Membership> memberships;
 
         public UserDTO(User user) {

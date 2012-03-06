@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.ArrayList;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.BbGroup;
+import edu.ualberta.med.biobank.model.Group;
 import java.util.Collection;
 import edu.ualberta.med.biobank.model.User;
 
@@ -133,17 +133,17 @@ public class UserPeer  extends PrincipalPeer {
 			}
 		});
 
-	public static final Property<Collection<BbGroup>, User> GROUPS = Property.create(
+	public static final Property<Collection<Group>, User> GROUPS = Property.create(
 		"groups" //$NON-NLS-1$
 		, User.class
-		, new TypeReference<Collection<BbGroup>>() {}
-		, new Property.Accessor<Collection<BbGroup>, User>() { private static final long serialVersionUID = 1L;
+		, new TypeReference<Collection<Group>>() {}
+		, new Property.Accessor<Collection<Group>, User>() { private static final long serialVersionUID = 1L;
 			@Override
-			public Collection<BbGroup> get(User model) {
+			public Collection<Group> get(User model) {
 				return model.getGroups();
 			}
 			@Override
-			public void set(User model, Collection<BbGroup> value) {
+			public void set(User model, Collection<Group> value) {
 				model.getGroups().clear();
 				model.getGroups().addAll(value);
 			}

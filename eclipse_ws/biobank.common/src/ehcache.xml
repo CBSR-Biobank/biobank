@@ -696,14 +696,14 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 				
-	<cache name="edu.ualberta.med.biobank.model.BbGroup"
+	<cache name="edu.ualberta.med.biobank.model.Group"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.BbGroup.users"
+	<cache name="edu.ualberta.med.biobank.model.Group.users"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"

@@ -25,7 +25,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
-import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
@@ -53,7 +53,7 @@ public class UserEditDialog extends BgcBaseDialog {
 
     private UserWrapper originalUser = new UserWrapper(null);
     private MembershipInfoTable membershipInfoTable;
-    private MultiSelectWidget<BbGroupWrapper> groupsWidget;
+    private MultiSelectWidget<GroupWrapper> groupsWidget;
 
     public UserEditDialog(Shell parent, UserWrapper originalUser) {
         super(parent);
@@ -160,17 +160,17 @@ public class UserEditDialog extends BgcBaseDialog {
 
     private void createGroupsSection(Composite contents)
         throws ApplicationException {
-        groupsWidget = new MultiSelectWidget<BbGroupWrapper>(contents,
+        groupsWidget = new MultiSelectWidget<GroupWrapper>(contents,
             SWT.NONE, Messages.UserEditDialog_groups_available,
             Messages.UserEditDialog_groups_selected, 200) {
             @Override
-            protected String getTextForObject(BbGroupWrapper nodeObject) {
+            protected String getTextForObject(GroupWrapper nodeObject) {
                 return nodeObject.getName();
             }
         };
 
         groupsWidget.setSelections(
-            BbGroupWrapper.getAllGroups(SessionManager.getAppService()),
+            GroupWrapper.getAllGroups(SessionManager.getAppService()),
             originalUser.getGroupCollection(false));
     }
 
@@ -207,12 +207,12 @@ public class UserEditDialog extends BgcBaseDialog {
                 SessionManager.getAppService());
             tx.persist(originalUser);
 
-            for (BbGroupWrapper g : groupsWidget.getAddedToSelection()) {
+            for (GroupWrapper g : groupsWidget.getAddedToSelection()) {
                 g.addToUserCollection(Arrays.asList(originalUser));
                 tx.persist(g);
             }
 
-            for (BbGroupWrapper g : groupsWidget.getRemovedFromSelection()) {
+            for (GroupWrapper g : groupsWidget.getRemovedFromSelection()) {
                 g.removeFromUserCollection(Arrays.asList(originalUser));
                 tx.persist(g);
             }

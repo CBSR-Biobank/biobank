@@ -18,7 +18,7 @@ INSERT INTO entity_filter VALUES (31, 1, 'Processing Event Worksheet', 32, 0);
 -- add new objects into the csm database:
 insert into csm_protection_element (protection_element_name, object_id, application_id, update_date) values
 ('edu.ualberta.med.biobank.model.User','edu.ualberta.med.biobank.model.User',2,sysdate()),
-('edu.ualberta.med.biobank.model.BbGroup','edu.ualberta.med.biobank.model.BbGroup',2,sysdate()),
+('edu.ualberta.med.biobank.model.Group','edu.ualberta.med.biobank.model.Group',2,sysdate()),
 ('edu.ualberta.med.biobank.model.Principal','edu.ualberta.med.biobank.model.Principal',2,sysdate()),
 ('edu.ualberta.med.biobank.model.Membership','edu.ualberta.med.biobank.model.Membership',2,sysdate()),
 ('edu.ualberta.med.biobank.model.Permission','edu.ualberta.med.biobank.model.Permission',2,sysdate()),
@@ -29,7 +29,7 @@ insert into csm_protection_element (protection_element_name, object_id, applicat
 insert into csm_pg_pe (protection_group_id, protection_element_id, update_date)
 select 1, protection_element_id, sysdate() from csm_protection_element
 where protection_element_name = 'edu.ualberta.med.biobank.model.User'
-or protection_element_name = 'edu.ualberta.med.biobank.model.BbGroup'
+or protection_element_name = 'edu.ualberta.med.biobank.model.Group'
 or protection_element_name = 'edu.ualberta.med.biobank.model.Principal'
 or protection_element_name = 'edu.ualberta.med.biobank.model.Membership'
 or protection_element_name = 'edu.ualberta.med.biobank.model.Permission'

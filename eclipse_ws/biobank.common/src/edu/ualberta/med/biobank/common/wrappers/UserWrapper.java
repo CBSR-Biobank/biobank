@@ -61,7 +61,7 @@ public class UserWrapper extends UserBaseWrapper {
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         // should remove this user from its groups
-        for (BbGroupWrapper group : getGroupCollection(false)) {
+        for (GroupWrapper group : getGroupCollection(false)) {
             group.removeFromUserCollection(Arrays.asList(this));
             group.addPersistTasks(tasks);
         }
@@ -253,7 +253,7 @@ public class UserWrapper extends UserBaseWrapper {
         }
         Set<CenterWrapper<?>> setOfWorkingCenter = super
             .getWorkingCentersInternal();
-        for (BbGroupWrapper g : getGroupCollection(false)) {
+        for (GroupWrapper g : getGroupCollection(false)) {
             setOfWorkingCenter.addAll(g.getWorkingCentersInternal());
         }
         return setOfWorkingCenter;
