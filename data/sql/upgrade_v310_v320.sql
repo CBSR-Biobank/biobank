@@ -9,6 +9,28 @@ INSERT INTO entity_filter VALUES (31, 1, 'Processing Event Worksheet', 32, 0);
 
 -- end bug#1405 fix
 
+-- start renaming of collection properties (to replace with plural)
+
+UPDATE entity_property SET property = 'dispatchSpecimens.dispatch.senderCenter.nameShort' WHERE id = 22;
+UPDATE entity_property SET property = 'dispatchSpecimens.dispatch.receiverCenter.nameShort' WHERE id = 23;
+UPDATE entity_property SET property = 'dispatchSpecimens.dispatch.shipmentInfo.receivedAt' WHERE id = 24;
+UPDATE entity_property SET property = 'dispatchSpecimens.dispatch.shipmentInfo.packedAt' WHERE id = 25;
+UPDATE entity_property SET property = 'dispatchSpecimens.dispatch.shipmentInfo.waybill' WHERE id = 26;
+UPDATE entity_property SET property = 'dispatchSpecimens.dispatch.shipmentInfo.boxNumber' WHERE id = 27;
+UPDATE entity_property SET property = 'specimenPositions.specimen.createdAt' WHERE id = 106;
+UPDATE entity_property SET property = 'collectionEvents.allSpecimens.parentSpecimen.processingEvent.createdAt' WHERE id = 203;
+UPDATE entity_property SET property = 'collectionEvents.allSpecimens.createdAt' WHERE id = 204;
+UPDATE entity_property SET property = 'collectionEvents.allSpecimens.originInfo.center.nameShort' WHERE id = 205;
+UPDATE entity_property SET property = 'collectionEvents.allSpecimens.inventoryId' WHERE id = 206;
+UPDATE entity_property SET property = 'collectionEvents.visitNumber' WHERE id = 207;
+UPDATE entity_property SET property = 'allSpecimens.parentSpecimen.processingEvent.createdAt' WHERE id = 301;
+UPDATE entity_property SET property = 'allSpecimens.createdAt' WHERE id = 302;
+UPDATE entity_property SET property = 'allSpecimens.originInfo.center.nameShort' WHERE id = 305;
+UPDATE entity_property SET property = 'specimens.inventoryId' WHERE id = 406;
+UPDATE entity_property SET property = 'specimens.createdAt' WHERE id = 407;
+
+-- end renaming of collection properties
+
 -- -----------------------------------------------------------------------
 --
 -- New security / user management
