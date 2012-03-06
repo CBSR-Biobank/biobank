@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.ConstraintViolationException;
@@ -18,6 +19,8 @@ import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
@@ -91,10 +94,9 @@ public class TestProcessingEvent extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
-        ArrayList<SpecimenInfo> sourceSpecs =
-            EXECUTOR.exec(
-                new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
-                .getList();
+        CEventInfo ceventInfo =
+            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+        List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
 
         // ship the specimens to the site
         OriginInfoSaveInfo oiSaveInfo = new OriginInfoSaveInfo(
@@ -226,11 +228,9 @@ public class TestProcessingEvent extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.siteId);
-        ArrayList<SpecimenInfo> sourceSpecs =
-            EXECUTOR
-                .exec(
-                    new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
-                .getList();
+        CEventInfo ceventInfo =
+            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+        List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
         Integer spcId = sourceSpecs.get(0).specimen.getId();
 
         // create a processing event with one of the collection event source

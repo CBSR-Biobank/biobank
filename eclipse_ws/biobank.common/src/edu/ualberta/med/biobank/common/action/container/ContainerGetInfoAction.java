@@ -47,7 +47,7 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
             + " LEFT JOIN FETCH parentContainer.containerType parentCtype"
             + " LEFT JOIN FETCH parentCtype.capacity"
             + " LEFT JOIN FETCH parentCtype.childLabelingScheme"
-            + " LEFT JOIN FETCH parentCtype.childContainerTypeCollection"
+            + " LEFT JOIN FETCH parentCtype.childContainerTypes"
             + " WHERE container.id = ?";
 
     public static class ContainerInfo implements ActionResult {

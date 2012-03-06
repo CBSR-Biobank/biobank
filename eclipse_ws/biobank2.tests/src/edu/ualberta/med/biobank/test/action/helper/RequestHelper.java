@@ -7,7 +7,7 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGet
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
-import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
+import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.test.action.IActionExecutor;
 import edu.ualberta.med.biobank.test.Utils;
@@ -39,8 +39,8 @@ public class RequestHelper extends Helper {
             specs.add(specInfo.specimen.getInventoryId());
 
         // request specs
-        SubmitRequestAction action =
-            new SubmitRequestAction(rgId, specs);
+        RequestSubmitAction action =
+            new RequestSubmitAction(rgId, specs);
         return actionExecutor.exec(action).getId();
 
     }

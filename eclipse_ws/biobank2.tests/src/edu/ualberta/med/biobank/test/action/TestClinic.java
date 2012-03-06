@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
@@ -114,13 +113,8 @@ public class TestClinic extends TestAction {
     public void checkGetAction() throws Exception {
         Provisioning provisioning = new Provisioning(EXECUTOR, name);
 
-        Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(EXECUTOR,
-                provisioning.patientIds.get(0), provisioning.clinicId);
-        // TODO: get collection event info instead
-        EXECUTOR.exec(
-            new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
-            .getList();
+        CollectionEventHelper.createCEventWithSourceSpecimens(EXECUTOR,
+            provisioning.patientIds.get(0), provisioning.clinicId);
 
         ClinicInfo clinicInfo =
             EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
@@ -131,7 +125,8 @@ public class TestClinic extends TestAction {
         Assert.assertEquals(new Long(1), clinicInfo.collectionEventCount);
         Assert.assertEquals(1, clinicInfo.contacts.size());
         Assert.assertEquals(1, clinicInfo.studyInfos.size());
-        Assert.assertEquals(name + "_clinic", clinicInfo.clinic.getAddress()
+        Assert.assertEquals(name + "_clinic_city", clinicInfo.clinic
+            .getAddress()
             .getCity());
     }
 

@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.action.request.RequestGetSpecimenInfosAct
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupDeleteAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
-import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
+import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Request;
@@ -99,8 +99,8 @@ public class TestResearchGroup extends TestAction {
         specs.remove(Math.abs(R.nextInt()) % specs.size());
 
         // request specs
-        SubmitRequestAction action =
-            new SubmitRequestAction(rgId, specs);
+        RequestSubmitAction action =
+            new RequestSubmitAction(rgId, specs);
         Integer rId = EXECUTOR.exec(action).getId();
 
         // make sure you got what was requested
