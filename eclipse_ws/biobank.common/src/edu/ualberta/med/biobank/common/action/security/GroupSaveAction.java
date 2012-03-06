@@ -8,15 +8,17 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Group;
+import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
 
 public class GroupSaveAction extends PrincipalSaveAction {
-
     private static final long serialVersionUID = 1L;
 
+    private String name = null;
     private String description = null;
     private Group group = null;
     private Set<Integer> userIds;
+    private Set<Membership> memberships;
 
     public void setDescription(String description) {
         this.description = description;
@@ -34,6 +36,11 @@ public class GroupSaveAction extends PrincipalSaveAction {
 
     private void saveUsers(ActionContext context) {
         Map<Integer, User> users = context.load(User.class, userIds);
+
+        // TODO: localise and parameterise the exception message
+        if (!group.isFullyManageable(context.getUser()))
+            throw new ActionException(
+                "you do not have adequate permissions to modify this group");
 
         SetDifference<User> usersDiff =
             new SetDifference<User>(group.getUsers(),

@@ -9,12 +9,12 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
-import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
+import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.model.Role;
 
 public class RoleGetAllAction implements Action<ListResult<Role>> {
     private static final long serialVersionUID = 1L;
-    private static final Permission PERMISSION = new UserManagementPermission();
+    private static final Permission PERMISSION = new UserManagerPermission();
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {

@@ -36,6 +36,9 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * Manageable means that <em>some</em> portion of the {@link Membership} can be
  * manipulated (e.g. some {@link PermissionEnum}-s or {@link Role}-s can be
  * added or removed).
+ * <p>
+ * Also note that it is easier to <em>Directly</em> modify the elements of a
+ * collection (e.g. a {@link Membership})
  * 
  * @author Jonathan Ferland
  */

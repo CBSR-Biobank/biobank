@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
+import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.model.User;
 
 public class UserDeleteAction implements Action<EmptyResult> {
@@ -18,7 +18,7 @@ public class UserDeleteAction implements Action<EmptyResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new UserManagementPermission().isAllowed(context);
+        return new UserManagerPermission().isAllowed(context);
     }
 
     @Override

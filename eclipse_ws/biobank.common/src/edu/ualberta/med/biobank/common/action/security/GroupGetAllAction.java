@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
-import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
+import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.User;
 
@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.model.User;
  */
 public class GroupGetAllAction implements Action<ListResult<Group>> {
     private static final long serialVersionUID = 1L;
-    private static final Permission PERMISSION = new UserManagementPermission();
+    private static final Permission PERMISSION = new UserManagerPermission();
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
@@ -35,7 +35,10 @@ public class GroupGetAllAction implements Action<ListResult<Group>> {
         throws ActionException {
         Criteria c = context.getSession().createCriteria(Group.class, "g")
             .createAlias("g.memberships", "m", Criteria.LEFT_JOIN)
+            .createAlias("m.center", "c", Criteria.LEFT_JOIN)
+            .createAlias("m.study", "s", Criteria.LEFT_JOIN)
             .createAlias("m.roles", "r", Criteria.LEFT_JOIN)
+            .createAlias("g.users", "u", Criteria.LEFT_JOIN)
             .addOrder(Order.asc("name"));
 
         User user = context.getUser();

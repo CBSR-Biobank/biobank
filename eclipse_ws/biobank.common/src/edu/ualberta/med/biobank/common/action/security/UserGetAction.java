@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
-import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
+import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.model.User;
  */
 public class UserGetAction implements Action<UserGetResult> {
     private static final long serialVersionUID = 1L;
-    private static final Permission PERMISSION = new UserManagementPermission();
+    private static final Permission PERMISSION = new UserManagerPermission();
 
     private Integer userId;
 

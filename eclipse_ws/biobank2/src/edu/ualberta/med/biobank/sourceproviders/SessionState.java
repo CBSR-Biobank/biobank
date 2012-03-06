@@ -7,7 +7,7 @@ import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
+import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -122,7 +122,7 @@ public class SessionState extends AbstractSourceProvider {
             // FIXME need this permission implemented
             setHasUserManagementRights(user != null
                 && SessionManager.getAppService().isAllowed(
-                    new UserManagementPermission()));
+                    new UserManagerPermission()));
         } catch (Exception e) {
             logger.error("Error setting session state", e); //$NON-NLS-1$
         }

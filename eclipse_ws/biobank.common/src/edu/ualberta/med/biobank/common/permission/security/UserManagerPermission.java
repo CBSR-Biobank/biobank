@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.User;
 
-public class UserManagementPermission implements Permission {
+public class UserManagerPermission implements Permission {
     private static final long serialVersionUID = 1L;
 
     @Override

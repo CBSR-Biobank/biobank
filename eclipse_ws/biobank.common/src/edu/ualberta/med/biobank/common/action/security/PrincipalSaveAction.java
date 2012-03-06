@@ -7,7 +7,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
+import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Principal;
@@ -29,7 +29,7 @@ public abstract class PrincipalSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new UserManagementPermission().isAllowed(context);
+        return new UserManagerPermission().isAllowed(context);
     }
 
     public IdResult run(ActionContext context, Principal principal)
