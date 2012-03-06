@@ -61,8 +61,8 @@ public class CenterPeer {
 			}
 		});
 
-	public static final Property<Collection<Dispatch>, Center> DST_DISPATCH_COLLECTION = Property.create(
-		"dstDispatchCollection" //$NON-NLS-1$
+	public static final Property<Collection<Dispatch>, Center> DST_DISPATCHES = Property.create(
+		"dstDispatches" //$NON-NLS-1$
 		, Center.class
 		, new TypeReference<Collection<Dispatch>>() {}
 		, new Property.Accessor<Collection<Dispatch>, Center>() { private static final long serialVersionUID = 1L;
@@ -77,8 +77,8 @@ public class CenterPeer {
 			}
 		});
 
-	public static final Property<Collection<Dispatch>, Center> SRC_DISPATCH_COLLECTION = Property.create(
-		"srcDispatchCollection" //$NON-NLS-1$
+	public static final Property<Collection<Dispatch>, Center> SRC_DISPATCHES = Property.create(
+		"srcDispatches" //$NON-NLS-1$
 		, Center.class
 		, new TypeReference<Collection<Dispatch>>() {}
 		, new Property.Accessor<Collection<Dispatch>, Center>() { private static final long serialVersionUID = 1L;
@@ -93,8 +93,8 @@ public class CenterPeer {
 			}
 		});
 
-	public static final Property<Collection<Comment>, Center> COMMENT_COLLECTION = Property.create(
-		"commentCollection" //$NON-NLS-1$
+	public static final Property<Collection<Comment>, Center> COMMENTS = Property.create(
+		"comments" //$NON-NLS-1$
 		, Center.class
 		, new TypeReference<Collection<Comment>>() {}
 		, new Property.Accessor<Collection<Comment>, Center>() { private static final long serialVersionUID = 1L;
@@ -124,8 +124,8 @@ public class CenterPeer {
 			}
 		});
 
-	public static final Property<Collection<ProcessingEvent>, Center> PROCESSING_EVENT_COLLECTION = Property.create(
-		"processingEventCollection" //$NON-NLS-1$
+	public static final Property<Collection<ProcessingEvent>, Center> PROCESSING_EVENTS = Property.create(
+		"processingEvents" //$NON-NLS-1$
 		, Center.class
 		, new TypeReference<Collection<ProcessingEvent>>() {}
 		, new Property.Accessor<Collection<ProcessingEvent>, Center>() { private static final long serialVersionUID = 1L;
@@ -140,8 +140,8 @@ public class CenterPeer {
 			}
 		});
 
-	public static final Property<Collection<Membership>, Center> MEMBERSHIP_COLLECTION = Property.create(
-		"membershipCollection" //$NON-NLS-1$
+	public static final Property<Collection<Membership>, Center> MEMBERSHIPS = Property.create(
+		"memberships" //$NON-NLS-1$
 		, Center.class
 		, new TypeReference<Collection<Membership>>() {}
 		, new Property.Accessor<Collection<Membership>, Center>() { private static final long serialVersionUID = 1L;
@@ -156,8 +156,8 @@ public class CenterPeer {
 			}
 		});
 
-	public static final Property<Collection<OriginInfo>, Center> ORIGIN_INFO_COLLECTION = Property.create(
-		"originInfoCollection" //$NON-NLS-1$
+	public static final Property<Collection<OriginInfo>, Center> ORIGIN_INFOS = Property.create(
+		"originInfos" //$NON-NLS-1$
 		, Center.class
 		, new TypeReference<Collection<OriginInfo>>() {}
 		, new Property.Accessor<Collection<OriginInfo>, Center>() { private static final long serialVersionUID = 1L;
@@ -193,13 +193,13 @@ public class CenterPeer {
       aList.add(ID);
       aList.add(NAME);
       aList.add(NAME_SHORT);
-      aList.add(DST_DISPATCH_COLLECTION);
-      aList.add(SRC_DISPATCH_COLLECTION);
-      aList.add(COMMENT_COLLECTION);
+      aList.add(DST_DISPATCHES);
+      aList.add(SRC_DISPATCHES);
+      aList.add(COMMENTS);
       aList.add(ADDRESS);
-      aList.add(PROCESSING_EVENT_COLLECTION);
-      aList.add(MEMBERSHIP_COLLECTION);
-      aList.add(ORIGIN_INFO_COLLECTION);
+      aList.add(PROCESSING_EVENTS);
+      aList.add(MEMBERSHIPS);
+      aList.add(ORIGIN_INFOS);
       aList.add(ACTIVITY_STATUS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };

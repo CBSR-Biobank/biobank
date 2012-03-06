@@ -41,8 +41,8 @@ public class RolePeer {
 			}
 		});
 
-	public static final Property<Set<PermissionEnum>, Role> PERMISSION_COLLECTION = Property.create(
-		"permissionCollection" //$NON-NLS-1$
+	public static final Property<Set<PermissionEnum>, Role> PERMISSIONS = Property.create(
+		"permissions" //$NON-NLS-1$
 		, Role.class
 		, new TypeReference<Set<PermissionEnum>>() {}
 		, new Property.Accessor<Set<PermissionEnum>, Role>() { private static final long serialVersionUID = 1L;
@@ -61,7 +61,7 @@ public class RolePeer {
       List<Property<?, ? super Role>> aList = new ArrayList<Property<?, ? super Role>>();
       aList.add(ID);
       aList.add(NAME);
-      aList.add(PERMISSION_COLLECTION);
+      aList.add(PERMISSIONS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

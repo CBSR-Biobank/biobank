@@ -20,7 +20,7 @@ public class StudyGetSourceSpecimensAction implements
     private static final String SELECT_SOURCE_SPCS_HQL =
         " FROM " + SourceSpecimen.class.getName() + " AS srce"
             + " INNER JOIN FETCH srce.specimenType specimenType"
-            + " LEFT JOIN FETCH specimenType.childSpecimenTypeCollection"
+            + " LEFT JOIN FETCH specimenType.childSpecimenTypes"
             + " WHERE srce.study.id=?";
 
     private final Integer studyId;

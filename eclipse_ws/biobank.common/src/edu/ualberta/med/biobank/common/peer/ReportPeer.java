@@ -102,8 +102,8 @@ public class ReportPeer {
 			}
 		});
 
-	public static final Property<Collection<ReportColumn>, Report> REPORT_COLUMN_COLLECTION = Property.create(
-		"reportColumnCollection" //$NON-NLS-1$
+	public static final Property<Collection<ReportColumn>, Report> REPORT_COLUMNS = Property.create(
+		"reportColumns" //$NON-NLS-1$
 		, Report.class
 		, new TypeReference<Collection<ReportColumn>>() {}
 		, new Property.Accessor<Collection<ReportColumn>, Report>() { private static final long serialVersionUID = 1L;
@@ -133,8 +133,8 @@ public class ReportPeer {
 			}
 		});
 
-	public static final Property<Collection<ReportFilter>, Report> REPORT_FILTER_COLLECTION = Property.create(
-		"reportFilterCollection" //$NON-NLS-1$
+	public static final Property<Collection<ReportFilter>, Report> REPORT_FILTERS = Property.create(
+		"reportFilters" //$NON-NLS-1$
 		, Report.class
 		, new TypeReference<Collection<ReportFilter>>() {}
 		, new Property.Accessor<Collection<ReportFilter>, Report>() { private static final long serialVersionUID = 1L;
@@ -158,9 +158,9 @@ public class ReportPeer {
       aList.add(USER_ID);
       aList.add(NAME);
       aList.add(IS_PUBLIC);
-      aList.add(REPORT_COLUMN_COLLECTION);
+      aList.add(REPORT_COLUMNS);
       aList.add(ENTITY);
-      aList.add(REPORT_FILTER_COLLECTION);
+      aList.add(REPORT_FILTERS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

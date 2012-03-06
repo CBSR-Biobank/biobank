@@ -15,7 +15,7 @@ public class RequestRetrievalAction implements Action<ListResult<Request>> {
     private static final String REQUEST_HQL =
         "select r from "
             + Request.class.getName()
-            + " r inner join fetch r.requestSpecimenCollection rs where rs.specimen.currentCenter.id=?";
+            + " r inner join fetch r.requestSpecimens rs where rs.specimen.currentCenter.id=?";
 
     private static final long serialVersionUID = 5306372891238576571L;
 

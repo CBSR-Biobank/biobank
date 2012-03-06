@@ -120,8 +120,8 @@ public class ContainerTypePeer {
 			}
 		});
 
-	public static final Property<Collection<SpecimenType>, ContainerType> SPECIMEN_TYPE_COLLECTION = Property.create(
-		"specimenTypeCollection" //$NON-NLS-1$
+	public static final Property<Collection<SpecimenType>, ContainerType> SPECIMEN_TYPES = Property.create(
+		"specimenTypes" //$NON-NLS-1$
 		, ContainerType.class
 		, new TypeReference<Collection<SpecimenType>>() {}
 		, new Property.Accessor<Collection<SpecimenType>, ContainerType>() { private static final long serialVersionUID = 1L;
@@ -136,8 +136,8 @@ public class ContainerTypePeer {
 			}
 		});
 
-	public static final Property<Collection<Comment>, ContainerType> COMMENT_COLLECTION = Property.create(
-		"commentCollection" //$NON-NLS-1$
+	public static final Property<Collection<Comment>, ContainerType> COMMENTS = Property.create(
+		"comments" //$NON-NLS-1$
 		, ContainerType.class
 		, new TypeReference<Collection<Comment>>() {}
 		, new Property.Accessor<Collection<Comment>, ContainerType>() { private static final long serialVersionUID = 1L;
@@ -182,8 +182,8 @@ public class ContainerTypePeer {
 			}
 		});
 
-	public static final Property<Collection<ContainerType>, ContainerType> CHILD_CONTAINER_TYPE_COLLECTION = Property.create(
-		"childContainerTypeCollection" //$NON-NLS-1$
+	public static final Property<Collection<ContainerType>, ContainerType> CHILD_CONTAINER_TYPES = Property.create(
+		"childContainerTypes" //$NON-NLS-1$
 		, ContainerType.class
 		, new TypeReference<Collection<ContainerType>>() {}
 		, new Property.Accessor<Collection<ContainerType>, ContainerType>() { private static final long serialVersionUID = 1L;
@@ -198,8 +198,8 @@ public class ContainerTypePeer {
 			}
 		});
 
-	public static final Property<Collection<ContainerType>, ContainerType> PARENT_CONTAINER_TYPE_COLLECTION = Property.create(
-		"parentContainerTypeCollection" //$NON-NLS-1$
+	public static final Property<Collection<ContainerType>, ContainerType> PARENT_CONTAINER_TYPES = Property.create(
+		"parentContainerTypes" //$NON-NLS-1$
 		, ContainerType.class
 		, new TypeReference<Collection<ContainerType>>() {}
 		, new Property.Accessor<Collection<ContainerType>, ContainerType>() { private static final long serialVersionUID = 1L;
@@ -224,12 +224,12 @@ public class ContainerTypePeer {
       aList.add(NAME_SHORT);
       aList.add(SITE);
       aList.add(CHILD_LABELING_SCHEME);
-      aList.add(SPECIMEN_TYPE_COLLECTION);
-      aList.add(COMMENT_COLLECTION);
+      aList.add(SPECIMEN_TYPES);
+      aList.add(COMMENTS);
       aList.add(ACTIVITY_STATUS);
       aList.add(CAPACITY);
-      aList.add(CHILD_CONTAINER_TYPE_COLLECTION);
-      aList.add(PARENT_CONTAINER_TYPE_COLLECTION);
+      aList.add(CHILD_CONTAINER_TYPES);
+      aList.add(PARENT_CONTAINER_TYPES);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

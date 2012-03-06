@@ -74,8 +74,8 @@ public class ProcessingEventPeer {
 			}
 		});
 
-	public static final Property<Collection<Comment>, ProcessingEvent> COMMENT_COLLECTION = Property.create(
-		"commentCollection" //$NON-NLS-1$
+	public static final Property<Collection<Comment>, ProcessingEvent> COMMENTS = Property.create(
+		"comments" //$NON-NLS-1$
 		, ProcessingEvent.class
 		, new TypeReference<Collection<Comment>>() {}
 		, new Property.Accessor<Collection<Comment>, ProcessingEvent>() { private static final long serialVersionUID = 1L;
@@ -105,8 +105,8 @@ public class ProcessingEventPeer {
 			}
 		});
 
-	public static final Property<Collection<Specimen>, ProcessingEvent> SPECIMEN_COLLECTION = Property.create(
-		"specimenCollection" //$NON-NLS-1$
+	public static final Property<Collection<Specimen>, ProcessingEvent> SPECIMENS = Property.create(
+		"specimens" //$NON-NLS-1$
 		, ProcessingEvent.class
 		, new TypeReference<Collection<Specimen>>() {}
 		, new Property.Accessor<Collection<Specimen>, ProcessingEvent>() { private static final long serialVersionUID = 1L;
@@ -128,9 +128,9 @@ public class ProcessingEventPeer {
       aList.add(CREATED_AT);
       aList.add(WORKSHEET);
       aList.add(CENTER);
-      aList.add(COMMENT_COLLECTION);
+      aList.add(COMMENTS);
       aList.add(ACTIVITY_STATUS);
-      aList.add(SPECIMEN_COLLECTION);
+      aList.add(SPECIMENS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

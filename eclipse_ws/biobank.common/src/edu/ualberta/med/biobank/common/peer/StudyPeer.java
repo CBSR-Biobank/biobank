@@ -79,8 +79,8 @@ public class StudyPeer {
 			}
 		});
 
-	public static final Property<Collection<Contact>, Study> CONTACT_COLLECTION = Property.create(
-		"contactCollection" //$NON-NLS-1$
+	public static final Property<Collection<Contact>, Study> CONTACTS = Property.create(
+		"contacts" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<Contact>>() {}
 		, new Property.Accessor<Collection<Contact>, Study>() { private static final long serialVersionUID = 1L;
@@ -95,8 +95,8 @@ public class StudyPeer {
 			}
 		});
 
-	public static final Property<Collection<Patient>, Study> PATIENT_COLLECTION = Property.create(
-		"patientCollection" //$NON-NLS-1$
+	public static final Property<Collection<Patient>, Study> PATIENTS = Property.create(
+		"patients" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<Patient>>() {}
 		, new Property.Accessor<Collection<Patient>, Study>() { private static final long serialVersionUID = 1L;
@@ -111,8 +111,8 @@ public class StudyPeer {
 			}
 		});
 
-	public static final Property<Collection<Comment>, Study> COMMENT_COLLECTION = Property.create(
-		"commentCollection" //$NON-NLS-1$
+	public static final Property<Collection<Comment>, Study> COMMENTS = Property.create(
+		"comments" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<Comment>>() {}
 		, new Property.Accessor<Collection<Comment>, Study>() { private static final long serialVersionUID = 1L;
@@ -127,8 +127,8 @@ public class StudyPeer {
 			}
 		});
 
-	public static final Property<Collection<Membership>, Study> MEMBERSHIP_COLLECTION = Property.create(
-		"membershipCollection" //$NON-NLS-1$
+	public static final Property<Collection<Membership>, Study> MEMBERSHIPS = Property.create(
+		"memberships" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<Membership>>() {}
 		, new Property.Accessor<Collection<Membership>, Study>() { private static final long serialVersionUID = 1L;
@@ -143,8 +143,8 @@ public class StudyPeer {
 			}
 		});
 
-	public static final Property<Collection<Site>, Study> SITE_COLLECTION = Property.create(
-		"siteCollection" //$NON-NLS-1$
+	public static final Property<Collection<Site>, Study> SITES = Property.create(
+		"sites" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<Site>>() {}
 		, new Property.Accessor<Collection<Site>, Study>() { private static final long serialVersionUID = 1L;
@@ -159,8 +159,8 @@ public class StudyPeer {
 			}
 		});
 
-	public static final Property<Collection<StudyEventAttr>, Study> STUDY_EVENT_ATTR_COLLECTION = Property.create(
-		"studyEventAttrCollection" //$NON-NLS-1$
+	public static final Property<Collection<StudyEventAttr>, Study> STUDY_EVENT_ATTRS = Property.create(
+		"studyEventAttrs" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<StudyEventAttr>>() {}
 		, new Property.Accessor<Collection<StudyEventAttr>, Study>() { private static final long serialVersionUID = 1L;
@@ -190,8 +190,8 @@ public class StudyPeer {
 			}
 		});
 
-	public static final Property<Collection<AliquotedSpecimen>, Study> ALIQUOTED_SPECIMEN_COLLECTION = Property.create(
-		"aliquotedSpecimenCollection" //$NON-NLS-1$
+	public static final Property<Collection<AliquotedSpecimen>, Study> ALIQUOTED_SPECIMENS = Property.create(
+		"aliquotedSpecimens" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<AliquotedSpecimen>>() {}
 		, new Property.Accessor<Collection<AliquotedSpecimen>, Study>() { private static final long serialVersionUID = 1L;
@@ -206,8 +206,8 @@ public class StudyPeer {
 			}
 		});
 
-	public static final Property<Collection<SourceSpecimen>, Study> SOURCE_SPECIMEN_COLLECTION = Property.create(
-		"sourceSpecimenCollection" //$NON-NLS-1$
+	public static final Property<Collection<SourceSpecimen>, Study> SOURCE_SPECIMENS = Property.create(
+		"sourceSpecimens" //$NON-NLS-1$
 		, Study.class
 		, new TypeReference<Collection<SourceSpecimen>>() {}
 		, new Property.Accessor<Collection<SourceSpecimen>, Study>() { private static final long serialVersionUID = 1L;
@@ -229,15 +229,15 @@ public class StudyPeer {
       aList.add(NAME);
       aList.add(NAME_SHORT);
       aList.add(RESEARCH_GROUP);
-      aList.add(CONTACT_COLLECTION);
-      aList.add(PATIENT_COLLECTION);
-      aList.add(COMMENT_COLLECTION);
-      aList.add(MEMBERSHIP_COLLECTION);
-      aList.add(SITE_COLLECTION);
-      aList.add(STUDY_EVENT_ATTR_COLLECTION);
+      aList.add(CONTACTS);
+      aList.add(PATIENTS);
+      aList.add(COMMENTS);
+      aList.add(MEMBERSHIPS);
+      aList.add(SITES);
+      aList.add(STUDY_EVENT_ATTRS);
       aList.add(ACTIVITY_STATUS);
-      aList.add(ALIQUOTED_SPECIMEN_COLLECTION);
-      aList.add(SOURCE_SPECIMEN_COLLECTION);
+      aList.add(ALIQUOTED_SPECIMENS);
+      aList.add(SOURCE_SPECIMENS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

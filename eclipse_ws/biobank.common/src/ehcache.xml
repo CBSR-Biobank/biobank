@@ -45,7 +45,7 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Contact.studyCollection"
+	<cache name="edu.ualberta.med.biobank.model.Contact.studies"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -73,14 +73,14 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.OriginInfo.commentCollection"
+	<cache name="edu.ualberta.med.biobank.model.OriginInfo.comments"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.OriginInfo.specimenCollection"
+	<cache name="edu.ualberta.med.biobank.model.OriginInfo.specimens"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -94,14 +94,14 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Membership.permissionCollection"
+	<cache name="edu.ualberta.med.biobank.model.Membership.permissions"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Membership.roleCollection"
+	<cache name="edu.ualberta.med.biobank.model.Membership.roles"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -122,14 +122,14 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Entity.reportCollection"
+	<cache name="edu.ualberta.med.biobank.model.Entity.reports"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Entity.entityPropertyCollection"
+	<cache name="edu.ualberta.med.biobank.model.Entity.entityProperties"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -143,14 +143,14 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.SpecimenType.parentSpecimenTypeCollection"
+	<cache name="edu.ualberta.med.biobank.model.SpecimenType.parentSpecimenTypes"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.SpecimenType.containerTypeCollection"
+	<cache name="edu.ualberta.med.biobank.model.SpecimenType.containerTypes"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -164,14 +164,14 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.EntityProperty.entityColumnCollection"
+	<cache name="edu.ualberta.med.biobank.model.EntityProperty.entityColumns"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.EntityProperty.entityFilterCollection"
+	<cache name="edu.ualberta.med.biobank.model.EntityProperty.entityFilters"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -185,56 +185,56 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Study.aliquotedSpecimenCollection"
+	<cache name="edu.ualberta.med.biobank.model.Study.aliquotedSpecimens"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Study.patientCollection"
+	<cache name="edu.ualberta.med.biobank.model.Study.patients"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Study.siteCollection"
+	<cache name="edu.ualberta.med.biobank.model.Study.sites"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Study.commentCollection"
+	<cache name="edu.ualberta.med.biobank.model.Study.comments"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Study.membershipCollection"
+	<cache name="edu.ualberta.med.biobank.model.Study.memberships"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Study.studyEventAttrCollection"
+	<cache name="edu.ualberta.med.biobank.model.Study.studyEventAttrs"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Study.contactCollection"
+	<cache name="edu.ualberta.med.biobank.model.Study.contacts"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Study.sourceSpecimenCollection"
+	<cache name="edu.ualberta.med.biobank.model.Study.sourceSpecimens"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -248,21 +248,21 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.ContainerType.childContainerTypeCollection"
+	<cache name="edu.ualberta.med.biobank.model.ContainerType.childContainerTypes"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.ContainerType.specimenTypeCollection"
+	<cache name="edu.ualberta.med.biobank.model.ContainerType.specimenTypes"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.ContainerType.commentCollection"
+	<cache name="edu.ualberta.med.biobank.model.ContainerType.comments"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -276,14 +276,14 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.ProcessingEvent.specimenCollection"
+	<cache name="edu.ualberta.med.biobank.model.ProcessingEvent.specimens"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.ProcessingEvent.commentCollection"
+	<cache name="edu.ualberta.med.biobank.model.ProcessingEvent.comments"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -311,7 +311,7 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.DispatchSpecimen.commentCollection"
+	<cache name="edu.ualberta.med.biobank.model.DispatchSpecimen.comments"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -332,21 +332,21 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Site.studyCollection"
+	<cache name="edu.ualberta.med.biobank.model.Site.studies"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Site.containerTypeCollection"
+	<cache name="edu.ualberta.med.biobank.model.Site.containerTypes"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Site.containerCollection"
+	<cache name="edu.ualberta.med.biobank.model.Site.containers"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -360,7 +360,7 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Principal.membershipCollection"
+	<cache name="edu.ualberta.med.biobank.model.Principal.memberships"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -381,14 +381,14 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Patient.collectionEventCollection"
+	<cache name="edu.ualberta.med.biobank.model.Patient.collectionEvents"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Patient.commentCollection"
+	<cache name="edu.ualberta.med.biobank.model.Patient.comments"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -409,42 +409,42 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Center.processingEventCollection"
+	<cache name="edu.ualberta.med.biobank.model.Center.processingEvents"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Center.membershipCollection"
+	<cache name="edu.ualberta.med.biobank.model.Center.memberships"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Center.srcDispatchCollection"
+	<cache name="edu.ualberta.med.biobank.model.Center.srcDispatches"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Center.dstDispatchCollection"
+	<cache name="edu.ualberta.med.biobank.model.Center.dstDispatches"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Center.originInfoCollection"
+	<cache name="edu.ualberta.med.biobank.model.Center.originInfos"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Center.commentCollection"
+	<cache name="edu.ualberta.med.biobank.model.Center.comments"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -479,7 +479,7 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Clinic.contactCollection"
+	<cache name="edu.ualberta.med.biobank.model.Clinic.contacts"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -493,28 +493,28 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.CollectionEvent.allSpecimenCollection"
+	<cache name="edu.ualberta.med.biobank.model.CollectionEvent.allSpecimens"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.CollectionEvent.eventAttrCollection"
+	<cache name="edu.ualberta.med.biobank.model.CollectionEvent.eventAttrs"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.CollectionEvent.commentCollection"
+	<cache name="edu.ualberta.med.biobank.model.CollectionEvent.comments"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.CollectionEvent.originalSpecimenCollection"
+	<cache name="edu.ualberta.med.biobank.model.CollectionEvent.originalSpecimens"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -542,7 +542,7 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Role.permissionCollection"
+	<cache name="edu.ualberta.med.biobank.model.Role.permissions"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -570,14 +570,14 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Dispatch.dispatchSpecimenCollection"
+	<cache name="edu.ualberta.med.biobank.model.Dispatch.dispatchSpecimens"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Dispatch.commentCollection"
+	<cache name="edu.ualberta.med.biobank.model.Dispatch.comments"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -605,7 +605,7 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.ReportFilter.reportFilterValueCollection"
+	<cache name="edu.ualberta.med.biobank.model.ReportFilter.reportFilterValues"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -633,14 +633,14 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Request.dispatchCollection"
+	<cache name="edu.ualberta.med.biobank.model.Request.dispatches"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Request.requestSpecimenCollection"
+	<cache name="edu.ualberta.med.biobank.model.Request.requestSpecimens"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -654,21 +654,21 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Container.commentCollection"
+	<cache name="edu.ualberta.med.biobank.model.Container.comments"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Container.childPositionCollection"
+	<cache name="edu.ualberta.med.biobank.model.Container.childPositions"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Container.specimenPositionCollection"
+	<cache name="edu.ualberta.med.biobank.model.Container.specimenPositions"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -682,14 +682,14 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Report.reportColumnCollection"
+	<cache name="edu.ualberta.med.biobank.model.Report.reportColumns"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Report.reportFilterCollection"
+	<cache name="edu.ualberta.med.biobank.model.Report.reportFilters"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -703,7 +703,7 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.BbGroup.userCollection"
+	<cache name="edu.ualberta.med.biobank.model.BbGroup.users"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -717,28 +717,28 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.Specimen.requestSpecimenCollection"
+	<cache name="edu.ualberta.med.biobank.model.Specimen.requestSpecimens"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Specimen.childSpecimenCollection"
+	<cache name="edu.ualberta.med.biobank.model.Specimen.childSpecimens"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Specimen.dispatchSpecimenCollection"
+	<cache name="edu.ualberta.med.biobank.model.Specimen.dispatchSpecimens"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.Specimen.commentCollection"
+	<cache name="edu.ualberta.med.biobank.model.Specimen.comments"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -752,7 +752,7 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.PropertyType.propertyModifierCollection"
+	<cache name="edu.ualberta.med.biobank.model.PropertyType.propertyModifiers"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -780,7 +780,7 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.ResearchGroup.requestCollection"
+	<cache name="edu.ualberta.med.biobank.model.ResearchGroup.requests"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
@@ -794,14 +794,14 @@
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 	
-	<cache name="edu.ualberta.med.biobank.model.User.commentCollection"
+	<cache name="edu.ualberta.med.biobank.model.User.comments"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"
 		timeToLiveSeconds="100000"
 		overflowToDisk="true"/>
 			
-	<cache name="edu.ualberta.med.biobank.model.User.groupCollection"
+	<cache name="edu.ualberta.med.biobank.model.User.groups"
 		maxElementsInMemory="500"
 		eternal="false"
 		timeToIdleSeconds="1800"

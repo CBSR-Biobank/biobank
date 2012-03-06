@@ -15,7 +15,7 @@ public class SpecimenTypeReport1 extends AbstractReport {
             + "     min(s.topSpecimen.createdAt) as first_date_drawn, s.specimenType.name, count(*)"
             + " FROM "
             + CollectionEvent.class.getName()
-            + " as ce join ce.allSpecimenCollection as s"
+            + " as ce join ce.allSpecimens as s"
             + " left join s.specimenPosition as p WHERE (p is null or p not in (from "
             + SpecimenPosition.class.getName()
             + " a where a.container.label like '"

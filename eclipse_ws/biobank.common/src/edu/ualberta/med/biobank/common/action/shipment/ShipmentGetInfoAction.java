@@ -30,7 +30,7 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
     + " oi join fetch oi." + OriginInfoPeer.SHIPMENT_INFO.getName()
     + " si join fetch si." + ShipmentInfoPeer.SHIPPING_METHOD.getName()
     + " join fetch oi." + OriginInfoPeer.CENTER.getName() 
-    + " left join fetch oi." + OriginInfoPeer.COMMENT_COLLECTION.getName()
+    + " left join fetch oi." + OriginInfoPeer.COMMENTS.getName()
     + " where oi." + OriginInfoPeer.ID.getName()+"=?";
     // @formatter:on
 

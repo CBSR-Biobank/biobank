@@ -56,8 +56,8 @@ public class EntityPeer {
 			}
 		});
 
-	public static final Property<Collection<EntityProperty>, Entity> ENTITY_PROPERTY_COLLECTION = Property.create(
-		"entityPropertyCollection" //$NON-NLS-1$
+	public static final Property<Collection<EntityProperty>, Entity> ENTITY_PROPERTIES = Property.create(
+		"entityProperties" //$NON-NLS-1$
 		, Entity.class
 		, new TypeReference<Collection<EntityProperty>>() {}
 		, new Property.Accessor<Collection<EntityProperty>, Entity>() { private static final long serialVersionUID = 1L;
@@ -72,8 +72,8 @@ public class EntityPeer {
 			}
 		});
 
-	public static final Property<Collection<Report>, Entity> REPORT_COLLECTION = Property.create(
-		"reportCollection" //$NON-NLS-1$
+	public static final Property<Collection<Report>, Entity> REPORTS = Property.create(
+		"reports" //$NON-NLS-1$
 		, Entity.class
 		, new TypeReference<Collection<Report>>() {}
 		, new Property.Accessor<Collection<Report>, Entity>() { private static final long serialVersionUID = 1L;
@@ -94,8 +94,8 @@ public class EntityPeer {
       aList.add(ID);
       aList.add(NAME);
       aList.add(CLASS_NAME);
-      aList.add(ENTITY_PROPERTY_COLLECTION);
-      aList.add(REPORT_COLLECTION);
+      aList.add(ENTITY_PROPERTIES);
+      aList.add(REPORTS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

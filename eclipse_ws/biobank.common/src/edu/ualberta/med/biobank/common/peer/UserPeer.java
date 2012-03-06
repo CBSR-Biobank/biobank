@@ -102,8 +102,8 @@ public class UserPeer  extends PrincipalPeer {
 			}
 		});
 
-	public static final Property<Collection<Comment>, User> COMMENT_COLLECTION = Property.create(
-		"commentCollection" //$NON-NLS-1$
+	public static final Property<Collection<Comment>, User> COMMENTS = Property.create(
+		"comments" //$NON-NLS-1$
 		, User.class
 		, new TypeReference<Collection<Comment>>() {}
 		, new Property.Accessor<Collection<Comment>, User>() { private static final long serialVersionUID = 1L;
@@ -133,8 +133,8 @@ public class UserPeer  extends PrincipalPeer {
 			}
 		});
 
-	public static final Property<Collection<BbGroup>, User> GROUP_COLLECTION = Property.create(
-		"groupCollection" //$NON-NLS-1$
+	public static final Property<Collection<BbGroup>, User> GROUPS = Property.create(
+		"groups" //$NON-NLS-1$
 		, User.class
 		, new TypeReference<Collection<BbGroup>>() {}
 		, new Property.Accessor<Collection<BbGroup>, User>() { private static final long serialVersionUID = 1L;
@@ -158,9 +158,9 @@ public class UserPeer  extends PrincipalPeer {
       aList.add(LOGIN);
       aList.add(FULL_NAME);
       aList.add(RECV_BULK_EMAILS);
-      aList.add(COMMENT_COLLECTION);
+      aList.add(COMMENTS);
       aList.add(ACTIVITY_STATUS);
-      aList.add(GROUP_COLLECTION);
+      aList.add(GROUPS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

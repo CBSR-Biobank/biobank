@@ -339,7 +339,7 @@ public class TestCollectionEvent extends TestAction {
             "select eattr from "
                 + CollectionEvent.class.getName()
                 + " as ce "
-                + "join ce.eventAttrCollection as eattr "
+                + "join ce.eventAttrs as eattr "
                 + "join eattr.studyEventAttr as seattr "
                 + "join seattr.globalEventAttr as geattr "
                 + "where ce.id = ? and geattr.label= ?");

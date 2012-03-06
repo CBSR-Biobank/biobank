@@ -25,7 +25,7 @@ public class ContainerGetChildrenAction implements
             + " FROM " + Container.class.getName() + " container"
             + " INNER JOIN FETCH container.containerType containerType"
             + " INNER JOIN FETCH container.site site"
-            + " LEFT JOIN FETCH container.specimenPositionCollection"
+            + " LEFT JOIN FETCH container.specimenPositions"
             + " WHERE container.position.parentContainer.id = ?";
 
     private final Integer parentContainerId;

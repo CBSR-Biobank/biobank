@@ -317,7 +317,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     public List<DispatchSpecimenWrapper> getDispatchSpecimenCollection() {
-        return getWrapperCollection(SpecimenPeer.DISPATCH_SPECIMEN_COLLECTION,
+        return getWrapperCollection(SpecimenPeer.DISPATCH_SPECIMENS,
             DispatchSpecimenWrapper.class, false);
     }
 
@@ -424,7 +424,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             SpecimenPeer.SPECIMEN_POSITION
                 .to(SpecimenPositionPeer.CONTAINER
                     .to(ContainerPeer.CONTAINER_TYPE
-                        .to(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION)));
+                        .to(ContainerTypePeer.SPECIMEN_TYPES)));
 
         BiobankSessionAction checkLegalSampleType = check().legalOption(
             pathToLegalSpecimenTypeOptions, SpecimenPeer.SPECIMEN_TYPE,
@@ -438,7 +438,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     private void addTasksToUpdateChildren(TaskList tasks) {
         if (topSpecimenChanged) {
             SpecimenWrapper topSpecimen = getTopSpecimen();
-            if (isPropertyCached(SpecimenPeer.CHILD_SPECIMEN_COLLECTION)) {
+            if (isPropertyCached(SpecimenPeer.CHILD_SPECIMENS)) {
                 // if the children have already been loaded, then update their
                 // top specimen so that they update their children, etc. so that
                 // the entire subtree is consistent.
@@ -487,7 +487,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
-        tasks.add(check().empty(SpecimenPeer.CHILD_SPECIMEN_COLLECTION));
+        tasks.add(check().empty(SpecimenPeer.CHILD_SPECIMENS));
 
         // Either Hibernate must delete this object (via the defined cascade) or
         // do it here, but not both. If both are done, then a

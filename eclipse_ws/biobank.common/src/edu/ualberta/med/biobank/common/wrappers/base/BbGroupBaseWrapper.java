@@ -65,8 +65,8 @@ public abstract class BbGroupBaseWrapper extends PrincipalWrapper<BbGroup> {
     }
 
     public List<UserWrapper> getUserCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(BbGroupPeer.USER_COLLECTION);
-        List<UserWrapper> userCollection = getWrapperCollection(BbGroupPeer.USER_COLLECTION, UserWrapper.class, sort);
+        boolean notCached = !isPropertyCached(BbGroupPeer.USERS);
+        List<UserWrapper> userCollection = getWrapperCollection(BbGroupPeer.USERS, UserWrapper.class, sort);
         if (notCached) {
             for (UserBaseWrapper e : userCollection) {
                 e.addToGroupCollectionInternal(Arrays.asList(this));
@@ -76,44 +76,44 @@ public abstract class BbGroupBaseWrapper extends PrincipalWrapper<BbGroup> {
     }
 
     public void addToUserCollection(List<? extends UserBaseWrapper> userCollection) {
-        addToWrapperCollection(BbGroupPeer.USER_COLLECTION, userCollection);
+        addToWrapperCollection(BbGroupPeer.USERS, userCollection);
         for (UserBaseWrapper e : userCollection) {
             e.addToGroupCollectionInternal(Arrays.asList(this));
         }
     }
 
     void addToUserCollectionInternal(List<? extends UserBaseWrapper> userCollection) {
-        if (isInitialized(BbGroupPeer.USER_COLLECTION)) {
-            addToWrapperCollection(BbGroupPeer.USER_COLLECTION, userCollection);
+        if (isInitialized(BbGroupPeer.USERS)) {
+            addToWrapperCollection(BbGroupPeer.USERS, userCollection);
         } else {
-            getElementQueue().add(BbGroupPeer.USER_COLLECTION, userCollection);
+            getElementQueue().add(BbGroupPeer.USERS, userCollection);
         }
     }
 
     public void removeFromUserCollection(List<? extends UserBaseWrapper> userCollection) {
-        removeFromWrapperCollection(BbGroupPeer.USER_COLLECTION, userCollection);
+        removeFromWrapperCollection(BbGroupPeer.USERS, userCollection);
         for (UserBaseWrapper e : userCollection) {
             e.removeFromGroupCollectionInternal(Arrays.asList(this));
         }
     }
 
     void removeFromUserCollectionInternal(List<? extends UserBaseWrapper> userCollection) {
-        if (isPropertyCached(BbGroupPeer.USER_COLLECTION)) {
-            removeFromWrapperCollection(BbGroupPeer.USER_COLLECTION, userCollection);
+        if (isPropertyCached(BbGroupPeer.USERS)) {
+            removeFromWrapperCollection(BbGroupPeer.USERS, userCollection);
         } else {
-            getElementQueue().remove(BbGroupPeer.USER_COLLECTION, userCollection);
+            getElementQueue().remove(BbGroupPeer.USERS, userCollection);
         }
     }
 
     public void removeFromUserCollectionWithCheck(List<? extends UserBaseWrapper> userCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(BbGroupPeer.USER_COLLECTION, userCollection);
+        removeFromWrapperCollectionWithCheck(BbGroupPeer.USERS, userCollection);
         for (UserBaseWrapper e : userCollection) {
             e.removeFromGroupCollectionInternal(Arrays.asList(this));
         }
     }
 
     void removeFromUserCollectionWithCheckInternal(List<? extends UserBaseWrapper> userCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(BbGroupPeer.USER_COLLECTION, userCollection);
+        removeFromWrapperCollectionWithCheck(BbGroupPeer.USERS, userCollection);
     }
 
 }

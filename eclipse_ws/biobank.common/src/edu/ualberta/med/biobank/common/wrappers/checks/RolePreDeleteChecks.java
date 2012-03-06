@@ -22,7 +22,7 @@ public class RolePreDeleteChecks extends UncachedAction<Role> {
     private static final String USED_IN_MEMBERSHIP_QRY = "select count(ms) from " //$NON-NLS-1$
         + Membership.class.getName()
         + " as ms join ms." //$NON-NLS-1$
-        + MembershipPeer.ROLE_COLLECTION.getName()
+        + MembershipPeer.ROLES.getName()
         + " as roles where roles=?"; //$NON-NLS-1$
     // @formatter:on
 

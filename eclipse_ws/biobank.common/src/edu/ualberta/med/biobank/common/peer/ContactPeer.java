@@ -146,8 +146,8 @@ public class ContactPeer {
 			}
 		});
 
-	public static final Property<Collection<Study>, Contact> STUDY_COLLECTION = Property.create(
-		"studyCollection" //$NON-NLS-1$
+	public static final Property<Collection<Study>, Contact> STUDIES = Property.create(
+		"studies" //$NON-NLS-1$
 		, Contact.class
 		, new TypeReference<Collection<Study>>() {}
 		, new Property.Accessor<Collection<Study>, Contact>() { private static final long serialVersionUID = 1L;
@@ -174,7 +174,7 @@ public class ContactPeer {
       aList.add(EMAIL_ADDRESS);
       aList.add(MOBILE_NUMBER);
       aList.add(CLINIC);
-      aList.add(STUDY_COLLECTION);
+      aList.add(STUDIES);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

@@ -54,40 +54,40 @@ public class DispatchSpecimenBaseWrapper extends ModelWrapper<DispatchSpecimen> 
     }
 
     public List<CommentWrapper> getCommentCollection(boolean sort) {
-        List<CommentWrapper> commentCollection = getWrapperCollection(DispatchSpecimenPeer.COMMENT_COLLECTION, CommentWrapper.class, sort);
+        List<CommentWrapper> commentCollection = getWrapperCollection(DispatchSpecimenPeer.COMMENTS, CommentWrapper.class, sort);
         return commentCollection;
     }
 
     public void addToCommentCollection(List<? extends CommentBaseWrapper> commentCollection) {
-        addToWrapperCollection(DispatchSpecimenPeer.COMMENT_COLLECTION, commentCollection);
+        addToWrapperCollection(DispatchSpecimenPeer.COMMENTS, commentCollection);
     }
 
     void addToCommentCollectionInternal(List<? extends CommentBaseWrapper> commentCollection) {
-        if (isInitialized(DispatchSpecimenPeer.COMMENT_COLLECTION)) {
-            addToWrapperCollection(DispatchSpecimenPeer.COMMENT_COLLECTION, commentCollection);
+        if (isInitialized(DispatchSpecimenPeer.COMMENTS)) {
+            addToWrapperCollection(DispatchSpecimenPeer.COMMENTS, commentCollection);
         } else {
-            getElementQueue().add(DispatchSpecimenPeer.COMMENT_COLLECTION, commentCollection);
+            getElementQueue().add(DispatchSpecimenPeer.COMMENTS, commentCollection);
         }
     }
 
     public void removeFromCommentCollection(List<? extends CommentBaseWrapper> commentCollection) {
-        removeFromWrapperCollection(DispatchSpecimenPeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollection(DispatchSpecimenPeer.COMMENTS, commentCollection);
     }
 
     void removeFromCommentCollectionInternal(List<? extends CommentBaseWrapper> commentCollection) {
-        if (isPropertyCached(DispatchSpecimenPeer.COMMENT_COLLECTION)) {
-            removeFromWrapperCollection(DispatchSpecimenPeer.COMMENT_COLLECTION, commentCollection);
+        if (isPropertyCached(DispatchSpecimenPeer.COMMENTS)) {
+            removeFromWrapperCollection(DispatchSpecimenPeer.COMMENTS, commentCollection);
         } else {
-            getElementQueue().remove(DispatchSpecimenPeer.COMMENT_COLLECTION, commentCollection);
+            getElementQueue().remove(DispatchSpecimenPeer.COMMENTS, commentCollection);
         }
     }
 
     public void removeFromCommentCollectionWithCheck(List<? extends CommentBaseWrapper> commentCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(DispatchSpecimenPeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollectionWithCheck(DispatchSpecimenPeer.COMMENTS, commentCollection);
     }
 
     void removeFromCommentCollectionWithCheckInternal(List<? extends CommentBaseWrapper> commentCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(DispatchSpecimenPeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollectionWithCheck(DispatchSpecimenPeer.COMMENTS, commentCollection);
     }
 
     public SpecimenWrapper getSpecimen() {

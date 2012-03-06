@@ -19,7 +19,7 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
         "SELECT DISTINCT site"
             + " FROM " + Site.class.getName() + " site"
             + " INNER JOIN FETCH site.address address"
-            + " LEFT JOIN FETCH site.commentCollection comments"
+            + " LEFT JOIN FETCH site.comments comments"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE site.id = ?";
 
@@ -28,9 +28,9 @@ public class SiteGetInfoAction implements Action<SiteInfo> {
         "SELECT site, COUNT(DISTINCT patients), "
             + "COUNT(DISTINCT collectionEvents) "
             + " FROM " + Site.class.getName() + " site"
-            + " LEFT JOIN site.studyCollection studies"
-            + " LEFT JOIN studies.patientCollection patients"
-            + " LEFT JOIN patients.collectionEventCollection collectionEvents"
+            + " LEFT JOIN site.studies studies"
+            + " LEFT JOIN studies.patients patients"
+            + " LEFT JOIN patients.collectionEvents collectionEvents"
             + " WHERE site.id = ?"
             + " GROUP BY site";
 

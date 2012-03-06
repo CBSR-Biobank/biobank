@@ -25,8 +25,8 @@ public class ClinicPeer  extends CenterPeer {
 			}
 		});
 
-	public static final Property<Collection<Contact>, Clinic> CONTACT_COLLECTION = Property.create(
-		"contactCollection" //$NON-NLS-1$
+	public static final Property<Collection<Contact>, Clinic> CONTACTS = Property.create(
+		"contacts" //$NON-NLS-1$
 		, Clinic.class
 		, new TypeReference<Collection<Contact>>() {}
 		, new Property.Accessor<Collection<Contact>, Clinic>() { private static final long serialVersionUID = 1L;
@@ -45,7 +45,7 @@ public class ClinicPeer  extends CenterPeer {
    static {
       List<Property<?, ? super Clinic>> aList = new ArrayList<Property<?, ? super Clinic>>();
       aList.add(SENDS_SHIPMENTS);
-      aList.add(CONTACT_COLLECTION);
+      aList.add(CONTACTS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

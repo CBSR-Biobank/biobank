@@ -56,8 +56,8 @@ public class ReportFilterPeer {
 			}
 		});
 
-	public static final Property<Collection<ReportFilterValue>, ReportFilter> REPORT_FILTER_VALUE_COLLECTION = Property.create(
-		"reportFilterValueCollection" //$NON-NLS-1$
+	public static final Property<Collection<ReportFilterValue>, ReportFilter> REPORT_FILTER_VALUES = Property.create(
+		"reportFilterValues" //$NON-NLS-1$
 		, ReportFilter.class
 		, new TypeReference<Collection<ReportFilterValue>>() {}
 		, new Property.Accessor<Collection<ReportFilterValue>, ReportFilter>() { private static final long serialVersionUID = 1L;
@@ -93,7 +93,7 @@ public class ReportFilterPeer {
       aList.add(POSITION);
       aList.add(ID);
       aList.add(OPERATOR);
-      aList.add(REPORT_FILTER_VALUE_COLLECTION);
+      aList.add(REPORT_FILTER_VALUES);
       aList.add(ENTITY_FILTER);
       PROPERTIES = Collections.unmodifiableList(aList);
    };

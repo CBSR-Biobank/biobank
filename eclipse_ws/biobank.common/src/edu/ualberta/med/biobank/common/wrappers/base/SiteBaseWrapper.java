@@ -51,8 +51,8 @@ public abstract class SiteBaseWrapper extends CenterWrapper<Site> {
     }
 
     public List<ContainerWrapper> getContainerCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(SitePeer.CONTAINER_COLLECTION);
-        List<ContainerWrapper> containerCollection = getWrapperCollection(SitePeer.CONTAINER_COLLECTION, ContainerWrapper.class, sort);
+        boolean notCached = !isPropertyCached(SitePeer.CONTAINERS);
+        List<ContainerWrapper> containerCollection = getWrapperCollection(SitePeer.CONTAINERS, ContainerWrapper.class, sort);
         if (notCached) {
             for (ContainerBaseWrapper e : containerCollection) {
                 e.setSiteInternal(this);
@@ -62,49 +62,49 @@ public abstract class SiteBaseWrapper extends CenterWrapper<Site> {
     }
 
     public void addToContainerCollection(List<? extends ContainerBaseWrapper> containerCollection) {
-        addToWrapperCollection(SitePeer.CONTAINER_COLLECTION, containerCollection);
+        addToWrapperCollection(SitePeer.CONTAINERS, containerCollection);
         for (ContainerBaseWrapper e : containerCollection) {
             e.setSiteInternal(this);
         }
     }
 
     void addToContainerCollectionInternal(List<? extends ContainerBaseWrapper> containerCollection) {
-        if (isInitialized(SitePeer.CONTAINER_COLLECTION)) {
-            addToWrapperCollection(SitePeer.CONTAINER_COLLECTION, containerCollection);
+        if (isInitialized(SitePeer.CONTAINERS)) {
+            addToWrapperCollection(SitePeer.CONTAINERS, containerCollection);
         } else {
-            getElementQueue().add(SitePeer.CONTAINER_COLLECTION, containerCollection);
+            getElementQueue().add(SitePeer.CONTAINERS, containerCollection);
         }
     }
 
     public void removeFromContainerCollection(List<? extends ContainerBaseWrapper> containerCollection) {
-        removeFromWrapperCollection(SitePeer.CONTAINER_COLLECTION, containerCollection);
+        removeFromWrapperCollection(SitePeer.CONTAINERS, containerCollection);
         for (ContainerBaseWrapper e : containerCollection) {
             e.setSiteInternal(null);
         }
     }
 
     void removeFromContainerCollectionInternal(List<? extends ContainerBaseWrapper> containerCollection) {
-        if (isPropertyCached(SitePeer.CONTAINER_COLLECTION)) {
-            removeFromWrapperCollection(SitePeer.CONTAINER_COLLECTION, containerCollection);
+        if (isPropertyCached(SitePeer.CONTAINERS)) {
+            removeFromWrapperCollection(SitePeer.CONTAINERS, containerCollection);
         } else {
-            getElementQueue().remove(SitePeer.CONTAINER_COLLECTION, containerCollection);
+            getElementQueue().remove(SitePeer.CONTAINERS, containerCollection);
         }
     }
 
     public void removeFromContainerCollectionWithCheck(List<? extends ContainerBaseWrapper> containerCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(SitePeer.CONTAINER_COLLECTION, containerCollection);
+        removeFromWrapperCollectionWithCheck(SitePeer.CONTAINERS, containerCollection);
         for (ContainerBaseWrapper e : containerCollection) {
             e.setSiteInternal(null);
         }
     }
 
     void removeFromContainerCollectionWithCheckInternal(List<? extends ContainerBaseWrapper> containerCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(SitePeer.CONTAINER_COLLECTION, containerCollection);
+        removeFromWrapperCollectionWithCheck(SitePeer.CONTAINERS, containerCollection);
     }
 
     public List<ContainerTypeWrapper> getContainerTypeCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(SitePeer.CONTAINER_TYPE_COLLECTION);
-        List<ContainerTypeWrapper> containerTypeCollection = getWrapperCollection(SitePeer.CONTAINER_TYPE_COLLECTION, ContainerTypeWrapper.class, sort);
+        boolean notCached = !isPropertyCached(SitePeer.CONTAINER_TYPES);
+        List<ContainerTypeWrapper> containerTypeCollection = getWrapperCollection(SitePeer.CONTAINER_TYPES, ContainerTypeWrapper.class, sort);
         if (notCached) {
             for (ContainerTypeBaseWrapper e : containerTypeCollection) {
                 e.setSiteInternal(this);
@@ -114,49 +114,49 @@ public abstract class SiteBaseWrapper extends CenterWrapper<Site> {
     }
 
     public void addToContainerTypeCollection(List<? extends ContainerTypeBaseWrapper> containerTypeCollection) {
-        addToWrapperCollection(SitePeer.CONTAINER_TYPE_COLLECTION, containerTypeCollection);
+        addToWrapperCollection(SitePeer.CONTAINER_TYPES, containerTypeCollection);
         for (ContainerTypeBaseWrapper e : containerTypeCollection) {
             e.setSiteInternal(this);
         }
     }
 
     void addToContainerTypeCollectionInternal(List<? extends ContainerTypeBaseWrapper> containerTypeCollection) {
-        if (isInitialized(SitePeer.CONTAINER_TYPE_COLLECTION)) {
-            addToWrapperCollection(SitePeer.CONTAINER_TYPE_COLLECTION, containerTypeCollection);
+        if (isInitialized(SitePeer.CONTAINER_TYPES)) {
+            addToWrapperCollection(SitePeer.CONTAINER_TYPES, containerTypeCollection);
         } else {
-            getElementQueue().add(SitePeer.CONTAINER_TYPE_COLLECTION, containerTypeCollection);
+            getElementQueue().add(SitePeer.CONTAINER_TYPES, containerTypeCollection);
         }
     }
 
     public void removeFromContainerTypeCollection(List<? extends ContainerTypeBaseWrapper> containerTypeCollection) {
-        removeFromWrapperCollection(SitePeer.CONTAINER_TYPE_COLLECTION, containerTypeCollection);
+        removeFromWrapperCollection(SitePeer.CONTAINER_TYPES, containerTypeCollection);
         for (ContainerTypeBaseWrapper e : containerTypeCollection) {
             e.setSiteInternal(null);
         }
     }
 
     void removeFromContainerTypeCollectionInternal(List<? extends ContainerTypeBaseWrapper> containerTypeCollection) {
-        if (isPropertyCached(SitePeer.CONTAINER_TYPE_COLLECTION)) {
-            removeFromWrapperCollection(SitePeer.CONTAINER_TYPE_COLLECTION, containerTypeCollection);
+        if (isPropertyCached(SitePeer.CONTAINER_TYPES)) {
+            removeFromWrapperCollection(SitePeer.CONTAINER_TYPES, containerTypeCollection);
         } else {
-            getElementQueue().remove(SitePeer.CONTAINER_TYPE_COLLECTION, containerTypeCollection);
+            getElementQueue().remove(SitePeer.CONTAINER_TYPES, containerTypeCollection);
         }
     }
 
     public void removeFromContainerTypeCollectionWithCheck(List<? extends ContainerTypeBaseWrapper> containerTypeCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(SitePeer.CONTAINER_TYPE_COLLECTION, containerTypeCollection);
+        removeFromWrapperCollectionWithCheck(SitePeer.CONTAINER_TYPES, containerTypeCollection);
         for (ContainerTypeBaseWrapper e : containerTypeCollection) {
             e.setSiteInternal(null);
         }
     }
 
     void removeFromContainerTypeCollectionWithCheckInternal(List<? extends ContainerTypeBaseWrapper> containerTypeCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(SitePeer.CONTAINER_TYPE_COLLECTION, containerTypeCollection);
+        removeFromWrapperCollectionWithCheck(SitePeer.CONTAINER_TYPES, containerTypeCollection);
     }
 
     public List<StudyWrapper> getStudyCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(SitePeer.STUDY_COLLECTION);
-        List<StudyWrapper> studyCollection = getWrapperCollection(SitePeer.STUDY_COLLECTION, StudyWrapper.class, sort);
+        boolean notCached = !isPropertyCached(SitePeer.STUDIES);
+        List<StudyWrapper> studyCollection = getWrapperCollection(SitePeer.STUDIES, StudyWrapper.class, sort);
         if (notCached) {
             for (StudyBaseWrapper e : studyCollection) {
                 e.addToSiteCollectionInternal(Arrays.asList(this));
@@ -166,44 +166,44 @@ public abstract class SiteBaseWrapper extends CenterWrapper<Site> {
     }
 
     public void addToStudyCollection(List<? extends StudyBaseWrapper> studyCollection) {
-        addToWrapperCollection(SitePeer.STUDY_COLLECTION, studyCollection);
+        addToWrapperCollection(SitePeer.STUDIES, studyCollection);
         for (StudyBaseWrapper e : studyCollection) {
             e.addToSiteCollectionInternal(Arrays.asList(this));
         }
     }
 
     void addToStudyCollectionInternal(List<? extends StudyBaseWrapper> studyCollection) {
-        if (isInitialized(SitePeer.STUDY_COLLECTION)) {
-            addToWrapperCollection(SitePeer.STUDY_COLLECTION, studyCollection);
+        if (isInitialized(SitePeer.STUDIES)) {
+            addToWrapperCollection(SitePeer.STUDIES, studyCollection);
         } else {
-            getElementQueue().add(SitePeer.STUDY_COLLECTION, studyCollection);
+            getElementQueue().add(SitePeer.STUDIES, studyCollection);
         }
     }
 
     public void removeFromStudyCollection(List<? extends StudyBaseWrapper> studyCollection) {
-        removeFromWrapperCollection(SitePeer.STUDY_COLLECTION, studyCollection);
+        removeFromWrapperCollection(SitePeer.STUDIES, studyCollection);
         for (StudyBaseWrapper e : studyCollection) {
             e.removeFromSiteCollectionInternal(Arrays.asList(this));
         }
     }
 
     void removeFromStudyCollectionInternal(List<? extends StudyBaseWrapper> studyCollection) {
-        if (isPropertyCached(SitePeer.STUDY_COLLECTION)) {
-            removeFromWrapperCollection(SitePeer.STUDY_COLLECTION, studyCollection);
+        if (isPropertyCached(SitePeer.STUDIES)) {
+            removeFromWrapperCollection(SitePeer.STUDIES, studyCollection);
         } else {
-            getElementQueue().remove(SitePeer.STUDY_COLLECTION, studyCollection);
+            getElementQueue().remove(SitePeer.STUDIES, studyCollection);
         }
     }
 
     public void removeFromStudyCollectionWithCheck(List<? extends StudyBaseWrapper> studyCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(SitePeer.STUDY_COLLECTION, studyCollection);
+        removeFromWrapperCollectionWithCheck(SitePeer.STUDIES, studyCollection);
         for (StudyBaseWrapper e : studyCollection) {
             e.removeFromSiteCollectionInternal(Arrays.asList(this));
         }
     }
 
     void removeFromStudyCollectionWithCheckInternal(List<? extends StudyBaseWrapper> studyCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(SitePeer.STUDY_COLLECTION, studyCollection);
+        removeFromWrapperCollectionWithCheck(SitePeer.STUDIES, studyCollection);
     }
 
 }

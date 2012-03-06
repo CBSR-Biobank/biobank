@@ -35,7 +35,7 @@ public class SiteQuery {
     @SuppressWarnings("nls")
     private static final String STUDIES_NON_ASSOC_BASE_QRY = "select s from "
         + Study.class.getName() + " s left join s."
-        + StudyPeer.SITE_COLLECTION.getName() + " where ";
+        + StudyPeer.SITES.getName() + " where ";
 
     @SuppressWarnings("nls")
     public static List<StudyWrapper> getStudiesNotAssoc(SiteWrapper site)
@@ -43,7 +43,7 @@ public class SiteQuery {
         List<StudyWrapper> studyWrappers = new ArrayList<StudyWrapper>();
         StringBuilder qry = new StringBuilder(STUDIES_NON_ASSOC_BASE_QRY)
             .append(site.getId()).append(" not in elements(s.")
-            .append(StudyPeer.SITE_COLLECTION.getName()).append(")");
+            .append(StudyPeer.SITES.getName()).append(")");
         HQLCriteria c = new HQLCriteria(qry.toString());
         List<Study> results = site.getAppService().query(c);
         for (Study res : results) {
@@ -114,10 +114,10 @@ public class SiteQuery {
         + Site.class.getName()
         + " as site "
         + "inner join site."
-        + SitePeer.STUDY_COLLECTION.getName()
+        + SitePeer.STUDIES.getName()
         + " as study "
         + "inner join study."
-        + StudyPeer.CONTACT_COLLECTION.getName()
+        + StudyPeer.CONTACTS.getName()
         + " as contact where site." + SitePeer.ID.getName() + "=?";
 
     /**

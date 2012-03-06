@@ -28,10 +28,10 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
             + "COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourceSpecs)"
             + " FROM " + Patient.class.getName() + " patient"
             + " INNER JOIN FETCH patient.study study"
-            + " LEFT JOIN patient.collectionEventCollection cevents"
-            + " LEFT JOIN FETCH patient.commentCollection comments"
-            + " LEFT JOIN cevents.originalSpecimenCollection sourceSpecs"
-            + " LEFT JOIN cevents.allSpecimenCollection allSpecs"
+            + " LEFT JOIN patient.collectionEvents cevents"
+            + " LEFT JOIN FETCH patient.comments comments"
+            + " LEFT JOIN cevents.originalSpecimens sourceSpecs"
+            + " LEFT JOIN cevents.allSpecimens allSpecs"
             + " WHERE patient.id = ?"
             + " GROUP BY patient";
 

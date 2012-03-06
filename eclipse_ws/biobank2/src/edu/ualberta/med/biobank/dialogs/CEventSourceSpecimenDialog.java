@@ -180,7 +180,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             (BgcBaseText) createBoundWidgetWithLabel(contents,
                 BgcBaseText.class, SWT.MULTI,
                 Messages.CEventSourceSpecimenDialog_label_comments, null,
-                internalSpecimen, SpecimenPeer.COMMENT_COLLECTION.getName(),
+                internalSpecimen, SpecimenPeer.COMMENTS.getName(),
                 null);
         gd = (GridData) commentWidget.getLayoutData();
         gd.horizontalSpan = 2;

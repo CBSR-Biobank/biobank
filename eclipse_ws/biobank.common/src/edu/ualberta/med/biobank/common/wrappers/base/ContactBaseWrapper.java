@@ -127,8 +127,8 @@ public class ContactBaseWrapper extends ModelWrapper<Contact> {
     }
 
     public List<StudyWrapper> getStudyCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(ContactPeer.STUDY_COLLECTION);
-        List<StudyWrapper> studyCollection = getWrapperCollection(ContactPeer.STUDY_COLLECTION, StudyWrapper.class, sort);
+        boolean notCached = !isPropertyCached(ContactPeer.STUDIES);
+        List<StudyWrapper> studyCollection = getWrapperCollection(ContactPeer.STUDIES, StudyWrapper.class, sort);
         if (notCached) {
             for (StudyBaseWrapper e : studyCollection) {
                 e.addToContactCollectionInternal(Arrays.asList(this));
@@ -138,44 +138,44 @@ public class ContactBaseWrapper extends ModelWrapper<Contact> {
     }
 
     public void addToStudyCollection(List<? extends StudyBaseWrapper> studyCollection) {
-        addToWrapperCollection(ContactPeer.STUDY_COLLECTION, studyCollection);
+        addToWrapperCollection(ContactPeer.STUDIES, studyCollection);
         for (StudyBaseWrapper e : studyCollection) {
             e.addToContactCollectionInternal(Arrays.asList(this));
         }
     }
 
     void addToStudyCollectionInternal(List<? extends StudyBaseWrapper> studyCollection) {
-        if (isInitialized(ContactPeer.STUDY_COLLECTION)) {
-            addToWrapperCollection(ContactPeer.STUDY_COLLECTION, studyCollection);
+        if (isInitialized(ContactPeer.STUDIES)) {
+            addToWrapperCollection(ContactPeer.STUDIES, studyCollection);
         } else {
-            getElementQueue().add(ContactPeer.STUDY_COLLECTION, studyCollection);
+            getElementQueue().add(ContactPeer.STUDIES, studyCollection);
         }
     }
 
     public void removeFromStudyCollection(List<? extends StudyBaseWrapper> studyCollection) {
-        removeFromWrapperCollection(ContactPeer.STUDY_COLLECTION, studyCollection);
+        removeFromWrapperCollection(ContactPeer.STUDIES, studyCollection);
         for (StudyBaseWrapper e : studyCollection) {
             e.removeFromContactCollectionInternal(Arrays.asList(this));
         }
     }
 
     void removeFromStudyCollectionInternal(List<? extends StudyBaseWrapper> studyCollection) {
-        if (isPropertyCached(ContactPeer.STUDY_COLLECTION)) {
-            removeFromWrapperCollection(ContactPeer.STUDY_COLLECTION, studyCollection);
+        if (isPropertyCached(ContactPeer.STUDIES)) {
+            removeFromWrapperCollection(ContactPeer.STUDIES, studyCollection);
         } else {
-            getElementQueue().remove(ContactPeer.STUDY_COLLECTION, studyCollection);
+            getElementQueue().remove(ContactPeer.STUDIES, studyCollection);
         }
     }
 
     public void removeFromStudyCollectionWithCheck(List<? extends StudyBaseWrapper> studyCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(ContactPeer.STUDY_COLLECTION, studyCollection);
+        removeFromWrapperCollectionWithCheck(ContactPeer.STUDIES, studyCollection);
         for (StudyBaseWrapper e : studyCollection) {
             e.removeFromContactCollectionInternal(Arrays.asList(this));
         }
     }
 
     void removeFromStudyCollectionWithCheckInternal(List<? extends StudyBaseWrapper> studyCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(ContactPeer.STUDY_COLLECTION, studyCollection);
+        removeFromWrapperCollectionWithCheck(ContactPeer.STUDIES, studyCollection);
     }
 
 }

@@ -22,7 +22,7 @@ public class ClinicPreDeleteChecks extends UncachedAction<Clinic> {
     private static final String COUNT_STUDIES_HQL =
         "SELECT COUNT(DISTINCT studies)" + //$NON-NLS-1$
         " FROM " + Contact.class.getName() + " AS contacts" + //$NON-NLS-1$ //$NON-NLS-2$
-        " INNER JOIN contacts." + ContactPeer.STUDY_COLLECTION.getName() + " AS studies" + //$NON-NLS-1$ //$NON-NLS-2$
+        " INNER JOIN contacts." + ContactPeer.STUDIES.getName() + " AS studies" + //$NON-NLS-1$ //$NON-NLS-2$
         " WHERE contacts." + ContactPeer.CLINIC.getName() + " = ?"; //$NON-NLS-1$ //$NON-NLS-2$
     // @formatter:on
 

@@ -23,7 +23,7 @@ public class ResearchGroupGetInfoAction implements
     // @formatter:off
     @SuppressWarnings("nls")
     private static final String RESEARCH_INFO_HQL = "select distinct rg from "
-    + ResearchGroup.class.getName() +" rg left join fetch rg.commentCollection inner join fetch rg.study inner join fetch rg.address where rg.id=?";
+    + ResearchGroup.class.getName() +" rg left join fetch rg.comments inner join fetch rg.study inner join fetch rg.address where rg.id=?";
     // @formatter:on
 
     private final Integer rgId;

@@ -127,9 +127,9 @@ public class BbpdbConsent {
 
     private static final String PT_WITH_CE_QRY = "from "
         + Patient.class.getName()
-        + " pt inner join fetch pt.collectionEventCollection cevents"
-        + " inner join fetch cevents.originalSpecimenCollection spcs"
-        + " inner join fetch cevents.eventAttrCollection eattrs"
+        + " pt inner join fetch pt.collectionEvents cevents"
+        + " inner join fetch cevents.originalSpecimens spcs"
+        + " inner join fetch cevents.eventAttrs eattrs"
         + " inner join fetch eattrs.studyEventAttr seattrs"
         + " inner join fetch seattrs.eventAttrType where pt.pnumber = ?";
 

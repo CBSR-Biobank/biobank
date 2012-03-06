@@ -59,8 +59,8 @@ public class OriginInfoPeer {
 			}
 		});
 
-	public static final Property<Collection<Comment>, OriginInfo> COMMENT_COLLECTION = Property.create(
-		"commentCollection" //$NON-NLS-1$
+	public static final Property<Collection<Comment>, OriginInfo> COMMENTS = Property.create(
+		"comments" //$NON-NLS-1$
 		, OriginInfo.class
 		, new TypeReference<Collection<Comment>>() {}
 		, new Property.Accessor<Collection<Comment>, OriginInfo>() { private static final long serialVersionUID = 1L;
@@ -90,8 +90,8 @@ public class OriginInfoPeer {
 			}
 		});
 
-	public static final Property<Collection<Specimen>, OriginInfo> SPECIMEN_COLLECTION = Property.create(
-		"specimenCollection" //$NON-NLS-1$
+	public static final Property<Collection<Specimen>, OriginInfo> SPECIMENS = Property.create(
+		"specimens" //$NON-NLS-1$
 		, OriginInfo.class
 		, new TypeReference<Collection<Specimen>>() {}
 		, new Property.Accessor<Collection<Specimen>, OriginInfo>() { private static final long serialVersionUID = 1L;
@@ -112,9 +112,9 @@ public class OriginInfoPeer {
       aList.add(ID);
       aList.add(CENTER);
       aList.add(SHIPMENT_INFO);
-      aList.add(COMMENT_COLLECTION);
+      aList.add(COMMENTS);
       aList.add(RECEIVER_SITE);
-      aList.add(SPECIMEN_COLLECTION);
+      aList.add(SPECIMENS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

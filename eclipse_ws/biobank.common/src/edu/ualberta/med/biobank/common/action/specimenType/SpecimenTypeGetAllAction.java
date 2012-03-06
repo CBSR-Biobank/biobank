@@ -18,7 +18,7 @@ public class SpecimenTypeGetAllAction implements
     @SuppressWarnings("nls")
     private static final String SPEC_TYPE_QRY =
         "SELECT DISTINCT stype FROM " + SpecimenType.class.getName() + " stype"
-            + " LEFT JOIN FETCH stype.childSpecimenTypeCollection";
+            + " LEFT JOIN FETCH stype.childSpecimenTypes";
 
     public SpecimenTypeGetAllAction() {
     }

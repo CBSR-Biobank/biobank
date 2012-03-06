@@ -23,7 +23,7 @@ public class SpecimenGetDispatchesAction implements
             + " INNER JOIN FETCH dispatch.senderCenter"
             + " INNER JOIN FETCH dispatch.receiverCenter"
             + " LEFT JOIN FETCH dispatch.shipmentInfo"
-            + " LEFT JOIN FETCH dispatch.dispatchSpecimenCollection dspecs"
+            + " LEFT JOIN FETCH dispatch.dispatchSpecimens dspecs"
             + " LEFT JOIN FETCH dspecs.specimen specimens"
             + " WHERE specimens.id=?";
 

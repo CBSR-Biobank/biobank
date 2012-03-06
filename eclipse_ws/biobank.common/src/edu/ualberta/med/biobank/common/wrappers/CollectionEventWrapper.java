@@ -65,9 +65,9 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         // Specimens are deleted after that, so that's ok to keep the cevent
         // reference
         removeFromWrapperCollection(
-            CollectionEventPeer.ALL_SPECIMEN_COLLECTION, specimenCollection);
+            CollectionEventPeer.ALL_SPECIMENS, specimenCollection);
         removeFromWrapperCollection(
-            CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION,
+            CollectionEventPeer.ORIGINAL_SPECIMENS,
             specimenCollection);
     }
 
@@ -119,7 +119,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     private static final String COLLECTION_EVENTS_BY_WAYBILL_QRY = "from " //$NON-NLS-1$
         + CollectionEvent.class.getName()
         + " ce join ce." //$NON-NLS-1$
-        + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION
+        + CollectionEventPeer.ORIGINAL_SPECIMENS
         + " as spcs join spcs." + SpecimenPeer.ORIGIN_INFO.getName() //$NON-NLS-1$
         + " as oi join oi." + OriginInfoPeer.SHIPMENT_INFO.getName() //$NON-NLS-1$
         + " as shipinfo where shipinfo." + ShipmentInfoPeer.WAYBILL + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -144,7 +144,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         "from " //$NON-NLS-1$
             + CollectionEvent.class.getName()
             + " ce join ce." //$NON-NLS-1$
-            + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION
+            + CollectionEventPeer.ORIGINAL_SPECIMENS
             + " as spcs join spcs." //$NON-NLS-1$
             + SpecimenPeer.ORIGIN_INFO.getName()
             + " as oi join oi." //$NON-NLS-1$
@@ -167,12 +167,12 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     public long getSourceSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
         return getPropertyCount(
-            CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION, fast);
+            CollectionEventPeer.ORIGINAL_SPECIMENS, fast);
     }
 
     public long getAllSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
-        return getPropertyCount(CollectionEventPeer.ALL_SPECIMEN_COLLECTION,
+        return getPropertyCount(CollectionEventPeer.ALL_SPECIMENS,
             fast);
     }
 
@@ -189,8 +189,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         long count = 0;
 
         if (fast
-            && !isInitialized(CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION)
-            && !isInitialized(CollectionEventPeer.ALL_SPECIMEN_COLLECTION)) {
+            && !isInitialized(CollectionEventPeer.ORIGINAL_SPECIMENS)
+            && !isInitialized(CollectionEventPeer.ALL_SPECIMENS)) {
             HQLCriteria criteria = new HQLCriteria(
                 ALIQUOTED_SPECIMEN_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
@@ -471,9 +471,9 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
         tasks.add(check().unique(UNIQUE_VISIT_NUMBER_PROPS));
 
-        tasks.deleteRemoved(this, CollectionEventPeer.ALL_SPECIMEN_COLLECTION);
+        tasks.deleteRemoved(this, CollectionEventPeer.ALL_SPECIMENS);
         tasks.deleteRemoved(this,
-            CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION);
+            CollectionEventPeer.ORIGINAL_SPECIMENS);
 
         super.addPersistTasks(tasks);
     }
@@ -481,7 +481,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
-        tasks.add(check().empty(CollectionEventPeer.ALL_SPECIMEN_COLLECTION,
+        tasks.add(check().empty(CollectionEventPeer.ALL_SPECIMENS,
             HAS_SPECIMENS_MSG));
 
         super.addDeleteTasks(tasks);

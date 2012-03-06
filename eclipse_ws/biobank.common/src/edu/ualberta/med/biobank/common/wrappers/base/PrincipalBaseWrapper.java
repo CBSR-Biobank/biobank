@@ -37,8 +37,8 @@ public abstract class PrincipalBaseWrapper<E extends Principal> extends ModelWra
     }
 
     public List<MembershipWrapper> getMembershipCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(PrincipalPeer.MEMBERSHIP_COLLECTION);
-        List<MembershipWrapper> membershipCollection = getWrapperCollection(PrincipalPeer.MEMBERSHIP_COLLECTION, MembershipWrapper.class, sort);
+        boolean notCached = !isPropertyCached(PrincipalPeer.MEMBERSHIPS);
+        List<MembershipWrapper> membershipCollection = getWrapperCollection(PrincipalPeer.MEMBERSHIPS, MembershipWrapper.class, sort);
         if (notCached) {
             for (MembershipBaseWrapper e : membershipCollection) {
                 e.setPrincipalInternal(this);
@@ -48,44 +48,44 @@ public abstract class PrincipalBaseWrapper<E extends Principal> extends ModelWra
     }
 
     public void addToMembershipCollection(List<? extends MembershipBaseWrapper> membershipCollection) {
-        addToWrapperCollection(PrincipalPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+        addToWrapperCollection(PrincipalPeer.MEMBERSHIPS, membershipCollection);
         for (MembershipBaseWrapper e : membershipCollection) {
             e.setPrincipalInternal(this);
         }
     }
 
     void addToMembershipCollectionInternal(List<? extends MembershipBaseWrapper> membershipCollection) {
-        if (isInitialized(PrincipalPeer.MEMBERSHIP_COLLECTION)) {
-            addToWrapperCollection(PrincipalPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+        if (isInitialized(PrincipalPeer.MEMBERSHIPS)) {
+            addToWrapperCollection(PrincipalPeer.MEMBERSHIPS, membershipCollection);
         } else {
-            getElementQueue().add(PrincipalPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+            getElementQueue().add(PrincipalPeer.MEMBERSHIPS, membershipCollection);
         }
     }
 
     public void removeFromMembershipCollection(List<? extends MembershipBaseWrapper> membershipCollection) {
-        removeFromWrapperCollection(PrincipalPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+        removeFromWrapperCollection(PrincipalPeer.MEMBERSHIPS, membershipCollection);
         for (MembershipBaseWrapper e : membershipCollection) {
             e.setPrincipalInternal(null);
         }
     }
 
     void removeFromMembershipCollectionInternal(List<? extends MembershipBaseWrapper> membershipCollection) {
-        if (isPropertyCached(PrincipalPeer.MEMBERSHIP_COLLECTION)) {
-            removeFromWrapperCollection(PrincipalPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+        if (isPropertyCached(PrincipalPeer.MEMBERSHIPS)) {
+            removeFromWrapperCollection(PrincipalPeer.MEMBERSHIPS, membershipCollection);
         } else {
-            getElementQueue().remove(PrincipalPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+            getElementQueue().remove(PrincipalPeer.MEMBERSHIPS, membershipCollection);
         }
     }
 
     public void removeFromMembershipCollectionWithCheck(List<? extends MembershipBaseWrapper> membershipCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(PrincipalPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+        removeFromWrapperCollectionWithCheck(PrincipalPeer.MEMBERSHIPS, membershipCollection);
         for (MembershipBaseWrapper e : membershipCollection) {
             e.setPrincipalInternal(null);
         }
     }
 
     void removeFromMembershipCollectionWithCheckInternal(List<? extends MembershipBaseWrapper> membershipCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(PrincipalPeer.MEMBERSHIP_COLLECTION, membershipCollection);
+        removeFromWrapperCollectionWithCheck(PrincipalPeer.MEMBERSHIPS, membershipCollection);
     }
 
 }

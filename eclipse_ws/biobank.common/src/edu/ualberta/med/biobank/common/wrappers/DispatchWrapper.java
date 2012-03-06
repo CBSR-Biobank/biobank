@@ -499,14 +499,14 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         tasks.add(new NotNullPreCheck<Dispatch>(this,
             DispatchPeer.SENDER_CENTER));
 
-        tasks.deleteRemoved(this, DispatchPeer.DISPATCH_SPECIMEN_COLLECTION);
+        tasks.deleteRemoved(this, DispatchPeer.DISPATCH_SPECIMENS);
 
         removeSpecimensFromParents(tasks);
         persistSpecimens(tasks);
 
         super.addPersistTasks(tasks);
 
-        tasks.persistAdded(this, DispatchPeer.DISPATCH_SPECIMEN_COLLECTION);
+        tasks.persistAdded(this, DispatchPeer.DISPATCH_SPECIMENS);
 
         BiobankSessionAction checkWaybill = new UniqueCheck<Dispatch>(this,
             UNIQUE_WAYBILL_PER_SENDER_PROPERTIES);

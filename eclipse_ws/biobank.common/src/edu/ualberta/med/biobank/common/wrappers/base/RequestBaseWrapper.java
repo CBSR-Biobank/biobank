@@ -98,45 +98,45 @@ public class RequestBaseWrapper extends ModelWrapper<Request> {
     }
 
     public List<DispatchWrapper> getDispatchCollection(boolean sort) {
-        List<DispatchWrapper> dispatchCollection = getWrapperCollection(RequestPeer.DISPATCH_COLLECTION, DispatchWrapper.class, sort);
+        List<DispatchWrapper> dispatchCollection = getWrapperCollection(RequestPeer.DISPATCHES, DispatchWrapper.class, sort);
         return dispatchCollection;
     }
 
     public void addToDispatchCollection(List<? extends DispatchBaseWrapper> dispatchCollection) {
-        addToWrapperCollection(RequestPeer.DISPATCH_COLLECTION, dispatchCollection);
+        addToWrapperCollection(RequestPeer.DISPATCHES, dispatchCollection);
     }
 
     void addToDispatchCollectionInternal(List<? extends DispatchBaseWrapper> dispatchCollection) {
-        if (isInitialized(RequestPeer.DISPATCH_COLLECTION)) {
-            addToWrapperCollection(RequestPeer.DISPATCH_COLLECTION, dispatchCollection);
+        if (isInitialized(RequestPeer.DISPATCHES)) {
+            addToWrapperCollection(RequestPeer.DISPATCHES, dispatchCollection);
         } else {
-            getElementQueue().add(RequestPeer.DISPATCH_COLLECTION, dispatchCollection);
+            getElementQueue().add(RequestPeer.DISPATCHES, dispatchCollection);
         }
     }
 
     public void removeFromDispatchCollection(List<? extends DispatchBaseWrapper> dispatchCollection) {
-        removeFromWrapperCollection(RequestPeer.DISPATCH_COLLECTION, dispatchCollection);
+        removeFromWrapperCollection(RequestPeer.DISPATCHES, dispatchCollection);
     }
 
     void removeFromDispatchCollectionInternal(List<? extends DispatchBaseWrapper> dispatchCollection) {
-        if (isPropertyCached(RequestPeer.DISPATCH_COLLECTION)) {
-            removeFromWrapperCollection(RequestPeer.DISPATCH_COLLECTION, dispatchCollection);
+        if (isPropertyCached(RequestPeer.DISPATCHES)) {
+            removeFromWrapperCollection(RequestPeer.DISPATCHES, dispatchCollection);
         } else {
-            getElementQueue().remove(RequestPeer.DISPATCH_COLLECTION, dispatchCollection);
+            getElementQueue().remove(RequestPeer.DISPATCHES, dispatchCollection);
         }
     }
 
     public void removeFromDispatchCollectionWithCheck(List<? extends DispatchBaseWrapper> dispatchCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(RequestPeer.DISPATCH_COLLECTION, dispatchCollection);
+        removeFromWrapperCollectionWithCheck(RequestPeer.DISPATCHES, dispatchCollection);
     }
 
     void removeFromDispatchCollectionWithCheckInternal(List<? extends DispatchBaseWrapper> dispatchCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(RequestPeer.DISPATCH_COLLECTION, dispatchCollection);
+        removeFromWrapperCollectionWithCheck(RequestPeer.DISPATCHES, dispatchCollection);
     }
 
     public List<RequestSpecimenWrapper> getRequestSpecimenCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(RequestPeer.REQUEST_SPECIMEN_COLLECTION);
-        List<RequestSpecimenWrapper> requestSpecimenCollection = getWrapperCollection(RequestPeer.REQUEST_SPECIMEN_COLLECTION, RequestSpecimenWrapper.class, sort);
+        boolean notCached = !isPropertyCached(RequestPeer.REQUEST_SPECIMENS);
+        List<RequestSpecimenWrapper> requestSpecimenCollection = getWrapperCollection(RequestPeer.REQUEST_SPECIMENS, RequestSpecimenWrapper.class, sort);
         if (notCached) {
             for (RequestSpecimenBaseWrapper e : requestSpecimenCollection) {
                 e.setRequestInternal(this);
@@ -146,44 +146,44 @@ public class RequestBaseWrapper extends ModelWrapper<Request> {
     }
 
     public void addToRequestSpecimenCollection(List<? extends RequestSpecimenBaseWrapper> requestSpecimenCollection) {
-        addToWrapperCollection(RequestPeer.REQUEST_SPECIMEN_COLLECTION, requestSpecimenCollection);
+        addToWrapperCollection(RequestPeer.REQUEST_SPECIMENS, requestSpecimenCollection);
         for (RequestSpecimenBaseWrapper e : requestSpecimenCollection) {
             e.setRequestInternal(this);
         }
     }
 
     void addToRequestSpecimenCollectionInternal(List<? extends RequestSpecimenBaseWrapper> requestSpecimenCollection) {
-        if (isInitialized(RequestPeer.REQUEST_SPECIMEN_COLLECTION)) {
-            addToWrapperCollection(RequestPeer.REQUEST_SPECIMEN_COLLECTION, requestSpecimenCollection);
+        if (isInitialized(RequestPeer.REQUEST_SPECIMENS)) {
+            addToWrapperCollection(RequestPeer.REQUEST_SPECIMENS, requestSpecimenCollection);
         } else {
-            getElementQueue().add(RequestPeer.REQUEST_SPECIMEN_COLLECTION, requestSpecimenCollection);
+            getElementQueue().add(RequestPeer.REQUEST_SPECIMENS, requestSpecimenCollection);
         }
     }
 
     public void removeFromRequestSpecimenCollection(List<? extends RequestSpecimenBaseWrapper> requestSpecimenCollection) {
-        removeFromWrapperCollection(RequestPeer.REQUEST_SPECIMEN_COLLECTION, requestSpecimenCollection);
+        removeFromWrapperCollection(RequestPeer.REQUEST_SPECIMENS, requestSpecimenCollection);
         for (RequestSpecimenBaseWrapper e : requestSpecimenCollection) {
             e.setRequestInternal(null);
         }
     }
 
     void removeFromRequestSpecimenCollectionInternal(List<? extends RequestSpecimenBaseWrapper> requestSpecimenCollection) {
-        if (isPropertyCached(RequestPeer.REQUEST_SPECIMEN_COLLECTION)) {
-            removeFromWrapperCollection(RequestPeer.REQUEST_SPECIMEN_COLLECTION, requestSpecimenCollection);
+        if (isPropertyCached(RequestPeer.REQUEST_SPECIMENS)) {
+            removeFromWrapperCollection(RequestPeer.REQUEST_SPECIMENS, requestSpecimenCollection);
         } else {
-            getElementQueue().remove(RequestPeer.REQUEST_SPECIMEN_COLLECTION, requestSpecimenCollection);
+            getElementQueue().remove(RequestPeer.REQUEST_SPECIMENS, requestSpecimenCollection);
         }
     }
 
     public void removeFromRequestSpecimenCollectionWithCheck(List<? extends RequestSpecimenBaseWrapper> requestSpecimenCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(RequestPeer.REQUEST_SPECIMEN_COLLECTION, requestSpecimenCollection);
+        removeFromWrapperCollectionWithCheck(RequestPeer.REQUEST_SPECIMENS, requestSpecimenCollection);
         for (RequestSpecimenBaseWrapper e : requestSpecimenCollection) {
             e.setRequestInternal(null);
         }
     }
 
     void removeFromRequestSpecimenCollectionWithCheckInternal(List<? extends RequestSpecimenBaseWrapper> requestSpecimenCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(RequestPeer.REQUEST_SPECIMEN_COLLECTION, requestSpecimenCollection);
+        removeFromWrapperCollectionWithCheck(RequestPeer.REQUEST_SPECIMENS, requestSpecimenCollection);
     }
 
 }

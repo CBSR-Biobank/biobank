@@ -34,7 +34,7 @@ public class Principal extends AbstractBiobankModel {
 
     // Require at least one membership on creation so there is some loose
     // association between the creator and the created user.
-    @NotEmpty(groups = PreInsert.class, message = "{edu.ualberta.med.biobank.model.Principal.membershipCollection.NotEmpty}")
+    @NotEmpty(groups = PreInsert.class, message = "{edu.ualberta.med.biobank.model.Principal.memberships.NotEmpty}")
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "principal")
     public Set<Membership> getMemberships() {
         return this.memberships;

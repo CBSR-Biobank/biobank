@@ -55,8 +55,8 @@ public class SpecimenTypePeer {
 			}
 		});
 
-	public static final Property<Collection<ContainerType>, SpecimenType> CONTAINER_TYPE_COLLECTION = Property.create(
-		"containerTypeCollection" //$NON-NLS-1$
+	public static final Property<Collection<ContainerType>, SpecimenType> CONTAINER_TYPES = Property.create(
+		"containerTypes" //$NON-NLS-1$
 		, SpecimenType.class
 		, new TypeReference<Collection<ContainerType>>() {}
 		, new Property.Accessor<Collection<ContainerType>, SpecimenType>() { private static final long serialVersionUID = 1L;
@@ -71,8 +71,8 @@ public class SpecimenTypePeer {
 			}
 		});
 
-	public static final Property<Collection<SpecimenType>, SpecimenType> PARENT_SPECIMEN_TYPE_COLLECTION = Property.create(
-		"parentSpecimenTypeCollection" //$NON-NLS-1$
+	public static final Property<Collection<SpecimenType>, SpecimenType> PARENT_SPECIMEN_TYPES = Property.create(
+		"parentSpecimenTypes" //$NON-NLS-1$
 		, SpecimenType.class
 		, new TypeReference<Collection<SpecimenType>>() {}
 		, new Property.Accessor<Collection<SpecimenType>, SpecimenType>() { private static final long serialVersionUID = 1L;
@@ -87,8 +87,8 @@ public class SpecimenTypePeer {
 			}
 		});
 
-	public static final Property<Collection<SpecimenType>, SpecimenType> CHILD_SPECIMEN_TYPE_COLLECTION = Property.create(
-		"childSpecimenTypeCollection" //$NON-NLS-1$
+	public static final Property<Collection<SpecimenType>, SpecimenType> CHILD_SPECIMEN_TYPES = Property.create(
+		"childSpecimenTypes" //$NON-NLS-1$
 		, SpecimenType.class
 		, new TypeReference<Collection<SpecimenType>>() {}
 		, new Property.Accessor<Collection<SpecimenType>, SpecimenType>() { private static final long serialVersionUID = 1L;
@@ -109,9 +109,9 @@ public class SpecimenTypePeer {
       aList.add(ID);
       aList.add(NAME);
       aList.add(NAME_SHORT);
-      aList.add(CONTAINER_TYPE_COLLECTION);
-      aList.add(PARENT_SPECIMEN_TYPE_COLLECTION);
-      aList.add(CHILD_SPECIMEN_TYPE_COLLECTION);
+      aList.add(CONTAINER_TYPES);
+      aList.add(PARENT_SPECIMEN_TYPES);
+      aList.add(CHILD_SPECIMEN_TYPES);
       PROPERTIES = Collections.unmodifiableList(aList);
    };
 }

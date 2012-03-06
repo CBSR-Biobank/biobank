@@ -29,7 +29,7 @@ public class PatientGetSimpleCollectionEventInfosAction implements
             + SpecimenPeer.CREATED_AT.getName() + ")"
             + " from " + CollectionEvent.class.getName() + " as cevent"
             + " left join cevent."
-            + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
+            + CollectionEventPeer.ORIGINAL_SPECIMENS.getName()
             + " as sourcesSpecs"
             + " inner join fetch cevent.patient"
             + " where cevent."

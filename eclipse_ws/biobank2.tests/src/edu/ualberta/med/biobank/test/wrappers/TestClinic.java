@@ -43,7 +43,7 @@ public class TestClinic extends TestDatabase {
     }
 
     @Test
-    public void testGetContactCollection() throws Exception {
+    public void testGetContacts() throws Exception {
         String name = "testGetContactCollection" + r.nextInt();
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
         int nber = r.nextInt(5) + 1;

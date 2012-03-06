@@ -20,7 +20,7 @@ public class StudyGetContactsAction implements Action<ListResult<Contact>> {
     @SuppressWarnings("nls")
     private static final String HQL =
         "SELECT contacts FROM " + Study.class.getName() + " study"
-        + " INNER JOIN study.contactCollection contacts"
+        + " INNER JOIN study.contacts contacts"
         + " WHERE study.id=?";
     // @formatter:on
 

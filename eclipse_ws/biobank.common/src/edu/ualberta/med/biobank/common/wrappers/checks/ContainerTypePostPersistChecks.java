@@ -74,7 +74,7 @@ public class ContainerTypePostPersistChecks extends LoadModelAction<ContainerTyp
 
         Collection<ModelWrapper<SpecimenType>> removedSpecimenTypes = wrapper
             .getElementTracker().getRemovedElements(
-                ContainerTypePeer.SPECIMEN_TYPE_COLLECTION);
+                ContainerTypePeer.SPECIMEN_TYPES);
 
         Collection<SpecimenType> unwrapped = new ArrayList<SpecimenType>();
         for (ModelWrapper<SpecimenType> specimenType : removedSpecimenTypes) {
@@ -92,7 +92,7 @@ public class ContainerTypePostPersistChecks extends LoadModelAction<ContainerTyp
 
         Collection<ModelWrapper<ContainerType>> removedContainerTypes = wrapper
             .getElementTracker().getRemovedElements(
-                ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION);
+                ContainerTypePeer.CHILD_CONTAINER_TYPES);
 
         Collection<ContainerType> unwrapped = new ArrayList<ContainerType>();
         for (ModelWrapper<ContainerType> containerType : removedContainerTypes) {

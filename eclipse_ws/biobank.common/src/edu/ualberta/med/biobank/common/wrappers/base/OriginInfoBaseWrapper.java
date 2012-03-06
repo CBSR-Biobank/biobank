@@ -84,40 +84,40 @@ public class OriginInfoBaseWrapper extends ModelWrapper<OriginInfo> {
     }
 
     public List<CommentWrapper> getCommentCollection(boolean sort) {
-        List<CommentWrapper> commentCollection = getWrapperCollection(OriginInfoPeer.COMMENT_COLLECTION, CommentWrapper.class, sort);
+        List<CommentWrapper> commentCollection = getWrapperCollection(OriginInfoPeer.COMMENTS, CommentWrapper.class, sort);
         return commentCollection;
     }
 
     public void addToCommentCollection(List<? extends CommentBaseWrapper> commentCollection) {
-        addToWrapperCollection(OriginInfoPeer.COMMENT_COLLECTION, commentCollection);
+        addToWrapperCollection(OriginInfoPeer.COMMENTS, commentCollection);
     }
 
     void addToCommentCollectionInternal(List<? extends CommentBaseWrapper> commentCollection) {
-        if (isInitialized(OriginInfoPeer.COMMENT_COLLECTION)) {
-            addToWrapperCollection(OriginInfoPeer.COMMENT_COLLECTION, commentCollection);
+        if (isInitialized(OriginInfoPeer.COMMENTS)) {
+            addToWrapperCollection(OriginInfoPeer.COMMENTS, commentCollection);
         } else {
-            getElementQueue().add(OriginInfoPeer.COMMENT_COLLECTION, commentCollection);
+            getElementQueue().add(OriginInfoPeer.COMMENTS, commentCollection);
         }
     }
 
     public void removeFromCommentCollection(List<? extends CommentBaseWrapper> commentCollection) {
-        removeFromWrapperCollection(OriginInfoPeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollection(OriginInfoPeer.COMMENTS, commentCollection);
     }
 
     void removeFromCommentCollectionInternal(List<? extends CommentBaseWrapper> commentCollection) {
-        if (isPropertyCached(OriginInfoPeer.COMMENT_COLLECTION)) {
-            removeFromWrapperCollection(OriginInfoPeer.COMMENT_COLLECTION, commentCollection);
+        if (isPropertyCached(OriginInfoPeer.COMMENTS)) {
+            removeFromWrapperCollection(OriginInfoPeer.COMMENTS, commentCollection);
         } else {
-            getElementQueue().remove(OriginInfoPeer.COMMENT_COLLECTION, commentCollection);
+            getElementQueue().remove(OriginInfoPeer.COMMENTS, commentCollection);
         }
     }
 
     public void removeFromCommentCollectionWithCheck(List<? extends CommentBaseWrapper> commentCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(OriginInfoPeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollectionWithCheck(OriginInfoPeer.COMMENTS, commentCollection);
     }
 
     void removeFromCommentCollectionWithCheckInternal(List<? extends CommentBaseWrapper> commentCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(OriginInfoPeer.COMMENT_COLLECTION, commentCollection);
+        removeFromWrapperCollectionWithCheck(OriginInfoPeer.COMMENTS, commentCollection);
     }
 
     public SiteWrapper getReceiverSite() {
@@ -134,8 +134,8 @@ public class OriginInfoBaseWrapper extends ModelWrapper<OriginInfo> {
     }
 
     public List<SpecimenWrapper> getSpecimenCollection(boolean sort) {
-        boolean notCached = !isPropertyCached(OriginInfoPeer.SPECIMEN_COLLECTION);
-        List<SpecimenWrapper> specimenCollection = getWrapperCollection(OriginInfoPeer.SPECIMEN_COLLECTION, SpecimenWrapper.class, sort);
+        boolean notCached = !isPropertyCached(OriginInfoPeer.SPECIMENS);
+        List<SpecimenWrapper> specimenCollection = getWrapperCollection(OriginInfoPeer.SPECIMENS, SpecimenWrapper.class, sort);
         if (notCached) {
             for (SpecimenBaseWrapper e : specimenCollection) {
                 e.setOriginInfoInternal(this);
@@ -145,44 +145,44 @@ public class OriginInfoBaseWrapper extends ModelWrapper<OriginInfo> {
     }
 
     public void addToSpecimenCollection(List<? extends SpecimenBaseWrapper> specimenCollection) {
-        addToWrapperCollection(OriginInfoPeer.SPECIMEN_COLLECTION, specimenCollection);
+        addToWrapperCollection(OriginInfoPeer.SPECIMENS, specimenCollection);
         for (SpecimenBaseWrapper e : specimenCollection) {
             e.setOriginInfoInternal(this);
         }
     }
 
     void addToSpecimenCollectionInternal(List<? extends SpecimenBaseWrapper> specimenCollection) {
-        if (isInitialized(OriginInfoPeer.SPECIMEN_COLLECTION)) {
-            addToWrapperCollection(OriginInfoPeer.SPECIMEN_COLLECTION, specimenCollection);
+        if (isInitialized(OriginInfoPeer.SPECIMENS)) {
+            addToWrapperCollection(OriginInfoPeer.SPECIMENS, specimenCollection);
         } else {
-            getElementQueue().add(OriginInfoPeer.SPECIMEN_COLLECTION, specimenCollection);
+            getElementQueue().add(OriginInfoPeer.SPECIMENS, specimenCollection);
         }
     }
 
     public void removeFromSpecimenCollection(List<? extends SpecimenBaseWrapper> specimenCollection) {
-        removeFromWrapperCollection(OriginInfoPeer.SPECIMEN_COLLECTION, specimenCollection);
+        removeFromWrapperCollection(OriginInfoPeer.SPECIMENS, specimenCollection);
         for (SpecimenBaseWrapper e : specimenCollection) {
             e.setOriginInfoInternal(null);
         }
     }
 
     void removeFromSpecimenCollectionInternal(List<? extends SpecimenBaseWrapper> specimenCollection) {
-        if (isPropertyCached(OriginInfoPeer.SPECIMEN_COLLECTION)) {
-            removeFromWrapperCollection(OriginInfoPeer.SPECIMEN_COLLECTION, specimenCollection);
+        if (isPropertyCached(OriginInfoPeer.SPECIMENS)) {
+            removeFromWrapperCollection(OriginInfoPeer.SPECIMENS, specimenCollection);
         } else {
-            getElementQueue().remove(OriginInfoPeer.SPECIMEN_COLLECTION, specimenCollection);
+            getElementQueue().remove(OriginInfoPeer.SPECIMENS, specimenCollection);
         }
     }
 
     public void removeFromSpecimenCollectionWithCheck(List<? extends SpecimenBaseWrapper> specimenCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(OriginInfoPeer.SPECIMEN_COLLECTION, specimenCollection);
+        removeFromWrapperCollectionWithCheck(OriginInfoPeer.SPECIMENS, specimenCollection);
         for (SpecimenBaseWrapper e : specimenCollection) {
             e.setOriginInfoInternal(null);
         }
     }
 
     void removeFromSpecimenCollectionWithCheckInternal(List<? extends SpecimenBaseWrapper> specimenCollection) throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(OriginInfoPeer.SPECIMEN_COLLECTION, specimenCollection);
+        removeFromWrapperCollectionWithCheck(OriginInfoPeer.SPECIMENS, specimenCollection);
     }
 
 }

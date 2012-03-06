@@ -108,7 +108,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         "select count(spcs) from " //$NON-NLS-1$
             + CollectionEvent.class.getName()
             + " as cevent join cevent." //$NON-NLS-1$
-            + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
+            + CollectionEventPeer.ORIGINAL_SPECIMENS.getName()
             + " as spcs where cevent." //$NON-NLS-1$
             + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
             + "=?"; //$NON-NLS-1$
@@ -130,7 +130,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         "select count(spcs) from " //$NON-NLS-1$
             + CollectionEvent.class.getName()
             + " as cevent join cevent." //$NON-NLS-1$
-            + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
+            + CollectionEventPeer.ALL_SPECIMENS.getName()
             + " as spcs where cevent." //$NON-NLS-1$
             + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
             + "=? and spcs." //$NON-NLS-1$
@@ -169,9 +169,9 @@ public class PatientWrapper extends PatientBaseWrapper {
         "select distinct(pEvent) from " //$NON-NLS-1$
             + Patient.class.getName()
             + " as patient join patient." //$NON-NLS-1$
-            + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
+            + PatientPeer.COLLECTION_EVENTS.getName()
             + " as ces join ces." //$NON-NLS-1$
-            + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
+            + CollectionEventPeer.ALL_SPECIMENS.getName()
             + " as specimens join specimens." //$NON-NLS-1$
             + SpecimenPeer.PROCESSING_EVENT.getName()
             + " as pEvent where patient." //$NON-NLS-1$
@@ -301,7 +301,7 @@ public class PatientWrapper extends PatientBaseWrapper {
 
     public Long getCollectionEventCount(boolean fast)
         throws BiobankQueryResultSizeException, ApplicationException {
-        return getPropertyCount(PatientPeer.COLLECTION_EVENT_COLLECTION, fast);
+        return getPropertyCount(PatientPeer.COLLECTION_EVENTS, fast);
     }
 
     @Deprecated
@@ -318,7 +318,7 @@ public class PatientWrapper extends PatientBaseWrapper {
     protected void addDeleteTasks(TaskList tasks) {
         String hasCollectionEventsMsg = HAS_COLLECTION_EVENTS_MSG;
         tasks.add(new CollectionIsEmptyCheck<Patient>(this,
-            PatientPeer.COLLECTION_EVENT_COLLECTION, hasCollectionEventsMsg));
+            PatientPeer.COLLECTION_EVENTS, hasCollectionEventsMsg));
 
         String hasSpecimensMsg = MessageFormat.format(HAS_SPECIMENS_MSG,
             getPnumber());

@@ -26,7 +26,7 @@ public class RoleGetAllAction implements Action<ListResult<Role>> {
         @SuppressWarnings("unchecked")
         List<Role> roles = (List<Role>) context.getSession()
             .createCriteria(Role.class)
-            .setFetchMode("permissionCollection", FetchMode.JOIN)
+            .setFetchMode("permissions", FetchMode.JOIN)
             .list();
 
         return new ListResult<Role>(roles);

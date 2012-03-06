@@ -22,7 +22,7 @@ public class ProcessingEventGetInfoAction implements Action<PEventInfo> {
         "SELECT distinct pevent"
             + " FROM " + ProcessingEvent.class.getName() + " pevent"
             + " INNER JOIN FETCH pevent.center"
-            + " LEFT JOIN FETCH pevent.commentCollection comments"
+            + " LEFT JOIN FETCH pevent.comments comments"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE pevent.id=?";
 

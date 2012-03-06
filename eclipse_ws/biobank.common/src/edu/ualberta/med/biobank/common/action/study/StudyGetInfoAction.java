@@ -16,15 +16,15 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     private static final String STUDY_INFO_HQL =
         "SELECT DISTINCT study"
             + " FROM " + Study.class.getName() + " study"
-            + " LEFT JOIN FETCH study.siteCollection"
-            + " LEFT JOIN FETCH study.contactCollection"
-            + " LEFT JOIN FETCH study.sourceSpecimenCollection srcSpc"
+            + " LEFT JOIN FETCH study.sites"
+            + " LEFT JOIN FETCH study.contacts"
+            + " LEFT JOIN FETCH study.sourceSpecimens srcSpc"
             + " LEFT JOIN FETCH srcSpc.specimenType"
-            + " LEFT JOIN FETCH study.aliquotedSpecimenCollection aqSpc"
+            + " LEFT JOIN FETCH study.aliquotedSpecimens aqSpc"
             + " LEFT JOIN FETCH aqSpc.specimenType"
-            + " LEFT JOIN FETCH study.studyEventAttrCollection seattr"
+            + " LEFT JOIN FETCH study.studyEventAttrs seattr"
             + " LEFT JOIN FETCH seattr.globalEventAttr"
-            + " LEFT JOIN FETCH study.commentCollection comments"
+            + " LEFT JOIN FETCH study.comments comments"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE study.id = ?";
 
@@ -32,8 +32,8 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     private static final String STUDY_COUNT_INFO_HQL =
         "SELECT study,COUNT(DISTINCT patients),COUNT(DISTINCT cevents)"
             + " FROM " + Study.class.getName() + " study"
-            + " LEFT JOIN study.patientCollection as patients"
-            + " LEFT JOIN patients.collectionEventCollection AS cevents"
+            + " LEFT JOIN study.patients as patients"
+            + " LEFT JOIN patients.collectionEvents AS cevents"
             + " WHERE study.id = ?";
 
     private final Integer studyId;

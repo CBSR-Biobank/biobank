@@ -54,7 +54,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         "select distinct studies from "
             + Contact.class.getName()
             + " as contacts inner join contacts."
-            + ContactPeer.STUDY_COLLECTION.getName()
+            + ContactPeer.STUDIES.getName()
             + " as studies where contacts."
             + Property.concatNames(ContactPeer.CLINIC, ClinicPeer.ID)
             + " = ? order by studies.nameShort";
@@ -98,9 +98,9 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         "select count(distinct patients) from "
             + Clinic.class.getName()
             + " as clinic join clinic."
-            + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
+            + ClinicPeer.ORIGIN_INFOS.getName()
             + " as oi join oi."
-            + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
+            + OriginInfoPeer.SPECIMENS.getName()
             + " as spcs join spcs."
             + SpecimenPeer.COLLECTION_EVENT.getName()
             + " as cevents join cevents."
@@ -122,9 +122,9 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         "select count(distinct patients) from "
             + Clinic.class.getName()
             + " as clinic join clinic."
-            + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
+            + ClinicPeer.ORIGIN_INFOS.getName()
             + " as oi join oi."
-            + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
+            + OriginInfoPeer.SPECIMENS.getName()
             + " as spcs join spcs."
             + SpecimenPeer.COLLECTION_EVENT.getName()
             + " as cevents join cevents."
@@ -169,9 +169,9 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         "select count(cevent) from "
             + Clinic.class.getName()
             + " as clinic join clinic."
-            + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
+            + ClinicPeer.ORIGIN_INFOS.getName()
             + " as origins join origins."
-            + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
+            + OriginInfoPeer.SPECIMENS.getName()
             + " as spcs join spcs."
             + SpecimenPeer.COLLECTION_EVENT.getName()
             + " as cevent where clinic."
@@ -190,9 +190,9 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         "select count(distinct cEvent) from "
             + Clinic.class.getName()
             + " as clinic join clinic."
-            + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
+            + ClinicPeer.ORIGIN_INFOS.getName()
             + " as origins join origins."
-            + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
+            + OriginInfoPeer.SPECIMENS.getName()
             + " as specimens join specimens."
             + SpecimenPeer.COLLECTION_EVENT.getName()
             + " as cEvent where clinic."
@@ -216,7 +216,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.deleteRemoved(this, ClinicPeer.CONTACT_COLLECTION);
+        tasks.deleteRemoved(this, ClinicPeer.CONTACTS);
 
         super.addPersistTasks(tasks);
     }

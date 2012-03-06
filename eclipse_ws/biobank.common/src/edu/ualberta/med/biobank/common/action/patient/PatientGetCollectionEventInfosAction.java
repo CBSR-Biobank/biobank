@@ -24,7 +24,7 @@ public class PatientGetCollectionEventInfosAction implements
     private static final String CEVENT_INFO_QRY =
         "SELECT distinct cevent"
             + " FROM " + CollectionEvent.class.getName() + " as cevent"
-            + " LEFT JOIN FETCH cevent.commentCollection comments"
+            + " LEFT JOIN FETCH cevent.comments comments"
             + " LEFT JOIN FETCH comments.user"
             + " WHERE cevent.patient.id=?";
 
@@ -34,8 +34,8 @@ public class PatientGetCollectionEventInfosAction implements
             + "COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourcesSpecs),"
             + " MIN(sourcesSpecs." + SpecimenPeer.CREATED_AT.getName() + ")"
             + " FROM " + CollectionEvent.class.getName() + " as cevent"
-            + " LEFT JOIN cevent.originalSpecimenCollection as sourcesSpecs"
-            + " LEFT JOIN cevent.allSpecimenCollection as allSpecs"
+            + " LEFT JOIN cevent.originalSpecimens as sourcesSpecs"
+            + " LEFT JOIN cevent.allSpecimens as allSpecs"
             + " WHERE cevent.patient.id=?"
             + " GROUP BY cevent";
 

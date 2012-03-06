@@ -42,8 +42,8 @@ public class DispatchSpecimenPeer {
 			}
 		});
 
-	public static final Property<Collection<Comment>, DispatchSpecimen> COMMENT_COLLECTION = Property.create(
-		"commentCollection" //$NON-NLS-1$
+	public static final Property<Collection<Comment>, DispatchSpecimen> COMMENTS = Property.create(
+		"comments" //$NON-NLS-1$
 		, DispatchSpecimen.class
 		, new TypeReference<Collection<Comment>>() {}
 		, new Property.Accessor<Collection<Comment>, DispatchSpecimen>() { private static final long serialVersionUID = 1L;
@@ -93,7 +93,7 @@ public class DispatchSpecimenPeer {
       List<Property<?, ? super DispatchSpecimen>> aList = new ArrayList<Property<?, ? super DispatchSpecimen>>();
       aList.add(ID);
       aList.add(STATE);
-      aList.add(COMMENT_COLLECTION);
+      aList.add(COMMENTS);
       aList.add(SPECIMEN);
       aList.add(DISPATCH);
       PROPERTIES = Collections.unmodifiableList(aList);
