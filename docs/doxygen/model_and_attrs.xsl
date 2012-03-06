@@ -29,26 +29,42 @@
   </xsl:template>
 
   <xsl:template match="name">
-      <h4>Attribute: <xsl:value-of select="lower-case(substring(substring-after(../name,'get'),1,1))"/><xsl:value-of select="substring(substring-after(../name,'get'),2)"/>
-      <xsl:choose>
-        <xsl:when test="../type = 'ActivityStatus'">
-          <xsl:text>(type: one of: ACTIVE, FLAGGED, CLOSED)</xsl:text>
-        </xsl:when>
+    <tr>
+      <td><xsl:value-of select="lower-case(substring(substring-after(../name,'get'),1,1))"/><xsl:value-of select="substring(substring-after(../name,'get'),2)"/></td>
+      <td>
+        <xsl:choose>
+          <xsl:when test="../type = 'ActivityStatus'">
+            <xsl:text>one of: ACTIVE, FLAGGED, CLOSED</xsl:text>
+          </xsl:when>
         <xsl:otherwise>
-          (type: <xsl:value-of select="../type" />)
+          <xsl:value-of select="../type" />
         </xsl:otherwise>
-      </xsl:choose>
-      </h4>
-      <xsl:apply-templates select="../briefdescription"/>
-      <xsl:apply-templates select="../detaileddescription"/>
+        </xsl:choose>
+      </td>
+      <td>
+        <xsl:apply-templates select="../briefdescription"/>
+        <xsl:apply-templates select="../detaileddescription"/>
+      </td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="sectiondef[@kind='public-func']">
     <xsl:param name="classNum" />
+    <table>
+      <thead>
+        <tr>
+          <td>Name</td>
+          <td>Type</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
     <xsl:for-each select="memberdef[@kind='function']/name[starts-with(.,'get')]" >
       <xsl:sort select="../name" data-type="text" />
       <xsl:apply-templates select="../name" />
     </xsl:for-each>
+      </tbody>
+    </table>
   </xsl:template>
 
   <xsl:template match="compoundname">
@@ -57,7 +73,13 @@
 
   <xsl:template match="/*">
     <html>
+      <head>
+        <style type="text/css">
+          table td { }
+        </style>
+      </head>
       <body>
+        <!-- do not show class AbstractBiobankModel in the output -->
         <xsl:for-each select="compounddef[@kind='class'][not(contains(@id,'AbstractBiobankModel'))]">
           <div>
             <xsl:apply-templates select="compoundname" />
