@@ -123,7 +123,7 @@ public class TestResearchGroup extends TestAction {
             ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
                 name,
                 studyId);
-        Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
+        Integer rId = RequestHelper.createRequest(session = SESSION_PROVIDER.openSession(), EXECUTOR, rgId);
         ResearchGroupDeleteAction delete =
             new ResearchGroupDeleteAction(rgId);
         try {
