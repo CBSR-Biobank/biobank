@@ -1,43 +1,66 @@
 package edu.ualberta.med.biobank.common.action.security;
 
-import java.util.List;
-
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.peer.UserPeer;
+import edu.ualberta.med.biobank.common.permission.Permission;
+import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
+import edu.ualberta.med.biobank.model.BbGroup;
+import edu.ualberta.med.biobank.model.Membership;
+import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
 
+/**
+ * Return a {@link User} only with the {@link Membership}-s, {@link Group}-s,
+ * {@link Role}-s, and {@link PermissionEnum}-s that the executing {@link User}
+ * is able to manage.
+ * 
+ * @author Jonathan Ferland
+ */
 public class UserGetAction implements Action<UserGetResult> {
-
     private static final long serialVersionUID = 1L;
-    private String login;
+    private static final Permission PERMISSION = new UserManagementPermission();
 
-    public UserGetAction(String login) {
-        this.login = login;
+    private Integer userId;
+
+    public UserGetAction(Integer userId) {
+        this.userId = userId;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return true;
+        return PERMISSION.isAllowed(context);
     }
 
     @Override
     public UserGetResult run(ActionContext context) throws ActionException {
-        Criteria c =
-            context.getSession().createCriteria(User.class.getName()).add(
-                Restrictions.eq(UserPeer.LOGIN.getName(), login));
-        // FIXME need to fetch all the user graph of object?
+        User user = context.load(User.class, userId);
 
-        @SuppressWarnings("unchecked")
-        List<User> list = c.list();
-        if (list.size() == 0) {
-            throw new ActionException("Problem getting user with login=" //$NON-NLS-1$
-                + login);
+        return new UserGetResult(user);
+    }
+
+    public static class UserDTO {
+        private String login;
+        private boolean recvBulkEmails = true;
+        private String fullName;
+        private String email;
+        private boolean needPwdChange = true;
+
+        private WorkingSet<BbGroup> groups;
+        private WorkingSet<Membership> memberships;
+
+        public UserDTO(User user) {
+            // go through Membership-s, find if any PermissionEnum-s in it, then
+            // add it to the collection if so.
+            for (Membership membership : user.getMembershipCollection()) {
+
+            }
         }
-        return new UserGetResult(list.get(0));
+
+        public static class MembershipDTO {
+            private WorkingSet<Role> roles;
+            private WorkingSet<PermissionEnum> permissions;
+        }
     }
 }
