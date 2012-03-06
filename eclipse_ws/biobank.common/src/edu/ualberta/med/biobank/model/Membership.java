@@ -225,6 +225,26 @@ public class Membership extends AbstractBiobankModel {
         return true;
     }
 
+    @Transient
+    public boolean isRankGe(Rank rank) {
+        return rank.isLe(getRank());
+    }
+
+    @Transient
+    public boolean isGlobal() {
+        return isAllCenters() && isAllStudies();
+    }
+
+    @Transient
+    public boolean isAllCenters() {
+        return getCenter() == null;
+    }
+
+    @Transient
+    public boolean isAllStudies() {
+        return getStudy() == null;
+    }
+
     /**
      * Return true if at least one {@link PermissionEnum} or {@link Role} in
      * this {@link Membership} can be managed by the given {@link Membership},

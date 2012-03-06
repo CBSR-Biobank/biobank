@@ -196,7 +196,8 @@ public class TestUser extends TestDatabase {
         UserWrapper user = UserHelper.addUser(name, null, true);
 
         MembershipWrapper ms = MembershipHelper.newMembership(user, null, null);
-        ms.addToPermissionCollection(Arrays.asList(PermissionEnum.ADMINISTRATION));
+        ms.addToPermissionCollection(Arrays
+            .asList(PermissionEnum.CLINIC_CREATE));
         user.persist();
 
         user.reload();

@@ -74,7 +74,7 @@ public class TestRole extends TestAction {
         action.setName(getMethodNameR());
 
         Set<PermissionEnum> permissions = new HashSet<PermissionEnum>();
-        permissions.add(PermissionEnum.ADMINISTRATION);
+        permissions.add(PermissionEnum.CLINIC_READ);
         permissions.add(PermissionEnum.CLINIC_CREATE);
 
         action.setPermissions(permissions);
@@ -95,7 +95,7 @@ public class TestRole extends TestAction {
         action.setName(getMethodNameR());
 
         Set<PermissionEnum> permissions = new HashSet<PermissionEnum>();
-        permissions.add(PermissionEnum.ADMINISTRATION);
+        permissions.add(PermissionEnum.CLINIC_READ);
 
         action.setPermissions(permissions);
 
