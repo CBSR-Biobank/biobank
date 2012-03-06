@@ -48,6 +48,8 @@ public class MembershipSaveAction implements Action<IdResult> {
         // (1) sending the entire set you think you're working with or
         // (2) sending what you think the differences are, (i.e. and added set
         // and a removed set)
+        // -- don't bother sending the Membership PE and Role options back, we
+        // can figure this out on the client.
         this.permissions = m.getPermissions();
         // this.manageablePermissions =
         m.getManageablePermissions(manager);

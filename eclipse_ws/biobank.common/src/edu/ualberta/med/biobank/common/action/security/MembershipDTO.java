@@ -23,23 +23,22 @@ import edu.ualberta.med.biobank.model.User;
  * @author Jonathan Ferland
  */
 public class MembershipDTO {
-    private final Set<Role> manageableRoles = null;
-    private final Set<PermissionEnum> manageablePermissions;
+    private final Set<Role> roleOptions = null;
+    private final Set<PermissionEnum> permissionOptions;
 
     private Center center;
     private Study study;
 
-    public MembershipDTO(Membership membership, User requestingUser) {
-        this.manageablePermissions =
-            Collections.unmodifiableSet(membership
-                .getManageablePermissions(requestingUser));
+    public MembershipDTO(Membership m, User requestingUser) {
+        this.permissionOptions = Collections.unmodifiableSet(m
+            .getManageablePermissions(requestingUser));
     }
 
     public Set<PermissionEnum> getManageablePermissions() {
-        return manageablePermissions;
+        return permissionOptions;
     }
 
     public Set<Role> getManageableRoles() {
-        return manageableRoles;
+        return roleOptions;
     }
 }
