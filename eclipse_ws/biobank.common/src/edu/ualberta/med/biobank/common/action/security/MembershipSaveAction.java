@@ -33,17 +33,27 @@ public class MembershipSaveAction implements Action<IdResult> {
     private final Set<PermissionEnum> permissions;
     private final Set<Integer> roleIds;
 
+    // TODO: take a MembershipDTO that knows what PermissionEnum-s and Role-s it
+    // is meant to be working with?
     public MembershipSaveAction(Membership m, User manager) {
         this.id = m.getId();
-        this.centerId = m.getCenter().getId();
-        this.studyId = m.getStudy().getId();
+        this.centerId = ModelUtil.getId(m.getCenter());
+        this.studyId = ModelUtil.getId(m.getStudy());
         this.rank = m.getRank();
         this.level = m.getLevel();
 
+        // I HAVE TO SEND THE OPTIONS, SO WHAT I THINK IS GOING TO BE DONE IS
+        // WHAT IS ACTUALLY DONE.
+        // Note that this can be done by either:
+        // (1) sending the entire set you think you're working with or
+        // (2) sending what you think the differences are, (i.e. and added set
+        // and a removed set)
         this.permissions = m.getPermissions();
         // this.manageablePermissions =
         m.getManageablePermissions(manager);
         m.getManageableRoles(manager);
+
+        // EnumSet.
 
         this.roleIds = ModelUtil.getIds(m.getRoles());
     }
@@ -57,6 +67,8 @@ public class MembershipSaveAction implements Action<IdResult> {
     public IdResult run(ActionContext context) throws ActionException {
         Membership m = context.load(Membership.class, id, new Membership());
 
+        if (m.getId() != null) checkManageability(m, context);
+
         m.setCenter(context.load(Center.class, centerId));
         m.setStudy(context.load(Study.class, studyId));
         m.setRank(rank);
@@ -64,6 +76,18 @@ public class MembershipSaveAction implements Action<IdResult> {
 
         // m.getPermissions().removeAll(c)
 
+        // TODO: check user can still manage all permissions before removing
+        // TODO: check user can still manage all roles before removing
+
+        checkManageability(m, context);
+
         return new IdResult(m.getId());
+    }
+
+    private void checkManageability(Membership m, ActionContext c) {
+        if (!m.isManageable(c.getUser())) {
+            throw new ActionException(
+                "you do not have the permissions to modify this membership");
+        }
     }
 }

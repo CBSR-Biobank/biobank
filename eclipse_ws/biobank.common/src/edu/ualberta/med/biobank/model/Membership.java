@@ -183,6 +183,11 @@ public class Membership extends AbstractBiobankModel {
         return permissions;
     }
 
+    @Transient
+    public Set<Role> getManageableRoles(User user) {
+        return getManageableRoles(user, getRoles());
+    }
+
     /**
      * Returns a {@link Set} of all the <strong>existing</strong> {@link Role}-s
      * on this {@link Membership} that the given {@link User} is allowed to
@@ -195,15 +200,17 @@ public class Membership extends AbstractBiobankModel {
      * 
      * @param user the manager, who is allowed to modify the returned
      *            {@link Role}-s
+     * @param defaultAdminRoles which {@link Role}-s to add to the set if the
+     *            {@link User} is an {@link Rank#ADMINISTRATOR}.
      * @return the {@link Role}-s that the manager can manipulate
      */
     @Transient
-    public Set<Role> getManageableRoles(User user) {
+    public Set<Role> getManageableRoles(User user, Set<Role> defaultAdminRoles) {
         Set<Role> roles = new HashSet<Role>();
         for (Membership membership : user.getAllMemberships()) {
             if (isManageable(membership)) {
                 if (Rank.ADMINISTRATOR.equals(membership.getRank())) {
-                    roles.addAll(getRoles());
+                    roles.addAll(defaultAdminRoles);
                 }
                 roles.addAll(membership.getRoles());
             }
@@ -226,6 +233,14 @@ public class Membership extends AbstractBiobankModel {
         if (!getManageableRoles(u).containsAll(getRoles()))
             return false;
         return true;
+    }
+
+    @Transient
+    public boolean isManageable(User u) {
+        for (Membership membership : u.getAllMemberships()) {
+            if (isManageable(membership)) return true;
+        }
+        return false;
     }
 
     @Transient
