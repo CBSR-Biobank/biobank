@@ -16,7 +16,6 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.action.SetResult;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
@@ -110,16 +109,29 @@ public class TestSite extends TestAction {
             Assert.assertTrue(true);
         }
 
-        // test invalid act status: 5, -1
+        // TODO: test invalid act status: 5, -1
         Address address = new Address();
         address.setCity(name);
         siteSaveAction.setAddress(address);
-        siteSaveAction.setStudyIds(null);
+        Set<Integer> studyIds = new HashSet<Integer>();
+        studyIds.add(null);
+        siteSaveAction.setStudyIds(studyIds);
         try {
             EXECUTOR.exec(siteSaveAction);
             Assert.fail(
-                "should not be allowed to add site with null site ids");
-        } catch (ConstraintViolationException e) {
+                "should not be allowed to add site with a null site id");
+        } catch (ModelNotFoundException e) {
+            Assert.assertTrue(true);
+        }
+
+        studyIds.clear();
+        studyIds.add(-1);
+        siteSaveAction.setStudyIds(studyIds);
+        try {
+            EXECUTOR.exec(siteSaveAction);
+            Assert.fail(
+                "should not be allowed to add site with an invalid site id");
+        } catch (ModelNotFoundException e) {
             Assert.assertTrue(true);
         }
 
@@ -461,9 +473,9 @@ public class TestSite extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
-        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
-            new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
-            .getList();
+        CEventInfo ceventInfo =
+            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+        List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
 
         // create a processing event with one of the collection event source
         // specimens

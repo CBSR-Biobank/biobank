@@ -228,8 +228,6 @@ public class StudySaveAction implements Action<IdResult> {
     public IdResult run(ActionContext context) throws ActionException {
         study = context.get(Study.class, id, new Study());
 
-        // TODO: version check?
-
         study.setId(id);
         study.setName(name);
         study.setNameShort(nameShort);

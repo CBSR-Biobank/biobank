@@ -21,6 +21,10 @@ public class SiteSaveAction extends CenterSaveAction {
     private Set<Integer> studyIds;
 
     public void setStudyIds(Set<Integer> studyIds) {
+        if (studyIds == null) {
+            throw new IllegalArgumentException();
+        }
+
         this.studyIds = studyIds;
     }
 

@@ -22,7 +22,6 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.StudyInfo;
@@ -166,12 +165,8 @@ public class TestStudy extends TestAction {
     public void checkGetAction() throws Exception {
         Provisioning provisioning = new Provisioning(EXECUTOR, name);
 
-        Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(EXECUTOR,
-                provisioning.patientIds.get(0), provisioning.clinicId);
-        EXECUTOR.exec(
-            new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
-            .getList();
+        CollectionEventHelper.createCEventWithSourceSpecimens(EXECUTOR,
+            provisioning.patientIds.get(0), provisioning.clinicId);
 
         Set<SourceSpecimenSaveInfo> ssSaveInfosAll =
             getSourceSpecimens(R.nextInt(5) + 1, getSpecimenTypes());
@@ -239,7 +234,6 @@ public class TestStudy extends TestAction {
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
-
     }
 
     @Test
@@ -250,9 +244,9 @@ public class TestStudy extends TestAction {
             ClinicHelper.createClinicsWithContacts(EXECUTOR,
                 name + "_clinic", numClinics, numContacts);
 
-        List<Contact> studyContactsSet1 = new ArrayList<Contact>();
-        List<Contact> studyContactsSet2 = new ArrayList<Contact>();
-        Set<Contact> expectedStudyContacts = new HashSet<Contact>();
+        List<Integer> studyContactIdsSet1 = new ArrayList<Integer>();
+        List<Integer> studyContactIdsSet2 = new ArrayList<Integer>();
+        Set<Integer> expectedStudyContactIds = new HashSet<Integer>();
 
         // get a contact id from each clinic
         for (Integer clinicId : clinicIds) {
@@ -262,53 +256,52 @@ public class TestStudy extends TestAction {
             Assert.assertNotNull(contacts);
             Assert.assertNotNull(contacts.get(0));
             Assert.assertNotNull(contacts.get(1));
-            studyContactsSet1.add(contacts.get(0));
-            studyContactsSet2.add(contacts.get(1));
+            studyContactIdsSet1.add(contacts.get(0).getId());
+            studyContactIdsSet2.add(contacts.get(1).getId());
         }
 
         // add a contact one by one from set 1
         Integer studyId = EXECUTOR.exec(studySaveAction).getId();
-        for (Contact c : studyContactsSet1) {
-            expectedStudyContacts.add(c);
-            studyAddContacts(studyId, Arrays.asList(c));
-            Assert.assertEquals(expectedStudyContacts,
-                getStudyContacts(studyId));
+        for (Integer id : studyContactIdsSet1) {
+            expectedStudyContactIds.add(id);
+            studyAddContacts(studyId, Arrays.asList(id));
+            Assert.assertEquals(expectedStudyContactIds,
+                getStudyContactIds(studyId));
         }
 
         // add contact set 2
-        studyAddContacts(studyId, studyContactsSet2);
-        expectedStudyContacts.addAll(studyContactsSet2);
-        Assert.assertEquals(expectedStudyContacts,
-            getStudyContacts(studyId));
+        studyAddContacts(studyId, studyContactIdsSet2);
+        expectedStudyContactIds.addAll(studyContactIdsSet2);
+        Assert.assertEquals(expectedStudyContactIds,
+            getStudyContactIds(studyId));
 
         // remove all contacts from set 1 individually
-        for (Contact c : studyContactsSet1) {
-            expectedStudyContacts.remove(c);
-            studyRemoveContacts(studyId, Arrays.asList(c));
-            Assert.assertEquals(expectedStudyContacts,
-                getStudyContacts(studyId));
+        for (Integer id : studyContactIdsSet1) {
+            expectedStudyContactIds.remove(id);
+            studyRemoveContacts(studyId, Arrays.asList(id));
+            Assert.assertEquals(expectedStudyContactIds,
+                getStudyContactIds(studyId));
         }
 
         // remove contact set 2
-        studyRemoveContacts(studyId, studyContactsSet2);
-        expectedStudyContacts.removeAll(studyContactsSet2);
-        Assert.assertEquals(expectedStudyContacts,
-            getStudyContacts(studyId));
-        Assert.assertTrue(getStudyContacts(studyId).isEmpty());
+        studyRemoveContacts(studyId, studyContactIdsSet2);
+        expectedStudyContactIds.removeAll(studyContactIdsSet2);
+        Assert.assertEquals(expectedStudyContactIds,
+            getStudyContactIds(studyId));
+        Assert.assertTrue(getStudyContactIds(studyId).isEmpty());
 
         // test removing clinics - should fail
-        studyAddContacts(studyId, studyContactsSet2);
-        expectedStudyContacts.addAll(studyContactsSet2);
-        Assert.assertEquals(expectedStudyContacts,
-            getStudyContacts(studyId));
+        studyAddContacts(studyId, studyContactIdsSet2);
+        expectedStudyContactIds.addAll(studyContactIdsSet2);
+        Assert.assertEquals(expectedStudyContactIds,
+            getStudyContactIds(studyId));
 
-        for (Contact c : studyContactsSet2) {
+        for (Integer clinicId : clinicIds) {
             try {
-                EXECUTOR.exec(new ClinicDeleteAction(c.getClinic()
-                    .getId()));
+                EXECUTOR.exec(new ClinicDeleteAction(clinicId));
                 Assert
                     .fail("should not be allowed to delete a clinic with contact linked to study");
-            } catch (ActionCheckException e) {
+            } catch (ConstraintViolationException e) {
                 Assert.assertTrue(true);
             }
         }
@@ -328,28 +321,24 @@ public class TestStudy extends TestAction {
         }
     }
 
-    private void studyAddContacts(Integer studyId, List<Contact> contacts)
+    private void studyAddContacts(Integer studyId, List<Integer> newContactIds)
         throws ApplicationException {
-        StudyInfo studyInfo =
-            EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        for (Contact c : contacts) {
-            ClinicInfo clinicInfo =
-                new ClinicInfo(c.getClinic(), 0L, 0L, Arrays.asList(c));
-            studyInfo.clinicInfos.add(clinicInfo);
+        StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
+        Set<Integer> contactIds = new HashSet<Integer>();
+        for (ClinicInfo clinicInfo : studyInfo.clinicInfos) {
+            for (Contact c : clinicInfo.getContacts()) {
+                contactIds.add(c.getId());
+            }
         }
-        StudySaveAction studySave =
-            StudyHelper.getSaveAction(studyInfo);
+        contactIds.addAll(newContactIds);
+
+        StudySaveAction studySave = StudyHelper.getSaveAction(studyInfo);
+        studySave.setContactIds(contactIds);
         EXECUTOR.exec(studySave);
     }
 
     private void studyRemoveContacts(Integer studyId,
-        List<Contact> contactsToRemove) throws ApplicationException {
-        // get a list of contact IDs to remove
-        List<Integer> idsToRemove = new ArrayList<Integer>();
-        for (Contact c : contactsToRemove) {
-            idsToRemove.add(c.getId());
-        }
-
+        List<Integer> contactIdsToRemove) throws ApplicationException {
         // get a list of current contact IDs
         StudyInfo studyInfo =
             EXECUTOR.exec(new StudyGetInfoAction(studyId));
@@ -359,7 +348,7 @@ public class TestStudy extends TestAction {
                 studyContactIds.add(c.getId());
             }
         }
-        studyContactIds.removeAll(idsToRemove);
+        studyContactIds.removeAll(contactIdsToRemove);
 
         StudySaveAction studySave =
             StudyHelper.getSaveAction(studyInfo);
@@ -367,15 +356,16 @@ public class TestStudy extends TestAction {
         EXECUTOR.exec(studySave);
     }
 
-    private Set<Contact> getStudyContacts(Integer studyId)
+    private Set<Integer> getStudyContactIds(Integer studyId)
         throws ApplicationException {
-        StudyInfo studyInfo =
-            EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        Set<Contact> contacts = new HashSet<Contact>();
+        StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
+        Set<Integer> contactIds = new HashSet<Integer>();
         for (ClinicInfo clinicInfo : studyInfo.clinicInfos) {
-            contacts.addAll(clinicInfo.getContacts());
+            for (Contact c : clinicInfo.getContacts()) {
+                contactIds.add(c.getId());
+            }
         }
-        return contacts;
+        return contactIds;
     }
 
     private static Set<SourceSpecimenSaveInfo> getSourceSpecimens(
