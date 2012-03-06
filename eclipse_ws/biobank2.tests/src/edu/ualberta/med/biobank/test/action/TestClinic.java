@@ -183,13 +183,13 @@ public class TestClinic extends TestAction {
         Integer clinicId = EXECUTOR.exec(clinicSaveAction).getId();
         ClinicInfo clinicInfo =
             EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
-        Assert.assertEquals(0, clinicInfo.clinic.getCommentCollection().size());
+        Assert.assertEquals(0, clinicInfo.clinic.getComments().size());
 
         clinicInfo = addComment(clinicId);
-        Assert.assertEquals(1, clinicInfo.clinic.getCommentCollection().size());
+        Assert.assertEquals(1, clinicInfo.clinic.getComments().size());
 
         clinicInfo = addComment(clinicId);
-        Assert.assertEquals(2, clinicInfo.clinic.getCommentCollection().size());
+        Assert.assertEquals(2, clinicInfo.clinic.getComments().size());
 
         // TODO: check full name on each comment's user
         // for (Comment comment : clinicInfo.clinic.getCommentCollection()) {

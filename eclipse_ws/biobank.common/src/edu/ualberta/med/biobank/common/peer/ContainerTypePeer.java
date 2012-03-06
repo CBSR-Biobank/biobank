@@ -127,12 +127,12 @@ public class ContainerTypePeer {
 		, new Property.Accessor<Collection<SpecimenType>, ContainerType>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<SpecimenType> get(ContainerType model) {
-				return model.getSpecimenTypeCollection();
+				return model.getSpecimenTypes();
 			}
 			@Override
 			public void set(ContainerType model, Collection<SpecimenType> value) {
-				model.getSpecimenTypeCollection().clear();
-				model.getSpecimenTypeCollection().addAll(value);
+				model.getSpecimenTypes().clear();
+				model.getSpecimenTypes().addAll(value);
 			}
 		});
 
@@ -143,12 +143,12 @@ public class ContainerTypePeer {
 		, new Property.Accessor<Collection<Comment>, ContainerType>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(ContainerType model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(ContainerType model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -189,12 +189,12 @@ public class ContainerTypePeer {
 		, new Property.Accessor<Collection<ContainerType>, ContainerType>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<ContainerType> get(ContainerType model) {
-				return model.getChildContainerTypeCollection();
+				return model.getChildContainerTypes();
 			}
 			@Override
 			public void set(ContainerType model, Collection<ContainerType> value) {
-				model.getChildContainerTypeCollection().clear();
-				model.getChildContainerTypeCollection().addAll(value);
+				model.getChildContainerTypes().clear();
+				model.getChildContainerTypes().addAll(value);
 			}
 		});
 
@@ -205,12 +205,12 @@ public class ContainerTypePeer {
 		, new Property.Accessor<Collection<ContainerType>, ContainerType>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<ContainerType> get(ContainerType model) {
-				return model.getParentContainerTypeCollection();
+				return model.getParentContainerTypes();
 			}
 			@Override
 			public void set(ContainerType model, Collection<ContainerType> value) {
-				model.getParentContainerTypeCollection().clear();
-				model.getParentContainerTypeCollection().addAll(value);
+				model.getParentContainerTypes().clear();
+				model.getParentContainerTypes().addAll(value);
 			}
 		});
 

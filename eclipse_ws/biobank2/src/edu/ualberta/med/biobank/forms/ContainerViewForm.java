@@ -143,7 +143,7 @@ public class ContainerViewForm extends BiobankViewForm {
         createContainerSection();
 
         if (containerInfo.container.getContainerType()
-            .getSpecimenTypeCollection().size() > 0) {
+            .getSpecimenTypes().size() > 0) {
             // only show specimens section this if this container type does not
             // have child containers
             createSpecimensSection();
@@ -183,7 +183,7 @@ public class ContainerViewForm extends BiobankViewForm {
         setContainerValues();
 
         if (containerInfo.container.getContainerType()
-            .getChildContainerTypeCollection().size() > 0) {
+            .getChildContainerTypes().size() > 0) {
             createVisualizeContainer();
         }
     }
@@ -194,7 +194,7 @@ public class ContainerViewForm extends BiobankViewForm {
             new CommentCollectionInfoTable(client,
                 ModelWrapper.wrapModelCollection(
                     SessionManager.getAppService(),
-                    containerInfo.container.getCommentCollection(),
+                    containerInfo.container.getComments(),
                     CommentWrapper.class));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
@@ -203,7 +203,7 @@ public class ContainerViewForm extends BiobankViewForm {
     private void initCells() {
         try {
             if (containerInfo.container.getContainerType()
-                .getChildContainerTypeCollection().isEmpty()) return;
+                .getChildContainerTypes().isEmpty()) return;
 
             Integer rowCap =
                 containerInfo.container.getContainerType().getCapacity()
@@ -220,7 +220,7 @@ public class ContainerViewForm extends BiobankViewForm {
             Map<RowColPos, ContainerWrapper> childrenMap =
                 new HashMap<RowColPos, ContainerWrapper>();
             for (ContainerPosition position : containerInfo.container
-                .getChildPositionCollection()) {
+                .getChildPositions()) {
                 childrenMap.put(
                     new RowColPos(position.getRow(), position.getCol()),
                     new ContainerWrapper(SessionManager.getAppService(),
@@ -599,7 +599,7 @@ public class ContainerViewForm extends BiobankViewForm {
     private List<SpecimenWrapper> getSpecimenWrappers() {
         List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
         for (SpecimenPosition pos : containerInfo.container
-            .getSpecimenPositionCollection()) {
+            .getSpecimenPositions()) {
             specimens.add(new SpecimenWrapper(SessionManager.getAppService(),
                 pos.getSpecimen()));
         }
@@ -610,7 +610,7 @@ public class ContainerViewForm extends BiobankViewForm {
         return ModelWrapper.wrapModelCollection(
             SessionManager.getAppService(),
             containerInfo.container.getContainerType()
-                .getChildContainerTypeCollection(),
+                .getChildContainerTypes(),
             ContainerTypeWrapper.class);
 
     }
@@ -635,7 +635,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 .getLabel(), containerInfo.container.getContainerType()
                 .getNameShort()));
         if (containerInfo.container.getContainerType()
-            .getChildContainerTypeCollection()
+            .getChildContainerTypes()
             .size() > 0) refreshVis();
         setContainerValues();
         List<ContainerTypeWrapper> containerTypes = getChildContainerTypes();
@@ -659,7 +659,7 @@ public class ContainerViewForm extends BiobankViewForm {
         commentTable.setList(
             ModelWrapper.wrapModelCollection(
                 SessionManager.getAppService(),
-                containerInfo.container.getCommentCollection(),
+                containerInfo.container.getComments(),
                 CommentWrapper.class));
     }
 }

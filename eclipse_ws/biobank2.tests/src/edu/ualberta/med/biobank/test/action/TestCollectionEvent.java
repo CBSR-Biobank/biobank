@@ -80,7 +80,7 @@ public class TestCollectionEvent extends TestAction {
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         Assert.assertEquals(visitNumber, cevent.getVisitNumber());
         Assert.assertEquals(ActivityStatus.ACTIVE, cevent.getActivityStatus());
-        Assert.assertEquals(1, cevent.getCommentCollection().size());
+        Assert.assertEquals(1, cevent.getComments().size());
     }
 
     @Test
@@ -108,20 +108,20 @@ public class TestCollectionEvent extends TestAction {
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         Assert.assertEquals(visitNumber, cevent.getVisitNumber());
         Assert.assertEquals(ActivityStatus.ACTIVE, cevent.getActivityStatus());
-        Assert.assertNotNull(cevent.getCommentCollection());
-        Assert.assertEquals(1, cevent.getCommentCollection().size());
-        Assert.assertEquals(specs.size(), cevent.getAllSpecimenCollection()
+        Assert.assertNotNull(cevent.getComments());
+        Assert.assertEquals(1, cevent.getComments().size());
+        Assert.assertEquals(specs.size(), cevent.getAllSpecimens()
             .size());
         Assert.assertEquals(specs.size(), cevent
-            .getOriginalSpecimenCollection().size());
+            .getOriginalSpecimens().size());
         for (Iterator<Specimen> iter =
-            cevent.getOriginalSpecimenCollection().iterator(); iter.hasNext();) {
+            cevent.getOriginalSpecimens().iterator(); iter.hasNext();) {
             Specimen sp = iter.next();
             Assert.assertEquals(typeId, sp.getSpecimenType().getId());
             SaveCEventSpecimenInfo info = specs.get(sp.getInventoryId());
             Assert.assertNotNull(info);
             if (info != null) {
-                Assert.assertEquals(1, sp.getCommentCollection().size());
+                Assert.assertEquals(1, sp.getComments().size());
                 Assert.assertEquals(info.inventoryId, sp.getInventoryId());
                 Assert
                     .assertTrue(MathUtil.equals(info.quantity, sp.getQuantity()));
@@ -160,17 +160,17 @@ public class TestCollectionEvent extends TestAction {
         session.refresh(cevent);
         Assert
             .assertEquals(visitNumber + 1, cevent.getVisitNumber().intValue());
-        Assert.assertEquals(2, cevent.getAllSpecimenCollection().size());
-        Assert.assertEquals(2, cevent.getOriginalSpecimenCollection().size());
+        Assert.assertEquals(2, cevent.getAllSpecimens().size());
+        Assert.assertEquals(2, cevent.getOriginalSpecimens().size());
         for (Iterator<Specimen> iter =
-            cevent.getOriginalSpecimenCollection().iterator(); iter.hasNext();) {
+            cevent.getOriginalSpecimens().iterator(); iter.hasNext();) {
             Specimen sp = iter.next();
             Assert.assertEquals(typeId, sp.getSpecimenType().getId());
             Assert.assertTrue(sp.getInventoryId().equals(newSpec.inventoryId)
                 || sp.getInventoryId().equals(modifiedSpec.inventoryId));
             if (sp.getInventoryId().equals(newSpec.inventoryId)) {
-                Assert.assertNotNull(sp.getCommentCollection());
-                Assert.assertEquals(1, sp.getCommentCollection().size());
+                Assert.assertNotNull(sp.getComments());
+                Assert.assertEquals(1, sp.getComments().size());
                 Assert.assertEquals(newSpec.inventoryId, sp.getInventoryId());
                 Assert.assertTrue(MathUtil.equals(newSpec.quantity,
                     sp.getQuantity()));
@@ -254,9 +254,9 @@ public class TestCollectionEvent extends TestAction {
 
         // TODO: add test to check if the comments' user is fetched
 
-        Assert.assertNotNull(info.cevent.getCommentCollection());
+        Assert.assertNotNull(info.cevent.getComments());
         // FIXME sometimes size not correct !!??!!
-        Assert.assertEquals(1, info.cevent.getCommentCollection()
+        Assert.assertEquals(1, info.cevent.getComments()
             .size());
         Assert.assertEquals(attrs.size(), info.eventAttrs.size());
         Assert.assertEquals(specs.size(), info.sourceSpecimenInfos.size());
@@ -309,10 +309,10 @@ public class TestCollectionEvent extends TestAction {
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         Assert.assertEquals(visitNumber, cevent.getVisitNumber());
         Assert.assertEquals(ActivityStatus.ACTIVE, cevent.getActivityStatus());
-        Assert.assertEquals(1, cevent.getCommentCollection()
+        Assert.assertEquals(1, cevent.getComments()
             .size());
-        Assert.assertEquals(1, cevent.getEventAttrCollection().size());
-        EventAttr eventAttr = cevent.getEventAttrCollection().iterator().next();
+        Assert.assertEquals(1, cevent.getEventAttrs().size());
+        EventAttr eventAttr = cevent.getEventAttrs().iterator().next();
         Assert.assertEquals(value1, eventAttr.getValue());
         Assert.assertEquals(phlebotomistStudyAttr.getId(), eventAttr
             .getStudyEventAttr()
@@ -329,8 +329,8 @@ public class TestCollectionEvent extends TestAction {
         session.clear();
         cevent = (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         session.refresh(cevent);
-        Assert.assertEquals(1, cevent.getEventAttrCollection().size());
-        eventAttr = cevent.getEventAttrCollection().iterator().next();
+        Assert.assertEquals(1, cevent.getEventAttrs().size());
+        eventAttr = cevent.getEventAttrs().iterator().next();
         Assert.assertEquals(value2, eventAttr.getValue());
         Assert.assertEquals(eventAttrId, eventAttr.getId());
 

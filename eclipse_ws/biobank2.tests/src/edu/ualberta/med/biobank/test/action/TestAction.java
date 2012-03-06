@@ -92,8 +92,8 @@ public class TestAction {
         Membership membership = new Membership();
         membership.setRank(Rank.ADMINISTRATOR);
         membership.setPrincipal(superAdmin);
-        superAdmin.getMembershipCollection().add(membership);
-        membership.getPermissionCollection().add(PermissionEnum.ADMINISTRATION);
+        superAdmin.getMemberships().add(membership);
+        membership.getPermissions().add(PermissionEnum.ADMINISTRATION);
 
         session.save(membership);
 

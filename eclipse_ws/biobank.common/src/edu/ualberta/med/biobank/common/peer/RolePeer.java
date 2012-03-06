@@ -48,11 +48,11 @@ public class RolePeer {
 		, new Property.Accessor<Set<PermissionEnum>, Role>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Set<PermissionEnum> get(Role model) {
-				return model.getPermissionCollection();
+				return model.getPermissions();
 			}
 			@Override
 			public void set(Role model, Set<PermissionEnum> value) {
-				model.setPermissionCollection(value);
+				model.setPermissions(value);
 			}
 		});
 

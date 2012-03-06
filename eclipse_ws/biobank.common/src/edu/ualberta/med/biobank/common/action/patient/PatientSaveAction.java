@@ -69,7 +69,7 @@ public class PatientSaveAction implements Action<IdResult> {
         Comment comment = CommentUtil.create(context.getUser(), commentText);
         if (comment != null) {
             context.getSession().save(comment);
-            p.getCommentCollection().add(comment);
+            p.getComments().add(comment);
         }
     }
 }

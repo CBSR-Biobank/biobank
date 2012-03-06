@@ -96,12 +96,12 @@ public class RequestPeer {
 		, new Property.Accessor<Collection<Dispatch>, Request>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Dispatch> get(Request model) {
-				return model.getDispatchCollection();
+				return model.getDispatches();
 			}
 			@Override
 			public void set(Request model, Collection<Dispatch> value) {
-				model.getDispatchCollection().clear();
-				model.getDispatchCollection().addAll(value);
+				model.getDispatches().clear();
+				model.getDispatches().addAll(value);
 			}
 		});
 
@@ -112,12 +112,12 @@ public class RequestPeer {
 		, new Property.Accessor<Collection<RequestSpecimen>, Request>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<RequestSpecimen> get(Request model) {
-				return model.getRequestSpecimenCollection();
+				return model.getRequestSpecimens();
 			}
 			@Override
 			public void set(Request model, Collection<RequestSpecimen> value) {
-				model.getRequestSpecimenCollection().clear();
-				model.getRequestSpecimenCollection().addAll(value);
+				model.getRequestSpecimens().clear();
+				model.getRequestSpecimens().addAll(value);
 			}
 		});
 

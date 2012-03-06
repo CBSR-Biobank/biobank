@@ -30,7 +30,7 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
 
         // if no aliquoted specimen, then ok to remove the specimens and to
         // delete the processing event
-        for (Specimen sp : pevent.getSpecimenCollection()) {
+        for (Specimen sp : pevent.getSpecimens()) {
             sp.setProcessingEvent(null);
             context.getSession().saveOrUpdate(sp);
         }

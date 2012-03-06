@@ -65,12 +65,12 @@ public class PatientPeer {
 		, new Property.Accessor<Collection<Comment>, Patient>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(Patient model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(Patient model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -81,12 +81,12 @@ public class PatientPeer {
 		, new Property.Accessor<Collection<CollectionEvent>, Patient>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<CollectionEvent> get(Patient model) {
-				return model.getCollectionEventCollection();
+				return model.getCollectionEvents();
 			}
 			@Override
 			public void set(Patient model, Collection<CollectionEvent> value) {
-				model.getCollectionEventCollection().clear();
-				model.getCollectionEventCollection().addAll(value);
+				model.getCollectionEvents().clear();
+				model.getCollectionEvents().addAll(value);
 			}
 		});
 

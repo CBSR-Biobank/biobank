@@ -63,12 +63,12 @@ public class ReportFilterPeer {
 		, new Property.Accessor<Collection<ReportFilterValue>, ReportFilter>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<ReportFilterValue> get(ReportFilter model) {
-				return model.getReportFilterValueCollection();
+				return model.getReportFilterValues();
 			}
 			@Override
 			public void set(ReportFilter model, Collection<ReportFilterValue> value) {
-				model.getReportFilterValueCollection().clear();
-				model.getReportFilterValueCollection().addAll(value);
+				model.getReportFilterValues().clear();
+				model.getReportFilterValues().addAll(value);
 			}
 		});
 

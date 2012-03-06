@@ -68,12 +68,12 @@ public class CenterPeer {
 		, new Property.Accessor<Collection<Dispatch>, Center>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Dispatch> get(Center model) {
-				return model.getDstDispatchCollection();
+				return model.getDstDispatches();
 			}
 			@Override
 			public void set(Center model, Collection<Dispatch> value) {
-				model.getDstDispatchCollection().clear();
-				model.getDstDispatchCollection().addAll(value);
+				model.getDstDispatches().clear();
+				model.getDstDispatches().addAll(value);
 			}
 		});
 
@@ -84,12 +84,12 @@ public class CenterPeer {
 		, new Property.Accessor<Collection<Dispatch>, Center>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Dispatch> get(Center model) {
-				return model.getSrcDispatchCollection();
+				return model.getSrcDispatches();
 			}
 			@Override
 			public void set(Center model, Collection<Dispatch> value) {
-				model.getSrcDispatchCollection().clear();
-				model.getSrcDispatchCollection().addAll(value);
+				model.getSrcDispatches().clear();
+				model.getSrcDispatches().addAll(value);
 			}
 		});
 
@@ -100,12 +100,12 @@ public class CenterPeer {
 		, new Property.Accessor<Collection<Comment>, Center>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(Center model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(Center model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -131,12 +131,12 @@ public class CenterPeer {
 		, new Property.Accessor<Collection<ProcessingEvent>, Center>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<ProcessingEvent> get(Center model) {
-				return model.getProcessingEventCollection();
+				return model.getProcessingEvents();
 			}
 			@Override
 			public void set(Center model, Collection<ProcessingEvent> value) {
-				model.getProcessingEventCollection().clear();
-				model.getProcessingEventCollection().addAll(value);
+				model.getProcessingEvents().clear();
+				model.getProcessingEvents().addAll(value);
 			}
 		});
 
@@ -147,12 +147,12 @@ public class CenterPeer {
 		, new Property.Accessor<Collection<Membership>, Center>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Membership> get(Center model) {
-				return model.getMembershipCollection();
+				return model.getMemberships();
 			}
 			@Override
 			public void set(Center model, Collection<Membership> value) {
-				model.getMembershipCollection().clear();
-				model.getMembershipCollection().addAll(value);
+				model.getMemberships().clear();
+				model.getMemberships().addAll(value);
 			}
 		});
 
@@ -163,12 +163,12 @@ public class CenterPeer {
 		, new Property.Accessor<Collection<OriginInfo>, Center>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<OriginInfo> get(Center model) {
-				return model.getOriginInfoCollection();
+				return model.getOriginInfos();
 			}
 			@Override
 			public void set(Center model, Collection<OriginInfo> value) {
-				model.getOriginInfoCollection().clear();
-				model.getOriginInfoCollection().addAll(value);
+				model.getOriginInfos().clear();
+				model.getOriginInfos().addAll(value);
 			}
 		});
 

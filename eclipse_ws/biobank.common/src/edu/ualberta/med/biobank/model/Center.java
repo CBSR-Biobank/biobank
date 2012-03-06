@@ -37,8 +37,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Unique(properties = "nameShort", groups = PrePersist.class)
 })
 @Empty.List({
-    @Empty(property = "srcDispatchCollection", groups = PreDelete.class),
-    @Empty(property = "dstDispatchCollection", groups = PreDelete.class)
+    @Empty(property = "srcDispatches", groups = PreDelete.class),
+    @Empty(property = "dstDispatches", groups = PreDelete.class)
 })
 public class Center extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
@@ -46,18 +46,15 @@ public class Center extends AbstractBiobankModel {
     private String name;
     private String nameShort;
     private Address address = new Address();
-    private Set<ProcessingEvent> processingEventCollection =
+    private Set<ProcessingEvent> processingEvents =
         new HashSet<ProcessingEvent>(0);
-    private Set<Membership> membershipCollection =
-        new HashSet<Membership>(0);
-    private Set<Dispatch> srcDispatchCollection = new HashSet<Dispatch>(
-        0);
-    private Set<Dispatch> dstDispatchCollection = new HashSet<Dispatch>(
-        0);
-    private Set<OriginInfo> originInfoCollection =
+    private Set<Membership> memberships = new HashSet<Membership>(0);
+    private Set<Dispatch> srcDispatches = new HashSet<Dispatch>(0);
+    private Set<Dispatch> dstDispatches = new HashSet<Dispatch>(0);
+    private Set<OriginInfo> originInfos =
         new HashSet<OriginInfo>(0);
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
-    private Set<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<Comment> comments = new HashSet<Comment>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Center.name.NotEmpty}")
     @Column(name = "NAME", unique = true, nullable = false)
@@ -91,55 +88,50 @@ public class Center extends AbstractBiobankModel {
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "center")
-    public Set<ProcessingEvent> getProcessingEventCollection() {
-        return this.processingEventCollection;
+    public Set<ProcessingEvent> getProcessingEvents() {
+        return this.processingEvents;
     }
 
-    public void setProcessingEventCollection(
-        Set<ProcessingEvent> processingEventCollection) {
-        this.processingEventCollection = processingEventCollection;
+    public void setProcessingEvents(Set<ProcessingEvent> processingEvents) {
+        this.processingEvents = processingEvents;
     }
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "CENTER_ID", updatable = false)
-    public Set<Membership> getMembershipCollection() {
-        return this.membershipCollection;
+    public Set<Membership> getMemberships() {
+        return this.memberships;
     }
 
-    public void setMembershipCollection(
-        Set<Membership> membershipCollection) {
-        this.membershipCollection = membershipCollection;
+    public void setMemberships(Set<Membership> memberships) {
+        this.memberships = memberships;
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "senderCenter")
-    public Set<Dispatch> getSrcDispatchCollection() {
-        return this.srcDispatchCollection;
+    public Set<Dispatch> getSrcDispatches() {
+        return this.srcDispatches;
     }
 
-    public void setSrcDispatchCollection(
-        Set<Dispatch> srcDispatchCollection) {
-        this.srcDispatchCollection = srcDispatchCollection;
+    public void setSrcDispatches(Set<Dispatch> srcDispatches) {
+        this.srcDispatches = srcDispatches;
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "receiverCenter")
-    public Set<Dispatch> getDstDispatchCollection() {
-        return this.dstDispatchCollection;
+    public Set<Dispatch> getDstDispatches() {
+        return this.dstDispatches;
     }
 
-    public void setDstDispatchCollection(
-        Set<Dispatch> dstDispatchCollection) {
-        this.dstDispatchCollection = dstDispatchCollection;
+    public void setDstDispatches(Set<Dispatch> dstDispatches) {
+        this.dstDispatches = dstDispatches;
     }
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "CENTER_ID", updatable = false)
-    public Set<OriginInfo> getOriginInfoCollection() {
-        return this.originInfoCollection;
+    public Set<OriginInfo> getOriginInfos() {
+        return this.originInfos;
     }
 
-    public void setOriginInfoCollection(
-        Set<OriginInfo> originInfoCollection) {
-        this.originInfoCollection = originInfoCollection;
+    public void setOriginInfos(Set<OriginInfo> originInfos) {
+        this.originInfos = originInfos;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Center.activityStatus.NotNull}")
@@ -157,12 +149,12 @@ public class Center extends AbstractBiobankModel {
     @JoinTable(name = "CENTER_COMMENT",
         joinColumns = { @JoinColumn(name = "CENTER_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Set<Comment> getCommentCollection() {
-        return this.commentCollection;
+    public Set<Comment> getComments() {
+        return this.comments;
     }
 
-    public void setCommentCollection(Set<Comment> commentCollection) {
-        this.commentCollection = commentCollection;
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
     }
 
 }

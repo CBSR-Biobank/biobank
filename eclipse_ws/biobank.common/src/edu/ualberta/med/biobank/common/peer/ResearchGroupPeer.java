@@ -33,12 +33,12 @@ public class ResearchGroupPeer  extends CenterPeer {
 		, new Property.Accessor<Collection<Request>, ResearchGroup>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Request> get(ResearchGroup model) {
-				return model.getRequestCollection();
+				return model.getRequests();
 			}
 			@Override
 			public void set(ResearchGroup model, Collection<Request> value) {
-				model.getRequestCollection().clear();
-				model.getRequestCollection().addAll(value);
+				model.getRequests().clear();
+				model.getRequests().addAll(value);
 			}
 		});
 

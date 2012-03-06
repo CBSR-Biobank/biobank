@@ -63,10 +63,10 @@ public class TestContainer extends TestAction {
             .getActivityStatus());
         Assert.assertEquals(name, containerInfo.container.getSite().getName());
         Assert.assertEquals(0, containerInfo.container
-            .getChildPositionCollection().size());
+            .getChildPositions().size());
         Assert.assertEquals(0, containerInfo.container
-            .getSpecimenPositionCollection().size());
-        Assert.assertEquals(0, containerInfo.container.getCommentCollection()
+            .getSpecimenPositions().size());
+        Assert.assertEquals(0, containerInfo.container.getComments()
             .size());
 
     }

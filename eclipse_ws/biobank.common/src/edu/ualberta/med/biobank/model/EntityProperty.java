@@ -20,11 +20,9 @@ public class EntityProperty extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String property;
-    private Set<EntityColumn> entityColumnCollection =
-        new HashSet<EntityColumn>(0);
+    private Set<EntityColumn> entityColumns = new HashSet<EntityColumn>(0);
     private PropertyType propertyType;
-    private Set<EntityFilter> entityFilterCollection =
-        new HashSet<EntityFilter>(0);
+    private Set<EntityFilter> entityFilters = new HashSet<EntityFilter>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.EntityProperty.property.NotEmpty}")
     @Column(name = "PROPERTY")
@@ -38,13 +36,12 @@ public class EntityProperty extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "ENTITY_PROPERTY_ID", updatable = false)
-    public Set<EntityColumn> getEntityColumnCollection() {
-        return this.entityColumnCollection;
+    public Set<EntityColumn> getEntityColumns() {
+        return this.entityColumns;
     }
 
-    public void setEntityColumnCollection(
-        Set<EntityColumn> entityColumnCollection) {
-        this.entityColumnCollection = entityColumnCollection;
+    public void setEntityColumns(Set<EntityColumn> entityColumns) {
+        this.entityColumns = entityColumns;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.EntityProperty.propertyType.NotNull}")
@@ -60,12 +57,11 @@ public class EntityProperty extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "ENTITY_PROPERTY_ID", updatable = false)
-    public Set<EntityFilter> getEntityFilterCollection() {
-        return this.entityFilterCollection;
+    public Set<EntityFilter> getEntityFilters() {
+        return this.entityFilters;
     }
 
-    public void setEntityFilterCollection(
-        Set<EntityFilter> entityFilterCollection) {
-        this.entityFilterCollection = entityFilterCollection;
+    public void setEntityFilters(Set<EntityFilter> entityFilters) {
+        this.entityFilters = entityFilters;
     }
 }

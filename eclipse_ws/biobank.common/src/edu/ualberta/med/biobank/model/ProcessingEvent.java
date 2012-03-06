@@ -38,9 +38,9 @@ public class ProcessingEvent extends AbstractBiobankModel {
     private String worksheet;
     private Date createdAt;
     private Center center;
-    private Set<Specimen> specimenCollection = new HashSet<Specimen>(0);
+    private Set<Specimen> specimens = new HashSet<Specimen>(0);
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
-    private Set<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<Comment> comments = new HashSet<Comment>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.worksheet.NotEmpty}")
     @Column(name = "WORKSHEET", length = 150, unique = true)
@@ -75,12 +75,12 @@ public class ProcessingEvent extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "processingEvent")
     @Cascade({ CascadeType.SAVE_UPDATE })
-    public Set<Specimen> getSpecimenCollection() {
-        return this.specimenCollection;
+    public Set<Specimen> getSpecimens() {
+        return this.specimens;
     }
 
-    public void setSpecimenCollection(Set<Specimen> specimenCollection) {
-        this.specimenCollection = specimenCollection;
+    public void setSpecimens(Set<Specimen> specimens) {
+        this.specimens = specimens;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.activityStatus.NotNull}")
@@ -98,11 +98,11 @@ public class ProcessingEvent extends AbstractBiobankModel {
     @JoinTable(name = "PROCESSING_EVENT_COMMENT",
         joinColumns = { @JoinColumn(name = "PROCESSING_EVENT_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Set<Comment> getCommentCollection() {
-        return this.commentCollection;
+    public Set<Comment> getComments() {
+        return this.comments;
     }
 
-    public void setCommentCollection(Set<Comment> commentCollection) {
-        this.commentCollection = commentCollection;
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
     }
 }

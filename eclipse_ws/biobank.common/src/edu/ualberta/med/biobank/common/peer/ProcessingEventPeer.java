@@ -81,12 +81,12 @@ public class ProcessingEventPeer {
 		, new Property.Accessor<Collection<Comment>, ProcessingEvent>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(ProcessingEvent model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(ProcessingEvent model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -112,12 +112,12 @@ public class ProcessingEventPeer {
 		, new Property.Accessor<Collection<Specimen>, ProcessingEvent>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Specimen> get(ProcessingEvent model) {
-				return model.getSpecimenCollection();
+				return model.getSpecimens();
 			}
 			@Override
 			public void set(ProcessingEvent model, Collection<Specimen> value) {
-				model.getSpecimenCollection().clear();
-				model.getSpecimenCollection().addAll(value);
+				model.getSpecimens().clear();
+				model.getSpecimens().addAll(value);
 			}
 		});
 

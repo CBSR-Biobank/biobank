@@ -32,12 +32,12 @@ public class PrincipalPeer {
 		, new Property.Accessor<Collection<Membership>, Principal>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Membership> get(Principal model) {
-				return model.getMembershipCollection();
+				return model.getMemberships();
 			}
 			@Override
 			public void set(Principal model, Collection<Membership> value) {
-				model.getMembershipCollection().clear();
-				model.getMembershipCollection().addAll(value);
+				model.getMemberships().clear();
+				model.getMemberships().addAll(value);
 			}
 		});
 

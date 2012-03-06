@@ -21,12 +21,12 @@ public class Dispatch extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private Integer state;
-    private Set<DispatchSpecimen> dispatchSpecimenCollection =
+    private Set<DispatchSpecimen> dispatchSpecimens =
         new HashSet<DispatchSpecimen>(0);
     private Center senderCenter;
     private ShipmentInfo shipmentInfo;
     private Center receiverCenter;
-    private Set<Comment> commentCollection = new HashSet<Comment>(0);
+    private Set<Comment> comments = new HashSet<Comment>(0);
 
     // TODO: convert to enum
     @NotNull(message = "{edu.ualberta.med.biobank.model.Dispatch.state.NotNull}")
@@ -40,13 +40,12 @@ public class Dispatch extends AbstractBiobankModel {
     }
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "dispatch")
-    public Set<DispatchSpecimen> getDispatchSpecimenCollection() {
-        return this.dispatchSpecimenCollection;
+    public Set<DispatchSpecimen> getDispatchSpecimens() {
+        return this.dispatchSpecimens;
     }
 
-    public void setDispatchSpecimenCollection(
-        Set<DispatchSpecimen> dispatchSpecimenCollection) {
-        this.dispatchSpecimenCollection = dispatchSpecimenCollection;
+    public void setDispatchSpecimens(Set<DispatchSpecimen> dispatchSpecimens) {
+        this.dispatchSpecimens = dispatchSpecimens;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Dispatch.senderCenter.NotNull}")
@@ -85,11 +84,11 @@ public class Dispatch extends AbstractBiobankModel {
     @JoinTable(name = "DISPATCH_COMMENT",
         joinColumns = { @JoinColumn(name = "DISPATCH_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Set<Comment> getCommentCollection() {
-        return this.commentCollection;
+    public Set<Comment> getComments() {
+        return this.comments;
     }
 
-    public void setCommentCollection(Set<Comment> commentCollection) {
-        this.commentCollection = commentCollection;
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
     }
 }

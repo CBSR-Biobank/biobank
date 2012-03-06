@@ -362,8 +362,8 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
     }
 
     private static String getCommentLetter(SpecimenInfo si) {
-        return (si.specimen.getCommentCollection() == null || si.specimen
-            .getCommentCollection().size() == 0) ? Messages.SpecimenInfoTable_no_first_letter
+        return (si.specimen.getComments() == null || si.specimen
+            .getComments().size() == 0) ? Messages.SpecimenInfoTable_no_first_letter
             : Messages.SpecimenInfoTable_yes_first_letter;
     }
 }

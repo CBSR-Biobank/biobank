@@ -86,12 +86,12 @@ public class StudyPeer {
 		, new Property.Accessor<Collection<Contact>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Contact> get(Study model) {
-				return model.getContactCollection();
+				return model.getContacts();
 			}
 			@Override
 			public void set(Study model, Collection<Contact> value) {
-				model.getContactCollection().clear();
-				model.getContactCollection().addAll(value);
+				model.getContacts().clear();
+				model.getContacts().addAll(value);
 			}
 		});
 
@@ -102,12 +102,12 @@ public class StudyPeer {
 		, new Property.Accessor<Collection<Patient>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Patient> get(Study model) {
-				return model.getPatientCollection();
+				return model.getPatients();
 			}
 			@Override
 			public void set(Study model, Collection<Patient> value) {
-				model.getPatientCollection().clear();
-				model.getPatientCollection().addAll(value);
+				model.getPatients().clear();
+				model.getPatients().addAll(value);
 			}
 		});
 
@@ -118,12 +118,12 @@ public class StudyPeer {
 		, new Property.Accessor<Collection<Comment>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(Study model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(Study model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -134,12 +134,12 @@ public class StudyPeer {
 		, new Property.Accessor<Collection<Membership>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Membership> get(Study model) {
-				return model.getMembershipCollection();
+				return model.getMemberships();
 			}
 			@Override
 			public void set(Study model, Collection<Membership> value) {
-				model.getMembershipCollection().clear();
-				model.getMembershipCollection().addAll(value);
+				model.getMemberships().clear();
+				model.getMemberships().addAll(value);
 			}
 		});
 
@@ -150,12 +150,12 @@ public class StudyPeer {
 		, new Property.Accessor<Collection<Site>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Site> get(Study model) {
-				return model.getSiteCollection();
+				return model.getSites();
 			}
 			@Override
 			public void set(Study model, Collection<Site> value) {
-				model.getSiteCollection().clear();
-				model.getSiteCollection().addAll(value);
+				model.getSites().clear();
+				model.getSites().addAll(value);
 			}
 		});
 
@@ -166,12 +166,12 @@ public class StudyPeer {
 		, new Property.Accessor<Collection<StudyEventAttr>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<StudyEventAttr> get(Study model) {
-				return model.getStudyEventAttrCollection();
+				return model.getStudyEventAttrs();
 			}
 			@Override
 			public void set(Study model, Collection<StudyEventAttr> value) {
-				model.getStudyEventAttrCollection().clear();
-				model.getStudyEventAttrCollection().addAll(value);
+				model.getStudyEventAttrs().clear();
+				model.getStudyEventAttrs().addAll(value);
 			}
 		});
 
@@ -197,12 +197,12 @@ public class StudyPeer {
 		, new Property.Accessor<Collection<AliquotedSpecimen>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<AliquotedSpecimen> get(Study model) {
-				return model.getAliquotedSpecimenCollection();
+				return model.getAliquotedSpecimens();
 			}
 			@Override
 			public void set(Study model, Collection<AliquotedSpecimen> value) {
-				model.getAliquotedSpecimenCollection().clear();
-				model.getAliquotedSpecimenCollection().addAll(value);
+				model.getAliquotedSpecimens().clear();
+				model.getAliquotedSpecimens().addAll(value);
 			}
 		});
 
@@ -213,12 +213,12 @@ public class StudyPeer {
 		, new Property.Accessor<Collection<SourceSpecimen>, Study>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<SourceSpecimen> get(Study model) {
-				return model.getSourceSpecimenCollection();
+				return model.getSourceSpecimens();
 			}
 			@Override
 			public void set(Study model, Collection<SourceSpecimen> value) {
-				model.getSourceSpecimenCollection().clear();
-				model.getSourceSpecimenCollection().addAll(value);
+				model.getSourceSpecimens().clear();
+				model.getSourceSpecimens().addAll(value);
 			}
 		});
 

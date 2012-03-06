@@ -80,7 +80,7 @@ public class ContainerPersistChecks extends LoadModelAction<Container> {
         if (containerType != null && parent != null) {
             ContainerType parentType = parent.getContainerType();
             Collection<ContainerType> legalTypes = parentType
-                .getChildContainerTypeCollection();
+                .getChildContainerTypes();
 
             if (legalTypes == null || !legalTypes.contains(containerType)) {
                 String parentLabel = parent.getLabel();

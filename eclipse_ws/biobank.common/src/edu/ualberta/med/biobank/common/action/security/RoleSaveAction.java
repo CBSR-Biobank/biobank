@@ -42,8 +42,8 @@ public class RoleSaveAction implements Action<IdResult> {
         Role role = context.load(Role.class, roleId, new Role());
 
         role.setName(name);
-        role.getPermissionCollection().clear();
-        role.getPermissionCollection().addAll(permissions);
+        role.getPermissions().clear();
+        role.getPermissions().addAll(permissions);
 
         context.getSession().saveOrUpdate(role);
 

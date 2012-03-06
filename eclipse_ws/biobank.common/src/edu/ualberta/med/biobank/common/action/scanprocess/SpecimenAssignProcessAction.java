@@ -147,7 +147,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
                 } else {
                     ContainerType cType =
                         data.getContainerType(session, actionContext);
-                    if (cType.getSpecimenTypeCollection().contains(
+                    if (cType.getSpecimenTypes().contains(
                         foundSpecimen.getSpecimenType())) {
                         if (foundSpecimen.getSpecimenPosition() != null
                             && foundSpecimen.getSpecimenPosition()

@@ -150,8 +150,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             ceventCopy.setId(ceventInfo.cevent.getId());
             ceventCopy.setVisitNumber(ceventInfo.cevent.getVisitNumber());
             ceventCopy.setActivityStatus(ceventInfo.cevent.getActivityStatus());
-            ceventCopy.setCommentCollection(ceventInfo.cevent
-                .getCommentCollection());
+            ceventCopy.setComments(ceventInfo.cevent
+                .getComments());
             sourceSpecimens =
                 new ArrayList<SpecimenInfo>(ceventInfo.sourceSpecimenInfos);
         }
@@ -180,7 +180,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             new CommentCollectionInfoTable(client,
                 ModelWrapper.wrapModelCollection(
                     SessionManager.getAppService(),
-                    ceventCopy.getCommentCollection(), CommentWrapper.class));
+                    ceventCopy.getComments(), CommentWrapper.class));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
@@ -459,7 +459,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         specimensTable.reload(sourceSpecimens);
         commentEntryTable.setList(ModelWrapper.wrapModelCollection(
             SessionManager.getAppService(),
-            ceventInfo.cevent.getCommentCollection(),
+            ceventInfo.cevent.getComments(),
             CommentWrapper.class));
         resetPvCustomInfo();
     }

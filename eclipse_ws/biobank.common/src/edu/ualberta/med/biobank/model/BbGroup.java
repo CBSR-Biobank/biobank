@@ -24,7 +24,7 @@ public class BbGroup extends Principal {
 
     private String name;
     private String description;
-    private Set<User> userCollection = new HashSet<User>(0);
+    private Set<User> users = new HashSet<User>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.BbGroup.name.NotEmpty}")
     @Column(name = "NAME", unique = true)
@@ -50,11 +50,11 @@ public class BbGroup extends Principal {
     @JoinTable(name = "GROUP_USER",
         joinColumns = { @JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "USER_ID", nullable = false, updatable = false) })
-    public Set<User> getUserCollection() {
-        return this.userCollection;
+    public Set<User> getUsers() {
+        return this.users;
     }
 
-    public void setUserCollection(Set<User> userCollection) {
-        this.userCollection = userCollection;
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 }

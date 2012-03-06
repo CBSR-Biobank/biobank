@@ -63,12 +63,12 @@ public class EntityPeer {
 		, new Property.Accessor<Collection<EntityProperty>, Entity>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<EntityProperty> get(Entity model) {
-				return model.getEntityPropertyCollection();
+				return model.getEntityProperties();
 			}
 			@Override
 			public void set(Entity model, Collection<EntityProperty> value) {
-				model.getEntityPropertyCollection().clear();
-				model.getEntityPropertyCollection().addAll(value);
+				model.getEntityProperties().clear();
+				model.getEntityProperties().addAll(value);
 			}
 		});
 
@@ -79,12 +79,12 @@ public class EntityPeer {
 		, new Property.Accessor<Collection<Report>, Entity>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Report> get(Entity model) {
-				return model.getReportCollection();
+				return model.getReports();
 			}
 			@Override
 			public void set(Entity model, Collection<Report> value) {
-				model.getReportCollection().clear();
-				model.getReportCollection().addAll(value);
+				model.getReports().clear();
+				model.getReports().addAll(value);
 			}
 		});
 

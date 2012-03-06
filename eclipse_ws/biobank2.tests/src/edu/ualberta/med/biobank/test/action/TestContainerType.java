@@ -148,9 +148,9 @@ public class TestContainerType extends TestAction {
         Assert.assertEquals(10, topContainerTypeInfo.getContainerType()
             .getCapacity().getColCapacity().intValue());
         Assert.assertEquals(0, topContainerTypeInfo.getContainerType()
-            .getChildContainerTypeCollection().size());
+            .getChildContainerTypes().size());
         Assert.assertEquals(0, topContainerTypeInfo.getContainerType()
-            .getCommentCollection().size());
+            .getComments().size());
 
         containerTypeSaveAction =
             ContainerTypeHelper.getSaveAction(
@@ -266,13 +266,13 @@ public class TestContainerType extends TestAction {
         containerTypeInfo =
             EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
         Assert.assertEquals(0, containerTypeInfo.getContainerType()
-            .getSpecimenTypeCollection().size());
+            .getSpecimenTypes().size());
     }
 
     private Set<Integer> getSpecimenTypeIds(ContainerTypeInfo containerTypeInfo) {
         HashSet<Integer> result = new HashSet<Integer>();
         for (SpecimenType specimenType : containerTypeInfo.getContainerType()
-            .getSpecimenTypeCollection()) {
+            .getSpecimenTypes()) {
             result.add(specimenType.getId());
         }
         return result;
@@ -339,7 +339,7 @@ public class TestContainerType extends TestAction {
         containerTypeInfo =
             EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
         Assert.assertEquals(0, containerTypeInfo.getContainerType()
-            .getChildContainerTypeCollection().size());
+            .getChildContainerTypes().size());
     }
 
     private Set<Integer> getChildContainerTypeIds(
@@ -347,7 +347,7 @@ public class TestContainerType extends TestAction {
         HashSet<Integer> result = new HashSet<Integer>();
         for (ContainerType childContainerType : containerTypeInfo
             .getContainerType()
-            .getChildContainerTypeCollection()) {
+            .getChildContainerTypes()) {
             result.add(childContainerType.getId());
         }
         return result;
@@ -407,15 +407,15 @@ public class TestContainerType extends TestAction {
         ContainerTypeInfo containerTypeInfo =
             EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
         Assert.assertEquals(0, containerTypeInfo.getContainerType()
-            .getCommentCollection().size());
+            .getComments().size());
 
         containerTypeInfo = addComment(containerTypeId);
         Assert.assertEquals(1, containerTypeInfo.getContainerType()
-            .getCommentCollection().size());
+            .getComments().size());
 
         containerTypeInfo = addComment(containerTypeId);
         Assert.assertEquals(2, containerTypeInfo.getContainerType()
-            .getCommentCollection().size());
+            .getComments().size());
 
         // TODO: check full name on each comment's user
         // for (Comment comment :
@@ -504,7 +504,7 @@ public class TestContainerType extends TestAction {
             EXECUTOR.exec(new ContainerTypeGetInfoAction(parentCtId));
         Integer childCtId =
             containerTypeInfo.getContainerType()
-                .getChildContainerTypeCollection()
+                .getChildContainerTypes()
                 .iterator().next().getId();
 
         try {

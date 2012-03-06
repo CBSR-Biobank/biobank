@@ -35,7 +35,7 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
 
         Center currentCenter = null;
         Center wCenter = context.load(Center.class, workingCenter);
-        for (Specimen spc : ship.getSpecimenCollection()) {
+        for (Specimen spc : ship.getSpecimens()) {
             if (currentCenter == null)
                 currentCenter = spc.getCurrentCenter();
             else if (currentCenter != spc.getCurrentCenter())
@@ -46,7 +46,7 @@ public class ShipmentDeleteAction implements Action<EmptyResult> {
         }
         oi.setCenter(wCenter);
         context.getSession().saveOrUpdate(oi);
-        for (Specimen spc : ship.getSpecimenCollection()) {
+        for (Specimen spc : ship.getSpecimens()) {
             context.getSession().saveOrUpdate(spc);
         }
 

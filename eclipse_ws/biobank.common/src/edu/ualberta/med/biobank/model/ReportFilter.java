@@ -19,7 +19,7 @@ public class ReportFilter extends AbstractBiobankModel {
 
     private Integer position;
     private Integer operator;
-    private Set<ReportFilterValue> reportFilterValueCollection =
+    private Set<ReportFilterValue> reportFilterValues =
         new HashSet<ReportFilterValue>(0);
     private EntityFilter entityFilter;
 
@@ -43,13 +43,12 @@ public class ReportFilter extends AbstractBiobankModel {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "REPORT_FILTER_ID", updatable = false)
-    public Set<ReportFilterValue> getReportFilterValueCollection() {
-        return this.reportFilterValueCollection;
+    public Set<ReportFilterValue> getReportFilterValues() {
+        return this.reportFilterValues;
     }
 
-    public void setReportFilterValueCollection(
-        Set<ReportFilterValue> reportFilterValueCollection) {
-        this.reportFilterValueCollection = reportFilterValueCollection;
+    public void setReportFilterValues(Set<ReportFilterValue> reportFilterValues) {
+        this.reportFilterValues = reportFilterValues;
     }
 
     @ManyToOne(fetch = FetchType.EAGER)

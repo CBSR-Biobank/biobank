@@ -25,8 +25,7 @@ public class Role extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private Set<PermissionEnum> permissionCollection =
-        new HashSet<PermissionEnum>(0);
+    private Set<PermissionEnum> permissions = new HashSet<PermissionEnum>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Role.name.NotEmpty}")
     @Column(name = "NAME", unique = true, nullable = false)
@@ -43,12 +42,11 @@ public class Role extends AbstractBiobankModel {
         joinColumns = @JoinColumn(name = "ID"))
     @Column(name = "PERMISSION_ID", nullable = false)
     @Type(type = "permissionEnum")
-    public Set<PermissionEnum> getPermissionCollection() {
-        return this.permissionCollection;
+    public Set<PermissionEnum> getPermissions() {
+        return this.permissions;
     }
 
-    public void setPermissionCollection(
-        Set<PermissionEnum> permissionCollection) {
-        this.permissionCollection = permissionCollection;
+    public void setPermissions(Set<PermissionEnum> permissions) {
+        this.permissions = permissions;
     }
 }

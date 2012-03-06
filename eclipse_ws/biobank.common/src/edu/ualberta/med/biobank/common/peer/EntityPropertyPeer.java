@@ -50,11 +50,11 @@ public class EntityPropertyPeer {
 		, new Property.Accessor<Set<EntityFilter>, EntityProperty>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Set<EntityFilter> get(EntityProperty model) {
-				return model.getEntityFilterCollection();
+				return model.getEntityFilters();
 			}
 			@Override
 			public void set(EntityProperty model, Set<EntityFilter> value) {
-				model.setEntityFilterCollection(value);
+				model.setEntityFilters(value);
 			}
 		});
 
@@ -80,11 +80,11 @@ public class EntityPropertyPeer {
 		, new Property.Accessor<Set<EntityColumn>, EntityProperty>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Set<EntityColumn> get(EntityProperty model) {
-				return model.getEntityColumnCollection();
+				return model.getEntityColumns();
 			}
 			@Override
 			public void set(EntityProperty model, Set<EntityColumn> value) {
-				model.setEntityColumnCollection(value);
+				model.setEntityColumns(value);
 			}
 		});
 

@@ -153,12 +153,12 @@ public class ContactPeer {
 		, new Property.Accessor<Collection<Study>, Contact>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Study> get(Contact model) {
-				return model.getStudyCollection();
+				return model.getStudies();
 			}
 			@Override
 			public void set(Contact model, Collection<Study> value) {
-				model.getStudyCollection().clear();
-				model.getStudyCollection().addAll(value);
+				model.getStudies().clear();
+				model.getStudies().addAll(value);
 			}
 		});
 

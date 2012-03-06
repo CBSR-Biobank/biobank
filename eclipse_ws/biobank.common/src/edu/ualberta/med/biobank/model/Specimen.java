@@ -33,7 +33,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "SPECIMEN")
 @Unique(properties = "inventoryId", groups = PrePersist.class)
-@Empty(property = "childSpecimenCollection", groups = PreDelete.class)
+@Empty(property = "childSpecimens", groups = PreDelete.class)
 public class Specimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -43,15 +43,14 @@ public class Specimen extends AbstractBiobankModel {
     private Specimen topSpecimen;
     private CollectionEvent collectionEvent;
     private Center currentCenter;
-    private Set<DispatchSpecimen> dispatchSpecimenCollection =
+    private Set<DispatchSpecimen> dispatchSpecimens =
         new HashSet<DispatchSpecimen>(0);
     private CollectionEvent originalCollectionEvent;
     private SpecimenType specimenType;
     private SpecimenPosition specimenPosition;
-    private Set<Specimen> childSpecimenCollection =
-        new HashSet<Specimen>(0);
-    private Set<Comment> commentCollection = new HashSet<Comment>(0);
-    private Set<RequestSpecimen> requestSpecimenCollection =
+    private Set<Specimen> childSpecimens = new HashSet<Specimen>(0);
+    private Set<Comment> comments = new HashSet<Comment>(0);
+    private Set<RequestSpecimen> requestSpecimens =
         new HashSet<RequestSpecimen>(0);
     private OriginInfo originInfo;
     @Enumerated(EnumType.STRING)
@@ -121,13 +120,12 @@ public class Specimen extends AbstractBiobankModel {
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "specimen")
-    public Set<DispatchSpecimen> getDispatchSpecimenCollection() {
-        return this.dispatchSpecimenCollection;
+    public Set<DispatchSpecimen> getDispatchSpecimens() {
+        return this.dispatchSpecimens;
     }
 
-    public void setDispatchSpecimenCollection(
-        Set<DispatchSpecimen> dispatchSpecimenCollection) {
-        this.dispatchSpecimenCollection = dispatchSpecimenCollection;
+    public void setDispatchSpecimens(Set<DispatchSpecimen> dispatchSpecimens) {
+        this.dispatchSpecimens = dispatchSpecimens;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -163,36 +161,34 @@ public class Specimen extends AbstractBiobankModel {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "parentSpecimen")
     @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-    public Set<Specimen> getChildSpecimenCollection() {
-        return this.childSpecimenCollection;
+    public Set<Specimen> getChildSpecimens() {
+        return this.childSpecimens;
     }
 
-    public void setChildSpecimenCollection(
-        Set<Specimen> childSpecimenCollection) {
-        this.childSpecimenCollection = childSpecimenCollection;
+    public void setChildSpecimens(Set<Specimen> childSpecimens) {
+        this.childSpecimens = childSpecimens;
     }
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "SPECIMEN_COMMENT",
         joinColumns = { @JoinColumn(name = "SPECIMEN_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Set<Comment> getCommentCollection() {
-        return this.commentCollection;
+    public Set<Comment> getComments() {
+        return this.comments;
     }
 
-    public void setCommentCollection(Set<Comment> commentCollection) {
-        this.commentCollection = commentCollection;
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
     }
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_ID", updatable = false)
-    public Set<RequestSpecimen> getRequestSpecimenCollection() {
-        return this.requestSpecimenCollection;
+    public Set<RequestSpecimen> getRequestSpecimens() {
+        return this.requestSpecimens;
     }
 
-    public void setRequestSpecimenCollection(
-        Set<RequestSpecimen> requestSpecimenCollection) {
-        this.requestSpecimenCollection = requestSpecimenCollection;
+    public void setRequestSpecimens(Set<RequestSpecimen> requestSpecimens) {
+        this.requestSpecimens = requestSpecimens;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.originInfo.NotNull}")

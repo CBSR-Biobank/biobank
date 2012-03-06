@@ -53,7 +53,7 @@ public class UserGetAction implements Action<UserGetResult> {
         public UserDTO(User user) {
             // go through Membership-s, find if any PermissionEnum-s in it, then
             // add it to the collection if so.
-            for (Membership membership : user.getMembershipCollection()) {
+            for (Membership membership : user.getMemberships()) {
 
             }
         }

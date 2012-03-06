@@ -136,8 +136,8 @@ public class TestPatient extends TestAction {
             patientCeventInfo.sourceSpecimenCount);
         Assert.assertEquals(new Long(0),
             patientCeventInfo.aliquotedSpecimenCount);
-        Assert.assertEquals(ceventInfo.cevent.getCommentCollection().size(),
-            patientCeventInfo.cevent.getCommentCollection().size());
+        Assert.assertEquals(ceventInfo.cevent.getComments().size(),
+            patientCeventInfo.cevent.getComments().size());
     }
 
     @Test
@@ -234,21 +234,21 @@ public class TestPatient extends TestAction {
         Assert.assertNotNull(p1);
         Patient p2 = (Patient) session.get(Patient.class, patientId2);
         Assert.assertNull(p2);
-        Collection<CollectionEvent> cevents = p1.getCollectionEventCollection();
+        Collection<CollectionEvent> cevents = p1.getCollectionEvents();
         Assert.assertEquals(3, cevents.size());
         for (CollectionEvent cevent : cevents) {
             switch (cevent.getVisitNumber()) {
             case 1:
                 Assert
-                    .assertEquals(9, cevent.getAllSpecimenCollection().size());
+                    .assertEquals(9, cevent.getAllSpecimens().size());
                 break;
             case 2:
                 Assert
-                    .assertEquals(2, cevent.getAllSpecimenCollection().size());
+                    .assertEquals(2, cevent.getAllSpecimens().size());
                 break;
             case 3:
                 Assert
-                    .assertEquals(7, cevent.getAllSpecimenCollection().size());
+                    .assertEquals(7, cevent.getAllSpecimens().size());
                 break;
             default:
                 Assert.fail("wrong visit number");

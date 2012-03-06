@@ -79,7 +79,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             internalSpecimen.setInventoryId(spec.getInventoryId());
             internalSpecimen.setQuantity(spec.getQuantity());
             internalSpecimen.setCreatedAt(spec.getCreatedAt());
-            internalSpecimen.setCommentCollection(spec.getCommentCollection());
+            internalSpecimen.setComments(spec.getComments());
             internalSpecimen.setActivityStatus(spec.getActivityStatus());
             editedSpecimen = spec;
         }
@@ -330,7 +330,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         spec.setSpecimenType(internalSpecimen.getSpecimenType());
         spec.setQuantity(internalSpecimen.getQuantity());
         spec.setCreatedAt(internalSpecimen.getCreatedAt());
-        spec.setCommentCollection(internalSpecimen.getCommentCollection());
+        spec.setComments(internalSpecimen.getComments());
         spec.setActivityStatus(internalSpecimen.getActivityStatus());
         inventoryIdExcludeList.add(internalSpecimen.getInventoryId());
     }

@@ -51,12 +51,12 @@ public class CollectionEventPeer {
 		, new Property.Accessor<Collection<Specimen>, CollectionEvent>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Specimen> get(CollectionEvent model) {
-				return model.getAllSpecimenCollection();
+				return model.getAllSpecimens();
 			}
 			@Override
 			public void set(CollectionEvent model, Collection<Specimen> value) {
-				model.getAllSpecimenCollection().clear();
-				model.getAllSpecimenCollection().addAll(value);
+				model.getAllSpecimens().clear();
+				model.getAllSpecimens().addAll(value);
 			}
 		});
 
@@ -82,12 +82,12 @@ public class CollectionEventPeer {
 		, new Property.Accessor<Collection<EventAttr>, CollectionEvent>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<EventAttr> get(CollectionEvent model) {
-				return model.getEventAttrCollection();
+				return model.getEventAttrs();
 			}
 			@Override
 			public void set(CollectionEvent model, Collection<EventAttr> value) {
-				model.getEventAttrCollection().clear();
-				model.getEventAttrCollection().addAll(value);
+				model.getEventAttrs().clear();
+				model.getEventAttrs().addAll(value);
 			}
 		});
 
@@ -98,12 +98,12 @@ public class CollectionEventPeer {
 		, new Property.Accessor<Collection<Comment>, CollectionEvent>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(CollectionEvent model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(CollectionEvent model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -129,12 +129,12 @@ public class CollectionEventPeer {
 		, new Property.Accessor<Collection<Specimen>, CollectionEvent>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Specimen> get(CollectionEvent model) {
-				return model.getOriginalSpecimenCollection();
+				return model.getOriginalSpecimens();
 			}
 			@Override
 			public void set(CollectionEvent model, Collection<Specimen> value) {
-				model.getOriginalSpecimenCollection().clear();
-				model.getOriginalSpecimenCollection().addAll(value);
+				model.getOriginalSpecimens().clear();
+				model.getOriginalSpecimens().addAll(value);
 			}
 		});
 

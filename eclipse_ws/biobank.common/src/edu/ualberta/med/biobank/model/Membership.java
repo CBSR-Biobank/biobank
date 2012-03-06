@@ -50,10 +50,9 @@ public class Membership extends AbstractBiobankModel {
     public static final short MAX_LEVEL = 1000;
     private static final long serialVersionUID = 1L;
 
-    private Set<PermissionEnum> permissionCollection =
-        new HashSet<PermissionEnum>(0);
+    private Set<PermissionEnum> permissions = new HashSet<PermissionEnum>(0);
     private Center center;
-    private Set<Role> roleCollection = new HashSet<Role>(0);
+    private Set<Role> roles = new HashSet<Role>(0);
     private Study study;
     private Principal principal;
     private Rank rank = Rank.NORMAL;
@@ -85,12 +84,12 @@ public class Membership extends AbstractBiobankModel {
         joinColumns = @JoinColumn(name = "ID"))
     @Column(name = "PERMISSION_ID", nullable = false)
     @Type(type = "permissionEnum")
-    public Set<PermissionEnum> getPermissionCollection() {
-        return this.permissionCollection;
+    public Set<PermissionEnum> getPermissions() {
+        return this.permissions;
     }
 
-    public void setPermissionCollection(Set<PermissionEnum> permissionCollection) {
-        this.permissionCollection = permissionCollection;
+    public void setPermissions(Set<PermissionEnum> permissions) {
+        this.permissions = permissions;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -107,12 +106,12 @@ public class Membership extends AbstractBiobankModel {
     @JoinTable(name = "MEMBERSHIP_ROLE",
         joinColumns = { @JoinColumn(name = "MEMBERSHIP_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "ROLE_ID", nullable = false, updatable = false) })
-    public Set<Role> getRoleCollection() {
-        return this.roleCollection;
+    public Set<Role> getRoles() {
+        return this.roles;
     }
 
-    public void setRoleCollection(Set<Role> roleCollection) {
-        this.roleCollection = roleCollection;
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -173,9 +172,9 @@ public class Membership extends AbstractBiobankModel {
         if (Rank.ADMINISTRATOR.equals(getRank())) {
             permissions.addAll(PermissionEnum.valuesList());
         } else {
-            permissions.addAll(getPermissionCollection());
-            for (Role role : getRoleCollection()) {
-                permissions.addAll(role.getPermissionCollection());
+            permissions.addAll(getPermissions());
+            for (Role role : getRoles()) {
+                permissions.addAll(role.getPermissions());
             }
         }
         return permissions;
@@ -201,9 +200,9 @@ public class Membership extends AbstractBiobankModel {
         for (Membership membership : user.getAllMemberships()) {
             if (isManageable(membership)) {
                 if (Rank.ADMINISTRATOR.equals(membership.getRank())) {
-                    roles.addAll(getRoleCollection());
+                    roles.addAll(getRoles());
                 }
-                roles.addAll(membership.getRoleCollection());
+                roles.addAll(membership.getRoles());
             }
         }
         return roles;
@@ -219,9 +218,9 @@ public class Membership extends AbstractBiobankModel {
      */
     @Transient
     public boolean isFullyManageable(User u) {
-        if (!getManageablePermissions(u).containsAll(getPermissionCollection()))
+        if (!getManageablePermissions(u).containsAll(getPermissions()))
             return false;
-        if (!getManageableRoles(u).containsAll(getRoleCollection()))
+        if (!getManageableRoles(u).containsAll(getRoles()))
             return false;
         return true;
     }
@@ -254,8 +253,8 @@ public class Membership extends AbstractBiobankModel {
     public boolean isManageable(Membership that) {
         if (equals(that)) return false;
 
-        if (that.getPermissionCollection().isEmpty()
-            && that.getRoleCollection().isEmpty()) return false;
+        if (that.getPermissions().isEmpty()
+            && that.getRoles().isEmpty()) return false;
 
         if (that.getRank().isLt(Rank.USER_MANAGER)) return false;
 

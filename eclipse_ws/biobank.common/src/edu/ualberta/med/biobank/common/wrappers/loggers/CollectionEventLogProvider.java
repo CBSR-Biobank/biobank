@@ -28,7 +28,7 @@ public class CollectionEventLogProvider implements
 
         // TODO: could be switched to HQL count query to be way faster
         Set<Specimen> originals = collectionEvent
-            .getOriginalSpecimenCollection();
+            .getOriginalSpecimens();
         if (originals != null) {
             count = originals.size();
         }

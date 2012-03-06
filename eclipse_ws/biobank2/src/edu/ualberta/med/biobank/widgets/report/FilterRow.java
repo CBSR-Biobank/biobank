@@ -48,8 +48,8 @@ class FilterRow extends Composite {
     // TODO: make configurable?
     private static final int MAX_QUERY_TIME = 3;
     private static final int MAX_SUGGESTIONS = 100;
-    private static final SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
+    private static final SimpleDateFormat SQL_DATE_FORMAT =
+        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
     private final FilterSelectWidget filtersWidget;
     private final EntityFilter filter;
     private Composite container;
@@ -333,7 +333,8 @@ class FilterRow extends Composite {
 
         // remember current setting, if possible
         if (!isEditMode && filterValueWidget instanceof SetFilterValueWidget) {
-            isEditMode = ((SetFilterValueWidget) filterValueWidget).getMode() == SetFilterValueWidget.Mode.EditMode;
+            isEditMode =
+                ((SetFilterValueWidget) filterValueWidget).getMode() == SetFilterValueWidget.Mode.EditMode;
         }
 
         disposeInputContainer();
@@ -419,8 +420,8 @@ class FilterRow extends Composite {
                 FilterOperator op = FilterOperator.getFilterOperator(opId);
 
                 if (op.isValueRequired()
-                    && (filter.getReportFilterValueCollection() == null || filter
-                        .getReportFilterValueCollection().isEmpty())) {
+                    && (filter.getReportFilterValues() == null || filter
+                        .getReportFilterValues().isEmpty())) {
                     // do not consider filters that require a value, yet none is
                     // set
                     continue;
@@ -437,10 +438,9 @@ class FilterRow extends Composite {
 
         Report report = new Report();
         report.setEntity(entity);
-        report.setReportFilterCollection(reportFilters);
+        report.setReportFilters(reportFilters);
         report.setIsCount(true);
-        report.setReportColumnCollection(new HashSet<ReportColumn>(Arrays
-            .asList(rc)));
+        report.setReportColumns(new HashSet<ReportColumn>(Arrays.asList(rc)));
 
         return report;
     }

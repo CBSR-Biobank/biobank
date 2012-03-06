@@ -53,11 +53,11 @@ public class MembershipPeer {
 		, new Property.Accessor<Set<PermissionEnum>, Membership>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Set<PermissionEnum> get(Membership model) {
-				return model.getPermissionCollection();
+				return model.getPermissions();
 			}
 			@Override
 			public void set(Membership model, Set<PermissionEnum> value) {
-				model.setPermissionCollection(value);
+				model.setPermissions(value);
 			}
 		});
 
@@ -98,12 +98,12 @@ public class MembershipPeer {
 		, new Property.Accessor<Collection<Role>, Membership>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Role> get(Membership model) {
-				return model.getRoleCollection();
+				return model.getRoles();
 			}
 			@Override
 			public void set(Membership model, Collection<Role> value) {
-				model.getRoleCollection().clear();
-				model.getRoleCollection().addAll(value);
+				model.getRoles().clear();
+				model.getRoles().addAll(value);
 			}
 		});
 

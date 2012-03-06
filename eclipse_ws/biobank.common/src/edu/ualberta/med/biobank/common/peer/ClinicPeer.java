@@ -32,12 +32,12 @@ public class ClinicPeer  extends CenterPeer {
 		, new Property.Accessor<Collection<Contact>, Clinic>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Contact> get(Clinic model) {
-				return model.getContactCollection();
+				return model.getContacts();
 			}
 			@Override
 			public void set(Clinic model, Collection<Contact> value) {
-				model.getContactCollection().clear();
-				model.getContactCollection().addAll(value);
+				model.getContacts().clear();
+				model.getContacts().addAll(value);
 			}
 		});
 

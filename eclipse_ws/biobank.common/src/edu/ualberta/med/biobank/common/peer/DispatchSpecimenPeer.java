@@ -49,12 +49,12 @@ public class DispatchSpecimenPeer {
 		, new Property.Accessor<Collection<Comment>, DispatchSpecimen>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(DispatchSpecimen model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(DispatchSpecimen model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 

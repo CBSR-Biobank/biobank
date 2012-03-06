@@ -77,8 +77,8 @@ public class SpecimenTypeSaveAction implements Action<IdResult> {
             context.load(SpecimenType.class, childSpecimenTypeIds);
         SetDifference<SpecimenType> sitesDiff =
             new SetDifference<SpecimenType>(
-                specimenType.getChildSpecimenTypeCollection(), studies.values());
-        specimenType.setChildSpecimenTypeCollection(sitesDiff.getNewSet());
+                specimenType.getChildSpecimenTypes(), studies.values());
+        specimenType.setChildSpecimenTypes(sitesDiff.getNewSet());
         for (SpecimenType childType : sitesDiff.getRemoveSet()) {
             context.getSession().delete(childType);
         }

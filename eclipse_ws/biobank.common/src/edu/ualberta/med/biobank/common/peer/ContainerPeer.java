@@ -142,12 +142,12 @@ public class ContainerPeer {
 		, new Property.Accessor<Collection<SpecimenPosition>, Container>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<SpecimenPosition> get(Container model) {
-				return model.getSpecimenPositionCollection();
+				return model.getSpecimenPositions();
 			}
 			@Override
 			public void set(Container model, Collection<SpecimenPosition> value) {
-				model.getSpecimenPositionCollection().clear();
-				model.getSpecimenPositionCollection().addAll(value);
+				model.getSpecimenPositions().clear();
+				model.getSpecimenPositions().addAll(value);
 			}
 		});
 
@@ -158,12 +158,12 @@ public class ContainerPeer {
 		, new Property.Accessor<Collection<ContainerPosition>, Container>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<ContainerPosition> get(Container model) {
-				return model.getChildPositionCollection();
+				return model.getChildPositions();
 			}
 			@Override
 			public void set(Container model, Collection<ContainerPosition> value) {
-				model.getChildPositionCollection().clear();
-				model.getChildPositionCollection().addAll(value);
+				model.getChildPositions().clear();
+				model.getChildPositions().addAll(value);
 			}
 		});
 
@@ -189,12 +189,12 @@ public class ContainerPeer {
 		, new Property.Accessor<Collection<Comment>, Container>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(Container model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(Container model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 

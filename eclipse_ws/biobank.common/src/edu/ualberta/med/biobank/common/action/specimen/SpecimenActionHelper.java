@@ -36,7 +36,7 @@ public class SpecimenActionHelper {
     public static void setQuantityFromType(Specimen specimen) {
         Study study = specimen.getCollectionEvent().getPatient().getStudy();
         Collection<AliquotedSpecimen> aliquotedSpecimenCollection = study
-            .getAliquotedSpecimenCollection();
+            .getAliquotedSpecimens();
         if (aliquotedSpecimenCollection != null)
             // FIXME query
             for (AliquotedSpecimen as : aliquotedSpecimenCollection)

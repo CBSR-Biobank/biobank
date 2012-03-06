@@ -41,7 +41,7 @@ public class SpecimenIsUsedInDispatchAction implements Action<BooleanResult> {
         // FIXME reused code from wrapper. Might be more efficient to use a hql
         // query!
         Collection<DispatchSpecimen> dsas = specimen
-            .getDispatchSpecimenCollection();
+            .getDispatchSpecimens();
         if (dsas != null)
             for (DispatchSpecimen dsa : dsas) {
                 Dispatch dispatch = dsa.getDispatch();

@@ -41,7 +41,7 @@ public class TestRole extends TestAction {
         session.save(study);
         session.flush();
 
-        site.getStudyCollection().add(study);
+        site.getStudies().add(study);
 
         Serializable siteId = session.save(site);
 
@@ -86,7 +86,7 @@ public class TestRole extends TestAction {
         Assert.assertNotNull(role);
         Assert.assertTrue(
             "Permissions not saved.",
-            role.getPermissionCollection().containsAll(permissions));
+            role.getPermissions().containsAll(permissions));
     }
 
     @Test
@@ -117,7 +117,7 @@ public class TestRole extends TestAction {
 
         Assert.assertNotNull(role);
         Assert.assertTrue("Permissions not saved.", role
-            .getPermissionCollection().equals(permissions));
+            .getPermissions().equals(permissions));
     }
 
     @Test

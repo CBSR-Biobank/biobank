@@ -56,7 +56,7 @@ public class RequestDispatchAction implements Action<EmptyResult> {
             new RequestStateChangeAction(specs, rsstate);
         stateaction.run(context);
         Request request = context.get(Request.class, requestId);
-        request.getDispatchCollection()
+        request.getDispatches()
             .add(context.get(Dispatch.class, dInfo.id));
         context.getSession().saveOrUpdate(request);
         dsave.run(context);

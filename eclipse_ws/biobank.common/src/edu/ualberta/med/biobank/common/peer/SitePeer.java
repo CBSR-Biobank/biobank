@@ -19,12 +19,12 @@ public class SitePeer  extends CenterPeer {
 		, new Property.Accessor<Collection<Container>, Site>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Container> get(Site model) {
-				return model.getContainerCollection();
+				return model.getContainers();
 			}
 			@Override
 			public void set(Site model, Collection<Container> value) {
-				model.getContainerCollection().clear();
-				model.getContainerCollection().addAll(value);
+				model.getContainers().clear();
+				model.getContainers().addAll(value);
 			}
 		});
 
@@ -35,12 +35,12 @@ public class SitePeer  extends CenterPeer {
 		, new Property.Accessor<Collection<ContainerType>, Site>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<ContainerType> get(Site model) {
-				return model.getContainerTypeCollection();
+				return model.getContainerTypes();
 			}
 			@Override
 			public void set(Site model, Collection<ContainerType> value) {
-				model.getContainerTypeCollection().clear();
-				model.getContainerTypeCollection().addAll(value);
+				model.getContainerTypes().clear();
+				model.getContainerTypes().addAll(value);
 			}
 		});
 
@@ -51,12 +51,12 @@ public class SitePeer  extends CenterPeer {
 		, new Property.Accessor<Collection<Study>, Site>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Study> get(Site model) {
-				return model.getStudyCollection();
+				return model.getStudies();
 			}
 			@Override
 			public void set(Site model, Collection<Study> value) {
-				model.getStudyCollection().clear();
-				model.getStudyCollection().addAll(value);
+				model.getStudies().clear();
+				model.getStudies().addAll(value);
 			}
 		});
 

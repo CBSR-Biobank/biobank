@@ -193,13 +193,13 @@ public class TestSite extends TestAction {
         // save with no comments
         Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
         SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
-        Assert.assertEquals(0, siteInfo.site.getCommentCollection().size());
+        Assert.assertEquals(0, siteInfo.site.getComments().size());
 
         siteInfo = addComment(siteId);
-        Assert.assertEquals(1, siteInfo.site.getCommentCollection().size());
+        Assert.assertEquals(1, siteInfo.site.getComments().size());
 
         siteInfo = addComment(siteId);
-        Assert.assertEquals(2, siteInfo.site.getCommentCollection().size());
+        Assert.assertEquals(2, siteInfo.site.getComments().size());
 
         // TODO: check full name on each comment's user
         // for (Comment comment : siteInfo.site.getCommentCollection()) {

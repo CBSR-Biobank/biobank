@@ -109,12 +109,12 @@ public class UserPeer  extends PrincipalPeer {
 		, new Property.Accessor<Collection<Comment>, User>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(User model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(User model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -140,12 +140,12 @@ public class UserPeer  extends PrincipalPeer {
 		, new Property.Accessor<Collection<BbGroup>, User>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<BbGroup> get(User model) {
-				return model.getGroupCollection();
+				return model.getGroups();
 			}
 			@Override
 			public void set(User model, Collection<BbGroup> value) {
-				model.getGroupCollection().clear();
-				model.getGroupCollection().addAll(value);
+				model.getGroups().clear();
+				model.getGroups().addAll(value);
 			}
 		});
 

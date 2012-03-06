@@ -20,8 +20,8 @@ public class TestPermissionEnum extends TestAction {
         Integer roleId = (Integer) session.save(role);
 
         for (PermissionEnum permissionEnum : PermissionEnum.values()) {
-            role.getPermissionCollection().clear();
-            role.getPermissionCollection().add(permissionEnum);
+            role.getPermissions().clear();
+            role.getPermissions().add(permissionEnum);
 
             session.update(role);
             session.flush();

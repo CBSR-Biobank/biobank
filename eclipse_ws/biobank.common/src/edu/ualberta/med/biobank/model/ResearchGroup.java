@@ -15,12 +15,12 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 @Entity
 @DiscriminatorValue("ResearchGroup")
-@Empty(property = "requestCollection", groups = PreDelete.class)
+@Empty(property = "requests", groups = PreDelete.class)
 public class ResearchGroup extends Center {
     private static final long serialVersionUID = 1L;
 
     private Study study;
-    private Set<Request> requestCollection = new HashSet<Request>(0);
+    private Set<Request> requests = new HashSet<Request>(0);
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_ID", unique = true)
@@ -34,11 +34,11 @@ public class ResearchGroup extends Center {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "RESEARCH_GROUP_ID", updatable = false)
-    public Set<Request> getRequestCollection() {
-        return this.requestCollection;
+    public Set<Request> getRequests() {
+        return this.requests;
     }
 
-    public void setRequestCollection(Set<Request> requestCollection) {
-        this.requestCollection = requestCollection;
+    public void setRequests(Set<Request> requests) {
+        this.requests = requests;
     }
 }

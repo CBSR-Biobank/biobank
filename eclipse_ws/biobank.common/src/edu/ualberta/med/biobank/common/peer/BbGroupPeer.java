@@ -47,12 +47,12 @@ public class BbGroupPeer  extends PrincipalPeer {
 		, new Property.Accessor<Collection<User>, BbGroup>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<User> get(BbGroup model) {
-				return model.getUserCollection();
+				return model.getUsers();
 			}
 			@Override
 			public void set(BbGroup model, Collection<User> value) {
-				model.getUserCollection().clear();
-				model.getUserCollection().addAll(value);
+				model.getUsers().clear();
+				model.getUsers().addAll(value);
 			}
 		});
 

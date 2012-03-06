@@ -56,7 +56,7 @@ public class DispatchSaveAction implements Action<IdResult> {
 
         disp.setState(dInfo.state);
 
-        disp.setDispatchSpecimenCollection(reassemble(context, disp,
+        disp.setDispatchSpecimens(reassemble(context, disp,
             dsInfos));
 
         if (siInfo != null) {
@@ -78,7 +78,7 @@ public class DispatchSaveAction implements Action<IdResult> {
         // This stuff could be extracted to a util method. need to think about
         // how
         if (!dInfo.comment.trim().equals("")) {
-            Set<Comment> comments = disp.getCommentCollection();
+            Set<Comment> comments = disp.getComments();
             if (comments == null) comments = new HashSet<Comment>();
             Comment newComment = new Comment();
             newComment.setCreatedAt(new Date());
@@ -87,7 +87,7 @@ public class DispatchSaveAction implements Action<IdResult> {
             context.getSession().saveOrUpdate(newComment);
 
             comments.add(newComment);
-            disp.setCommentCollection(comments);
+            disp.setComments(comments);
         }
 
         context.getSession().saveOrUpdate(disp);

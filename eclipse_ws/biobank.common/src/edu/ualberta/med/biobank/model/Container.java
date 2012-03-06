@@ -22,7 +22,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -43,8 +42,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Unique(properties = { "site", "productBarcode" }, groups = PrePersist.class)
 })
 @Empty.List({
-    @Empty(property = "specimenPositionCollection", groups = PreDelete.class),
-    @Empty(property = "childPositionCollection", groups = PreDelete.class)
+    @Empty(property = "specimenPositions", groups = PreDelete.class),
+    @Empty(property = "childPositions", groups = PreDelete.class)
 })
 public class Container extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
@@ -53,11 +52,11 @@ public class Container extends AbstractBiobankModel {
     private String label;
     private Double temperature;
     private String path;
-    private Set<Comment> commentCollection = new HashSet<Comment>(0);
-    private Set<ContainerPosition> childPositionCollection =
+    private Set<Comment> comments = new HashSet<Comment>(0);
+    private Set<ContainerPosition> childPositions =
         new HashSet<ContainerPosition>(0);
     private Container topContainer;
-    private Set<SpecimenPosition> specimenPositionCollection =
+    private Set<SpecimenPosition> specimenPositions =
         new HashSet<SpecimenPosition>(0);
     private ContainerType containerType;
     private ContainerPosition position;
@@ -106,22 +105,21 @@ public class Container extends AbstractBiobankModel {
     @JoinTable(name = "CONTAINER_COMMENT",
         joinColumns = { @JoinColumn(name = "CONTAINER_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Set<Comment> getCommentCollection() {
-        return this.commentCollection;
+    public Set<Comment> getComments() {
+        return this.comments;
     }
 
-    public void setCommentCollection(Set<Comment> commentCollection) {
-        this.commentCollection = commentCollection;
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "parentContainer")
-    public Set<ContainerPosition> getChildPositionCollection() {
-        return this.childPositionCollection;
+    public Set<ContainerPosition> getChildPositions() {
+        return this.childPositions;
     }
 
-    public void setChildPositionCollection(
-        Set<ContainerPosition> childPositionCollection) {
-        this.childPositionCollection = childPositionCollection;
+    public void setChildPositions(Set<ContainerPosition> childPositions) {
+        this.childPositions = childPositions;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -135,13 +133,12 @@ public class Container extends AbstractBiobankModel {
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "container")
-    public Set<SpecimenPosition> getSpecimenPositionCollection() {
-        return this.specimenPositionCollection;
+    public Set<SpecimenPosition> getSpecimenPositions() {
+        return this.specimenPositions;
     }
 
-    public void setSpecimenPositionCollection(
-        Set<SpecimenPosition> specimenPositionCollection) {
-        this.specimenPositionCollection = specimenPositionCollection;
+    public void setSpecimenPositions(Set<SpecimenPosition> specimenPositions) {
+        this.specimenPositions = specimenPositions;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Container.containerType.NotNull}")
@@ -211,8 +208,8 @@ public class Container extends AbstractBiobankModel {
     }
 
     public boolean isPositionFree(RowColPos requestedPosition) {
-        if (childPositionCollection.size() > 0) {
-            for (ContainerPosition pos : childPositionCollection) {
+        if (childPositions.size() > 0) {
+            for (ContainerPosition pos : childPositions) {
                 RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
                 if (requestedPosition.equals(rcp)) {
                     return false;
@@ -221,7 +218,7 @@ public class Container extends AbstractBiobankModel {
         }
 
         // else assume this container has specimens
-        for (SpecimenPosition pos : specimenPositionCollection) {
+        for (SpecimenPosition pos : specimenPositions) {
             RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
             if (requestedPosition.equals(rcp)) {
                 return false;
@@ -232,11 +229,11 @@ public class Container extends AbstractBiobankModel {
 
     @Transient
     public Container getChild(RowColPos requestedPosition) throws Exception {
-        if (childPositionCollection.size() == 0) {
+        if (childPositions.size() == 0) {
             throw new Exception("container does not have children");
         }
 
-        for (ContainerPosition pos : childPositionCollection) {
+        for (ContainerPosition pos : childPositions) {
             RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
             if (requestedPosition.equals(rcp)) {
                 return pos.getContainer();
@@ -312,7 +309,7 @@ public class Container extends AbstractBiobankModel {
     }
 
     public boolean hasSpecimens() {
-        return (specimenPositionCollection.size() > 0);
+        return (specimenPositions.size() > 0);
     }
 
 }

@@ -40,9 +40,9 @@ public abstract class PrincipalSaveAction implements Action<IdResult> {
             context.load(Membership.class, membershipIds);
 
         SetDifference<Membership> sitesDiff =
-            new SetDifference<Membership>(principal.getMembershipCollection(),
+            new SetDifference<Membership>(principal.getMemberships(),
                 memberships.values());
-        principal.setMembershipCollection(sitesDiff.getNewSet());
+        principal.setMemberships(sitesDiff.getNewSet());
 
         // remove memberships no longer used
         for (Membership membership : sitesDiff.getRemoveSet()) {

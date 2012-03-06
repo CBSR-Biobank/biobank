@@ -62,12 +62,12 @@ public class SpecimenTypePeer {
 		, new Property.Accessor<Collection<ContainerType>, SpecimenType>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<ContainerType> get(SpecimenType model) {
-				return model.getContainerTypeCollection();
+				return model.getContainerTypes();
 			}
 			@Override
 			public void set(SpecimenType model, Collection<ContainerType> value) {
-				model.getContainerTypeCollection().clear();
-				model.getContainerTypeCollection().addAll(value);
+				model.getContainerTypes().clear();
+				model.getContainerTypes().addAll(value);
 			}
 		});
 
@@ -78,12 +78,12 @@ public class SpecimenTypePeer {
 		, new Property.Accessor<Collection<SpecimenType>, SpecimenType>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<SpecimenType> get(SpecimenType model) {
-				return model.getParentSpecimenTypeCollection();
+				return model.getParentSpecimenTypes();
 			}
 			@Override
 			public void set(SpecimenType model, Collection<SpecimenType> value) {
-				model.getParentSpecimenTypeCollection().clear();
-				model.getParentSpecimenTypeCollection().addAll(value);
+				model.getParentSpecimenTypes().clear();
+				model.getParentSpecimenTypes().addAll(value);
 			}
 		});
 
@@ -94,12 +94,12 @@ public class SpecimenTypePeer {
 		, new Property.Accessor<Collection<SpecimenType>, SpecimenType>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<SpecimenType> get(SpecimenType model) {
-				return model.getChildSpecimenTypeCollection();
+				return model.getChildSpecimenTypes();
 			}
 			@Override
 			public void set(SpecimenType model, Collection<SpecimenType> value) {
-				model.getChildSpecimenTypeCollection().clear();
-				model.getChildSpecimenTypeCollection().addAll(value);
+				model.getChildSpecimenTypes().clear();
+				model.getChildSpecimenTypes().addAll(value);
 			}
 		});
 

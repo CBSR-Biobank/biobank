@@ -104,12 +104,12 @@ public class SpecimenPeer {
 		, new Property.Accessor<Collection<Comment>, Specimen>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(Specimen model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(Specimen model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -195,12 +195,12 @@ public class SpecimenPeer {
 		, new Property.Accessor<Collection<Specimen>, Specimen>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Specimen> get(Specimen model) {
-				return model.getChildSpecimenCollection();
+				return model.getChildSpecimens();
 			}
 			@Override
 			public void set(Specimen model, Collection<Specimen> value) {
-				model.getChildSpecimenCollection().clear();
-				model.getChildSpecimenCollection().addAll(value);
+				model.getChildSpecimens().clear();
+				model.getChildSpecimens().addAll(value);
 			}
 		});
 
@@ -211,12 +211,12 @@ public class SpecimenPeer {
 		, new Property.Accessor<Collection<DispatchSpecimen>, Specimen>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<DispatchSpecimen> get(Specimen model) {
-				return model.getDispatchSpecimenCollection();
+				return model.getDispatchSpecimens();
 			}
 			@Override
 			public void set(Specimen model, Collection<DispatchSpecimen> value) {
-				model.getDispatchSpecimenCollection().clear();
-				model.getDispatchSpecimenCollection().addAll(value);
+				model.getDispatchSpecimens().clear();
+				model.getDispatchSpecimens().addAll(value);
 			}
 		});
 
@@ -272,12 +272,12 @@ public class SpecimenPeer {
 		, new Property.Accessor<Collection<RequestSpecimen>, Specimen>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<RequestSpecimen> get(Specimen model) {
-				return model.getRequestSpecimenCollection();
+				return model.getRequestSpecimens();
 			}
 			@Override
 			public void set(Specimen model, Collection<RequestSpecimen> value) {
-				model.getRequestSpecimenCollection().clear();
-				model.getRequestSpecimenCollection().addAll(value);
+				model.getRequestSpecimens().clear();
+				model.getRequestSpecimens().addAll(value);
 			}
 		});
 

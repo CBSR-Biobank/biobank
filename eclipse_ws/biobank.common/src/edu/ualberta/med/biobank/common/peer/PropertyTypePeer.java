@@ -47,12 +47,12 @@ public class PropertyTypePeer {
 		, new Property.Accessor<Collection<PropertyModifier>, PropertyType>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<PropertyModifier> get(PropertyType model) {
-				return model.getPropertyModifierCollection();
+				return model.getPropertyModifiers();
 			}
 			@Override
 			public void set(PropertyType model, Collection<PropertyModifier> value) {
-				model.getPropertyModifierCollection().clear();
-				model.getPropertyModifierCollection().addAll(value);
+				model.getPropertyModifiers().clear();
+				model.getPropertyModifiers().addAll(value);
 			}
 		});
 

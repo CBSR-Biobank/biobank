@@ -61,7 +61,7 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
         // This stuff could be extracted to a util method. need to think about
         // how
         if (!rgInfo.comment.trim().equals("")) {
-            Set<Comment> comments = rg.getCommentCollection();
+            Set<Comment> comments = rg.getComments();
             if (comments == null) comments = new HashSet<Comment>();
             Comment newComment = new Comment();
             newComment.setCreatedAt(new Date());
@@ -70,7 +70,7 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
             context.getSession().saveOrUpdate(newComment);
 
             comments.add(newComment);
-            rg.setCommentCollection(comments);
+            rg.setComments(comments);
         }
 
         context.getSession().saveOrUpdate(rg);

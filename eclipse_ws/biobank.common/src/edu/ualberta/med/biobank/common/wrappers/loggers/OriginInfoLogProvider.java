@@ -39,7 +39,7 @@ public class OriginInfoLogProvider implements WrapperLogProvider<OriginInfo> {
     }
 
     private int getSpecimenCollectionSize(OriginInfo originInfo) {
-        Collection<Specimen> specimens = originInfo.getSpecimenCollection();
+        Collection<Specimen> specimens = originInfo.getSpecimens();
         return specimens == null ? 0 : specimens.size();
     }
 

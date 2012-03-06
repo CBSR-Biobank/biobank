@@ -65,12 +65,12 @@ public class DispatchPeer {
 		, new Property.Accessor<Collection<Comment>, Dispatch>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(Dispatch model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(Dispatch model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -96,12 +96,12 @@ public class DispatchPeer {
 		, new Property.Accessor<Collection<DispatchSpecimen>, Dispatch>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<DispatchSpecimen> get(Dispatch model) {
-				return model.getDispatchSpecimenCollection();
+				return model.getDispatchSpecimens();
 			}
 			@Override
 			public void set(Dispatch model, Collection<DispatchSpecimen> value) {
-				model.getDispatchSpecimenCollection().clear();
-				model.getDispatchSpecimenCollection().addAll(value);
+				model.getDispatchSpecimens().clear();
+				model.getDispatchSpecimens().addAll(value);
 			}
 		});
 

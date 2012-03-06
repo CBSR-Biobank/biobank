@@ -36,15 +36,15 @@ public class GroupSaveAction extends PrincipalSaveAction {
         Map<Integer, User> users = context.load(User.class, userIds);
 
         SetDifference<User> usersDiff =
-            new SetDifference<User>(group.getUserCollection(),
+            new SetDifference<User>(group.getUsers(),
                 users.values());
-        group.setUserCollection(usersDiff.getNewSet());
+        group.setUsers(usersDiff.getNewSet());
 
         // remove this group from users in removed list
         for (User user : usersDiff.getRemoveSet()) {
-            Set<BbGroup> userGroups = user.getGroupCollection();
+            Set<BbGroup> userGroups = user.getGroups();
             if (userGroups.remove(user)) {
-                user.setGroupCollection(userGroups);
+                user.setGroups(userGroups);
             } else {
                 throw new ActionException(
                     "group not found in user's collection");

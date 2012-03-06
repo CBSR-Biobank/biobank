@@ -173,7 +173,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         List<Contact> contacts = new ArrayList<Contact>();
 
         for (ClinicInfo clinicInfo : clinicInfos) {
-            contacts.addAll(clinicInfo.getClinic().getContactCollection());
+            contacts.addAll(clinicInfo.getClinic().getContacts());
         }
 
         return contacts;

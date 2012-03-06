@@ -252,14 +252,14 @@ public class StudySaveAction implements Action<IdResult> {
         Map<Integer, Site> sites = context.load(Site.class, siteIds);
 
         SetDifference<Site> sitesDiff =
-            new SetDifference<Site>(study.getSiteCollection(), sites.values());
-        study.setSiteCollection(sitesDiff.getNewSet());
+            new SetDifference<Site>(study.getSites(), sites.values());
+        study.setSites(sitesDiff.getNewSet());
 
         // remove this study from sites in removed list
         for (Site site : sitesDiff.getRemoveSet()) {
-            Set<Study> siteStudies = site.getStudyCollection();
+            Set<Study> siteStudies = site.getStudies();
             if (siteStudies.remove(study)) {
-                site.setStudyCollection(siteStudies);
+                site.setStudies(siteStudies);
             } else {
                 throw new ActionException(
                     "study not found in removed site's collection");
@@ -271,21 +271,21 @@ public class StudySaveAction implements Action<IdResult> {
         Map<Integer, Contact> contacts =
             context.load(Contact.class, contactIds);
         SetDifference<Contact> contactsDiff =
-            new SetDifference<Contact>(study.getContactCollection(),
+            new SetDifference<Contact>(study.getContacts(),
                 contacts.values());
-        study.setContactCollection(contactsDiff.getNewSet());
+        study.setContacts(contactsDiff.getNewSet());
 
         for (Contact contact : contactsDiff.getAddSet()) {
-            Set<Study> contactStudies = contact.getStudyCollection();
+            Set<Study> contactStudies = contact.getStudies();
             contactStudies.add(study);
-            contact.setStudyCollection(contactStudies);
+            contact.setStudies(contactStudies);
         }
 
         // remove this study from contacts in removed list
         for (Contact contact : contactsDiff.getRemoveSet()) {
-            Set<Study> contactStudies = contact.getStudyCollection();
+            Set<Study> contactStudies = contact.getStudies();
             if (contactStudies.remove(study)) {
-                contact.setStudyCollection(contactStudies);
+                contact.setStudies(contactStudies);
             } else {
                 throw new ActionException(
                     "study not found in removed site's collection");
@@ -311,8 +311,8 @@ public class StudySaveAction implements Action<IdResult> {
         // delete source specimens no longer in use
         SetDifference<SourceSpecimen> srcSpcsDiff =
             new SetDifference<SourceSpecimen>(
-                study.getSourceSpecimenCollection(), newSsCollection);
-        study.setSourceSpecimenCollection(newSsCollection);
+                study.getSourceSpecimens(), newSsCollection);
+        study.setSourceSpecimens(newSsCollection);
         for (SourceSpecimen srcSpc : srcSpcsDiff.getRemoveSet()) {
             context.getSession().delete(srcSpc);
         }
@@ -338,8 +338,8 @@ public class StudySaveAction implements Action<IdResult> {
 
         SetDifference<AliquotedSpecimen> aqSpcsDiff =
             new SetDifference<AliquotedSpecimen>(
-                study.getAliquotedSpecimenCollection(), newAsCollection);
-        study.setAliquotedSpecimenCollection(aqSpcsDiff.getNewSet());
+                study.getAliquotedSpecimens(), newAsCollection);
+        study.setAliquotedSpecimens(aqSpcsDiff.getNewSet());
 
         // delete aliquoted specimens no longer in use
         for (AliquotedSpecimen aqSpc : aqSpcsDiff.getRemoveSet()) {
@@ -372,8 +372,8 @@ public class StudySaveAction implements Action<IdResult> {
 
         SetDifference<StudyEventAttr> attrsDiff =
             new SetDifference<StudyEventAttr>(
-                study.getStudyEventAttrCollection(), newEAttrCollection);
-        study.setStudyEventAttrCollection(attrsDiff.getNewSet());
+                study.getStudyEventAttrs(), newEAttrCollection);
+        study.setStudyEventAttrs(attrsDiff.getNewSet());
         for (StudyEventAttr attr : attrsDiff.getRemoveSet()) {
             context.getSession().delete(attr);
         }
@@ -383,7 +383,7 @@ public class StudySaveAction implements Action<IdResult> {
         Comment comment = CommentUtil.create(context.getUser(), commentText);
         if (comment != null) {
             context.getSession().save(comment);
-            study.getCommentCollection().add(comment);
+            study.getComments().add(comment);
         }
     }
 }

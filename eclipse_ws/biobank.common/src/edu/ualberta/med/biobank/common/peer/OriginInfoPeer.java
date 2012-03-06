@@ -66,12 +66,12 @@ public class OriginInfoPeer {
 		, new Property.Accessor<Collection<Comment>, OriginInfo>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Comment> get(OriginInfo model) {
-				return model.getCommentCollection();
+				return model.getComments();
 			}
 			@Override
 			public void set(OriginInfo model, Collection<Comment> value) {
-				model.getCommentCollection().clear();
-				model.getCommentCollection().addAll(value);
+				model.getComments().clear();
+				model.getComments().addAll(value);
 			}
 		});
 
@@ -97,12 +97,12 @@ public class OriginInfoPeer {
 		, new Property.Accessor<Collection<Specimen>, OriginInfo>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Collection<Specimen> get(OriginInfo model) {
-				return model.getSpecimenCollection();
+				return model.getSpecimens();
 			}
 			@Override
 			public void set(OriginInfo model, Collection<Specimen> value) {
-				model.getSpecimenCollection().clear();
-				model.getSpecimenCollection().addAll(value);
+				model.getSpecimens().clear();
+				model.getSpecimens().addAll(value);
 			}
 		});
 

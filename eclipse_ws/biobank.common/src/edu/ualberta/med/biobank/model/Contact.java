@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 @Entity
 @Table(name = "CONTACT")
-@Empty(property = "studyCollection",groups = PreDelete.class)
+@Empty(property = "studies", groups = PreDelete.class)
 public class Contact extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
@@ -29,7 +29,7 @@ public class Contact extends AbstractBiobankModel {
     private String emailAddress;
     private String pagerNumber;
     private String officeNumber;
-    private Set<Study> studyCollection = new HashSet<Study>(0);
+    private Set<Study> studies = new HashSet<Study>(0);
     private Clinic clinic;
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Contact.name.NotNull}")
@@ -97,13 +97,13 @@ public class Contact extends AbstractBiobankModel {
         this.officeNumber = officeNumber;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "contactCollection")
-    public Set<Study> getStudyCollection() {
-        return this.studyCollection;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "contacts")
+    public Set<Study> getStudies() {
+        return this.studies;
     }
 
-    public void setStudyCollection(Set<Study> studyCollection) {
-        this.studyCollection = studyCollection;
+    public void setStudies(Set<Study> studies) {
+        this.studies = studies;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
