@@ -2323,9 +2323,9 @@
           </with>
        </definition>
       <definition
-            id="biobank.hasPrinterLabelsRights">
+            id="biobank.hasLabelPrintingRights">
          <with
-               variable="edu.ualberta.med.biobank.sourceprovider.hasPrinterLabelsRights">
+               variable="edu.ualberta.med.biobank.sourceprovider.hasLabelPrintingRights">
             <equals
                   value="true">
             </equals>
