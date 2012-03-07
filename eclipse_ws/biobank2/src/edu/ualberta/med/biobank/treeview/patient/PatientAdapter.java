@@ -171,7 +171,10 @@ public class PatientAdapter extends AbstractNewAdapterBase {
             this.patient = pinfo.patient;
             this.study = pinfo.study;
             this.ceventsCount = pinfo.ceventsCount;
-            if (patient.getId() != null) init();
+            if (patient.getId() != null) {
+                setId(patient.getId());
+                init();
+            }
         }
 
     }
