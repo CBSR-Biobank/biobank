@@ -3,6 +3,9 @@ package edu.ualberta.med.biobank.forms;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -40,6 +43,7 @@ import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Base class for data all BioBank view and entry forms. This class is the
@@ -238,6 +242,25 @@ public abstract class BiobankFormBase extends BgcFormBase {
         } else if (ex instanceof ActionException) {
             BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
                 ex);
+            cancelSave(monitor);
+        } else if (ex instanceof ApplicationException) {
+            if (ex.getCause() instanceof ConstraintViolationException) {
+                ConstraintViolationException v =
+                    (ConstraintViolationException) ex.getCause();
+                for (ConstraintViolation cv : v.getConstraintViolations()) {
+
+                }
+                // LocalizedConstraintViolation lcv =
+                // v.getConstraintViolations().iterator().next();
+                // BgcPlugin.openAsyncError(
+                // Messages.BiobankFormBase_save_error_title,
+                // v.getConstraintViolations().iterator().next());
+
+            } else {
+                BgcPlugin.openAsyncError(
+                    Messages.BiobankFormBase_save_error_title,
+                    ex.getLocalizedMessage());
+            }
             cancelSave(monitor);
         } else {
             cancelSave(monitor);

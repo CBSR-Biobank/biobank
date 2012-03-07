@@ -146,6 +146,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.server.applicationservice.exceptions,
  edu.ualberta.med.biobank.server.query,
  edu.ualberta.med.biobank.server.reports,
+ edu.ualberta.med.biobank.validator.engine,
  gov.nih.nci.system.applicationservice;
   uses:="gov.nih.nci.system.query,
    gov.nih.nci.system.query.hibernate,
@@ -156,6 +157,7 @@ Export-Package: antlr;
  gov.nih.nci.system.query,
  gov.nih.nci.system.query.example;uses:="gov.nih.nci.system.query",
  gov.nih.nci.system.query.hibernate,
+ javax.validation,
  net.sf.cglib.proxy,
  org.acegisecurity;uses:="org.springframework.core,org.springframework.context.support",
  org.acegisecurity.providers.rcp;
