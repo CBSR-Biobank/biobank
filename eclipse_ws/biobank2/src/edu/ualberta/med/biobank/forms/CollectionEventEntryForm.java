@@ -426,7 +426,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 ceventCopy.getActivityStatus(), comment.getMessage(),
                 cevents, ceventAttrList)).getId();
         PatientGetSimpleCollectionEventInfosAction action =
-            new PatientGetSimpleCollectionEventInfosAction(savedCeventId);
+            new PatientGetSimpleCollectionEventInfosAction(ceventCopy
+                .getPatient().getId());
         Map<Integer, SimpleCEventInfo> infos =
             SessionManager.getAppService().doAction(action).getMap();
         ((CollectionEventAdapter) adapter).setValue(
