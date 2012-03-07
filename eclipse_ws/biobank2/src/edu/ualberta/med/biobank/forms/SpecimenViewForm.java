@@ -33,7 +33,8 @@ public class SpecimenViewForm extends BiobankViewForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.SpecimenViewForm"; //$NON-NLS-1$
 
-    private SpecimenWrapper specimenWrapper;
+    private SpecimenWrapper specimenWrapper =
+        new SpecimenWrapper(SessionManager.getAppService());
 
     private BgcBaseText centerLabel;
 
@@ -90,8 +91,7 @@ public class SpecimenViewForm extends BiobankViewForm {
             new SpecimenGetInfoAction(adapter.getId()));
         Specimen specimen = specimenBriefInfo.getSpecimen();
         Assert.isNotNull(specimen);
-        specimenWrapper =
-            new SpecimenWrapper(SessionManager.getAppService(), specimen);
+        specimenWrapper.setWrappedObject(specimen);
     }
 
     @Override

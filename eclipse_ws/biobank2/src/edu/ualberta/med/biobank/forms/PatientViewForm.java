@@ -55,9 +55,8 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     private void updatePatientInfo() throws Exception {
-        patientInfo =
-            SessionManager.getAppService().doAction(
-                new PatientGetInfoAction(adapter.getId()));
+        patientInfo = SessionManager.getAppService().doAction(
+            new PatientGetInfoAction(adapter.getId()));
     }
 
     @Override

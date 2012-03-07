@@ -34,7 +34,8 @@ public class StudyViewForm extends BiobankViewForm {
     private static final String DATE_PROCESSED_INFO_FIELD_NAME =
         Messages.study_visit_info_dateProcessed;
 
-    private StudyWrapper study;
+    private StudyWrapper study =
+        new StudyWrapper(SessionManager.getAppService());
 
     private BgcBaseText nameLabel;
     private BgcBaseText nameShortLabel;
@@ -71,9 +72,7 @@ public class StudyViewForm extends BiobankViewForm {
     private void updateStudyInfo() throws Exception {
         studyInfo = SessionManager.getAppService().doAction(
             new StudyGetInfoAction(adapter.getId()));
-        study =
-            new StudyWrapper(SessionManager.getAppService(),
-                studyInfo.getStudy());
+        study.setWrappedObject(studyInfo.getStudy());
     }
 
     @Override
@@ -210,7 +209,8 @@ public class StudyViewForm extends BiobankViewForm {
             }
             combinedStudyEventAttrInfo = new StudyEventAttrCustomInfo();
             combinedStudyEventAttrInfo.setLabel(label);
-            combinedStudyEventAttrInfo.setType(study.getStudyEventAttrType(label));
+            combinedStudyEventAttrInfo.setType(study
+                .getStudyEventAttrType(label));
             combinedStudyEventAttrInfo.setAllowedValues(study
                 .getStudyEventAttrPermissible(label));
             pvCustomInfoList.add(combinedStudyEventAttrInfo);

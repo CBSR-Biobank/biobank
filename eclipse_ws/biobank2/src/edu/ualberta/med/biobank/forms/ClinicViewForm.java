@@ -29,7 +29,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ClinicViewForm"; //$NON-NLS-1$
 
-    private ClinicWrapper clinic;
+    private ClinicWrapper clinic =
+        new ClinicWrapper(SessionManager.getAppService());
 
     private ContactInfoTable contactsTable;
 
@@ -70,8 +71,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
             new ClinicGetInfoAction(adapter.getId()));
         Assert.isNotNull(clinicInfo);
         Assert.isNotNull(clinicInfo.clinic);
-        clinic =
-            new ClinicWrapper(SessionManager.getAppService(), clinicInfo.clinic);
+        clinic.setWrappedObject(clinicInfo.clinic);
 
         studyCountInfo =
             SessionManager.getAppService().doAction(

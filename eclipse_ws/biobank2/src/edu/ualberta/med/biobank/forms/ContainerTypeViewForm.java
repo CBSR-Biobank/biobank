@@ -29,7 +29,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ContainerTypeViewForm"; //$NON-NLS-1$
 
-    private ContainerTypeWrapper containerType;
+    private ContainerTypeWrapper containerType = new ContainerTypeWrapper(
+        SessionManager.getAppService());
 
     private BgcBaseText siteLabel;
 
@@ -76,9 +77,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         containerTypeInfo = SessionManager.getAppService().doAction(
             new ContainerTypeGetInfoAction(adapter.getId()));
         Assert.isNotNull(containerTypeInfo);
-        containerType =
-            new ContainerTypeWrapper(SessionManager.getAppService(),
-                containerTypeInfo.getContainerType());
+        containerType.setWrappedObject(containerTypeInfo.getContainerType());
     }
 
     @Override

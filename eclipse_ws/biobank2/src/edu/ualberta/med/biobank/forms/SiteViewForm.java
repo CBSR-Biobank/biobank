@@ -53,7 +53,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private SiteInfo siteInfo;
 
-    private SiteWrapper site;
+    private SiteWrapper site = new SiteWrapper(SessionManager.getAppService());
 
     private CommentCollectionInfoTable commentTable;
 
@@ -74,8 +74,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         siteInfo = SessionManager.getAppService().doAction(
             new SiteGetInfoAction(adapter.getId()));
         Assert.isNotNull(siteInfo.getSite());
-        site = new SiteWrapper(SessionManager.getAppService(),
-            siteInfo.getSite());
+        site.setWrappedObject(siteInfo.getSite());
     }
 
     @Override

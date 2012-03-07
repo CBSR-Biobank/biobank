@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
@@ -59,7 +60,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private ContainerAdapter containerAdapter;
 
-    private ContainerWrapper container;
+    private ContainerWrapper container = new ContainerWrapper(
+        SessionManager.getAppService());
 
     private BgcBaseText tempWidget;
 
@@ -126,11 +128,10 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (id != null) {
             containerInfo = SessionManager.getAppService().doAction(
                 new ContainerGetInfoAction(id));
-            container = new ContainerWrapper(SessionManager.getAppService(),
-                containerInfo.container);
+            container.setWrappedObject(containerInfo.container);
         } else {
             containerInfo = new ContainerInfo();
-            container = new ContainerWrapper(SessionManager.getAppService());
+            container.setWrappedObject(new Container());
             container.setSite(SessionManager.getUser().getCurrentWorkingSite());
         }
 
