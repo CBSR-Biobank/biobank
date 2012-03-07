@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
+import edu.ualberta.med.biobank.treeview.patient.StudyWithPatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SourceSpecimenInfoTable;
@@ -59,9 +60,11 @@ public class StudyViewForm extends BiobankViewForm {
 
     @Override
     public void init() throws Exception {
-        Assert.isTrue((adapter instanceof StudyAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
-                + adapter.getClass().getName());
+        Assert
+            .isTrue(
+                (adapter instanceof StudyAdapter || adapter instanceof StudyWithPatientAdapter),
+                "Invalid editor input: object of type " //$NON-NLS-1$
+                    + adapter.getClass().getName());
 
         updateStudyInfo();
         setPartName(NLS
