@@ -7,6 +7,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.acegisecurity.AccessDeniedException;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -247,14 +248,13 @@ public abstract class BiobankFormBase extends BgcFormBase {
             if (ex.getCause() instanceof ConstraintViolationException) {
                 ConstraintViolationException v =
                     (ConstraintViolationException) ex.getCause();
-                for (ConstraintViolation cv : v.getConstraintViolations()) {
-
+                ArrayList<String> msgs = new ArrayList<String>();
+                for (ConstraintViolation<?> cv : v.getConstraintViolations()) {
+                    msgs.add(cv.getMessage());
                 }
-                // LocalizedConstraintViolation lcv =
-                // v.getConstraintViolations().iterator().next();
-                // BgcPlugin.openAsyncError(
-                // Messages.BiobankFormBase_save_error_title,
-                // v.getConstraintViolations().iterator().next());
+                BgcPlugin.openAsyncError(
+                    Messages.BiobankFormBase_save_error_title,
+                    StringUtils.join(msgs, "\n"));
 
             } else {
                 BgcPlugin.openAsyncError(
