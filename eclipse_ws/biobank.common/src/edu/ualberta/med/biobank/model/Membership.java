@@ -45,6 +45,11 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "MEMBERSHIP",
     uniqueConstraints = {
+        // TODO: consider adding 'RANK' so can be admin on 1, user manager on 1
+        // and a normal user for all? But there's no point of being an admin and
+        // a user manager on the same center/ study combo, since admin
+        // completely encompases manager. Actually, how about an "isManager"
+        // field and an "isAllPermissions" field?
         @UniqueConstraint(columnNames = { "PRINCIPAL_ID", "NOT_NULL_CENTER_ID",
             "NOT_NULL_STUDY_ID" }) })
 @Unique(properties = { "principal", "notNullCenterId", "notNullStudyId" }, groups = PrePersist.class)

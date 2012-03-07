@@ -11,10 +11,10 @@ import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.model.util.ModelUtil;
+import edu.ualberta.med.biobank.model.util.IdUtil;
 
 /**
  * It is easier to modify
@@ -26,38 +26,43 @@ public class MembershipSaveAction implements Action<IdResult> {
     private static final Permission PERMISSION = new UserManagerPermission();
 
     private final Integer id;
+    private final Integer principalId;
     private final Integer centerId;
     private final Integer studyId;
     private final Rank rank;
     private final short level;
-    private final Set<PermissionEnum> permissions;
-    private final Set<Integer> roleIds;
+
+    private final SetDiff<PermissionEnum> permissions;
+    private final SetDiff<Integer> roleIds;
+
+    public static class SetDiff<T> {
+        public SetDiff(Set<T> before, Set<T> after) {
+        }
+
+        public static <E> SetDiff<E> of(Set<E> before, Set<E> after) {
+            return new SetDiff<E>(before, after);
+        }
+
+        // public static Diff<E> ofIds(Set<HasId<E>> before, Set<HasId<E>>
+        // after) {
+
+        // }
+    }
 
     // TODO: take a MembershipDTO that knows what PermissionEnum-s and Role-s it
     // is meant to be working with?
-    public MembershipSaveAction(Membership m, User manager) {
-        this.id = m.getId();
-        this.centerId = ModelUtil.getId(m.getCenter());
-        this.studyId = ModelUtil.getId(m.getStudy());
-        this.rank = m.getRank();
-        this.level = m.getLevel();
+    public MembershipSaveAction(ManagedMembership m) {
+        id = m.getId();
+        principalId = IdUtil.getId(m.getPrincipal());
+        centerId = IdUtil.getId(m.getCenter());
+        studyId = IdUtil.getId(m.getStudy());
+        rank = m.getRank();
+        level = m.getLevel();
 
-        // I HAVE TO SEND THE OPTIONS, SO WHAT I THINK IS GOING TO BE DONE IS
-        // WHAT IS ACTUALLY DONE.
-        // Note that this can be done by either:
-        // (1) sending the entire set you think you're working with or
-        // (2) sending what you think the differences are, (i.e. and added set
-        // and a removed set)
-        // -- don't bother sending the Membership PE and Role options back, we
-        // can figure this out on the client.
-        this.permissions = m.getPermissions();
-        // this.manageablePermissions =
-        m.getManageablePermissions(manager);
-        m.getManageableRoles(manager);
-
-        // EnumSet.
-
-        this.roleIds = ModelUtil.getIds(m.getRoles());
+        permissions = SetDiff.of(m.getPermissionOptions(), m.getPermissions());
+        roleIds =
+            SetDiff.of(IdUtil.getIds(m.getRoleOptions()),
+                IdUtil.getIds(m.getRoles()));
     }
 
     @Override
@@ -71,6 +76,7 @@ public class MembershipSaveAction implements Action<IdResult> {
 
         if (m.getId() != null) checkManageability(m, context);
 
+        m.setPrincipal(context.load(Principal.class, principalId));
         m.setCenter(context.load(Center.class, centerId));
         m.setStudy(context.load(Study.class, studyId));
         m.setRank(rank);
@@ -80,6 +86,8 @@ public class MembershipSaveAction implements Action<IdResult> {
 
         // TODO: check user can still manage all permissions before removing
         // TODO: check user can still manage all roles before removing
+
+        // context.load(Role.class, roleIds);
 
         checkManageability(m, context);
 

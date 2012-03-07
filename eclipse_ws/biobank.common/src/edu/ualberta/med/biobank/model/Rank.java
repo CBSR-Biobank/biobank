@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+// TODO: consider making Rank an @Embeddable with an isManager and an isAllPermissions components, perhaps serialized to an int? a bit array?
 public enum Rank {
     NORMAL(0, "Normal"),
     USER_MANAGER(1, "User Manager"),

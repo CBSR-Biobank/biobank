@@ -27,6 +27,10 @@ public class WorkingSet<T> implements Set<T> {
     private final Set<T> original;
     private final Set<T> delegate = new HashSet<T>();
 
+    public static <E> WorkingSet<E> of(Set<E> original) {
+        return new WorkingSet<E>(original);
+    }
+
     public WorkingSet(Set<T> original) {
         this.original = Collections.unmodifiableSet(original);
     }
