@@ -2,12 +2,14 @@ package edu.ualberta.med.biobank.common.action;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
+import edu.ualberta.med.biobank.common.action.util.SetDiff;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -125,6 +127,29 @@ public class ActionContext {
         }
 
         return results;
+    }
+
+    public <K extends Serializable, V> SetDiff<V> load(Class<V> klazz,
+        SetDiff<K> ids) throws ModelNotFoundException {
+        Set<V> additions = new HashSet<V>(ids.getAdditions().size());
+        Set<V> removals = new HashSet<V>(ids.getRemovals().size());
+
+        for (K id : ids.getAdditions()) {
+            V result = get(klazz, id);
+
+            if (result == null) {
+                throw new ModelNotFoundException(klazz, id);
+            }
+
+            additions.add(result);
+        }
+
+        for (K id : ids.getRemovals()) {
+            V result = get(klazz, id);
+            removals.add(result);
+        }
+
+        return SetDiff.copy(additions, removals);
     }
 
     public WritableApplicationService getAppService() {

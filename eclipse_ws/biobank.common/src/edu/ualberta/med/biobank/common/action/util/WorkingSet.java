@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.security;
+package edu.ualberta.med.biobank.common.action.util;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -50,6 +50,10 @@ public class WorkingSet<T> implements Set<T> {
         Set<T> removals = new HashSet<T>(original);
         removals.removeAll(delegate);
         return removals;
+    }
+
+    public SetDiff<T> getDiff() {
+        return SetDiff.of(original, delegate);
     }
 
     public Set<T> getOriginal() {
