@@ -27,7 +27,7 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
 
     private SpecimenType specimenType;
 
-    private int quantity;
+    private Integer quantity;
 
     private BigDecimal volume;
 
@@ -40,11 +40,11 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
      *        type.
      */
     @Column(name = "QUANTITY")
-    public int getQuantity() {
+    public Integer getQuantity() {
         return this.quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 

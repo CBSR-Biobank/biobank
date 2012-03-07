@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.validator.constraint.impl;
 
 import java.text.MessageFormat;
 import java.util.List;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -57,7 +58,7 @@ public class NotUsedValidator extends SessionAwareConstraintValidator<Object>
             template.append(".");
             template.append(NotUsed.class.getSimpleName());
             template.append(".");
-            template.append(by);
+            template.append(by.getSimpleName());
             template.append(".");
             template.append(property);
             template.append("}");

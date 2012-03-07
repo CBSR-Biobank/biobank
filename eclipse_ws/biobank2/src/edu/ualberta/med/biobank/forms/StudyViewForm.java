@@ -72,6 +72,7 @@ public class StudyViewForm extends BiobankViewForm {
     private void updateStudyInfo() throws Exception {
         studyInfo = SessionManager.getAppService().doAction(
             new StudyGetInfoAction(adapter.getId()));
+        Assert.isNotNull(studyInfo.getStudy());
         study.setWrappedObject(studyInfo.getStudy());
     }
 
@@ -132,30 +133,6 @@ public class StudyViewForm extends BiobankViewForm {
         contactsTable.createDefaultEditItem();
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
-
-        // contactsTable.addClickListener(new IDoubleClickListener() {
-        // @Override
-        // public void doubleClick(DoubleClickEvent event) {
-        // Object selection = event.getSelection();
-        // if (selection instanceof InfoTableSelection) {
-        // Object obj = ((InfoTableSelection) selection).getObject();
-        // if (obj instanceof ClinicWrapper) {
-        // ClinicWrapper c = (ClinicWrapper) obj;
-        // DoubleClickEvent newEvent = new DoubleClickEvent(
-        // (Viewer) event.getSource(), new InfoTableSelection(
-        // c));
-        // collectionDoubleClickListener.doubleClick(newEvent);
-        // } else {
-        // Assert.isTrue(false,
-        //                            "invalid InfoTableSelection class:" //$NON-NLS-1$
-        // + obj.getClass().getName());
-        // }
-        // } else {
-        //                    Assert.isTrue(false, "invalid class for event selection:" //$NON-NLS-1$
-        // + event.getClass().getName());
-        // }
-        // }
-        // });
     }
 
     private void setStudySectionValues() throws Exception {

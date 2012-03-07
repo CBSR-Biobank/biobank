@@ -99,8 +99,8 @@ public class StudyAdapter extends AdapterBase {
 
     @Override
     protected void runDelete() throws Exception {
-        // TODO: feedback to the user if this action fails
-        SessionManager.getAppService().doAction(new StudyDeleteAction(getId()));
+        SessionManager.getAppService().doAction(
+            new StudyDeleteAction(getId()));
         SessionManager.updateAllSimilarNodes(getParent(), true);
     }
 

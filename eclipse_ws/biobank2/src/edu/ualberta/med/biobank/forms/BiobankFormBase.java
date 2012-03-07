@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -246,12 +247,9 @@ public abstract class BiobankFormBase extends BgcFormBase {
             cancelSave(monitor);
         } else if (ex instanceof ApplicationException) {
             if (ex.getCause() instanceof ConstraintViolationException) {
-                ConstraintViolationException v =
-                    (ConstraintViolationException) ex.getCause();
-                ArrayList<String> msgs = new ArrayList<String>();
-                for (ConstraintViolation<?> cv : v.getConstraintViolations()) {
-                    msgs.add(cv.getMessage());
-                }
+                List<String> msgs =
+                    getConstraintViolationsMsgs((ConstraintViolationException) ex
+                        .getCause());
                 BgcPlugin.openAsyncError(
                     Messages.BiobankFormBase_save_error_title,
                     StringUtils.join(msgs, "\n"));
@@ -272,6 +270,15 @@ public abstract class BiobankFormBase extends BgcFormBase {
                         "An unknown error occurred. Report this issue to your administrator");
             }
         }
+    }
+
+    public static List<String> getConstraintViolationsMsgs(
+        ConstraintViolationException e) {
+        ArrayList<String> msgs = new ArrayList<String>();
+        for (ConstraintViolation<?> cv : e.getConstraintViolations()) {
+            msgs.add(cv.getMessage());
+        }
+        return msgs;
     }
 
     protected void cancelSave(IProgressMonitor monitor) {
