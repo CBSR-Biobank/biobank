@@ -114,6 +114,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.common.permission.container,
  edu.ualberta.med.biobank.common.permission.containerType,
  edu.ualberta.med.biobank.common.permission.dispatch,
+ edu.ualberta.med.biobank.common.permission.labelPrinting,
  edu.ualberta.med.biobank.common.permission.logging,
  edu.ualberta.med.biobank.common.permission.patient,
  edu.ualberta.med.biobank.common.permission.processingEvent,

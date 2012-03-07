@@ -7,6 +7,7 @@ import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.labelPrinting.LabelPrintingPermission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
@@ -114,12 +115,11 @@ public class SessionState extends AbstractSourceProvider {
             setSuperAdminMode(user != null && user.isInSuperAdminMode());
             setHasWorkingCenter(user != null
                 && user.getCurrentWorkingCenter() != null);
-            setCurrentCenterType((user == null) ? null : user
-                .getCurrentWorkingCenter());
-            // setHasLabelPrintingRights(user != null
-            // && SessionManager.getAppService().isAllowed(
-            // new PrinterLabelPermission()));
-            // FIXME need this permission implemented
+            setCurrentCenterType((user == null)
+                ? null : user.getCurrentWorkingCenter());
+            setHasLabelPrintingRights(user != null
+                && SessionManager.getAppService().isAllowed(
+                    new LabelPrintingPermission()));
             setHasUserManagementRights(user != null
                 && SessionManager.getAppService().isAllowed(
                     new UserManagementPermission()));
