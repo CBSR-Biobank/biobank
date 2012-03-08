@@ -39,12 +39,16 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class LoggingView extends ViewPart {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.LoggingView"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.LoggingView"; //$NON-NLS-1$
 
     private ISourceProviderListener siteStateListener;
 
     private static enum ComboListType {
-        CENTER, USER, TYPE, ACTION
+        CENTER,
+        USER,
+        TYPE,
+        ACTION
     }
 
     private BgcBaseText patientNumTextInput, inventoryIdTextInput,
@@ -383,7 +387,8 @@ public class LoggingView extends ViewPart {
             return;
         }
 
-        FormInput input = new FormInput(null, Messages.LoggingView_resform_title);
+        FormInput input =
+            new FormInput(null, Messages.LoggingView_resform_title);
         try {
             LogQuery.getInstance().setSearchQueryItem(LogPeer.CENTER.getName(),
                 centerCombo.getText());
@@ -409,13 +414,17 @@ public class LoggingView extends ViewPart {
             if (startDateStr != null && startDateStr.length() > 0) {
                 LogQuery.getInstance().setSearchQueryItem(
                     LogQuery.START_DATE_KEY, startDateStr);
-            }
+            } else
+                LogQuery.getInstance().setSearchQueryItem(
+                    LogQuery.START_DATE_KEY, "");
 
             String endDateStr = DateFormatter.formatAsDate(endDateDate);
             if (endDateStr != null && endDateStr.length() > 0) {
                 LogQuery.getInstance().setSearchQueryItem(
                     LogQuery.END_DATE_KEY, endDateStr);
-            }
+            } else
+                LogQuery.getInstance().setSearchQueryItem(
+                    LogQuery.END_DATE_KEY, "");
             /*
              * LogQuery.getInstance().setSearchQueryItem( "containerType",
              * containerTypeCombo.getText()); LogQuery.getInstance()

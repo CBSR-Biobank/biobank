@@ -336,9 +336,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             widgetCreator.addBinding(DATE_SHIPPED_BINDING);
         } else {
             widgetCreator.removeBinding(DATE_SHIPPED_BINDING);
+            shipmentInfo.setPackedAt(null);
         }
         form.layout(true, true);
-
     }
 
     private void createSpecimensSection() {
