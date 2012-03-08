@@ -27,11 +27,14 @@ public class ContactEntryInfoTable extends ContactInfoTable {
 
     private List<ContactWrapper> deletedContacts;
 
-    private List<ContactWrapper> originalCcontacts;
+    private List<ContactWrapper> originalContacts;
 
     public ContactEntryInfoTable(Composite parent, List<ContactWrapper> contacts) {
         super(parent, contacts);
-        originalCcontacts = contacts;
+        originalContacts = new ArrayList<ContactWrapper>();
+        if (contacts != null) {
+            originalContacts.addAll(contacts);
+        }
         selectedContacts = contacts;
         if (selectedContacts == null) {
             selectedContacts = new ArrayList<ContactWrapper>();
@@ -132,10 +135,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
 
     @Override
     public void reload() {
-        selectedContacts = originalCcontacts;
-        if (selectedContacts == null) {
-            selectedContacts = new ArrayList<ContactWrapper>();
-        }
+        selectedContacts = new ArrayList<ContactWrapper>(originalContacts);
         addedOrModifiedContacts = new ArrayList<ContactWrapper>();
         deletedContacts = new ArrayList<ContactWrapper>();
         reloadCollection(selectedContacts, null);

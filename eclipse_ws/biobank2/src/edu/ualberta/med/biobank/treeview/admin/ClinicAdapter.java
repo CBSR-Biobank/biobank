@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicDeleteAction;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicDeletePermission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicReadPermission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
@@ -105,6 +106,13 @@ public class ClinicAdapter extends AdapterBase {
         if (o instanceof ClinicAdapter)
             return internalCompareTo(o);
         return 0;
+    }
+
+    @Override
+    protected void runDelete() throws Exception {
+        SessionManager.getAppService().doAction(
+            new ClinicDeleteAction(getId()));
+        SessionManager.updateAllSimilarNodes(getParent(), true);
     }
 
 }
