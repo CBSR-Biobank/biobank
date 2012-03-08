@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.action.security;
 
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -30,7 +31,7 @@ public class MembershipSaveAction implements Action<IdResult> {
     private final Rank rank;
     private final short level;
 
-    private final SetDiff<PermissionEnum> permissionsDiff;
+    private final SetDiff<PermissionEnum> permsDiff;
     private final SetDiff<Integer> roleIdsDiff;
 
     public MembershipSaveAction(ManagedMembership m) {
@@ -41,8 +42,7 @@ public class MembershipSaveAction implements Action<IdResult> {
         rank = m.getRank();
         level = m.getLevel();
 
-        permissionsDiff =
-            SetDiff.of(m.getPermissionOptions(), m.getPermissions());
+        permsDiff = SetDiff.of(m.getPermissionOptions(), m.getPermissions());
         roleIdsDiff = SetDiff.ofIds(m.getRoleOptions(), m.getRoles());
     }
 
@@ -53,42 +53,48 @@ public class MembershipSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        Membership m = context.load(Membership.class, id, new Membership());
-        User user = context.getUser();
+        Membership memb = context.load(Membership.class, id, new Membership());
+        User manager = context.getUser();
 
-        if (m.getId() != null) checkManageability(m, user);
+        if (memb.getId() != null) checkManageability(memb, manager);
 
-        m.setPrincipal(context.load(Principal.class, principalId));
-        m.setCenter(context.load(Center.class, centerId));
-        m.setStudy(context.load(Study.class, studyId));
-        m.setRank(rank);
-        m.setLevel(level);
+        memb.setPrincipal(context.load(Principal.class, principalId));
+        memb.setCenter(context.load(Center.class, centerId));
+        memb.setStudy(context.load(Study.class, studyId));
+        memb.setRank(rank);
+        memb.setLevel(level);
 
-        if (!m.getManageablePermissions(user).containsAll(
-            permissionsDiff.getDifference())) {
-            throw new ActionException("Not allowed");
-        }
+        setPermissions(memb, manager);
+        setRoles(memb, manager, context);
 
-        permissionsDiff.apply(m.getPermissions());
+        checkManageability(memb, manager);
 
-        Map<Integer, Role> roleAdditions =
-            context.load(Role.class, roleIdsDiff.getAdditions());
-
-        Map<Integer, Role> roleRemovals =
-            context.load(Role.class, roleIdsDiff.getRemovals());
-
-        m.getRoles().removeAll(roleRemovals.values());
-        m.getRoles().addAll(roleAdditions.values());
-
-        checkManageability(m, user);
-
-        return new IdResult(m.getId());
+        return new IdResult(memb.getId());
     }
 
-    private void checkManageability(Membership membership, User user) {
-        if (!membership.isManageable(user)) {
+    private void checkManageability(Membership membership, User manager) {
+        if (!membership.isManageable(manager)) {
             throw new ActionException(
                 "you do not have the permissions to modify this membership");
         }
+    }
+
+    private void setPermissions(Membership memb, User manager) {
+        Set<PermissionEnum> disallowed = new HashSet<PermissionEnum>(permsDiff);
+        disallowed.removeAll(memb.getManageablePermissions(manager));
+        if (!disallowed.isEmpty()) {
+            throw new ActionException("Not allowed");
+        }
+        permsDiff.apply(memb.getPermissions());
+    }
+
+    private void setRoles(Membership m, User manager, ActionContext context) {
+        SetDiff<Role> rolesDiff = context.load(Role.class, roleIdsDiff);
+        Set<Role> disallowed = new HashSet<Role>(rolesDiff);
+        disallowed.removeAll(m.getManageableRoles(manager, rolesDiff));
+        if (!disallowed.isEmpty()) {
+            throw new ActionException("Not allowed");
+        }
+        rolesDiff.apply(m.getRoles());
     }
 }

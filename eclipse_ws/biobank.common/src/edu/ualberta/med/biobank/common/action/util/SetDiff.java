@@ -1,8 +1,10 @@
 package edu.ualberta.med.biobank.common.action.util;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.model.HasId;
@@ -14,34 +16,36 @@ import edu.ualberta.med.biobank.model.util.IdUtil;
  * 
  * @author Jonathan Ferland
  * 
- * @param <T>
+ * @param <E> element type
  */
-public class SetDiff<T> {
-    private final Set<T> additions;
-    private final Set<T> removals;
-    private final Set<T> difference;
+public class SetDiff<E> implements Set<E> {
+    private static final String NOT_MUTEX_MSG = "Sets not mutually exclusive."
+        + " The additions and removals sets must not share any equal values.";
+    private final Set<E> additions;
+    private final Set<E> removals;
+    private final Set<E> difference;
 
-    private SetDiff(Set<T> additions, Set<T> removals) {
+    private SetDiff(Set<E> additions, Set<E> removals) {
         this.additions = Collections.unmodifiableSet(additions);
         this.removals = Collections.unmodifiableSet(removals);
 
-        Set<T> difference = new HashSet<T>();
+        Set<E> difference = new HashSet<E>();
         difference.addAll(additions);
         difference.addAll(removals);
+
+        if (difference.size() != additions.size() + removals.size()) {
+            throw new IllegalArgumentException(NOT_MUTEX_MSG);
+        }
 
         this.difference = Collections.unmodifiableSet(difference);
     }
 
-    public Set<T> getAdditions() {
+    public Set<E> getAdditions() {
         return additions;
     }
 
-    public Set<T> getRemovals() {
+    public Set<E> getRemovals() {
         return removals;
-    }
-
-    public Set<T> getDifference() {
-        return difference;
     }
 
     /**
@@ -49,7 +53,7 @@ public class SetDiff<T> {
      * 
      * @param s {@link Set} to apply this {@link SetDiff} to.
      */
-    public void apply(Set<T> s) {
+    public void apply(Set<E> s) {
         s.removeAll(removals);
         s.addAll(additions);
     }
@@ -71,5 +75,70 @@ public class SetDiff<T> {
     public static <U extends Serializable, E extends HasId<U>> SetDiff<U> ofIds(
         Set<E> before, Set<E> after) {
         return of(IdUtil.getIds(before), IdUtil.getIds(after));
+    }
+
+    @Override
+    public boolean add(E e) {
+        return difference.add(e);
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends E> c) {
+        return difference.addAll(c);
+    }
+
+    @Override
+    public void clear() {
+        difference.clear();
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return difference.contains(o);
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return difference.containsAll(c);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return difference.isEmpty();
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return difference.iterator();
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return difference.remove(o);
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        return difference.removeAll(c);
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return difference.retainAll(c);
+    }
+
+    @Override
+    public int size() {
+        return difference.size();
+    }
+
+    @Override
+    public Object[] toArray() {
+        return difference.toArray();
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        return difference.toArray(a);
     }
 }

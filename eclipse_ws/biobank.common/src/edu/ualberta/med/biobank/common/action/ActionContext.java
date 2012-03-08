@@ -129,6 +129,18 @@ public class ActionContext {
         return results;
     }
 
+    /**
+     * The same as {@link #load(Class, Set)} but throws a
+     * {@link ModelNotFoundException} if any object in the given
+     * {@link SetDiff#getAdditions()} set does not exist. If objects in the
+     * {@link SetDiff#getRemovals()} are missing, they are simply ignored since
+     * they should not affect the difference.
+     * 
+     * @param klazz
+     * @param ids
+     * @return
+     * @throws ModelNotFoundException
+     */
     public <K extends Serializable, V> SetDiff<V> load(Class<V> klazz,
         SetDiff<K> ids) throws ModelNotFoundException {
         Set<V> additions = new HashSet<V>(ids.getAdditions().size());
