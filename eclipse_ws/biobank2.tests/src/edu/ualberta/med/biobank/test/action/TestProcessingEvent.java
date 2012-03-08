@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.test.action;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -273,7 +272,7 @@ public class TestProcessingEvent extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.siteId);
-        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
+        List<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
             new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
             .getList();
         Integer spcId = sourceSpecs.get(0).specimen.getId();

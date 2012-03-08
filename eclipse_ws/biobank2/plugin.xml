@@ -275,8 +275,21 @@
              name="Add Research Group">
        </command>
    </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+       	  class="DisabledNewEditorHandler"
+          commandId="org.eclipse.ui.window.newEditor">
+       		<enabledWhen>
+          		<count value="-1">
+          		</count>
+       		</enabledWhen>
+       		<activeWhen>
+          		<not>
+             		<count value="-1">
+             		</count>
+          		</not>
+       		</activeWhen>
+      </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.LoginHandler"
             commandId="edu.ualberta.med.biobank.commands.login">

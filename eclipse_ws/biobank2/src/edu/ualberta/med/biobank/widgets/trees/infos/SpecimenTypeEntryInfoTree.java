@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.trees.infos;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -191,7 +190,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
 
     public void reload() {
         try {
-            ArrayList<SpecimenType> globalSpecimenTypes =
+            List<SpecimenType> globalSpecimenTypes =
                 SessionManager.getAppService().doAction(
                     new SpecimenTypeGetAllAction()).getList();
             Assert.isNotNull(globalSpecimenTypes);

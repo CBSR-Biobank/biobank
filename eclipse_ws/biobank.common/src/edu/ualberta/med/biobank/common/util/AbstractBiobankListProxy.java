@@ -267,10 +267,6 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
 
     @Override
     public int size() {
-        return -1;
-    }
-
-    public int getRealSize() {
         return realSize;
     }
 
@@ -286,6 +282,8 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
         // for (int i = fromIndex; i < toIndex; i++) {
         // subList.add(get(i));
         // }
+        if (realSize != REAL_SIZE_UNKNOWN && toIndex > realSize)
+            toIndex = realSize;
 
         for (Object o : page.list.subList(fromIndex - page.offset,
             Math.min(page.list.size(), toIndex - page.offset))) {

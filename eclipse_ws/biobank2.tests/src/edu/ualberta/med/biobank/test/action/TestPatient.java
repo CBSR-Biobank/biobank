@@ -356,7 +356,7 @@ public class TestPatient extends TestAction {
             .nextInt(20), ActivityStatus.ACTIVE, null,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
-        ArrayList<PatientCEventInfo> infos =
+        List<PatientCEventInfo> infos =
             EXECUTOR
                 .exec(new PatientGetCollectionEventInfosAction(patientId))
                 .getList();
