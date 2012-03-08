@@ -213,6 +213,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         throw new BiobankRuntimeException("cannot set path on container"); //$NON-NLS-1$
     }
 
+    /**
+     * This sets the parent bidirectionally. If this is not required then use
+     * setParentInternal().
+     */
     public void setParent(ContainerWrapper container, RowColPos position)
         throws BiobankCheckException {
         if (container != null) {
@@ -222,6 +226,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         }
     }
 
+    /**
+     * KLUDGE ALERT: this method is called by ContainerViewForm.
+     */
     public void setParentInternal(ContainerWrapper container, RowColPos position) {
         if (container == null) {
             setPosition(null);
