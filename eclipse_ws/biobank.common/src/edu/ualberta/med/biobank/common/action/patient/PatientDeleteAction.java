@@ -11,10 +11,13 @@ public class PatientDeleteAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
 
-    private Integer patientId;
+    private final Integer patientId;
 
-    public PatientDeleteAction(Integer patientId) {
-        this.patientId = patientId;
+    public PatientDeleteAction(Patient patient) {
+        if (patient == null) {
+            throw new IllegalArgumentException();
+        }
+        this.patientId = patient.getId();
     }
 
     @Override

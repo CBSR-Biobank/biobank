@@ -25,6 +25,8 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSav
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyDeleteAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
@@ -728,7 +730,9 @@ public class TestStudy extends TestAction {
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
-        EXECUTOR.exec(new PatientDeleteAction(patientId));
+        PatientInfo patientInfo =
+            EXECUTOR.exec(new PatientGetInfoAction(patientId));
+        EXECUTOR.exec(new PatientDeleteAction(patientInfo.patient));
         EXECUTOR.exec(new StudyDeleteAction(studyInfo.getStudy()));
     }
 

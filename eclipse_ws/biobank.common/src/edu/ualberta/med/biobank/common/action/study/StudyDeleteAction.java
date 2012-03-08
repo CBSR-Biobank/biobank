@@ -13,6 +13,9 @@ public class StudyDeleteAction implements Action<EmptyResult> {
     protected final Integer studyId;
 
     public StudyDeleteAction(Study study) {
+        if (study == null) {
+            throw new IllegalArgumentException();
+        }
         this.studyId = study.getId();
     }
 

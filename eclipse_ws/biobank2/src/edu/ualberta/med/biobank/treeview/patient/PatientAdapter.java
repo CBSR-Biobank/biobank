@@ -182,7 +182,7 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     @Override
     protected void runDelete() throws Exception {
         SessionManager.getAppService().doAction(
-            new PatientDeleteAction(getId()));
+            new PatientDeleteAction(patient));
     }
 
 }

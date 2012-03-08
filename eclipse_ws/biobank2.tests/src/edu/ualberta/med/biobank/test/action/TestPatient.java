@@ -168,7 +168,8 @@ public class TestPatient extends TestAction {
             provisioning.studyId, pnumber, date, null)).getId();
 
         // delete the patient
-        EXECUTOR.exec(new PatientDeleteAction(id));
+        PatientInfo patientInfo = EXECUTOR.exec(new PatientGetInfoAction(id));
+        EXECUTOR.exec(new PatientDeleteAction(patientInfo.patient));
 
         Patient patient = (Patient) session.get(Patient.class, id);
         Assert.assertNull(patient);
@@ -187,8 +188,10 @@ public class TestPatient extends TestAction {
             .nextInt(20) + 1, ActivityStatus.ACTIVE, null, null, null));
 
         // delete the patient
+        PatientInfo patientInfo =
+            EXECUTOR.exec(new PatientGetInfoAction(patientId));
         try {
-            EXECUTOR.exec(new PatientDeleteAction(patientId));
+            EXECUTOR.exec(new PatientDeleteAction(patientInfo.patient));
             Assert
                 .fail("should throw an exception since the patient still has on cevent");
         } catch (ConstraintViolationException ae) {
