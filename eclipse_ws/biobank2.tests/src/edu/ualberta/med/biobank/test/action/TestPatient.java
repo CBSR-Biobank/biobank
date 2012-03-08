@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGet
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
@@ -36,6 +35,7 @@ import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.Search
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
@@ -119,7 +119,7 @@ public class TestPatient extends TestAction {
             EXECUTOR.exec(new PatientGetInfoAction(provisioning.patientIds
                 .get(0)));
 
-        Assert.assertEquals(studyInfo.study.getName(), patientInfo.patient
+        Assert.assertEquals(studyInfo.getStudy().getName(), patientInfo.patient
             .getStudy().getName());
         Assert.assertEquals(1, patientInfo.ceventInfos.size());
         Assert.assertEquals(new Long(sourceSpecs.size()),

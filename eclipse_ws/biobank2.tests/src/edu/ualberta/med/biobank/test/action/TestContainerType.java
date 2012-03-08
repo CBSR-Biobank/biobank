@@ -479,7 +479,10 @@ public class TestContainerType extends TestAction {
         // save with no comments
         Integer containerTypeId =
             EXECUTOR.exec(containerTypeSaveAction).getId();
-        EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeId));
+        ContainerTypeInfo containerTypeInfo =
+            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+        EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeInfo
+            .getContainerType()));
 
         // hql query for container type should return empty
         Query q =
@@ -508,8 +511,11 @@ public class TestContainerType extends TestAction {
                 .getChildContainerTypes()
                 .iterator().next().getId();
 
+        ContainerTypeInfo childCtInfo =
+            EXECUTOR.exec(new ContainerTypeGetInfoAction(childCtId));
         try {
-            EXECUTOR.exec(new ContainerTypeDeleteAction(childCtId));
+            EXECUTOR.exec(new ContainerTypeDeleteAction(childCtInfo
+                .getContainerType()));
             Assert
                 .fail(
                 "should not be allowed to delete a child container type and linked to a parent type");
@@ -533,8 +539,11 @@ public class TestContainerType extends TestAction {
         // FIXME: should this test pass or fail?
 
         // delete parent type
+        ContainerTypeInfo parentCtInfo =
+            EXECUTOR.exec(new ContainerTypeGetInfoAction(parentCtId));
         try {
-            EXECUTOR.exec(new ContainerTypeDeleteAction(parentCtId));
+            EXECUTOR.exec(new ContainerTypeDeleteAction(parentCtInfo
+                .getContainerType()));
             Assert
                 .fail(
                 "should not be allowed to delete a parent container type and "
@@ -549,8 +558,11 @@ public class TestContainerType extends TestAction {
         Container container = createTypeWithContainer();
         Integer containerTypeId = container.getContainerType().getId();
 
+        ContainerTypeInfo containerTypeInfo =
+            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
         try {
-            EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeId));
+            EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeInfo
+                .getContainerType()));
             Assert
                 .fail(
                 "should not be allowed to delete a container type in use by a container");

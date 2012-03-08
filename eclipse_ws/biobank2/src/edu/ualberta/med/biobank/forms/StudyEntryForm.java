@@ -19,9 +19,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecimenSaveInfo;
@@ -132,7 +132,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         if (id != null) {
             studyInfo = SessionManager.getAppService().doAction(
                 new StudyGetInfoAction(id));
-            study.setWrappedObject(studyInfo.study);
+            study.setWrappedObject(studyInfo.getStudy());
         } else {
             studyInfo = new StudyInfo();
             study.setWrappedObject(new Study());

@@ -66,7 +66,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         siteAdapter = (SiteAdapter) adapter;
         updateSiteInfo();
         setPartName(NLS.bind(Messages.SiteViewForm_title,
-            siteInfo.site.getNameShort()));
+            siteInfo.getSite().getNameShort()));
     }
 
     private void updateSiteInfo() throws Exception {
@@ -128,21 +128,25 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void setSiteSectionValues() {
-        setTextValue(nameLabel, siteInfo.site.getName());
-        setTextValue(nameShortLabel, siteInfo.site.getNameShort());
-        setTextValue(studyCountLabel, siteInfo.studyCountInfo.size());
-        setTextValue(containerTypeCountLabel, siteInfo.containerTypes.size());
-        setTextValue(topContainerCountLabel, siteInfo.topContainers.size());
-        setTextValue(patientCountLabel, siteInfo.patientCount);
-        setTextValue(processingEventCountLabel, siteInfo.processingEventCount);
-        setTextValue(specimenCountLabel, siteInfo.specimenCount);
-        setTextValue(activityStatusLabel, siteInfo.site.getActivityStatus()
+        setTextValue(nameLabel, siteInfo.getSite().getName());
+        setTextValue(nameShortLabel, siteInfo.getSite().getNameShort());
+        setTextValue(studyCountLabel, siteInfo.getStudyCountInfos().size());
+        setTextValue(containerTypeCountLabel, siteInfo.getContainerTypeInfos()
+            .size());
+        setTextValue(topContainerCountLabel, siteInfo.getTopContainerCount());
+        setTextValue(patientCountLabel, siteInfo.getPatientCount());
+        setTextValue(processingEventCountLabel,
+            siteInfo.getProcessingEventCount());
+        setTextValue(specimenCountLabel, siteInfo.getSpecimenCount());
+        setTextValue(activityStatusLabel, siteInfo.getSite()
+            .getActivityStatus()
             .getName());
     }
 
     private void createStudySection() {
         Section section = createSection(Messages.SiteViewForm_studies_title);
-        studiesTable = new NewStudyInfoTable(section, siteInfo.studyCountInfo);
+        studiesTable =
+            new NewStudyInfoTable(section, siteInfo.getStudyCountInfos());
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addClickListener(collectionDoubleClickListener);
 
@@ -174,7 +178,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
         containerTypesTable =
             new ContainerTypeInfoTable(section, siteAdapter,
-                siteInfo.containerTypes);
+                siteInfo.getContainerTypeInfos());
         containerTypesTable.adaptToToolkit(toolkit, true);
 
         containerTypesTable.addClickListener(collectionDoubleClickListener);
@@ -194,7 +198,8 @@ public class SiteViewForm extends AddressViewFormCommon {
             }, ContainerWrapper.class);
 
         topContainersTable =
-            new ContainerInfoTable(section, siteAdapter, siteInfo.topContainers);
+            new ContainerInfoTable(section, siteAdapter,
+                siteInfo.getTopContainers());
         topContainersTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(topContainersTable);
 
@@ -205,15 +210,15 @@ public class SiteViewForm extends AddressViewFormCommon {
     @Override
     public void setValues() throws Exception {
         setPartName(NLS.bind(Messages.SiteViewForm_title,
-            siteInfo.site.getNameShort()));
+            siteInfo.getSite().getNameShort()));
         form.setText(NLS.bind(Messages.SiteViewForm_title,
-            siteInfo.site.getName()));
+            siteInfo.getSite().getName()));
         setSiteSectionValues();
         setAddressValues(site);
 
-        studiesTable.setCollection(siteInfo.studyCountInfo);
-        containerTypesTable.setList(siteInfo.containerTypes);
-        topContainersTable.setList(siteInfo.topContainers);
+        studiesTable.setCollection(siteInfo.getStudyCountInfos());
+        containerTypesTable.setList(siteInfo.getContainerTypeInfos());
+        topContainersTable.setList(siteInfo.getTopContainers());
         // TODO: load comments?
         // commentTable.setList((List<?>) siteInfo.site
         // .getCommentCollection());

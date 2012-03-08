@@ -10,8 +10,8 @@ import edu.ualberta.med.biobank.model.Site;
 public class SiteDeleteAction extends CenterDeleteAction {
     private static final long serialVersionUID = 1L;
 
-    public SiteDeleteAction(Integer id) {
-        super(id);
+    public SiteDeleteAction(Site site) {
+        super(site);
     }
 
     @Override

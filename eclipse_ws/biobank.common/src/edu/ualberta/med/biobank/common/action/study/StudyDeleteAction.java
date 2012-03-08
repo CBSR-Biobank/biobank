@@ -10,10 +10,10 @@ import edu.ualberta.med.biobank.model.Study;
 public class StudyDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
 
-    protected Integer studyId = null;
+    protected final Integer studyId;
 
-    public StudyDeleteAction(Integer id) {
-        this.studyId = id;
+    public StudyDeleteAction(Study study) {
+        this.studyId = study.getId();
     }
 
     @Override

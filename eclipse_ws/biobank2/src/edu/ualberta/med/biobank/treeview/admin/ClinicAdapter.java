@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -110,9 +111,10 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     protected void runDelete() throws Exception {
-        SessionManager.getAppService().doAction(
-            new ClinicDeleteAction(getId()));
+        SessionManager.getAppService()
+            .doAction(
+                new ClinicDeleteAction((Clinic) getModelObject()
+                    .getWrappedObject()));
         SessionManager.updateAllSimilarNodes(getParent(), true);
     }
-
 }

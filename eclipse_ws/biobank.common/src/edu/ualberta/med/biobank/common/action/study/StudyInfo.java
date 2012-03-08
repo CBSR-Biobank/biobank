@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.info;
+package edu.ualberta.med.biobank.common.action.study;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,13 +13,13 @@ import edu.ualberta.med.biobank.model.StudyEventAttr;
 public class StudyInfo implements ActionResult {
     private static final long serialVersionUID = 1L;
 
-    public Study study;
-    public Long patientCount;
-    public Long collectionEventCount;
-    public List<ClinicInfo> clinicInfos;
-    public List<SourceSpecimen> sourceSpcs;
-    public List<AliquotedSpecimen> aliquotedSpcs;
-    public List<StudyEventAttr> studyEventAttrs;
+    Study study;
+    Long patientCount;
+    Long collectionEventCount;
+    List<ClinicInfo> clinicInfos;
+    List<SourceSpecimen> sourceSpcs;
+    List<AliquotedSpecimen> aliquotedSpcs;
+    List<StudyEventAttr> studyEventAttrs;
 
     public StudyInfo() {
         this.study = null;
@@ -47,6 +47,14 @@ public class StudyInfo implements ActionResult {
         return study;
     }
 
+    public Long getPatientCount() {
+        return patientCount;
+    }
+
+    public Long getCollectionEventCount() {
+        return collectionEventCount;
+    }
+
     public void setStudy(Study study) {
         this.study = study;
     }
@@ -71,15 +79,7 @@ public class StudyInfo implements ActionResult {
         return aliquotedSpcs;
     }
 
-    public void setAliquotedSpcs(List<AliquotedSpecimen> aliquotedSpcs) {
-        this.aliquotedSpcs = aliquotedSpcs;
-    }
-
     public List<StudyEventAttr> getStudyEventAttrs() {
         return studyEventAttrs;
-    }
-
-    public void setStudyEventAttrs(List<StudyEventAttr> studyEventAttrs) {
-        this.studyEventAttrs = studyEventAttrs;
     }
 }

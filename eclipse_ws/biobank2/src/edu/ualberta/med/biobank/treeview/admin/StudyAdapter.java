@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -114,7 +115,7 @@ public class StudyAdapter extends AdapterBase {
     @Override
     protected void runDelete() throws Exception {
         SessionManager.getAppService().doAction(
-            new StudyDeleteAction(getId()));
+            new StudyDeleteAction((Study) getModelObject().getWrappedObject()));
         SessionManager.updateAllSimilarNodes(getParent(), true);
     }
 

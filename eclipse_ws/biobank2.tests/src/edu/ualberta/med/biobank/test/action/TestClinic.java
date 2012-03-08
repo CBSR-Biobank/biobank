@@ -276,7 +276,9 @@ public class TestClinic extends TestAction {
     public void delete() throws ApplicationException {
         // delete a study with no patients and no other associations
         Integer clinicId = EXECUTOR.exec(clinicSaveAction).getId();
-        EXECUTOR.exec(new ClinicDeleteAction(clinicId));
+        ClinicInfo clinicInfo =
+            EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
+        EXECUTOR.exec(new ClinicDeleteAction(clinicInfo.clinic));
 
         // hql query for clinic should return empty
         Query q =
@@ -291,9 +293,10 @@ public class TestClinic extends TestAction {
     @Test
     public void deleteWithStudies() throws ApplicationException {
         Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        ClinicInfo clinicInfo =
+            EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
         try {
-            EXECUTOR.exec(new ClinicDeleteAction(
-                provisioning.clinicId));
+            EXECUTOR.exec(new ClinicDeleteAction(clinicInfo.clinic));
             Assert
                 .fail("should not be allowed to delete a clinic linked to a study");
         } catch (ConstraintViolationException e) {
@@ -304,14 +307,15 @@ public class TestClinic extends TestAction {
     @Test
     public void deleteWithSrcDispatch() throws Exception {
         Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        ClinicInfo clinicInfo =
+            EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
 
         DispatchHelper.createDispatch(EXECUTOR, provisioning.clinicId,
             provisioning.siteId,
             provisioning.patientIds.get(0));
 
         try {
-            EXECUTOR.exec(new ClinicDeleteAction(
-                provisioning.clinicId));
+            EXECUTOR.exec(new ClinicDeleteAction(clinicInfo.clinic));
             Assert
                 .fail(
                 "should not be allowed to delete a clinic which is a source of dispatches");
@@ -330,13 +334,15 @@ public class TestClinic extends TestAction {
             ClinicHelper.getSaveAction(name + "_clinic2", name,
                 ActivityStatus.ACTIVE, R.nextBoolean());
         Integer clinicId2 = EXECUTOR.exec(csa2).getId();
+        ClinicInfo clinic2Info =
+            EXECUTOR.exec(new ClinicGetInfoAction(clinicId2));
 
         DispatchHelper.createDispatch(EXECUTOR, provisioning.clinicId,
             clinicId2,
             provisioning.patientIds.get(0));
 
         try {
-            EXECUTOR.exec(new ClinicDeleteAction(clinicId2));
+            EXECUTOR.exec(new ClinicDeleteAction(clinic2Info.clinic));
             Assert
                 .fail(
                 "should not be allowed to delete a clinic which is a destination for dispatches");

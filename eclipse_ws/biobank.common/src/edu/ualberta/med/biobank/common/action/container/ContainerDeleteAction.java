@@ -10,10 +10,13 @@ import edu.ualberta.med.biobank.model.Container;
 public class ContainerDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
 
-    protected Integer containerId = null;
+    protected final Integer containerId;
 
-    public ContainerDeleteAction(Integer id) {
-        this.containerId = id;
+    public ContainerDeleteAction(Container container) {
+        if (container == null) {
+            throw new IllegalArgumentException();
+        }
+        this.containerId = container.getId();
     }
 
     @Override

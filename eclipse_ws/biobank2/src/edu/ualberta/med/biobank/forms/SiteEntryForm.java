@@ -95,7 +95,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         if (id != null) {
             siteInfo = SessionManager.getAppService().doAction(
                 new SiteGetInfoAction(id));
-            site.setWrappedObject(siteInfo.site);
+            site.setWrappedObject(siteInfo.getSite());
         } else {
             siteInfo = new SiteInfo.Builder().build();
             site.setWrappedObject(new Site());

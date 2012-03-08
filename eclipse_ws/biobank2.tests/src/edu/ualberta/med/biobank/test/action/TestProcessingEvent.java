@@ -166,7 +166,7 @@ public class TestProcessingEvent extends TestAction {
             Assert.assertEquals(clinicInfo.clinic.getName(),
                 specimenInfo.specimen.getOriginInfo().getCenter().getName());
 
-            Assert.assertEquals(siteInfo.site.getName(),
+            Assert.assertEquals(siteInfo.getSite().getName(),
                 specimenInfo.specimen.getCurrentCenter().getName());
 
             Assert.assertEquals(patientInfo.patient.getPnumber(),

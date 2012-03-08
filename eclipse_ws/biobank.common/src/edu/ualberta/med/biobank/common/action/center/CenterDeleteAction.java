@@ -9,10 +9,13 @@ import edu.ualberta.med.biobank.model.Center;
 public abstract class CenterDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
 
-    protected Integer centerId = null;
+    protected final Integer centerId;
 
-    public CenterDeleteAction(Integer id) {
-        this.centerId = id;
+    public CenterDeleteAction(Center center) {
+        if (center == null) {
+            throw new IllegalArgumentException();
+        }
+        this.centerId = center.getId();
     }
 
     public EmptyResult run(ActionContext context, Center center)

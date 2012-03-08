@@ -16,32 +16,33 @@ import edu.ualberta.med.biobank.model.Site;
  */
 public class SiteInfo implements ActionResult {
     private static final long serialVersionUID = 1L;
-    public final Site site;
-    public final List<SiteContainerTypeInfo> containerTypes;
-    public final List<StudyCountInfo> studyCountInfo;
-    public final List<Container> topContainers;
-    public final Long patientCount;
-    public final Long processingEventCount;
-    public final Long specimenCount;
+
+    private final Site site;
+    private final List<SiteContainerTypeInfo> containerTypeInfos;
+    private final List<StudyCountInfo> studyCountInfo;
+    private final List<Container> topContainers;
+    private final Long patientCount;
+    private final Long processingEventCount;
+    private final Long specimenCount;
 
     public Site getSite() {
         return site;
     }
 
-    public List<SiteContainerTypeInfo> getContainerTypeCollection() {
-        return Collections.unmodifiableList(containerTypes);
+    public List<SiteContainerTypeInfo> getContainerTypeInfos() {
+        return Collections.unmodifiableList(containerTypeInfos);
     }
 
-    public List<StudyCountInfo> getStudyCollection() {
+    public List<StudyCountInfo> getStudyCountInfos() {
         return Collections.unmodifiableList(studyCountInfo);
     }
 
-    public List<Container> getTopContainerCollection() {
+    public List<Container> getTopContainers() {
         return Collections.unmodifiableList(topContainers);
     }
 
     public Long getContainerTypeCount() {
-        return new Long(containerTypes.size());
+        return new Long(containerTypeInfos.size());
     }
 
     public Long getStudyCount() {
@@ -89,7 +90,7 @@ public class SiteInfo implements ActionResult {
         Long patientCount, Long processingEventCount,
         Long aliquotedSpecimenCount) {
         this.site = site;
-        this.containerTypes = containerTypes;
+        this.containerTypeInfos = containerTypes;
         this.studyCountInfo = studies;
         this.topContainers = topContainers;
         this.patientCount = patientCount;
@@ -116,7 +117,8 @@ public class SiteInfo implements ActionResult {
             return this;
         }
 
-        public Builder setContainerTypes(List<SiteContainerTypeInfo> containerTypes) {
+        public Builder setContainerTypes(
+            List<SiteContainerTypeInfo> containerTypes) {
             this.containerTypes = containerTypes;
             return this;
         }
