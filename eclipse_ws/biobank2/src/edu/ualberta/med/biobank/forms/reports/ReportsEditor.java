@@ -377,8 +377,8 @@ public abstract class ReportsEditor extends BiobankEntryForm {
 
         if (exportCSV == false
             && ((reportData instanceof HQLCriteriaListProxy && (((HQLCriteriaListProxy<?>) reportData)
-                .getRealSize() == -1 || ((HQLCriteriaListProxy<?>) reportData)
-                .getRealSize() > 1000)) || reportData.size() > 1000)) {
+                .size() == -1 || ((HQLCriteriaListProxy<?>) reportData)
+                .size() > 1000)) || reportData.size() > 1000)) {
             throw new Exception(Messages.ReportsEditor_exceed_1000_msg);
         }
 
