@@ -567,10 +567,9 @@ public class ContainerViewForm extends BiobankViewForm {
                         containerToOpen =
                             new ContainerWrapper(SessionManager.getAppService());
                     }
-                    containerToOpen
-                        .setSite((SiteWrapper) containerAdapter
-                            .getParentFromClass(SiteAdapter.class)
-                            .getModelObject());
+                    containerToOpen.setSite((SiteWrapper) containerAdapter
+                        .getParentFromClass(SiteAdapter.class)
+                        .getModelObject());
                     RowColPos pos = new RowColPos(cell.getRow(), cell.getCol());
                     containerToOpen.setParent(
                         new ContainerWrapper(SessionManager.getAppService(),

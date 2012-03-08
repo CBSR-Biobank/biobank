@@ -328,9 +328,7 @@ public class StudySaveAction implements Action<IdResult> {
                     asSaveInfo.id);
             }
             newAsCollection.add(asSaveInfo.populateAliquotedSpecimen(study, as,
-
-                asSaveInfo.activityStatus,
-                context.load(SpecimenType.class,
+                asSaveInfo.activityStatus, context.load(SpecimenType.class,
                     asSaveInfo.specimenTypeId)));
         }
 

@@ -29,7 +29,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
@@ -131,7 +130,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             container.setWrappedObject(containerInfo.container);
         } else {
             containerInfo = new ContainerInfo();
-            container.setWrappedObject(new Container());
+            container = (ContainerWrapper) containerAdapter.getModelObject();
             container.setSite(SessionManager.getUser().getCurrentWorkingSite());
         }
 

@@ -7,17 +7,42 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicDeletePermission;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicReadPermission;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicAdapter extends AdapterBase {
 
     public ClinicAdapter(AdapterBase parent, ClinicWrapper clinicWrapper) {
         super(parent, clinicWrapper);
+    }
+
+    @Override
+    public void init() {
+        try {
+            Integer id = ((ClinicWrapper) getModelObject()).getId();
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new ClinicDeletePermission(id));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new ClinicReadPermission(id));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new ClinicUpdatePermission(id));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     @Override
@@ -42,12 +67,6 @@ public class ClinicAdapter extends AdapterBase {
     @Override
     protected String getConfirmDeleteMessage() {
         return Messages.ClinicAdapter_delete_confirm_msg;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        // TODO: this needs to be implemented correctly
-        return true;
     }
 
     @Override

@@ -8,26 +8,46 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.study.StudyDeleteAction;
+import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyAdapter extends AdapterBase {
 
-    private StudyWrapper study;
-
     public StudyAdapter(AdapterBase parent, StudyWrapper study) {
         super(parent, study);
-        this.study = study;
+    }
+
+    @Override
+    public void init() {
+        try {
+            Integer id = ((StudyWrapper) getModelObject()).getId();
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new StudyDeletePermission(id));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new StudyReadPermission(id));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new StudyUpdatePermission(id));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     @Override
     protected void setModelObject(Object modelObject) {
         super.setModelObject(modelObject);
-        this.study = (StudyWrapper) modelObject;
     }
 
     @Override
@@ -51,12 +71,6 @@ public class StudyAdapter extends AdapterBase {
     @Override
     protected String getConfirmDeleteMessage() {
         return Messages.StudyAdapter_delete_confirm_msg;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        // TODO: this needs to be implemented correctly
-        return true;
     }
 
     @Override
@@ -117,10 +131,4 @@ public class StudyAdapter extends AdapterBase {
     // @Override
     // // eventBus.fireEvent(new StudyViewEvent(study.getId()));
     // }
-
-    @Override
-    public boolean isEditable() {
-        // TODO: this needs to be implemented correctly
-        return true;
-    }
 }
