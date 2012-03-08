@@ -227,7 +227,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     /**
-     * KLUDGE ALERT: this method is called by ContainerViewForm.
+     * KLUDGE ALERT: this method is called by ContainerViewForm.openFormFor().
      */
     public void setParentInternal(ContainerWrapper container, RowColPos position) {
         if (container == null) {

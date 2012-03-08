@@ -9,7 +9,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.select.ContactAddDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -28,12 +27,12 @@ public class ContactEntryInfoTable extends ContactInfoTable {
 
     private List<ContactWrapper> deletedContacts;
 
-    private ClinicWrapper clinic;
+    private List<ContactWrapper> originalCcontacts;
 
-    public ContactEntryInfoTable(Composite parent,
-        List<ContactWrapper> contactCollection) {
-        super(parent, contactCollection);
-        selectedContacts = contactCollection;
+    public ContactEntryInfoTable(Composite parent, List<ContactWrapper> contacts) {
+        super(parent, contacts);
+        originalCcontacts = contacts;
+        selectedContacts = contacts;
         if (selectedContacts == null) {
             selectedContacts = new ArrayList<ContactWrapper>();
         }
@@ -102,7 +101,6 @@ public class ContactEntryInfoTable extends ContactInfoTable {
             ContactWrapper contact = dlg.getContactWrapper();
             if (add) {
                 // only add to the collection when adding and not editing
-                contact.setClinic(clinic);
                 selectedContacts.add(contact);
                 addedOrModifiedContacts.add(contact);
             }
@@ -134,7 +132,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
 
     @Override
     public void reload() {
-        selectedContacts = clinic.getContactCollection(false);
+        selectedContacts = originalCcontacts;
         if (selectedContacts == null) {
             selectedContacts = new ArrayList<ContactWrapper>();
         }
