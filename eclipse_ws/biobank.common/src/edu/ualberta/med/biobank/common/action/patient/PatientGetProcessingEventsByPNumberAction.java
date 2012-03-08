@@ -8,8 +8,6 @@ import org.hibernate.Query;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.LocalizedActionException;
-import edu.ualberta.med.biobank.common.i18n.Messages;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
@@ -54,7 +52,8 @@ public class PatientGetProcessingEventsByPNumberAction implements
     public PatientGetProcessingEventsByPNumberResult run(ActionContext context)
         throws ActionException {
         if (pNumber == null || pNumber.isEmpty()) {
-            throw new LocalizedActionException(Messages.Greeting, "one", "two");
+            // throw new LocalizedActionException(Messages.Greeting, "one",
+            // "two");
 
             // throw new EmptyValueException(Patient.class,
             // PatientPeer.PNUMBER);
