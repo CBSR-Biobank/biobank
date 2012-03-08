@@ -75,6 +75,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             internalSpecimen.setActivityStatus(ActivityStatus.ACTIVE);
             internalSpecimen.setCreatedAt(defaultTimeDrawn);
         } else {
+            internalSpecimen.setId(spec.getId());
             internalSpecimen.setSpecimenType(spec.getSpecimenType());
             internalSpecimen.setInventoryId(spec.getInventoryId());
             internalSpecimen.setQuantity(spec.getQuantity());

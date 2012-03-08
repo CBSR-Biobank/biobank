@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.action.others;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -39,12 +38,9 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
 
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
-        final List<Object> params = new ArrayList<Object>();
-        params.add(value);
         String equalsTest = ""; //$NON-NLS-1$
         if (objectId != null) {
             equalsTest = " and id <> ?"; //$NON-NLS-1$
-            params.add(objectId);
         }
 
         final String qryString = MessageFormat.format(CHECK_NO_DUPLICATES,
@@ -52,6 +48,9 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
 
         Query query = context.getSession().createQuery(qryString);
         query.setParameter(0, value);
+        if (objectId != null) {
+            query.setParameter(1, objectId);
+        }
         @SuppressWarnings("unchecked")
         List<Long> res = query.list();
         if (res.size() != 1) {
