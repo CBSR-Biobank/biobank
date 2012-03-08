@@ -4,13 +4,14 @@ import java.lang.reflect.Constructor;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.ListResult;
+import edu.ualberta.med.biobank.common.action.ProxiedListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
 
-public class ReportAction implements Action<ListResult<Object>> {
+public class ReportAction implements Action<ProxiedListResult<Object>> {
 
     /**
      * 
@@ -28,7 +29,8 @@ public class ReportAction implements Action<ListResult<Object>> {
     }
 
     @Override
-    public ListResult<Object> run(ActionContext context) throws ActionException {
+    public ProxiedListResult<Object> run(ActionContext context)
+        throws ActionException {
         try {
             Class<?> cls =
                 Class.forName("edu.ualberta.med.biobank.server.reports."
@@ -37,8 +39,9 @@ public class ReportAction implements Action<ListResult<Object>> {
             Constructor<?> constructor = cls.getConstructor(partypes);
             AbstractReport runReport =
                 (AbstractReport) constructor.newInstance(report);
-            return new ListResult<Object>(runReport.generate(context
-                .getAppService()));
+            return new ProxiedListResult<Object>(
+                (AbstractBiobankListProxy<Object>) runReport.generate(context
+                    .getAppService()));
         } catch (Exception e) {
             throw new ActionException(e);
         }
