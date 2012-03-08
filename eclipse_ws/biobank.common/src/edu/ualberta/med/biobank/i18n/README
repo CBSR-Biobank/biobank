@@ -1,4 +1,0 @@
-* create a src/message.properties
-* create a class Message that holds the keys
-* pull out OgnlMessageInterpolator functionality into an OgnlFormatter class
-that can be used by the interpolator and on our Message keys.

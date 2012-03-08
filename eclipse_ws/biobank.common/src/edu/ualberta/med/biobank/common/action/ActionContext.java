@@ -9,7 +9,7 @@ import java.util.Set;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
-import edu.ualberta.med.biobank.common.action.util.SetDiff;
+import edu.ualberta.med.biobank.common.action.util.DiffSet;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -132,8 +132,8 @@ public class ActionContext {
     /**
      * The same as {@link #load(Class, Set)} but throws a
      * {@link ModelNotFoundException} if any object in the given
-     * {@link SetDiff#getAdditions()} set does not exist. If objects in the
-     * {@link SetDiff#getRemovals()} are missing, they are simply ignored since
+     * {@link DiffSet#getAdditions()} set does not exist. If objects in the
+     * {@link DiffSet#getRemovals()} are missing, they are simply ignored since
      * they should not affect the difference.
      * 
      * @param klazz
@@ -141,8 +141,8 @@ public class ActionContext {
      * @return
      * @throws ModelNotFoundException
      */
-    public <K extends Serializable, V> SetDiff<V> load(Class<V> klazz,
-        SetDiff<K> ids) throws ModelNotFoundException {
+    public <K extends Serializable, V> DiffSet<V> load(Class<V> klazz,
+        DiffSet<K> ids) throws ModelNotFoundException {
         Set<V> additions = new HashSet<V>(ids.getAdditions().size());
         Set<V> removals = new HashSet<V>(ids.getRemovals().size());
 
@@ -161,7 +161,7 @@ public class ActionContext {
             removals.add(result);
         }
 
-        return SetDiff.copy(additions, removals);
+        return DiffSet.copy(additions, removals);
     }
 
     public WritableApplicationService getAppService() {

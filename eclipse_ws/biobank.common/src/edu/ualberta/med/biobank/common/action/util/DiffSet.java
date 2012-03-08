@@ -18,14 +18,14 @@ import edu.ualberta.med.biobank.model.util.IdUtil;
  * 
  * @param <E> element type
  */
-public class SetDiff<E> implements Set<E> {
+public class DiffSet<E> implements Set<E> {
     private static final String NOT_MUTEX_MSG = "Sets not mutually exclusive."
         + " The additions and removals sets must not share any equal values.";
     private final Set<E> additions;
     private final Set<E> removals;
     private final Set<E> difference;
 
-    private SetDiff(Set<E> additions, Set<E> removals) {
+    private DiffSet(Set<E> additions, Set<E> removals) {
         this.additions = Collections.unmodifiableSet(additions);
         this.removals = Collections.unmodifiableSet(removals);
 
@@ -51,28 +51,28 @@ public class SetDiff<E> implements Set<E> {
     /**
      * Apply the difference to the given {@link Set}.
      * 
-     * @param s {@link Set} to apply this {@link SetDiff} to.
+     * @param s {@link Set} to apply this {@link DiffSet} to.
      */
     public void apply(Set<E> s) {
         s.removeAll(removals);
         s.addAll(additions);
     }
 
-    public static <E> SetDiff<E> copy(Set<E> additions, Set<E> removals) {
-        return new SetDiff<E>(additions, removals);
+    public static <E> DiffSet<E> copy(Set<E> additions, Set<E> removals) {
+        return new DiffSet<E>(additions, removals);
     }
 
-    public static <E> SetDiff<E> of(Set<E> before, Set<E> after) {
+    public static <E> DiffSet<E> of(Set<E> before, Set<E> after) {
         Set<E> additions = new HashSet<E>(after);
         additions.removeAll(before);
 
         Set<E> removals = new HashSet<E>(before);
         additions.removeAll(after);
 
-        return new SetDiff<E>(additions, removals);
+        return new DiffSet<E>(additions, removals);
     }
 
-    public static <U extends Serializable, E extends HasId<U>> SetDiff<U> ofIds(
+    public static <U extends Serializable, E extends HasId<U>> DiffSet<U> ofIds(
         Set<E> before, Set<E> after) {
         return of(IdUtil.getIds(before), IdUtil.getIds(after));
     }

@@ -7,9 +7,11 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.util.SetDiff;
+import edu.ualberta.med.biobank.common.action.util.DiffSet;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
+import edu.ualberta.med.biobank.i18n.BundleI18dMessage;
+import edu.ualberta.med.biobank.i18n.I18dMessage;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
@@ -21,6 +23,8 @@ import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.util.IdUtil;
 
 public class MembershipSaveAction implements Action<IdResult> {
+    public static final I18dMessage ILLEGAL_PERMS_MODIFIED =
+        new BundleI18dMessage("messages", "illegalPermissionsModified");
     private static final long serialVersionUID = 1L;
     private static final Permission PERMISSION = new UserManagerPermission();
 
@@ -31,8 +35,8 @@ public class MembershipSaveAction implements Action<IdResult> {
     private final Rank rank;
     private final short level;
 
-    private final SetDiff<PermissionEnum> permsDiff;
-    private final SetDiff<Integer> roleIdsDiff;
+    private final DiffSet<PermissionEnum> permsDiff;
+    private final DiffSet<Integer> roleIdsDiff;
 
     public MembershipSaveAction(ManagedMembership m) {
         id = m.getId();
@@ -42,8 +46,8 @@ public class MembershipSaveAction implements Action<IdResult> {
         rank = m.getRank();
         level = m.getLevel();
 
-        permsDiff = SetDiff.of(m.getPermissionOptions(), m.getPermissions());
-        roleIdsDiff = SetDiff.ofIds(m.getRoleOptions(), m.getRoles());
+        permsDiff = DiffSet.of(m.getPermissionOptions(), m.getPermissions());
+        roleIdsDiff = DiffSet.ofIds(m.getRoleOptions(), m.getRoles());
     }
 
     @Override
@@ -74,8 +78,8 @@ public class MembershipSaveAction implements Action<IdResult> {
 
     private void checkManageability(Membership membership, User manager) {
         if (!membership.isManageable(manager)) {
-            throw new ActionException(
-                "you do not have the permissions to modify this membership");
+            // throw new I18dActionException(new OgnlI18dMessage(
+            // ActionI18dMessage.ONE, membership));
         }
     }
 
@@ -83,17 +87,21 @@ public class MembershipSaveAction implements Action<IdResult> {
         Set<PermissionEnum> disallowed = new HashSet<PermissionEnum>(permsDiff);
         disallowed.removeAll(memb.getManageablePermissions(manager));
         if (!disallowed.isEmpty()) {
-            throw new ActionException("Not allowed");
+            // I18dMessage msg =
+            // new OgnlI18dMessage(ILLEGAL_PERMS_MODIFIED, disallowed);
+            // throw new I18dActionException(msg);
         }
         permsDiff.apply(memb.getPermissions());
     }
 
     private void setRoles(Membership m, User manager, ActionContext context) {
-        SetDiff<Role> rolesDiff = context.load(Role.class, roleIdsDiff);
+        DiffSet<Role> rolesDiff = context.load(Role.class, roleIdsDiff);
         Set<Role> disallowed = new HashSet<Role>(rolesDiff);
         disallowed.removeAll(m.getManageableRoles(manager, rolesDiff));
         if (!disallowed.isEmpty()) {
-            throw new ActionException("Not allowed");
+            // throw new I18dActionException(
+            // "MembershipSaveAciton.disallowedPermissions",
+            // disallowed);
         }
         rolesDiff.apply(m.getRoles());
     }

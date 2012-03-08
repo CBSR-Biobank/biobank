@@ -52,8 +52,8 @@ public class WorkingSet<T> implements Set<T> {
         return removals;
     }
 
-    public SetDiff<T> getDiff() {
-        return SetDiff.of(original, delegate);
+    public DiffSet<T> getDiff() {
+        return DiffSet.of(original, delegate);
     }
 
     public Set<T> getOriginal() {
