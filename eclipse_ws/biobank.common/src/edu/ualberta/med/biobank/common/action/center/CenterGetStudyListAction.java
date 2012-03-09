@@ -24,7 +24,7 @@ public class CenterGetStudyListAction implements Action<ListResult<Study>> {
     private static final String STUDIES_QRY =
         "SELECT study"
             + " FROM " + Study.class.getName() + " study"
-            + " LEFT JOIN study.site site"
+            + " LEFT JOIN study.sites site"
             + " where site.id=?";
 
     @SuppressWarnings("nls")
