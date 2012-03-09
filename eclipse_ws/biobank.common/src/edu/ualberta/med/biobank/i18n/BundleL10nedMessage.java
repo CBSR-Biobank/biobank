@@ -14,6 +14,11 @@ class BundleL10nedMessage extends AbstractLazyL10nedMessage {
     }
 
     @Override
+    public String getKey() {
+        return key;
+    }
+
+    @Override
     protected String loadMessage() {
         return LOCATOR.getResourceBundle(bundleName).getString(key);
     }

@@ -12,8 +12,13 @@ public class OgnlL10nedMessage extends AbstractLazyL10nedMessage {
     }
 
     @Override
+    public Object getKey() {
+        return delegate.getKey();
+    }
+
+    @Override
     protected String loadMessage() {
-        String message = delegate.getL10nedMessage();
+        String message = delegate.getMessage();
         String evaluated = OgnlMessageFormatter.format(message, root);
         return evaluated;
     }

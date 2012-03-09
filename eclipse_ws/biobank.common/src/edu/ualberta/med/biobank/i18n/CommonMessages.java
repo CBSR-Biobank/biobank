@@ -12,7 +12,12 @@ public enum CommonMessages implements L10nedMessage {
     }
 
     @Override
-    public String getL10nedMessage() {
-        return message.getL10nedMessage();
+    public String getMessage() {
+        return message.getMessage();
+    }
+
+    @Override
+    public Object getKey() {
+        return message.getKey();
     }
 }
