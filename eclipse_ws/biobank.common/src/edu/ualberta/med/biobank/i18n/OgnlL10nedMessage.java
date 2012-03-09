@@ -1,19 +1,19 @@
 package edu.ualberta.med.biobank.i18n;
 
-public class OgnlI18dMessage extends AbstractI18dMessage {
+public class OgnlL10nedMessage extends AbstractLazyL10nedMessage {
     private static final long serialVersionUID = 1L;
 
-    private final I18dMessage delegate;
+    private final L10nedMessage delegate;
     private final Object root;
 
-    public OgnlI18dMessage(I18dMessage delegate, Object root) {
+    public OgnlL10nedMessage(L10nedMessage delegate, Object root) {
         this.delegate = delegate;
         this.root = root;
     }
 
     @Override
     protected String loadMessage() {
-        String message = delegate.getI18dMessage();
+        String message = delegate.getL10nedMessage();
         String evaluated = OgnlMessageFormatter.format(message, root);
         return evaluated;
     }
