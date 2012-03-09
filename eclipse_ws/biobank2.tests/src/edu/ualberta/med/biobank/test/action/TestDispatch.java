@@ -194,9 +194,9 @@ public class TestDispatch extends TestAction {
             EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
-        DispatchDeleteAction delete = new DispatchDeleteAction(id);
+        DispatchReadInfo info = EXECUTOR.exec(new DispatchGetInfoAction(id));
         try {
-            EXECUTOR.exec(delete);
+            EXECUTOR.exec(new DispatchDeleteAction(info.dispatch));
             Assert.fail();
         } catch (ActionException e) {
             Assert.assertTrue(true);
@@ -205,7 +205,7 @@ public class TestDispatch extends TestAction {
         DispatchChangeStateAction stateChange =
             new DispatchChangeStateAction(id, DispatchState.CREATION, shipsave);
         EXECUTOR.exec(stateChange);
-        EXECUTOR.exec(delete);
+        EXECUTOR.exec(new DispatchDeleteAction(info.dispatch));
     }
 
     @Test
@@ -225,8 +225,7 @@ public class TestDispatch extends TestAction {
                 .getId();
         d.id = id;
 
-        DispatchReadInfo info =
-            EXECUTOR.exec(new DispatchGetInfoAction(id));
+        DispatchReadInfo info = EXECUTOR.exec(new DispatchGetInfoAction(id));
         Assert.assertEquals(1, info.dispatch.getComments().size());
         EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
             .getId();

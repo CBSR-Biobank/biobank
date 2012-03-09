@@ -14,8 +14,11 @@ public class RoleDeleteAction implements Action<EmptyResult> {
 
     private final Integer roleId;
 
-    public RoleDeleteAction(Integer id) {
-        this.roleId = id;
+    public RoleDeleteAction(Role role) {
+        if (role == null) {
+            throw new IllegalArgumentException();
+        }
+        this.roleId = role.getId();
     }
 
     @Override

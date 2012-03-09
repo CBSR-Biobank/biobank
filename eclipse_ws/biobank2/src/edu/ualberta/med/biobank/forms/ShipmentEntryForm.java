@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
-import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
+import edu.ualberta.med.biobank.common.action.originInfo.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -164,8 +164,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             ShipmentReadInfo read =
                 SessionManager.getAppService().doAction(
                     new ShipmentGetInfoAction(id));
-            originInfo.setWrappedObject(read.oi);
-            shipmentInfo.setWrappedObject(read.oi.getShipmentInfo());
+            originInfo.setWrappedObject(read.originInfo);
+            shipmentInfo.setWrappedObject(read.originInfo.getShipmentInfo());
             specimens =
                 ModelWrapper.wrapModelCollection(
                     SessionManager.getAppService(), read.specimens,

@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 public class ShipmentReadInfo implements ActionResult {
     private static final long serialVersionUID = 1L;
 
-    public OriginInfo oi;
+    public OriginInfo originInfo;
     public Set<Specimen> specimens = new HashSet<Specimen>();
 
 }

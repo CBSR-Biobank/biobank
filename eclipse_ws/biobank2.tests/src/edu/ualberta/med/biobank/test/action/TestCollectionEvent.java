@@ -428,7 +428,9 @@ public class TestCollectionEvent extends TestAction {
                     null, null)).getId();
 
         // test delete
-        EXECUTOR.exec(new CollectionEventDeleteAction(ceventId));
+        CEventInfo info =
+            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+        EXECUTOR.exec(new CollectionEventDeleteAction(info.cevent));
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         Assert.assertNull(cevent);
@@ -451,9 +453,11 @@ public class TestCollectionEvent extends TestAction {
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
             .getId();
 
-        // try delete this cevent:
+        // try to delete this cevent
+        CEventInfo info =
+            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
         try {
-            EXECUTOR.exec(new CollectionEventDeleteAction(ceventId));
+            EXECUTOR.exec(new CollectionEventDeleteAction(info.cevent));
             Assert
                 .fail("should throw an exception because specimens are still in the cevent");
         } catch (ConstraintViolationException ae) {

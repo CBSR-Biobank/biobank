@@ -78,8 +78,8 @@ public class ShipmentViewForm extends BiobankViewForm {
             ShipmentReadInfo read =
                 SessionManager.getAppService().doAction(
                     new ShipmentGetInfoAction(id));
-            originInfo.setWrappedObject(read.oi);
-            shipmentInfo.setWrappedObject(read.oi.getShipmentInfo());
+            originInfo.setWrappedObject(read.originInfo);
+            shipmentInfo.setWrappedObject(read.originInfo.getShipmentInfo());
             specimens =
                 ModelWrapper.wrapModelCollection(
                     SessionManager.getAppService(), read.specimens,

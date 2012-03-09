@@ -79,7 +79,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             ResearchGroupReadInfo read =
                 SessionManager.getAppService().doAction(
                     new ResearchGroupGetInfoAction(id));
-            researchGroup.setWrappedObject(read.rg);
+            researchGroup.setWrappedObject(read.researchGroup);
         }
     }
 

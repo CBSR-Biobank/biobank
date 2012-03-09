@@ -13,10 +13,12 @@ import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
+import edu.ualberta.med.biobank.common.action.info.SiteInfo;
+import edu.ualberta.med.biobank.common.action.originInfo.OriginInfoDeleteAction;
+import edu.ualberta.med.biobank.common.action.originInfo.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
-import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
-import edu.ualberta.med.biobank.common.action.shipment.ShipmentDeleteAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.Utils;
@@ -77,8 +79,8 @@ public class TestShipment extends TestAction {
         ShipmentReadInfo info =
             EXECUTOR.exec(new ShipmentGetInfoAction(id));
 
-        Assert.assertTrue(info.oi.getCenter().getId().equals(oisave.centerId));
-        Assert.assertTrue(info.oi.getReceiverSite().getId()
+        Assert.assertTrue(info.originInfo.getCenter().getId().equals(oisave.centerId));
+        Assert.assertTrue(info.originInfo.getReceiverSite().getId()
             .equals(oisave.siteId));
         for (Specimen spec : info.specimens) {
             Assert.assertTrue(oisave.addedSpecIds.contains(spec.getId()));
@@ -158,7 +160,10 @@ public class TestShipment extends TestAction {
                 .equals(siteId));
         }
 
-        ShipmentDeleteAction action = new ShipmentDeleteAction(id, siteId);
+        ShipmentReadInfo info = EXECUTOR.exec(new ShipmentGetInfoAction(id));
+        SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        OriginInfoDeleteAction action =
+            new OriginInfoDeleteAction(info.originInfo, siteInfo.getSite());
         EXECUTOR.exec(action);
 
         session.close();
@@ -192,16 +197,16 @@ public class TestShipment extends TestAction {
         ShipmentReadInfo info =
             EXECUTOR.exec(new ShipmentGetInfoAction(id));
 
-        Assert.assertEquals(1, info.oi.getComments().size());
+        Assert.assertEquals(1, info.originInfo.getComments().size());
         EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
             .getId();
         info =
             EXECUTOR.exec(new ShipmentGetInfoAction(id));
-        Assert.assertEquals(2, info.oi.getComments().size());
+        Assert.assertEquals(2, info.originInfo.getComments().size());
         EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
             .getId();
         info =
             EXECUTOR.exec(new ShipmentGetInfoAction(id));
-        Assert.assertEquals(3, info.oi.getComments().size());
+        Assert.assertEquals(3, info.originInfo.getComments().size());
     }
 }

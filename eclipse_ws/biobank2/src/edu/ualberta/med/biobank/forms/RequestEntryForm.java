@@ -82,10 +82,9 @@ public class RequestEntryForm extends BiobankViewForm {
             Request r = new Request();
             request.setWrappedObject(r);
         } else {
-            RequestReadInfo read =
-                SessionManager.getAppService().doAction(
-                    new RequestGetInfoAction(id));
-            request.setWrappedObject(read.request);
+            RequestReadInfo reqInfo = SessionManager.getAppService().doAction(
+                new RequestGetInfoAction(id));
+            request.setWrappedObject(reqInfo.request);
         }
     }
 

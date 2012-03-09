@@ -101,7 +101,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             ResearchGroupReadInfo read =
                 SessionManager.getAppService().doAction(
                     new ResearchGroupGetInfoAction(id));
-            researchGroup.setWrappedObject(read.rg);
+            researchGroup.setWrappedObject(read.researchGroup);
         }
     }
 
@@ -232,8 +232,8 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         ResearchGroupReadInfo read =
             SessionManager.getAppService().doAction(
                 new ResearchGroupGetInfoAction(id));
-        researchGroup.setWrappedObject(read.rg);
-        adapter.setValue(new ResearchGroupAdapterInfo(read.rg.getId(), read.rg
+        researchGroup.setWrappedObject(read.researchGroup);
+        adapter.setValue(new ResearchGroupAdapterInfo(read.researchGroup.getId(), read.researchGroup
             .getName()));
     }
 

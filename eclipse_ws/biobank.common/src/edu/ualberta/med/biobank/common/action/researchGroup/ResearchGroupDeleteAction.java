@@ -10,10 +10,13 @@ import edu.ualberta.med.biobank.model.ResearchGroup;
 public class ResearchGroupDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
 
-    protected Integer rgId = null;
+    protected final Integer rgId;
 
-    public ResearchGroupDeleteAction(Integer id) {
-        this.rgId = id;
+    public ResearchGroupDeleteAction(ResearchGroup researchGroup) {
+        if (researchGroup == null) {
+            throw new IllegalArgumentException();
+        }
+        this.rgId = researchGroup.getId();
     }
 
     @Override

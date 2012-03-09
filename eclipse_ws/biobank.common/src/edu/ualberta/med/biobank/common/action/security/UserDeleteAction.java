@@ -12,8 +12,11 @@ public class UserDeleteAction implements Action<EmptyResult> {
 
     private final Integer userToDeleteId;
 
-    public UserDeleteAction(Integer id) {
-        this.userToDeleteId = id;
+    public UserDeleteAction(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException();
+        }
+        this.userToDeleteId = user.getId();
     }
 
     @Override

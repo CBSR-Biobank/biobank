@@ -11,10 +11,13 @@ import edu.ualberta.med.biobank.model.Dispatch;
 public class DispatchDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
 
-    protected Integer shipId = null;
+    protected final Integer shipId;
 
-    public DispatchDeleteAction(Integer id) {
-        this.shipId = id;
+    public DispatchDeleteAction(Dispatch dispatch) {
+        if (dispatch == null) {
+            throw new IllegalArgumentException();
+        }
+        this.shipId = dispatch.getId();
     }
 
     @Override

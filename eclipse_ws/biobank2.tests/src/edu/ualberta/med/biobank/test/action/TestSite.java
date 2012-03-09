@@ -24,12 +24,16 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfo
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
+import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.common.action.site.SiteDeleteAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypeInfoAction;
@@ -497,7 +501,7 @@ public class TestSite extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimens
-        Integer pEventId = EXECUTOR.exec(
+        Integer peventId = EXECUTOR.exec(
             new ProcessingEventSaveAction(
                 null, provisioning.siteId, Utils.getRandomDate(), Utils
                     .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
@@ -517,7 +521,9 @@ public class TestSite extends TestAction {
         }
 
         // delete the processing event
-        EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
+        PEventInfo peventInfo =
+            EXECUTOR.exec(new ProcessingEventGetInfoAction(peventId));
+        EXECUTOR.exec(new ProcessingEventDeleteAction(peventInfo.pevent));
         EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 
@@ -566,8 +572,12 @@ public class TestSite extends TestAction {
             specimens.add(dspec.getSpecimen());
         }
 
-        EXECUTOR.exec(new DispatchDeleteAction(dispatchId2));
-        EXECUTOR.exec(new DispatchDeleteAction(dispatchId1));
+        DispatchReadInfo dispatchInfo =
+            EXECUTOR.exec(new DispatchGetInfoAction(dispatchId2));
+        EXECUTOR.exec(new DispatchDeleteAction(dispatchInfo.dispatch));
+        dispatchInfo =
+            EXECUTOR.exec(new DispatchGetInfoAction(dispatchId1));
+        EXECUTOR.exec(new DispatchDeleteAction(dispatchInfo.dispatch));
 
         for (Specimen specimen : specimens) {
             EXECUTOR.exec(new SpecimenDeleteAction(specimen.getId()));
@@ -599,7 +609,9 @@ public class TestSite extends TestAction {
 
         // delete the dispatch and then the site - no need to delete dispatch
         // specimens
-        EXECUTOR.exec(new DispatchDeleteAction(dispatchId));
+        DispatchReadInfo dispatchInfo =
+            EXECUTOR.exec(new DispatchGetInfoAction(dispatchId));
+        EXECUTOR.exec(new DispatchDeleteAction(dispatchInfo.dispatch));
         EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 

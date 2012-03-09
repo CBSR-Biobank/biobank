@@ -173,7 +173,7 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     @Override
     protected void runDelete() throws Exception {
         SessionManager.getAppService().doAction(
-            new CollectionEventDeleteAction(getId()));
+            new CollectionEventDeleteAction(ceventInfo.cevent));
     }
 
     @Override

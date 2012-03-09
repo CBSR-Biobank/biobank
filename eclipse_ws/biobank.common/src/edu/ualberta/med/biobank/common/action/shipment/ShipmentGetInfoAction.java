@@ -9,8 +9,6 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
-import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
-import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -23,16 +21,15 @@ import edu.ualberta.med.biobank.model.Specimen;
  */
 public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
     private static final long serialVersionUID = 1L;
-    // @formatter:off
+
     @SuppressWarnings("nls")
-    private static final String ORIGIN_INFO_HQL = "select distinct oi from "
-    + OriginInfo.class.getName() 
-    + " oi join fetch oi." + OriginInfoPeer.SHIPMENT_INFO.getName()
-    + " si join fetch si." + ShipmentInfoPeer.SHIPPING_METHOD.getName()
-    + " join fetch oi." + OriginInfoPeer.CENTER.getName() 
-    + " left join fetch oi." + OriginInfoPeer.COMMENTS.getName()
-    + " where oi." + OriginInfoPeer.ID.getName()+"=?";
-    // @formatter:on
+    private static final String ORIGIN_INFO_HQL =
+        "SELECT DISTINCT oi FROM " + OriginInfo.class.getName() + " oi"
+            + " INNER JOIN FETCH oi.shipmentInfo si"
+            + " INNER JOIN FETCH si.shippingMethod"
+            + " INNER JOIN FETCH oi.center"
+            + " LEFT JOIN FETCH oi.comments"
+            + " WHERE oi.id=?";
 
     private final Integer oiId;
 
@@ -58,7 +55,7 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
         if (rows.size() == 1) {
             Object row = rows.get(0);
 
-            sInfo.oi = (OriginInfo) row;
+            sInfo.originInfo = (OriginInfo) row;
             sInfo.specimens = new HashSet<Specimen>(
                 new ShipmentGetSpecimenInfosAction(oiId).run(context)
                     .getList());

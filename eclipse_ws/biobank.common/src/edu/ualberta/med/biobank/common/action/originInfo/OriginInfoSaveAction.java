@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.shipment;
+package edu.ualberta.med.biobank.common.action.originInfo;
 
 import java.util.Date;
 import java.util.HashSet;

@@ -161,7 +161,7 @@ public class DispatchAdapter extends AdapterBase {
     @Override
     public void runDelete() throws Exception {
         DispatchDeleteAction delete =
-            new DispatchDeleteAction(getDispatchWrapper().getId());
+            new DispatchDeleteAction(getDispatchWrapper().getWrappedObject());
         SessionManager.getAppService().doAction(delete);
     }
 

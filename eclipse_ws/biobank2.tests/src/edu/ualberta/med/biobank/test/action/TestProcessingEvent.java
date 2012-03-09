@@ -25,13 +25,13 @@ import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
+import edu.ualberta.med.biobank.common.action.originInfo.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
-import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
@@ -209,7 +209,9 @@ public class TestProcessingEvent extends TestAction {
                 .getRandomString(50), ActivityStatus.ACTIVE, null,
             new HashSet<Integer>())).getId();
 
-        EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
+        PEventInfo peventInfo =
+            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
+        EXECUTOR.exec(new ProcessingEventDeleteAction(peventInfo.pevent));
 
         try {
             EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
@@ -246,7 +248,9 @@ public class TestProcessingEvent extends TestAction {
 
         // delete this processing event. Can do it since the specimen has no
         // children
-        EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
+        PEventInfo peventInfo =
+            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
+        EXECUTOR.exec(new ProcessingEventDeleteAction(peventInfo.pevent));
 
         try {
             EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
@@ -294,8 +298,10 @@ public class TestProcessingEvent extends TestAction {
 
         // delete this processing event. Can do it since the specimen has no
         // children
+        PEventInfo peventInfo =
+            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
         try {
-            EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
+            EXECUTOR.exec(new ProcessingEventDeleteAction(peventInfo.pevent));
             Assert
                 .fail("one of the source specimen of this pevent has children. "
                     + "Can't delete the processing event");

@@ -768,11 +768,11 @@ End:
   </target>
 
   <target name="doxygen" description="generates documentation for the model classes">
-    <exec command="${doxygen}">
+    <exec executable="${doxygen}">
       <arg value="docs/doxygen/doxygen.cfg" />
     </exec>
     <echo message="point your browser to: file://${doxygen.output}/html/index.html" />
-    <exec command="${xsltproc}" dir="docs/doxygen/xml" output="docs/doxygen/xml/all.xml">
+    <exec executable="${xsltproc}" dir="docs/doxygen/xml" output="docs/doxygen/xml/all.xml">
       <arg value="combine.xslt" />
       <arg value="index.xml" />
     </exec>
