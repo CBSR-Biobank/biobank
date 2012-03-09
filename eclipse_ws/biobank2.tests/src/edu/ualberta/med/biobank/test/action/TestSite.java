@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.validation.ConstraintViolationException;
 
 import org.hibernate.Query;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,6 +77,8 @@ public class TestSite extends TestAction {
             EXECUTOR.exec(siteSaveAction);
             Assert.fail("should not be allowed to add site with no name");
         } catch (ConstraintViolationException e) {
+            Assert.assertTrue(TestAction.contains(e, NotEmpty.class,
+                Site.class, "getName"));
             Assert.assertTrue(true);
         }
 

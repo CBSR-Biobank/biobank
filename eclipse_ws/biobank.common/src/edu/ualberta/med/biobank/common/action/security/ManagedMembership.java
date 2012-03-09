@@ -1,9 +1,10 @@
 package edu.ualberta.med.biobank.common.action.security;
 
-import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
+import javax.validation.Valid;
+
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
@@ -24,21 +25,15 @@ import edu.ualberta.med.biobank.model.User;
  * 
  * @author Jonathan Ferland
  */
-public class ManagedMembership implements Serializable {
+public class ManagedMembership implements ActionResult {
     private static final long serialVersionUID = 1L;
 
-    private final User manager;
-    private final Set<Role> allRoles;
-
+    @Valid
     private final Membership delegate;
+    private final Manager manager;
 
-    private final Set<PermissionEnum> permissions;
-    private final Set<Role> roles;
-
-    public ManagedMembership(Membership membership, User manager,
-        Set<Role> allRoles) {
+    public ManagedMembership(Membership membership, Manager manager) {
         this.manager = manager;
-        this.allRoles = allRoles;
 
         delegate = new Membership();
 
@@ -49,8 +44,8 @@ public class ManagedMembership implements Serializable {
         delegate.setRank(membership.getRank());
         delegate.setLevel(membership.getLevel());
 
-        permissions = new HashSet<PermissionEnum>(membership.getPermissions());
-        roles = new HashSet<Role>(membership.getRoles());
+        delegate.getPermissions().addAll(membership.getPermissions());
+        delegate.getRoles().addAll(membership.getRoles());
 
         filter();
     }
@@ -104,19 +99,20 @@ public class ManagedMembership implements Serializable {
     }
 
     public Set<PermissionEnum> getPermissions() {
-        return permissions;
+        return delegate.getPermissions();
     }
 
     public Set<Role> getRoles() {
-        return roles;
+        return delegate.getRoles();
     }
 
     public Set<PermissionEnum> getPermissionOptions() {
-        return delegate.getManageablePermissions(manager);
+        return delegate.getManageablePermissions(manager.getUser());
     }
 
     public Set<Role> getRoleOptions() {
-        return delegate.getManageableRoles(manager, allRoles);
+        return delegate.getManageableRoles(manager.getUser(),
+            manager.getAllRoles());
     }
 
     /**

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.action;
 
+import java.lang.annotation.Annotation;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -7,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -185,5 +189,35 @@ public class TestAction {
 
     protected String getMethodNameR() {
         return testName.getMethodName() + R.nextInt();
+    }
+
+    public static boolean contains(ConstraintViolationException e,
+        Class<? extends Annotation> annotationKlazz, Class<?> klazz) {
+        Annotation annotation = klazz.getAnnotation(annotationKlazz);
+        return contains(e, annotation);
+    }
+
+    public static boolean contains(ConstraintViolationException e,
+        Class<? extends Annotation> annotationKlazz, Class<?> klazz,
+        String methodName) {
+        Annotation annotation;
+        try {
+            annotation = klazz.getMethod(methodName)
+                .getAnnotation(annotationKlazz);
+        } catch (Throwable caught) {
+            throw new RuntimeException(caught);
+        }
+        return contains(e, annotation);
+    }
+
+    public static boolean contains(ConstraintViolationException e, Annotation a) {
+        if (a == null) {
+            throw new NullPointerException("annotation cannot be null");
+        }
+        for (ConstraintViolation<?> cv : e.getConstraintViolations()) {
+            if (cv.getConstraintDescriptor().getAnnotation().equals(a))
+                return true;
+        }
+        return false;
     }
 }

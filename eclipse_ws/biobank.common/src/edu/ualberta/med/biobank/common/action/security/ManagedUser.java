@@ -1,14 +1,14 @@
 package edu.ualberta.med.biobank.common.action.security;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.common.action.ActionResult;
+import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
 
-public class ManagedUser implements Serializable {
+public class ManagedUser implements ActionResult {
     private static final long serialVersionUID = 1L;
 
     public Set<ManagedMembership> managedMemberships =
@@ -16,12 +16,19 @@ public class ManagedUser implements Serializable {
 
     // ManagedGroup
 
-    public ManagedUser(User user, User manager, Set<Role> allRoles) {
+    public ManagedUser(User user, Manager manager) {
 
         for (Membership m : user.getMemberships()) {
-            if (m.isManageable(manager)) {
-                ManagedMembership managedMembership =
-                    new ManagedMembership(m, manager, allRoles);
+            if (m.isManageable(manager.getUser())) {
+                ManagedMembership mm = new ManagedMembership(m, manager);
+            }
+        }
+
+        for (Group group : user.getGroups()) {
+            if (group.isFullyManageable(manager.getUser())) {
+                for (Membership m : group.getMemberships()) {
+                    ManagedMembership mm = new ManagedMembership(m, manager);
+                }
             }
         }
     }
