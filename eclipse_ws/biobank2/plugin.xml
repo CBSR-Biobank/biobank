@@ -277,7 +277,7 @@
    </extension>
    <extension point="org.eclipse.ui.handlers">
       <handler
-       	  class="DisabledNewEditorHandler"
+       	  class="edu.ualberta.med.biobank.handlers.DisabledNewEditorHandler"
           commandId="org.eclipse.ui.window.newEditor">
        		<enabledWhen>
           		<count value="-1">

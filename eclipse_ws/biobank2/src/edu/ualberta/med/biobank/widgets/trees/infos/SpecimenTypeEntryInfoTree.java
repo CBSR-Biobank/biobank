@@ -11,6 +11,7 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeDeleteAction;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -123,45 +124,47 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
             @Override
             public void deleteItem(InfoTreeEvent<SpecimenTypeWrapper> event) {
                 SpecimenTypeWrapper specType = getSelection();
-                if (specType != null) {
-                    try {
-                        specType.reload();
-                        if (!specType.isNew() && specType.isUsed()) {
-                            BgcPlugin
-                                .openError(
-                                    Messages.SpecimenTypeEntryInfoTree_delete_error_title,
-                                    NLS.bind(
-                                        Messages.SpecimenTypeEntryInfoTree_delete_error_msg,
-                                        specType.getName()));
-                            return;
-                        }
+                if (specType == null) return;
 
-                        if (!MessageDialog
-                            .openConfirm(
-                                PlatformUI.getWorkbench()
-                                    .getActiveWorkbenchWindow().getShell(),
-                                Messages.SpecimenTypeEntryInfoTree_delete_question_title,
-                                NLS.bind(
-                                    Messages.SpecimenTypeEntryInfoTree_delete_question_msg,
-                                    specType.getName()))) {
-                            return;
-                        }
-
-                        // equals method now compare toString() results if both
-                        // ids are null.
-                        selectedSpecimenTypes.remove(specType);
-                        needReload.addAll(specType
-                            .getParentSpecimenTypeCollection(false));
-                        specType.delete();
-                        reloadCollection(selectedSpecimenTypes);
-                    } catch (final RemoteConnectFailureException exp) {
-                        BgcPlugin.openRemoteConnectErrorMessage(exp);
-                    } catch (Exception e) {
+                try {
+                    specType.reload();
+                    if (!specType.isNew() && specType.isUsed()) {
                         BgcPlugin
-                            .openAsyncError(
-                                Messages.SpecimenTypeEntryInfoTree_delete_type_error_msg,
-                                e);
+                            .openError(
+                                Messages.SpecimenTypeEntryInfoTree_delete_error_title,
+                                NLS.bind(
+                                    Messages.SpecimenTypeEntryInfoTree_delete_error_msg,
+                                    specType.getName()));
+                        return;
                     }
+
+                    if (!MessageDialog
+                        .openConfirm(
+                            PlatformUI.getWorkbench()
+                                .getActiveWorkbenchWindow().getShell(),
+                            Messages.SpecimenTypeEntryInfoTree_delete_question_title,
+                            NLS.bind(
+                                Messages.SpecimenTypeEntryInfoTree_delete_question_msg,
+                                specType.getName()))) {
+                        return;
+                    }
+
+                    // equals method now compare toString() results if both
+                    // ids are null.
+                    selectedSpecimenTypes.remove(specType);
+                    needReload.addAll(specType
+                        .getParentSpecimenTypeCollection(false));
+                    SessionManager.getAppService().doAction(
+                        new SpecimenTypeDeleteAction(specType
+                            .getWrappedObject()));
+                    reloadCollection(selectedSpecimenTypes);
+                } catch (final RemoteConnectFailureException exp) {
+                    BgcPlugin.openRemoteConnectErrorMessage(exp);
+                } catch (Exception e) {
+                    BgcPlugin
+                        .openAsyncError(
+                            Messages.SpecimenTypeEntryInfoTree_delete_type_error_msg,
+                            e);
                 }
             }
         });

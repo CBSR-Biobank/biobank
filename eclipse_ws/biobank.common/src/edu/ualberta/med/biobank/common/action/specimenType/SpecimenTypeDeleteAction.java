@@ -1,33 +1,33 @@
-package edu.ualberta.med.biobank.common.action.specimen;
+package edu.ualberta.med.biobank.common.action.specimenType;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.permission.specimen.SpecimenDeletePermission;
+import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeDeletePermission;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 
-public class SpecimenDeleteAction implements Action<EmptyResult> {
+public class SpecimenTypeDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
 
-    private final Integer specimenId;
+    private final Integer specimenTypeId;
 
-    public SpecimenDeleteAction(Specimen specimen) {
-        if (specimen == null) {
+    public SpecimenTypeDeleteAction(SpecimenType specimenType) {
+        if (specimenType == null) {
             throw new IllegalArgumentException();
         }
-        this.specimenId = specimen.getId();
+        this.specimenTypeId = specimenType.getId();
     }
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new SpecimenDeletePermission(specimenId)
-            .isAllowed(context);
+        return new SpecimenTypeDeletePermission().isAllowed(context);
     }
 
     @Override
     public EmptyResult run(ActionContext context) throws ActionException {
-        Specimen specimen = context.load(Specimen.class, specimenId);
+        Specimen specimen = context.load(Specimen.class, specimenTypeId);
 
         context.getSession().delete(specimen);
         return new EmptyResult();
