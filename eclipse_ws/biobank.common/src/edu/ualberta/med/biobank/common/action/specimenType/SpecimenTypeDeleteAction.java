@@ -5,7 +5,6 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeDeletePermission;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 
 public class SpecimenTypeDeleteAction implements Action<EmptyResult> {
@@ -27,7 +26,8 @@ public class SpecimenTypeDeleteAction implements Action<EmptyResult> {
 
     @Override
     public EmptyResult run(ActionContext context) throws ActionException {
-        Specimen specimen = context.load(Specimen.class, specimenTypeId);
+        SpecimenType specimen =
+            context.load(SpecimenType.class, specimenTypeId);
 
         context.getSession().delete(specimen);
         return new EmptyResult();
