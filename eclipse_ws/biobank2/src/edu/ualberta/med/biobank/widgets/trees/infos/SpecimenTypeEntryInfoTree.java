@@ -2,6 +2,9 @@ package edu.ualberta.med.biobank.widgets.trees.infos;
 
 import java.util.List;
 
+import javax.validation.ConstraintViolationException;
+
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -18,6 +21,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.dialogs.SpecimenTypeDialog;
+import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
@@ -158,6 +162,22 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                         new SpecimenTypeDeleteAction(specType
                             .getWrappedObject()));
                     reloadCollection(selectedSpecimenTypes);
+                } catch (ApplicationException e) {
+                    if (e.getCause() instanceof ConstraintViolationException) {
+                        List<String> msgs = BiobankFormBase
+                            .getConstraintViolationsMsgs(
+                            (ConstraintViolationException) e.getCause());
+                        BgcPlugin
+                            .openAsyncError(
+                                Messages.SpecimenTypeEntryInfoTree_delete_type_error_msg,
+                                StringUtils.join(msgs, "\n"));
+
+                    } else {
+                        BgcPlugin
+                            .openAsyncError(
+                                Messages.SpecimenTypeEntryInfoTree_delete_type_error_msg,
+                                e.getLocalizedMessage());
+                    }
                 } catch (final RemoteConnectFailureException exp) {
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
