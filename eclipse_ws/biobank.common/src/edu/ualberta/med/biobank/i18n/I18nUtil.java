@@ -28,5 +28,29 @@ public class I18nUtil {
         protected String loadMessage() {
             return StringUtil.join(collection, delimiter.getMessage());
         }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int i = 1;
+            i = prime * i + ((collection == null) ? 0 : collection.hashCode());
+            i = prime * i + ((delimiter == null) ? 0 : delimiter.hashCode());
+            return i;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null) return false;
+            if (getClass() != obj.getClass()) return false;
+            JoinedCollection other = (JoinedCollection) obj;
+            if (collection == null) {
+                if (other.collection != null) return false;
+            } else if (!collection.equals(other.collection)) return false;
+            if (delimiter == null) {
+                if (other.delimiter != null) return false;
+            } else if (!delimiter.equals(other.delimiter)) return false;
+            return true;
+        }
     }
 }

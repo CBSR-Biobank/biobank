@@ -1,8 +1,7 @@
 package edu.ualberta.med.biobank.common.action.security;
 
+import java.util.HashSet;
 import java.util.Set;
-
-import javax.validation.Valid;
 
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.model.Center;
@@ -28,12 +27,14 @@ import edu.ualberta.med.biobank.model.User;
 public class ManagedMembership implements ActionResult {
     private static final long serialVersionUID = 1L;
 
-    @Valid
     private final Membership delegate;
-    private final Manager manager;
+    private final User manager;
+    private final Set<Role> allRoles;
 
-    public ManagedMembership(Membership membership, Manager manager) {
+    public ManagedMembership(Membership membership, User manager,
+        Set<Role> allRoles) {
         this.manager = manager;
+        this.allRoles = new HashSet<Role>(allRoles);
 
         delegate = new Membership();
 
@@ -107,12 +108,11 @@ public class ManagedMembership implements ActionResult {
     }
 
     public Set<PermissionEnum> getPermissionOptions() {
-        return delegate.getManageablePermissions(manager.getUser());
+        return delegate.getManageablePermissions(manager);
     }
 
     public Set<Role> getRoleOptions() {
-        return delegate.getManageableRoles(manager.getUser(),
-            manager.getAllRoles());
+        return delegate.getManageableRoles(manager, allRoles);
     }
 
     /**

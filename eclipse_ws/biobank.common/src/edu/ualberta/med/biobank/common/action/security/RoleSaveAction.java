@@ -16,20 +16,14 @@ public class RoleSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
     private static final Permission PERMISSION = new RoleManagementPermission();
 
-    private Integer roleId;
-    private String name;
-    private Set<PermissionEnum> permissions = new HashSet<PermissionEnum>();
+    private final Integer roleId;
+    private final String name;
+    private final Set<PermissionEnum> permissions;
 
-    public void setId(Integer roleId) {
-        this.roleId = roleId;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setPermissions(Set<PermissionEnum> permissions) {
-        this.permissions = permissions;
+    public RoleSaveAction(Role role) {
+        this.roleId = role.getId();
+        this.name = role.getName();
+        this.permissions = new HashSet<PermissionEnum>(role.getPermissions());
     }
 
     @Override
