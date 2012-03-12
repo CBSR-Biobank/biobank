@@ -97,11 +97,6 @@ public class SiteGroup extends AdapterBase {
     }
 
     @Override
-    protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren().size();
-    }
-
-    @Override
     public void notifyListeners(AdapterChangedEvent event) {
         getParent().notifyListeners(event);
     }

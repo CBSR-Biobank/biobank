@@ -125,11 +125,6 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     }
 
     @Override
-    protected int getChildrenCount() throws Exception {
-        return 0;
-    }
-
-    @Override
     public String getEntryFormId() {
         return CollectionEventEntryForm.ID;
     }

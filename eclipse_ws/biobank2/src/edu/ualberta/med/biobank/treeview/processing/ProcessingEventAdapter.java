@@ -118,11 +118,6 @@ public class ProcessingEventAdapter extends AdapterBase {
     }
 
     @Override
-    protected int getWrapperChildCount() throws Exception {
-        return 0;
-    }
-
-    @Override
     public String getViewFormId() {
         return ProcessingEventViewForm.ID;
     }

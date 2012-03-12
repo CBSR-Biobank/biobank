@@ -133,11 +133,6 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     }
 
     @Override
-    protected int getChildrenCount() throws Exception {
-        return ceventsCount.intValue();
-    }
-
-    @Override
     public String getEntryFormId() {
         return PatientEntryForm.ID;
     }

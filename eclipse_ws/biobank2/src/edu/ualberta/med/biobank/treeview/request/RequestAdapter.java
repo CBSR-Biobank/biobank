@@ -70,11 +70,6 @@ public class RequestAdapter extends AdapterBase {
     }
 
     @Override
-    protected int getWrapperChildCount() throws Exception {
-        return 0;
-    }
-
-    @Override
     public String getViewFormId() {
         return RequestEntryForm.ID;
     }

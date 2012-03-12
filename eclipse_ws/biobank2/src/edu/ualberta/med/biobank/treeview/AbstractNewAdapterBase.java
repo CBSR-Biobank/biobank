@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.springframework.remoting.RemoteAccessException;
 
@@ -61,30 +62,37 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
      * @param updateNode If not null, the node in the treeview to update.
      */
     @Override
-    public void loadChildren(boolean updateNode) {
-        try {
-            Map<Integer, ?> children = getChildrenObjects();
-            if (children != null) {
-                for (Entry<Integer, ?> entry : children.entrySet()) {
-                    AbstractAdapterBase node = getChild(entry.getKey());
-                    if (node == null) {
-                        node = createChildNode(entry.getValue());
-                        addChild(node);
+    public void loadChildren(final boolean updateNode) {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Map<Integer, ?> children = getChildrenObjects();
+                    if (children != null) {
+                        for (Entry<Integer, ?> entry : children.entrySet()) {
+                            AbstractAdapterBase node = getChild(entry.getKey());
+                            if (node == null) {
+                                node = createChildNode(entry.getValue());
+                                addChild(node);
+                            }
+                            if (updateNode) {
+                                node.setValue(entry.getValue());
+                                SessionManager.updateAdapterTreeNode(node);
+                            }
+                        }
+                        SessionManager
+                            .refreshTreeNode(AbstractNewAdapterBase.this);
                     }
-                    if (updateNode) {
-                        node.setValue(entry.getValue());
-                        SessionManager.updateAdapterTreeNode(node);
-                    }
+                } catch (final RemoteAccessException exp) {
+                    BgcPlugin.openRemoteAccessErrorMessage(exp);
+                } catch (Exception e) {
+                    String text = getClass().getName();
+                    text += " id=" + getId(); //$NON-NLS-1$
+                    logger.error(
+                        "Error while loading children of node " + text, e); //$NON-NLS-1$
                 }
-                SessionManager.refreshTreeNode(AbstractNewAdapterBase.this);
             }
-        } catch (final RemoteAccessException exp) {
-            BgcPlugin.openRemoteAccessErrorMessage(exp);
-        } catch (Exception e) {
-            String text = getClass().getName();
-            text += " id=" + getId(); //$NON-NLS-1$
-            logger.error("Error while loading children of node " + text, e); //$NON-NLS-1$
-        }
+        });
     }
 
     @Override

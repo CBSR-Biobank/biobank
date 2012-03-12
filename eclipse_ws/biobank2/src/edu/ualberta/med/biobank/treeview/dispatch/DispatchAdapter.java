@@ -280,11 +280,6 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     @Override
-    protected int getWrapperChildCount() throws Exception {
-        return 0;
-    }
-
-    @Override
     public String getViewFormId() {
         return DispatchViewForm.ID;
     }

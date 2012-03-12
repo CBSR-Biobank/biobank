@@ -1,14 +1,11 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -21,12 +18,12 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyMasterGroup extends AbstractStudyGroup {
 
+    @SuppressWarnings("unused")
     private static BgcLogger LOGGER = BgcLogger
         .getLogger(StudyMasterGroup.class.getName());
 
@@ -59,42 +56,13 @@ public class StudyMasterGroup extends AbstractStudyGroup {
     }
 
     @Override
-    public void performExpand() {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    studiesInfo = SessionManager.getAppService().doAction(
-                        new StudyGetAllAction());
-                    StudyMasterGroup.super.performExpand();
-                } catch (ApplicationException e) {
-                    // TODO: open an error dialog here?
-                    LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
-                }
-            }
-        });
-    }
-
-    @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        List<StudyWrapper> result = new ArrayList<StudyWrapper>();
+        studiesInfo = SessionManager.getAppService().doAction(
+            new StudyGetAllAction());
 
-        if (studiesInfo != null) {
-            // return results only if this node has been expanded
-            for (Study study : studiesInfo.getStudies()) {
-                StudyWrapper wrapper =
-                    new StudyWrapper(SessionManager.getAppService(), study);
-                result.add(wrapper);
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return (int) StudyWrapper.getCount(SessionManager.getAppService());
+        return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+            studiesInfo.getStudies(), StudyWrapper.class);
     }
 
     public void addStudy() {

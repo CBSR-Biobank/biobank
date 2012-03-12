@@ -103,11 +103,6 @@ public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
     }
 
     @Override
-    protected int getChildrenCount() throws Exception {
-        return rgs.size();
-    }
-
-    @Override
     public String getViewFormId() {
         return null;
     }
@@ -117,6 +112,7 @@ public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void setValue(Object value) {
         this.rgs = (Map<Integer, ResearchGroup>) value;

@@ -77,8 +77,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     private ClinicInfo clinicInfo;
 
-    private BgcBaseText commentWidget;
-
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ClinicAdapter),
@@ -181,10 +179,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         comment = new CommentWrapper(SessionManager.getAppService());
-        commentWidget = (BgcBaseText) createBoundWidgetWithLabel(client,
-            BgcBaseText.class, SWT.MULTI, Messages.Comments_add, null,
-            comment, "message", null);
 
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_add, null, comment, "message", null);
     }
 
     private void createContactSection() {

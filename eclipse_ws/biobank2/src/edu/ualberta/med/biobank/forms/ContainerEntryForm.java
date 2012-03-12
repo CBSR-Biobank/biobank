@@ -204,20 +204,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     }
 
     private void createContainerTypesSection(Composite client) throws Exception {
-        // List<ContainerTypeWrapper> containerTypes;
         ContainerTypeWrapper currentType = container.getContainerType();
-        // if (!container.hasParentContainer()) {
-        // SiteWrapper currentSite = container.getSite();
-        // if (currentSite == null)
-        // containerTypes = new ArrayList<ContainerTypeWrapper>();
-        // else
-        // containerTypes = ContainerTypeWrapper
-        // .getTopContainerTypesInSite(SessionManager.getAppService(),
-        // currentSite);
-        // } else {
-        // containerTypes = container.getParentContainer().getContainerType()
-        // .getChildContainerTypeCollection();
-        // }
 
         containerTypeComboViewer = createComboViewer(client,
             Messages.ContainerEntryForm_type_label, containerTypes,
@@ -239,6 +226,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     }
                 }
             });
+
         // temperature is set for the toplevel container only.
         String tempProperty = ContainerPeer.TEMPERATURE.getName();
         if (container.hasParentContainer())

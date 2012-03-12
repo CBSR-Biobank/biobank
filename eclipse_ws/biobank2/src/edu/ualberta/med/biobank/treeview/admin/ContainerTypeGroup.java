@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -21,7 +20,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
@@ -29,6 +27,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeGroup extends AdapterBase {
 
+    @SuppressWarnings("unused")
     private static BgcLogger LOGGER = BgcLogger.getLogger(ContainerGroup.class
         .getName());
 
@@ -54,19 +53,6 @@ public class ContainerTypeGroup extends AdapterBase {
     @Override
     public void executeDoubleClick() {
         performExpand();
-    }
-
-    @Override
-    public void performExpand() {
-        SiteAdapter siteAdapter = (SiteAdapter) getParent();
-        try {
-            containerTypesResult = SessionManager.getAppService().doAction(
-                new SiteGetContainerTypesAction(siteAdapter.getId()));
-            super.performExpand();
-        } catch (ApplicationException e) {
-            // TODO: open an error dialog here?
-            LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
-        }
     }
 
     @Override
@@ -110,26 +96,13 @@ public class ContainerTypeGroup extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        List<ContainerTypeWrapper> result =
-            new ArrayList<ContainerTypeWrapper>();
+        SiteAdapter siteAdapter = (SiteAdapter) getParent();
+        containerTypesResult = SessionManager.getAppService().doAction(
+            new SiteGetContainerTypesAction(siteAdapter.getId()));
 
-        if (containerTypesResult != null) {
-            // return results only if this node has been expanded
-            for (ContainerType containerType : containerTypesResult
-                .getContainerTypes()) {
-                ContainerTypeWrapper wrapper =
-                    new ContainerTypeWrapper(SessionManager.getAppService(),
-                        containerType);
-                result.add(wrapper);
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren().size();
+        return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+            containerTypesResult.getContainerTypes(),
+            ContainerTypeWrapper.class);
     }
 
     @Override

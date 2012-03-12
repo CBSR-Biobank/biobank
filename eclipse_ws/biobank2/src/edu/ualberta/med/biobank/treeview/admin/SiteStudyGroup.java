@@ -21,11 +21,4 @@ public class SiteStudyGroup extends AbstractStudyGroup {
         SiteAdapter site = getParentFromClass(SiteAdapter.class);
         return ((SiteWrapper) site.getModelObject()).getStudyCollection();
     }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        SiteAdapter site = getParentFromClass(SiteAdapter.class);
-        return ((SiteWrapper) site.getModelObject()).getStudyCollection()
-            .size();
-    }
 }

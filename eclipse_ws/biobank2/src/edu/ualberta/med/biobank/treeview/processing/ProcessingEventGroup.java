@@ -105,11 +105,6 @@ public class ProcessingEventGroup extends AdapterBase {
     }
 
     @Override
-    protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren().size();
-    }
-
-    @Override
     public int compareTo(AbstractAdapterBase o) {
         return 0;
     }

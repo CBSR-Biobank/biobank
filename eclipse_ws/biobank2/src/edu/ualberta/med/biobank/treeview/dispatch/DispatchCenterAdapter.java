@@ -72,11 +72,6 @@ public class DispatchCenterAdapter extends AdapterBase {
     }
 
     @Override
-    protected int getWrapperChildCount() {
-        return 0;
-    }
-
-    @Override
     public String getEntryFormId() {
         return null;
     }

@@ -119,9 +119,4 @@ public class ResearchGroupAdapter extends AbstractNewAdapterBase {
     protected Map<Integer, ?> getChildrenObjects() throws Exception {
         return null;
     }
-
-    @Override
-    protected int getChildrenCount() throws Exception {
-        return 0;
-    }
 }

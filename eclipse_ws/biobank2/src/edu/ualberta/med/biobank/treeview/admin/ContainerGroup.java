@@ -156,24 +156,13 @@ public class ContainerGroup extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        List<ContainerWrapper> result = new ArrayList<ContainerWrapper>();
+        final SiteAdapter siteAdapter = (SiteAdapter) getParent();
 
-        if (topContainers != null) {
-            // return results only if this node has been expanded
-            for (Container container : topContainers) {
-                ContainerWrapper wrapper =
-                    new ContainerWrapper(SessionManager.getAppService(),
-                        container);
-                result.add(wrapper);
-            }
-        }
+        topContainers = SessionManager.getAppService().doAction(
+            new SiteGetTopContainersAction(siteAdapter.getId())).getList();
 
-        return result;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return topContainers.size();
+        return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+            topContainers, ContainerWrapper.class);
     }
 
     @Override

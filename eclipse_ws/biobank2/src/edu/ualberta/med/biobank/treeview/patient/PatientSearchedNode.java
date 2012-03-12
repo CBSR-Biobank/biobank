@@ -96,11 +96,6 @@ public class PatientSearchedNode extends NewAbstractSearchedNode {
     }
 
     @Override
-    protected int getChildrenCount() throws Exception {
-        return studyPatientsMap.size();
-    }
-
-    @Override
     public int compareTo(AbstractAdapterBase o) {
         return 0;
     }

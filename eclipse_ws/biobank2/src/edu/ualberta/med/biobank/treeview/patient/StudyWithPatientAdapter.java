@@ -30,11 +30,6 @@ public class StudyWithPatientAdapter extends NewStudyAdapter {
     }
 
     @Override
-    protected int getChildrenCount() throws Exception {
-        return spInfo.patients.size();
-    }
-
-    @Override
     protected PatientAdapter createChildNode() {
         return new PatientAdapter(this, null);
     }

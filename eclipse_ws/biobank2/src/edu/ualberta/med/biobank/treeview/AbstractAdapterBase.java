@@ -335,8 +335,8 @@ public abstract class AbstractAdapterBase implements
                     // the order is very important
                     IWorkbenchPage page = PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow().getActivePage();
-                    IEditorPart part = page.findEditor(new FormInput(
-                        AbstractAdapterBase.this));
+                    IEditorPart part = page.findEditor(
+                        new FormInput(AbstractAdapterBase.this));
                     getParent().removeChild(AbstractAdapterBase.this,
                         false, false);
                     try {
@@ -372,7 +372,8 @@ public abstract class AbstractAdapterBase implements
     }
 
     protected void runDelete() throws Exception {
-        // donothing
+        BgcPlugin.openAsyncError("Programming Error",
+            "This adapter is missing its implementation for runDelete()");
     }
 
     /**
@@ -402,8 +403,6 @@ public abstract class AbstractAdapterBase implements
      * @throws Exception
      */
     protected abstract Map<Integer, ?> getChildrenObjects() throws Exception;
-
-    protected abstract int getChildrenCount() throws Exception;
 
     public static boolean closeEditor(FormInput input) {
         IWorkbenchPage page = PlatformUI.getWorkbench()

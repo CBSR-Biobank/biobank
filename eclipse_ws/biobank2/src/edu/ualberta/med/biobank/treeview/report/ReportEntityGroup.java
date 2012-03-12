@@ -86,11 +86,6 @@ public class ReportEntityGroup extends AdapterBase {
     }
 
     @Override
-    protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren() == null ? 0 : getWrapperChildren().size();
-    }
-
-    @Override
     protected AdapterBase createChildNode() {
         return new ReportAdapter(this, null);
     }
