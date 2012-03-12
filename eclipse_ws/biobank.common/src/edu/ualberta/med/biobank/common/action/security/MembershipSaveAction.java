@@ -77,7 +77,7 @@ public class MembershipSaveAction implements Action<IdResult> {
     private void checkManageability(Membership membership, User manager) {
         if (!membership.isManageable(manager)) {
             throw new L10nedActionException(
-                CommonMessages.MEMBERSHIP_SAVE_ILLEGAL_MODIFICATION);
+                CommonMessages.MEMBERSHIP_SAVE_NOT_ALLOWED);
         }
     }
 

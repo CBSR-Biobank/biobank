@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.i18n;
 
 public enum CommonMessages implements L10nedMessage {
-    MEMBERSHIP_SAVE_ILLEGAL_MODIFICATION,
+    LIST_ITEM_DELIMITER,
+    MEMBERSHIP_SAVE_NOT_ALLOWED,
     MEMBERSHIP_SAVE_ILLEGAL_PERMS_MODIFIED,
     MEMBERSHIP_SAVE_ILLEGAL_ROLES_MODIFIED;
 
