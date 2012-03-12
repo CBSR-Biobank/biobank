@@ -27,18 +27,19 @@ public class WorkingSet<T> implements Set<T> {
     private final Set<T> original;
     private final Set<T> delegate = new HashSet<T>();
 
-    public static <E> WorkingSet<E> of(Set<E> original) {
-        return new WorkingSet<E>(original);
-    }
+    // public static <E> WorkingSet<E> of(Set<E> original) {
+    // return new WorkingSet<E>(original);
+    // }
 
     public WorkingSet(Set<T> original) {
         this.original = Collections.unmodifiableSet(original);
+        this.delegate.addAll(original);
     }
 
-    public void setValues(Set<T> s) {
-        delegate.clear();
-        delegate.addAll(s);
-    }
+    // public void setValues(Set<T> s) {
+    // delegate.clear();
+    // delegate.addAll(s);
+    // }
 
     public Set<T> getAdditions() {
         Set<T> additions = new HashSet<T>(delegate);

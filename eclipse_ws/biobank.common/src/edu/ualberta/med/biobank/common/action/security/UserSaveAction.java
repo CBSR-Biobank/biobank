@@ -1,97 +1,146 @@
 package edu.ualberta.med.biobank.common.action.security;
 
-import java.util.Map;
-import java.util.Set;
+import java.text.MessageFormat;
 
+import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.util.SetDifference;
+import edu.ualberta.med.biobank.common.permission.Permission;
+import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
+import edu.ualberta.med.biobank.server.applicationservice.Messages;
+import gov.nih.nci.security.SecurityServiceProvider;
+import gov.nih.nci.security.UserProvisioningManager;
+import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class UserSaveAction extends PrincipalSaveAction {
-
+public class UserSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
+    private static final Permission PERMISSION = new UserManagerPermission();
 
-    private String login;
-    private Long csmUserId;
-    private Boolean recvBulkEmails;
-    private String fullName;
-    private String email;
-    private Boolean needPwdChange;
-    private ActivityStatus activityStatus;
-    private Set<Integer> groupIds;
-    private User newUser;
+    private final Integer userId;
+    private final String login;
+    private final boolean recvBulkEmails;
+    private final boolean needPwdChange;
+    private final String fullName;
+    private final String email;
+    private final ActivityStatus activityStatus;
 
-    public void setLogin(String login) {
-        this.login = login;
+    public UserSaveAction(User user) {
+        this.userId = user.getId();
+        this.login = user.getLogin();
+        this.recvBulkEmails = user.getRecvBulkEmails();
+        this.needPwdChange = user.getNeedPwdChange();
+        this.fullName = user.getFullName();
+        this.email = user.getEmail();
+        this.activityStatus = user.getActivityStatus();
     }
 
-    public void setCsmUserId(Long csmUserId) {
-        this.csmUserId = csmUserId;
-    }
-
-    public void setRecvBulkEmails(Boolean recvBulkEmails) {
-        this.recvBulkEmails = recvBulkEmails;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setNeedPwdChange(Boolean needPwdChange) {
-        this.needPwdChange = needPwdChange;
-    }
-
-    public void setActivityStatusId(ActivityStatus activityStatus) {
-        this.activityStatus = activityStatus;
-    }
-
-    public void setGroupIds(Set<Integer> groupIds) {
-        this.groupIds = groupIds;
+    @Override
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        return PERMISSION.isAllowed(context);
     }
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        newUser = context.get(User.class, principalId, new User());
+        User user = context.load(User.class, userId, new User());
 
-        newUser.setLogin(login);
-        newUser.setCsmUserId(csmUserId);
-        newUser.setRecvBulkEmails(recvBulkEmails);
-        newUser.setFullName(fullName);
-        newUser.setEmail(email);
-        newUser.setNeedPwdChange(needPwdChange);
+        // user.setCsmUserId(csmUserId);
 
-        newUser.setActivityStatus(activityStatus);
+        Long csmUserId = user.getCsmUserId();
+        if (csmUserId == null) {
+            Long csmUserId2 = BiobankCSMSecurityUtil.persistUser(getModel(),
+                password);
+        }
 
-        saveGroups(context);
+        user.setLogin(login);
+        user.setRecvBulkEmails(recvBulkEmails);
+        user.setFullName(fullName);
+        user.setEmail(email);
+        user.setNeedPwdChange(needPwdChange);
 
-        return run(context, newUser);
+        user.setActivityStatus(activityStatus);
+
+        // TODO: set groups
+
+        context.getSession().saveOrUpdate(user);
+
+        return new IdResult(user.getId());
     }
 
-    private void saveGroups(ActionContext context) {
-        Map<Integer, Group> groups =
-            context.load(Group.class, groupIds);
+    private static class CsmUtil {
+        public static final String APPLICATION_CONTEXT_NAME = "biobank";
 
-        SetDifference<Group> groupsDiff =
-            new SetDifference<Group>(newUser.getGroups(),
-                groups.values());
-        newUser.setGroups(groupsDiff.getNewSet());
+        public static Long persistUser(
+            edu.ualberta.med.biobank.model.User user,
+            String password) throws ApplicationException {
+            try {
+                UserProvisioningManager upm =
+                    SecurityServiceProvider
+                        .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
+                if (user.getLogin() == null)
+                    throw new ApplicationException(
+                        Messages
+                            .getString("BiobankSecurityUtil.login.set.error.msg")); //$NON-NLS-1$
+                boolean newUser = (user.getId() == null);
+                User serverUser;
+                if (newUser) {
+                    serverUser = upm.getUser(user.getLogin());
+                    if (serverUser == null) {
+                        serverUser = new User();
+                    } else
+                        throw new ApplicationException(
+                            MessageFormat.format(
+                                Messages
+                                    .getString("BiobankCSMSecurityUtil.login.exists.error"), user.getLogin())); //$NON-NLS-1$
+                } else {
+                    if (user.getCsmUserId() == null)
+                        throw new ApplicationException(
+                            MessageFormat.format(
+                                Messages
+                                    .getString("BiobankCSMSecurityUtil.user.csm.missing.error"), //$NON-NLS-1$
+                                user.getId()));
+                    serverUser = null;
+                    try {
+                        serverUser = upm
+                            .getUserById(user.getCsmUserId().toString());
+                    } catch (CSObjectNotFoundException confe) {
+                        throw new ApplicationException(
+                            MessageFormat.format(
+                                Messages
+                                    .getString("BiobankCSMSecurityUtil.csm.user.not.found.error"), //$NON-NLS-1$
+                                user.getCsmUserId()), confe);
+                    }
+                }
+                serverUser.setLoginName(user.getLogin());
+                if (password != null && !password.isEmpty()) {
+                    serverUser.setPassword(password);
+                }
+                if (newUser) {
+                    upm.createUser(serverUser);
+                    serverUser = upm.getUser(user.getLogin());
+                } else
+                    upm.modifyUser(serverUser);
 
-        // remove newUser from groups in removed list
-        for (Group group : groupsDiff.getRemoveSet()) {
-            Set<User> groupUsers = group.getUsers();
-            if (groupUsers.remove(newUser)) {
-                group.setUsers(groupUsers);
-            } else {
-                throw new ActionException(
-                    "user not found in group's collection");
+                // add association of protection group/csm role to the user
+                // protection group with id '1' contains all database objects.
+                // csm role with id '8' (Object Full Access) contains privileges
+                // read, delete, create, update
+                if (newUser)
+                    upm.assignUserRoleToProtectionGroup(serverUser.getUserId()
+                        .toString(), new String[] { String.valueOf(8) }, String
+                        .valueOf(1));
+
+                return serverUser.getUserId();
+            } catch (ApplicationException ae) {
+                log.error("Error persisting csm security user", ae); //$NON-NLS-1$
+                throw ae;
+            } catch (Exception ex) {
+                log.error("Error persisting csm security user", ex); //$NON-NLS-1$
+                throw new ApplicationException(ex.getMessage(), ex);
             }
         }
     }

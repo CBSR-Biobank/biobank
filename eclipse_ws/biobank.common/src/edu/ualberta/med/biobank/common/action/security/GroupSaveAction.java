@@ -8,7 +8,6 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Group;
-import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
 
 public class GroupSaveAction extends PrincipalSaveAction {
@@ -18,7 +17,6 @@ public class GroupSaveAction extends PrincipalSaveAction {
     private String description = null;
     private Group group = null;
     private Set<Integer> userIds;
-    private Set<Membership> memberships;
 
     public void setDescription(String description) {
         this.description = description;

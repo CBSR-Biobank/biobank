@@ -1,12 +1,13 @@
 package edu.ualberta.med.biobank.common.action.security;
 
 import java.util.Map;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.util.DiffSet;
+import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Membership;
@@ -14,22 +15,18 @@ import edu.ualberta.med.biobank.model.Principal;
 
 public abstract class PrincipalSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
+    private static final Permission PERMISSION = new UserManagerPermission();
 
-    protected Integer principalId = null;
+    private final Integer principalId;
+    private DiffSet<Integer> membershipIds;
 
-    private Set<Integer> membershipIds;
+    public PrincipalSaveAction(Principal mp) {
 
-    public void setId(Integer id) {
-        this.principalId = id;
-    }
-
-    public void setMembershipIds(Set<Integer> membershipIds) {
-        this.membershipIds = membershipIds;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new UserManagerPermission().isAllowed(context);
+        return PERMISSION.isAllowed(context);
     }
 
     public IdResult run(ActionContext context, Principal principal)
