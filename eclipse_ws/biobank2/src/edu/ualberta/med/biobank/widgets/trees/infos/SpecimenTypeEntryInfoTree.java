@@ -173,11 +173,21 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
     private boolean addEditOk(SpecimenTypeWrapper type) {
         try {
             for (SpecimenTypeWrapper sv : selectedSpecimenTypes)
-                if (!sv.getId().equals(type.getId())
-                    && (sv.getName().equals(type.getName()) || sv
-                        .getNameShort().equals(type.getNameShort())))
-                    throw new BiobankCheckException(
-                        Messages.SpecimenTypeEntryInfoTree_already_added_error_msg);
+                if (!sv.getId().equals(type.getId())) {
+                    if (sv.getName().equals(type.getName())) {
+                        throw new BiobankCheckException(
+                            NLS.bind(
+                                Messages.SpecimenTypeEntryInfoTree_name_already_added_error_msg,
+                                type.getName()));
+                    }
+                    else if (sv.getNameShort().equals(type.getNameShort())) {
+                        throw new BiobankCheckException(
+                            NLS.bind(
+                                Messages.SpecimenTypeEntryInfoTree_name_short_already_added_error_msg,
+                                type.getNameShort()));
+                    }
+                }
+
         } catch (BiobankException bce) {
             BgcPlugin.openAsyncError(
                 Messages.SpecimenTypeEntryInfoTree_check_error_title, bce);
