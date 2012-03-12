@@ -38,6 +38,6 @@ public class UserGetAction implements Action<ManagedUser> {
         // ManagedUser managedUser =
         // new ManagedUser(user, context.getUser(), allRoles);
 
-        return managedUser;
+        return null;
     }
 }

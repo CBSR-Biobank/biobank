@@ -14,12 +14,31 @@ class BundleL10nedMessage extends AbstractLazyL10nedMessage {
     }
 
     @Override
-    public String getKey() {
-        return key;
+    protected String loadMessage() {
+        return LOCATOR.getResourceBundle(bundleName).getString(key);
     }
 
     @Override
-    protected String loadMessage() {
-        return LOCATOR.getResourceBundle(bundleName).getString(key);
+    public int hashCode() {
+        final int prime = 31;
+        int i = 1;
+        i = prime * i + ((bundleName == null) ? 0 : bundleName.hashCode());
+        i = prime * i + ((key == null) ? 0 : key.hashCode());
+        return i;
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        if (this == that) return true;
+        if (that == null) return false;
+        if (getClass() != that.getClass()) return false;
+        BundleL10nedMessage other = (BundleL10nedMessage) that;
+        if (bundleName == null) {
+            if (other.bundleName != null) return false;
+        } else if (!bundleName.equals(other.bundleName)) return false;
+        if (key == null) {
+            if (other.key != null) return false;
+        } else if (!key.equals(other.key)) return false;
+        return true;
     }
 }

@@ -30,4 +30,9 @@ public abstract class AbstractLazyL10nedMessage implements L10nedMessage {
      * @return a message appropriate for {@link L10nedMessage#getMessage()}.
      */
     protected abstract String loadMessage();
+
+    @Override
+    public String toString() {
+        return getMessage();
+    }
 }

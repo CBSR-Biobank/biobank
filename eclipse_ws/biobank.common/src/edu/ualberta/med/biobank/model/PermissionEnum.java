@@ -148,6 +148,10 @@ public enum PermissionEnum implements NotAProxy, Serializable {
         return id;
     }
 
+    public String getName() {
+        return name(); // TODO: localized name?
+    }
+
     public static PermissionEnum fromId(Integer id) {
         return valuesMap().get(id);
     }

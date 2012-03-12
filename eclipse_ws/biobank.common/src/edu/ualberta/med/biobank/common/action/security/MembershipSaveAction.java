@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.common.action.security;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -12,6 +14,7 @@ import edu.ualberta.med.biobank.common.action.util.DiffSet;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.i18n.CommonMessages;
+import edu.ualberta.med.biobank.i18n.I18nUtil;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
@@ -85,8 +88,14 @@ public class MembershipSaveAction implements Action<IdResult> {
         Set<PermissionEnum> illegal = new HashSet<PermissionEnum>(permsDiff);
         illegal.removeAll(memb.getManageablePermissions(manager));
         if (!illegal.isEmpty()) {
+            List<String> permNames = new ArrayList<String>();
+            for (PermissionEnum permission : illegal) {
+                permNames.add(permission.getName());
+            }
+
             throw L10nedActionException.ognl(
-                CommonMessages.MEMBERSHIP_SAVE_ILLEGAL_PERMS_MODIFIED, illegal);
+                CommonMessages.MEMBERSHIP_SAVE_ILLEGAL_PERMS_MODIFIED,
+                I18nUtil.join(permNames));
         }
         permsDiff.apply(memb.getPermissions());
     }
@@ -96,8 +105,14 @@ public class MembershipSaveAction implements Action<IdResult> {
         Set<Role> illegal = new HashSet<Role>(rolesDiff);
         illegal.removeAll(m.getManageableRoles(manager, rolesDiff));
         if (!illegal.isEmpty()) {
+            List<String> roleNames = new ArrayList<String>();
+            for (Role role : illegal) {
+                roleNames.add(role.getName());
+            }
+
             throw L10nedActionException.ognl(
-                CommonMessages.MEMBERSHIP_SAVE_ILLEGAL_ROLES_MODIFIED, illegal);
+                CommonMessages.MEMBERSHIP_SAVE_ILLEGAL_ROLES_MODIFIED,
+                I18nUtil.join(roleNames));
         }
         rolesDiff.apply(m.getRoles());
     }
