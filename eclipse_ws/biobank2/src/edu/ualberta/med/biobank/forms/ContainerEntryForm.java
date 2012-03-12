@@ -1,10 +1,10 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
@@ -62,7 +63,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     private ContainerWrapper container = new ContainerWrapper(
         SessionManager.getAppService());
 
-    private BgcBaseText tempWidget;
+    private BgcBaseText temperatureWidget;
 
     private ComboViewer containerTypeComboViewer;
 
@@ -130,8 +131,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
             container.setWrappedObject(containerInfo.container);
         } else {
             containerInfo = new ContainerInfo();
-            container = (ContainerWrapper) containerAdapter.getModelObject();
-            container.setSite(SessionManager.getUser().getCurrentWorkingSite());
+            container.setWrappedObject((Container) containerAdapter
+                .getModelObject().getWrappedObject());
         }
 
         ((AdapterBase) adapter).setModelObject(container);
@@ -149,6 +150,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
             GuiUtil.reset(containerTypeComboViewer,
                 container.getContainerType());
         }
+
+        setValues();
     }
 
     private void createContainerSection() throws Exception {
@@ -158,14 +161,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-
-        if (!container.hasParentContainer()) {
-            containerTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
-                SessionManager.getAppService(), container.getSite());
-        } else {
-            containerTypes = container.getParentContainer().getContainerType()
-                .getChildContainerTypeCollection();
-        }
 
         setFirstControl(client);
 
@@ -204,10 +199,64 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 }
             });
 
-        createCommentSection();
-
         createContainerTypesSection(client);
+        createCommentSection();
+    }
 
+    private void createContainerTypesSection(Composite client) throws Exception {
+        // List<ContainerTypeWrapper> containerTypes;
+        ContainerTypeWrapper currentType = container.getContainerType();
+        // if (!container.hasParentContainer()) {
+        // SiteWrapper currentSite = container.getSite();
+        // if (currentSite == null)
+        // containerTypes = new ArrayList<ContainerTypeWrapper>();
+        // else
+        // containerTypes = ContainerTypeWrapper
+        // .getTopContainerTypesInSite(SessionManager.getAppService(),
+        // currentSite);
+        // } else {
+        // containerTypes = container.getParentContainer().getContainerType()
+        // .getChildContainerTypeCollection();
+        // }
+
+        containerTypeComboViewer = createComboViewer(client,
+            Messages.ContainerEntryForm_type_label, containerTypes,
+            currentType, MSG_CONTAINER_TYPE_EMPTY, new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    ContainerTypeWrapper ct =
+                        (ContainerTypeWrapper) selectedObject;
+                    container.setContainerType(ct);
+                    if (temperatureWidget != null) {
+                        if (ct != null && Boolean.TRUE.equals(ct.getTopLevel())) {
+                            Double temp = ct.getDefaultTemperature();
+                            if (temp == null) {
+                                temperatureWidget.setText(""); //$NON-NLS-1$
+                            } else {
+                                temperatureWidget.setText(temp.toString());
+                            }
+                        }
+                    }
+                }
+            });
+        // temperature is set for the toplevel container only.
+        String tempProperty = ContainerPeer.TEMPERATURE.getName();
+        if (container.hasParentContainer())
+            // subcontainer are using topcontainer temperature. This is display
+            // only.
+            tempProperty = Property.concatNames(ContainerPeer.TOP_CONTAINER,
+                ContainerPeer.TEMPERATURE);
+        temperatureWidget = (BgcBaseText) createBoundWidgetWithLabel(client,
+            BgcBaseText.class, SWT.NONE,
+            Messages.ContainerEntryForm_temperature_label, null, container,
+            tempProperty, new DoubleNumberValidator(
+                Messages.ContainerEntryForm_temperature_validation_msg));
+        if (container.hasParentContainer())
+            temperatureWidget.setEnabled(false);
+
+        if (container.hasChildren() || container.hasSpecimens()) {
+            containerTypeComboViewer.getCombo().setEnabled(false);
+        }
     }
 
     private void createCommentSection() {
@@ -225,64 +274,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
         createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
             Messages.Comments_add);
 
-    }
-
-    private void createContainerTypesSection(Composite client) throws Exception {
-        List<ContainerTypeWrapper> containerTypes;
-        ContainerTypeWrapper currentType = container.getContainerType();
-        if (!container.hasParentContainer()) {
-            SiteWrapper currentSite = container.getSite();
-            if (currentSite == null)
-                containerTypes = new ArrayList<ContainerTypeWrapper>();
-            else
-                containerTypes = ContainerTypeWrapper
-                    .getTopContainerTypesInSite(SessionManager.getAppService(),
-                        currentSite);
-        } else {
-            containerTypes = container.getParentContainer().getContainerType()
-                .getChildContainerTypeCollection();
-        }
-        if (container.isNew() && containerTypes.size() == 1)
-            currentType = containerTypes.get(0);
-
-        containerTypeComboViewer = createComboViewer(client,
-            Messages.ContainerEntryForm_type_label, containerTypes,
-            currentType, MSG_CONTAINER_TYPE_EMPTY, new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    ContainerTypeWrapper ct =
-                        (ContainerTypeWrapper) selectedObject;
-                    container.setContainerType(ct);
-                    if (tempWidget != null) {
-                        if (ct != null && Boolean.TRUE.equals(ct.getTopLevel())) {
-                            Double temp = ct.getDefaultTemperature();
-                            if (temp == null) {
-                                tempWidget.setText(""); //$NON-NLS-1$
-                            } else {
-                                tempWidget.setText(temp.toString());
-                            }
-                        }
-                    }
-                }
-            });
-        // temperature is set for the toplevel container only.
-        String tempProperty = ContainerPeer.TEMPERATURE.getName();
-        if (container.hasParentContainer())
-            // subcontainer are using topcontainer temperature. This is display
-            // only.
-            tempProperty = Property.concatNames(ContainerPeer.TOP_CONTAINER,
-                ContainerPeer.TEMPERATURE);
-        tempWidget = (BgcBaseText) createBoundWidgetWithLabel(client,
-            BgcBaseText.class, SWT.NONE,
-            Messages.ContainerEntryForm_temperature_label, null, container,
-            tempProperty, new DoubleNumberValidator(
-                Messages.ContainerEntryForm_temperature_validation_msg));
-        if (container.hasParentContainer())
-            tempWidget.setEnabled(false);
-
-        if (container.hasChildren() || container.hasSpecimens()) {
-            containerTypeComboViewer.getCombo().setEnabled(false);
-        }
     }
 
     private void createButtonsSection() {
@@ -365,6 +356,18 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (container.isNew()) {
             container.setActivityStatus(ActivityStatus.ACTIVE);
         }
+
+        if (!container.hasParentContainer()) {
+            containerTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
+                SessionManager.getAppService(), container.getSite());
+        } else {
+            containerTypes = container.getParentContainer().getContainerType()
+                .getChildContainerTypeCollection();
+        }
+        containerTypeComboViewer.setInput(containerTypes);
+        if (container.isNew() && containerTypes.size() == 1)
+            containerTypeComboViewer.setSelection(new StructuredSelection(
+                containerTypes.get(0)));
 
         GuiUtil.reset(activityStatusComboViewer, container.getActivityStatus());
         GuiUtil.reset(containerTypeComboViewer, container.getContainerType());

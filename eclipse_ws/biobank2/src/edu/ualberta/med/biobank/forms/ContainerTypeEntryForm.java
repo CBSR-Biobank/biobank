@@ -140,9 +140,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 containerTypeInfo.getContainerType());
         } else {
             containerTypeInfo = new ContainerTypeInfo();
-            containerType.setWrappedObject(new ContainerType());
-            containerType.setSite(SessionManager.getUser()
-                .getCurrentWorkingSite());
+            containerType.setWrappedObject((ContainerType) containerTypeAdapter
+                .getModelObject().getWrappedObject());
         }
 
         ((AdapterBase) adapter).setModelObject(containerType);
