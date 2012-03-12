@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventDeletePermission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
@@ -19,6 +20,7 @@ import edu.ualberta.med.biobank.forms.ProcessingEventEntryForm;
 import edu.ualberta.med.biobank.forms.ProcessingEventViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -134,4 +136,11 @@ public class ProcessingEventAdapter extends AdapterBase {
         return 0;
     }
 
+    @Override
+    public void runDelete() throws Exception {
+        ProcessingEventDeleteAction action =
+            new ProcessingEventDeleteAction((ProcessingEvent) getModelObject()
+                .getWrappedObject());
+        SessionManager.getAppService().doAction(action);
+    }
 }

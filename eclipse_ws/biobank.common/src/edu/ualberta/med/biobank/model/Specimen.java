@@ -26,6 +26,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.validator.constraint.Empty;
+import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
@@ -44,6 +45,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "SPECIMEN")
 @Unique(properties = "inventoryId", groups = PrePersist.class)
 @Empty(property = "childSpecimens", groups = PreDelete.class)
+@NotUsed(by = DispatchSpecimen.class, property = "specimen", groups = PreDelete.class)
 public class Specimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
