@@ -21,6 +21,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenUpdateAction;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
@@ -37,14 +39,16 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
-import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import edu.ualberta.med.biobank.wizards.SelectCollectionEventWizard;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenEntryForm extends BiobankEntryForm {
 
@@ -53,7 +57,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     public static final String OK_MESSAGE = Messages.SpecimenEntryForm_ok_msg;
 
-    private SpecimenWrapper specimen;
+    private SpecimenWrapper specimen = new SpecimenWrapper(
+        SessionManager.getAppService());
 
     private ComboViewer activityStatusComboViewer;
 
@@ -80,21 +85,32 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private CommentCollectionInfoTable commentEntryTable;
 
-    private BgcEntryFormWidgetListener listener =
-        new BgcEntryFormWidgetListener() {
-            @Override
-            public void selectionChanged(MultiSelectEvent event) {
-                setDirty(true);
-            }
-        };
+    private SpecimenBriefInfo specimenInfo;
+
+    private SpecimenAdapter specimenAdapter;
 
     @Override
     protected void init() throws Exception {
-        specimen = (SpecimenWrapper) getModelObject();
+        specimenAdapter = (SpecimenAdapter) adapter;
+        updateSpecimenInfo(adapter.getId());
         SessionManager.logEdit(specimen);
         setPartName(Messages.SpecimenEntryForm_title);
         allchildren = new ArrayList<SpecimenWrapper>();
         origchildren = new ArrayList<SpecimenWrapper>();
+    }
+
+    private void updateSpecimenInfo(Integer id) throws ApplicationException {
+        if (id != null) {
+            specimenInfo = SessionManager.getAppService().doAction(
+                new SpecimenGetInfoAction(id));
+            specimen.setWrappedObject(specimenInfo.getSpecimen());
+        } else {
+            specimenInfo = new SpecimenBriefInfo();
+            specimen.setWrappedObject((Specimen) specimenAdapter
+                .getModelObject().getWrappedObject());
+        }
+
+        ((AdapterBase) adapter).setModelObject(specimen);
     }
 
     @Override

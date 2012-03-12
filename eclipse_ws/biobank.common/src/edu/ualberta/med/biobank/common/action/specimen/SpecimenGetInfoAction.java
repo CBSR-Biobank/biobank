@@ -44,6 +44,9 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
         private Specimen specimen;
         private Stack<Container> parents = new Stack<Container>();
 
+        public SpecimenBriefInfo() {
+        }
+
         public SpecimenBriefInfo(Specimen specimen, Stack<Container> parents) {
             this.specimen = specimen;
             this.parents = parents;
