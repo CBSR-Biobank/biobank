@@ -156,7 +156,7 @@ public class ReportEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ReportEntryForm.ID;
     }
 

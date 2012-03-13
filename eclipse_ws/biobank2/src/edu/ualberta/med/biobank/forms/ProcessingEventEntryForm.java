@@ -375,7 +375,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ProcessingEventViewForm.ID;
     }
 

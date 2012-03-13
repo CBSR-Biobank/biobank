@@ -457,7 +457,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return CollectionEventViewForm.ID;
     }
 

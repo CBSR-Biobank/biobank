@@ -314,10 +314,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
             Integer id =
                 SessionManager.getAppService().doAction(saveAction).getId();
-
             updateContainerInfo(id);
 
-            SessionManager.updateAllSimilarNodes(containerAdapter, true);
             if (renamingChildren)
                 Display.getDefault().asyncExec(new Runnable() {
                     @Override
@@ -331,7 +329,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ContainerViewForm.ID;
     }
 

@@ -265,7 +265,7 @@ public class SessionManager {
     /**
      * do an update on node holding the same wrapper than the given adapter.
      * 
-     * @param canRest if true, then the node found will be reloaded from the
+     * @param canReset if true, then the node found will be reloaded from the
      *            database (might not want that if the object could be open in
      *            an entry form).
      * @param expandParent if true will expand the parent node of 'adapter'
@@ -281,8 +281,9 @@ public class SessionManager {
                     AbstractAdapterBase parent = adapter.getParent();
                     if (parent != null)
                         parent.addChild(adapter);
-                    List<AbstractAdapterBase> res = searchNodes(
-                        adapter.getClass(), adapter.getId());
+                    Integer id = adapter.getId();
+                    List<AbstractAdapterBase> res =
+                        searchNodes(adapter.getClass(), id);
                     final AbstractViewWithAdapterTree view =
                         getCurrentAdapterViewWithTree();
                     if (view != null) {

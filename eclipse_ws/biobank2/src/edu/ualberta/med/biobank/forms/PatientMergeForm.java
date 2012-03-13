@@ -317,7 +317,7 @@ public class PatientMergeForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return PatientViewForm.ID;
     }
 }

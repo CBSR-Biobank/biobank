@@ -119,7 +119,8 @@ public abstract class AbstractViewWithAdapterTree extends
                     ISelection selection) {
                     if (part != AbstractViewWithAdapterTree.this
                         && selection instanceof IStructuredSelection) {
-                        IStructuredSelection strucSel = (IStructuredSelection) selection;
+                        IStructuredSelection strucSel =
+                            (IStructuredSelection) selection;
                         if (!strucSel.isEmpty()) {
                             if (strucSel.getFirstElement() instanceof AbstractAdapterBase) {
                                 // if a form is selected, the corresponding

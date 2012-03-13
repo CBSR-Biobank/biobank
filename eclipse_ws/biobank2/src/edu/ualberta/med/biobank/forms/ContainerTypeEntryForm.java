@@ -408,9 +408,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         Integer id =
             SessionManager.getAppService().doAction(ctSaveAction).getId();
         updateContainerTypeInfo(id);
-
-        SessionManager.updateAllSimilarNodes(containerTypeAdapter, true);
-
     }
 
     private HashSet<Integer> getSpecimenTypeIds() {
@@ -458,7 +455,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ContainerTypeViewForm.ID;
     }
 

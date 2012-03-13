@@ -228,7 +228,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         Integer id =
             SessionManager.getAppService().doAction(saveClinic).getId();
         updateClinicInfo(id);
-        SessionManager.updateAllSimilarNodes(clinicAdapter, true);
         SessionManager.getUser().updateCurrentCenter(clinic);
     }
 
@@ -250,7 +249,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ClinicViewForm.ID;
     }
 

@@ -255,7 +255,7 @@ public class PatientEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return PatientViewForm.ID;
     }
 

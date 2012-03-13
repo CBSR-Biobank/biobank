@@ -203,7 +203,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ID;
     }
 

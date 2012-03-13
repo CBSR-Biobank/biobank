@@ -345,10 +345,8 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-
         childContainers = SessionManager.getAppService().doAction(
             new ContainerGetChildrenAction(getId())).getList();
-
         return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
             childContainers, ContainerWrapper.class);
     }

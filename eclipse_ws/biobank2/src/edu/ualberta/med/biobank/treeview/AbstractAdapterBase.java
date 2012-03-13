@@ -468,8 +468,6 @@ public abstract class AbstractAdapterBase implements
 
     protected List<AbstractAdapterBase> searchChildren(Class<?> searchedClass,
         Integer objectId) {
-        // FIXME children are loading in background most of the time:
-        // they are not loaded then the objects are not found
         loadChildren(false);
         List<AbstractAdapterBase> result = new ArrayList<AbstractAdapterBase>();
         for (AbstractAdapterBase child : getChildren()) {

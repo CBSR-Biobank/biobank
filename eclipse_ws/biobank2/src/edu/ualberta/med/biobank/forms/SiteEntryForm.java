@@ -229,7 +229,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return SiteViewForm.ID;
     }
 

@@ -314,7 +314,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return DispatchViewForm.ID;
     }
 

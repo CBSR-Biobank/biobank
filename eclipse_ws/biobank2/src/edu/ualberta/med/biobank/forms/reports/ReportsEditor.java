@@ -590,7 +590,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ID;
     }
 

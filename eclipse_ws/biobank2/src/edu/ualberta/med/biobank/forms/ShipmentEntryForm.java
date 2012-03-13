@@ -463,7 +463,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ShipmentViewForm.ID;
     }
 

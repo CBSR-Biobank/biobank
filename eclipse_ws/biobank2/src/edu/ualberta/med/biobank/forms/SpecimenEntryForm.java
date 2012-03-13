@@ -392,7 +392,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return SpecimenViewForm.ID;
     }
 

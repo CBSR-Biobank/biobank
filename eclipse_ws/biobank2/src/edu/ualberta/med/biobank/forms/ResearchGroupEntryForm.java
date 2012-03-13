@@ -243,7 +243,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ResearchGroupViewForm.ID;
     }
 
