@@ -49,6 +49,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -103,7 +104,6 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private CommentsInfoTable commentEntryTable;
 
-    private BgcBaseText commentWidget;
     private CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
@@ -157,7 +157,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             sourceSpecimens =
                 new ArrayList<SpecimenInfo>(ceventInfo.sourceSpecimenInfos);
         }
-
+        comment.setWrappedObject(new Comment());
     }
 
     @Override
@@ -188,10 +188,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        commentWidget =
-            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
-                SWT.MULTI,
-                Messages.Comments_add, null, comment, "message", null);
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_add, null, comment, "message", null);
 
     }
 
@@ -467,8 +465,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             .reset(activityStatusComboViewer, ceventCopy.getActivityStatus());
         specimensTable.reload(sourceSpecimens);
         commentEntryTable.setList(ModelWrapper.wrapModelCollection(
-            SessionManager.getAppService(),
-            ceventInfo.cevent.getComments(),
+            SessionManager.getAppService(), ceventInfo.cevent.getComments(),
             CommentWrapper.class));
         resetPvCustomInfo();
     }

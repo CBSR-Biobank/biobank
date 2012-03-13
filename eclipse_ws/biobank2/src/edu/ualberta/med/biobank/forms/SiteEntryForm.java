@@ -12,7 +12,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -20,7 +19,9 @@ import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -29,6 +30,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
@@ -61,7 +63,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private CommentsInfoTable commentEntryTable;
 
-    private BgcBaseText commentText;
+    private CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
 
     private BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
@@ -101,6 +104,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             site.setWrappedObject(new Site());
         }
 
+        comment.setWrappedObject(new Comment());
         ((AdapterBase) adapter).setModelObject(site);
     }
 
@@ -130,8 +134,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        commentText = (BgcBaseText) createLabelledWidget(
-            client, BgcBaseText.class, SWT.MULTI, Messages.Comments_add);
+        createBoundWidgetWithLabel(client, BgcBaseText.class,
+            SWT.MULTI, Messages.Comments_add, null, comment, "message", null);
     }
 
     private void createSiteSection() throws ApplicationException {
@@ -212,13 +216,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             studyIds.add(study.getId());
         }
         siteSaveAction.setStudyIds(studyIds);
-
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                siteSaveAction.setCommentText(commentText.getText());
-            }
-        });
+        siteSaveAction.setCommentText(comment.getMessage());
 
         Integer id =
             SessionManager.getAppService().doAction(siteSaveAction).getId();
@@ -239,7 +237,9 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             site.setActivityStatus(ActivityStatus.ACTIVE);
         }
         GuiUtil.reset(activityStatusComboViewer, site.getActivityStatus());
-        commentText.setText(null);
         studiesTable.reload();
+        commentEntryTable.setList(ModelWrapper.wrapModelCollection(
+            SessionManager.getAppService(), siteInfo.getSite().getComments(),
+            CommentWrapper.class));
     }
 }

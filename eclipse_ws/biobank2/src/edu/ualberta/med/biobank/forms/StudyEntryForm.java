@@ -457,6 +457,9 @@ public class StudyEntryForm extends BiobankEntryForm {
         contactEntryTable.reload();
         aliquotedSpecimenEntryTable.reload();
         sourceSpecimenEntryTable.reload();
+        commentEntryTable.setList(ModelWrapper.wrapModelCollection(
+            SessionManager.getAppService(), studyInfo.getStudy().getComments(),
+            CommentWrapper.class));
         resetPvCustomInfo();
     }
 

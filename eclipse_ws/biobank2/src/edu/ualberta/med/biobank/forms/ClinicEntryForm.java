@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -51,8 +52,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     private static final String MSG_NO_CLINIC_NAME =
         Messages.ClinicEntryForm_msg_noClinicName;
-
-    private ClinicAdapter clinicAdapter;
 
     private ClinicWrapper clinic = new ClinicWrapper(
         SessionManager.getAppService());
@@ -73,7 +72,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     private CommentsInfoTable commentEntryTable;
 
-    private CommentWrapper comment;
+    private CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
 
     private ClinicInfo clinicInfo;
 
@@ -82,7 +82,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         Assert.isTrue((adapter instanceof ClinicAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
-        clinicAdapter = (ClinicAdapter) adapter;
         updateClinicInfo(adapter.getId());
         String tabName;
         if (clinic.isNew()) {
@@ -103,6 +102,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             clinicInfo = new ClinicInfo();
             clinic.setWrappedObject(new Clinic());
         }
+        comment.setWrappedObject(new Comment());
         ((AdapterBase) adapter).setModelObject(clinic);
     }
 
@@ -261,5 +261,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         GuiUtil.reset(activityStatusComboViewer, clinic.getActivityStatus());
         contactEntryWidget.reload();
+        commentEntryTable.setList(ModelWrapper.wrapModelCollection(
+            SessionManager.getAppService(), clinicInfo.clinic.getComments(),
+            CommentWrapper.class));
     }
 }

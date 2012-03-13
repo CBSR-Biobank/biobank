@@ -24,8 +24,10 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfo
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -36,6 +38,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
@@ -93,6 +96,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private ContainerTypeInfo containerTypeInfo;
 
+    private CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
+
     private BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
             @Override
@@ -144,6 +150,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 .getModelObject().getWrappedObject());
         }
 
+        comment.setWrappedObject(new Comment());
         ((AdapterBase) adapter).setModelObject(containerType);
     }
 
@@ -170,8 +177,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add);
+        createBoundWidgetWithLabel(client, BgcBaseText.class,
+            SWT.MULTI, Messages.Comments_add, null, comment, "message", null);
 
     }
 
@@ -401,6 +408,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             .getDefaultTemperature());
         ctSaveAction.setChildLabelingSchemeId(containerType
             .getChildLabelingSchemeId());
+        ctSaveAction.setCommentMessage(comment.getMessage());
 
         ctSaveAction.setSpecimenTypeIds(getSpecimenTypeIds());
         ctSaveAction.setChildContainerTypeIds(getChildContainerTypeIds());
@@ -477,6 +485,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             containerType.getChildLabelingSchemeName());
         GuiUtil.reset(activityStatusComboViewer,
             containerType.getActivityStatus());
+
+        commentEntryTable.setList(ModelWrapper.wrapModelCollection(
+            SessionManager.getAppService(), containerTypeInfo
+                .getContainerType().getComments(), CommentWrapper.class));
     }
 
     private void showContainersOrSpecimens() {
