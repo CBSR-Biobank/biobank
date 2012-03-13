@@ -48,8 +48,8 @@ public class ContainerPosition extends AbstractPosition {
     @NotNull(message = "TODO: a better message")
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID"),
-        @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID")
+        @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", referencedColumnName = "PARENT_CONTAINER_TYPE_ID"),
+        @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", referencedColumnName = "CHILD_CONTAINER_TYPE_ID")
     })
     ContainerTypeContainerType getContainerTypeContainerType() {
         ContainerType parentCt = getParentContainer().getContainerType();

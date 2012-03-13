@@ -1,13 +1,13 @@
 package edu.ualberta.med.biobank.validator.constraint.impl;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.EntityMode;
-import org.hibernate.Query;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.metadata.ClassMetadata;
 
 import edu.ualberta.med.biobank.validator.SessionAwareConstraintValidator;
@@ -15,9 +15,6 @@ import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 
 public class NotUsedValidator extends SessionAwareConstraintValidator<Object>
     implements ConstraintValidator<NotUsed, Object> {
-    private static final String USAGE_QUERY_TEMPLATE =
-        "SELECT COUNT(*) FROM {0} o WHERE o.{1} = ?";
-
     private Class<?> by;
     private String property;
 
@@ -73,12 +70,12 @@ public class NotUsedValidator extends SessionAwareConstraintValidator<Object>
         ClassMetadata meta = getSession().getSessionFactory()
             .getClassMetadata(by);
 
-        String hql = MessageFormat.format(USAGE_QUERY_TEMPLATE,
-            meta.getMappedClass(EntityMode.POJO).getName(), property);
+        List<?> results = getSession()
+            .createCriteria(meta.getMappedClass(EntityMode.POJO))
+            .add(Restrictions.eq(property, value))
+            .setProjection(Projections.rowCount())
+            .list();
 
-        Query query = getSession().createQuery(hql).setParameter(0, value);
-
-        List<?> results = query.list();
         Number count = (Number) results.iterator().next();
 
         return count.intValue();

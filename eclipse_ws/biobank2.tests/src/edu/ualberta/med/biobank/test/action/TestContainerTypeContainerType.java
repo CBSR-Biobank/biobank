@@ -7,6 +7,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ContainerTypeContainerType;
 import edu.ualberta.med.biobank.model.Site;
@@ -57,14 +58,46 @@ public class TestContainerTypeContainerType extends TestAction {
 
         ct1.getChildContainerTypeContainerTypes().add(link);
 
+        session.save(ct1);
+        session.save(ct2);
+
         Container c1 = new Container();
         c1.setLabel(methodNameR + "_1");
         c1.setActivityStatus(ActivityStatus.ACTIVE);
         c1.setContainerType(ct1);
         c1.setSite(site);
 
-        session.save(ct1);
-        session.save(ct2);
+        Container c2 = new Container();
+        c2.setLabel(methodNameR + "_2");
+        c2.setActivityStatus(ActivityStatus.ACTIVE);
+        c2.setContainerType(ct2);
+        c2.setSite(site);
+
+        ContainerPosition cp = new ContainerPosition();
+        cp.setParentContainer(c1);
+        cp.setContainer(c2);
+        cp.setRow(0);
+        cp.setCol(0);
+
+        tx.commit();
+        tx = session.beginTransaction();
+
+        session.save(c1);
+        session.flush();
+
+        session.save(c2);
+        session.flush();
+
+        session.save(cp);
+        session.flush();
+
+        tx.commit();
+        session.close();
+
+        session = SESSION_PROVIDER.openSession();
+        tx = session.beginTransaction();
+
+        session.delete(link);
 
         tx.commit();
     }

@@ -57,7 +57,7 @@ public class ContainerTypeContainerType {
     public boolean equals(Object o) {
         if (o != null && o instanceof Id) {
             ContainerTypeContainerType that = (ContainerTypeContainerType) o;
-            return getId().equals(that.getId()) && getId().equals(that.getId());
+            return getId().equals(that.getId());
         } else {
             return false;
         }
