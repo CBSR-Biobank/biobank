@@ -57,6 +57,7 @@
 		<mapping class="edu.ualberta.med.biobank.model.ContainerLabelingScheme" />
 		<mapping class="edu.ualberta.med.biobank.model.ContainerPosition" />
 		<mapping class="edu.ualberta.med.biobank.model.ContainerType" />
+		<mapping class="edu.ualberta.med.biobank.model.ContainerTypeContainerType" />
 		<mapping class="edu.ualberta.med.biobank.model.Dispatch" />
 		<mapping class="edu.ualberta.med.biobank.model.DispatchSpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.EntityColumn" />

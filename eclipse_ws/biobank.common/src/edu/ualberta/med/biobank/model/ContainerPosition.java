@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.model;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -42,5 +43,27 @@ public class ContainerPosition extends AbstractPosition {
 
     public void setContainer(Container container) {
         this.container = container;
+    }
+
+    @NotNull(message = "TODO: a better message")
+    @ManyToOne
+    @JoinColumns({
+        @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID"),
+        @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID")
+    })
+    ContainerTypeContainerType getContainerTypeContainerType() {
+        ContainerType parentCt = getParentContainer().getContainerType();
+        ContainerType childCt = getContainer().getContainerType();
+        for (ContainerTypeContainerType ctCt : parentCt
+            .getChildContainerTypeContainerTypes()) {
+            if (ctCt.getParentContainerType().equals(parentCt)
+                && ctCt.getChildContainerType().equals(childCt)) {
+                return ctCt;
+            }
+        }
+        return null;
+    }
+
+    void setContainerTypeContainerType(ContainerTypeContainerType ctct) {
     }
 }
