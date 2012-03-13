@@ -200,7 +200,7 @@ public class DispatchViewForm extends BiobankViewForm {
         } else {
             specimensTree =
                 new DispatchSpecimensTreeTable(page, dispatch,
-                    false, false);
+                    false);
             specimensTree.addClickListener();
         }
     }

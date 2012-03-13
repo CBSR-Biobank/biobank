@@ -59,16 +59,14 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createMainSection();
-        boolean editSpecimens = !dispatch.isInClosedState()
-            && !dispatch.isInLostState();
-
+        boolean editSpecimens = true;
         setFirstControl(form);
 
         if (editSpecimens)
             createSpecimensSelectionActions(page, true);
         specimensTree =
             new DispatchSpecimensTreeTable(page, dispatch,
-                editSpecimens, true);
+                editSpecimens);
         specimensTree.addSelectionChangedListener(biobankListener);
         specimensTree.addClickListener();
     }
