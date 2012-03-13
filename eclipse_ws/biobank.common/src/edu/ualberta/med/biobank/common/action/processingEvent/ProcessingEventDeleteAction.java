@@ -5,6 +5,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventDeletePermission;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 
@@ -34,6 +35,7 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
         // if no aliquoted specimen, then ok to remove the specimens and to
         // delete the processing event
         for (Specimen sp : pevent.getSpecimens()) {
+            sp.setActivityStatus(ActivityStatus.ACTIVE);
             sp.setProcessingEvent(null);
             context.getSession().saveOrUpdate(sp);
         }
