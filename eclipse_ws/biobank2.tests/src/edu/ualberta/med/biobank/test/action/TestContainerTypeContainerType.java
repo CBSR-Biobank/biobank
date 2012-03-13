@@ -53,13 +53,19 @@ public class TestContainerTypeContainerType extends TestAction {
         ct2.getCapacity().setColCapacity(5);
 
         ContainerTypeContainerType link = new ContainerTypeContainerType();
-        link.setParentContainerType(ct1);
-        link.setChildContainerType(ct2);
+        link.setParent(ct1);
+        link.setChild(ct2);
 
-        ct1.getChildContainerTypeContainerTypes().add(link);
+        ct1.getChild2ContainerTypeContainerTypes().add(link);
 
         session.save(ct1);
+        session.flush();
+
         session.save(ct2);
+        session.flush();
+
+        session.saveOrUpdate(link);
+        session.flush();
 
         Container c1 = new Container();
         c1.setLabel(methodNameR + "_1");

@@ -74,19 +74,19 @@ public class ContainerType extends AbstractBiobankModel {
         new HashSet<ContainerTypeContainerType>(0);
 
     // @Cascade(org.hibernate.annotations.CascadeType.ALL)
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "parentContainerType")
-    public Set<ContainerTypeContainerType> getChildContainerTypeContainerTypes() {
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "parent")
+    public Set<ContainerTypeContainerType> getChild2ContainerTypeContainerTypes() {
         return childContainerTypeContainerTypes;
     }
 
-    public void setChildContainerTypeContainerTypes(
-        Set<ContainerTypeContainerType> childContainerTypeContainerTypes) {
+    public void setChild2ContainerTypeContainerTypes(
+        Set<ContainerTypeContainerType> child2ContainerTypeContainerTypes) {
         this.childContainerTypeContainerTypes =
-            childContainerTypeContainerTypes;
+            child2ContainerTypeContainerTypes;
     }
 
     // @Cascade(org.hibernate.annotations.CascadeType.ALL)
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "childContainerType")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "child")
     public Set<ContainerTypeContainerType> getParentContainerTypeContainerTypes() {
         return parentContainerTypeContainerTypes;
     }
@@ -151,8 +151,8 @@ public class ContainerType extends AbstractBiobankModel {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
-        joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false, updatable = false) })
+        joinColumns = { @JoinColumn(name = "PARENT_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "CHILD_ID", nullable = false, updatable = false) })
     public Set<ContainerType> getChildContainerTypes() {
         return this.childContainerTypes;
     }
