@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
 import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Dispatch;
@@ -116,5 +117,16 @@ public class DispatchSaveAction implements Action<IdResult> {
         }
         return dispSpecimens;
 
+    }
+
+    public static ShipmentInfoSaveInfo prepareShipInfo(
+        ShipmentInfoWrapper shipmentInfo) {
+        if (shipmentInfo == null) return null;
+        ShipmentInfoSaveInfo si =
+            new ShipmentInfoSaveInfo(shipmentInfo.getId(),
+                shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(),
+                shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),
+                shipmentInfo.getShippingMethod().getId());
+        return si;
     }
 }

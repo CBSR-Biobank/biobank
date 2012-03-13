@@ -138,6 +138,10 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
                 Messages.DispatchSendingEntryForm_waybill_label, null,
                 shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
+
+            createDateTimeWidget(client,
+                Messages.DispatchReceivingEntryForm_departed_label, null,
+                shipmentInfo, ShipmentInfoPeer.PACKED_AT.getName(), null);
         }
 
         createCommentSection();

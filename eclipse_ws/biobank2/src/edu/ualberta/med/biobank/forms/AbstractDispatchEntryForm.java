@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -188,7 +189,11 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
                 .getId(), dispatch.getSenderCenter().getId(),
                 dispatch.getState(), comment.getMessage() == null ? ""
                     : comment.getMessage());
-        DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, null);
+        ShipmentInfoSaveInfo ship = null;
+        if (!dispatch.isNew() && dispatch.getShipmentInfo() != null)
+            ship =
+                DispatchSaveAction.prepareShipInfo(dispatch.getShipmentInfo());
+        DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, ship);
         dispatch.setId(SessionManager.getAppService().doAction(save).getId());
         ((AdapterBase) adapter).setModelObject(dispatch);
     }

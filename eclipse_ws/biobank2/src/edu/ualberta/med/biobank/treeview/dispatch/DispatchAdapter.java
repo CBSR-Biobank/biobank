@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
-import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
@@ -230,7 +230,7 @@ public class DispatchAdapter extends AdapterBase {
         DispatchChangeStateAction action =
             new DispatchChangeStateAction(getDispatchWrapper().getId(),
                 getDispatchWrapper().getDispatchState(),
-                prepareShipInfo(getDispatchWrapper()
+                DispatchSaveAction.prepareShipInfo(getDispatchWrapper()
                     .getShipmentInfo()));
         try {
             SessionManager.getAppService().doAction(action);
@@ -250,17 +250,6 @@ public class DispatchAdapter extends AdapterBase {
         getDispatchWrapper().setState(DispatchState.CREATION);
         getDispatchWrapper().setShipmentInfo(null);
         persistDispatch();
-    }
-
-    private ShipmentInfoSaveInfo prepareShipInfo(
-        ShipmentInfoWrapper shipmentInfo) {
-        if (shipmentInfo == null) return null;
-        ShipmentInfoSaveInfo si =
-            new ShipmentInfoSaveInfo(shipmentInfo.getId(),
-                shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(),
-                shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),
-                shipmentInfo.getShippingMethod().getId());
-        return si;
     }
 
     @Override
