@@ -112,6 +112,18 @@ public class DispatchAdapter extends AdapterBase {
             if (isDeletable()) {
                 addDeleteMenu(menu, Messages.DispatchAdapter_dispatch_label);
             }
+            if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
+                && isEditable
+                && getDispatchWrapper().hasErrors()) {
+                MenuItem mi = new MenuItem(menu, SWT.PUSH);
+                mi.setText(Messages.DispatchAdapter_close_label);
+                mi.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent event) {
+                        doClose();
+                    }
+                });
+            }
             if (siteParent.equals(getDispatchWrapper().getSenderCenter())
                 && isEditable
                 && getDispatchWrapper().isInTransitState()) {

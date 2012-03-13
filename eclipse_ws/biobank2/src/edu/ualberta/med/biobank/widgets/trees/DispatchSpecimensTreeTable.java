@@ -54,8 +54,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
 
     public DispatchSpecimensTreeTable(Composite parent,
         final DispatchWrapper shipment,
-        final boolean editSpecimensState,
-        final boolean editSpecimensComment) {
+        final boolean editSpecimensState) {
         super(parent, SWT.NONE);
 
         this.shipment = shipment;
@@ -166,20 +165,23 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         menu.addListener(SWT.Show, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                for (MenuItem menuItem : menu.getItems()) {
-                    if (!menuItem.equals(editItem))
-                        menuItem.dispose();
-                }
-                BgcClipboard
-                    .addClipboardCopySupport(tv, menu, labelProvider, 5);
-                if (editSpecimensState || editSpecimensComment) {
-                    DispatchSpecimenWrapper dsa = getSelectedSpecimen();
-                    if (dsa != null) {
-                        if (editSpecimensState
-                            && DispatchSpecimenState.getState(dsa.getState()) == DispatchSpecimenState.NONE)
+                DispatchSpecimenWrapper dsa = getSelectedSpecimen();
+                if (dsa != null) {
+                    for (MenuItem menuItem : menu.getItems()) {
+                        if (!menuItem.equals(editItem))
+                            menuItem.dispose();
+                    }
+
+                    BgcClipboard
+                        .addClipboardCopySupport(tv, menu, labelProvider, 5);
+
+                    if (editSpecimensState) {
+                        if (
+                        DispatchSpecimenState.getState(dsa.getState()) == DispatchSpecimenState.NONE)
                             addSetMissingMenu(menu);
-                        if (editSpecimensComment)
-                            addModifyCommentMenu(menu);
+                        addModifyCommentMenu(menu);
+                        if (DispatchSpecimenState.getState(dsa.getState()) != DispatchSpecimenState.NONE)
+                            addSetNonprocessedMenu(menu);
                     }
                 }
             }
@@ -223,6 +225,19 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         });
     }
 
+    private void addSetNonprocessedMenu(final Menu menu) {
+        MenuItem item;
+        item = new MenuItem(menu, SWT.PUSH);
+        item.setText(Messages.DispatchSpecimensTreeTable_set_nonprocessed_label);
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                modifyCommentAndState((IStructuredSelection) tv.getSelection(),
+                    DispatchSpecimenState.NONE);
+            }
+        });
+    }
+
     private void modifyCommentAndState(
         IStructuredSelection iStructuredSelection,
         DispatchSpecimenState newState) {
@@ -256,8 +271,8 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                 }
             }
             shipment.resetMap();
-            tv.refresh();
             notifyListeners();
+            tv.refresh();
         }
     }
 

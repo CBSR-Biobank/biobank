@@ -223,8 +223,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         } else {
             specimensTreeTable =
                 new DispatchSpecimensTreeTable(page, dispatch,
-                    !dispatch.isInClosedState() && !dispatch.isInLostState(),
-                    true);
+                    !dispatch.isInClosedState() && !dispatch.isInLostState());
             specimensTreeTable.addSelectionChangedListener(biobankListener);
             specimensTreeTable.addClickListener();
         }
