@@ -52,7 +52,7 @@ import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget.ItemAction;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.Event;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
@@ -109,7 +109,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     protected boolean tryAgain;
 
-    private CommentCollectionInfoTable commentEntryTable;
+    private CommentsInfoTable commentEntryTable;
 
     private BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
@@ -126,7 +126,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private ShipmentInfoWrapper shipmentInfo = new ShipmentInfoWrapper(
         SessionManager.getAppService());
 
-    private BgcBaseText commentWidget;
     private CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
@@ -448,17 +447,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         client.setLayout(gl);
         commentEntryTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 originInfo.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        commentWidget =
-            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
-                SWT.MULTI,
-                Messages.Comments_add, null, comment, "message", null);
+        createBoundWidgetWithLabel(client, BgcBaseText.class,
+            SWT.MULTI, Messages.Comments_add, null, comment, "message", null);
 
     }
 

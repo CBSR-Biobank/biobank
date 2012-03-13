@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.CollectionView;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class PatientEntryForm extends BiobankEntryForm {
@@ -74,7 +74,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             }
         };
 
-    private CommentCollectionInfoTable commentEntryTable;
+    private CommentsInfoTable commentEntryTable;
 
     private BgcBaseText commentWidget;
 
@@ -204,7 +204,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         client.setLayout(gl);
         commentEntryTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 ModelWrapper.wrapModelCollection(
                     SessionManager.getAppService(),
                     patientCopy.getComments(), CommentWrapper.class));

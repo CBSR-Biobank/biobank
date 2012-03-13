@@ -32,7 +32,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -59,7 +59,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private SiteInfo siteInfo;
 
-    private CommentCollectionInfoTable commentEntryTable;
+    private CommentsInfoTable commentEntryTable;
 
     private BgcBaseText commentText;
 
@@ -123,7 +123,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentCollectionInfoTable(client,
+        commentEntryTable = new CommentsInfoTable(client,
             site.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;

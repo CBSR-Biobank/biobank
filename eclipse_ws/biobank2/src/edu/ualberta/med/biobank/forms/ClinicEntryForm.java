@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ContactEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -71,7 +71,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     private ComboViewer activityStatusComboViewer;
 
-    private CommentCollectionInfoTable commentEntryTable;
+    private CommentsInfoTable commentEntryTable;
 
     private CommentWrapper comment;
 
@@ -171,7 +171,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentCollectionInfoTable(client,
+        commentEntryTable = new CommentsInfoTable(client,
             clinic.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;

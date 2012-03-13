@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
  * automatically wrap the text.
  * 
  */
-public class CommentCollectionInfoTable extends InfoTableWidget<CommentWrapper> {
+public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
 
     final int TEXT_MARGIN = 3;
 
@@ -45,7 +45,7 @@ public class CommentCollectionInfoTable extends InfoTableWidget<CommentWrapper> 
         Messages.CommentCollectionInfoTable_1,
         Messages.CommentCollectionInfoTable_2 };
 
-    public CommentCollectionInfoTable(Composite parent,
+    public CommentsInfoTable(Composite parent,
         List<CommentWrapper> collection) {
         super(parent, collection, HEADINGS, CommentWrapper.class);
 

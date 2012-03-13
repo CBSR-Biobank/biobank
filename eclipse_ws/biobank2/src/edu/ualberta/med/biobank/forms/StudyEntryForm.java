@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecim
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.StudyEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.GlobalEventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -42,13 +43,14 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.EventAttrWidget;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.AliquotedSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ClinicAddInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SourceSpecimenEntryInfoTable;
@@ -84,8 +86,6 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private AliquotedSpecimenEntryInfoTable aliquotedSpecimenEntryTable;
 
-    private BgcBaseText commentText;
-
     private BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
             @Override
@@ -98,7 +98,10 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private SourceSpecimenEntryInfoTable sourceSpecimenEntryTable;
 
-    private CommentCollectionInfoTable commentEntryTable;
+    private CommentsInfoTable commentEntryTable;
+
+    private CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
 
     private StudyInfo studyInfo;
 
@@ -137,6 +140,8 @@ public class StudyEntryForm extends BiobankEntryForm {
             studyInfo = new StudyInfo();
             study.setWrappedObject(new Study());
         }
+
+        comment.setWrappedObject(new Comment());
 
         List<SpecimenType> specimenTypes =
             SessionManager.getAppService().doAction(
@@ -211,15 +216,15 @@ public class StudyEntryForm extends BiobankEntryForm {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentCollectionInfoTable(client,
+        commentEntryTable = new CommentsInfoTable(client,
             study.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        commentText = (BgcBaseText) createLabelledWidget(
-            client, BgcBaseText.class, SWT.MULTI, Messages.Comments_add);
+        createBoundWidgetWithLabel(client, BgcBaseText.class,
+            SWT.MULTI, Messages.Comments_add, null, comment, "message", null);
     }
 
     private void createSourceSpecimensSection() {
@@ -330,13 +335,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         saveAction.setSourceSpecimenSaveInfo(getSourceSpecimenInfos());
         saveAction.setAliquotSpecimenSaveInfo(getAliquotedSpecimenInfos());
         saveAction.setStudyEventAttrSaveInfo(getStudyEventAttrInfos());
-
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                saveAction.setCommentText(commentText.getText());
-            }
-        });
+        saveAction.setCommentText(comment.getMessage());
 
         Integer id =
             SessionManager.getAppService().doAction(saveAction).getId();
@@ -458,7 +457,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         contactEntryTable.reload();
         aliquotedSpecimenEntryTable.reload();
         sourceSpecimenEntryTable.reload();
-        commentText.setText("");
         resetPvCustomInfo();
     }
 

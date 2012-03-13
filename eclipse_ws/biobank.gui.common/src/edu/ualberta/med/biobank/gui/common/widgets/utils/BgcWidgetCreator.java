@@ -301,10 +301,11 @@ public class BgcWidgetCreator {
         text.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if ((modelObservableValue.getValueType().equals(
-                    Integer.class)
+                if ((modelObservableValue != null)
+                    && (modelObservableValue.getValueType().equals(
+                        Integer.class)
                     || modelObservableValue.getValueType().equals(
-                    Double.class))
+                        Double.class))
                     && Character.isLetter(e.character))
                     e.doit = false;
             }

@@ -45,7 +45,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import edu.ualberta.med.biobank.wizards.SelectCollectionEventWizard;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -83,7 +83,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     protected CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
-    private CommentCollectionInfoTable commentEntryTable;
+    private CommentsInfoTable commentEntryTable;
 
     private SpecimenBriefInfo specimenInfo;
 
@@ -329,7 +329,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         client.setLayout(gl);
         commentEntryTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 specimen.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;

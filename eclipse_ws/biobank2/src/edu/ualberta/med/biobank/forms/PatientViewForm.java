@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewCollectionEventInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -50,7 +50,7 @@ public class PatientViewForm extends BiobankViewForm {
 
     private BgcBaseText commentLabel;
 
-    private CommentCollectionInfoTable commentEntryTable;
+    private CommentsInfoTable commentEntryTable;
 
     @Override
     public void init() throws Exception {
@@ -89,7 +89,7 @@ public class PatientViewForm extends BiobankViewForm {
 
         client.setLayout(gl);
         commentEntryTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 ModelWrapper.wrapModelCollection(
                     SessionManager.getAppService(),
                     patientInfo.patient.getComments(),
