@@ -104,10 +104,11 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
-                groups =
-                    DispatchTableGroup
-                        .getGroupsForShipment(
-                        DispatchSpecimensTreeTable.this.shipment);
+                if (newInput != null)
+                    groups =
+                        DispatchTableGroup
+                            .getGroupsForShipment(
+                            DispatchSpecimensTreeTable.this.shipment);
             }
 
             @Override

@@ -94,9 +94,10 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
-                groups =
-                    RequestTableGroup
-                        .getGroupsForRequest(RequestSpecimensTreeTable.this.request);
+                if (newInput != null)
+                    groups =
+                        RequestTableGroup
+                            .getGroupsForRequest(RequestSpecimensTreeTable.this.request);
             }
 
             @Override
