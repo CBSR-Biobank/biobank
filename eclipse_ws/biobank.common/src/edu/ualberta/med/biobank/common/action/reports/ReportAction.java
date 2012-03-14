@@ -8,7 +8,6 @@ import edu.ualberta.med.biobank.common.action.ProxiedListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
 
 public class ReportAction implements Action<ProxiedListResult<Object>> {
@@ -40,7 +39,7 @@ public class ReportAction implements Action<ProxiedListResult<Object>> {
             AbstractReport runReport =
                 (AbstractReport) constructor.newInstance(report);
             return new ProxiedListResult<Object>(
-                (AbstractBiobankListProxy<Object>) runReport.generate(context
+                runReport.generate(context
                     .getAppService()));
         } catch (Exception e) {
             throw new ActionException(e);
