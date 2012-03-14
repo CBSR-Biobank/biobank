@@ -412,8 +412,6 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                     : new String[] { ".pdf" }; //$NON-NLS-1$
                 path = runExportDialog(fileName, filterExt);
                 if (path == null) {
-                    BgcPlugin.openAsyncError("Exporting canceled.", //$NON-NLS-1$
-                        "Select a valid path and try again."); //$NON-NLS-1$
                     return;
                 }
             }
