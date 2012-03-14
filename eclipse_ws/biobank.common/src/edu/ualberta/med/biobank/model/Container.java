@@ -75,8 +75,8 @@ public class Container extends AbstractBiobankModel {
     // CONTAINER_TYPE_ID for a unique constraint
     @OneToOne
     @JoinColumns({
-        @JoinColumn(name = "ID", referencedColumnName = "CONTAINER_ID"),
-        @JoinColumn(name = "CONTAINER_TYPE_ID", referencedColumnName = "CONTAINER_TYPE_ID")
+        @JoinColumn(name = "ID", referencedColumnName = "CONTAINER_ID", insertable = false, updatable = false),
+        @JoinColumn(name = "CONTAINER_TYPE_ID", referencedColumnName = "CONTAINER_TYPE_ID", insertable = false, updatable = false)
     })
     ContainerContainerType getContainerContainerType() {
         return containerContainerType;
@@ -166,7 +166,8 @@ public class Container extends AbstractBiobankModel {
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Container.containerType.NotNull}")
-    @Transient
+    @ManyToOne
+    @JoinColumn(name = "CONTAINER_TYPE_ID")
     public ContainerType getContainerType() {
         return getContainerContainerType().getContainerType();
     }
