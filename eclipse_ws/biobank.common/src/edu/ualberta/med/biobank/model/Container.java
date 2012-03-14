@@ -72,6 +72,8 @@ public class Container extends AbstractBiobankModel {
     private ContainerContainerType containerContainerType =
         new ContainerContainerType(this);
 
+    // cannot use @OneToOne(mappedBy = "container") because we need the
+    // CONTAINER_TYPE_ID for a unique constraint
     @OneToOne
     @JoinColumns({
         @JoinColumn(name = "ID", referencedColumnName = "CONTAINER_ID"),
@@ -165,8 +167,7 @@ public class Container extends AbstractBiobankModel {
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Container.containerType.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false)
+    @Transient
     public ContainerType getContainerType() {
         return getContainerContainerType().getContainerType();
     }
