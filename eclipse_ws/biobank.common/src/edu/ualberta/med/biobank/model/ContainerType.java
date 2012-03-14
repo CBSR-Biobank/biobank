@@ -151,8 +151,8 @@ public class ContainerType extends AbstractBiobankModel {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
-        joinColumns = { @JoinColumn(name = "PARENT_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "CHILD_ID", nullable = false, updatable = false) })
+        joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false, updatable = false) })
     public Set<ContainerType> getChildContainerTypes() {
         return this.childContainerTypes;
     }
