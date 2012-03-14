@@ -26,33 +26,35 @@ public class ContainerPosition extends AbstractPosition {
 
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "PARENT_CONTAINER_ID2", referencedColumnName = "CONTAINER_ID"),
-        @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID2", referencedColumnName = "CONTAINER_TYPE_ID")
+        @JoinColumn(name = "PARENT_CONTAINER_ID", referencedColumnName = "CONTAINER_ID"),
+        @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", referencedColumnName = "CONTAINER_TYPE_ID")
     })
-    public ContainerContainerType getParentContainerContainerType() {
-        return null;
+    ContainerContainerType getParentContainerContainerType() {
+        return parentContainer.getContainerContainerType();
     }
 
-    public void setParentContainerContainerType(ContainerContainerType pcct) {
+    void setParentContainerContainerType(ContainerContainerType pcct) {
+        this.parentContainer = pcct.getContainer();
     }
 
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "CONTAINER_ID2", referencedColumnName = "CONTAINER_ID"),
-        @JoinColumn(name = "CONTAINER_TYPE_ID2", referencedColumnName = "CONTAINER_TYPE_ID")
+        @JoinColumn(name = "CONTAINER_ID", referencedColumnName = "CONTAINER_ID"),
+        @JoinColumn(name = "CONTAINER_TYPE_ID", referencedColumnName = "CONTAINER_TYPE_ID")
     })
-    public ContainerContainerType getContainerContainerType() {
-        return null;
+    ContainerContainerType getContainerContainerType() {
+        return container.getContainerContainerType();
     }
 
-    public void setContainerContainerType(ContainerContainerType cct) {
+    void setContainerContainerType(ContainerContainerType cct) {
+        this.container = cct.getContainer();
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerPosition.parentContainer.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PARENT_CONTAINER_ID", nullable = false)
+    @JoinColumn(name = "PARENT_CONTAINER_ID", nullable = false, insertable = false, updatable = false)
     public Container getParentContainer() {
-        return this.parentContainer;
+        return parentContainer;
     }
 
     public void setParentContainer(Container parentContainer) {
@@ -72,7 +74,7 @@ public class ContainerPosition extends AbstractPosition {
     @NotNull(message = "TODO: a better message")
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", referencedColumnName = "CHILD_ID", nullable = false),
+        @JoinColumn(name = "CONTAINER_TYPE_ID", referencedColumnName = "CHILD_ID", nullable = false),
         @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", referencedColumnName = "PARENT_ID", nullable = false)
     })
     ContainerTypeContainerType getContainerTypeContainerType() {

@@ -68,7 +68,6 @@ public class Container extends AbstractBiobankModel {
     private ContainerPosition position;
     private Site site;
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
-
     private ContainerContainerType containerContainerType =
         new ContainerContainerType(this);
 
