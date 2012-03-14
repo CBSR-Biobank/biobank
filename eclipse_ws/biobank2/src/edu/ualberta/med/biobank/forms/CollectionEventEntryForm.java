@@ -310,9 +310,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             pvCustomInfo.setAllowedValues(entry.getValue()
                 .getStudyEventAttrPermissible());
             // FIXME ugly
-            EventAttrInfo eventAttrInfo =
-                adapter.getId() == null ? null : ceventInfo.eventAttrs
-                    .get(entry.getKey());
+            EventAttrInfo eventAttrInfo = (adapter.getId() == null)
+                ? null : ceventInfo.eventAttrs.get(entry.getKey());
             pvCustomInfo.setValue(eventAttrInfo == null ? "" //$NON-NLS-1$
                 : eventAttrInfo.attr.getValue());
             pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);

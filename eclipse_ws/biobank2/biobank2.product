@@ -27,16 +27,18 @@ AICML: http://aicml.cs.ualberta.ca
 
    <windowImages/>
 
-   <splash location="biobank"/>
+   <splash
+      location="biobank" />
    <launcher name="BioBank">
       <linux icon="/biobank2/icons/biobank_launcher.xpm"/>
       <macosx icon="/biobank2/icons/biobank_launcher.icns"/>
       <solaris/>
       <win useIco="false">
-         <bmp winSmallHigh="/biobank2/icons/biobank_launcher_16.bmp" winMediumHigh="/biobank2/icons/biobank_launcher_32.bmp"/>
+         <bmp
+            winSmallHigh="/biobank2/icons/biobank_launcher_16.bmp"
+            winMediumHigh="/biobank2/icons/biobank_launcher_32.bmp"/>
       </win>
    </launcher>
-
 
    <vm>
       <linux include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</linux>
@@ -45,17 +47,42 @@ AICML: http://aicml.cs.ualberta.ca
       <windows include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</windows>
    </vm>
 
+   <license>
+        <text>
+   Copyright 2010 Canadian BioSample Repository. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE CANADIAN BIOSAMPLE REPOSITORY ``AS IS&apos;&apos; AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE CANADIAN BIOSAMPLE EPOSITORY OR CONTRIBUTORS
+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+The views and conclusions contained in the software and documentation are those
+of the authors and should not be interpreted as representing official policies,
+either expressed or implied, of the Canadian BioSample Repository.
+         </text>
+   </license>
 
    <plugins>
    </plugins>
 
-   <features>
-      <feature id="biobank2.feature.core"/>
-      <feature id="biobank2.feature.platform"/>
-   </features>
-
    <configurations>
-      <plugin id="biobank.mvp" autoStart="true" startLevel="7"/>
+      <plugin id="biobank.mvp" autoStart="true" startLevel="7" />
    </configurations>
 
 </product>

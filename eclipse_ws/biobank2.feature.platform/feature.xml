@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature id="biobank2.feature.platform" label="BioBank Platform Feature" version="3.2.0.rc1">
+<feature
+      id="biobank2.feature.platform"
+      label="BioBank Platform Feature"
+      version="3.2.0.rc1">
 
    <license url="http://www.example.com/license">
       [Enter License Description here.]
    </license>
 
-   <includes id="org.eclipse.rcp" version="0.0.0"/>
-
-   <includes id="org.eclipse.equinox.p2.user.ui" version="0.0.0"/>
+   <includes
+         id="org.eclipse.rcp"
+         version="0.0.0"/>
 
 </feature>
