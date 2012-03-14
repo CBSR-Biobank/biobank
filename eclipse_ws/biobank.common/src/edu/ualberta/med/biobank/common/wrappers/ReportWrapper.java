@@ -25,7 +25,7 @@ public class ReportWrapper extends ReportBaseWrapper {
     public static final String PROPERTY_IS_PUBLIC = "isPublic"; //$NON-NLS-1$
     public static final String PROPERTY_USER_ID = "userId"; //$NON-NLS-1$
     public static final String REPORT_COLUMN_COLLECTION_CACHE_KEY =
-        "reportColumnCollection"; //$NON-NLS-1$
+        "reportColumns"; //$NON-NLS-1$
     public static final String REPORT_FILTER_COLLECTION_CACHE_KEY =
         "reportFilterCollection"; //$NON-NLS-1$
 

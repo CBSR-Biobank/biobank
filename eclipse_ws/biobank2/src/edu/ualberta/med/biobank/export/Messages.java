@@ -10,7 +10,6 @@ public class Messages extends NLS {
     public static String GuiDataExporter_exporting;
     public static String GuiDataExporter_exporting_error_msg;
     public static String GuiDataExporter_noresult_msg;
-    public static String PdfDataExporter_cancel_msg;
     public static String PdfDataExporter_log_export;
     public static String PdfDataExporter_logging_error_msg;
     public static String PdfDataExporter_name;
