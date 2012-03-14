@@ -9,10 +9,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
@@ -63,10 +65,26 @@ public class Container extends AbstractBiobankModel {
     private Container topContainer;
     private Set<SpecimenPosition> specimenPositions =
         new HashSet<SpecimenPosition>(0);
-    private ContainerType containerType;
     private ContainerPosition position;
     private Site site;
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
+
+    private ContainerContainerType containerContainerType =
+        new ContainerContainerType(this);
+
+    @OneToOne
+    @JoinColumns({
+        @JoinColumn(name = "ID", referencedColumnName = "CONTAINER_ID"),
+        @JoinColumn(name = "CONTAINER_TYPE_ID", referencedColumnName = "CONTAINER_TYPE_ID")
+    })
+    ContainerContainerType getContainerContainerType() {
+        return containerContainerType;
+    }
+
+    void setContainerContainerType(ContainerContainerType
+        containerContainerType) {
+        this.containerContainerType = containerContainerType;
+    }
 
     @Column(name = "PRODUCT_BARCODE")
     public String getProductBarcode() {
@@ -150,11 +168,11 @@ public class Container extends AbstractBiobankModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false)
     public ContainerType getContainerType() {
-        return this.containerType;
+        return getContainerContainerType().getContainerType();
     }
 
-    public void setContainerType(ContainerType containerType) {
-        this.containerType = containerType;
+    public void setContainerType(ContainerType ct) {
+        setContainerContainerType(new ContainerContainerType(this, ct));
     }
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -256,6 +274,7 @@ public class Container extends AbstractBiobankModel {
      */
     @Transient
     public Container getChildByLabel(String childLabel) throws Exception {
+        ContainerType containerType = getContainerType();
         if (containerType == null) {
             throw new Exception("container type is null");
         }
@@ -278,6 +297,7 @@ public class Container extends AbstractBiobankModel {
     @Transient
     public RowColPos getPositionFromLabelingScheme(String position)
         throws Exception {
+        ContainerType containerType = getContainerType();
         RowColPos rcp = containerType.getRowColFromPositionString(position);
         if (rcp != null) {
             if (rcp.getRow() >= containerType.getRowCapacity()
@@ -307,6 +327,7 @@ public class Container extends AbstractBiobankModel {
      */
     @Transient
     public String getFullInfoLabel() {
+        ContainerType containerType = getContainerType();
         if ((containerType == null) || (containerType.getNameShort() == null)) {
             return getLabel();
         }

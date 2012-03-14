@@ -24,6 +24,30 @@ public class ContainerPosition extends AbstractPosition {
     private Container parentContainer;
     private Container container;
 
+    @ManyToOne
+    @JoinColumns({
+        @JoinColumn(name = "PARENT_CONTAINER_ID2", referencedColumnName = "CONTAINER_ID"),
+        @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID2", referencedColumnName = "CONTAINER_TYPE_ID")
+    })
+    public ContainerContainerType getParentContainerContainerType() {
+        return null;
+    }
+
+    public void setParentContainerContainerType(ContainerContainerType pcct) {
+    }
+
+    @ManyToOne
+    @JoinColumns({
+        @JoinColumn(name = "CONTAINER_ID2", referencedColumnName = "CONTAINER_ID"),
+        @JoinColumn(name = "CONTAINER_TYPE_ID2", referencedColumnName = "CONTAINER_TYPE_ID")
+    })
+    public ContainerContainerType getContainerContainerType() {
+        return null;
+    }
+
+    public void setContainerContainerType(ContainerContainerType cct) {
+    }
+
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerPosition.parentContainer.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PARENT_CONTAINER_ID", nullable = false)
