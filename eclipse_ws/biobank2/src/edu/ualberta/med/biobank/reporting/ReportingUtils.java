@@ -145,7 +145,7 @@ public class ReportingUtils {
     public static void saveReport(JasperPrint jasperPrint, String path)
         throws Exception {
         if (path == null)
-            throw new Exception(Messages.ReportingUtils_cancel_error_msg);
+            return;
 
         if (path.startsWith(FILE_URI)) {
             path = path.substring(FILE_URI.length());

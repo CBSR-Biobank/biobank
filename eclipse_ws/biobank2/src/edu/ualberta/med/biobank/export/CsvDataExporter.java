@@ -38,8 +38,7 @@ public class CsvDataExporter extends GuiDataExporter {
             Object[] labels = new Object[numHeaders];
             for (Object row : data.getRows()) {
                 if (monitor.isCanceled()) {
-                    throw new DataExportException(
-                        Messages.CsvDataExporter_cancel_msg);
+                    return;
                 }
 
                 for (int i = 0; i < numHeaders; i++) {
@@ -53,8 +52,7 @@ public class CsvDataExporter extends GuiDataExporter {
         } catch (IOException e) {
             throw new DataExportException(e.getMessage());
         } catch (Exception e) {
-            throw new DataExportException(Messages.CsvDataExporter_0);
+            return;
         }
     }
-
 }

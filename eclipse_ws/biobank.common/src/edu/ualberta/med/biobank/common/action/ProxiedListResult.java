@@ -1,16 +1,16 @@
 package edu.ualberta.med.biobank.common.action;
 
-import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
+import java.util.List;
 
 public class ProxiedListResult<E> implements ActionResult {
     private static final long serialVersionUID = 1L;
-    private AbstractBiobankListProxy<E> list;
+    private List<E> list;
 
-    public ProxiedListResult(AbstractBiobankListProxy<E> list) {
+    public ProxiedListResult(List<E> list) {
         this.list = list;
     }
 
-    public AbstractBiobankListProxy<E> getList() {
+    public List<E> getList() {
         return list;
     }
 }
