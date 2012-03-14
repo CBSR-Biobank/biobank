@@ -9,7 +9,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -71,13 +70,7 @@ public class Container extends AbstractBiobankModel {
     private ContainerContainerType containerContainerType =
         new ContainerContainerType(this);
 
-    // cannot use @OneToOne(mappedBy = "container") because we need the
-    // CONTAINER_TYPE_ID for a unique constraint
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumns({
-        @JoinColumn(name = "ID", referencedColumnName = "CONTAINER_ID", insertable = false, updatable = false),
-        @JoinColumn(name = "CONTAINER_TYPE_ID", referencedColumnName = "CONTAINER_TYPE_ID", insertable = false, updatable = false)
-    })
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "container", fetch = FetchType.EAGER, orphanRemoval = true)
     ContainerContainerType getContainerContainerType() {
         return containerContainerType;
     }
@@ -172,7 +165,7 @@ public class Container extends AbstractBiobankModel {
     }
 
     public void setContainerType(ContainerType ct) {
-        setContainerContainerType(new ContainerContainerType(this, ct));
+        getContainerContainerType().setContainerType(ct);
     }
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
