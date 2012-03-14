@@ -27,13 +27,16 @@ AICML: http://aicml.cs.ualberta.ca
 
    <windowImages/>
 
-   <splash location="biobank"/>
+   <splash
+      location="biobank" />
    <launcher name="BioBank">
       <linux icon="/biobank2/icons/biobank_launcher.xpm"/>
       <macosx icon="/biobank2/icons/biobank_launcher.icns"/>
       <solaris/>
       <win useIco="false">
-         <bmp winSmallHigh="/biobank2/icons/biobank_launcher_16.bmp" winMediumHigh="/biobank2/icons/biobank_launcher_32.bmp"/>
+         <bmp
+            winSmallHigh="/biobank2/icons/biobank_launcher_16.bmp"
+            winMediumHigh="/biobank2/icons/biobank_launcher_32.bmp"/>
       </win>
    </launcher>
 
@@ -58,7 +61,7 @@ list of conditions and the following disclaimer.
 this list of conditions and the following disclaimer in the documentation
 and/or other materials provided with the distribution.
 
-THIS SOFTWARE IS PROVIDED BY THE CANADIAN BIOSAMPLE REPOSITORY ``AS IS'' AND
+THIS SOFTWARE IS PROVIDED BY THE CANADIAN BIOSAMPLE REPOSITORY ``AS IS&apos;&apos; AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 DISCLAIMED. IN NO EVENT SHALL THE CANADIAN BIOSAMPLE EPOSITORY OR CONTRIBUTORS
@@ -79,12 +82,13 @@ either expressed or implied, of the Canadian BioSample Repository.
    </plugins>
 
    <features>
-      <feature id="biobank2.feature.core" version="3.2.0.rc1"/>
-      <feature id="biobank2.feature.platform" version="3.2.0.rc1"/>
+      <feature id="biobank2.feature.core"/>
+      <feature id="biobank2.feature.platform"/>
+      <feature id="org.eclipse.equinox.p2.rcp.feature"/>
    </features>
 
    <configurations>
-      <plugin id="biobank.mvp" autoStart="true" startLevel="7"/>
+      <plugin id="biobank.mvp" autoStart="true" startLevel="7" />
    </configurations>
 
 </product>
