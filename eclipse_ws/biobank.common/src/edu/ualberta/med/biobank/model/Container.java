@@ -73,7 +73,7 @@ public class Container extends AbstractBiobankModel {
 
     // cannot use @OneToOne(mappedBy = "container") because we need the
     // CONTAINER_TYPE_ID for a unique constraint
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumns({
         @JoinColumn(name = "ID", referencedColumnName = "CONTAINER_ID", insertable = false, updatable = false),
         @JoinColumn(name = "CONTAINER_TYPE_ID", referencedColumnName = "CONTAINER_TYPE_ID", insertable = false, updatable = false)
@@ -82,9 +82,8 @@ public class Container extends AbstractBiobankModel {
         return containerContainerType;
     }
 
-    void setContainerContainerType(ContainerContainerType
-        containerContainerType) {
-        this.containerContainerType = containerContainerType;
+    void setContainerContainerType(ContainerContainerType cct) {
+        this.containerContainerType = cct;
     }
 
     @Column(name = "PRODUCT_BARCODE")

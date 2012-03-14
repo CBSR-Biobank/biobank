@@ -52,20 +52,26 @@ public class TestContainerTypeContainerType extends TestAction {
         ct2.getCapacity().setRowCapacity(5);
         ct2.getCapacity().setColCapacity(5);
 
-        ContainerTypeContainerType link = new ContainerTypeContainerType();
-        link.setParent(ct1);
-        link.setChild(ct2);
-
-        ct1.getChild2ContainerTypeContainerTypes().add(link);
-
         session.save(ct1);
         session.flush();
 
         session.save(ct2);
         session.flush();
 
+        ContainerTypeContainerType link = new ContainerTypeContainerType();
+        link.setParent(ct1);
+        link.setChild(ct2);
+
+        ct1.getChild2ContainerTypeContainerTypes().add(link);
+
         session.saveOrUpdate(link);
         session.flush();
+
+        tx.commit();
+        session.close();
+
+        session = SESSION_PROVIDER.openSession();
+        tx = session.beginTransaction();
 
         Container c1 = new Container();
         c1.setLabel(methodNameR + "_1");
@@ -84,9 +90,6 @@ public class TestContainerTypeContainerType extends TestAction {
         cp.setContainer(c2);
         cp.setRow(0);
         cp.setCol(0);
-
-        tx.commit();
-        tx = session.beginTransaction();
 
         session.save(c1);
         session.flush();
