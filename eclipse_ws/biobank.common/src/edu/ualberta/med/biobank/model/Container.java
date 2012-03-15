@@ -158,7 +158,7 @@ public class Container extends AbstractBiobankModel {
         this.containerType = containerType;
     }
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "container")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "container", orphanRemoval = true)
     public ContainerPosition getPosition() {
         return this.position;
     }

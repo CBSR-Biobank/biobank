@@ -9,7 +9,6 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.ContainerTypeContainerType;
 import edu.ualberta.med.biobank.model.Site;
 
 public class TestContainerTypeContainerType extends TestAction {
@@ -52,19 +51,12 @@ public class TestContainerTypeContainerType extends TestAction {
         ct2.getCapacity().setRowCapacity(5);
         ct2.getCapacity().setColCapacity(5);
 
-        session.save(ct1);
-        session.flush();
-
         session.save(ct2);
         session.flush();
 
-        ContainerTypeContainerType link = new ContainerTypeContainerType();
-        link.setParent(ct1);
-        link.setChild(ct2);
+        ct1.getChildContainerTypes().add(ct2);
 
-        ct1.getChild2ContainerTypeContainerTypes().add(link);
-
-        session.saveOrUpdate(link);
+        session.save(ct1);
         session.flush();
 
         tx.commit();
@@ -106,7 +98,11 @@ public class TestContainerTypeContainerType extends TestAction {
         session = SESSION_PROVIDER.openSession();
         tx = session.beginTransaction();
 
-        session.delete(link);
+        c1.setContainerType(ct2);
+        session.saveOrUpdate(c1);
+
+        // ct1.getChildContainerTypes().clear();
+        // session.saveOrUpdate(ct1);
 
         tx.commit();
     }

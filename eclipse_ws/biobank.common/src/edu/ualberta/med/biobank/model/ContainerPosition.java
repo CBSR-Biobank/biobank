@@ -1,14 +1,14 @@
 package edu.ualberta.med.biobank.model;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.ForeignKey;
 
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
@@ -17,6 +17,28 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "CONTAINER_POSITION",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "PARENT_CONTAINER_ID", "ROW", "COL" }) })
+// @SecondaryTables({
+// @SecondaryTable(name = "CONTAINER",
+// pkJoinColumns = {
+// @PrimaryKeyJoinColumn(name = "CONTAINER_ID", referencedColumnName = "ID"),
+// @PrimaryKeyJoinColumn(name = "CONTAINER_TYPE_ID", referencedColumnName =
+// "CONTAINER_TYPE_ID")
+// }),
+// @SecondaryTable(name = "CONTAINER",
+// pkJoinColumns = {
+// @PrimaryKeyJoinColumn(name = "PARENT_CONTAINER_ID", referencedColumnName =
+// "ID"),
+// @PrimaryKeyJoinColumn(name = "PARENT_CONTAINER_TYPE_ID", referencedColumnName
+// = "CONTAINER_TYPE_ID")
+// }),
+// @SecondaryTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
+// pkJoinColumns = {
+// @PrimaryKeyJoinColumn(name = "PARENT_CONTAINER_TYPE_ID", referencedColumnName
+// = "PARENT_CONTAINER_TYPE_ID"),
+// @PrimaryKeyJoinColumn(name = "CONTAINER_TYPE_ID", referencedColumnName =
+// "CHILD_CONTAINER_TYPE_ID")
+// })
+// })
 @Unique(properties = { "parentContainer", "row", "col" }, groups = PrePersist.class)
 public class ContainerPosition extends AbstractPosition {
     private static final long serialVersionUID = 1L;
@@ -25,11 +47,9 @@ public class ContainerPosition extends AbstractPosition {
     private Container container;
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerPosition.parentContainer.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({
-        @JoinColumn(name = "PARENT_CONTAINER_ID", referencedColumnName = "ID"),
-        @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", referencedColumnName = "CONTAINER_TYPE_ID")
-    })
+    @ManyToOne
+    @ForeignKey(name = "none")
+    @JoinColumn(name = "PARENT_CONTAINER_ID")
     public Container getParentContainer() {
         return parentContainer;
     }
@@ -38,39 +58,52 @@ public class ContainerPosition extends AbstractPosition {
         this.parentContainer = parentContainer;
     }
 
+    /**
+     * Read-only property (the corresponding setter does nothing) to get data
+     * for a foreign key constraint to the parent container, ensuring that as
+     * long as this {@link ContainerPosition} exists, the parent
+     * {@link Container} has the same {@link ContainerType}.
+     * 
+     * @return
+     */
+    @ManyToOne
+    @ForeignKey(name = "none")
+    @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false)
+    ContainerType getParentContainerType() {
+        return parentContainer != null ? parentContainer.getContainerType()
+            : null;
+    }
+
+    void setParentContainerType(ContainerType parentContainerType) {
+    }
+
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerPosition.container.NotNull}")
     @OneToOne
-    @JoinColumns({
-        @JoinColumn(name = "CONTAINER_ID", referencedColumnName = "ID"),
-        @JoinColumn(name = "CONTAINER_TYPE_ID", referencedColumnName = "CONTAINER_TYPE_ID")
-    })
+    @ForeignKey(name = "none")
+    @JoinColumn(name = "CONTAINER_ID")
     public Container getContainer() {
-        return this.container;
+        return container;
     }
 
     public void setContainer(Container container) {
         this.container = container;
     }
 
-    @NotNull(message = "TODO: a better message")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({
-        @JoinColumn(name = "CONTAINER_TYPE_ID", referencedColumnName = "CHILD_CONTAINER_TYPE_ID", nullable = false, insertable = false, updatable = false),
-        @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", referencedColumnName = "PARENT_CONTAINER_TYPE_ID", nullable = false, insertable = false, updatable = false)
-    })
-    ContainerTypeContainerType getContainerTypeContainerType() {
-        ContainerTypeContainerType ctct = null;
-        ContainerType parentCt = getParentContainer().getContainerType();
-        ContainerType ct = getContainer().getContainerType();
-        for (ContainerType childCt : parentCt.getChildContainerTypes()) {
-            if (childCt.equals(ct)) {
-                ctct = new ContainerTypeContainerType(parentCt, childCt);
-                break;
-            }
-        }
-        return ctct;
+    /**
+     * Read-only property (the corresponding setter does nothing) to get data
+     * for a foreign key constraint to the container, ensuring that as long as
+     * this {@link ContainerPosition} exists, parent {@link Container} has the
+     * same {@link ContainerType}.
+     * 
+     * @return
+     */
+    @ManyToOne
+    @ForeignKey(name = "none")
+    @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false)
+    ContainerType getContainerType() {
+        return container != null ? container.getContainerType() : null;
     }
 
-    void setContainerTypeContainerType(ContainerTypeContainerType ctct) {
+    void setContainerType(ContainerType containerType) {
     }
 }

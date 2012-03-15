@@ -77,16 +77,11 @@
          userid="${database.username}"
          password="${database.password}"
          classpathref="sql.classpath">
-      <transaction src="${data.sql.dir}/createIndices.sql" />
-      <transaction src="${data.sql.dir}/eventAttrType.sql" />
-      <transaction src="${data.sql.dir}/globalEventAttr.sql" />
-      <transaction src="${data.sql.dir}/specimenTypes.sql" />
-      <transaction src="${data.sql.dir}/containerLabelingScheme.sql" />
-      <transaction src="${data.sql.dir}/shippingMethod.sql" />
-      <transaction src="${data.sql.dir}/patientLabels.sql" />
-      <transaction src="${data.sql.dir}/advancedReportsData.sql" />
-      <transaction src="${data.sql.dir}/groups.sql" />
-      <transaction src="${secu-log.dir}/schemaSecurity.sql" />
+      <path>
+        <fileset dir="${db.import.dir}">
+          <include name="**/*.sql"/>
+        </fileset>
+      </path>
       <transaction>commit;</transaction>
     </sql>
   </target>
