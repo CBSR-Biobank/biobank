@@ -11,7 +11,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
@@ -68,34 +67,6 @@ public class ContainerType extends AbstractBiobankModel {
     private ContainerLabelingScheme childLabelingScheme;
     private Set<ContainerType> parentContainerTypes =
         new HashSet<ContainerType>(0);
-    private Set<ContainerTypeContainerType> childContainerTypeContainerTypes =
-        new HashSet<ContainerTypeContainerType>(0);
-    private Set<ContainerTypeContainerType> parentContainerTypeContainerTypes =
-        new HashSet<ContainerTypeContainerType>(0);
-
-    // @Cascade(org.hibernate.annotations.CascadeType.ALL)
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "parent")
-    public Set<ContainerTypeContainerType> getChild2ContainerTypeContainerTypes() {
-        return childContainerTypeContainerTypes;
-    }
-
-    public void setChild2ContainerTypeContainerTypes(
-        Set<ContainerTypeContainerType> child2ContainerTypeContainerTypes) {
-        this.childContainerTypeContainerTypes =
-            child2ContainerTypeContainerTypes;
-    }
-
-    // @Cascade(org.hibernate.annotations.CascadeType.ALL)
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "child")
-    public Set<ContainerTypeContainerType> getParentContainerTypeContainerTypes() {
-        return parentContainerTypeContainerTypes;
-    }
-
-    public void setParentContainerTypeContainerTypes(
-        Set<ContainerTypeContainerType> parentContainerTypeContainerTypes) {
-        this.parentContainerTypeContainerTypes =
-            parentContainerTypeContainerTypes;
-    }
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ContainerType.name.NotEmpty}")
     @Column(name = "NAME")

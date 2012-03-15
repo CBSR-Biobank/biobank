@@ -8,21 +8,32 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import edu.ualberta.med.biobank.validator.constraint.NotUsed;
-import edu.ualberta.med.biobank.validator.group.PreDelete;
-
+/**
+ * Dummy class that should never actually be saved, it's only used to create a
+ * reference from {@link ContainerPosition} to the {@link ContainerType}-
+ * {@link ContainerType} relation.
+ * 
+ * @author Jonathan Ferland
+ */
 @Entity
 @Table(name = "CONTAINER_TYPE_CONTAINER_TYPE")
-@NotUsed(by = ContainerPosition.class, property = "containerTypeContainerType", groups = PreDelete.class)
 public class ContainerTypeContainerType implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private ContainerType parent;
     private ContainerType child;
 
+    public ContainerTypeContainerType() {
+    }
+
+    public ContainerTypeContainerType(ContainerType parent, ContainerType child) {
+        this.parent = parent;
+        this.child = child;
+    }
+
     @Id
     @ManyToOne(optional = false)
-    @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID")
+    @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", insertable = false, updatable = false)
     public ContainerType getParent() {
         return parent;
     }
@@ -33,7 +44,7 @@ public class ContainerTypeContainerType implements Serializable {
 
     @Id
     @ManyToOne(optional = false)
-    @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID")
+    @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", insertable = false, updatable = false)
     public ContainerType getChild() {
         return child;
     }

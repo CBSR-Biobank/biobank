@@ -67,17 +67,7 @@ public class Container extends AbstractBiobankModel {
     private ContainerPosition position;
     private Site site;
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
-    private ContainerContainerType containerContainerType =
-        new ContainerContainerType(this);
-
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "container", fetch = FetchType.EAGER, orphanRemoval = true)
-    ContainerContainerType getContainerContainerType() {
-        return containerContainerType;
-    }
-
-    void setContainerContainerType(ContainerContainerType cct) {
-        this.containerContainerType = cct;
-    }
+    private ContainerType containerType;
 
     @Column(name = "PRODUCT_BARCODE")
     public String getProductBarcode() {
@@ -161,15 +151,14 @@ public class Container extends AbstractBiobankModel {
     @ManyToOne
     @JoinColumn(name = "CONTAINER_TYPE_ID")
     public ContainerType getContainerType() {
-        return getContainerContainerType().getContainerType();
+        return containerType;
     }
 
-    public void setContainerType(ContainerType ct) {
-        getContainerContainerType().setContainerType(ct);
+    public void setContainerType(ContainerType containerType) {
+        this.containerType = containerType;
     }
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "POSITION_ID", unique = true)
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "container")
     public ContainerPosition getPosition() {
         return this.position;
     }
