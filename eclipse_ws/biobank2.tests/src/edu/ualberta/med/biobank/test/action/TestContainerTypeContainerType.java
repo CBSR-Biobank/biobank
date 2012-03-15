@@ -93,13 +93,11 @@ public class TestContainerTypeContainerType extends TestAction {
         session.flush();
 
         tx.commit();
-        session.close();
-
-        session = SESSION_PROVIDER.openSession();
         tx = session.beginTransaction();
 
-        c1.setContainerType(ct2);
-        session.saveOrUpdate(c1);
+        c2.setContainerType(ct1);
+        session.saveOrUpdate(c2);
+        session.flush();
 
         // ct1.getChildContainerTypes().clear();
         // session.saveOrUpdate(ct1);
