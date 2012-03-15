@@ -219,8 +219,9 @@ public class ContainerType extends AbstractBiobankModel {
     @Transient
     public RowColPos getRowColFromPositionString(String position)
         throws Exception {
-        return childLabelingScheme.getRowColFromPositionString(position,
-            getRowCapacity(), getColCapacity());
+        return getChildLabelingScheme()
+            .getRowColFromPositionString(position, getRowCapacity(),
+                getColCapacity());
     }
 
     @Transient

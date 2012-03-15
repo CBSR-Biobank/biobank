@@ -191,12 +191,12 @@ public class Container extends AbstractBiobankModel {
 
     @Transient
     public RowColPos getPositionAsRowCol() {
-        return this.position == null ? null : this.position.getPosition();
+        return getPosition() == null ? null : getPosition().getPosition();
     }
 
     @Transient
     public Container getParentContainer() {
-        return this.position == null ? null : this.position
+        return getPosition() == null ? null : getPosition()
             .getParentContainer();
     }
 
@@ -213,8 +213,8 @@ public class Container extends AbstractBiobankModel {
     }
 
     public boolean isPositionFree(RowColPos requestedPosition) {
-        if (childPositions.size() > 0) {
-            for (ContainerPosition pos : childPositions) {
+        if (getChildPositions().size() > 0) {
+            for (ContainerPosition pos : getChildPositions()) {
                 RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
                 if (requestedPosition.equals(rcp)) {
                     return false;
@@ -223,7 +223,7 @@ public class Container extends AbstractBiobankModel {
         }
 
         // else assume this container has specimens
-        for (SpecimenPosition pos : specimenPositions) {
+        for (SpecimenPosition pos : getSpecimenPositions()) {
             RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
             if (requestedPosition.equals(rcp)) {
                 return false;
@@ -234,7 +234,7 @@ public class Container extends AbstractBiobankModel {
 
     @Transient
     public Container getChild(RowColPos requestedPosition) throws Exception {
-        if (childPositions.size() == 0) {
+        if (getChildPositions().size() == 0) {
             throw new Exception("container does not have children");
         }
 
@@ -262,10 +262,10 @@ public class Container extends AbstractBiobankModel {
         }
 
         // remove parent label from child label
-        if (childLabel.startsWith(label)) {
-            childLabel = childLabel.substring(label.length());
+        if (childLabel.startsWith(getLabel())) {
+            childLabel = childLabel.substring(getLabel().length());
         }
-        RowColPos pos = getPositionFromLabelingScheme(label);
+        RowColPos pos = getPositionFromLabelingScheme(getLabel());
         return getChild(pos);
     }
 
@@ -317,7 +317,7 @@ public class Container extends AbstractBiobankModel {
     }
 
     public boolean hasSpecimens() {
-        return (specimenPositions.size() > 0);
+        return (getSpecimenPositions().size() > 0);
     }
 
 }
