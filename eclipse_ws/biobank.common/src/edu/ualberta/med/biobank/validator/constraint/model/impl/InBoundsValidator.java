@@ -36,6 +36,10 @@ public class InBoundsValidator
         if (value == null) return true;
         if (!(value instanceof ContainerType)) return false;
 
+        // TODO: note that this type of validation should probably be enforced
+        // through foreign key constraints. Then the capacity and labeling
+        // scheme can be changed?
+
         context.disableDefaultConstraintViolation();
 
         ContainerType containerType = (ContainerType) value;
