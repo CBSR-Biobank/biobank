@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.action.shipment;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -9,9 +9,9 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.model.OriginInfo;
-import edu.ualberta.med.biobank.model.Specimen;
 
 /**
  * Retrieve a patient information using a patient id
@@ -56,8 +56,8 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
             Object row = rows.get(0);
 
             sInfo.originInfo = (OriginInfo) row;
-            sInfo.specimens = new HashSet<Specimen>(
-                new ShipmentGetSpecimenInfosAction(oiId).run(context)
+            sInfo.specimens = new ArrayList<SpecimenInfo>(
+                new ShipmentGetSpecimenListInfoAction(oiId).run(context)
                     .getList());
 
         } else {

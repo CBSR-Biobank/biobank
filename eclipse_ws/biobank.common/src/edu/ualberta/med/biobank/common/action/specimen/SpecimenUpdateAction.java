@@ -5,6 +5,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenUpdatePermission;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
@@ -19,6 +20,7 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
     private Integer collectionEventId;
     private ActivityStatus activityStatus;
     private String commentMessage;
+    private Integer parentSpecimenId;
 
     public void setSpecimenId(Integer specimenId) {
         this.specimenId = specimenId;
@@ -40,9 +42,13 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
         this.commentMessage = commentMessage;
     }
 
+    public void setParentSpecimenId(Integer parentSpecimenId) {
+        this.parentSpecimenId = parentSpecimenId;
+    }
+
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return true; // TODO: inappropriate!
+        return new SpecimenUpdatePermission(specimenId).isAllowed(context);
     }
 
     @Override
@@ -52,14 +58,28 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
         SpecimenType specimenType =
             context.load(SpecimenType.class, specimenTypeId);
         specimen.setSpecimenType(specimenType);
-
+        // get is intended, load is wrong
+        specimen.setParentSpecimen(context.get(Specimen.class,
+            parentSpecimenId));
         specimen.setActivityStatus(activityStatus);
 
         Comment comment = addComment(context, specimen);
 
         updateCollectionEvent(context, specimen, comment);
+        updateTopSpecimen(context, specimen);
 
         return new EmptyResult();
+    }
+
+    private void updateTopSpecimen(ActionContext context, Specimen specimen) {
+        if (specimen.getParentSpecimen() == null)
+            specimen.setTopSpecimen(specimen);
+        else
+            specimen.setTopSpecimen(specimen.getParentSpecimen()
+                .getTopSpecimen());
+        context.getSession().saveOrUpdate(specimen);
+        for (Specimen spec : specimen.getChildSpecimens())
+            updateTopSpecimen(context, spec);
     }
 
     private Comment addComment(ActionContext context, Specimen specimen) {
@@ -73,18 +93,27 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
 
     private void updateCollectionEvent(ActionContext context,
         Specimen specimen, Comment comment) {
-        if (!specimen.equals(specimen.getTopSpecimen())) return;
-
-        CollectionEvent newCEvent = specimen.getCollectionEvent();
-        CollectionEvent oldCEvent =
+        // when i came across this old and new were reversed... definitely
+        // wrong. Test prolly breaks now if it ever worked
+        CollectionEvent oldCEvent = specimen.getCollectionEvent();
+        CollectionEvent newCEvent =
             context.load(CollectionEvent.class, collectionEventId);
 
-        if (!oldCEvent.equals(newCEvent)) {
-            specimen.setCollectionEvent(newCEvent);
+        specimen.setCollectionEvent(newCEvent);
+        if (specimen.getParentSpecimen() == null)
             specimen.setOriginalCollectionEvent(newCEvent);
+        else {
+            specimen.setOriginalCollectionEvent(null);
+            if (specimen.getParentSpecimen()
+                .getProcessingEvent() == null)
+                throw new ActionException(
+                    "You must select a parent with a processing event");
+        }
 
+        if (!oldCEvent.equals(newCEvent)) {
             updateChildSpecimensCEvent(specimen, newCEvent, comment);
         }
+
     }
 
     private void updateChildSpecimensCEvent(Specimen specimen,
@@ -99,4 +128,5 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
             updateChildSpecimensCEvent(childSpecimen, cEvent, comment);
         }
     }
+
 }

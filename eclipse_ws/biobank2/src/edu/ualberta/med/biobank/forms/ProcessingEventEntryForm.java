@@ -222,11 +222,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
         toolkit.paintBordersFor(client);
 
-        List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>();
-        for (SpecimenInfo info : specimens)
-            specs.add(new SpecimenWrapper(SessionManager.getAppService(),
-                info.specimen));
-
         specimenEntryWidget =
             new SpecimenEntryWidget(client, SWT.NONE, toolkit,
                 SessionManager.getAppService(), true);
@@ -341,7 +336,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         specimenEntryWidget.addVetoListener(ItemAction.POST_DELETE,
             vetoListener);
 
-        specimenEntryWidget.setSpecimens(specs);
+        specimenEntryWidget.setSpecimens(specimens);
     }
 
     @Override
@@ -388,6 +383,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             pevent.setActivityStatus(ActivityStatus.ACTIVE);
         }
         GuiUtil.reset(activityStatusComboViewer, pevent.getActivityStatus());
-        specimenEntryWidget.setSpecimens(pevent.getSpecimenCollection(true));
+        specimenEntryWidget.setSpecimens(specimens);
     }
 }

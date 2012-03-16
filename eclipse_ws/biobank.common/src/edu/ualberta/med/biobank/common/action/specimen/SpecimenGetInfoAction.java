@@ -30,6 +30,7 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
             + " INNER JOIN FETCH cevent.patient patient"
             + " INNER JOIN FETCH patient.study"
             + " LEFT JOIN FETCH spc.specimenPosition pos"
+            + " LEFT JOIN FETCH originInfo.shipmentInfo"
             + " LEFT JOIN FETCH pos.container"
             + " LEFT JOIN FETCH spc.dispatchSpecimens ds"
             + " LEFT JOIN FETCH ds.dispatch"
