@@ -10,10 +10,10 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.metadata.ClassMetadata;
 
-import edu.ualberta.med.biobank.validator.SessionAwareConstraintValidator;
+import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 
-public class NotUsedValidator extends SessionAwareConstraintValidator<Object>
+public class NotUsedValidator extends EventSourceAwareConstraintValidator<Object>
     implements ConstraintValidator<NotUsed, Object> {
     private Class<?> by;
     private String property;
@@ -25,7 +25,7 @@ public class NotUsedValidator extends SessionAwareConstraintValidator<Object>
     }
 
     @Override
-    public boolean isValidInSession(Object value,
+    public boolean isValidInEventSource(Object value,
         ConstraintValidatorContext context) {
         if (value == null) {
             return true;
@@ -45,7 +45,7 @@ public class NotUsedValidator extends SessionAwareConstraintValidator<Object>
         String defaultTemplate = context.getDefaultConstraintMessageTemplate();
 
         if (defaultTemplate.isEmpty()) {
-            ClassMetadata meta = getSession().getSessionFactory()
+            ClassMetadata meta = getEventSource().getSessionFactory()
                 .getClassMetadata(value.getClass());
 
             StringBuilder template = new StringBuilder();
@@ -67,10 +67,10 @@ public class NotUsedValidator extends SessionAwareConstraintValidator<Object>
     }
 
     private int countRows(Object value) {
-        ClassMetadata meta = getSession().getSessionFactory()
+        ClassMetadata meta = getEventSource().getSessionFactory()
             .getClassMetadata(by);
 
-        List<?> results = getSession()
+        List<?> results = getEventSource()
             .createCriteria(meta.getMappedClass(EntityMode.POJO))
             .add(Restrictions.eq(property, value))
             .setProjection(Projections.rowCount())

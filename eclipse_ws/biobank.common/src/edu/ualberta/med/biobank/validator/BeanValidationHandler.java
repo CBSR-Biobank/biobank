@@ -82,6 +82,8 @@ public class BeanValidationHandler implements PreInsertEventListener,
         String role = event.getCollection().getRole();
         String propertyName = StringHelper.unqualify(role);
 
+        // event.get
+
         System.out.println("Update. Role: " + event.getCollection().getRole());
     }
 
@@ -122,7 +124,7 @@ public class BeanValidationHandler implements PreInsertEventListener,
             persister, associationsPerEntityPersister, sessionFactory);
 
         ConstraintValidatorFactory validatorFactory =
-            new SessionAwareConstraintValidatorFactory(session);
+            new EventSourceAwareConstraintValidatorFactory(session);
 
         Validator validator = factory.usingContext()
             .traversableResolver(tr)
@@ -141,9 +143,6 @@ public class BeanValidationHandler implements PreInsertEventListener,
                 final Set<ConstraintViolation<T>> constraintViolations =
                     validator.validate(object, groups);
                 if (constraintViolations.size() > 0) {
-                    //
-                    // TODO: ensure translatable ConstraintViolation-s?
-                    //
                     // TODO: include the bean being validated and the type of
                     // action that was trying to be performed?
                     // TODO: put some of this code in another separate class
