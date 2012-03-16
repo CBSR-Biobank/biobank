@@ -26,7 +26,7 @@ public class ContainerPosition extends AbstractPosition {
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerPosition.parentContainer.NotNull}")
     @ManyToOne
-    @ForeignKey(name = "none")
+    @ForeignKey(name = "FK_ContainerPosition_parentContainer")
     @JoinColumn(name = "PARENT_CONTAINER_ID")
     public Container getParentContainer() {
         return parentContainer;
@@ -48,7 +48,8 @@ public class ContainerPosition extends AbstractPosition {
     @ForeignKey(name = "none")
     @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false)
     ContainerType getParentContainerType() {
-        return parentContainer != null ? parentContainer.getContainerType()
+        return getParentContainer() != null
+            ? getParentContainer().getContainerType()
             : null;
     }
 
@@ -79,7 +80,9 @@ public class ContainerPosition extends AbstractPosition {
     @ForeignKey(name = "none")
     @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false)
     ContainerType getContainerType() {
-        return container != null ? container.getContainerType() : null;
+        return getContainer() != null
+            ? getContainer().getContainerType()
+            : null;
     }
 
     void setContainerType(ContainerType containerType) {

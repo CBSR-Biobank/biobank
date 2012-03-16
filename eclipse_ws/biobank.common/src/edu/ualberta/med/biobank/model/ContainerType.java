@@ -134,7 +134,7 @@ public class ContainerType extends AbstractBiobankModel {
     @JoinTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
         joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false, updatable = false) })
-    @ForeignKey(name = "FK_PARENT", inverseName = "FK_CHILD")
+    @ForeignKey(name = "FK_ContainerType_childContainerTypes", inverseName = "FK_ContainerType_parentContainerTypes")
     public Set<ContainerType> getChildContainerTypes() {
         return this.childContainerTypes;
     }

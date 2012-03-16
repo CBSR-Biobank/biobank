@@ -151,7 +151,7 @@ public class Container extends AbstractBiobankModel {
     @NotNull(message = "{edu.ualberta.med.biobank.model.Container.containerType.NotNull}")
     @ManyToOne
     @JoinColumn(name = "CONTAINER_TYPE_ID")
-    @ForeignKey(name = "FK_CONTAINER_TYPE")
+    @ForeignKey(name = "FK_Container_containerType")
     public ContainerType getContainerType() {
         return containerType;
     }
