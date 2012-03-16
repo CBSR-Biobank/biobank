@@ -80,6 +80,7 @@ either expressed or implied, of the Canadian BioSample Repository.
 
    <features>
       <feature id="biobank2.feature.core"/>
+      <feature id="biobank2.feature.platform"/>
       <feature id="org.eclipse.equinox.p2.rcp.feature"/>
       <feature id="org.eclipse.rcp"/>
    </features>
