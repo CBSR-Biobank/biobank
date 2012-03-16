@@ -17,28 +17,6 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "CONTAINER_POSITION",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "PARENT_CONTAINER_ID", "ROW", "COL" }) })
-// @SecondaryTables({
-// @SecondaryTable(name = "CONTAINER",
-// pkJoinColumns = {
-// @PrimaryKeyJoinColumn(name = "CONTAINER_ID", referencedColumnName = "ID"),
-// @PrimaryKeyJoinColumn(name = "CONTAINER_TYPE_ID", referencedColumnName =
-// "CONTAINER_TYPE_ID")
-// }),
-// @SecondaryTable(name = "CONTAINER",
-// pkJoinColumns = {
-// @PrimaryKeyJoinColumn(name = "PARENT_CONTAINER_ID", referencedColumnName =
-// "ID"),
-// @PrimaryKeyJoinColumn(name = "PARENT_CONTAINER_TYPE_ID", referencedColumnName
-// = "CONTAINER_TYPE_ID")
-// }),
-// @SecondaryTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
-// pkJoinColumns = {
-// @PrimaryKeyJoinColumn(name = "PARENT_CONTAINER_TYPE_ID", referencedColumnName
-// = "PARENT_CONTAINER_TYPE_ID"),
-// @PrimaryKeyJoinColumn(name = "CONTAINER_TYPE_ID", referencedColumnName =
-// "CHILD_CONTAINER_TYPE_ID")
-// })
-// })
 @Unique(properties = { "parentContainer", "row", "col" }, groups = PrePersist.class)
 public class ContainerPosition extends AbstractPosition {
     private static final long serialVersionUID = 1L;

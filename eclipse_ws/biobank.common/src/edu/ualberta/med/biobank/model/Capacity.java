@@ -1,16 +1,12 @@
 package edu.ualberta.med.biobank.model;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.Embeddable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-@Entity
-@Table(name = "CAPACITY")
-public class Capacity extends AbstractBiobankModel {
-    private static final long serialVersionUID = 1L;
-
+@Embeddable
+public class Capacity {
     private Integer rowCapacity;
     private Integer colCapacity;
 

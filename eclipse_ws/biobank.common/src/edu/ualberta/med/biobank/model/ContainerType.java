@@ -5,6 +5,7 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -156,8 +157,7 @@ public class ContainerType extends AbstractBiobankModel {
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.capacity.NotNull}")
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "CAPACITY_ID", unique = true, nullable = false)
+    @Embedded
     public Capacity getCapacity() {
         return this.capacity;
     }
