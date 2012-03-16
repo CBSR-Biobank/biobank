@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/biobank2.feature.core_3.2.0.rc1.jar" id="biobank2.feature.core" version="3.2.0.rc1"/>
+</site>

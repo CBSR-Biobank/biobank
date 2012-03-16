@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature
-      id="biobank2.feature.core"
-      label="BioBank Core Feature"
-      version="3.2.0.rc1"
-      provider-name="AICML"
-      plugin="biobank">
+<feature id="biobank2.feature.core" label="BioBank Core Feature" version="3.2.0.rc1" provider-name="AICML" plugin="biobank">
 
    <description>
       This feature contains all plugins developped by AICML for the BioBank application
    </description>
 
    <license url="epl-v10.html">
-      Unless otherwise indicated, all Content made available by BioBank application is provided to you under the terms and conditions of the Eclipse Public License Version 1.0 (&quot;EPL&quot;). A copy of the EPL is provided with this Content and is also available at http://www.eclipse.org/legal/epl-v10.html.
+      Unless otherwise indicated, all Content made available by BioBank application is provided to you under the terms and conditions of the Eclipse Public License Version 1.0 ("EPL"). A copy of the EPL is provided with this Content and is also available at http://www.eclipse.org/legal/epl-v10.html.
    </license>
 
    <requires>
@@ -44,46 +39,16 @@
       <import plugin="biobank" version="3.2.0" match="greaterOrEqual"/>
    </requires>
 
-   <plugin
-         id="biobank.common"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+   <plugin id="biobank.common" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
-   <plugin
-         id="biobank"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+   <plugin id="biobank" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
-   <plugin
-         id="scannerConfig"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+   <plugin id="scannerConfig" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
-   <plugin
-         id="biobank.gui.common"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+   <plugin id="biobank.gui.common" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
-   <plugin
-         id="biobank.mvp"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+   <plugin id="biobank.mvp" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
-   <plugin
-         id="labelPrinter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+   <plugin id="labelPrinter" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
 </feature>
