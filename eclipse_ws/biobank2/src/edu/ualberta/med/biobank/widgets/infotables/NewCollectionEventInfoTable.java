@@ -45,8 +45,8 @@ public class NewCollectionEventInfoTable extends
                 case 2:
                     return NumberFormatter.format(info.aliquotedSpecimenCount);
                 case 3:
-                    return info.cevent.getComments().size() == 0 ? "N"
-                        : "Y";
+                    return info.cevent.getComments().size() == 0 ? Messages.SpecimenInfoTable_no_first_letter
+                        : Messages.SpecimenInfoTable_yes_first_letter;
 
                 default:
                     return ""; //$NON-NLS-1$

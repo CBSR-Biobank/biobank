@@ -25,18 +25,17 @@ import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.originInfo.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
-import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.dialogs.SpecimenOriginSelectDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -129,7 +128,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
-    private List<SpecimenWrapper> specimens;
+    private List<SpecimenInfo> specimens;
 
     @Override
     protected void init() throws Exception {
@@ -158,17 +157,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             oi.setShipmentInfo(new ShipmentInfo());
             originInfo.setWrappedObject(oi);
             shipmentInfo.setWrappedObject(oi.getShipmentInfo());
-            specimens = new ArrayList<SpecimenWrapper>();
+            specimens = new ArrayList<SpecimenInfo>();
         } else {
             ShipmentReadInfo read =
                 SessionManager.getAppService().doAction(
                     new ShipmentGetInfoAction(id));
             originInfo.setWrappedObject(read.originInfo);
             shipmentInfo.setWrappedObject(read.originInfo.getShipmentInfo());
-            specimens =
-                ModelWrapper.wrapModelCollection(
-                    SessionManager.getAppService(), read.specimens,
-                    SpecimenWrapper.class);
+            specimens = read.specimens;
+
         }
 
     }
@@ -397,9 +394,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                                     specimen.getOriginInfo().getShipmentInfo()));
                         break;
                     case POST_ADD:
-                        originInfo.addToSpecimenCollection(Arrays
-                            .asList(specimen));
-                        specimen.setOriginInfo(originInfo);
+                        // action performs this now
                         break;
                     case PRE_DELETE:
                         if (!originInfo.isNew()) {
@@ -472,12 +467,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
 
-        Set<Integer> addedSpecimenIds =
-            WrapperUtil.getCollectionIds(specimenEntryWidget
-                .getAddedSpecimens());
-        Set<Integer> removedSpecimenIds =
-            WrapperUtil.getCollectionIds(specimenEntryWidget
-                .getRemovedSpecimens());
+        Set<Integer> addedSpecimenIds = new HashSet<Integer>();
+        for (SpecimenInfo info : specimenEntryWidget.getAddedSpecimens()) {
+            addedSpecimenIds.add(info.specimen.getId());
+        }
+        Set<Integer> removedSpecimenIds = new HashSet<Integer>();
+        for (SpecimenInfo info : specimenEntryWidget
+            .getRemovedSpecimens()) {
+            removedSpecimenIds.add(info.specimen.getId());
+        }
 
         OriginInfoSaveInfo oiInfo =
             new OriginInfoSaveInfo(originInfo.getId(), originInfo

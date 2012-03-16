@@ -52,7 +52,7 @@ public class Specimen extends AbstractBiobankModel {
     private String inventoryId;
     private BigDecimal quantity;
     private Date createdAt;
-    private Specimen topSpecimen;
+    private Specimen topSpecimen = this;
     private CollectionEvent collectionEvent;
     private Center currentCenter;
     private Set<DispatchSpecimen> dispatchSpecimens =

@@ -21,7 +21,7 @@ public abstract class SpecimenListGetInfoAction implements
 
     @SuppressWarnings("nls")
     protected static final String SPEC_BASE_QRY =
-        "SELECT distinct spec,parent.label,pos.positionString,toptype.nameShort"
+        "SELECT spec,parent.label,pos.positionString,toptype.nameShort, count(comment)"
             + " FROM " + Specimen.class.getName() + " spec"
             + " INNER JOIN FETCH spec.specimenType"
             + " INNER JOIN FETCH spec.currentCenter"
@@ -32,9 +32,11 @@ public abstract class SpecimenListGetInfoAction implements
             + " INNER JOIN FETCH spec.collectionEvent cevent"
             + " INNER JOIN FETCH spec.originInfo originInfo"
             + " INNER JOIN FETCH originInfo.center"
-            + " LEFT JOIN FETCH spec.comments"
             + " INNER JOIN FETCH cevent.patient patient"
-            + " INNER JOIN FETCH patient.study study";
+            + " INNER JOIN FETCH patient.study study"
+            + " LEFT JOIN spec.comments comment";
+
+    protected static final String SPEC_BASE_END = " GROUP BY spec.id";
 
     @Override
     public boolean isAllowed(ActionContext context) {
@@ -57,10 +59,11 @@ public abstract class SpecimenListGetInfoAction implements
             specInfo.parentLabel = (String) row[1];
             specInfo.positionString = (String) row[2];
             specInfo.topContainerTypeNameShort = (String) row[3];
+            specInfo.comments = ((Long) row[4]).equals(0) ? "N"
+                : "Y";
             specs.add(specInfo);
         }
 
         return new ListResult<SpecimenInfo>(specs);
     }
-
 }

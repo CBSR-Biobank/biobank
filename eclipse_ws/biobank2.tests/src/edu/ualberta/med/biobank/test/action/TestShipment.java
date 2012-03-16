@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.action.originInfo.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.Utils;
@@ -79,19 +80,24 @@ public class TestShipment extends TestAction {
         ShipmentReadInfo info =
             EXECUTOR.exec(new ShipmentGetInfoAction(id));
 
-        Assert.assertTrue(info.originInfo.getCenter().getId().equals(oisave.centerId));
+        Assert.assertTrue(info.originInfo.getCenter().getId()
+            .equals(oisave.centerId));
         Assert.assertTrue(info.originInfo.getReceiverSite().getId()
             .equals(oisave.siteId));
-        for (Specimen spec : info.specimens) {
-            Assert.assertTrue(oisave.addedSpecIds.contains(spec.getId()));
-            Assert.assertTrue(spec.getOriginInfo().getCenter().getId()
+        for (SpecimenInfo spec : info.specimens) {
+            Assert.assertTrue(oisave.addedSpecIds.contains(spec.specimen
+                .getId()));
+            Assert.assertTrue(spec.specimen.getOriginInfo().getCenter().getId()
                 .equals(centerId));
-            Assert.assertTrue(spec.getOriginInfo().getReceiverSite().getId()
+            Assert.assertTrue(spec.specimen.getOriginInfo().getReceiverSite()
+                .getId()
                 .equals(siteId));
-            Assert.assertTrue(spec.getCurrentCenter().getId().equals(siteId));
+            Assert.assertTrue(spec.specimen.getCurrentCenter().getId()
+                .equals(siteId));
         }
-        for (Specimen spec : info.specimens)
-            Assert.assertTrue(!oisave.removedSpecIds.contains(spec.getId()));
+        for (SpecimenInfo spec : info.specimens)
+            Assert.assertTrue(!oisave.removedSpecIds.contains(spec.specimen
+                .getId()));
 
         oisave.removedSpecIds = oisave.addedSpecIds;
         oisave.addedSpecIds = new HashSet<Integer>();
