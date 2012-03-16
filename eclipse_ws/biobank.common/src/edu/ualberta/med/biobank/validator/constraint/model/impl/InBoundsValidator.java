@@ -14,11 +14,11 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
-import edu.ualberta.med.biobank.validator.constraint.model.ValidContainerType;
+import edu.ualberta.med.biobank.validator.constraint.model.InBounds;
 
-public class ValidContainerTypeValidator
+public class InBoundsValidator
     extends EventSourceAwareConstraintValidator<Object>
-    implements ConstraintValidator<ValidContainerType, Object> {
+    implements ConstraintValidator<InBounds, Object> {
     private static final String MULTIPLE_CHILD_TYPES =
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.multipleChildTypes}";
     private static final String OVER_CAPACITY =
@@ -27,7 +27,7 @@ public class ValidContainerTypeValidator
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.illegalChange}";
 
     @Override
-    public void initialize(ValidContainerType annotation) {
+    public void initialize(InBounds annotation) {
     }
 
     @Override
@@ -64,7 +64,6 @@ public class ValidContainerTypeValidator
                     .addNode("childContainerTypes")
                     .addNode("specimenTypes")
                     .addConstraintViolation();
-                return false;
             }
         }
         return true;
@@ -78,7 +77,6 @@ public class ValidContainerTypeValidator
                 // TODO: any way to mark rowCapacity and colCapacity?
                 .addNode("capacity")
                 .addConstraintViolation();
-            return false;
         }
         return true;
     }

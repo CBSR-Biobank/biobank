@@ -26,6 +26,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.constraint.model.ValidContainer;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
@@ -52,6 +53,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "specimenPositions", groups = PreDelete.class),
     @Empty(property = "childPositions", groups = PreDelete.class)
 })
+@ValidContainer(groups = PrePersist.class)
 public class Container extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
