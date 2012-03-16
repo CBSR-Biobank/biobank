@@ -13,8 +13,8 @@ Bundle-ClassPath: lib/javax.inject.jar,
  lib/guice-3.0.jar,
  lib/peaberry-1.2.jar,
  lib/aopalliance.jar,
- .,
- lib/gwt-pectin-0.8.1.jar
+ lib/gwt-pectin-0.8.1.jar,
+ .
 Export-Package: com.google.gwt.event.dom.client,
  com.google.gwt.event.logical.shared,
  com.google.gwt.event.shared,

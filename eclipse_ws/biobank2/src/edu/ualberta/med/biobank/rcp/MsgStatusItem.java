@@ -99,7 +99,7 @@ public class MsgStatusItem extends ContributionItem {
         }
     }
 
-    public Color getBackgroundColor(@SuppressWarnings("unused") String text) {
+    public Color getBackgroundColor(String text) {
         return null;
     }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="BioBank" uid="biobank.product" id="biobank.product" application="biobank.biobank" version="3.2.0.rc1" useFeatures="true" includeLaunchers="false">
+<product name="BioBank" id="biobank.product" application="biobank.biobank" version="3.2.0.rc1" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/biobank2/icons/about.png"/>
@@ -35,8 +35,8 @@ AICML: http://aicml.cs.ualberta.ca
       <solaris/>
       <win useIco="false">
          <bmp
-            winSmallHigh="/biobank2/icons/biobank_launcher_16.bmp"
-            winMediumHigh="/biobank2/icons/biobank_launcher_32.bmp"/>
+            winSmallHigh="/biobank.gui.common/icons/biobank_launcher_16.bmp"
+            winMediumHigh="/biobank.gui.common/icons/biobank_launcher_32.bmp"/>
       </win>
    </launcher>
 
@@ -83,12 +83,15 @@ either expressed or implied, of the Canadian BioSample Repository.
 
    <features>
       <feature id="biobank2.feature.core"/>
-      <feature id="biobank2.feature.platform"/>
       <feature id="org.eclipse.equinox.p2.rcp.feature"/>
+      <feature id="org.eclipse.rcp"/>
    </features>
 
    <configurations>
-      <plugin id="biobank.mvp" autoStart="true" startLevel="7" />
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
+      <plugin id="org.eclipse.osgi" autoStart="true" startLevel="-1" />
    </configurations>
 
 </product>

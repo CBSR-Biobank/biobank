@@ -1082,18 +1082,30 @@
          </separator>
       </menuContribution>
          <menuContribution
-            locationURI="menu:help?after=additions">
+            locationURI="menu:biobank.help?after=additions">
             <separator
                   name="edu.ualberta.med.biobank.menu.update.separatorA"
                   visible="true">
             </separator>
+            <command
+                  commandId="org.eclipse.equinox.p2.ui.sdk.update"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.equinox.p2.ui.sdk.install"
+                  style="push">
+            </command>
+            <separator
+                  name="edu.ualberta.med.biobank.menu.update.separatorB"
+                  visible="true">
+            </separator>  
             <command
                   commandId="edu.ualberta.med.biobank.commands.cbsrHelp"
                   label="%CbsrHelp.command"
                   id="edu.ualberta.med.biobank.menu.cbsrHelp">
             </command>
             <separator
-                  name="edu.ualberta.med.biobank.menu.update.separatorB"
+                  name="edu.ualberta.med.biobank.menu.update.separatorC"
                   visible="true">
             </separator>  
             <command
@@ -2441,5 +2453,17 @@
          id="edu.ualberta.med.biobank.perspective.linkAssign"
          name="Link or Assign perspective">
    </context>  
+   </extension>
+   <extension
+         id="product1"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="biobank.biobank"
+            name="Biobank">
+         <property
+               name="appName"
+               value="Biobank">
+         </property>
+      </product>
    </extension>
 </plugin>

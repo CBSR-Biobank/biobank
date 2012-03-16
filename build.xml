@@ -711,7 +711,7 @@ End:
 
       <!-- uncomment line below to build a single executable product -->
       <!-- arg line="-Dconfigs='win32, win32, x86'" / -->
-      <arg line="-Dconfigs='linux, gtk, x86_64'" />
+      <!-- arg line="-Dconfigs='linux, gtk, x86_64'" / -->
     </java>
     <antcall target="updateSiteMetadata" />
   </target>
