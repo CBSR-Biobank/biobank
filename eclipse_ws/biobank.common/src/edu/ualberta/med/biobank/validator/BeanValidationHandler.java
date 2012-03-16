@@ -17,7 +17,6 @@ import javax.validation.groups.Default;
 
 import org.hibernate.EntityMode;
 import org.hibernate.FlushMode;
-import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.cfg.beanvalidation.HibernateTraversableResolver;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.event.AbstractPreDatabaseOperationEvent;
@@ -80,28 +79,29 @@ public class BeanValidationHandler implements PreInsertEventListener,
 
     @Override
     public void onPreUpdateCollection(PreCollectionUpdateEvent event) {
-        Object entity = event.getAffectedOwnerOrNull();
-        String role = event.getCollection().getRole();
-        String propertyName = StringHelper.unqualify(role);
+        // Object entity = event.getAffectedOwnerOrNull();
+        // String role = event.getCollection().getRole();
+        // String propertyName = StringHelper.unqualify(role);
 
-        // event.get
+        // not sure this is actually important. The owning object will be
+        // checked first anyways
 
-        System.out.println("Update. Role: " + event.getCollection().getRole());
+        // System.out.println("Update. Role: " +
+        // event.getCollection().getRole());
     }
 
     @Override
     public void onPreRemoveCollection(PreCollectionRemoveEvent event) {
-        System.out.println("Remove. Role: " + event.getCollection().getRole());
+        // TODO: this is important when the owning entity is deleted, to check
+        // this first.
+        // System.out.println("Remove. Role: " +
+        // event.getCollection().getRole());
     }
 
     @Override
     public void onPreRecreateCollection(PreCollectionRecreateEvent event) {
-        System.out
-            .println("Recreate. Role: " + event.getCollection().getRole());
-    }
-
-    private void validate(Object entity, String property) {
-
+        // System.out
+        // .println("Recreate. Role: " + event.getCollection().getRole());
     }
 
     private void validate(AbstractPreDatabaseOperationEvent event,

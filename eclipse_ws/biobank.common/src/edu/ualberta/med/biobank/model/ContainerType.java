@@ -16,6 +16,8 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.SQLInsert;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -120,11 +122,19 @@ public class ContainerType extends AbstractBiobankModel {
         this.specimenTypes = specimenTypes;
     }
 
-//    @
+    /**
+     * The custom @SQLInsert allows a `SITE_ID` to be inserted into the
+     * correlation table so a foreign key can be created to ensure that
+     * {@link ContainerType}-s with the same {@link Site} can be related.
+     * 
+     * @return
+     */
+    @SQLInsert(sql = "INSERT INTO `CONTAINER_TYPE_CONTAINER_TYPE` (PARENT_CONTAINER_TYPE_ID, CHILD_CONTAINER_TYPE_ID, SITE_ID) SELECT ?, ID, SITE_ID FROM `CONTAINER_TYPE` WHERE ID = ?")
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
         joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false, updatable = false) })
+    @ForeignKey(name = "FK_PARENT", inverseName = "FK_CHILD")
     public Set<ContainerType> getChildContainerTypes() {
         return this.childContainerTypes;
     }

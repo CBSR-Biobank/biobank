@@ -19,6 +19,7 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -150,6 +151,7 @@ public class Container extends AbstractBiobankModel {
     @NotNull(message = "{edu.ualberta.med.biobank.model.Container.containerType.NotNull}")
     @ManyToOne
     @JoinColumn(name = "CONTAINER_TYPE_ID")
+    @ForeignKey(name = "FK_CONTAINER_TYPE")
     public ContainerType getContainerType() {
         return containerType;
     }
