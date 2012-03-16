@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
@@ -386,14 +386,14 @@ public class TestContainerLabelingScheme extends TestDatabase {
             Assert.fail("Should be out of bounds");
 
         // test canlabel
-        CapacityWrapper cap = new CapacityWrapper(appService);
-        cap.setCol(4);
-        cap.setRow(2);
+        Capacity cap = new Capacity();
+        cap.setColCapacity(4);
+        cap.setRowCapacity(2);
 
         Assert.assertTrue(ContainerLabelingSchemeWrapper.canLabel(
             ContainerLabelingSchemeWrapper.getLabelingSchemeById(appService,
                 ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA)
-                .getWrappedObject(), cap.getWrappedObject()));
+                .getWrappedObject(), cap));
 
     }
 

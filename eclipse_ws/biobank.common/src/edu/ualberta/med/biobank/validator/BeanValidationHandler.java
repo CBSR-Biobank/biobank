@@ -17,10 +17,17 @@ import javax.validation.groups.Default;
 
 import org.hibernate.EntityMode;
 import org.hibernate.FlushMode;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.cfg.beanvalidation.HibernateTraversableResolver;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.event.AbstractPreDatabaseOperationEvent;
 import org.hibernate.event.EventSource;
+import org.hibernate.event.PreCollectionRecreateEvent;
+import org.hibernate.event.PreCollectionRecreateEventListener;
+import org.hibernate.event.PreCollectionRemoveEvent;
+import org.hibernate.event.PreCollectionRemoveEventListener;
+import org.hibernate.event.PreCollectionUpdateEvent;
+import org.hibernate.event.PreCollectionUpdateEventListener;
 import org.hibernate.event.PreDeleteEvent;
 import org.hibernate.event.PreDeleteEventListener;
 import org.hibernate.event.PreInsertEvent;
@@ -36,7 +43,9 @@ import edu.ualberta.med.biobank.validator.group.PreUpdate;
 import edu.ualberta.med.biobank.validator.messageinterpolator.OgnlMessageInterpolator;
 
 public class BeanValidationHandler implements PreInsertEventListener,
-    PreUpdateEventListener, PreDeleteEventListener {
+    PreUpdateEventListener, PreDeleteEventListener,
+    PreCollectionUpdateEventListener, PreCollectionRecreateEventListener,
+    PreCollectionRemoveEventListener {
     private static final long serialVersionUID = 1L;
 
     private final ValidatorFactory factory;
@@ -65,6 +74,26 @@ public class BeanValidationHandler implements PreInsertEventListener,
     public boolean onPreDelete(PreDeleteEvent event) {
         validate(event, new Class<?>[] { PreDelete.class });
         return false;
+    }
+
+    @Override
+    public void onPreUpdateCollection(PreCollectionUpdateEvent event) {
+        Object entity = event.getAffectedOwnerOrNull();
+        String role = event.getCollection().getRole();
+        String propertyName = StringHelper.unqualify(role);
+
+        System.out.println("Update. Role: " + event.getCollection().getRole());
+    }
+
+    @Override
+    public void onPreRemoveCollection(PreCollectionRemoveEvent event) {
+        System.out.println("Remove. Role: " + event.getCollection().getRole());
+    }
+
+    @Override
+    public void onPreRecreateCollection(PreCollectionRecreateEvent event) {
+        System.out
+            .println("Recreate. Role: " + event.getCollection().getRole());
     }
 
     private void validate(AbstractPreDatabaseOperationEvent event,

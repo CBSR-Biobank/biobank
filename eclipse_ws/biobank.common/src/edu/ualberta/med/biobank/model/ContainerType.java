@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -121,6 +120,7 @@ public class ContainerType extends AbstractBiobankModel {
         this.specimenTypes = specimenTypes;
     }
 
+//    @
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
         joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },

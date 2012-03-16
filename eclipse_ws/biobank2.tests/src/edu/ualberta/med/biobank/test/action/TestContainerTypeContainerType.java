@@ -51,10 +51,23 @@ public class TestContainerTypeContainerType extends TestAction {
         ct2.getCapacity().setRowCapacity(5);
         ct2.getCapacity().setColCapacity(5);
 
+        ContainerType ct3 = new ContainerType();
+        ct3.setName(methodNameR + "_3");
+        ct3.setNameShort(methodNameR + "_3");
+        ct3.setActivityStatus(ActivityStatus.ACTIVE);
+        ct3.setChildLabelingScheme(sbsScheme);
+        ct3.setSite(site);
+        ct3.getCapacity().setRowCapacity(5);
+        ct3.getCapacity().setColCapacity(5);
+
         session.save(ct2);
+        session.flush();
+        
+        session.save(ct3);
         session.flush();
 
         ct1.getChildContainerTypes().add(ct2);
+        ct1.getChildContainerTypes().add(ct3);
 
         session.save(ct1);
         session.flush();
@@ -95,6 +108,11 @@ public class TestContainerTypeContainerType extends TestAction {
         tx.commit();
         tx = session.beginTransaction();
 
+        ct1.getChildContainerTypes().remove(ct3);
+        session.saveOrUpdate(ct1);
+        session.flush();
+        // hope the above causes some collection event?
+        
         c2.setContainerType(ct1);
         session.saveOrUpdate(c2);
         session.flush();
