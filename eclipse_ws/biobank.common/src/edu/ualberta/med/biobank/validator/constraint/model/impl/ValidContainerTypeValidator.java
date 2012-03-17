@@ -1,30 +1,39 @@
 package edu.ualberta.med.biobank.validator.constraint.model.impl;
 
+import java.sql.Connection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.persister.entity.EntityPersister;
 
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.model.ValidContainerType;
 
 public class ValidContainerTypeValidator
     extends EventSourceAwareConstraintValidator<Object>
     implements ConstraintValidator<ValidContainerType, Object> {
-    private static final String MULTIPLE_CHILD_TYPES =
+    public static final String MULTIPLE_CHILD_TYPES =
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.multipleChildTypes}";
-    private static final String OVER_CAPACITY =
+    public static final String OVER_CAPACITY =
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.overCapacity}";
-    private static final String ILLEGAL_CHANGE =
+    public static final String ILLEGAL_CHANGE =
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.illegalChange}";
+    public static final String ILLEGAL_CHILD_CONTAINER_TYPE_REMOVE =
+        "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.illegalChildContainerTypeRemove}";
+    public static final String ILLEGAL_SPECIMEN_TYPE_REMOVE =
+        "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.illegalSpecimenTypeRemove}";
 
     @Override
     public void initialize(ValidContainerType annotation) {
@@ -38,15 +47,19 @@ public class ValidContainerTypeValidator
 
         context.disableDefaultConstraintViolation();
 
-        ContainerType containerType = (ContainerType) value;
+        ContainerType ct = (ContainerType) value;
+        ContainerType oldCt = getOldContainerTypeOrNull(ct);
 
         boolean isValid = true;
 
-        isValid &= checkCapacity(containerType, context);
-        isValid &= checkChanges(containerType, context);
-        isValid &= checkChildrenTypes(containerType, context);
-        isValid &= checkRemovedChildContainerTypes(containerType, context);
-        isValid &= checkRemovedSpecimenTypes(containerType, context);
+        isValid &= checkCapacity(ct, context);
+        isValid &= checkChildrenTypes(ct, context);
+
+        if (oldCt != null) {
+            isValid &= checkChanges(ct, oldCt, context);
+            isValid &= checkRemovedChildContainerTypes(ct, oldCt, context);
+            isValid &= checkRemovedSpecimenTypes(ct, oldCt, context);
+        }
 
         return isValid;
     }
@@ -83,32 +96,38 @@ public class ValidContainerTypeValidator
         return true;
     }
 
-    private boolean checkChanges(ContainerType ct,
+    private ContainerType getOldContainerTypeOrNull(ContainerType ct) {
+        if (ct.isNew()) return null;
+
+        ContainerType oldCt = null;
+
+        // Get the old value in the same transaction in case that transaction
+        // has not been committed yet
+        Connection conn = getEventSource().connection();
+        Session newSession = getEventSource().getSessionFactory()
+            .openSession(conn);
+
+        try {
+            oldCt = (ContainerType) newSession
+                .createCriteria(ContainerType.class)
+                .add(Restrictions.idEq(ct.getId()))
+                .uniqueResult();
+        } catch (HibernateException e) {
+        }
+
+        return oldCt;
+    }
+
+    private boolean checkChanges(ContainerType ct, ContainerType oldCt,
         ConstraintValidatorContext context) {
-        if (ct.isNew()) return true;
         if (!isUsed(ct)) return true;
-
-        EntityPersister persister = getEventSource().
-            getEntityPersister(ContainerType.class.getName(), ct);
-
-        Integer id = ct.getId();
-        Object[] data = persister.getDatabaseSnapshot(id, getEventSource());
-        String[] propertyNames = persister.getPropertyNames();
 
         boolean isValid = true;
 
-        for (int i = 0, n = data.length; i < n && isValid; i++) {
-            Object value = data[i];
-            String propertyName = propertyNames[i];
-
-            if ("capacity".equals(propertyName)) {
-                isValid &= !nullSafeEquals(value, ct.getCapacity());
-            } else if ("topLevel".equals(propertyName)) {
-                isValid &= !nullSafeEquals(value, ct.getTopLevel());
-            } else if ("childLabelingScheme".equals(propertyName)) {
-                isValid &= !nullSafeEquals(value, ct.getChildLabelingScheme());
-            }
-        }
+        isValid &= nullSafeEquals(ct.getCapacity(), oldCt.getCapacity());
+        isValid &= nullSafeEquals(ct.getTopLevel(), oldCt.getTopLevel());
+        isValid &= nullSafeEquals(ct.getChildLabelingScheme(),
+            oldCt.getChildLabelingScheme());
 
         if (!isValid) {
             context.buildConstraintViolationWithTemplate(ILLEGAL_CHANGE)
@@ -143,14 +162,56 @@ public class ValidContainerTypeValidator
     }
 
     private boolean checkRemovedChildContainerTypes(ContainerType ct,
-        ConstraintValidatorContext context) {
-        // TODO: check this?
-        return true;
+        ContainerType oldCt, ConstraintValidatorContext context) {
+        Set<ContainerType> removed = new HashSet<ContainerType>();
+        removed.addAll(oldCt.getChildContainerTypes());
+        removed.removeAll(ct.getChildContainerTypes());
+
+        if (removed.isEmpty()) return true;
+
+        List<?> results = getEventSource()
+            .createCriteria(ContainerPosition.class)
+            .add(Restrictions.in("containerType", removed))
+            .setProjection(Projections.rowCount())
+            .list();
+
+        Number count = (Number) results.iterator().next();
+        boolean isValid = count.intValue() == 0;
+
+        if (!isValid) {
+            context.buildConstraintViolationWithTemplate(
+                ILLEGAL_CHILD_CONTAINER_TYPE_REMOVE)
+                .addNode("childContainerTypes")
+                .addConstraintViolation();
+        }
+
+        return isValid;
     }
 
     private boolean checkRemovedSpecimenTypes(ContainerType ct,
-        ConstraintValidatorContext context) {
-        // TODO: check this?
-        return true;
+        ContainerType oldCt, ConstraintValidatorContext context) {
+        Set<SpecimenType> removed = new HashSet<SpecimenType>();
+        removed.addAll(oldCt.getSpecimenTypes());
+        removed.removeAll(ct.getSpecimenTypes());
+
+        if (removed.isEmpty()) return true;
+
+        List<?> results = getEventSource()
+            .createCriteria(SpecimenPosition.class)
+            .add(Restrictions.in("specimenType", removed))
+            .setProjection(Projections.rowCount())
+            .list();
+
+        Number count = (Number) results.iterator().next();
+        boolean isValid = count.intValue() == 0;
+
+        if (!isValid) {
+            context.buildConstraintViolationWithTemplate(
+                ILLEGAL_SPECIMEN_TYPE_REMOVE)
+                .addNode("specimenTypes")
+                .addConstraintViolation();
+        }
+
+        return isValid;
     }
 }

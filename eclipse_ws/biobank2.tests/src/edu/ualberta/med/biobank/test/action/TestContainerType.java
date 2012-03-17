@@ -11,6 +11,8 @@ import javax.validation.ConstraintViolationException;
 import junit.framework.Assert;
 
 import org.hibernate.Query;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,7 +26,10 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAct
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
@@ -441,6 +446,89 @@ public class TestContainerType extends TestAction {
             EXECUTOR.exec(new ContainerGetInfoAction(containerId));
 
         return containerInfo.container;
+    }
+
+    @Test
+    public void removeUsedChildContainerType() {
+        Transaction tx = session.beginTransaction();
+
+        String methodNameR = getMethodNameR();
+
+        Site site = new Site();
+
+        site.setActivityStatus(ActivityStatus.ACTIVE);
+        site.getAddress().setCity(methodNameR);
+        site.setName(methodNameR);
+        site.setNameShort(methodNameR);
+
+        session.save(site);
+
+        ContainerLabelingScheme sbsScheme = (ContainerLabelingScheme) session
+            .createCriteria(ContainerLabelingScheme.class)
+            .add(Restrictions.idEq(1))
+            .uniqueResult();
+
+        ContainerType ct1 = new ContainerType();
+        ct1.setName(methodNameR + "_1");
+        ct1.setNameShort(methodNameR + "_1");
+        ct1.setActivityStatus(ActivityStatus.ACTIVE);
+        ct1.setChildLabelingScheme(sbsScheme);
+        ct1.setSite(site);
+        ct1.setTopLevel(true);
+        ct1.getCapacity().setRowCapacity(5);
+        ct1.getCapacity().setColCapacity(5);
+
+        ContainerType ct2 = new ContainerType();
+        ct2.setName(methodNameR + "_2");
+        ct2.setNameShort(methodNameR + "_2");
+        ct2.setActivityStatus(ActivityStatus.ACTIVE);
+        ct2.setChildLabelingScheme(sbsScheme);
+        ct2.setSite(site);
+        ct2.getCapacity().setRowCapacity(5);
+        ct2.getCapacity().setColCapacity(5);
+
+        ct1.getChildContainerTypes().add(ct2);
+
+        session.save(ct2);
+        session.save(ct1);
+
+        session.flush();
+
+        Container c1 = new Container();
+        c1.setLabel(methodNameR + "_1");
+        c1.setActivityStatus(ActivityStatus.ACTIVE);
+        c1.setContainerType(ct1);
+        c1.setSite(site);
+
+        Container c2 = new Container();
+        c2.setLabel(methodNameR + "_2");
+        c2.setActivityStatus(ActivityStatus.ACTIVE);
+        c2.setContainerType(ct2);
+        c2.setSite(site);
+
+        ContainerPosition cp = new ContainerPosition();
+
+        cp.setParentContainer(c1);
+        cp.setRow(0);
+        cp.setCol(0);
+        cp.setContainer(c2);
+        c2.setPosition(cp);
+
+        session.save(c1);
+        session.save(c2);
+
+        try {
+            ct1.getChildContainerTypes().clear();
+            session.update(ct1);
+            tx.commit();
+
+            Assert.fail("cannot remove child container types in use");
+        } catch (ConstraintViolationException e) {
+        }
+    }
+
+    @Test
+    public void removeUsedSpecimenType() {
     }
 
     @Test
