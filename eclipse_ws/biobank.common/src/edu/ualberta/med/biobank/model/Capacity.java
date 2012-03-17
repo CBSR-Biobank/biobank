@@ -9,6 +9,19 @@ import javax.validation.constraints.NotNull;
 public class Capacity {
     private Integer rowCapacity;
     private Integer colCapacity;
+    
+    public Capacity() {
+    }
+    
+    public Capacity(Integer maxRows, Integer maxCols) {
+        this.rowCapacity = maxRows;
+        this.colCapacity = maxCols;
+    }
+    
+    public Capacity(Capacity other) {
+        this.rowCapacity = other.getRowCapacity();
+        this.colCapacity = other.getColCapacity();
+    }
 
     @Min(value = 0, message = "{edu.ualberta.med.biobank.model.Capacity.rowCapacity.Min}")
     @NotNull(message = "{edu.ualberta.med.biobank.model.Capacity.rowCapacity.NotNull}")

@@ -30,9 +30,9 @@ public class ValidContainerTypeValidator
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.overCapacity}";
     public static final String ILLEGAL_CHANGE =
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.illegalChange}";
-    public static final String ILLEGAL_CHILD_CONTAINER_TYPE_REMOVE =
+    public static final String ILLEGAL_CHILD_CT_REMOVE =
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.illegalChildContainerTypeRemove}";
-    public static final String ILLEGAL_SPECIMEN_TYPE_REMOVE =
+    public static final String ILLEGAL_ST_REMOVE =
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.illegalSpecimenTypeRemove}";
 
     @Override
@@ -180,7 +180,7 @@ public class ValidContainerTypeValidator
 
         if (!isValid) {
             context.buildConstraintViolationWithTemplate(
-                ILLEGAL_CHILD_CONTAINER_TYPE_REMOVE)
+                ILLEGAL_CHILD_CT_REMOVE)
                 .addNode("childContainerTypes")
                 .addConstraintViolation();
         }
@@ -207,7 +207,7 @@ public class ValidContainerTypeValidator
 
         if (!isValid) {
             context.buildConstraintViolationWithTemplate(
-                ILLEGAL_SPECIMEN_TYPE_REMOVE)
+                ILLEGAL_ST_REMOVE)
                 .addNode("specimenTypes")
                 .addConstraintViolation();
         }
