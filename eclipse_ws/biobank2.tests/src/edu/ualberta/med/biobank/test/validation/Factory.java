@@ -1,10 +1,12 @@
 package edu.ualberta.med.biobank.test.validation;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -15,6 +17,7 @@ import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 
@@ -28,6 +31,7 @@ import edu.ualberta.med.biobank.model.Study;
  */
 public class Factory {
     private final NameGenerator nameGenerator;
+    private final Session session;
 
     private Site defaultSite;
     private ContainerType defaultContainerType;
@@ -44,7 +48,8 @@ public class Factory {
     private final LinkedList<Object> saveOrUpdate = new LinkedList<Object>();
     private final LinkedList<Object> createdObjects = new LinkedList<Object>();
 
-    public Factory(String root) {
+    public Factory(Session session, String root) {
+        this.session = session;
         this.nameGenerator = new NameGenerator(root);
     }
 
@@ -126,6 +131,12 @@ public class Factory {
     }
 
     public ContainerLabelingScheme getDefaultContainerLabelingScheme() {
+        if (defaultContainerLabelingScheme == null) {
+            defaultContainerLabelingScheme = (ContainerLabelingScheme) session
+                .createCriteria(ContainerLabelingScheme.class)
+                .add(Restrictions.idEq(1))
+                .uniqueResult();
+        }
         return defaultContainerLabelingScheme;
     }
 
@@ -211,6 +222,7 @@ public class Factory {
 
         SpecimenType specimenType = new SpecimenType();
         specimenType.setName(name);
+        specimenType.setNameShort(name);
 
         setDefaultSpecimenType(specimenType);
         addCreatedObject(specimenType);
@@ -225,6 +237,8 @@ public class Factory {
         specimen.setSpecimenType(getDefaultSpecimenType());
         specimen.setCurrentCenter(getDefaultSite());
         specimen.setCollectionEvent(getDefaultCollectionEvent());
+        specimen.setOriginInfo(getDefaultOriginInfo());
+        specimen.setCreatedAt(new Date());
 
         setDefaultSpecimen(specimen);
         addCreatedObject(specimen);
@@ -266,21 +280,43 @@ public class Factory {
         Patient patient = new Patient();
         patient.setPnumber(name);
         patient.setStudy(getDefaultStudy());
+        patient.setCreatedAt(new Date());
 
         setDefaultPatient(patient);
         addCreatedObject(patient);
         return patient;
     }
-    
+
     public OriginInfo createOriginInfo() {
         OriginInfo originInfo = new OriginInfo();
         originInfo.setCenter(getDefaultSite());
-        
+
         // TODO: what about ShippingInfo?
-        
+
         setDefaultOriginInfo(originInfo);
         addCreatedObject(originInfo);
         return originInfo;
+    }
+
+    public SpecimenPosition createSpecimenPosition() {
+        SpecimenPosition position = new SpecimenPosition();
+
+        Container container = getDefaultContainer();
+        position.setContainer(container);
+        position.setSpecimen(getDefaultSpecimen());
+
+        container.getSpecimenPositions().add(position);
+
+        // set a sensible default position (row, col), to do this, make sure we
+        // keep the container's SpecimenPosition list up to date.
+        int numSpecimens = container.getSpecimenPositions().size();
+
+        ContainerType ct = container.getContainerType();
+        position.setRow(numSpecimens / ct.getRowCapacity());
+        position.setCol(numSpecimens % ct.getColCapacity());
+
+        addCreatedObject(position);
+        return position;
     }
 
     public class NameGenerator {
@@ -305,12 +341,13 @@ public class Factory {
             return sb.toString();
         }
     }
-    
+
     public void saveOrUpdate(Session session) {
         for (Object o : saveOrUpdate) {
             session.saveOrUpdate(o);
         }
         saveOrUpdate.clear();
+        session.flush();
     }
 
     private void addCreatedObject(Object o) {

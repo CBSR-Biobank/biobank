@@ -13,6 +13,8 @@ import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.validator.constraint.model.impl.ValidContainerTypeValidator;
 
 public class TestContainerType extends TestValidation {
@@ -20,12 +22,10 @@ public class TestContainerType extends TestValidation {
     public void removeUsedChildContainerType() {
         Transaction tx = session.beginTransaction();
 
-        Factory factory = new Factory(getMethodNameR());
+        Factory factory = new Factory(session, getMethodNameR());
 
         Site site = factory.createSite();
         session.save(site);
-
-        factory.setDefaultContainerLabelingScheme(getSbs());
 
         ContainerType ct1 = factory.createContainerType();
         ct1.setTopLevel(true);
@@ -69,48 +69,28 @@ public class TestContainerType extends TestValidation {
     public void removeUsedSpecimenType() {
         Transaction tx = session.beginTransaction();
 
-        Factory factory = new Factory(getMethodNameR());
+        Factory factory = new Factory(session, getMethodNameR());
 
-        Site site = factory.createSite();
-        session.save(site);
+        ContainerType ct = factory.createContainerType();
+        ct.setTopLevel(true);
 
-        factory.setDefaultContainerLabelingScheme(getSbs());
+        SpecimenType st = factory.createSpecimenType();
+        Specimen s = factory.createSpecimen();
+        s.setSpecimenPosition(factory.createSpecimenPosition());
 
-        ContainerType ct1 = factory.createContainerType();
-        ct1.setTopLevel(true);
+        ct.getSpecimenTypes().add(st);
 
-        Container c1 = factory.createContainer();
-
-        ContainerType ct2 = factory.createContainerType();
-        Container c2 = factory.createContainer();
-
-        ct1.getChildContainerTypes().add(ct2);
-
-        session.save(ct2);
-        session.save(ct1);
-
-        session.flush();
-
-        ContainerPosition cp = new ContainerPosition();
-
-        cp.setParentContainer(c1);
-        cp.setRow(0);
-        cp.setCol(0);
-        cp.setContainer(c2);
-        c2.setPosition(cp);
-
-        session.save(c1);
-        session.save(c2);
+        factory.saveOrUpdate(session);
 
         try {
-            ct1.getChildContainerTypes().clear();
-            session.update(ct1);
+            ct.getSpecimenTypes().clear();
+            session.update(ct);
             tx.commit();
 
-            Assert.fail("cannot remove child container types in use");
+            Assert.fail("cannot remove specimen types in use");
         } catch (ConstraintViolationException e) {
             ErrorUtil.assertContainsTemplate(e,
-                ValidContainerTypeValidator.ILLEGAL_CHILD_CT_REMOVE);
+                ValidContainerTypeValidator.ILLEGAL_ST_REMOVE);
         }
     }
 
@@ -133,12 +113,5 @@ public class TestContainerType extends TestValidation {
         // labeling scheme cannot be changed after on a container type once
         // containers of this type have been created
 
-    }
-
-    private ContainerLabelingScheme getSbs() {
-        return (ContainerLabelingScheme) session
-            .createCriteria(ContainerLabelingScheme.class)
-            .add(Restrictions.idEq(1))
-            .uniqueResult();
     }
 }
