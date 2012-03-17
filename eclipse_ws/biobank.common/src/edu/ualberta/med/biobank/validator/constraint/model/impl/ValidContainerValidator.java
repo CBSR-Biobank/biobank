@@ -12,6 +12,8 @@ public class ValidContainerValidator
     implements ConstraintValidator<ValidContainer, Object> {
     private static final String ILLEGAL_PARENT =
         "{edu.ualberta.med.biobank.model.Container.ValidContainer.illegalParent}";
+    private static final String MISSING_PARENT =
+        "{edu.ualberta.med.biobank.model.Container.ValidContainer.missingParent}";
 
     @Override
     public void initialize(ValidContainer annotation) {
@@ -36,13 +38,20 @@ public class ValidContainerValidator
 
     private boolean checkParent(Container container,
         ConstraintValidatorContext context) {
-        if (container.getPosition() != null
-            && container.getContainerType().getTopLevel()) {
-            // TODO: cannot be top-level and have a parent
-            // TODO: must have a parent if not top-level
-            context.buildConstraintViolationWithTemplate(ILLEGAL_PARENT)
-                .addNode("position")
-                .addConstraintViolation();
+        if (container.getContainerType().getTopLevel()) {
+            if (container.getPosition() != null) {
+                context.buildConstraintViolationWithTemplate(ILLEGAL_PARENT)
+                    .addNode("position")
+                    .addConstraintViolation();
+                return false;
+            }
+        } else {
+            if (container.getPosition() == null) {
+                context.buildConstraintViolationWithTemplate(MISSING_PARENT)
+                    .addNode("position")
+                    .addConstraintViolation();
+                return false;
+            }
         }
         return true;
     }

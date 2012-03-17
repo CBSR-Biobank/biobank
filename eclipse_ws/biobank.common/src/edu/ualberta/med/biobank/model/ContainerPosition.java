@@ -87,4 +87,9 @@ public class ContainerPosition extends AbstractPosition {
 
     void setContainerType(ContainerType containerType) {
     }
+
+    @Override
+    public Container getHoldingContainer() {
+        return getParentContainer();
+    }
 }

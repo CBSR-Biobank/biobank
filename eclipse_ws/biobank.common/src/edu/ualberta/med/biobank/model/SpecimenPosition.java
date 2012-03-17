@@ -99,4 +99,9 @@ public class SpecimenPosition extends AbstractPosition {
 
     void setSpecimenType(SpecimenType specimenType) {
     }
+
+    @Override
+    public Container getHoldingContainer() {
+        return getContainer();
+    }
 }
