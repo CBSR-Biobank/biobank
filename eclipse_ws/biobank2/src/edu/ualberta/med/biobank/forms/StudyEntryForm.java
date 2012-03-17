@@ -125,16 +125,18 @@ public class StudyEntryForm extends BiobankEntryForm {
             tabName = Messages.StudyEntryForm_title_new;
             study.setActivityStatus(ActivityStatus.ACTIVE);
         } else {
-            tabName = NLS.bind(Messages.StudyEntryForm_title_edit,
-                study.getNameShort());
+            tabName =
+                NLS.bind(Messages.StudyEntryForm_title_edit,
+                    study.getNameShort());
         }
         setPartName(tabName);
     }
 
     private void updateStudyInfo(Integer id) throws Exception {
         if (id != null) {
-            studyInfo = SessionManager.getAppService().doAction(
-                new StudyGetInfoAction(id));
+            studyInfo =
+                SessionManager.getAppService().doAction(
+                    new StudyGetInfoAction(id));
             study.setWrappedObject(studyInfo.getStudy());
         } else {
             studyInfo = new StudyInfo();
@@ -144,8 +146,8 @@ public class StudyEntryForm extends BiobankEntryForm {
         comment.setWrappedObject(new Comment());
 
         List<SpecimenType> specimenTypes =
-            SessionManager.getAppService().doAction(
-                new SpecimenTypeGetAllAction()).getList();
+            SessionManager.getAppService()
+                .doAction(new SpecimenTypeGetAllAction()).getList();
         specimenTypeWrappers =
             ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
                 specimenTypes, SpecimenTypeWrapper.class);
@@ -176,16 +178,17 @@ public class StudyEntryForm extends BiobankEntryForm {
             StudyPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 Messages.StudyEntryForm_nameShort_validator_msg));
 
-        activityStatusComboViewer = createComboViewer(client,
-            Messages.label_activity, ActivityStatus.valuesList(),
-            study.getActivityStatus(),
-            Messages.StudyEntryForm_activity_validator_msg,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    study.setActivityStatus((ActivityStatus) selectedObject);
-                }
-            });
+        activityStatusComboViewer =
+            createComboViewer(client, Messages.label_activity,
+                ActivityStatus.valuesList(), study.getActivityStatus(),
+                Messages.StudyEntryForm_activity_validator_msg,
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        study
+                            .setActivityStatus((ActivityStatus) selectedObject);
+                    }
+                });
 
         createCommentSection();
         createClinicSection();
@@ -216,22 +219,23 @@ public class StudyEntryForm extends BiobankEntryForm {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentsInfoTable(client,
-            study.getCommentCollection(false));
+        commentEntryTable =
+            new CommentsInfoTable(client, study.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.MULTI, Messages.Comments_add, null, comment, "message", null);
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_add, null, comment, "message", null);
     }
 
     private void createSourceSpecimensSection() {
         Section section =
             createSection(Messages.StudyEntryForm_source_specimens_title);
-        sourceSpecimenEntryTable = new SourceSpecimenEntryInfoTable(section,
-            study, specimenTypeWrappers);
+        sourceSpecimenEntryTable =
+            new SourceSpecimenEntryInfoTable(section, study,
+                specimenTypeWrappers);
         sourceSpecimenEntryTable.adaptToToolkit(toolkit, true);
         sourceSpecimenEntryTable.addSelectionChangedListener(listener);
 
@@ -249,8 +253,8 @@ public class StudyEntryForm extends BiobankEntryForm {
     private void createAliquotedSpecimensSection() {
         Section section =
             createSection(Messages.StudyEntryForm_aliquoted_specimens_title);
-        aliquotedSpecimenEntryTable = new AliquotedSpecimenEntryInfoTable(
-            section, study);
+        aliquotedSpecimenEntryTable =
+            new AliquotedSpecimenEntryInfoTable(section, study);
         aliquotedSpecimenEntryTable.adaptToToolkit(toolkit, true);
         aliquotedSpecimenEntryTable.addSelectionChangedListener(listener);
 
@@ -276,8 +280,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         StudyEventAttrCustom studyEventAttrCustom;
 
-        List<String> studyEventInfoLabels = Arrays.asList(study
-            .getStudyEventAttrLabels());
+        List<String> studyEventInfoLabels =
+            Arrays.asList(study.getStudyEventAttrLabels());
 
         for (GlobalEventAttrWrapper geAttr : GlobalEventAttrWrapper
             .getAllGlobalEventAttrs(SessionManager.getAppService())) {
@@ -292,12 +296,14 @@ public class StudyEntryForm extends BiobankEntryForm {
                     .getStudyEventAttr(label).getId());
                 studyEventAttrCustom.setAllowedValues(study
                     .getStudyEventAttrPermissible(label));
-                selected = study.getStudyEventAttrActivityStatus(label).equals(
-                    ActivityStatus.ACTIVE);
+                selected =
+                    study.getStudyEventAttrActivityStatus(label).equals(
+                        ActivityStatus.ACTIVE);
             }
             studyEventAttrCustom.setIsDefault(false);
-            studyEventAttrCustom.widget = new EventAttrWidget(client, SWT.NONE,
-                studyEventAttrCustom, selected);
+            studyEventAttrCustom.widget =
+                new EventAttrWidget(client, SWT.NONE, studyEventAttrCustom,
+                    selected);
             studyEventAttrCustom.widget.addSelectionChangedListener(listener);
             studyEventAttrCustom.inStudy = studyEventInfoLabels.contains(label);
             pvCustomInfoList.add(studyEventAttrCustom);
@@ -457,15 +463,13 @@ public class StudyEntryForm extends BiobankEntryForm {
         contactEntryTable.reload();
         aliquotedSpecimenEntryTable.reload();
         sourceSpecimenEntryTable.reload();
-        commentEntryTable.setList(ModelWrapper.wrapModelCollection(
-            SessionManager.getAppService(), studyInfo.getStudy().getComments(),
-            CommentWrapper.class));
+        commentEntryTable.setList(study.getCommentCollection(false));
         resetPvCustomInfo();
     }
 
     private void resetPvCustomInfo() throws Exception {
-        List<String> studyPvInfoLabels = Arrays.asList(study
-            .getStudyEventAttrLabels());
+        List<String> studyPvInfoLabels =
+            Arrays.asList(study.getStudyEventAttrLabels());
 
         for (StudyEventAttrCustom studyPvAttrCustom : pvCustomInfoList) {
             boolean selected = false;

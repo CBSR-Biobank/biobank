@@ -88,15 +88,17 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             tabName = Messages.ClinicEntryForm_title_new;
             clinic.setActivityStatus(ActivityStatus.ACTIVE);
         } else
-            tabName = NLS.bind(Messages.ClinicEntryForm_title_edit,
-                clinic.getNameShort());
+            tabName =
+                NLS.bind(Messages.ClinicEntryForm_title_edit,
+                    clinic.getNameShort());
         setPartName(tabName);
     }
 
     private void updateClinicInfo(Integer id) throws Exception {
         if (id != null) {
-            clinicInfo = SessionManager.getAppService().doAction(
-                new ClinicGetInfoAction(id));
+            clinicInfo =
+                SessionManager.getAppService().doAction(
+                    new ClinicGetInfoAction(id));
             clinic.setWrappedObject(clinicInfo.clinic);
         } else {
             clinicInfo = new ClinicInfo();
@@ -150,17 +152,17 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             ClinicPeer.SENDS_SHIPMENTS.getName(), null);
         toolkit.paintBordersFor(client);
 
-        activityStatusComboViewer = createComboViewer(client,
-            Messages.label_activity, ActivityStatus.valuesList(),
-            clinic.getActivityStatus(),
-            Messages.ClinicEntryForm_activity_validator_msg,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    clinic
-                        .setActivityStatus((ActivityStatus) selectedObject);
-                }
-            });
+        activityStatusComboViewer =
+            createComboViewer(client, Messages.label_activity,
+                ActivityStatus.valuesList(), clinic.getActivityStatus(),
+                Messages.ClinicEntryForm_activity_validator_msg,
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        clinic
+                            .setActivityStatus((ActivityStatus) selectedObject);
+                    }
+                });
 
         createCommentSection();
 
@@ -171,8 +173,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentsInfoTable(client,
-            clinic.getCommentCollection(false));
+        commentEntryTable =
+            new CommentsInfoTable(client, clinic.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
@@ -187,9 +189,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private void createContactSection() {
         Section section = createSection(Messages.clinic_contact_title);
 
-        List<ContactWrapper> contacts = ModelWrapper.wrapModelCollection(
-            SessionManager.getAppService(), clinicInfo.contacts,
-            ContactWrapper.class);
+        List<ContactWrapper> contacts =
+            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+                clinicInfo.contacts, ContactWrapper.class);
 
         contactEntryWidget = new ContactEntryInfoTable(section, contacts);
         contactEntryWidget.adaptToToolkit(toolkit, true);
@@ -241,9 +243,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             new HashSet<ContactSaveInfo>();
 
         for (ContactWrapper wrapper : clinic.getContactCollection(false)) {
-            contactSaveInfos.add(new ContactSaveInfo(
-                wrapper
-                    .getWrappedObject()));
+            contactSaveInfos
+                .add(new ContactSaveInfo(wrapper.getWrappedObject()));
         }
         return contactSaveInfos;
     }
@@ -261,8 +262,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         GuiUtil.reset(activityStatusComboViewer, clinic.getActivityStatus());
         contactEntryWidget.reload();
-        commentEntryTable.setList(ModelWrapper.wrapModelCollection(
-            SessionManager.getAppService(), clinicInfo.clinic.getComments(),
-            CommentWrapper.class));
+        commentEntryTable.setList(clinic.getCommentCollection(false));
     }
 }

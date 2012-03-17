@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -88,16 +87,17 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             tabName = Messages.SiteEntryForm_title_new;
             site.setActivityStatus(ActivityStatus.ACTIVE);
         } else {
-            tabName = NLS.bind(Messages.SiteEntryForm_title_edit,
-                site.getNameShort());
+            tabName =
+                NLS.bind(Messages.SiteEntryForm_title_edit, site.getNameShort());
         }
         setPartName(tabName);
     }
 
     private void updateSiteInfo(Integer id) throws Exception {
         if (id != null) {
-            siteInfo = SessionManager.getAppService().doAction(
-                new SiteGetInfoAction(id));
+            siteInfo =
+                SessionManager.getAppService().doAction(
+                    new SiteGetInfoAction(id));
             site.setWrappedObject(siteInfo.getSite());
         } else {
             siteInfo = new SiteInfo.Builder().build();
@@ -127,15 +127,15 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentsInfoTable(client,
-            site.getCommentCollection(false));
+        commentEntryTable =
+            new CommentsInfoTable(client, site.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.MULTI, Messages.Comments_add, null, comment, "message", null);
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_add, null, comment, "message", null);
     }
 
     private void createSiteSection() throws ApplicationException {
@@ -159,16 +159,16 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             SitePeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 Messages.SiteEntryForm_field_nameShort_validation_msg));
 
-        activityStatusComboViewer = createComboViewer(client,
-            Messages.label_activity,
-            ActivityStatus.valuesList(), site.getActivityStatus(),
-            Messages.SiteEntryForm_field_activity_validation_msg,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    site.setActivityStatus((ActivityStatus) selectedObject);
-                }
-            });
+        activityStatusComboViewer =
+            createComboViewer(client, Messages.label_activity,
+                ActivityStatus.valuesList(), site.getActivityStatus(),
+                Messages.SiteEntryForm_field_activity_validation_msg,
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        site.setActivityStatus((ActivityStatus) selectedObject);
+                    }
+                });
 
     }
 
@@ -238,8 +238,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         }
         GuiUtil.reset(activityStatusComboViewer, site.getActivityStatus());
         studiesTable.reload();
-        commentEntryTable.setList(ModelWrapper.wrapModelCollection(
-            SessionManager.getAppService(), siteInfo.getSite().getComments(),
-            CommentWrapper.class));
+        commentEntryTable.setList(site.getCommentCollection(false));
     }
 }
