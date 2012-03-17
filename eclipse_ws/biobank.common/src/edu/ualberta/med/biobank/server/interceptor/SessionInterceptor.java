@@ -26,7 +26,7 @@ public class SessionInterceptor extends EmptyInterceptor {
 
     private static final long serialVersionUID = 1L;
 
-    private void log(Object entity, String action) {
+    public void log(Object entity, String action) {
         try {
             WrapperLogProvider<?> logProvider = BiobankObjectStateLogger
                 .getLogProvider(entity.getClass());
@@ -41,7 +41,21 @@ public class SessionInterceptor extends EmptyInterceptor {
                 ex);
         }
     }
+    
+    @Override
+    public String onPrepareStatement(String sql) {
+    	System.out.println(sql);
+    	return sql;
+    }
+    
 
+    @Override
+    public boolean onLoad(Object entity, Serializable id, Object[] state,
+        String[] propertyNames, org.hibernate.type.Type[] types) {
+    	log(entity, "select");
+    	return false;
+    }
+    
     /**
      * This method gets called before an object is saved.
      */

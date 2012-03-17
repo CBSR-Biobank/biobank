@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.action.dispatch;
 
 import java.util.List;
 
+import org.hibernate.EmptyInterceptor;
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -10,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.server.interceptor.SessionInterceptor;
 
 public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
     private static final long serialVersionUID = 1L;
@@ -58,7 +60,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
             throw new ActionException(
                 "No dispatch found for id:" + id); //$NON-NLS-1$
         }
-
+        
         return sInfo;
     }
 
