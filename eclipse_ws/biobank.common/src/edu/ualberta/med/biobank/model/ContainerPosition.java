@@ -5,6 +5,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
@@ -89,6 +90,7 @@ public class ContainerPosition extends AbstractPosition {
     }
 
     @Override
+    @Transient
     public Container getHoldingContainer() {
         return getParentContainer();
     }
