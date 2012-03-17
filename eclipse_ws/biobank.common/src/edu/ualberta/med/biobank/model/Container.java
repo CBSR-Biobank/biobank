@@ -13,11 +13,13 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -63,10 +65,10 @@ public class Container extends AbstractBiobankModel {
     private Container topContainer;
     private Set<SpecimenPosition> specimenPositions =
         new HashSet<SpecimenPosition>(0);
-    private ContainerType containerType;
     private ContainerPosition position;
     private Site site;
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
+    private ContainerType containerType;
 
     @Column(name = "PRODUCT_BARCODE")
     public String getProductBarcode() {
@@ -147,18 +149,18 @@ public class Container extends AbstractBiobankModel {
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Container.containerType.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "CONTAINER_TYPE_ID")
+    @ForeignKey(name = "FK_Container_containerType")
     public ContainerType getContainerType() {
-        return this.containerType;
+        return containerType;
     }
 
     public void setContainerType(ContainerType containerType) {
         this.containerType = containerType;
     }
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "POSITION_ID", unique = true)
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "container", orphanRemoval = true)
     public ContainerPosition getPosition() {
         return this.position;
     }
@@ -191,12 +193,12 @@ public class Container extends AbstractBiobankModel {
 
     @Transient
     public RowColPos getPositionAsRowCol() {
-        return this.position == null ? null : this.position.getPosition();
+        return getPosition() == null ? null : getPosition().getPosition();
     }
 
     @Transient
     public Container getParentContainer() {
-        return this.position == null ? null : this.position
+        return getPosition() == null ? null : getPosition()
             .getParentContainer();
     }
 
@@ -213,8 +215,8 @@ public class Container extends AbstractBiobankModel {
     }
 
     public boolean isPositionFree(RowColPos requestedPosition) {
-        if (childPositions.size() > 0) {
-            for (ContainerPosition pos : childPositions) {
+        if (getChildPositions().size() > 0) {
+            for (ContainerPosition pos : getChildPositions()) {
                 RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
                 if (requestedPosition.equals(rcp)) {
                     return false;
@@ -223,7 +225,7 @@ public class Container extends AbstractBiobankModel {
         }
 
         // else assume this container has specimens
-        for (SpecimenPosition pos : specimenPositions) {
+        for (SpecimenPosition pos : getSpecimenPositions()) {
             RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
             if (requestedPosition.equals(rcp)) {
                 return false;
@@ -234,7 +236,7 @@ public class Container extends AbstractBiobankModel {
 
     @Transient
     public Container getChild(RowColPos requestedPosition) throws Exception {
-        if (childPositions.size() == 0) {
+        if (getChildPositions().size() == 0) {
             throw new Exception("container does not have children");
         }
 
@@ -256,15 +258,16 @@ public class Container extends AbstractBiobankModel {
      */
     @Transient
     public Container getChildByLabel(String childLabel) throws Exception {
+        ContainerType containerType = getContainerType();
         if (containerType == null) {
             throw new Exception("container type is null");
         }
 
         // remove parent label from child label
-        if (childLabel.startsWith(label)) {
-            childLabel = childLabel.substring(label.length());
+        if (childLabel.startsWith(getLabel())) {
+            childLabel = childLabel.substring(getLabel().length());
         }
-        RowColPos pos = getPositionFromLabelingScheme(label);
+        RowColPos pos = getPositionFromLabelingScheme(getLabel());
         return getChild(pos);
     }
 
@@ -278,6 +281,7 @@ public class Container extends AbstractBiobankModel {
     @Transient
     public RowColPos getPositionFromLabelingScheme(String position)
         throws Exception {
+        ContainerType containerType = getContainerType();
         RowColPos rcp = containerType.getRowColFromPositionString(position);
         if (rcp != null) {
             if (rcp.getRow() >= containerType.getRowCapacity()
@@ -307,6 +311,7 @@ public class Container extends AbstractBiobankModel {
      */
     @Transient
     public String getFullInfoLabel() {
+        ContainerType containerType = getContainerType();
         if ((containerType == null) || (containerType.getNameShort() == null)) {
             return getLabel();
         }
@@ -314,7 +319,7 @@ public class Container extends AbstractBiobankModel {
     }
 
     public boolean hasSpecimens() {
-        return (specimenPositions.size() > 0);
+        return (getSpecimenPositions().size() > 0);
     }
 
 }

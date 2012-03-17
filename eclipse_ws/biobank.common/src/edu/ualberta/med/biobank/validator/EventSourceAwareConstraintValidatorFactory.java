@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.validator;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 
-import org.hibernate.Session;
+import org.hibernate.event.EventSource;
 import org.hibernate.validator.engine.ConstraintValidatorFactoryImpl;
 
 /**
@@ -17,13 +17,13 @@ import org.hibernate.validator.engine.ConstraintValidatorFactoryImpl;
  * @see http
  *      ://stackoverflow.com/questions/4613055/hibernate-unique-key-validation
  */
-public class SessionAwareConstraintValidatorFactory implements
+public class EventSourceAwareConstraintValidatorFactory implements
     ConstraintValidatorFactory {
     private final ConstraintValidatorFactoryImpl constraintValidatorFactoryImpl;
-    private final Session session;
+    private final EventSource eventSource;
 
-    public SessionAwareConstraintValidatorFactory(Session session) {
-        this.session = session;
+    public EventSourceAwareConstraintValidatorFactory(EventSource eventSource) {
+        this.eventSource = eventSource;
 
         constraintValidatorFactoryImpl = new ConstraintValidatorFactoryImpl();
     }
@@ -31,9 +31,9 @@ public class SessionAwareConstraintValidatorFactory implements
     @Override
     public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
         T constraintValidator = constraintValidatorFactoryImpl.getInstance(key);
-        if (constraintValidator instanceof SessionAwareConstraintValidator) {
-            ((SessionAwareConstraintValidator<?>) constraintValidator)
-                .setSession(session);
+        if (constraintValidator instanceof EventSourceAwareConstraintValidator) {
+            ((EventSourceAwareConstraintValidator<?>) constraintValidator)
+                .setSession(eventSource);
         }
         return constraintValidator;
     }
