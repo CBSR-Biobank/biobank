@@ -312,8 +312,11 @@ public class Factory {
         int numSpecimens = container.getSpecimenPositions().size();
 
         ContainerType ct = container.getContainerType();
-        position.setRow(numSpecimens / ct.getRowCapacity());
-        position.setCol(numSpecimens % ct.getColCapacity());
+        position.setRow((numSpecimens - 1) / ct.getRowCapacity());
+        position.setCol((numSpecimens - 1) % ct.getColCapacity());
+        
+        // TODO: set this RIGHT
+        position.setPositionString("asdf");
 
         addCreatedObject(position);
         return position;
