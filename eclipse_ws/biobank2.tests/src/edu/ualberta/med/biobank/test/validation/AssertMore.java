@@ -9,7 +9,7 @@ import javax.validation.ConstraintViolationException;
 
 import junit.framework.Assert;
 
-public class ErrorUtil {
+public class AssertMore {
     public static void assertContainsTemplate(ConstraintViolationException e,
         String messageTemplate) {
         Collection<String> messageTemplates = new ArrayList<String>();
@@ -29,9 +29,8 @@ public class ErrorUtil {
     public static void assertMessageContains(Throwable t, String substring) {
         if (!t.getMessage().contains(substring)) {
             Assert.fail("Expected exception " + t.getClass().getName()
-                + " with message '" + t.getMessage()
                 + "' to contain the substring '" + substring
-                + "' but it did not.");
+                + "' but instead got message: '" + t.getMessage() + "'");
         }
     }
 }
