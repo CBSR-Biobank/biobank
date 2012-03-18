@@ -151,7 +151,7 @@ public class ValidContainerTypeValidator
     }
 
     private boolean isUsed(ContainerType ct) {
-        return isUsed(ct, SpecimenPosition.class, "container")
+        return isUsed(ct, SpecimenPosition.class, "containerType")
             || isUsed(ct, ContainerPosition.class, "parentContainerType");
     }
 

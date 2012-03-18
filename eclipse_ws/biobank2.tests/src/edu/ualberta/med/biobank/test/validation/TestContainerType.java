@@ -11,7 +11,9 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.validator.constraint.model.impl.ValidContainerTypeValidator;
 
@@ -20,29 +22,13 @@ public class TestContainerType extends TestValidation {
     public void removeUsedChildContainerType() {
         Transaction tx = session.beginTransaction();
 
-        ContainerType ct2 = factory.createContainerType();
-        ContainerType ct1 = factory.createContainerType();
-        ct1.setTopLevel(true);
-        ct1.getChildContainerTypes().add(ct2);
-
-        Container c1 = factory.createContainer();
-        c1.setContainerType(ct1);
-
-        Container c2 = factory.createContainer();
-        c2.setContainerType(ct2);
-
-        ContainerPosition cp = new ContainerPosition();
-        cp.setParentContainer(c1);
-        cp.setRow(0);
-        cp.setCol(0);
-        cp.setContainer(c2);
-        c2.setPosition(cp);
-
-        factory.save();
+        Container topContainer = factory.createTopContainer();
+        factory.createContainer();
 
         try {
-            ct1.getChildContainerTypes().clear();
-            session.update(ct1);
+            ContainerType topContainerType = topContainer.getContainerType();
+            topContainerType.getChildContainerTypes().clear();
+            session.update(topContainerType);
             tx.commit();
             Assert.fail("cannot remove child container types in use");
         } catch (ConstraintViolationException e) {
@@ -56,20 +42,13 @@ public class TestContainerType extends TestValidation {
     public void removeUsedSpecimenType() {
         Transaction tx = session.beginTransaction();
 
-        SpecimenType st = factory.createSpecimenType();
-        ContainerType ct = factory.createContainerType();
-        ct.setTopLevel(true);
-        ct.getSpecimenTypes().add(st);
-
-        factory.createContainer();
-        Specimen s = factory.createSpecimen();
-        s.setSpecimenPosition(factory.createSpecimenPosition());
-
-        factory.save();
+        Specimen specimen = factory.createPositionedSpecimen();
 
         try {
-            ct.getSpecimenTypes().clear();
-            session.update(ct);
+            ContainerType parentCt = specimen.getSpecimenPosition()
+                .getContainer().getContainerType();
+            parentCt.getSpecimenTypes().remove(specimen.getSpecimenType());
+            session.update(parentCt);
             tx.commit();
             Assert.fail("cannot remove specimen types in use");
         } catch (ConstraintViolationException e) {
@@ -83,16 +62,14 @@ public class TestContainerType extends TestValidation {
     public void containerTypeChildSiteMismatch() {
         Transaction tx = session.beginTransaction();
 
-        ContainerType ct2 = factory.createContainerType();
+        ContainerType childCt = factory.createContainerType();
 
         factory.createSite();
-        ContainerType ct1 = factory.createContainerType();
-
-        factory.save();
+        ContainerType topCt = factory.createTopContainerType();
 
         try {
-            ct1.getChildContainerTypes().add(ct2);
-            session.update(ct1);
+            topCt.getChildContainerTypes().add(childCt);
+            session.update(topCt);
             tx.commit();
             Assert.fail("child container types must have the same site");
         } catch (org.hibernate.exception.ConstraintViolationException e) {
@@ -106,14 +83,12 @@ public class TestContainerType extends TestValidation {
     public void containerContainerTypeSiteMismatch() {
         Transaction tx = session.beginTransaction();
 
-        ContainerType ct = factory.createContainerType();
-        ct.setTopLevel(true);
-
-        factory.createSite();
-        factory.createContainer();
+        Container container = factory.createContainer();
+        Site newSite = factory.createSite();
 
         try {
-            factory.save();
+            container.getContainerType().setSite(newSite);
+            session.update(container);
             tx.commit();
             Assert.fail("site of container and its container type must match");
         } catch (org.hibernate.exception.ConstraintViolationException e) {
@@ -124,25 +99,24 @@ public class TestContainerType extends TestValidation {
     }
 
     @Test
-    public void illegalChildContainer() {
+    public void illegalChildContainerType() {
         Transaction tx = session.beginTransaction();
 
-        ContainerType ct1 = factory.createContainerType();
-        ct1.setTopLevel(true);
-        Container c1 = factory.createContainer();
+        Container childContainer = factory.createContainer();
 
-        factory.createContainerType(); // new default
-        Container c2 = factory.createContainer();
+        factory.createTopContainerType(); // new default
+        factory.createTopContainer(); // new default
+        Container newTopContainer = factory.createTopContainer();
 
         ContainerPosition position = new ContainerPosition();
-        position.setParentContainer(c1);
-        position.setContainer(c2);
+        position.setParentContainer(newTopContainer);
+        position.setContainer(childContainer);
         position.setRow(0);
         position.setCol(0);
-        c2.setPosition(position);
+        childContainer.setPosition(position);
 
         try {
-            factory.save();
+            session.update(childContainer);
             tx.commit();
         } catch (org.hibernate.exception.ConstraintViolationException e) {
             tx.rollback();
@@ -155,15 +129,18 @@ public class TestContainerType extends TestValidation {
     public void illegalChildSpecimen() {
         Transaction tx = session.beginTransaction();
 
-        ContainerType ct = factory.createContainerType();
-        ct.setTopLevel(true);
-        factory.createContainer();
-        Specimen s = factory.createSpecimen();
-        factory.save();
+        Specimen specimen = factory.createSpecimen();
+        Container container = factory.createContainer();
+
+        SpecimenPosition sp = new SpecimenPosition();
+        sp.setRow(0);
+        sp.setCol(0);
+        sp.setPositionString("");
+        sp.setSpecimen(specimen);
+        sp.setContainer(container);
 
         try {
-            s.setSpecimenPosition(factory.createSpecimenPosition());
-            session.update(s);
+            session.save(sp);
             tx.commit();
             Assert.fail("legal child specimen types must be defined");
         } catch (org.hibernate.exception.ConstraintViolationException e) {
@@ -180,8 +157,6 @@ public class TestContainerType extends TestValidation {
         ContainerType ct2 = factory.createContainerType();
         SpecimenType st = factory.createSpecimenType();
         ContainerType ct1 = factory.createContainerType();
-
-        factory.save();
 
         try {
             ct1.getChildContainerTypes().add(ct2);
@@ -204,7 +179,6 @@ public class TestContainerType extends TestValidation {
         ct.setCapacity(new Capacity(100, 100));
 
         try {
-            factory.save();
             tx.commit();
             Assert.fail("capacity cannot exceed what can be labeled");
         } catch (ConstraintViolationException e) {
@@ -218,34 +192,15 @@ public class TestContainerType extends TestValidation {
     public void changeTopLevelHavingContainers() {
         Transaction tx = session.beginTransaction();
 
-        ContainerType ct2 = factory.createContainerType();
-        ContainerType ct1 = factory.createContainerType();
-        ct1.setTopLevel(true);
-        ct1.getChildContainerTypes().add(ct2);
-
-        Container c1 = factory.createContainer();
-        c1.setContainerType(ct1);
-
-        Container c2 = factory.createContainer();
-        c2.setContainerType(ct2);
-
-        ContainerPosition cp = new ContainerPosition();
-        cp.setParentContainer(c1);
-        cp.setRow(0);
-        cp.setCol(0);
-        cp.setContainer(c2);
-        c2.setPosition(cp);
-
-        factory.save();
-        
-//        factory.createTopContainer();
-//        factory.createMiddleContainer(); // 
-//        factory.createChildContainer(); // creates a child of middle
+        Container topContainer = factory.createTopContainer();
+        factory.createContainer();
 
         try {
-            factory.save();
+            ContainerType topCt = topContainer.getContainerType();
+            topCt.setTopLevel(!topCt.getTopLevel());
+            session.update(topCt);
             tx.commit();
-            Assert.fail("cannot change topLevel if there children exist");
+            Assert.fail("cannot change topLevel if children exist");
         } catch (ConstraintViolationException e) {
             tx.rollback();
             AssertMore.assertContainsTemplate(e,
@@ -253,4 +208,107 @@ public class TestContainerType extends TestValidation {
         }
     }
 
+    @Test
+    public void changeCapacityHavingContainers() {
+        Transaction tx = session.beginTransaction();
+
+        Container topContainer = factory.createTopContainer();
+        factory.createContainer();
+
+        try {
+            ContainerType topCt = topContainer.getContainerType();
+            topCt.getCapacity().setRowCapacity(topCt.getRowCapacity() + 1);
+            session.update(topCt);
+            tx.commit();
+            Assert.fail("cannot change capacity if children exist");
+        } catch (ConstraintViolationException e) {
+            tx.rollback();
+            AssertMore.assertContainsTemplate(e,
+                ValidContainerTypeValidator.ILLEGAL_CHANGE);
+        }
+    }
+
+    @Test
+    public void changeSchemeHavingContainers() {
+        Transaction tx = session.beginTransaction();
+
+        Container topContainer = factory.createTopContainer();
+        factory.createContainer();
+
+        try {
+            ContainerType topCt = topContainer.getContainerType();
+            topCt.setChildLabelingScheme(factory.getScheme()
+                .get2CharAlphabetic());
+
+            session.update(topCt);
+            tx.commit();
+            Assert.fail("cannot change labeling scheme if children exist");
+        } catch (ConstraintViolationException e) {
+            tx.rollback();
+            AssertMore.assertContainsTemplate(e,
+                ValidContainerTypeValidator.ILLEGAL_CHANGE);
+        }
+    }
+
+    @Test
+    public void changeTopLevelHavingSpecimens() {
+        Transaction tx = session.beginTransaction();
+
+        Container topContainer = factory.createTopContainer();
+        factory.createPositionedSpecimen();
+
+        try {
+            ContainerType topCt = topContainer.getContainerType();
+            topCt.setTopLevel(!topCt.getTopLevel());
+            session.update(topCt);
+            tx.commit();
+            Assert.fail("cannot change topLevel if children exist");
+        } catch (ConstraintViolationException e) {
+            tx.rollback();
+            AssertMore.assertContainsTemplate(e,
+                ValidContainerTypeValidator.ILLEGAL_CHANGE);
+        }
+    }
+
+    @Test
+    public void changeCapacityHavingSpecimens() {
+        Transaction tx = session.beginTransaction();
+
+        Container topContainer = factory.createTopContainer();
+        factory.createPositionedSpecimen();
+
+        try {
+            ContainerType topCt = topContainer.getContainerType();
+            topCt.getCapacity().setRowCapacity(topCt.getRowCapacity() + 1);
+            session.update(topCt);
+            tx.commit();
+            Assert.fail("cannot change capacity if children exist");
+        } catch (ConstraintViolationException e) {
+            tx.rollback();
+            AssertMore.assertContainsTemplate(e,
+                ValidContainerTypeValidator.ILLEGAL_CHANGE);
+        }
+    }
+
+    @Test
+    public void changeSchemeHavingSpecimens() {
+        Transaction tx = session.beginTransaction();
+
+        Container topContainer = factory.createTopContainer();
+        factory.createPositionedSpecimen();
+
+        try {
+            ContainerType topCt = topContainer.getContainerType();
+            topCt.setChildLabelingScheme(factory.getScheme()
+                .get2CharAlphabetic());
+
+            session.update(topCt);
+            tx.commit();
+            Assert.fail("cannot change labeling scheme if children exist");
+        } catch (ConstraintViolationException e) {
+            tx.rollback();
+            AssertMore.assertContainsTemplate(e,
+                ValidContainerTypeValidator.ILLEGAL_CHANGE);
+        }
+    }
 }

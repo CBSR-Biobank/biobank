@@ -64,6 +64,12 @@ public abstract class AbstractBiobankModel implements IBiobankModel {
         }
         return false;
     }
+    
+    @Override
+    public int hashCode() {
+        if (getId() == null) return 0;
+        return getId().hashCode();
+    }
 
     @Transient
     public boolean isNew() {

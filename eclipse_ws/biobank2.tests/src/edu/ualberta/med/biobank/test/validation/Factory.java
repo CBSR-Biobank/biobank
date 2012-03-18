@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.test.validation;
 
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -12,6 +11,7 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
@@ -30,12 +30,16 @@ import edu.ualberta.med.biobank.model.Study;
  * 
  */
 public class Factory {
+    private final ContainerLabelingSchemeGetter schemeGetter;
     private final NameGenerator nameGenerator;
     private final Session session;
 
     private Site defaultSite;
+    private ContainerType defaultTopContainerType;
     private ContainerType defaultContainerType;
     private SpecimenType defaultSpecimenType;
+    private Container defaultTopContainer;
+    private Container defaultParentContainer;
     private Container defaultContainer;
     private Specimen defaultSpecimen;
     private ContainerLabelingScheme defaultContainerLabelingScheme;
@@ -45,12 +49,40 @@ public class Factory {
     private CollectionEvent defaultCollectionEvent;
     private OriginInfo defaultOriginInfo;
 
-    private final LinkedList<Object> saveOrUpdate = new LinkedList<Object>();
-    private final LinkedList<Object> createdObjects = new LinkedList<Object>();
-
     public Factory(Session session, String root) {
         this.session = session;
         this.nameGenerator = new NameGenerator(root);
+        this.schemeGetter = new ContainerLabelingSchemeGetter();
+    }
+
+    public Container getDefaultParentContainer() {
+        return defaultParentContainer;
+    }
+
+    public void setDefaultParentContainer(Container defaultParentContainer) {
+        this.defaultParentContainer = defaultParentContainer;
+    }
+
+    public Container getDefaultTopContainer() {
+        if (defaultTopContainer == null) {
+            defaultTopContainer = createTopContainer();
+        }
+        return defaultTopContainer;
+    }
+
+    public void setDefaultTopContainer(Container defaultTopContainer) {
+        this.defaultTopContainer = defaultTopContainer;
+    }
+
+    public ContainerType getDefaultTopContainerType() {
+        if (defaultTopContainerType == null) {
+            defaultTopContainerType = createTopContainerType();
+        }
+        return defaultTopContainerType;
+    }
+
+    public void setDefaultTopContainerType(ContainerType defaultTopContainerType) {
+        this.defaultTopContainerType = defaultTopContainerType;
     }
 
     public OriginInfo getDefaultOriginInfo() {
@@ -132,10 +164,7 @@ public class Factory {
 
     public ContainerLabelingScheme getDefaultContainerLabelingScheme() {
         if (defaultContainerLabelingScheme == null) {
-            defaultContainerLabelingScheme = (ContainerLabelingScheme) session
-                .createCriteria(ContainerLabelingScheme.class)
-                .add(Restrictions.idEq(1))
-                .uniqueResult();
+            defaultContainerLabelingScheme = getScheme().getSbs();
         }
         return defaultContainerLabelingScheme;
     }
@@ -184,7 +213,8 @@ public class Factory {
         site.getAddress().setCity("testville");
 
         setDefaultSite(site);
-        addCreatedObject(site);
+        session.save(site);
+        session.flush();
         return site;
     }
 
@@ -200,8 +230,22 @@ public class Factory {
             .setChildLabelingScheme(getDefaultContainerLabelingScheme());
 
         setDefaultContainerType(containerType);
-        addCreatedObject(containerType);
+        session.save(containerType);
+        session.flush();
         return containerType;
+    }
+
+    public ContainerType createTopContainerType() {
+        ContainerType oldDefaultContainerType = getDefaultContainerType();
+        ContainerType topContainerType = createContainerType();
+        topContainerType.setTopLevel(true);
+
+        // restore the old, non-topLevel ContainerType
+        setDefaultContainerType(oldDefaultContainerType);
+        setDefaultTopContainerType(topContainerType);
+        session.update(topContainerType);
+        session.flush();
+        return topContainerType;
     }
 
     public Container createContainer() {
@@ -209,12 +253,60 @@ public class Factory {
 
         Container container = new Container();
         container.setSite(getDefaultSite());
-        container.setContainerType(getDefaultContainerType());
+        container.setContainerType(getDefaultTopContainerType());
         container.setLabel(label);
 
+        Container parentContainer = getDefaultParentContainer();
+        if (parentContainer != null) {
+            ContainerType containerType = getDefaultContainerType();
+            container.setContainerType(containerType);
+
+            ContainerType parentCt = parentContainer.getContainerType();
+            parentCt.getChildContainerTypes().add(containerType);
+            containerType.getParentContainerTypes().add(parentCt);
+
+            session.update(parentCt);
+            session.flush();
+
+            Integer numChildren = parentContainer.getChildPositions().size();
+            Integer row = numChildren / parentCt.getRowCapacity();
+            Integer col = numChildren % parentCt.getColCapacity();
+
+            ContainerPosition cp = new ContainerPosition();
+            cp.setRow(row);
+            cp.setCol(col);
+
+            cp.setContainer(container);
+            container.setPosition(cp);
+
+            cp.setParentContainer(parentContainer);
+            parentContainer.getChildPositions().add(cp);
+        }
+
         setDefaultContainer(container);
-        addCreatedObject(container);
+        session.save(container);
+        session.flush();
         return container;
+    }
+
+    public Container createTopContainer() {
+        setDefaultParentContainer(null);
+        Container topContainer = createContainer();
+        topContainer.setContainerType(getDefaultTopContainerType());
+
+        setDefaultTopContainer(topContainer);
+        setDefaultParentContainer(topContainer);
+        session.update(topContainer);
+        session.flush();
+        return topContainer;
+    }
+
+    public Container createParentContainer() {
+        Container parentContainer = createContainer();
+        setDefaultParentContainer(parentContainer);
+        session.update(parentContainer);
+        session.flush();
+        return parentContainer;
     }
 
     public SpecimenType createSpecimenType() {
@@ -225,7 +317,8 @@ public class Factory {
         specimenType.setNameShort(name);
 
         setDefaultSpecimenType(specimenType);
-        addCreatedObject(specimenType);
+        session.save(specimenType);
+        session.flush();
         return specimenType;
     }
 
@@ -241,8 +334,40 @@ public class Factory {
         specimen.setCreatedAt(new Date());
 
         setDefaultSpecimen(specimen);
-        addCreatedObject(specimen);
+        session.save(specimen);
+        session.flush();
         return specimen;
+    }
+
+    public Specimen createPositionedSpecimen() {
+        Specimen assignedSpecimen = createSpecimen();
+
+        Container parentContainer = getDefaultContainer();
+        ContainerType parentCt = parentContainer.getContainerType();
+
+        parentCt.getSpecimenTypes().add(assignedSpecimen.getSpecimenType());
+
+        session.update(parentCt);
+        session.flush();
+
+        Integer numSpecimens = parentContainer.getSpecimenPositions().size();
+        Integer row = numSpecimens / parentCt.getRowCapacity();
+        Integer col = numSpecimens % parentCt.getColCapacity();
+
+        SpecimenPosition sp = new SpecimenPosition();
+        sp.setRow(row);
+        sp.setCol(col);
+        sp.setPositionString("asdf"); // TODO: set this right
+
+        sp.setSpecimen(assignedSpecimen);
+        assignedSpecimen.setSpecimenPosition(sp);
+
+        sp.setContainer(parentContainer);
+        parentContainer.getSpecimenPositions().add(sp);
+
+        session.update(assignedSpecimen);
+        session.flush();
+        return assignedSpecimen;
     }
 
     public Study createStudy() {
@@ -253,7 +378,8 @@ public class Factory {
         study.setNameShort(name);
 
         setDefaultStudy(study);
-        addCreatedObject(study);
+        session.save(study);
+        session.flush();
         return study;
     }
 
@@ -270,7 +396,9 @@ public class Factory {
         collectionEvent.setVisitNumber(numCEs + 1);
 
         setDefaultCollectionEvent(collectionEvent);
-        addCreatedObject(collectionEvent);
+        session.save(collectionEvent);
+        session.update(patient);
+        session.flush();
         return collectionEvent;
     }
 
@@ -283,7 +411,8 @@ public class Factory {
         patient.setCreatedAt(new Date());
 
         setDefaultPatient(patient);
-        addCreatedObject(patient);
+        session.save(patient);
+        session.flush();
         return patient;
     }
 
@@ -294,32 +423,29 @@ public class Factory {
         // TODO: what about ShippingInfo?
 
         setDefaultOriginInfo(originInfo);
-        addCreatedObject(originInfo);
+        session.save(originInfo);
+        session.flush();
         return originInfo;
     }
 
-    public SpecimenPosition createSpecimenPosition() {
-        SpecimenPosition position = new SpecimenPosition();
+    public ContainerLabelingSchemeGetter getScheme() {
+        return schemeGetter;
+    }
 
-        Container container = getDefaultContainer();
-        position.setContainer(container);
-        position.setSpecimen(getDefaultSpecimen());
+    public class ContainerLabelingSchemeGetter {
+        public ContainerLabelingScheme getSbs() {
+            return (ContainerLabelingScheme) session
+                .createCriteria(ContainerLabelingScheme.class)
+                .add(Restrictions.idEq(1))
+                .uniqueResult();
+        }
 
-        container.getSpecimenPositions().add(position);
-
-        // set a sensible default position (row, col), to do this, make sure we
-        // keep the container's SpecimenPosition list up to date.
-        int numSpecimens = container.getSpecimenPositions().size();
-
-        ContainerType ct = container.getContainerType();
-        position.setRow((numSpecimens - 1) / ct.getRowCapacity());
-        position.setCol((numSpecimens - 1) % ct.getColCapacity());
-
-        // TODO: set this RIGHT
-        position.setPositionString("asdf");
-
-        addCreatedObject(position);
-        return position;
+        public ContainerLabelingScheme get2CharAlphabetic() {
+            return (ContainerLabelingScheme) session
+                .createCriteria(ContainerLabelingScheme.class)
+                .add(Restrictions.idEq(6))
+                .uniqueResult();
+        }
     }
 
     public class NameGenerator {
@@ -343,23 +469,5 @@ public class Factory {
 
             return sb.toString();
         }
-    }
-
-    /**
-     * Saves or updates created objects (since the last time this was called).
-     * Objects are saved <em>in the same order they were created</em> and flush
-     * is called after each save to trade efficiency for ease-of-use.
-     */
-    public void save() {
-        for (Object o : saveOrUpdate) {
-            session.saveOrUpdate(o);
-            session.flush();
-        }
-        saveOrUpdate.clear();
-    }
-
-    private void addCreatedObject(Object o) {
-        createdObjects.add(o);
-        saveOrUpdate.add(o);
     }
 }
