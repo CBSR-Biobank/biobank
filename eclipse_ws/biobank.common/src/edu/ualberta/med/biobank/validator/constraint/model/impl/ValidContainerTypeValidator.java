@@ -124,6 +124,12 @@ public class ValidContainerTypeValidator
 
         boolean isValid = true;
 
+        // TODO: should be able to change capacity and labeling scheme as long
+        // as it does not cause any existing containers or specimens to have a
+        // label change. For example, it is probably okay to add and remove
+        // rows, but not columns if more than one row is filled (assuming
+        // labeling is done row by row)
+
         isValid &= nullSafeEquals(ct.getCapacity(), oldCt.getCapacity());
         isValid &= nullSafeEquals(ct.getTopLevel(), oldCt.getTopLevel());
         isValid &= nullSafeEquals(ct.getChildLabelingScheme(),

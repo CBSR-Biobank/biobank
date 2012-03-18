@@ -19,10 +19,19 @@ public class ErrorUtil {
         if (!messageTemplates.contains(messageTemplate)) {
             Assert.fail(ConstraintViolationException.class.getSimpleName()
                 + " does not contain an expected "
-                + ConstraintViolation.class.getSimpleName()
+                + ConstraintViolation.class.getName()
                 + " with a message template of " + messageTemplate
                 + ". Instead, it contains the message template(s): "
                 + Arrays.toString(messageTemplates.toArray()));
+        }
+    }
+
+    public static void assertMessageContains(Throwable t, String substring) {
+        if (!t.getMessage().contains(substring)) {
+            Assert.fail("Expected exception " + t.getClass().getName()
+                + " with message '" + t.getMessage()
+                + "' to contain the substring '" + substring
+                + "' but it did not.");
         }
     }
 }

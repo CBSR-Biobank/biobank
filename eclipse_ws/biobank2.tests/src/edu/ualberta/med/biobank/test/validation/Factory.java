@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.model.Study;
  * amount of data and remembering the last created object and using that as a
  * default for other objects.
  * 
- * @author jferland
+ * @author Jonathan Ferland
  * 
  */
 public class Factory {
@@ -181,7 +181,7 @@ public class Factory {
         Site site = new Site();
         site.setName(name);
         site.setNameShort(name);
-        site.getAddress().setCity(name);
+        site.getAddress().setCity("testville");
 
         setDefaultSite(site);
         addCreatedObject(site);
@@ -314,7 +314,7 @@ public class Factory {
         ContainerType ct = container.getContainerType();
         position.setRow((numSpecimens - 1) / ct.getRowCapacity());
         position.setCol((numSpecimens - 1) % ct.getColCapacity());
-        
+
         // TODO: set this RIGHT
         position.setPositionString("asdf");
 
@@ -345,12 +345,17 @@ public class Factory {
         }
     }
 
-    public void saveOrUpdate(Session session) {
+    /**
+     * Saves or updates created objects (since the last time this was called).
+     * Objects are saved <em>in the same order they were created</em> and flush
+     * is called after each save to trade efficiency for ease-of-use.
+     */
+    public void save() {
         for (Object o : saveOrUpdate) {
             session.saveOrUpdate(o);
+            session.flush();
         }
         saveOrUpdate.clear();
-        session.flush();
     }
 
     private void addCreatedObject(Object o) {
