@@ -22,7 +22,7 @@ public class ManagedUser implements ActionResult {
         Set<ManagedMembership> mms = new HashSet<ManagedMembership>();
         ManagedMembership mm;
         for (Membership m : user.getMemberships()) {
-            if (m.isManageable(manager)) {
+            if (m.isPartiallyManageable(manager)) {
                 mm = new ManagedMembership(m, manager, allRoles);
                 mms.add(mm);
             }

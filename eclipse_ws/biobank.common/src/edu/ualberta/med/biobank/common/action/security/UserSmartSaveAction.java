@@ -15,12 +15,17 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
 import edu.ualberta.med.biobank.util.NullHelper;
+import edu.ualberta.med.biobank.util.SetDiff;
+import edu.ualberta.med.biobank.util.SetDiff.Pair;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserSmartSaveAction implements Action<IdResult> {
@@ -103,39 +108,98 @@ public class UserSmartSaveAction implements Action<IdResult> {
     }
 
     private void setMemberships(ActionContext context, User user) {
+        SetDiff<MembershipDomain> diff = diffMemberships(user);
+
+        for (MembershipDomain domain : diff.getAdditions()) {
+            Membership membership = domain.getMembership();
+            checkFullyManageable(context, membership);
+
+            membership.reducePermissions();
+            user.getMemberships().add(membership);
+            membership.setPrincipal(user);
+        }
+
+        for (MembershipDomain domain : diff.getRemovals()) {
+            Membership membership = domain.getMembership();
+            checkFullyManageable(context, membership);
+
+            membership.reducePermissions();
+            user.getMemberships().remove(membership);
+            membership.setPrincipal(null);
+        }
+
+        mergeMemberships(context, diff.getIntersection());
+    }
+
+    private void mergeMemberships(ActionContext context,
+        Set<Pair<MembershipDomain>> conflicts) {
         User executingUser = context.getUser();
+        User manager = data.getContext().getManager();
 
         Set<Integer> contextRoleIds = data.getContext().getRoleIds();
         Map<Integer, Role> rolesMap = context.load(Role.class, contextRoleIds);
-        Set<Role> contextRoles = new HashSet<Role>(rolesMap.values());
+        Set<Role> awareOfRoles = new HashSet<Role>(rolesMap.values());
 
-        // ensure the executing user can do whatever.
+        // the permissions and roles the user would have intended to modify
+        Set<PermissionEnum> oldPermissionScope, newPermissionScope;
+        Set<Role> oldRoleScope, newRoleScope;
+        for (Pair<MembershipDomain> conflict : conflicts) {
+            Membership oldM = conflict.getOld().getMembership();
+            Membership newM = conflict.getNew().getMembership();
 
-        if (user.isNew()) {
-            for (Membership membership : data.getMemberships()) {
-                user.getMemberships().add(membership);
-                membership.setPrincipal(user);
+            oldPermissionScope = oldM.getManageablePermissions(manager);
+            oldRoleScope = oldM.getManageableRoles(manager, awareOfRoles);
+
+            newPermissionScope = newM.getManageablePermissions(executingUser);
+            newRoleScope = newM.getManageableRoles(executingUser, awareOfRoles);
+
+            // ensure the old (client?) scope can still be modified by the new
+            // (server?) scope
+            if (!newPermissionScope.containsAll(oldPermissionScope)
+                || newRoleScope.containsAll(oldRoleScope)) {
+                // TODO: better exception
+                throw new ActionException("reduced scope");
             }
-        } else { // merge
-            for (Membership membership : data.getMemberships()) {
-                // if (membership.get)
-            }
+
+            // looks okay, clear out the old scope and assign intended values
+            oldM.getPermissions().removeAll(oldPermissionScope);
+            oldM.getRoles().removeAll(oldRoleScope);
+
+            // LEFT OFF HERE!!!!!
+            // oldM.getPermissions().addAll(c)
+
+            oldM.reducePermissions();
         }
+    }
+
+    private void checkFullyManageable(ActionContext context, Membership m) {
+        User executingUser = context.getUser();
+        if (!m.isFullyManageable(executingUser)) {
+            // TODO: better exception
+            throw new ActionException("");
+        }
+    }
+
+    private SetDiff<MembershipDomain> diffMemberships(User user) {
+        final Set<MembershipDomain> oldDomains, newDomains;
+        oldDomains = MembershipDomain.from(data.getMemberships());
+        newDomains = MembershipDomain.from(user.getMemberships());
+        return new SetDiff<MembershipDomain>(oldDomains, newDomains);
     }
 
     private void setGroups(ActionContext context, User user) {
         User executingUser = context.getUser();
 
         Set<Integer> groupIds = data.getGroupIds();
-        Set<Integer> contextGroupIds = data.getContext().getGroupIds();
+        Set<Integer> awareOfGroupIds = data.getContext().getGroupIds();
 
-        if (!contextGroupIds.containsAll(groupIds)) {
+        if (!awareOfGroupIds.containsAll(groupIds)) {
             // TODO: better exception
             throw new ActionException("");
         }
 
         // add or remove every Group in the context
-        Map<Integer, Group> groups = context.load(Group.class, contextGroupIds);
+        Map<Integer, Group> groups = context.load(Group.class, awareOfGroupIds);
         for (Entry<Integer, Group> entry : groups.entrySet()) {
             Integer groupId = entry.getKey();
             Group group = entry.getValue();
@@ -207,12 +271,18 @@ public class UserSmartSaveAction implements Action<IdResult> {
         }
     }
 
-    private static class DomainUniqueMembership {
+    /**
+     * Helps merge {@link Membership}-s by comparing them by domain (their
+     * {@link Center} and {@link Study}).
+     * 
+     * @author Jonathan Ferland
+     */
+    private static class MembershipDomain {
         private final Membership membership;
         private final Integer centerId;
         private final Integer studyId;
 
-        private DomainUniqueMembership(Membership membership) {
+        private MembershipDomain(Membership membership) {
             this.membership = membership;
             this.centerId = membership.getCenter().getId();
             this.studyId = membership.getStudy().getId();
@@ -235,10 +305,35 @@ public class UserSmartSaveAction implements Action<IdResult> {
             if (this == o) return true;
             if (o == null) return false;
             if (getClass() != o.getClass()) return false;
-            DomainUniqueMembership that = (DomainUniqueMembership) o;
+            MembershipDomain that = (MembershipDomain) o;
             if (!NullHelper.safeEquals(centerId, that.centerId)) return false;
             if (!NullHelper.safeEquals(studyId, that.studyId)) return false;
             return true;
+        }
+
+        @Override
+        public String toString() {
+            return "MembershipDomain [membership=" + membership + ", centerId="
+                + centerId + ", studyId=" + studyId + "]";
+        }
+
+        /**
+         * 
+         * @param memberships
+         * @return
+         * @throws IllegalArgumentException if any two resulting
+         *             {@link MembershipDomain}-s are equal.
+         */
+        public static Set<MembershipDomain> from(Set<Membership> memberships)
+            throws IllegalArgumentException {
+            Set<MembershipDomain> domains = new HashSet<MembershipDomain>();
+            for (Membership m : memberships) {
+                MembershipDomain d = new MembershipDomain(m);
+                if (domains.add(d)) {
+                    throw new IllegalArgumentException("duplicate domain " + d);
+                }
+            }
+            return domains;
         }
     }
 }

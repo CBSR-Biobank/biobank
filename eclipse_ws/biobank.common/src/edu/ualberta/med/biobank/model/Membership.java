@@ -193,9 +193,18 @@ public class Membership extends AbstractBiobankModel {
         return permissions;
     }
 
+    /**
+     * Removes redundant {@link PermissionEnum}-s that are already reachable
+     * through a {@link Role}.
+     */
     @Transient
-    public Set<Role> getManageableRoles(User user) {
-        return getManageableRoles(user, getRoles());
+    public void reducePermissions() {
+        Set<PermissionEnum> nonRedundantPerms = new HashSet<PermissionEnum>();
+        nonRedundantPerms.addAll(getPermissions());
+        for (Role role : getRoles()) {
+            nonRedundantPerms.removeAll(role.getPermissions());
+        }
+        getPermissions().retainAll(nonRedundantPerms);
     }
 
     /**
@@ -240,13 +249,13 @@ public class Membership extends AbstractBiobankModel {
     public boolean isFullyManageable(User u) {
         if (!getManageablePermissions(u).containsAll(getPermissions()))
             return false;
-        if (!getManageableRoles(u).containsAll(getRoles()))
+        if (!getManageableRoles(u, getRoles()).containsAll(getRoles()))
             return false;
         return true;
     }
 
     @Transient
-    public boolean isManageable(User u) {
+    public boolean isPartiallyManageable(User u) {
         for (Membership membership : u.getAllMemberships()) {
             if (isManageable(membership)) return true;
         }

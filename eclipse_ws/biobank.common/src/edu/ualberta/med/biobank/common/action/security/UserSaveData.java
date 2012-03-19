@@ -90,12 +90,14 @@ public class UserSaveData {
          * <p>
          * Similarly, the modifiable {@link Role}-s and {@link Group}-s need to
          * be sent in case some where added or removed since this action was
-         * generated.
+         * generated. So, these are the sets the manager is aware of at this
+         * point.
          * 
          * @param manager the {@link User} that is executing the save
-         * @param roles every {@link Role} that <em>can</em> be modified
+         * @param roles every {@link Role} that <em>can</em> be modified, that
+         *            the manager is aware of at this point
          * @param groups every manageable {@link Group} that <em>can</em> be
-         *            modified
+         *            modified, that the manager is aware of at this point
          */
         public Context(User manager, Set<Role> roles, Set<Group> groups) {
             this.manager = manager;
