@@ -8,6 +8,7 @@ import javax.persistence.Transient;
 import javax.persistence.Version;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.proxy.HibernateProxyHelper;
 
 @MappedSuperclass
 public abstract class AbstractBiobankModel implements IBiobankModel {
@@ -47,24 +48,22 @@ public abstract class AbstractBiobankModel implements IBiobankModel {
         this.version = version;
     }
 
-    // TODO: does this actually work? Test (especially with hibernate proxies)
     @Override
-    public boolean equals(Object obj) {
-        return equals(obj, getClass());
-    }
+    public boolean equals(Object that) {
+        if (that == this) return true;
+        if (that == null) return false;
 
-    protected <T extends IBiobankModel> boolean equals(Object o, Class<T> klazz) {
-        if (o == this) return true;
-        if (o == null) return false;
-        if (klazz.isAssignableFrom(o.getClass())) {
-            T t = klazz.cast(o);
-            if (getId() != null && getId().equals(t.getId())) {
-                return true;
-            }
+        Class<?> thisClass = proxiedClass(this);
+        Class<?> thatClass = proxiedClass(that);
+        if (thisClass != thatClass) return false;
+
+        if (that instanceof IBiobankModel) {
+            Integer thatId = ((IBiobankModel) that).getId();
+            if (getId() != null && getId().equals(thatId)) return true;
         }
         return false;
     }
-    
+
     @Override
     public int hashCode() {
         if (getId() == null) return 0;
@@ -74,5 +73,9 @@ public abstract class AbstractBiobankModel implements IBiobankModel {
     @Transient
     public boolean isNew() {
         return getId() == null;
+    }
+
+    private static Class<?> proxiedClass(Object o) {
+        return HibernateProxyHelper.getClassWithoutInitializingProxy(o);
     }
 }
