@@ -30,7 +30,6 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
@@ -45,9 +44,6 @@ import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
 public class DispatchViewForm extends BiobankViewForm {
-
-    private static BgcLogger logger = BgcLogger
-        .getLogger(DispatchViewForm.class.getName());
 
     public static final String ID =
         "edu.ualberta.med.biobank.forms.DispatchViewForm"; //$NON-NLS-1$
