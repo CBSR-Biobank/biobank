@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.constraint.model.ValidContainerType;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
@@ -52,6 +53,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "parentContainerTypes", groups = PreDelete.class),
     @Empty(property = "specimenTypes", groups = PreDelete.class)
 })
+@ValidContainerType(groups = PrePersist.class)
 public class ContainerType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 

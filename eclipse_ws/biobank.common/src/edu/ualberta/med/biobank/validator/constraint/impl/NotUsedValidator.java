@@ -5,15 +5,18 @@ import java.util.List;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import org.hibernate.Criteria;
 import org.hibernate.EntityMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.util.StringHelper;
 
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 
-public class NotUsedValidator extends EventSourceAwareConstraintValidator<Object>
+public class NotUsedValidator extends
+    EventSourceAwareConstraintValidator<Object>
     implements ConstraintValidator<NotUsed, Object> {
     private Class<?> by;
     private String property;
@@ -31,7 +34,7 @@ public class NotUsedValidator extends EventSourceAwareConstraintValidator<Object
             return true;
         }
 
-        boolean unused = countRows(value) == 0;
+        boolean unused = countRows(value, property) == 0;
 
         if (!unused) {
             overrideEmptyMessageTemplate(value, context);
@@ -66,18 +69,22 @@ public class NotUsedValidator extends EventSourceAwareConstraintValidator<Object
         }
     }
 
-    private int countRows(Object value) {
-        ClassMetadata meta = getEventSource().getSessionFactory()
-            .getClassMetadata(by);
+    private int countRows(Object value, String property) {
+        Criteria criteria = getEventSource().createCriteria(by);
+        
+        String association = StringHelper.root(property);
+        while (!association.equals(property)) {
+            criteria = criteria.createCriteria(association);
+            property = StringHelper.unroot(property);
+            association = StringHelper.root(property);
+        }
 
-        List<?> results = getEventSource()
-            .createCriteria(meta.getMappedClass(EntityMode.POJO))
+        List<?> results = criteria
             .add(Restrictions.eq(property, value))
             .setProjection(Projections.rowCount())
             .list();
 
         Number count = (Number) results.iterator().next();
-
         return count.intValue();
     }
 }

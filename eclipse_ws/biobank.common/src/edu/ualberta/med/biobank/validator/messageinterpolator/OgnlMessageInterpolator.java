@@ -156,7 +156,7 @@ public class OgnlMessageInterpolator implements MessageInterpolator {
 
             Object value = Ognl.getValue(expression, root);
 
-            result = value.toString();
+            result = String.valueOf(value);
         } catch (OgnlException e) {
             // TODO: something better?
             throw new RuntimeException(e);

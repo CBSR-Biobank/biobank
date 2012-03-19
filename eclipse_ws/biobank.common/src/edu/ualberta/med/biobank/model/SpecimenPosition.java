@@ -6,6 +6,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
@@ -98,5 +99,11 @@ public class SpecimenPosition extends AbstractPosition {
     }
 
     void setSpecimenType(SpecimenType specimenType) {
+    }
+
+    @Override
+    @Transient
+    public Container getHoldingContainer() {
+        return getContainer();
     }
 }

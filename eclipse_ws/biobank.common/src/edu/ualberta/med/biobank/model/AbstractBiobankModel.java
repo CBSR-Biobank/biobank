@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -62,5 +63,16 @@ public abstract class AbstractBiobankModel implements IBiobankModel {
             }
         }
         return false;
+    }
+    
+    @Override
+    public int hashCode() {
+        if (getId() == null) return 0;
+        return getId().hashCode();
+    }
+
+    @Transient
+    public boolean isNew() {
+        return getId() == null;
     }
 }

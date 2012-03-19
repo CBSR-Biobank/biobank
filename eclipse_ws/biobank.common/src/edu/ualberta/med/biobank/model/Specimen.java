@@ -90,6 +90,7 @@ public class Specimen extends AbstractBiobankModel {
         this.quantity = quantity;
     }
 
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.createdAt.NotNull}")
     @Column(name = "CREATED_AT", nullable = false)
     public Date getCreatedAt() {
         return this.createdAt;

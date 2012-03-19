@@ -59,8 +59,8 @@ ALTER TABLE `SPECIMEN_POSITION` ADD CONSTRAINT `FK_SpecimenPosition_specimen`
 -- add a FK from the SpecimenPosition to the `CONTAINER_TYPE_SPECIMEN_TYPE`
 -- table so that only SpecimenPosition-s with an explicitly defined
 -- ContainerType-SpecimenType parent-child relationship can exist
-ALTER TABLE `SPECIMEN_POSITION` ADD CONSTRAINT `FK_SpecimenPosition_specimenTypeSpecimenType`
-  FOREIGN KEY `FK_SpecimenPosition_specimenTypeSpecimenType`
+ALTER TABLE `SPECIMEN_POSITION` ADD CONSTRAINT `FK_SpecimenPosition_containerTypeSpecimenType`
+  FOREIGN KEY `FK_SpecimenPosition_containerTypeSpecimenType`
     (`CONTAINER_TYPE_ID`, `SPECIMEN_TYPE_ID`)
   REFERENCES `CONTAINER_TYPE_SPECIMEN_TYPE`
     (`CONTAINER_TYPE_ID`, `SPECIMEN_TYPE_ID`);
