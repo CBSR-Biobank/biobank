@@ -228,8 +228,6 @@ public class StudySaveAction implements Action<IdResult> {
     public IdResult run(ActionContext context) throws ActionException {
         study = context.get(Study.class, id, new Study());
 
-        // TODO: version check?
-
         study.setId(id);
         study.setName(name);
         study.setNameShort(nameShort);
@@ -330,9 +328,7 @@ public class StudySaveAction implements Action<IdResult> {
                     asSaveInfo.id);
             }
             newAsCollection.add(asSaveInfo.populateAliquotedSpecimen(study, as,
-
-                asSaveInfo.activityStatus,
-                context.load(SpecimenType.class,
+                asSaveInfo.activityStatus, context.load(SpecimenType.class,
                     asSaveInfo.specimenTypeId)));
         }
 

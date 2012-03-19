@@ -74,14 +74,15 @@ public class SiteHelper extends Helper {
     public static SiteSaveAction getSaveAction(SiteInfo siteInfo) {
         SiteSaveAction siteSaveAction = new SiteSaveAction();
 
-        siteSaveAction.setId(siteInfo.site.getId());
-        siteSaveAction.setName(siteInfo.site.getName());
-        siteSaveAction.setNameShort(siteInfo.site.getNameShort());
-        siteSaveAction.setActivityStatus(siteInfo.site.getActivityStatus());
-        siteSaveAction.setAddress(siteInfo.site.getAddress());
+        siteSaveAction.setId(siteInfo.getSite().getId());
+        siteSaveAction.setName(siteInfo.getSite().getName());
+        siteSaveAction.setNameShort(siteInfo.getSite().getNameShort());
+        siteSaveAction
+            .setActivityStatus(siteInfo.getSite().getActivityStatus());
+        siteSaveAction.setAddress(siteInfo.getSite().getAddress());
 
         Set<Integer> ids = new HashSet<Integer>();
-        for (StudyCountInfo infos : siteInfo.studyCountInfo) {
+        for (StudyCountInfo infos : siteInfo.getStudyCountInfos()) {
             ids.add(infos.getStudy().getId());
         }
         siteSaveAction.setStudyIds(ids);

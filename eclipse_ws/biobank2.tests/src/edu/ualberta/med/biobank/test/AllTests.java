@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.test.action.TestRole;
 import edu.ualberta.med.biobank.test.action.TestShipment;
 import edu.ualberta.med.biobank.test.action.TestSite;
 import edu.ualberta.med.biobank.test.action.TestStudy;
+import edu.ualberta.med.biobank.test.validation.TestContainerTypeValidation;
 
 @RunWith(Suite.class)
 @SuiteClasses({ TestClinic.class, TestCollectionEvent.class,
@@ -29,7 +30,8 @@ import edu.ualberta.med.biobank.test.action.TestStudy;
     TestPatient.class, TestProcessingEvent.class, TestRequest.class,
     TestResearchGroup.class, TestRole.class,
     TestShipment.class, TestSite.class, TestStudy.class,
-    TestActivityStatus.class, TestPermissionEnum.class })
+    TestActivityStatus.class, TestPermissionEnum.class,
+    TestContainerTypeValidation.class })
 public class AllTests {
     public static BiobankApplicationService appService = null;
     public static final String userLogin = "testuser";

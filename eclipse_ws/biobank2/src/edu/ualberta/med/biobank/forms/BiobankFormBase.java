@@ -2,8 +2,13 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import org.acegisecurity.AccessDeniedException;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -40,6 +45,7 @@ import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Base class for data all BioBank view and entry forms. This class is the
@@ -239,6 +245,21 @@ public abstract class BiobankFormBase extends BgcFormBase {
             BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
                 ex);
             cancelSave(monitor);
+        } else if (ex instanceof ApplicationException) {
+            if (ex.getCause() instanceof ConstraintViolationException) {
+                List<String> msgs =
+                    getConstraintViolationsMsgs((ConstraintViolationException) ex
+                        .getCause());
+                BgcPlugin.openAsyncError(
+                    Messages.BiobankFormBase_save_error_title,
+                    StringUtils.join(msgs, "\n"));
+
+            } else {
+                BgcPlugin.openAsyncError(
+                    Messages.BiobankFormBase_save_error_title,
+                    ex.getLocalizedMessage());
+            }
+            cancelSave(monitor);
         } else {
             cancelSave(monitor);
             LOGGER.error("Unknown error", ex);
@@ -249,6 +270,15 @@ public abstract class BiobankFormBase extends BgcFormBase {
                         "An unknown error occurred. Report this issue to your administrator");
             }
         }
+    }
+
+    public static List<String> getConstraintViolationsMsgs(
+        ConstraintViolationException e) {
+        ArrayList<String> msgs = new ArrayList<String>();
+        for (ConstraintViolation<?> cv : e.getConstraintViolations()) {
+            msgs.add(cv.getMessage());
+        }
+        return msgs;
     }
 
     protected void cancelSave(IProgressMonitor monitor) {

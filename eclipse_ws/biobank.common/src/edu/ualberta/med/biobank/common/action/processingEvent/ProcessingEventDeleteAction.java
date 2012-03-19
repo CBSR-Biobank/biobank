@@ -12,10 +12,13 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
 
-    private Integer peventId;
+    private final Integer peventId;
 
-    public ProcessingEventDeleteAction(Integer peventId) {
-        this.peventId = peventId;
+    public ProcessingEventDeleteAction(ProcessingEvent pevent) {
+        if (pevent == null) {
+            throw new IllegalArgumentException();
+        }
+        this.peventId = pevent.getId();
     }
 
     @Override

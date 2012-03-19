@@ -14,13 +14,15 @@ import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestClaimAction;
 import edu.ualberta.med.biobank.common.action.request.RequestDeleteAction;
+import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.action.request.RequestGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.request.RequestStateChangeAction;
+import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
-import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -60,14 +62,14 @@ public class TestRequest extends TestAction {
     @Test
     public void testUpload() throws Exception {
 
-        ResearchGroupGetInfoAction reader =
+        ResearchGroupGetInfoAction rgInfo =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
+        ResearchGroupReadInfo rg = EXECUTOR.exec(rgInfo);
 
         // create specs
         Integer p =
             PatientHelper.createPatient(EXECUTOR, name + "_patient",
-                rg.rg.getStudy().getId());
+                rg.researchGroup.getStudy().getId());
         Integer ceId =
             CollectionEventHelper.createCEventWithSourceSpecimens(EXECUTOR,
                 p, rgId);
@@ -84,8 +86,8 @@ public class TestRequest extends TestAction {
         specs.remove(Math.abs(R.nextInt()) % specs.size());
 
         // request specs
-        SubmitRequestAction action =
-            new SubmitRequestAction(rgId, specs);
+        RequestSubmitAction action =
+            new RequestSubmitAction(rgId, specs);
         Integer rId = EXECUTOR.exec(action).getId();
 
         // make sure you got what was requested
@@ -102,7 +104,7 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testClaim() throws Exception {
-        Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
+        Integer rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
 
         RequestGetSpecimenInfosAction specAction =
             new RequestGetSpecimenInfosAction(rId);
@@ -129,7 +131,7 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testStateChanges() throws Exception {
-        Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
+        Integer rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
 
         RequestGetSpecimenInfosAction specAction =
             new RequestGetSpecimenInfosAction(rId);
@@ -156,21 +158,24 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testDelete() throws Exception {
-        Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
+        Integer rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
 
-        RequestDeleteAction delete = new RequestDeleteAction(rId);
+        RequestReadInfo reqInfo = EXECUTOR.exec(new RequestGetInfoAction(rId));
+        RequestDeleteAction delete = new RequestDeleteAction(reqInfo.request);
         EXECUTOR.exec(delete);
 
-        rId = RequestHelper.createRequest(EXECUTOR, rgId);
+        rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
         session.beginTransaction();
         Request r = (Request) session.get(Request.class, rId);
         r.setSubmitted(new Date());
         session.saveOrUpdate(r);
         session.getTransaction().commit();
-        delete = new RequestDeleteAction(rId);
+        reqInfo = EXECUTOR.exec(new RequestGetInfoAction(rId));
+        delete = new RequestDeleteAction(reqInfo.request);
+
         try {
             EXECUTOR.exec(delete);
-            Assert.fail();
+            Assert.fail("should not be allowed to delete the request");
         } catch (ConstraintViolationException e) {
             // good
         }

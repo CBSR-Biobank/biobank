@@ -93,11 +93,11 @@ public class SiteViewPresenter extends AbstractViewFormPresenter<View> {
         // view.getCommentCollection()
 
         view.getStudyCollection()
-            .setValue(siteInfo.getStudyCollection());
+            .setValue(siteInfo.getStudyCountInfos());
         view.getContainerTypeCollection()
-            .setValue(siteInfo.getContainerTypeCollection());
+            .setValue(siteInfo.getContainerTypeInfos());
         view.getTopContainerCollection()
-            .setValue(siteInfo.getTopContainerCollection());
+            .setValue(siteInfo.getTopContainers());
     }
 
     private class SiteView implements Loadable {

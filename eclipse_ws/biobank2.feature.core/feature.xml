@@ -17,8 +17,8 @@
 
    <plugin id="biobank.gui.common" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
-   <plugin id="barcodeGenerator" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-
    <plugin id="biobank.mvp" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+
+   <plugin id="labelPrinter" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
 </feature>

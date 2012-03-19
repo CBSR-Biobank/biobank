@@ -8,21 +8,6 @@ import java.util.ArrayList;
 import edu.ualberta.med.biobank.model.Capacity;
 
 public class CapacityPeer {
-	public static final Property<Integer, Capacity> ID = Property.create(
-		"id" //$NON-NLS-1$
-		, Capacity.class
-		, new TypeReference<Integer>() {}
-		, new Property.Accessor<Integer, Capacity>() { private static final long serialVersionUID = 1L;
-			@Override
-			public Integer get(Capacity model) {
-				return model.getId();
-			}
-			@Override
-			public void set(Capacity model, Integer value) {
-				model.setId(value);
-			}
-		});
-
 	public static final Property<Integer, Capacity> COL_CAPACITY = Property.create(
 		"colCapacity" //$NON-NLS-1$
 		, Capacity.class
@@ -56,7 +41,6 @@ public class CapacityPeer {
    public static final List<Property<?, ? super Capacity>> PROPERTIES;
    static {
       List<Property<?, ? super Capacity>> aList = new ArrayList<Property<?, ? super Capacity>>();
-      aList.add(ID);
       aList.add(COL_CAPACITY);
       aList.add(ROW_CAPACITY);
       PROPERTIES = Collections.unmodifiableList(aList);

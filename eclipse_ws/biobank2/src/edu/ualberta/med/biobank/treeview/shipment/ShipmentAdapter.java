@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.shipment.ShipmentDeleteAction;
+import edu.ualberta.med.biobank.common.action.originInfo.OriginInfoDeleteAction;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
 import edu.ualberta.med.biobank.common.permission.shipment.ShipmentDeletePermission;
@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -152,9 +153,11 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     public void runDelete() throws ApplicationException {
-        ShipmentDeleteAction action =
-            new ShipmentDeleteAction(getId(), SessionManager.getUser()
-                .getCurrentWorkingCenter().getId());
+        OriginInfoDeleteAction action =
+            new OriginInfoDeleteAction((OriginInfo)
+                getModelObject().getWrappedObject(),
+                SessionManager.getUser().getCurrentWorkingCenter()
+                    .getWrappedObject());
         SessionManager.getAppService().doAction(action);
     }
 

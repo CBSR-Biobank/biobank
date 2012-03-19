@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.test.action;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.ConstraintViolationException;
@@ -18,18 +18,20 @@ import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
+import edu.ualberta.med.biobank.common.action.originInfo.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
-import edu.ualberta.med.biobank.common.action.shipment.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
@@ -91,10 +93,9 @@ public class TestProcessingEvent extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
-        ArrayList<SpecimenInfo> sourceSpecs =
-            EXECUTOR.exec(
-                new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
-                .getList();
+        CEventInfo ceventInfo =
+            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+        List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
 
         // ship the specimens to the site
         OriginInfoSaveInfo oiSaveInfo = new OriginInfoSaveInfo(
@@ -165,7 +166,7 @@ public class TestProcessingEvent extends TestAction {
             Assert.assertEquals(clinicInfo.clinic.getName(),
                 specimenInfo.specimen.getOriginInfo().getCenter().getName());
 
-            Assert.assertEquals(siteInfo.site.getName(),
+            Assert.assertEquals(siteInfo.getSite().getName(),
                 specimenInfo.specimen.getCurrentCenter().getName());
 
             Assert.assertEquals(patientInfo.patient.getPnumber(),
@@ -208,7 +209,9 @@ public class TestProcessingEvent extends TestAction {
                 .getRandomString(50), ActivityStatus.ACTIVE, null,
             new HashSet<Integer>())).getId();
 
-        EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
+        PEventInfo peventInfo =
+            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
+        EXECUTOR.exec(new ProcessingEventDeleteAction(peventInfo.pevent));
 
         try {
             EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
@@ -226,11 +229,9 @@ public class TestProcessingEvent extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.siteId);
-        ArrayList<SpecimenInfo> sourceSpecs =
-            EXECUTOR
-                .exec(
-                    new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
-                .getList();
+        CEventInfo ceventInfo =
+            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+        List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
         Integer spcId = sourceSpecs.get(0).specimen.getId();
 
         // create a processing event with one of the collection event source
@@ -247,7 +248,9 @@ public class TestProcessingEvent extends TestAction {
 
         // delete this processing event. Can do it since the specimen has no
         // children
-        EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
+        PEventInfo peventInfo =
+            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
+        EXECUTOR.exec(new ProcessingEventDeleteAction(peventInfo.pevent));
 
         try {
             EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
@@ -273,7 +276,7 @@ public class TestProcessingEvent extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.siteId);
-        ArrayList<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
+        List<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
             new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
             .getList();
         Integer spcId = sourceSpecs.get(0).specimen.getId();
@@ -295,8 +298,10 @@ public class TestProcessingEvent extends TestAction {
 
         // delete this processing event. Can do it since the specimen has no
         // children
+        PEventInfo peventInfo =
+            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
         try {
-            EXECUTOR.exec(new ProcessingEventDeleteAction(pEventId));
+            EXECUTOR.exec(new ProcessingEventDeleteAction(peventInfo.pevent));
             Assert
                 .fail("one of the source specimen of this pevent has children. "
                     + "Can't delete the processing event");

@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
@@ -114,13 +113,8 @@ public class TestClinic extends TestAction {
     public void checkGetAction() throws Exception {
         Provisioning provisioning = new Provisioning(EXECUTOR, name);
 
-        Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(EXECUTOR,
-                provisioning.patientIds.get(0), provisioning.clinicId);
-        // TODO: get collection event info instead
-        EXECUTOR.exec(
-            new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
-            .getList();
+        CollectionEventHelper.createCEventWithSourceSpecimens(EXECUTOR,
+            provisioning.patientIds.get(0), provisioning.clinicId);
 
         ClinicInfo clinicInfo =
             EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
@@ -131,7 +125,8 @@ public class TestClinic extends TestAction {
         Assert.assertEquals(new Long(1), clinicInfo.collectionEventCount);
         Assert.assertEquals(1, clinicInfo.contacts.size());
         Assert.assertEquals(1, clinicInfo.studyInfos.size());
-        Assert.assertEquals(name + "_clinic", clinicInfo.clinic.getAddress()
+        Assert.assertEquals(name + "_clinic_city", clinicInfo.clinic
+            .getAddress()
             .getCity());
     }
 
@@ -281,7 +276,9 @@ public class TestClinic extends TestAction {
     public void delete() throws ApplicationException {
         // delete a study with no patients and no other associations
         Integer clinicId = EXECUTOR.exec(clinicSaveAction).getId();
-        EXECUTOR.exec(new ClinicDeleteAction(clinicId));
+        ClinicInfo clinicInfo =
+            EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
+        EXECUTOR.exec(new ClinicDeleteAction(clinicInfo.clinic));
 
         // hql query for clinic should return empty
         Query q =
@@ -296,9 +293,10 @@ public class TestClinic extends TestAction {
     @Test
     public void deleteWithStudies() throws ApplicationException {
         Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        ClinicInfo clinicInfo =
+            EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
         try {
-            EXECUTOR.exec(new ClinicDeleteAction(
-                provisioning.clinicId));
+            EXECUTOR.exec(new ClinicDeleteAction(clinicInfo.clinic));
             Assert
                 .fail("should not be allowed to delete a clinic linked to a study");
         } catch (ConstraintViolationException e) {
@@ -309,14 +307,15 @@ public class TestClinic extends TestAction {
     @Test
     public void deleteWithSrcDispatch() throws Exception {
         Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        ClinicInfo clinicInfo =
+            EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
 
         DispatchHelper.createDispatch(EXECUTOR, provisioning.clinicId,
             provisioning.siteId,
             provisioning.patientIds.get(0));
 
         try {
-            EXECUTOR.exec(new ClinicDeleteAction(
-                provisioning.clinicId));
+            EXECUTOR.exec(new ClinicDeleteAction(clinicInfo.clinic));
             Assert
                 .fail(
                 "should not be allowed to delete a clinic which is a source of dispatches");
@@ -335,13 +334,15 @@ public class TestClinic extends TestAction {
             ClinicHelper.getSaveAction(name + "_clinic2", name,
                 ActivityStatus.ACTIVE, R.nextBoolean());
         Integer clinicId2 = EXECUTOR.exec(csa2).getId();
+        ClinicInfo clinic2Info =
+            EXECUTOR.exec(new ClinicGetInfoAction(clinicId2));
 
         DispatchHelper.createDispatch(EXECUTOR, provisioning.clinicId,
             clinicId2,
             provisioning.patientIds.get(0));
 
         try {
-            EXECUTOR.exec(new ClinicDeleteAction(clinicId2));
+            EXECUTOR.exec(new ClinicDeleteAction(clinic2Info.clinic));
             Assert
                 .fail(
                 "should not be allowed to delete a clinic which is a destination for dispatches");

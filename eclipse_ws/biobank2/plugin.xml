@@ -275,8 +275,21 @@
              name="Add Research Group">
        </command>
    </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+       	  class="edu.ualberta.med.biobank.handlers.DisabledNewEditorHandler"
+          commandId="org.eclipse.ui.window.newEditor">
+       		<enabledWhen>
+          		<count value="-1">
+          		</count>
+       		</enabledWhen>
+       		<activeWhen>
+          		<not>
+             		<count value="-1">
+             		</count>
+          		</not>
+       		</activeWhen>
+      </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.LoginHandler"
             commandId="edu.ualberta.med.biobank.commands.login">
@@ -2323,9 +2336,9 @@
           </with>
        </definition>
       <definition
-            id="biobank.hasPrinterLabelsRights">
+            id="biobank.hasLabelPrintingRights">
          <with
-               variable="edu.ualberta.med.biobank.sourceprovider.hasPrinterLabelsRights">
+               variable="edu.ualberta.med.biobank.sourceprovider.hasLabelPrintingRights">
             <equals
                   value="true">
             </equals>

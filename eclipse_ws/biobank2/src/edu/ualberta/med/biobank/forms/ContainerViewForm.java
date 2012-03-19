@@ -39,7 +39,6 @@ import edu.ualberta.med.biobank.common.action.container.ContainerCreateChildrenA
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteChildrenAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -55,7 +54,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
-import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
 import edu.ualberta.med.biobank.widgets.grids.cell.ContainerCell;
@@ -558,36 +556,30 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void openFormFor(ContainerCell cell) {
-        try {
-            ContainerAdapter newAdapter = null;
-            if (cell.getStatus() == UICellStatus.NOT_INITIALIZED) {
-                if (canCreate) {
-                    ContainerWrapper containerToOpen = cell.getContainer();
-                    if (containerToOpen == null) {
-                        containerToOpen =
-                            new ContainerWrapper(SessionManager.getAppService());
-                    }
-                    containerToOpen
-                        .setSite((SiteWrapper) containerAdapter
-                            .getParentFromClass(SiteAdapter.class)
-                            .getModelObject());
-                    RowColPos pos = new RowColPos(cell.getRow(), cell.getCol());
-                    containerToOpen.setParent(
-                        new ContainerWrapper(SessionManager.getAppService(),
-                            containerInfo.container), pos);
-                    newAdapter =
-                        new ContainerAdapter(containerAdapter, containerToOpen);
-                    newAdapter.openEntryForm(true);
+        ContainerAdapter newAdapter = null;
+        if (cell.getStatus() == UICellStatus.NOT_INITIALIZED) {
+            if (canCreate) {
+                ContainerWrapper containerToOpen = cell.getContainer();
+                if (containerToOpen == null) {
+                    containerToOpen =
+                        new ContainerWrapper(SessionManager.getAppService());
                 }
-            } else {
-                ContainerWrapper child = cell.getContainer();
-                Assert.isNotNull(child);
-                SessionManager.openViewForm(child);
+                containerToOpen.setSite(new SiteWrapper(SessionManager
+                    .getAppService(), containerInfo.container.getSite()));
+                RowColPos pos = new RowColPos(cell.getRow(), cell.getCol());
+                containerToOpen.setParentInternal(
+                    new ContainerWrapper(SessionManager.getAppService(),
+                        containerInfo.container), pos);
+                newAdapter =
+                    new ContainerAdapter(containerAdapter, containerToOpen);
+                newAdapter.openEntryForm(true);
             }
-            containerAdapter.performExpand();
-        } catch (BiobankCheckException e) {
-            BgcPlugin.openAsyncError(Messages.ContainerViewForm_error_title, e);
+        } else {
+            ContainerWrapper child = cell.getContainer();
+            Assert.isNotNull(child);
+            SessionManager.openViewForm(child);
         }
+        containerAdapter.performExpand();
     }
 
     private void setContainerValues() {

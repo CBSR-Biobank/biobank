@@ -20,11 +20,14 @@ import edu.ualberta.med.biobank.model.ResearchGroup;
 public class ResearchGroupGetInfoAction implements
     Action<ResearchGroupReadInfo> {
     private static final long serialVersionUID = 1L;
-    // @formatter:off
+
     @SuppressWarnings("nls")
-    private static final String RESEARCH_INFO_HQL = "select distinct rg from "
-    + ResearchGroup.class.getName() +" rg left join fetch rg.comments inner join fetch rg.study inner join fetch rg.address where rg.id=?";
-    // @formatter:on
+    private static final String RESEARCH_INFO_HQL =
+        "SELECT DISTINCT rg FROM "
+            + ResearchGroup.class.getName() + " rg"
+            + " LEFT JOIN FETCH rg.comments"
+            + " INNER JOIN FETCH rg.study inner"
+            + " join fetch rg.address where rg.id=?";
 
     private final Integer rgId;
 
@@ -50,7 +53,7 @@ public class ResearchGroupGetInfoAction implements
         if (rows.size() == 1) {
             Object row = rows.get(0);
 
-            sInfo.rg = (ResearchGroup) row;
+            sInfo.researchGroup = (ResearchGroup) row;
 
         } else {
             throw new ActionException("No research group found with id:" + rgId); //$NON-NLS-1$

@@ -11,6 +11,8 @@ import javax.validation.ConstraintViolationException;
 import junit.framework.Assert;
 
 import org.hibernate.Query;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,7 +26,10 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAct
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
@@ -141,7 +146,8 @@ public class TestContainerType extends TestAction {
 
         Assert.assertEquals("FREEZER_3x10",
             topContainerTypeInfo.getContainerType().getName());
-        Assert.assertEquals(ActivityStatus.ACTIVE, topContainerTypeInfo.getContainerType()
+        Assert.assertEquals(ActivityStatus.ACTIVE, topContainerTypeInfo
+            .getContainerType()
             .getActivityStatus());
         Assert.assertEquals(3, topContainerTypeInfo.getContainerType()
             .getCapacity().getRowCapacity().intValue());
@@ -442,27 +448,6 @@ public class TestContainerType extends TestAction {
         return containerInfo.container;
     }
 
-    @Test
-    public void changeCapacity() {
-        // capacity cannot be changed after on a container type once containers
-        // of this type have been created
-
-    }
-
-    @Test
-    public void changeTopLevel() {
-        // top level cannot be changed after on a container type once containers
-        // of this type have been created
-
-    }
-
-    @Test
-    public void changeLabellingScheme() {
-        // labeling scheme cannot be changed after on a container type once
-        // containers of this type have been created
-
-    }
-
     private ContainerTypeInfo addComment(Integer containerTypeId) {
         ContainerTypeSaveAction containerTypeSaveAction =
             ContainerTypeHelper.getSaveAction(
@@ -478,7 +463,10 @@ public class TestContainerType extends TestAction {
         // save with no comments
         Integer containerTypeId =
             EXECUTOR.exec(containerTypeSaveAction).getId();
-        EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeId));
+        ContainerTypeInfo containerTypeInfo =
+            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+        EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeInfo
+            .getContainerType()));
 
         // hql query for container type should return empty
         Query q =
@@ -507,36 +495,14 @@ public class TestContainerType extends TestAction {
                 .getChildContainerTypes()
                 .iterator().next().getId();
 
+        ContainerTypeInfo childCtInfo =
+            EXECUTOR.exec(new ContainerTypeGetInfoAction(childCtId));
         try {
-            EXECUTOR.exec(new ContainerTypeDeleteAction(childCtId));
+            EXECUTOR.exec(new ContainerTypeDeleteAction(childCtInfo
+                .getContainerType()));
             Assert
                 .fail(
                 "should not be allowed to delete a child container type and linked to a parent type");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
-    public void deleteWithChildren() {
-        // create a top container type with children
-        Set<Integer> childContainerTypeIds = new HashSet<Integer>();
-        for (ContainerType childContainerType : createChildContainerTypes()) {
-            childContainerTypeIds.add(childContainerType.getId());
-        }
-
-        containerTypeSaveAction.setChildContainerTypeIds(childContainerTypeIds);
-        Integer parentCtId = EXECUTOR.exec(containerTypeSaveAction).getId();
-        EXECUTOR.exec(new ContainerTypeGetInfoAction(parentCtId));
-
-        // FIXME: should this test pass or fail?
-
-        // delete parent type
-        try {
-            EXECUTOR.exec(new ContainerTypeDeleteAction(parentCtId));
-            Assert
-                .fail(
-                "should not be allowed to delete a parent container type and linked to a children types");
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
@@ -547,8 +513,11 @@ public class TestContainerType extends TestAction {
         Container container = createTypeWithContainer();
         Integer containerTypeId = container.getContainerType().getId();
 
+        ContainerTypeInfo containerTypeInfo =
+            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
         try {
-            EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeId));
+            EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeInfo
+                .getContainerType()));
             Assert
                 .fail(
                 "should not be allowed to delete a container type in use by a container");

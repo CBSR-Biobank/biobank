@@ -5,8 +5,10 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -58,14 +60,19 @@ public class StudyMasterGroup extends AbstractStudyGroup {
 
     @Override
     public void performExpand() {
-        try {
-            studiesInfo = SessionManager.getAppService().doAction(
-                new StudyGetAllAction());
-            super.performExpand();
-        } catch (ApplicationException e) {
-            // TODO: open an error dialog here?
-            LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
-        }
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    studiesInfo = SessionManager.getAppService().doAction(
+                        new StudyGetAllAction());
+                    StudyMasterGroup.super.performExpand();
+                } catch (ApplicationException e) {
+                    // TODO: open an error dialog here?
+                    LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
+                }
+            }
+        });
     }
 
     @Override

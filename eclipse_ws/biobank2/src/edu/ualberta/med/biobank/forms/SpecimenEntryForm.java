@@ -75,6 +75,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     private List<SpecimenWrapper> allchildren;
 
     protected CollectionEventWrapper newCollectionEvent;
+    protected CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
 
     private CommentCollectionInfoTable commentEntryTable;
 
@@ -310,15 +312,18 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentCollectionInfoTable(client,
-            specimen.getCommentCollection(false));
+        commentEntryTable =
+            new CommentCollectionInfoTable(client,
+                specimen.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add);
+        commentText =
+            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
+                SWT.MULTI,
+                Messages.Comments_add, null, comment, "message", null);
 
     }
 

@@ -28,12 +28,12 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.eventattr.GlobalEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.eventattr.GlobalEventAttrInfoGetAction;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -203,10 +203,10 @@ public class TestCollectionEvent extends TestAction {
         setEventAttrs(provisioning.studyId);
         StudyInfo studyInfo =
             EXECUTOR.exec(new StudyGetInfoAction(provisioning.studyId));
-        Assert.assertEquals(5, studyInfo.studyEventAttrs.size());
+        Assert.assertEquals(5, studyInfo.getStudyEventAttrs().size());
 
         StudyEventAttr phlebotomistStudyAttr = null;
-        for (StudyEventAttr attr : studyInfo.studyEventAttrs) {
+        for (StudyEventAttr attr : studyInfo.getStudyEventAttrs()) {
             if ("Phlebotomist".equals(attr.getGlobalEventAttr().getLabel())) {
                 phlebotomistStudyAttr = attr;
             }
@@ -269,10 +269,10 @@ public class TestCollectionEvent extends TestAction {
         setEventAttrs(provisioning.studyId);
         StudyInfo studyInfo =
             EXECUTOR.exec(new StudyGetInfoAction(provisioning.studyId));
-        Assert.assertEquals(5, studyInfo.studyEventAttrs.size());
+        Assert.assertEquals(5, studyInfo.getStudyEventAttrs().size());
 
         StudyEventAttr phlebotomistStudyAttr = null;
-        for (StudyEventAttr attr : studyInfo.studyEventAttrs) {
+        for (StudyEventAttr attr : studyInfo.getStudyEventAttrs()) {
             if ("Phlebotomist".equals(attr.getGlobalEventAttr().getLabel())) {
                 phlebotomistStudyAttr = attr;
             }
@@ -428,7 +428,9 @@ public class TestCollectionEvent extends TestAction {
                     null, null)).getId();
 
         // test delete
-        EXECUTOR.exec(new CollectionEventDeleteAction(ceventId));
+        CEventInfo info =
+            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+        EXECUTOR.exec(new CollectionEventDeleteAction(info.cevent));
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         Assert.assertNull(cevent);
@@ -451,9 +453,11 @@ public class TestCollectionEvent extends TestAction {
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
             .getId();
 
-        // try delete this cevent:
+        // try to delete this cevent
+        CEventInfo info =
+            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
         try {
-            EXECUTOR.exec(new CollectionEventDeleteAction(ceventId));
+            EXECUTOR.exec(new CollectionEventDeleteAction(info.cevent));
             Assert
                 .fail("should throw an exception because specimens are still in the cevent");
         } catch (ConstraintViolationException ae) {
@@ -494,10 +498,10 @@ public class TestCollectionEvent extends TestAction {
         setEventAttrs(provisioning.studyId);
         StudyInfo studyInfo =
             EXECUTOR.exec(new StudyGetInfoAction(provisioning.studyId));
-        Assert.assertEquals(5, studyInfo.studyEventAttrs.size());
+        Assert.assertEquals(5, studyInfo.getStudyEventAttrs().size());
 
         StudyEventAttr phlebotomistStudyAttr = null;
-        for (StudyEventAttr attr : studyInfo.studyEventAttrs) {
+        for (StudyEventAttr attr : studyInfo.getStudyEventAttrs()) {
             if ("Phlebotomist".equals(attr.getGlobalEventAttr().getLabel())) {
                 phlebotomistStudyAttr = attr;
             }

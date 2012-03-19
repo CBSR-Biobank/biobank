@@ -12,8 +12,11 @@ public class GroupDeleteAction implements Action<EmptyResult> {
 
     private final Integer groupId;
 
-    public GroupDeleteAction(Integer id) {
-        this.groupId = id;
+    public GroupDeleteAction(Group group) {
+        if (group == null) {
+            throw new IllegalArgumentException();
+        }
+        this.groupId = group.getId();
     }
 
     @Override

@@ -22,15 +22,16 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyDeleteAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecimenSaveInfo;
@@ -166,12 +167,8 @@ public class TestStudy extends TestAction {
     public void checkGetAction() throws Exception {
         Provisioning provisioning = new Provisioning(EXECUTOR, name);
 
-        Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(EXECUTOR,
-                provisioning.patientIds.get(0), provisioning.clinicId);
-        EXECUTOR.exec(
-            new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
-            .getList();
+        CollectionEventHelper.createCEventWithSourceSpecimens(EXECUTOR,
+            provisioning.patientIds.get(0), provisioning.clinicId);
 
         Set<SourceSpecimenSaveInfo> ssSaveInfosAll =
             getSourceSpecimens(R.nextInt(5) + 1, getSpecimenTypes());
@@ -191,14 +188,15 @@ public class TestStudy extends TestAction {
         studyInfo = EXECUTOR.exec(new StudyGetInfoAction(provisioning.studyId));
 
         Assert.assertEquals(ActivityStatus.ACTIVE,
-            studyInfo.study.getActivityStatus());
-        Assert.assertEquals(new Long(1), studyInfo.patientCount);
-        Assert.assertEquals(new Long(1), studyInfo.collectionEventCount);
-        Assert.assertEquals(ssSaveInfosAll.size(), studyInfo.sourceSpcs.size());
+            studyInfo.getStudy().getActivityStatus());
+        Assert.assertEquals(new Long(1), studyInfo.getPatientCount());
+        Assert.assertEquals(new Long(1), studyInfo.getCollectionEventCount());
+        Assert.assertEquals(ssSaveInfosAll.size(), studyInfo
+            .getSourceSpecimens().size());
         Assert.assertEquals(asSaveInfosAll.size(),
-            studyInfo.aliquotedSpcs.size());
+            studyInfo.getAliquotedSpcs().size());
         Assert.assertEquals(studyEventAttrSaveInfos.size(),
-            studyInfo.studyEventAttrs.size());
+            studyInfo.getStudyEventAttrs().size());
     }
 
     @Test
@@ -207,13 +205,13 @@ public class TestStudy extends TestAction {
         Integer studyId = EXECUTOR.exec(studySaveAction).getId();
         StudyInfo studyInfo =
             EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        studyInfo.study.setName(name + "_2");
+        studyInfo.getStudy().setName(name + "_2");
         studySaveAction = StudyHelper.getSaveAction(studyInfo);
         EXECUTOR.exec(studySaveAction);
 
         // ensure we can change short name on existing study
         studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        studyInfo.study.setNameShort(name + "_2");
+        studyInfo.getStudy().setNameShort(name + "_2");
         studySaveAction = StudyHelper.getSaveAction(studyInfo);
         EXECUTOR.exec(studySaveAction);
 
@@ -239,7 +237,6 @@ public class TestStudy extends TestAction {
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
-
     }
 
     @Test
@@ -250,9 +247,9 @@ public class TestStudy extends TestAction {
             ClinicHelper.createClinicsWithContacts(EXECUTOR,
                 name + "_clinic", numClinics, numContacts);
 
-        List<Contact> studyContactsSet1 = new ArrayList<Contact>();
-        List<Contact> studyContactsSet2 = new ArrayList<Contact>();
-        Set<Contact> expectedStudyContacts = new HashSet<Contact>();
+        List<Integer> studyContactIdsSet1 = new ArrayList<Integer>();
+        List<Integer> studyContactIdsSet2 = new ArrayList<Integer>();
+        Set<Integer> expectedStudyContactIds = new HashSet<Integer>();
 
         // get a contact id from each clinic
         for (Integer clinicId : clinicIds) {
@@ -262,53 +259,54 @@ public class TestStudy extends TestAction {
             Assert.assertNotNull(contacts);
             Assert.assertNotNull(contacts.get(0));
             Assert.assertNotNull(contacts.get(1));
-            studyContactsSet1.add(contacts.get(0));
-            studyContactsSet2.add(contacts.get(1));
+            studyContactIdsSet1.add(contacts.get(0).getId());
+            studyContactIdsSet2.add(contacts.get(1).getId());
         }
 
         // add a contact one by one from set 1
         Integer studyId = EXECUTOR.exec(studySaveAction).getId();
-        for (Contact c : studyContactsSet1) {
-            expectedStudyContacts.add(c);
-            studyAddContacts(studyId, Arrays.asList(c));
-            Assert.assertEquals(expectedStudyContacts,
-                getStudyContacts(studyId));
+        for (Integer id : studyContactIdsSet1) {
+            expectedStudyContactIds.add(id);
+            studyAddContacts(studyId, Arrays.asList(id));
+            Assert.assertEquals(expectedStudyContactIds,
+                getStudyContactIds(studyId));
         }
 
         // add contact set 2
-        studyAddContacts(studyId, studyContactsSet2);
-        expectedStudyContacts.addAll(studyContactsSet2);
-        Assert.assertEquals(expectedStudyContacts,
-            getStudyContacts(studyId));
+        studyAddContacts(studyId, studyContactIdsSet2);
+        expectedStudyContactIds.addAll(studyContactIdsSet2);
+        Assert.assertEquals(expectedStudyContactIds,
+            getStudyContactIds(studyId));
 
         // remove all contacts from set 1 individually
-        for (Contact c : studyContactsSet1) {
-            expectedStudyContacts.remove(c);
-            studyRemoveContacts(studyId, Arrays.asList(c));
-            Assert.assertEquals(expectedStudyContacts,
-                getStudyContacts(studyId));
+        for (Integer id : studyContactIdsSet1) {
+            expectedStudyContactIds.remove(id);
+            studyRemoveContacts(studyId, Arrays.asList(id));
+            Assert.assertEquals(expectedStudyContactIds,
+                getStudyContactIds(studyId));
         }
 
         // remove contact set 2
-        studyRemoveContacts(studyId, studyContactsSet2);
-        expectedStudyContacts.removeAll(studyContactsSet2);
-        Assert.assertEquals(expectedStudyContacts,
-            getStudyContacts(studyId));
-        Assert.assertTrue(getStudyContacts(studyId).isEmpty());
+        studyRemoveContacts(studyId, studyContactIdsSet2);
+        expectedStudyContactIds.removeAll(studyContactIdsSet2);
+        Assert.assertEquals(expectedStudyContactIds,
+            getStudyContactIds(studyId));
+        Assert.assertTrue(getStudyContactIds(studyId).isEmpty());
 
         // test removing clinics - should fail
-        studyAddContacts(studyId, studyContactsSet2);
-        expectedStudyContacts.addAll(studyContactsSet2);
-        Assert.assertEquals(expectedStudyContacts,
-            getStudyContacts(studyId));
+        studyAddContacts(studyId, studyContactIdsSet2);
+        expectedStudyContactIds.addAll(studyContactIdsSet2);
+        Assert.assertEquals(expectedStudyContactIds,
+            getStudyContactIds(studyId));
 
-        for (Contact c : studyContactsSet2) {
+        for (Integer clinicId : clinicIds) {
+            ClinicGetInfoAction.ClinicInfo clinicInfo =
+                EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
             try {
-                EXECUTOR.exec(new ClinicDeleteAction(c.getClinic()
-                    .getId()));
+                EXECUTOR.exec(new ClinicDeleteAction(clinicInfo.clinic));
                 Assert
                     .fail("should not be allowed to delete a clinic with contact linked to study");
-            } catch (ActionCheckException e) {
+            } catch (ConstraintViolationException e) {
                 Assert.assertTrue(true);
             }
         }
@@ -328,38 +326,34 @@ public class TestStudy extends TestAction {
         }
     }
 
-    private void studyAddContacts(Integer studyId, List<Contact> contacts)
+    private void studyAddContacts(Integer studyId, List<Integer> newContactIds)
         throws ApplicationException {
-        StudyInfo studyInfo =
-            EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        for (Contact c : contacts) {
-            ClinicInfo clinicInfo =
-                new ClinicInfo(c.getClinic(), 0L, 0L, Arrays.asList(c));
-            studyInfo.clinicInfos.add(clinicInfo);
+        StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
+        Set<Integer> contactIds = new HashSet<Integer>();
+        for (ClinicInfo clinicInfo : studyInfo.getClinicInfos()) {
+            for (Contact c : clinicInfo.getContacts()) {
+                contactIds.add(c.getId());
+            }
         }
-        StudySaveAction studySave =
-            StudyHelper.getSaveAction(studyInfo);
+        contactIds.addAll(newContactIds);
+
+        StudySaveAction studySave = StudyHelper.getSaveAction(studyInfo);
+        studySave.setContactIds(contactIds);
         EXECUTOR.exec(studySave);
     }
 
     private void studyRemoveContacts(Integer studyId,
-        List<Contact> contactsToRemove) throws ApplicationException {
-        // get a list of contact IDs to remove
-        List<Integer> idsToRemove = new ArrayList<Integer>();
-        for (Contact c : contactsToRemove) {
-            idsToRemove.add(c.getId());
-        }
-
+        List<Integer> contactIdsToRemove) throws ApplicationException {
         // get a list of current contact IDs
         StudyInfo studyInfo =
             EXECUTOR.exec(new StudyGetInfoAction(studyId));
         Set<Integer> studyContactIds = new HashSet<Integer>();
-        for (ClinicInfo infos : studyInfo.clinicInfos) {
+        for (ClinicInfo infos : studyInfo.getClinicInfos()) {
             for (Contact c : infos.getContacts()) {
                 studyContactIds.add(c.getId());
             }
         }
-        studyContactIds.removeAll(idsToRemove);
+        studyContactIds.removeAll(contactIdsToRemove);
 
         StudySaveAction studySave =
             StudyHelper.getSaveAction(studyInfo);
@@ -367,15 +361,16 @@ public class TestStudy extends TestAction {
         EXECUTOR.exec(studySave);
     }
 
-    private Set<Contact> getStudyContacts(Integer studyId)
+    private Set<Integer> getStudyContactIds(Integer studyId)
         throws ApplicationException {
-        StudyInfo studyInfo =
-            EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        Set<Contact> contacts = new HashSet<Contact>();
-        for (ClinicInfo clinicInfo : studyInfo.clinicInfos) {
-            contacts.addAll(clinicInfo.getContacts());
+        StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
+        Set<Integer> contactIds = new HashSet<Integer>();
+        for (ClinicInfo clinicInfo : studyInfo.getClinicInfos()) {
+            for (Contact c : clinicInfo.getContacts()) {
+                contactIds.add(c.getId());
+            }
         }
-        return contacts;
+        return contactIds;
     }
 
     private static Set<SourceSpecimenSaveInfo> getSourceSpecimens(
@@ -448,7 +443,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(new StudyGetInfoAction(studyId));
         Assert.assertEquals(
             getSourceSpecimenSpecimenTypesFromSaveInfo(ssSaveInfosAll),
-            getSourceSpecimenSpecimenTypes(studyInfo.sourceSpcs));
+            getSourceSpecimenSpecimenTypes(studyInfo.getSourceSpecimens()));
 
         // remove Set 2 from the study, Set 1 should be left
         studySaveAction = StudyHelper.getSaveAction(studyInfo);
@@ -458,7 +453,7 @@ public class TestStudy extends TestAction {
         studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
         Assert.assertEquals(
             getSourceSpecimenSpecimenTypesFromSaveInfo(set1),
-            getSourceSpecimenSpecimenTypes(studyInfo.sourceSpcs));
+            getSourceSpecimenSpecimenTypes(studyInfo.getSourceSpecimens()));
 
         // remove all
         studySaveAction = StudyHelper.getSaveAction(studyInfo);
@@ -468,7 +463,7 @@ public class TestStudy extends TestAction {
 
         studyInfo =
             EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        Assert.assertTrue(studyInfo.sourceSpcs.isEmpty());
+        Assert.assertTrue(studyInfo.getSourceSpecimens().isEmpty());
 
         // check that this study no longer has any source specimens
         Assert.assertTrue(getSourceSpecimenCount(studyId).equals(0L));
@@ -548,7 +543,7 @@ public class TestStudy extends TestAction {
         Assert
             .assertEquals(
                 getAliquotedSpecimenSpecimenTypesFromSaveInfo(asSaveInfosAll),
-                getAliquotedSpecimenSpecimenTypes(studyInfo.aliquotedSpcs));
+                getAliquotedSpecimenSpecimenTypes(studyInfo.getAliquotedSpcs()));
 
         // remove Set 2 from the study, Set 1 should be left
         studySaveAction = StudyHelper.getSaveAction(studyInfo);
@@ -558,7 +553,7 @@ public class TestStudy extends TestAction {
         studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
         Assert.assertEquals(
             getAliquotedSpecimenSpecimenTypesFromSaveInfo(set1),
-            getAliquotedSpecimenSpecimenTypes(studyInfo.aliquotedSpcs));
+            getAliquotedSpecimenSpecimenTypes(studyInfo.getAliquotedSpcs()));
 
         // remove all
         studySaveAction = StudyHelper.getSaveAction(studyInfo);
@@ -567,7 +562,7 @@ public class TestStudy extends TestAction {
         EXECUTOR.exec(studySaveAction);
 
         studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        Assert.assertTrue(studyInfo.aliquotedSpcs.isEmpty());
+        Assert.assertTrue(studyInfo.getAliquotedSpcs().isEmpty());
 
         // check that this study no longer has any aliquoted specimens
         Assert.assertTrue(getAliquotedSpecimenCount(studyId).equals(0L));
@@ -630,7 +625,7 @@ public class TestStudy extends TestAction {
             EXECUTOR.exec(new StudyGetInfoAction(studyId));
         Assert.assertEquals(
             getStudyEventAttrSaveInfoGlobalIds(studyEventAttrSaveInfos),
-            getStudyEventAttrGlobalIds(studyInfo.studyEventAttrs));
+            getStudyEventAttrGlobalIds(studyInfo.getStudyEventAttrs()));
 
         // attempt to add 1 of each global type again -> should not be allowed
         studySaveAction = StudyHelper.getSaveAction(studyInfo);
@@ -650,7 +645,7 @@ public class TestStudy extends TestAction {
         EXECUTOR.exec(studySaveAction);
 
         studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        Assert.assertTrue(studyInfo.studyEventAttrs.isEmpty());
+        Assert.assertTrue(studyInfo.getStudyEventAttrs().isEmpty());
 
         // check that this study no longer has any study event attributes
         Assert.assertTrue(getStudyEventAttrCount(studyId).equals(0L));
@@ -679,13 +674,13 @@ public class TestStudy extends TestAction {
         // save with no comments
         Integer studyId = EXECUTOR.exec(studySaveAction).getId();
         StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
-        Assert.assertEquals(0, studyInfo.study.getComments().size());
+        Assert.assertEquals(0, studyInfo.getStudy().getComments().size());
 
         studyInfo = addComment(studyId);
-        Assert.assertEquals(1, studyInfo.study.getComments().size());
+        Assert.assertEquals(1, studyInfo.getStudy().getComments().size());
 
         studyInfo = addComment(studyId);
-        Assert.assertEquals(2, studyInfo.study.getComments().size());
+        Assert.assertEquals(2, studyInfo.getStudy().getComments().size());
 
         // TODO: check full name on each comment's user
         // for (Comment comment : studyInfo.study.getCommentCollection()) {
@@ -705,7 +700,8 @@ public class TestStudy extends TestAction {
     public void delete() throws ApplicationException {
         // delete a study with no patients and no other associations
         Integer studyId = EXECUTOR.exec(studySaveAction).getId();
-        EXECUTOR.exec(new StudyDeleteAction(studyId));
+        StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
+        EXECUTOR.exec(new StudyDeleteAction(studyInfo.getStudy()));
 
         // hql query for study should return empty
         Query q =
@@ -726,15 +722,18 @@ public class TestStudy extends TestAction {
                 Utils.getRandomDate(), null);
         Integer patientId = EXECUTOR.exec(patientSaveAction).getId();
 
+        StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
         try {
-            EXECUTOR.exec(new StudyDeleteAction(studyId));
+            EXECUTOR.exec(new StudyDeleteAction(studyInfo.getStudy()));
             Assert
                 .fail("should not be allowed to delete a study with patients");
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
-        EXECUTOR.exec(new PatientDeleteAction(patientId));
-        EXECUTOR.exec(new StudyDeleteAction(studyId));
+        PatientInfo patientInfo =
+            EXECUTOR.exec(new PatientGetInfoAction(patientId));
+        EXECUTOR.exec(new PatientDeleteAction(patientInfo.patient));
+        EXECUTOR.exec(new StudyDeleteAction(studyInfo.getStudy()));
     }
 
     @Test
@@ -764,7 +763,8 @@ public class TestStudy extends TestAction {
             StudyHelper.getSaveAction(studyInfo);
         studySaveAction.setContactIds(new HashSet<Integer>(contactId));
         EXECUTOR.exec(studySaveAction);
-        EXECUTOR.exec(new StudyDeleteAction(studyId));
+        studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
+        EXECUTOR.exec(new StudyDeleteAction(studyInfo.getStudy()));
     }
 
     @Test
@@ -772,7 +772,8 @@ public class TestStudy extends TestAction {
         // add source specimens to study
         Integer studyId = EXECUTOR.exec(studySaveAction).getId();
         getSourceSpecimens(5, getSpecimenTypes());
-        EXECUTOR.exec(new StudyDeleteAction(studyId));
+        StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
+        EXECUTOR.exec(new StudyDeleteAction(studyInfo.getStudy()));
         Assert.assertTrue(getSourceSpecimenCount(studyId).equals(0L));
     }
 
@@ -783,7 +784,8 @@ public class TestStudy extends TestAction {
         // there should be none for this study after the delete
         Integer studyId = EXECUTOR.exec(studySaveAction).getId();
         addAliquotedSpecimens(5, getSpecimenTypes());
-        EXECUTOR.exec(new StudyDeleteAction(studyId));
+        StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
+        EXECUTOR.exec(new StudyDeleteAction(studyInfo.getStudy()));
         Assert.assertTrue(getAliquotedSpecimenCount(studyId).equals(0L));
     }
 
@@ -795,7 +797,8 @@ public class TestStudy extends TestAction {
         studySaveAction
             .setStudyEventAttrSaveInfo(getStudyEventAttrSaveInfosAll());
         Integer studyId = EXECUTOR.exec(studySaveAction).getId();
-        EXECUTOR.exec(new StudyDeleteAction(studyId));
+        StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
+        EXECUTOR.exec(new StudyDeleteAction(studyInfo.getStudy()));
         Assert.assertTrue(getStudyEventAttrCount(studyId).equals(0L));
 
     }

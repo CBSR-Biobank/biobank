@@ -664,8 +664,8 @@ End:
     <copy todir="${buildDirectory}/plugins/sampleProcessingRobot">
       <fileset dir="${eclipse.workspace.dir}/sampleProcessingRobot" />
     </copy>
-    <copy todir="${buildDirectory}/plugins/barcodeGenerator">
-      <fileset dir="${eclipse.workspace.dir}/barcodeGenerator" />
+    <copy todir="${buildDirectory}/plugins/labelPrinter">
+      <fileset dir="${eclipse.workspace.dir}/labelPrinter" />
     </copy>
     <copy todir="${buildDirectory}/plugins/biobank.gui.common">
       <fileset dir="${eclipse.workspace.dir}/biobank.gui.common" />
@@ -768,11 +768,11 @@ End:
   </target>
 
   <target name="doxygen" description="generates documentation for the model classes">
-    <exec command="${doxygen}">
+    <exec executable="${doxygen}">
       <arg value="docs/doxygen/doxygen.cfg" />
     </exec>
     <echo message="point your browser to: file://${doxygen.output}/html/index.html" />
-    <exec command="${xsltproc}" dir="docs/doxygen/xml" output="docs/doxygen/xml/all.xml">
+    <exec executable="${xsltproc}" dir="docs/doxygen/xml" output="docs/doxygen/xml/all.xml">
       <arg value="combine.xslt" />
       <arg value="index.xml" />
     </exec>

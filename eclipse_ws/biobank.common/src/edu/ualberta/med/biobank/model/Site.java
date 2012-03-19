@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -53,7 +52,7 @@ public class Site extends Center {
         this.studies = studies;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "site")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "site")
     public Set<ContainerType> getContainerTypes() {
         return this.containerTypes;
     }
@@ -62,7 +61,7 @@ public class Site extends Center {
         this.containerTypes = containerTypes;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "site")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "site")
     public Set<Container> getContainers() {
         return this.containers;
     }

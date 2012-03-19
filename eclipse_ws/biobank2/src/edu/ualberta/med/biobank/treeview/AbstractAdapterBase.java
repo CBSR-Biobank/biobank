@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.ConstraintViolationException;
+
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -24,6 +27,7 @@ import com.google.inject.Injector;
 import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -32,6 +36,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 import edu.ualberta.med.biobank.treeview.util.DeltaEvent;
 import edu.ualberta.med.biobank.treeview.util.IDeltaListener;
 import edu.ualberta.med.biobank.treeview.util.NullDeltaListener;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Base class for all "Session" tree view nodes. Generally, most of the nodes in
@@ -337,6 +342,20 @@ public abstract class AbstractAdapterBase implements
                     try {
                         runDelete();
                         page.closeEditor(part, true);
+                    } catch (ApplicationException e) {
+                        if (e.getCause() instanceof ConstraintViolationException) {
+                            List<String> msgs = BiobankFormBase
+                                .getConstraintViolationsMsgs(
+                                (ConstraintViolationException) e.getCause());
+                            BgcPlugin.openAsyncError(
+                                Messages.AdapterBase_delete_error_title,
+                                StringUtils.join(msgs, "\n"));
+
+                        } else {
+                            BgcPlugin.openAsyncError(
+                                Messages.AdapterBase_delete_error_title,
+                                e.getLocalizedMessage());
+                        }
                     } catch (Exception e) {
                         BgcPlugin.openAsyncError(
                             Messages.AdapterBase_delete_error_title, e);

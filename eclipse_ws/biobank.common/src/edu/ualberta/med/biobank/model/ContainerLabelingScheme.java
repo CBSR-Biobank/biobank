@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -408,5 +409,30 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
             return twoCharToRowCol(position, rowCapacity, colCapacity, null);
         }
         return null;
+    }
+
+    @Transient
+    public boolean canLabel(Capacity capacity) {
+        boolean canLabel = true;
+
+        if (capacity.getRowCapacity() == null
+            || capacity.getColCapacity() == null) {
+            return false;
+        }
+
+        if (canLabel && getMaxRows() != null) {
+            canLabel &= capacity.getRowCapacity() <= getMaxRows();
+        }
+
+        if (canLabel && getMaxCols() != null) {
+            canLabel &= capacity.getColCapacity() <= getMaxCols();
+        }
+
+        if (canLabel && getMaxCapacity() != null) {
+            int max = capacity.getRowCapacity() * capacity.getColCapacity();
+            canLabel &= max <= getMaxCapacity();
+        }
+
+        return canLabel;
     }
 }

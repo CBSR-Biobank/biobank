@@ -88,6 +88,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.common.action.exception,
  edu.ualberta.med.biobank.common.action.info,
  edu.ualberta.med.biobank.common.action.logging,
+ edu.ualberta.med.biobank.common.action.originInfo,
  edu.ualberta.med.biobank.common.action.others,
  edu.ualberta.med.biobank.common.action.patient,
  edu.ualberta.med.biobank.common.action.processingEvent,
@@ -114,6 +115,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.common.permission.container,
  edu.ualberta.med.biobank.common.permission.containerType,
  edu.ualberta.med.biobank.common.permission.dispatch,
+ edu.ualberta.med.biobank.common.permission.labelPrinting,
  edu.ualberta.med.biobank.common.permission.logging,
  edu.ualberta.med.biobank.common.permission.patient,
  edu.ualberta.med.biobank.common.permission.processingEvent,
@@ -145,6 +147,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.server.applicationservice.exceptions,
  edu.ualberta.med.biobank.server.query,
  edu.ualberta.med.biobank.server.reports,
+ edu.ualberta.med.biobank.validator.engine,
  gov.nih.nci.system.applicationservice;
   uses:="gov.nih.nci.system.query,
    gov.nih.nci.system.query.hibernate,
@@ -155,6 +158,7 @@ Export-Package: antlr;
  gov.nih.nci.system.query,
  gov.nih.nci.system.query.example;uses:="gov.nih.nci.system.query",
  gov.nih.nci.system.query.hibernate,
+ javax.validation,
  net.sf.cglib.proxy,
  org.acegisecurity;uses:="org.springframework.core,org.springframework.context.support",
  org.acegisecurity.providers.rcp;

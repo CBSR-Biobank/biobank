@@ -19,9 +19,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecimenSaveInfo;
@@ -44,6 +44,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.EventAttrWidget;
@@ -74,7 +75,8 @@ public class StudyEntryForm extends BiobankEntryForm {
         public boolean inStudy;
     }
 
-    private StudyWrapper study;
+    private StudyWrapper study = new StudyWrapper(
+        SessionManager.getAppService());
 
     private ClinicAddInfoTable contactEntryTable;
 
@@ -130,11 +132,10 @@ public class StudyEntryForm extends BiobankEntryForm {
         if (id != null) {
             studyInfo = SessionManager.getAppService().doAction(
                 new StudyGetInfoAction(id));
-            study = new StudyWrapper(SessionManager.getAppService(),
-                studyInfo.study);
+            study.setWrappedObject(studyInfo.getStudy());
         } else {
             studyInfo = new StudyInfo();
-            study = new StudyWrapper(SessionManager.getAppService());
+            study.setWrappedObject(new Study());
         }
 
         List<SpecimenType> specimenTypes =
@@ -457,7 +458,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         contactEntryTable.reload();
         aliquotedSpecimenEntryTable.reload();
         sourceSpecimenEntryTable.reload();
-        commentText.setText(null);
+        commentText.setText("");
         resetPvCustomInfo();
     }
 

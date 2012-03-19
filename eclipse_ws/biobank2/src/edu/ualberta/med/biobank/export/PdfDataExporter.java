@@ -31,9 +31,7 @@ public class PdfDataExporter extends GuiDataExporter {
         super.canExport(data);
 
         if (data.getRows() instanceof AbstractBiobankListProxy) {
-            AbstractBiobankListProxy<?> proxy = (AbstractBiobankListProxy<?>) data
-                .getRows();
-            if (proxy.getRealSize() == -1) {
+            if (data.getRows().size() > 0 && data.getRows().size() <= 1000) {
                 throw new DataExportException(
                     Messages.PdfDataExporter_toomanyrows_error_msg);
             }

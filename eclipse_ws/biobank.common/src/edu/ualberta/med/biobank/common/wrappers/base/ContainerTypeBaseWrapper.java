@@ -7,6 +7,7 @@ package edu.ualberta.med.biobank.common.wrappers.base;
 import java.util.List;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -20,8 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.CommentBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.CapacityBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerTypeBaseWrapper;
 import java.util.Arrays;
@@ -223,17 +222,12 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
         wrappedObject.setActivityStatus(activityStatus);
     }
 
-    public CapacityWrapper getCapacity() {
-        CapacityWrapper capacity = getWrappedProperty(ContainerTypePeer.CAPACITY, CapacityWrapper.class);
-        return capacity;
+    public Capacity getCapacity() {
+        return wrappedObject.getCapacity();
     }
 
-    public void setCapacity(CapacityBaseWrapper capacity) {
-        setWrappedProperty(ContainerTypePeer.CAPACITY, capacity);
-    }
-
-    void setCapacityInternal(CapacityBaseWrapper capacity) {
-        setWrappedProperty(ContainerTypePeer.CAPACITY, capacity);
+    public void setCapacity(Capacity capacity) {
+        wrappedObject.setCapacity(capacity);
     }
 
     public List<ContainerTypeWrapper> getChildContainerTypeCollection(boolean sort) {

@@ -17,10 +17,8 @@ import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
@@ -37,6 +35,7 @@ import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.Search
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
@@ -103,14 +102,11 @@ public class TestPatient extends TestAction {
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(EXECUTOR,
                 provisioning.patientIds.get(0), provisioning.clinicId);
-        List<SpecimenInfo> sourceSpecs =
-            EXECUTOR.exec(
-                new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
-                .getList();
-
-        // save some comments on the colection event
         CEventInfo ceventInfo =
             EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+        List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
+
+        // save some comments on the colection event
         CollectionEventSaveAction ceventSaveAction =
             CollectionEventHelper.getSaveAction(ceventInfo);
         ceventSaveAction.setCommentText(Utils.getRandomString(20, 30));
@@ -123,7 +119,7 @@ public class TestPatient extends TestAction {
             EXECUTOR.exec(new PatientGetInfoAction(provisioning.patientIds
                 .get(0)));
 
-        Assert.assertEquals(studyInfo.study.getName(), patientInfo.patient
+        Assert.assertEquals(studyInfo.getStudy().getName(), patientInfo.patient
             .getStudy().getName());
         Assert.assertEquals(1, patientInfo.ceventInfos.size());
         Assert.assertEquals(new Long(sourceSpecs.size()),
@@ -172,7 +168,8 @@ public class TestPatient extends TestAction {
             provisioning.studyId, pnumber, date, null)).getId();
 
         // delete the patient
-        EXECUTOR.exec(new PatientDeleteAction(id));
+        PatientInfo patientInfo = EXECUTOR.exec(new PatientGetInfoAction(id));
+        EXECUTOR.exec(new PatientDeleteAction(patientInfo.patient));
 
         Patient patient = (Patient) session.get(Patient.class, id);
         Assert.assertNull(patient);
@@ -191,8 +188,10 @@ public class TestPatient extends TestAction {
             .nextInt(20) + 1, ActivityStatus.ACTIVE, null, null, null));
 
         // delete the patient
+        PatientInfo patientInfo =
+            EXECUTOR.exec(new PatientGetInfoAction(patientId));
         try {
-            EXECUTOR.exec(new PatientDeleteAction(patientId));
+            EXECUTOR.exec(new PatientDeleteAction(patientInfo.patient));
             Assert
                 .fail("should throw an exception since the patient still has on cevent");
         } catch (ConstraintViolationException ae) {
@@ -360,7 +359,7 @@ public class TestPatient extends TestAction {
             .nextInt(20), ActivityStatus.ACTIVE, null,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
-        ArrayList<PatientCEventInfo> infos =
+        List<PatientCEventInfo> infos =
             EXECUTOR
                 .exec(new PatientGetCollectionEventInfosAction(patientId))
                 .getList();
@@ -387,7 +386,7 @@ public class TestPatient extends TestAction {
         Provisioning provisioning = new Provisioning(EXECUTOR, name);
         final Integer patientId = provisioning.patientIds.get(0);
 
-        Integer visitNumber = R.nextInt(20);
+        Integer visitNumber = R.nextInt(20) + 1;
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
             visitNumber, ActivityStatus.ACTIVE, null, null, null));
 

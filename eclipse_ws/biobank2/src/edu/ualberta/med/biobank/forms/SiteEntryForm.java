@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
@@ -48,7 +49,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private SiteAdapter siteAdapter;
 
-    private SiteWrapper site;
+    private SiteWrapper site = new SiteWrapper(SessionManager.getAppService());
 
     protected Combo session;
 
@@ -94,11 +95,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         if (id != null) {
             siteInfo = SessionManager.getAppService().doAction(
                 new SiteGetInfoAction(id));
-            site = new SiteWrapper(SessionManager.getAppService(),
-                siteInfo.site);
+            site.setWrappedObject(siteInfo.getSite());
         } else {
             siteInfo = new SiteInfo.Builder().build();
-            site = new SiteWrapper(SessionManager.getAppService());
+            site.setWrappedObject(new Site());
         }
 
         ((AdapterBase) adapter).setModelObject(site);

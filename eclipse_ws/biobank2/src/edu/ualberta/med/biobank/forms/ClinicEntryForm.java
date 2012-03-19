@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
@@ -53,7 +54,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     private ClinicAdapter clinicAdapter;
 
-    private ClinicWrapper clinic;
+    private ClinicWrapper clinic = new ClinicWrapper(
+        SessionManager.getAppService());
 
     private ContactEntryInfoTable contactEntryWidget;
 
@@ -98,12 +100,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         if (id != null) {
             clinicInfo = SessionManager.getAppService().doAction(
                 new ClinicGetInfoAction(id));
-            clinic =
-                new ClinicWrapper(SessionManager.getAppService(),
-                    clinicInfo.clinic);
+            clinic.setWrappedObject(clinicInfo.clinic);
         } else {
             clinicInfo = new ClinicInfo();
-            clinic = new ClinicWrapper(SessionManager.getAppService());
+            clinic.setWrappedObject(new Clinic());
         }
         ((AdapterBase) adapter).setModelObject(clinic);
     }

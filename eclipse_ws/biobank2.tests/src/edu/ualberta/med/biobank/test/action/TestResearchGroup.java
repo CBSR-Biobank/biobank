@@ -17,10 +17,10 @@ import edu.ualberta.med.biobank.common.action.info.AddressSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestGetSpecimenInfosAction;
+import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupDeleteAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
-import edu.ualberta.med.biobank.common.action.researchGroup.SubmitRequestAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Request;
@@ -62,10 +62,11 @@ public class TestResearchGroup extends TestAction {
             new ResearchGroupGetInfoAction(rgId);
         ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
 
-        Assert.assertTrue(rg.rg.getName().equals(name + "rg"));
-        Assert.assertTrue(rg.rg.getNameShort().equals(name + "rg"));
-        Assert.assertTrue(rg.rg.getStudy().getId().equals(studyId));
-        Assert.assertTrue(rg.rg.getActivityStatus() == ActivityStatus.ACTIVE);
+        Assert.assertTrue(rg.researchGroup.getName().equals(name + "rg"));
+        Assert.assertTrue(rg.researchGroup.getNameShort().equals(name + "rg"));
+        Assert.assertTrue(rg.researchGroup.getStudy().getId().equals(studyId));
+        Assert
+            .assertTrue(rg.researchGroup.getActivityStatus() == ActivityStatus.ACTIVE);
 
     }
 
@@ -82,7 +83,7 @@ public class TestResearchGroup extends TestAction {
         // create specs
         Integer p =
             PatientHelper.createPatient(EXECUTOR, name + "_patient",
-                rg.rg.getStudy().getId());
+                rg.researchGroup.getStudy().getId());
         Integer ceId =
             CollectionEventHelper.createCEventWithSourceSpecimens(EXECUTOR,
                 p, rgId);
@@ -99,8 +100,8 @@ public class TestResearchGroup extends TestAction {
         specs.remove(Math.abs(R.nextInt()) % specs.size());
 
         // request specs
-        SubmitRequestAction action =
-            new SubmitRequestAction(rgId, specs);
+        RequestSubmitAction action =
+            new RequestSubmitAction(rgId, specs);
         Integer rId = EXECUTOR.exec(action).getId();
 
         // make sure you got what was requested
@@ -123,16 +124,19 @@ public class TestResearchGroup extends TestAction {
             ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
                 name,
                 studyId);
-        Integer rId = RequestHelper.createRequest(EXECUTOR, rgId);
+        Integer rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
+        ResearchGroupReadInfo rg =
+            EXECUTOR.exec(new ResearchGroupGetInfoAction(rgId));
         ResearchGroupDeleteAction delete =
-            new ResearchGroupDeleteAction(rgId);
+            new ResearchGroupDeleteAction(rg.researchGroup);
         try {
             EXECUTOR.exec(delete);
             Assert.fail();
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
-
+        session.close();
+        session = SESSION_PROVIDER.openSession();
         session.beginTransaction();
 
         Request r = (Request) session.load(Request.class, rId);
@@ -167,12 +171,12 @@ public class TestResearchGroup extends TestAction {
 
         save.id = rgId;
 
-        Assert.assertEquals(1, rg.rg.getComments().size());
+        Assert.assertEquals(1, rg.researchGroup.getComments().size());
         EXECUTOR.exec(rgSave);
         rg = EXECUTOR.exec(reader);
-        Assert.assertEquals(2, rg.rg.getComments().size());
+        Assert.assertEquals(2, rg.researchGroup.getComments().size());
         EXECUTOR.exec(rgSave);
         rg = EXECUTOR.exec(reader);
-        Assert.assertEquals(3, rg.rg.getComments().size());
+        Assert.assertEquals(3, rg.researchGroup.getComments().size());
     }
 }

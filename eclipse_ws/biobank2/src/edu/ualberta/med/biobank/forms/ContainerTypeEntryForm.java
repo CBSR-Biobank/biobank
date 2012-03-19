@@ -36,6 +36,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
@@ -63,7 +64,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private ContainerTypeAdapter containerTypeAdapter;
 
-    private ContainerTypeWrapper containerType;
+    private ContainerTypeWrapper containerType =
+        new ContainerTypeWrapper(SessionManager.getAppService());
 
     private MultiSelectWidget<SpecimenTypeWrapper> specimensMultiSelect;
 
@@ -134,15 +136,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         if (id != null) {
             containerTypeInfo = SessionManager.getAppService().doAction(
                 new ContainerTypeGetInfoAction(id));
-            containerType =
-                new ContainerTypeWrapper(SessionManager.getAppService(),
-                    containerTypeInfo.getContainerType());
+            containerType.setWrappedObject(
+                containerTypeInfo.getContainerType());
         } else {
             containerTypeInfo = new ContainerTypeInfo();
-            containerType =
-                new ContainerTypeWrapper(SessionManager.getAppService());
-            containerType.setSite(SessionManager.getUser()
-                .getCurrentWorkingSite());
+            containerType.setWrappedObject((ContainerType) containerTypeAdapter
+                .getModelObject().getWrappedObject());
         }
 
         ((AdapterBase) adapter).setModelObject(containerType);

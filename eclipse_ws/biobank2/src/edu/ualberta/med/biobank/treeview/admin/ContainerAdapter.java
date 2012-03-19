@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetChildrenAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerMoveSpecimensAction;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -386,5 +387,13 @@ public class ContainerAdapter extends AdapterBase {
         if (o instanceof ContainerAdapter)
             return internalCompareTo(o);
         return 0;
+    }
+
+    @Override
+    protected void runDelete() throws Exception {
+        SessionManager.getAppService().doAction(
+            new ContainerDeleteAction((Container) getModelObject()
+                .getWrappedObject()));
+        SessionManager.updateAllSimilarNodes(getParent(), true);
     }
 }

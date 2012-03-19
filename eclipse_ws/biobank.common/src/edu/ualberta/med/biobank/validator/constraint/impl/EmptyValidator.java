@@ -9,10 +9,10 @@ import org.hibernate.EntityMode;
 import org.hibernate.Query;
 import org.hibernate.metadata.ClassMetadata;
 
-import edu.ualberta.med.biobank.validator.SessionAwareConstraintValidator;
+import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 
-public class EmptyValidator extends SessionAwareConstraintValidator<Object>
+public class EmptyValidator extends EventSourceAwareConstraintValidator<Object>
     implements ConstraintValidator<Empty, Object> {
     private static final String SIZE_QUERY_TEMPLATE =
         "SELECT {0}.size FROM {1} o WHERE o = ?";
@@ -25,7 +25,7 @@ public class EmptyValidator extends SessionAwareConstraintValidator<Object>
     }
 
     @Override
-    public boolean isValidInSession(Object value,
+    public boolean isValidInEventSource(Object value,
         ConstraintValidatorContext context) {
         if (value == null) {
             return true;
@@ -45,7 +45,7 @@ public class EmptyValidator extends SessionAwareConstraintValidator<Object>
         String defaultTemplate = context.getDefaultConstraintMessageTemplate();
 
         if (defaultTemplate.isEmpty()) {
-            ClassMetadata meta = getSession().getSessionFactory()
+            ClassMetadata meta = getEventSource().getSessionFactory()
                 .getClassMetadata(value.getClass());
 
             StringBuilder template = new StringBuilder();
@@ -65,7 +65,7 @@ public class EmptyValidator extends SessionAwareConstraintValidator<Object>
     }
 
     private int getCollectionSize(Object value) {
-        ClassMetadata meta = getSession().getSessionFactory()
+        ClassMetadata meta = getEventSource().getSessionFactory()
             .getClassMetadata(value.getClass());
 
         // Don't check the property directy, but use HQL instead since it could
@@ -77,7 +77,7 @@ public class EmptyValidator extends SessionAwareConstraintValidator<Object>
         String hql = MessageFormat.format(SIZE_QUERY_TEMPLATE,
             property, meta.getMappedClass(EntityMode.POJO).getName());
 
-        Query query = getSession().createQuery(hql).setParameter(0, value);
+        Query query = getEventSource().createQuery(hql).setParameter(0, value);
 
         List<?> results = query.list();
         Number count = (Number) results.iterator().next();

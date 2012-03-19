@@ -10,8 +10,8 @@ import edu.ualberta.med.biobank.model.Clinic;
 public class ClinicDeleteAction extends CenterDeleteAction {
     private static final long serialVersionUID = 1L;
 
-    public ClinicDeleteAction(Integer id) {
-        super(id);
+    public ClinicDeleteAction(Clinic clinic) {
+        super(clinic);
     }
 
     @Override
