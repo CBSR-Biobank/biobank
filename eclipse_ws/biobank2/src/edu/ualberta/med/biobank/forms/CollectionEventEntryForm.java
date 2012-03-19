@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -124,11 +125,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         } else {
             ceventInfo = SessionManager.getAppService().doAction(
                 new CollectionEventGetInfoAction(adapter.getId()));
-            studyAttrInfos = SessionManager.getAppService().doAction(
-                new StudyGetEventAttrInfoAction(ceventInfo.cevent
-                    .getPatient().getStudy().getId())).getMap();
-            SessionManager.logLookup(ceventInfo.cevent);
         }
+        studyAttrInfos = SessionManager.getAppService().doAction(
+            new StudyGetEventAttrInfoAction(ceventInfo.cevent
+                .getPatient().getStudy().getId())).getMap();
         copyCEvent();
         // FIXME log edit action?
         // SessionManager.logEdit(cevent);

@@ -355,7 +355,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         return new SpecimenAssignPermission(currentWorkingCenterId).isAllowed(
-            null);
+            context);
     }
 
 }
