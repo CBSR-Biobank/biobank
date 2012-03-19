@@ -14,6 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
@@ -85,7 +86,8 @@ public class ValidContainerTypeValidator
 
     private boolean checkCapacity(ContainerType ct,
         ConstraintValidatorContext context) {
-        if (!ct.getChildLabelingScheme().canLabel(ct.getCapacity())) {
+        ContainerLabelingScheme scheme = ct.getChildLabelingScheme();
+        if (scheme != null && !scheme.canLabel(ct.getCapacity())) {
             context.buildConstraintViolationWithTemplate(OVER_CAPACITY)
                 .addNode("childLabelingScheme")
                 // TODO: any way to mark rowCapacity and colCapacity?

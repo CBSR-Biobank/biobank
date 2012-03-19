@@ -386,7 +386,7 @@ public class TestPatient extends TestAction {
         Provisioning provisioning = new Provisioning(EXECUTOR, name);
         final Integer patientId = provisioning.patientIds.get(0);
 
-        Integer visitNumber = R.nextInt(20);
+        Integer visitNumber = R.nextInt(20) + 1;
         EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
             visitNumber, ActivityStatus.ACTIVE, null, null, null));
 

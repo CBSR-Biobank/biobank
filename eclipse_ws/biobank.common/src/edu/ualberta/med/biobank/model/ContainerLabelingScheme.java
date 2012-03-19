@@ -415,6 +415,11 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
     public boolean canLabel(Capacity capacity) {
         boolean canLabel = true;
 
+        if (capacity.getRowCapacity() == null
+            || capacity.getColCapacity() == null) {
+            return false;
+        }
+
         if (canLabel && getMaxRows() != null) {
             canLabel &= capacity.getRowCapacity() <= getMaxRows();
         }

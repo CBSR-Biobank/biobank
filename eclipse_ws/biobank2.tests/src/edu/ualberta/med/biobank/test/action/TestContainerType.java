@@ -509,35 +509,6 @@ public class TestContainerType extends TestAction {
     }
 
     @Test
-    public void deleteWithChildren() {
-        // create a top container type with children
-        Set<Integer> childContainerTypeIds = new HashSet<Integer>();
-        for (ContainerType childContainerType : createChildContainerTypes()) {
-            childContainerTypeIds.add(childContainerType.getId());
-        }
-
-        containerTypeSaveAction.setChildContainerTypeIds(childContainerTypeIds);
-        Integer parentCtId = EXECUTOR.exec(containerTypeSaveAction).getId();
-        EXECUTOR.exec(new ContainerTypeGetInfoAction(parentCtId));
-
-        // FIXME: should this test pass or fail?
-
-        // delete parent type
-        ContainerTypeInfo parentCtInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(parentCtId));
-        try {
-            EXECUTOR.exec(new ContainerTypeDeleteAction(parentCtInfo
-                .getContainerType()));
-            Assert
-                .fail(
-                "should not be allowed to delete a parent container type and "
-                    + "linked to children types");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
     public void deleteWithContainer() {
         Container container = createTypeWithContainer();
         Integer containerTypeId = container.getContainerType().getId();
