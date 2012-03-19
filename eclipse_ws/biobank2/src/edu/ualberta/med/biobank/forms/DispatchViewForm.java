@@ -85,7 +85,6 @@ public class DispatchViewForm extends BiobankViewForm {
 
         setDispatchInfo(adapter.getId());
 
-        SessionManager.logLookup(dispatch);
         setPartName(Messages.DispatchViewForm_title);
     }
 

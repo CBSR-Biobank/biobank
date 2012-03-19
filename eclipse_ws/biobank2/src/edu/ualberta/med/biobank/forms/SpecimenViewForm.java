@@ -81,7 +81,6 @@ public class SpecimenViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
         updateSpecimenInfo();
 
-        SessionManager.logLookup(specimenWrapper);
         setPartName(NLS.bind(Messages.SpecimenViewForm_title,
             specimenWrapper.getInventoryId()));
     }

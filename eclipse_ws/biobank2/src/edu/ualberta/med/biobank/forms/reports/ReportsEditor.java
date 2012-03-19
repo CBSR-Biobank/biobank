@@ -46,6 +46,7 @@ import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.forms.BgcEntryFormActions;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 
@@ -221,6 +222,10 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     private void generate() {
         try {
             initReport();
+            Log logMessage = new Log();
+            logMessage.setType("report");
+            logMessage.setAction(report.getName()); //$NON-NLS-1$
+            SessionManager.getAppService().logActivity(logMessage);
         } catch (Exception e1) {
             BgcPlugin.openAsyncError("Failed to load parameters", e1); //$NON-NLS-1$
         }
