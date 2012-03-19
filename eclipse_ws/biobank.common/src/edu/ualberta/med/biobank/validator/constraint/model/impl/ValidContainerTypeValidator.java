@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.util.NullHelper;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.model.ValidContainerType;
 
@@ -132,9 +133,9 @@ public class ValidContainerTypeValidator
         // rows, but not columns if more than one row is filled (assuming
         // labeling is done row by row)
 
-        isValid &= nullSafeEquals(ct.getCapacity(), oldCt.getCapacity());
-        isValid &= nullSafeEquals(ct.getTopLevel(), oldCt.getTopLevel());
-        isValid &= nullSafeEquals(ct.getChildLabelingScheme(),
+        isValid &= NullHelper.safeEquals(ct.getCapacity(), oldCt.getCapacity());
+        isValid &= NullHelper.safeEquals(ct.getTopLevel(), oldCt.getTopLevel());
+        isValid &= NullHelper.safeEquals(ct.getChildLabelingScheme(),
             oldCt.getChildLabelingScheme());
 
         if (!isValid) {
@@ -146,10 +147,6 @@ public class ValidContainerTypeValidator
         }
 
         return isValid;
-    }
-
-    private static boolean nullSafeEquals(Object a, Object b) {
-        return (a == null) ? (b == null) : a.equals(b);
     }
 
     private boolean isUsed(ContainerType ct) {

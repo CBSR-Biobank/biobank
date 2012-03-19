@@ -66,6 +66,11 @@ public class Membership extends AbstractBiobankModel {
     private Rank rank = Rank.NORMAL;
     private short level = MIN_LEVEL;
 
+    @Transient
+    public boolean equalsDomain(Membership membership) {
+        return false;
+    }
+
     @NotNull(message = "{edu.ualberta.med.biobank.model.Membership.rank.NotNull}")
     @Column(name = "RANK", nullable = false)
     @Type(type = "rank")
