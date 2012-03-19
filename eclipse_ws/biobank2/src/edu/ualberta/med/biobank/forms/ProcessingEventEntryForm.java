@@ -27,6 +27,7 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.loggers.ProcessingEventLogProvider;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -41,7 +42,7 @@ import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget.ItemAction;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.Event;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
@@ -69,7 +70,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     private ActivityStatus closedActivityStatus;
 
-    private CommentCollectionInfoTable commentEntryTable;
+    private CommentsInfoTable commentEntryTable;
 
     private BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
@@ -84,6 +85,9 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     private CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
+
+    private ProcessingEventLogProvider logProvider =
+        new ProcessingEventLogProvider();
 
     private List<SpecimenInfo> specimens;
 
@@ -129,6 +133,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     new ProcessingEventGetInfoAction(adapter.getId()));
             pevent.setWrappedObject(read.pevent);
             specimens = read.sourceSpecimenInfos;
+            SessionManager.logLookup(read.pevent);
         }
     }
 
@@ -202,7 +207,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
         client.setLayout(gl);
         commentEntryTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 pevent.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
@@ -221,11 +226,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
         toolkit.paintBordersFor(client);
-
-        List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>();
-        for (SpecimenInfo info : specimens)
-            specs.add(new SpecimenWrapper(SessionManager.getAppService(),
-                info.specimen));
 
         specimenEntryWidget =
             new SpecimenEntryWidget(client, SWT.NONE, toolkit,
@@ -341,7 +341,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         specimenEntryWidget.addVetoListener(ItemAction.POST_DELETE,
             vetoListener);
 
-        specimenEntryWidget.setSpecimens(specs);
+        specimenEntryWidget.setSpecimens(specimens);
     }
 
     @Override
@@ -375,7 +375,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ProcessingEventViewForm.ID;
     }
 
@@ -388,6 +388,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             pevent.setActivityStatus(ActivityStatus.ACTIVE);
         }
         GuiUtil.reset(activityStatusComboViewer, pevent.getActivityStatus());
-        specimenEntryWidget.setSpecimens(pevent.getSpecimenCollection(true));
+        specimenEntryWidget.setSpecimens(specimens);
     }
 }

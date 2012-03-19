@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 
@@ -39,7 +39,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     private BgcBaseText activityLabel;
 
-    private CommentCollectionInfoTable commentTable;
+    private CommentsInfoTable commentTable;
 
     private ProcessingEventWrapper pevent = new ProcessingEventWrapper(
         SessionManager.getAppService());
@@ -69,6 +69,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
                     new ProcessingEventGetInfoAction(adapter.getId()));
             pevent.setWrappedObject(read.pevent);
             specimens = read.sourceSpecimenInfos;
+            SessionManager.logLookup(read.pevent);
         }
     }
 
@@ -109,7 +110,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
-        commentTable = new CommentCollectionInfoTable(client,
+        commentTable = new CommentsInfoTable(client,
             pevent.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);

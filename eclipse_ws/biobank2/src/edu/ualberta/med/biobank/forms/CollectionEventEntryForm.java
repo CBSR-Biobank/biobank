@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -49,6 +50,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -57,7 +59,7 @@ import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 import edu.ualberta.med.biobank.widgets.infotables.entry.CEventSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
@@ -101,11 +103,12 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private CEventInfo ceventInfo;
 
-    private CommentCollectionInfoTable commentEntryTable;
+    private CommentsInfoTable commentEntryTable;
 
-    private BgcBaseText commentWidget;
     private CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
+
+    Map<Integer, StudyEventAttrInfo> studyAttrInfos;
 
     @Override
     public void init() throws Exception {
@@ -120,10 +123,12 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             ceventInfo.cevent.setPatient(((CollectionEventAdapter) adapter)
                 .getPatient());
         } else {
-            ceventInfo =
-                SessionManager.getAppService().doAction(
-                    new CollectionEventGetInfoAction(adapter.getId()));
+            ceventInfo = SessionManager.getAppService().doAction(
+                new CollectionEventGetInfoAction(adapter.getId()));
         }
+        studyAttrInfos = SessionManager.getAppService().doAction(
+            new StudyGetEventAttrInfoAction(ceventInfo.cevent
+                .getPatient().getStudy().getId())).getMap();
         copyCEvent();
         // FIXME log edit action?
         // SessionManager.logEdit(cevent);
@@ -143,21 +148,22 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         // only value created when is a new cevent.
         ceventCopy.setPatient(ceventInfo.cevent.getPatient());
         if (adapter.getId() == null) {
-            ceventCopy.setVisitNumber(SessionManager.getAppService().doAction(
-                new PatientNextVisitNumberAction(ceventInfo.cevent.getPatient()
-                    .getId())).getNextVisitNumber());
+            ceventCopy.setVisitNumber(SessionManager
+                .getAppService()
+                .doAction(
+                    new PatientNextVisitNumberAction(ceventInfo.cevent
+                        .getPatient().getId())).getNextVisitNumber());
             ceventCopy.setActivityStatus(ActivityStatus.ACTIVE);
             sourceSpecimens = new ArrayList<SpecimenInfo>();
         } else {
             ceventCopy.setId(ceventInfo.cevent.getId());
             ceventCopy.setVisitNumber(ceventInfo.cevent.getVisitNumber());
             ceventCopy.setActivityStatus(ceventInfo.cevent.getActivityStatus());
-            ceventCopy.setComments(ceventInfo.cevent
-                .getComments());
+            ceventCopy.setComments(ceventInfo.cevent.getComments());
             sourceSpecimens =
                 new ArrayList<SpecimenInfo>(ceventInfo.sourceSpecimenInfos);
         }
-
+        comment.setWrappedObject(new Comment());
     }
 
     @Override
@@ -179,19 +185,16 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
         client.setLayout(gl);
         commentEntryTable =
-            new CommentCollectionInfoTable(client,
-                ModelWrapper.wrapModelCollection(
-                    SessionManager.getAppService(),
-                    ceventCopy.getComments(), CommentWrapper.class));
+            new CommentsInfoTable(client, ModelWrapper.wrapModelCollection(
+                SessionManager.getAppService(), ceventCopy.getComments(),
+                CommentWrapper.class));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        commentWidget =
-            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
-                SWT.MULTI,
-                Messages.Comments_add, null, comment, "message", null);
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_add, null, comment, "message", null);
 
     }
 
@@ -252,7 +255,30 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         toolkit.adapt(timeDrawnWidget);
 
         createEventAttrSection(client);
+    }
 
+    private void createEventAttrSection(Composite client) throws Exception {
+        pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
+
+        for (Entry<Integer, StudyEventAttrInfo> entry : studyAttrInfos
+            .entrySet()) {
+            FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
+            pvCustomInfo.setStudyEventAttrId(entry.getValue().attr.getId());
+            pvCustomInfo.setLabel(entry.getValue().attr.getGlobalEventAttr()
+                .getLabel());
+            pvCustomInfo.setType(entry.getValue().type);
+            pvCustomInfo.setAllowedValues(entry.getValue()
+                .getStudyEventAttrPermissible());
+            // FIXME ugly
+            EventAttrInfo eventAttrInfo = (adapter.getId() == null)
+                ? null : ceventInfo.eventAttrs.get(entry.getKey());
+            String origValue = (eventAttrInfo == null)
+                ? "" : eventAttrInfo.attr.getValue(); //$NON-NLS-1$ 
+            pvCustomInfo.setValue(origValue);
+            pvCustomInfo.setOrigValue(origValue);
+            pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
+            pvCustomInfoList.add(pvCustomInfo);
+        }
     }
 
     private void createSpecimensSection() {
@@ -260,19 +286,19 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             createSection(Messages.CollectionEventEntryForm_specimens_title);
         specimensTable =
             new CEventSpecimenEntryInfoTable(section, sourceSpecimens,
-                ceventCopy,
-                ColumnsShown.CEVENT_SOURCE_SPECIMENS);
+                ceventCopy, ColumnsShown.CEVENT_SOURCE_SPECIMENS);
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);
         try {
             final List<SpecimenType> allSpecimenTypes =
+                SessionManager.getAppService()
+                    .doAction(new SpecimenTypeGetAllAction()).getList();
+            final List<SourceSpecimen> studySourceSpecimens =
                 SessionManager
-                    .getAppService().doAction(new SpecimenTypeGetAllAction())
-                    .getList();
-            final List<SourceSpecimen> studySourceSpecimens = SessionManager
-                .getAppService().doAction(
-                    new StudyGetSourceSpecimensAction(ceventInfo.cevent
-                        .getPatient().getStudy().getId())).getList();
+                    .getAppService()
+                    .doAction(
+                        new StudyGetSourceSpecimensAction(ceventInfo.cevent
+                            .getPatient().getStudy().getId())).getList();
 
             specimensTable.addEditSupport(studySourceSpecimens,
                 allSpecimenTypes);
@@ -294,49 +320,15 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         section.setClient(specimensTable);
     }
 
-    private void createEventAttrSection(Composite client) throws Exception {
-        Map<Integer, StudyEventAttrInfo> studyAttrInfos =
-            SessionManager.getAppService().doAction(
-                new StudyGetEventAttrInfoAction(ceventInfo.cevent.getPatient()
-                    .getStudy().getId())).getMap();
-
-        pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
-
-        for (Entry<Integer, StudyEventAttrInfo> entry : studyAttrInfos
-            .entrySet()) {
-            FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
-            pvCustomInfo.setStudyEventAttrId(entry.getValue().attr.getId());
-            pvCustomInfo.setLabel(entry.getValue().attr.getGlobalEventAttr()
-                .getLabel());
-            pvCustomInfo.setType(entry.getValue().type);
-            pvCustomInfo.setAllowedValues(entry.getValue()
-                .getStudyEventAttrPermissible());
-            // FIXME ugly
-            EventAttrInfo eventAttrInfo =
-                adapter.getId() == null ? null : ceventInfo.eventAttrs
-                    .get(entry.getKey());
-            pvCustomInfo.setValue(eventAttrInfo == null ? "" //$NON-NLS-1$
-                : eventAttrInfo.attr.getValue());
-            pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
-            pvCustomInfoList.add(pvCustomInfo);
-        }
-    }
-
     private Control getControlForLabel(Composite client,
         FormPvCustomInfo pvCustomInfo) {
         Control control;
         if (EventAttrTypeEnum.NUMBER == pvCustomInfo.getType()) {
-            control =
-                createBoundWidgetWithLabel(
-                    client,
-                    BgcBaseText.class,
-                    SWT.NONE,
-                    pvCustomInfo.getLabel(),
-                    null,
-                    pvCustomInfo,
-                    FormPvCustomInfo.VALUE_BIND_STRING,
-                    new DoubleNumberValidator(
-                        Messages.CollectionEventEntryForm_number_validation_msg));
+            control = createBoundWidgetWithLabel(
+                client, BgcBaseText.class, SWT.NONE, pvCustomInfo.getLabel(),
+                null, pvCustomInfo, FormPvCustomInfo.VALUE_BIND_STRING,
+                new DoubleNumberValidator(
+                    Messages.CollectionEventEntryForm_number_validation_msg));
         } else if (EventAttrTypeEnum.TEXT == pvCustomInfo.getType()) {
             control =
                 createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
@@ -371,6 +363,22 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         control.setLayoutData(gd);
         return control;
+    }
+
+    private void updateControlForLabel(FormPvCustomInfo pvCustomInfo) {
+        if ((EventAttrTypeEnum.NUMBER == pvCustomInfo.getType())
+            || (EventAttrTypeEnum.TEXT == pvCustomInfo.getType())
+            || (EventAttrTypeEnum.DATE_TIME == pvCustomInfo.getType())
+            || (EventAttrTypeEnum.SELECT_SINGLE == pvCustomInfo.getType())) {
+            ((BgcBaseText) pvCustomInfo.control).setText(pvCustomInfo
+                .getOrigValue());
+        } else if (EventAttrTypeEnum.SELECT_MULTIPLE == pvCustomInfo.getType()) {
+            ((SelectMultipleWidget) pvCustomInfo.control)
+                .setSelections(pvCustomInfo.getOrigValue().split(";"));
+        } else {
+            Assert.isTrue(false,
+                "Invalid pvInfo type: " + pvCustomInfo.getType()); //$NON-NLS-1$
+        }
     }
 
     @Override
@@ -420,18 +428,20 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         }
 
         // save the collection event
-        Integer savedCeventId = SessionManager.getAppService().doAction(
-            new CollectionEventSaveAction(ceventCopy.getId(),
-                ceventCopy.getPatient().getId(), ceventCopy.getVisitNumber(),
-                ceventCopy.getActivityStatus(), comment.getMessage(),
-                cevents, ceventAttrList)).getId();
+        Integer savedCeventId =
+            SessionManager
+                .getAppService()
+                .doAction(
+                    new CollectionEventSaveAction(ceventCopy.getId(),
+                        ceventCopy.getPatient().getId(), ceventCopy
+                            .getVisitNumber(), ceventCopy.getActivityStatus(),
+                        comment.getMessage(), cevents, ceventAttrList)).getId();
         PatientGetSimpleCollectionEventInfosAction action =
             new PatientGetSimpleCollectionEventInfosAction(ceventCopy
                 .getPatient().getId());
         Map<Integer, SimpleCEventInfo> infos =
             SessionManager.getAppService().doAction(action).getMap();
-        ((CollectionEventAdapter) adapter).setValue(
-            infos.get(savedCeventId));
+        ((CollectionEventAdapter) adapter).setValue(infos.get(savedCeventId));
     }
 
     @Override
@@ -457,7 +467,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return CollectionEventViewForm.ID;
     }
 
@@ -467,40 +477,14 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             .reset(activityStatusComboViewer, ceventCopy.getActivityStatus());
         specimensTable.reload(sourceSpecimens);
         commentEntryTable.setList(ModelWrapper.wrapModelCollection(
-            SessionManager.getAppService(),
-            ceventInfo.cevent.getComments(),
+            SessionManager.getAppService(), ceventInfo.cevent.getComments(),
             CommentWrapper.class));
         resetPvCustomInfo();
     }
 
     private void resetPvCustomInfo() throws Exception {
-        Map<Integer, StudyEventAttrInfo> studyAttrInfos =
-            SessionManager.getAppService().doAction(
-                new StudyGetEventAttrInfoAction(ceventInfo.cevent.getPatient()
-                    .getStudy().getId())).getMap();
-
-        for (Entry<Integer, StudyEventAttrInfo> entry : studyAttrInfos
-            .entrySet()) {
-            for (FormPvCustomInfo pvCustomInfo : pvCustomInfoList) {
-                if (pvCustomInfo.getLabel().equals(entry.getValue().attr
-                    .getGlobalEventAttr()
-                    .getLabel())) {
-                    pvCustomInfo.setStudyEventAttrId(entry.getValue().attr
-                        .getId());
-                    pvCustomInfo.setLabel(entry.getValue().attr
-                        .getGlobalEventAttr()
-                        .getLabel());
-                    pvCustomInfo.setType(entry.getValue().type);
-                    pvCustomInfo.setAllowedValues(entry.getValue()
-                        .getStudyEventAttrPermissible());
-                    // FIXME ugly
-                    EventAttrInfo eventAttrInfo =
-                        adapter.getId() == null ? null : ceventInfo.eventAttrs
-                            .get(entry.getKey());
-                    pvCustomInfo.setValue(eventAttrInfo == null ? "" //$NON-NLS-1$
-                        : eventAttrInfo.attr.getValue());
-                }
-            }
+        for (FormPvCustomInfo pvCustomInfo : pvCustomInfoList) {
+            updateControlForLabel(pvCustomInfo);
         }
     }
 }

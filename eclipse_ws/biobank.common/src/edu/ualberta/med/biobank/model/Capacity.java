@@ -1,12 +1,16 @@
 package edu.ualberta.med.biobank.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @Embeddable
-public class Capacity {
+public class Capacity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Integer rowCapacity;
     private Integer colCapacity;
     

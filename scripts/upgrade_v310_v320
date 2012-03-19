@@ -67,7 +67,7 @@ pv $DBDUMP | gzip -dc | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
 echo "upgrading database..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v310_v320.sql
 echo "assigning groups..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/groups.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < db/import/data/groups.sql
 echo "migrating security..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v310_v320_security_transfer.sql
 echo "done"

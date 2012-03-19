@@ -815,10 +815,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return 0;
     }
 
-    @Override
-    public String toString() {
-        return getLabel() + " (" + getProductBarcode() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-    }
+    // @Override
+    // public String toString() {
+    //        return getLabel() + " (" + getProductBarcode() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+    // }
 
     @Override
     protected void resetInternalFields() {

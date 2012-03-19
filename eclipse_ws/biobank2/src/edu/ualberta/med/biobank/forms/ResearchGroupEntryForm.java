@@ -30,7 +30,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -72,7 +72,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
     private ComboViewer studyComboViewer;
 
-    private CommentCollectionInfoTable commentEntryTable;
+    private CommentsInfoTable commentEntryTable;
 
     @Override
     protected void init() throws Exception {
@@ -184,7 +184,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentCollectionInfoTable(client,
+        commentEntryTable = new CommentsInfoTable(client,
             researchGroup.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
@@ -233,7 +233,8 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             SessionManager.getAppService().doAction(
                 new ResearchGroupGetInfoAction(id));
         researchGroup.setWrappedObject(read.researchGroup);
-        adapter.setValue(new ResearchGroupAdapterInfo(read.researchGroup.getId(), read.researchGroup
+        adapter.setValue(new ResearchGroupAdapterInfo(read.researchGroup
+            .getId(), read.researchGroup
             .getName()));
     }
 
@@ -243,7 +244,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ResearchGroupViewForm.ID;
     }
 

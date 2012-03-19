@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.treeview.patient.StudyWithPatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SourceSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
 
@@ -56,7 +56,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private List<StudyEventAttrCustomInfo> pvCustomInfoList;
 
-    private CommentCollectionInfoTable commentTable;
+    private CommentsInfoTable commentTable;
 
     @Override
     public void init() throws Exception {
@@ -77,6 +77,7 @@ public class StudyViewForm extends BiobankViewForm {
             new StudyGetInfoAction(adapter.getId()));
         Assert.isNotNull(studyInfo.getStudy());
         study.setWrappedObject(studyInfo.getStudy());
+        SessionManager.logLookup(studyInfo.getStudy());
     }
 
     @Override
@@ -121,7 +122,7 @@ public class StudyViewForm extends BiobankViewForm {
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
         commentTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 study.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);

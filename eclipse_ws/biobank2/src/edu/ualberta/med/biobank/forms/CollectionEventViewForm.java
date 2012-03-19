@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 
@@ -49,7 +49,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private CEventInfo ceventInfo;
 
-    private CommentCollectionInfoTable commentTable;
+    private CommentsInfoTable commentTable;
 
     private static class FormPvCustomInfo extends EventAttrCustom {
         BgcBaseText widget;
@@ -71,6 +71,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
         ceventInfo =
             SessionManager.getAppService().doAction(
                 new CollectionEventGetInfoAction(adapter.getId()));
+        SessionManager.logLookup(ceventInfo.cevent);
     }
 
     @Override
@@ -114,7 +115,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
         commentTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 ModelWrapper.wrapModelCollection(
                     SessionManager.getAppService(),
                     ceventInfo.cevent.getComments(),

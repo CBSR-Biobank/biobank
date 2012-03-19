@@ -215,6 +215,10 @@ public class Messages extends NLS {
 
     public static String SpecimenAssignEntryForm_useScanner_check_label;
 
+    public static String SpecimenLinkAssign_assign;
+
+    public static String SpecimenLinkAssign_save;
+
     public static String SpecimenLinkEntryForm_activity_title;
 
     public static String SpecimenLinkEntryForm_activitylog_save_summary;
@@ -236,6 +240,8 @@ public class Messages extends NLS {
     public static String SpecimenLinkEntryForm_inventoryId_validator_msg;
 
     public static String SpecimenLinkEntryForm_linked_msg_multiple;
+
+    public static String SpecimenLinkEntryForm_link;
 
     public static String SpecimenLinkEntryForm_linked_msg_single;
 

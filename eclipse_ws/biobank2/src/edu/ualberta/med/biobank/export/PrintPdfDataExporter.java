@@ -22,8 +22,14 @@ public class PrintPdfDataExporter extends PdfDataExporter {
         IProgressMonitor monitor) throws DataExportException {
         canExport(data);
 
-        List<Map<String, String>> maps = getPropertyMaps(data, labelProvider,
-            monitor, true);
+        List<Map<String, String>> maps;
+        try {
+            maps = getPropertyMaps(data, labelProvider,
+                monitor, true);
+        } catch (Exception e1) {
+            // cancelled
+            return;
+        }
 
         try {
             JasperPrint jasperPrint = ReportingUtils.createDynamicReport(

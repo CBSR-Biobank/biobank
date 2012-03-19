@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
 import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Dispatch;
@@ -105,13 +106,27 @@ public class DispatchSaveAction implements Action<IdResult> {
             DispatchSpecimen dspec =
                 context.get(DispatchSpecimen.class, dsInfo.id,
                     new DispatchSpecimen());
-            dspec.setSpecimen(context.load(Specimen.class,
-                dsInfo.specimenId));
+            Specimen spec = context.load(Specimen.class,
+                dsInfo.specimenId);
+            spec.setCurrentCenter(context.get(Center.class, dInfo.receiverId));
+            context.getSession().saveOrUpdate(spec);
+            dspec.setSpecimen(spec);
             dspec.setState(dsInfo.state);
             dspec.setDispatch(dispatch);
             dispSpecimens.add(dspec);
         }
         return dispSpecimens;
 
+    }
+
+    public static ShipmentInfoSaveInfo prepareShipInfo(
+        ShipmentInfoWrapper shipmentInfo) {
+        if (shipmentInfo == null) return null;
+        ShipmentInfoSaveInfo si =
+            new ShipmentInfoSaveInfo(shipmentInfo.getId(),
+                shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(),
+                shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),
+                shipmentInfo.getShippingMethod().getId());
+        return si;
     }
 }

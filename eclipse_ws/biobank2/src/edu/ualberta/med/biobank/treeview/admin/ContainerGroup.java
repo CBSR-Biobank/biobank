@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -105,41 +104,8 @@ public class ContainerGroup extends AdapterBase {
     @Override
     public List<AbstractAdapterBase> search(Class<?> searchedClass,
         Integer objectId) {
-        List<AbstractAdapterBase> res = new ArrayList<AbstractAdapterBase>();
-        if (ContainerWrapper.class.isAssignableFrom(searchedClass)) {
-            // FIXME search might need to be different now
-            // ContainerWrapper container = (ContainerWrapper) searchedObject;
-            // if (container.getContainerType() != null) {
-            // if (Boolean.TRUE.equals(container.getContainerType()
-            // .getTopLevel())) {
-            // AbstractAdapterBase child = getChild(objectId, true);
-            // if (child != null)
-            // res.add(child);
-            // } else {
-            // List<ContainerWrapper> parents = new
-            // ArrayList<ContainerWrapper>();
-            // ContainerWrapper currentContainer = container;
-            // while (currentContainer.hasParentContainer()) {
-            // currentContainer = currentContainer
-            // .getParentContainer();
-            // parents.add(currentContainer);
-            // }
-            // for (AbstractAdapterBase child : getChildren()) {
-            // if (child instanceof ContainerAdapter) {
-            // res = searchChildContainers(searchedObject,
-            // objectId, (ContainerAdapter) child, parents);
-            // } else {
-            // res = child.search(searchedObject, objectId);
-            // }
-            // if (res.size() > 0)
-            // break;
-            // }
-            // if (res.size() == 0)
-            // res = searchChildren(searchedObject, objectId);
-            // }
-            // }
-        }
-        return res;
+        return findChildFromClass(searchedClass, objectId,
+            ContainerTypeWrapper.class);
     }
 
     @Override
@@ -156,24 +122,11 @@ public class ContainerGroup extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        List<ContainerWrapper> result = new ArrayList<ContainerWrapper>();
-
-        if (topContainers != null) {
-            // return results only if this node has been expanded
-            for (Container container : topContainers) {
-                ContainerWrapper wrapper =
-                    new ContainerWrapper(SessionManager.getAppService(),
-                        container);
-                result.add(wrapper);
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return topContainers.size();
+        final SiteAdapter siteAdapter = (SiteAdapter) getParent();
+        topContainers = SessionManager.getAppService().doAction(
+            new SiteGetTopContainersAction(siteAdapter.getId())).getList();
+        return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+            topContainers, ContainerWrapper.class);
     }
 
     @Override

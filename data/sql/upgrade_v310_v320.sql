@@ -721,6 +721,159 @@ update report r set r.IS_PUBLIC=b'0' where IS_PUBLIC is null;
 alter table report change is_count IS_COUNT bit(1) NOT NULL;
 alter table report change is_public IS_PUBLIC bit(1) NOT NULL;
 
+-- *************************************************
+-- *
+-- * Container and Containter type foreign keys
+-- *
+-- *************************************************
+
+--
+-- this section deals with container_type changes
+--
+
+ALTER TABLE container_type
+      ADD COLUMN COL_CAPACITY INT(11) NOT NULL COMMENT '',
+      ADD COLUMN ROW_CAPACITY INT(11) NOT NULL COMMENT '',
+      ADD INDEX ID (ID, SITE_ID);
+
+update container_type ct,capacity cap
+       set ct.row_capacity=cap.row_capacity,ct.col_capacity=cap.col_capacity
+       where ct.capacity_id=cap.id;
+
+ALTER TABLE container_type DROP FOREIGN KEY FKB2C878581764E225;
+DROP TABLE capacity;
+ALTER TABLE container_type
+      DROP INDEX FKB2C878581764E225,
+      DROP KEY CAPACITY_ID, DROP COLUMN CAPACITY_ID;
+
+ALTER TABLE container
+      ADD CONSTRAINT FK_Container_containerType
+          FOREIGN KEY FK_Container_containerType (CONTAINER_TYPE_ID, SITE_ID)
+          REFERENCES container_type (ID, SITE_ID)
+          ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE container ADD INDEX ID (ID, CONTAINER_TYPE_ID),
+      ADD INDEX FK_Container_containerType (CONTAINER_TYPE_ID, SITE_ID);
+
+--
+-- this section deals with container_position changes
+--
+
+ALTER TABLE container_position
+      ADD COLUMN CONTAINER_ID INT(11) NOT NULL COMMENT '',
+      ADD COLUMN CONTAINER_TYPE_ID INT(11) NOT NULL COMMENT '',
+      ADD COLUMN PARENT_CONTAINER_TYPE_ID INT(11) NOT NULL COMMENT '';
+
+update container_position cpos,container ctr
+       set cpos.container_id=ctr.id,cpos.container_type_id=ctr.container_type_id
+       where cpos.id=ctr.position_id;
+
+update container_position cpos,container ctr
+       set cpos.parent_container_type_id=ctr.container_type_id
+       where cpos.parent_container_id=ctr.id;
+
+ALTER TABLE container DROP FOREIGN KEY FK8D995C61AC528270, DROP FOREIGN KEY FK8D995C61B3E77A12;
+ALTER TABLE container_position DROP FOREIGN KEY FK39FBB477366CE44;
+ALTER TABLE container
+      DROP INDEX FK8D995C61AC528270,
+      DROP KEY POSITION_ID,
+      DROP INDEX FK8D995C61B3E77A12,
+      DROP COLUMN POSITION_ID;
+ALTER TABLE container_position DROP INDEX FK39FBB477366CE44;
+ALTER TABLE container_position
+      ADD INDEX FK_ContainerPosition_container (CONTAINER_ID, CONTAINER_TYPE_ID),
+      ADD INDEX FK_ContainerPosition_parentContainer (PARENT_CONTAINER_ID, PARENT_CONTAINER_TYPE_ID),
+      ADD INDEX FK_ContainerPosition_containerTypeContainerType (PARENT_CONTAINER_TYPE_ID, CONTAINER_TYPE_ID);
+
+ALTER TABLE container_position
+      ADD CONSTRAINT FK_ContainerPosition_containerTypeContainerType
+          FOREIGN KEY FK_ContainerPosition_containerTypeContainerType (PARENT_CONTAINER_TYPE_ID, CONTAINER_TYPE_ID)
+          REFERENCES container_type_container_type (PARENT_CONTAINER_TYPE_ID, CHILD_CONTAINER_TYPE_ID)
+          ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE container_position
+      ADD CONSTRAINT FK_ContainerPosition_container
+          FOREIGN KEY FK_ContainerPosition_container (CONTAINER_ID, CONTAINER_TYPE_ID)
+          REFERENCES container (ID, CONTAINER_TYPE_ID)
+          ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE container_position
+      ADD CONSTRAINT FK_ContainerPosition_parentContainer
+          FOREIGN KEY FK_ContainerPosition_parentContainer (PARENT_CONTAINER_ID, PARENT_CONTAINER_TYPE_ID)
+          REFERENCES container (ID, CONTAINER_TYPE_ID)
+          ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+--
+-- this section deals with container_type_container_type changes
+--
+
+ALTER TABLE container_type_container_type
+      ADD COLUMN SITE_ID INT(11) NOT NULL COMMENT '';
+
+update container_type_container_type ctct, container_type ct
+       set ctct.site_id=ct.site_id
+       where ctct.parent_container_type_id=ct.id;
+
+ALTER TABLE container_type_container_type
+      DROP FOREIGN KEY FK5991B31F371DC9AF,
+      DROP FOREIGN KEY FK5991B31F9C2855BD;
+ALTER TABLE container_type_container_type
+      DROP INDEX FK5991B31F9C2855BD,
+      DROP INDEX FK5991B31F371DC9AF;
+ALTER TABLE container_type_container_type
+      ADD INDEX FK_ContainerType_parentContainerTypes (PARENT_CONTAINER_TYPE_ID, SITE_ID),
+      ADD INDEX FK_ContainerType_childContainerTypes (CHILD_CONTAINER_TYPE_ID, SITE_ID);
+
+ALTER TABLE container_type_container_type
+      ADD CONSTRAINT FK_ContainerType_childContainerTypes
+          FOREIGN KEY FK_ContainerType_childContainerTypes (CHILD_CONTAINER_TYPE_ID, SITE_ID)
+          REFERENCES container_type (ID, SITE_ID)
+          ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FK_ContainerType_parentContainerTypes
+          FOREIGN KEY FK_ContainerType_parentContainerTypes (PARENT_CONTAINER_TYPE_ID, SITE_ID)
+          REFERENCES container_type (ID, SITE_ID)
+          ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+--
+-- this section deals with specimen_position changes
+--
+
+ALTER TABLE specimen_position
+      ADD COLUMN CONTAINER_TYPE_ID INT(11) NOT NULL COMMENT '',
+      ADD COLUMN SPECIMEN_TYPE_ID INT(11) NOT NULL COMMENT '';
+
+update specimen_position spos,specimen spc,container ctr
+       set spos.container_type_id=ctr.container_type_id,
+       spos.specimen_type_id=spc.specimen_type_id
+       where spos.container_id=ctr.id
+       and  spos.specimen_id=spc.id;
+
+ALTER TABLE specimen_position
+      DROP FOREIGN KEY FK3E45B0809BFD88CF,
+      DROP FOREIGN KEY FK3E45B080EF199765;
+ALTER TABLE specimen_position DROP INDEX FK3E45B080EF199765,
+      DROP INDEX FK3E45B0809BFD88CF;
+ALTER TABLE specimen ADD INDEX ID (ID, SPECIMEN_TYPE_ID);
+
+ALTER TABLE specimen_position
+      ADD INDEX FK_SpecimenPosition_specimenTypeSpecimenType (CONTAINER_TYPE_ID, SPECIMEN_TYPE_ID),
+      ADD INDEX FK_SpecimenPosition_container (CONTAINER_ID, CONTAINER_TYPE_ID),
+      ADD INDEX FK_SpecimenPosition_specimen (SPECIMEN_ID, SPECIMEN_TYPE_ID);
+
+ALTER TABLE specimen_position
+      ADD CONSTRAINT FK_SpecimenPosition_specimenTypeSpecimenType
+          FOREIGN KEY FK_SpecimenPosition_specimenTypeSpecimenType (CONTAINER_TYPE_ID, SPECIMEN_TYPE_ID)
+          REFERENCES container_type_specimen_type (CONTAINER_TYPE_ID, SPECIMEN_TYPE_ID)
+          ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FK_SpecimenPosition_container
+          FOREIGN KEY FK_SpecimenPosition_container (CONTAINER_ID, CONTAINER_TYPE_ID)
+          REFERENCES container (ID, CONTAINER_TYPE_ID)
+          ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FK_SpecimenPosition_specimen
+          FOREIGN KEY FK_SpecimenPosition_specimen (SPECIMEN_ID, SPECIMEN_TYPE_ID)
+          REFERENCES specimen (ID, SPECIMEN_TYPE_ID)
+          ON UPDATE NO ACTION ON DELETE NO ACTION;
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

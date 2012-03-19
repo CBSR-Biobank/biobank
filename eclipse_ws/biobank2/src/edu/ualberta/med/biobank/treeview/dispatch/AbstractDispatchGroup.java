@@ -44,11 +44,6 @@ public abstract class AbstractDispatchGroup extends AdapterBase {
     }
 
     @Override
-    protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren() == null ? 0 : getWrapperChildren().size();
-    }
-
-    @Override
     public void notifyListeners(AdapterChangedEvent event) {
         getParent().notifyListeners(event);
     }

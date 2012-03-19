@@ -117,11 +117,6 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    protected int getWrapperChildCount() {
-        return 0;
-    }
-
-    @Override
     public String getEntryFormId() {
         return SiteEntryForm.ID;
     }

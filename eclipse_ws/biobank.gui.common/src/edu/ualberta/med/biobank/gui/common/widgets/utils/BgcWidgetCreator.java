@@ -265,7 +265,7 @@ public class BgcWidgetCreator {
     }
 
     public BgcBaseText createText(Composite composite, int widgetOptions,
-        IObservableValue modelObservableValue, UpdateValueStrategy uvs,
+        final IObservableValue modelObservableValue, UpdateValueStrategy uvs,
         String bindingKey) {
         if (widgetOptions == SWT.NONE) {
             widgetOptions = SWT.SINGLE;
@@ -296,6 +296,20 @@ public class BgcWidgetCreator {
                 }
             });
         }
+        // Integer and Double fields should not accept alpha characters. Really
+        // should block all symbols but . and +- too. FIXME for a later date
+        text.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if ((modelObservableValue != null)
+                    && (modelObservableValue.getValueType().equals(
+                        Integer.class)
+                    || modelObservableValue.getValueType().equals(
+                        Double.class))
+                    && Character.isLetter(e.character))
+                    e.doit = false;
+            }
+        });
         text.setLayoutData(gd);
         if (keyListener != null) {
             text.addKeyListener(keyListener);

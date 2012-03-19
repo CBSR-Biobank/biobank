@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.action.container;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
+import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
@@ -10,6 +11,7 @@ import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermi
 import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
@@ -28,6 +30,7 @@ public class ContainerSaveAction implements Action<IdResult> {
     public RowColPos position;
     public String path;
     public Integer parentId;
+    private String commentText;
 
     public void setId(Integer containerId) {
         this.containerId = containerId;
@@ -59,6 +62,10 @@ public class ContainerSaveAction implements Action<IdResult> {
 
     public void setParentId(Integer parentId) {
         this.parentId = parentId;
+    }
+
+    public void setCommentText(String commentText) {
+        this.commentText = commentText;
     }
 
     @Override
@@ -101,8 +108,9 @@ public class ContainerSaveAction implements Action<IdResult> {
             container.setPath(path.toString());
 
             container.setTopContainer(parent.getTopContainer());
-            container.setLabel(parent.getContainerType().getPositionString(
-                position));
+            container.setLabel(parent.getLabel()
+                + parent.getContainerType().getPositionString(
+                    position));
         } else {
             container.setLabel(label);
         }
@@ -110,9 +118,14 @@ public class ContainerSaveAction implements Action<IdResult> {
         ContainerActionHelper.setPosition(context, container, position,
             parentId);
 
+        Comment comment = CommentUtil.create(context.getUser(), commentText);
+        if (comment != null) {
+            context.getSession().save(comment);
+            container.getComments().add(comment);
+        }
+
         context.getSession().saveOrUpdate(container);
 
         return new IdResult(container.getId());
     }
-
 }

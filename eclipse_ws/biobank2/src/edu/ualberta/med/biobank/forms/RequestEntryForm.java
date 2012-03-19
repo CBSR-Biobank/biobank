@@ -71,8 +71,6 @@ public class RequestEntryForm extends BiobankViewForm {
 
         setRequestInfo(adapter.getId());
 
-        SessionManager.logEdit(request);
-
         setPartName(Messages.RequestEntryForm_title
             + request.getId().toString());
     }
@@ -85,6 +83,7 @@ public class RequestEntryForm extends BiobankViewForm {
             RequestReadInfo reqInfo = SessionManager.getAppService().doAction(
                 new RequestGetInfoAction(id));
             request.setWrappedObject(reqInfo.request);
+            SessionManager.logLookup(reqInfo.request);
         }
     }
 

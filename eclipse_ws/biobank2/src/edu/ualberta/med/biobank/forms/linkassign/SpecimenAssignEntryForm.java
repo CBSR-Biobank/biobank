@@ -203,7 +203,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ID;
     }
 
@@ -962,6 +962,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         else
             saveMultipleSpecimens();
         setFinished(false);
+        SessionManager.log(Messages.SpecimenLinkAssign_save, null,
+            Messages.SpecimenLinkAssign_assign);
     }
 
     private void saveMultipleSpecimens() throws Exception {
@@ -991,7 +993,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 }
                 if (currentMultipleContainer.getId() == null) {
                     ContainerSaveAction csAction = new ContainerSaveAction();
-                    csAction.label = currentMultipleContainer.getLabel();
                     csAction.parentId =
                         currentMultipleContainer.getParentContainer()
                             .getId();

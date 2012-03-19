@@ -202,7 +202,8 @@ public class PatientMergeForm extends BiobankEntryForm {
                 SessionManager.getAppService().doAction(
                     new PatientSearchAction(pnumber));
             if (pinfo == null)
-                throw new ApplicationException("Patient not found");
+                throw new ApplicationException(
+                    Messages.PatientMergeForm_notfound);
             p2 = SessionManager
                 .getAppService().doAction(
                     new PatientGetInfoAction(pinfo.patient.getId()));
@@ -295,6 +296,10 @@ public class PatientMergeForm extends BiobankEntryForm {
                     closeEntryOpenView(false, true);
                 }
             });
+            SessionManager.log(Messages.PatientMergeForm_merge,
+                patient2.getPnumber() + " " + Messages.PatientMergeForm_arrow //$NON-NLS-1$
+                    + " " + patient1.getPnumber(), //$NON-NLS-1$
+                Messages.PatientMergeForm_patient);
         }
     }
 
@@ -317,7 +322,7 @@ public class PatientMergeForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return PatientViewForm.ID;
     }
 }

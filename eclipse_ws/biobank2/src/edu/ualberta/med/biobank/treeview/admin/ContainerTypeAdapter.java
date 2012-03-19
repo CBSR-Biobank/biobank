@@ -7,19 +7,48 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeDeletePermission;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeReadPermission;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerTypeViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeAdapter extends AdapterBase {
 
     public ContainerTypeAdapter(AdapterBase parent,
         ContainerTypeWrapper containerType) {
         super(parent, containerType);
+    }
+
+    @Override
+    public void init() {
+        try {
+            Integer id = ((ContainerTypeWrapper) getModelObject()).getId();
+            if (id == null) return;
+
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new ContainerTypeDeletePermission(id));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new ContainerTypeReadPermission(id));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new ContainerTypeUpdatePermission(id));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     @Override
@@ -57,18 +86,6 @@ public class ContainerTypeAdapter extends AdapterBase {
     }
 
     @Override
-    public boolean isEditable() {
-        // TODO: this needs to be implemented correctly
-        return true;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        // TODO: this needs to be implemented correctly
-        return true;
-    }
-
-    @Override
     protected AdapterBase createChildNode() {
         return null;
     }
@@ -82,11 +99,6 @@ public class ContainerTypeAdapter extends AdapterBase {
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return 0;
     }
 
     @Override
@@ -106,4 +118,11 @@ public class ContainerTypeAdapter extends AdapterBase {
         return 0;
     }
 
+    @Override
+    protected void runDelete() throws Exception {
+        SessionManager.getAppService().doAction(
+            new ContainerTypeDeleteAction((ContainerType) getModelObject()
+                .getWrappedObject()));
+        SessionManager.updateAllSimilarNodes(getParent(), true);
+    }
 }

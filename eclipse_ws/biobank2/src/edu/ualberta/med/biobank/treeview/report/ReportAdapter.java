@@ -84,7 +84,8 @@ public class ReportAdapter extends AdapterBase {
             int userId = SessionManager.getUser().getId().intValue();
             report.setUserId(userId);
 
-            ReportAdapter reportAdapter = new ReportAdapter(getParent(), report);
+            ReportAdapter reportAdapter =
+                new ReportAdapter(getParent(), report);
             reportAdapter.openEntryForm();
         }
     }
@@ -103,11 +104,6 @@ public class ReportAdapter extends AdapterBase {
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return 0;
     }
 
     @Override

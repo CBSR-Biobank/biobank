@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank.common.action.collectionEvent;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenListGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenListGetInfoAction;
 
 public class CollectionEventGetAliquotedSpecimenListInfoAction extends
     SpecimenListGetInfoAction {
@@ -16,7 +16,8 @@ public class CollectionEventGetAliquotedSpecimenListInfoAction extends
             + " LEFT JOIN FETCH spec.parentSpecimen parentSpec"
             + " LEFT JOIN FETCH parentSpec.processingEvent"
             + " WHERE spec.collectionEvent.id=?"
-            + " AND spec.parentSpecimen IS NOT null";
+            + " AND spec.parentSpecimen IS NOT null"
+            + SpecimenListGetInfoAction.SPEC_BASE_END;
 
     private Integer ceventId;
 
