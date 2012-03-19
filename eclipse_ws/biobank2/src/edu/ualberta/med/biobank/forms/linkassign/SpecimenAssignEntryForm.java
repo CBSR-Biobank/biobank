@@ -993,7 +993,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 }
                 if (currentMultipleContainer.getId() == null) {
                     ContainerSaveAction csAction = new ContainerSaveAction();
-                    csAction.label = currentMultipleContainer.getLabel();
                     csAction.parentId =
                         currentMultipleContainer.getParentContainer()
                             .getId();
