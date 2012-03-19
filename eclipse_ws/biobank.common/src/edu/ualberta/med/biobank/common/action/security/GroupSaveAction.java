@@ -18,13 +18,17 @@ public class GroupSaveAction extends PrincipalSaveAction {
     private Group group = null;
     private Set<Integer> userIds;
 
+    public GroupSaveAction() {
+        super(null);
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        group = context.get(Group.class, principalId, new Group());
+        group = null; // context.get(Group.class, principalId, new Group());
 
         group.setDescription(description);
         saveUsers(context);

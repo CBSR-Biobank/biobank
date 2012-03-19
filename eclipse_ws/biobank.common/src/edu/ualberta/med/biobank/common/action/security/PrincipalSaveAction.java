@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.security;
 
-import java.util.Map;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -9,8 +7,6 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.util.DiffSet;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
-import edu.ualberta.med.biobank.common.util.SetDifference;
-import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Principal;
 
 public abstract class PrincipalSaveAction implements Action<IdResult> {
@@ -21,7 +17,7 @@ public abstract class PrincipalSaveAction implements Action<IdResult> {
     private DiffSet<Integer> membershipIds;
 
     public PrincipalSaveAction(Principal mp) {
-
+        principalId = null;
     }
 
     @Override
@@ -33,21 +29,21 @@ public abstract class PrincipalSaveAction implements Action<IdResult> {
         throws ActionException {
         principal.setId(principalId);
 
-        Map<Integer, Membership> memberships =
-            context.load(Membership.class, membershipIds);
-
-        SetDifference<Membership> sitesDiff =
-            new SetDifference<Membership>(principal.getMemberships(),
-                memberships.values());
-        principal.setMemberships(sitesDiff.getNewSet());
-
-        // remove memberships no longer used
-        for (Membership membership : sitesDiff.getRemoveSet()) {
-            context.getSession().delete(membership);
-        }
-
-        context.getSession().saveOrUpdate(principal);
-        context.getSession().flush();
+        // Map<Integer, Membership> memberships =
+        // context.load(Membership.class, membershipIds);
+        //
+        // SetDifference<Membership> sitesDiff =
+        // new SetDifference<Membership>(principal.getMemberships(),
+        // memberships.values());
+        // principal.setMemberships(sitesDiff.getNewSet());
+        //
+        // // remove memberships no longer used
+        // for (Membership membership : sitesDiff.getRemoveSet()) {
+        // context.getSession().delete(membership);
+        // }
+        //
+        // context.getSession().saveOrUpdate(principal);
+        // context.getSession().flush();
 
         return new IdResult(principal.getId());
     }

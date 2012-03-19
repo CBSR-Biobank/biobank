@@ -42,7 +42,7 @@ public class UserGetMembershipsAction
             .setFetchMode("memberships.roles.permissions", FetchMode.JOIN)
             .add(Restrictions.idEq(userId));
 
-        User user = ActionContext.uniqueResult(criteria, User.class);
+        User user = null; // ActionContext.uniqueResult(criteria, User.class);
 
         Set<ManagedMembership> mms = new HashSet<ManagedMembership>();
         ManagedMembership mm;

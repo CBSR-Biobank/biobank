@@ -54,58 +54,6 @@ public class OgnlMessageInterpolator implements MessageInterpolator {
         return interpolatedMessage;
     }
 
-    /**
-     * 
-     * @param variable a string matching <code>$&#123;contents&#125;</code>
-     * @return contents
-     */
-    private String extractContents(String variable) {
-        int start = 2;
-        int end = variable.length() - 1;
-
-        if (end < start) {
-            throw new IndexOutOfBoundsException("");
-        }
-
-        return variable.substring(start, end);
-    }
-
-    /**
-     * Return true if the char at the given index is preceded by a backslash in
-     * the containing String.
-     * 
-     * @param string the containing string
-     * @param charIndex the index of the character
-     * 
-     * @return true if the given character is escaped, otherwise false
-     */
-    private boolean isEscaped(String string, int charIndex) {
-        if (charIndex < 0 || charIndex > string.length()) {
-            throw new IndexOutOfBoundsException(
-                "Index must be between 0 and string.length() - 1.");
-        }
-        return charIndex > 0 && string.charAt(charIndex - 1) == '\\';
-    }
-
-    private String evaluateOgnl(String expression, Context context) {
-        String result = null;
-
-        try {
-            RootObject root = new RootObject();
-            root.validatedValue = context.getValidatedValue();
-            root.attributes = context.getConstraintDescriptor().getAttributes();
-
-            Object value = Ognl.getValue(expression, root);
-
-            result = String.valueOf(value);
-        } catch (OgnlException e) {
-            // TODO: something better?
-            throw new RuntimeException(e);
-        }
-
-        return result;
-    }
-
     static class RootObject {
         private Object validatedValue;
         private Map<String, Object> attributes;
