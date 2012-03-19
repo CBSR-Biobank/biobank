@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.action.dispatch;
 
 import java.util.List;
 
-import org.hibernate.EmptyInterceptor;
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -11,21 +10,19 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.server.interceptor.SessionInterceptor;
 
 public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
-    private static final String DISPATCH_HQL =
-        "SELECT distinct dispatch "
-            + "FROM " + Dispatch.class.getName() + " dispatch"
-            + " LEFT JOIN FETCH dispatch.shipmentInfo si"
-            + " LEFT JOIN FETCH si.shippingMethod"
-            + " INNER JOIN FETCH dispatch.receiverCenter"
-            + " INNER JOIN FETCH dispatch.senderCenter"
-            + " LEFT JOIN fetch dispatch.comments comments"
-            + " WHERE dispatch.id=?";
+    private static final String DISPATCH_HQL = "SELECT distinct dispatch "
+        + "FROM " + Dispatch.class.getName() + " dispatch"
+        + " LEFT JOIN FETCH dispatch.shipmentInfo si"
+        + " LEFT JOIN FETCH si.shippingMethod"
+        + " INNER JOIN FETCH dispatch.receiverCenter"
+        + " INNER JOIN FETCH dispatch.senderCenter"
+        + " LEFT JOIN fetch dispatch.comments comments"
+        + " WHERE dispatch.id=?";
 
     private Integer id;
 
@@ -39,8 +36,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
     }
 
     @Override
-    public DispatchReadInfo run(ActionContext context)
-        throws ActionException {
+    public DispatchReadInfo run(ActionContext context) throws ActionException {
         DispatchReadInfo sInfo = new DispatchReadInfo();
 
         Query query = context.getSession().createQuery(DISPATCH_HQL);
@@ -53,14 +49,12 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
 
             sInfo.dispatch = (Dispatch) row;
             sInfo.specimens =
-                new DispatchGetSpecimenInfosAction(id).run(context)
-                    .getSet();
+                new DispatchGetSpecimenInfosAction(id).run(context).getSet();
 
         } else {
-            throw new ActionException(
-                "No dispatch found for id:" + id); //$NON-NLS-1$
+            throw new ActionException("No dispatch found for id:" + id); //$NON-NLS-1$
         }
-        
+
         return sInfo;
     }
 

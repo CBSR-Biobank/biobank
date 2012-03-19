@@ -26,10 +26,10 @@ public class SessionInterceptor extends EmptyInterceptor {
 
     private static final long serialVersionUID = 1L;
 
-    public void log(Object entity, String action) {
+    private void log(Object entity, String action) {
         try {
-            WrapperLogProvider<?> logProvider = BiobankObjectStateLogger
-                .getLogProvider(entity.getClass());
+            WrapperLogProvider<?> logProvider =
+                BiobankObjectStateLogger.getLogProvider(entity.getClass());
             if (logProvider != null) {
                 BiobankObjectStateLogger
                     .logMessage(logProvider, entity, action);
@@ -41,21 +41,7 @@ public class SessionInterceptor extends EmptyInterceptor {
                 ex);
         }
     }
-    
-    @Override
-    public String onPrepareStatement(String sql) {
-    	System.out.println(sql);
-    	return sql;
-    }
-    
 
-    @Override
-    public boolean onLoad(Object entity, Serializable id, Object[] state,
-        String[] propertyNames, org.hibernate.type.Type[] types) {
-    	log(entity, "select");
-    	return false;
-    }
-    
     /**
      * This method gets called before an object is saved.
      */
@@ -106,8 +92,7 @@ public class SessionInterceptor extends EmptyInterceptor {
     @Override
     public void afterTransactionBegin(Transaction tx) {
         LocalInfo userInfo = BiobankThreadVariable.get();
-        if (null == userInfo)
-            userInfo = new LocalInfo();
+        if (null == userInfo) userInfo = new LocalInfo();
         userInfo.setIsIntransaction(true);
         BiobankThreadVariable.set(userInfo);
     }
