@@ -962,6 +962,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         else
             saveMultipleSpecimens();
         setFinished(false);
+        SessionManager.log(Messages.SpecimenLinkAssign_save, null,
+            Messages.SpecimenLinkAssign_assign);
     }
 
     private void saveMultipleSpecimens() throws Exception {

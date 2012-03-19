@@ -19,9 +19,12 @@ import org.eclipse.ui.services.ISourceProviderService;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
+import edu.ualberta.med.biobank.common.wrappers.loggers.WrapperLogProvider;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcSessionState;
+import edu.ualberta.med.biobank.model.IBiobankModel;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.PerspectiveSecurity;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -250,16 +253,26 @@ public class SessionManager {
             type);
     }
 
-    public static void logLookup(ModelWrapper<?> wrapper) throws Exception {
-        if (!wrapper.isNew())
-            wrapper.logLookup(getUser().getCurrentWorkingCenter() == null ? "" //$NON-NLS-1$
-                : getUser().getCurrentWorkingCenter().getNameShort());
-    }
-
-    public static void logEdit(ModelWrapper<?> wrapper) throws Exception {
-        if (!wrapper.isNew())
-            wrapper.logEdit(getUser().getCurrentWorkingCenter() == null ? "" //$NON-NLS-1$
-                : getUser().getCurrentWorkingCenter().getNameShort());
+    public static void logLookup(IBiobankModel object) {
+        try {
+            Class<?> clazz = object.getClass();
+            StringBuilder loggerName =
+                new StringBuilder(clazz.getSimpleName());
+            loggerName.append("LogProvider");
+            loggerName.insert(0,
+                "edu.ualberta.med.biobank.common.wrappers.loggers.");
+            WrapperLogProvider<?> provider =
+                (WrapperLogProvider<?>) Class
+                    .forName(
+                        loggerName.toString())
+                    .getConstructor().newInstance();
+            Log log = provider.getObjectLog(object);
+            log.setAction("select");
+            log.setType(clazz.getSimpleName());
+            getAppService().logActivity(log);
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError("Logging failed", e);
+        }
     }
 
     /**

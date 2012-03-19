@@ -127,6 +127,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             studyAttrInfos = SessionManager.getAppService().doAction(
                 new StudyGetEventAttrInfoAction(ceventInfo.cevent
                     .getPatient().getStudy().getId())).getMap();
+            SessionManager.logLookup(ceventInfo.cevent);
         }
         copyCEvent();
         // FIXME log edit action?

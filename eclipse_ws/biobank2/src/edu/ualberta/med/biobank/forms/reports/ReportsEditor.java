@@ -223,8 +223,8 @@ public abstract class ReportsEditor extends BiobankEntryForm {
         try {
             initReport();
             Log logMessage = new Log();
-            logMessage.setType("report");
-            logMessage.setAction(report.getName()); //$NON-NLS-1$
+            logMessage.setType("report"); //$NON-NLS-1$
+            logMessage.setAction(report.getName());
             SessionManager.getAppService().logActivity(logMessage);
         } catch (Exception e1) {
             BgcPlugin.openAsyncError("Failed to load parameters", e1); //$NON-NLS-1$

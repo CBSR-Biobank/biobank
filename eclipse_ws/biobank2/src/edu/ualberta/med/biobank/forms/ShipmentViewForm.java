@@ -80,7 +80,7 @@ public class ShipmentViewForm extends BiobankViewForm {
             originInfo.setWrappedObject(read.originInfo);
             shipmentInfo.setWrappedObject(read.originInfo.getShipmentInfo());
             specimens = read.specimens;
-
+            SessionManager.logLookup(read.originInfo);
         }
 
     }

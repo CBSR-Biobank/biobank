@@ -91,6 +91,7 @@ public class SpecimenViewForm extends BiobankViewForm {
         Specimen specimen = specimenBriefInfo.getSpecimen();
         Assert.isNotNull(specimen);
         specimenWrapper.setWrappedObject(specimen);
+        SessionManager.logLookup(specimen);
     }
 
     @Override

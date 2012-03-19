@@ -233,7 +233,8 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             SessionManager.getAppService().doAction(
                 new ResearchGroupGetInfoAction(id));
         researchGroup.setWrappedObject(read.researchGroup);
-        adapter.setValue(new ResearchGroupAdapterInfo(read.researchGroup.getId(), read.researchGroup
+        adapter.setValue(new ResearchGroupAdapterInfo(read.researchGroup
+            .getId(), read.researchGroup
             .getName()));
     }
 

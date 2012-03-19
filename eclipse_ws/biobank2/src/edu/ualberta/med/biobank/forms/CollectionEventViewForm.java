@@ -71,6 +71,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
         ceventInfo =
             SessionManager.getAppService().doAction(
                 new CollectionEventGetInfoAction(adapter.getId()));
+        SessionManager.logLookup(ceventInfo.cevent);
     }
 
     @Override

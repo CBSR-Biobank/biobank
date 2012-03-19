@@ -165,7 +165,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             originInfo.setWrappedObject(read.originInfo);
             shipmentInfo.setWrappedObject(read.originInfo.getShipmentInfo());
             specimens = read.specimens;
-
+            SessionManager.logLookup(read.originInfo);
         }
 
     }

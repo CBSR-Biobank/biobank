@@ -27,6 +27,7 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.loggers.ProcessingEventLogProvider;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -85,6 +86,9 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     private CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
+    private ProcessingEventLogProvider logProvider =
+        new ProcessingEventLogProvider();
+
     private List<SpecimenInfo> specimens;
 
     @Override
@@ -129,6 +133,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     new ProcessingEventGetInfoAction(adapter.getId()));
             pevent.setWrappedObject(read.pevent);
             specimens = read.sourceSpecimenInfos;
+            SessionManager.logLookup(read.pevent);
         }
     }
 

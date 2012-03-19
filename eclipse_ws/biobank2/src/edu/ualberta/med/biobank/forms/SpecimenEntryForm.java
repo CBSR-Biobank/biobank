@@ -112,7 +112,6 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     protected void init() throws Exception {
         specimenAdapter = (SpecimenAdapter) adapter;
         updateSpecimenInfo(adapter.getId());
-        SessionManager.logEdit(specimen);
         setPartName(Messages.SpecimenEntryForm_title);
         allchildren = new ArrayList<SpecimenWrapper>();
         origchildren = new ArrayList<SpecimenWrapper>();
@@ -144,6 +143,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 .getModelObject().getWrappedObject());
         }
 
+        SessionManager.logLookup(specimen.getWrappedObject());
         ((AdapterBase) adapter).setModelObject(specimen);
     }
 

@@ -161,34 +161,34 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                 bspecimen =
                     appService.doAction(
                         new SpecimenGetInfoAction(specId));
+                // Need to convert to table type
+                SpecimenInfo ispecimen =
+                    new SpecimenInfo();
+                ispecimen.specimen = bspecimen.getSpecimen();
+                ispecimen.parentLabel =
+                    bspecimen.getParents().size() > 0 ? bspecimen.getParents()
+                        .pop().getLabel() : "";
+                ispecimen.positionString =
+                    bspecimen.getSpecimen().getSpecimenPosition() != null ?
+                        bspecimen.getSpecimen().getSpecimenPosition()
+                            .getPositionString() : null;
+                ispecimen.comments =
+                    bspecimen.getSpecimen().getComments().size() == 0 ? "N"
+                        : "Y";
+
+                if (ispecimen != null)
+                    try {
+                        addSpecimen(ispecimen);
+                    } catch (VetoException e) {
+                        BgcPlugin.openAsyncError(
+                            Messages.SpecimenEntryWidget_error_title,
+                            e.getMessage());
+                    }
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
                     Messages.SpecimenEntryWidget_retrieve_error_title,
                     "Specimen not found.");
             }
-            // Need to convert to table type
-            SpecimenInfo ispecimen =
-                new SpecimenInfo();
-            ispecimen.specimen = bspecimen.getSpecimen();
-            ispecimen.parentLabel =
-                bspecimen.getParents().size() > 0 ? bspecimen.getParents()
-                    .pop().getLabel() : "";
-            ispecimen.positionString =
-                bspecimen.getSpecimen().getSpecimenPosition() != null ?
-                    bspecimen.getSpecimen().getSpecimenPosition()
-                        .getPositionString() : null;
-            ispecimen.comments =
-                bspecimen.getSpecimen().getComments().size() == 0 ? "N"
-                    : "Y";
-
-            if (ispecimen != null)
-                try {
-                    addSpecimen(ispecimen);
-                } catch (VetoException e) {
-                    BgcPlugin.openAsyncError(
-                        Messages.SpecimenEntryWidget_error_title,
-                        e.getMessage());
-                }
         }
     }
 

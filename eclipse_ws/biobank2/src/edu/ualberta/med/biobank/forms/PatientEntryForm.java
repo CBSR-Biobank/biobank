@@ -106,6 +106,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             patientInfo = SessionManager.getAppService().doAction(
                 new PatientGetInfoAction(adapter.getId()));
             patient.setWrappedObject(patientInfo.patient);
+            SessionManager.logLookup(patientInfo.patient);
         } else {
             patient.setWrappedObject(new Patient());
         }

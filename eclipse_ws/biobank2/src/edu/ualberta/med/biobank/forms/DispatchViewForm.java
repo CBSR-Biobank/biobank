@@ -99,6 +99,7 @@ public class DispatchViewForm extends BiobankViewForm {
             read.dispatch
                 .setDispatchSpecimens((Set<DispatchSpecimen>) read.specimens);
             dispatch.setWrappedObject(read.dispatch);
+            SessionManager.logLookup(read.dispatch);
         }
     }
 

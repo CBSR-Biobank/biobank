@@ -5,6 +5,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME =
         "edu.ualberta.med.biobank.export.messages"; //$NON-NLS-1$
+    public static String CsvDataExporter_log_export;
     public static String CsvDataExporter_name;
     public static String GuiDataExporter_exportAs;
     public static String GuiDataExporter_exporting;

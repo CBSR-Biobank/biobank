@@ -138,6 +138,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 SessionManager.getAppService().doAction(
                     new StudyGetInfoAction(id));
             study.setWrappedObject(studyInfo.getStudy());
+            SessionManager.logLookup(studyInfo.getStudy());
         } else {
             studyInfo = new StudyInfo();
             study.setWrappedObject(new Study());

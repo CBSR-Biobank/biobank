@@ -241,8 +241,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         // temperature is set for the toplevel container only.
         String tempProperty = ContainerPeer.TEMPERATURE.getName();
         if (container.hasParentContainer())
-        // subcontainer are using topcontainer temperature. This is display
-        // only.
+            // subcontainer are using topcontainer temperature. This is display
+            // only.
             tempProperty =
                 Property.concatNames(ContainerPeer.TOP_CONTAINER,
                     ContainerPeer.TEMPERATURE);

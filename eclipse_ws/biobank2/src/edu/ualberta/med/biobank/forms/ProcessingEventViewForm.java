@@ -69,6 +69,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
                     new ProcessingEventGetInfoAction(adapter.getId()));
             pevent.setWrappedObject(read.pevent);
             specimens = read.sourceSpecimenInfos;
+            SessionManager.logLookup(read.pevent);
         }
     }
 
