@@ -68,7 +68,8 @@ public class TestContainer extends TestAction {
             .getSpecimenPositions().size());
         Assert.assertEquals(0, containerInfo.container.getComments()
             .size());
-
     }
+
+    // TODO: need tests for container labels
 
 }
