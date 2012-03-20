@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.util.ProxyUtil;
 import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.util.NullHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -602,27 +603,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     @Override
     public int compareTo(ModelWrapper<E> other) {
-        return nullSafeComparator(getId(), other.getId());
-    }
-
-    /**
-     * Compare two Comparable Object-s, even if either one is null.
-     * 
-     * @param <T>
-     * @param one
-     * @param two
-     * @return
-     */
-    protected static <T extends Comparable<T>> int nullSafeComparator(
-        final T one, final T two) {
-        if (one == null ^ two == null) {
-            return (one == null) ? -1 : 1;
-        }
-
-        if (one == null || two == null) {
-            return 0;
-        }
-        return one.compareTo(two);
+        return NullHelper.safeCompareTo(getId(), other.getId());
     }
 
     public static <W extends ModelWrapper<? extends R>, R, M> List<W> wrapModelCollection(

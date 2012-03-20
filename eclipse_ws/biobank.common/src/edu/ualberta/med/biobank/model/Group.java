@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,6 +14,7 @@ import javax.persistence.ManyToMany;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.util.NullHelper;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
@@ -20,6 +22,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @DiscriminatorValue("BbGroup")
 @Unique(properties = "name", groups = PrePersist.class)
 public class Group extends Principal {
+    public static final NameComparator NAME_COMPARATOR = new NameComparator();
     private static final long serialVersionUID = 1L;
 
     private String name;
@@ -56,5 +59,14 @@ public class Group extends Principal {
 
     public void setUsers(Set<User> users) {
         this.users = users;
+    }
+
+    private static class NameComparator implements Comparator<Group> {
+        @Override
+        public int compare(Group a, Group b) {
+            if (a == null && b == null) return 0;
+            if (a == null ^ b == null) return (a == null) ? -1 : 1;
+            return NullHelper.safeCompareTo(a.getName(), b.getName());
+        }
     }
 }

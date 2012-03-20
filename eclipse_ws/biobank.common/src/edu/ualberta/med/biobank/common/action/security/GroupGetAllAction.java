@@ -1,14 +1,14 @@
 package edu.ualberta.med.biobank.common.action.security;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
@@ -21,9 +21,15 @@ import edu.ualberta.med.biobank.model.User;
  * 
  * @author Jonathan Ferland
  */
-public class GroupGetAllAction implements Action<ListResult<Group>> {
+public class GroupGetAllAction implements Action<GroupGetAllOutput> {
     private static final long serialVersionUID = 1L;
     private static final Permission PERMISSION = new UserManagerPermission();
+
+    public GroupGetAllInput input;
+
+    public GroupGetAllAction(GroupGetAllInput input) {
+        this.input = input;
+    }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
@@ -31,7 +37,7 @@ public class GroupGetAllAction implements Action<ListResult<Group>> {
     }
 
     @Override
-    public ListResult<Group> run(ActionContext context)
+    public GroupGetAllOutput run(ActionContext context)
         throws ActionException {
         Criteria c = context.getSession().createCriteria(Group.class, "g")
             .createAlias("g.memberships", "m", Criteria.LEFT_JOIN)
@@ -42,16 +48,16 @@ public class GroupGetAllAction implements Action<ListResult<Group>> {
             .addOrder(Order.asc("name"));
 
         User user = context.getUser();
-        List<Group> groups = new ArrayList<Group>();
+        SortedSet<Group> groups = new TreeSet<Group>(Group.NAME_COMPARATOR);
 
         @SuppressWarnings("unchecked")
-        List<Group> allGroups = c.list();
-        for (Group group : allGroups) {
+        List<Group> results = c.list();
+        for (Group group : results) {
             if (group.isFullyManageable(user)) {
                 groups.add(group);
             }
         }
 
-        return new ListResult<Group>(groups);
+        return new GroupGetAllOutput(groups);
     }
 }

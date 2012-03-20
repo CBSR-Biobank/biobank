@@ -21,9 +21,11 @@ public interface Action2p0<I extends ActionInput, O extends ActionOutput> {
 
     public O run(I input);
 
-    public interface ActionInput extends Serializable, NotAProxy {
+    public interface ActionInput
+        extends Serializable, NotAProxy {
     }
 
-    public interface ActionOutput extends ActionResult, Serializable, NotAProxy {
+    public interface ActionOutput
+        extends ActionResult, Serializable, NotAProxy {
     }
 }

@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.common.action.security;
 
 import java.util.Set;
 
+import org.hibernate.Hibernate;
+
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -45,10 +47,37 @@ public class UserGetAction implements Action<UserGetOutput> {
 
     private ManagerContext getManagerContext(ActionContext context) {
         User manager = context.getUser();
-        Set<Role> allRoles = null;
+
+        initManager(manager);
+
+        Set<Role> allRoles = new RoleGetAllAction(new RoleGetAllInput())
+            .run(context).getAllRoles();
         Set<Group> manageableGroups = null;
 
         return new ManagerContext(manager, allRoles, manageableGroups);
+    }
+
+    /**
+     * Ensure all necessary areas of the {@link User} are initialized.
+     * 
+     * @param manager
+     */
+    private void initManager(User manager) {
+        Hibernate.initialize(manager);
+        initMemberships(manager.getMemberships());
+        for (Group group : manager.getGroups()) {
+            initMemberships(group.getMemberships());
+        }
+    }
+
+    private void initMemberships(Set<Membership> memberships) {
+        for (Membership membership : memberships) {
+            Hibernate.initialize(membership.getPermissions());
+            Hibernate.initialize(membership.getRoles());
+            for (Role role : membership.getRoles()) {
+                Hibernate.initialize(role.getPermissions());
+            }
+        }
     }
 
     private void copyProperties(User src, User dst) {
