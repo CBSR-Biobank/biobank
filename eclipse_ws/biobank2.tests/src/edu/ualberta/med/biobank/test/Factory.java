@@ -540,7 +540,7 @@ public class Factory {
         return user;
     }
 
-    public User createUserManager() {
+    public User createManager() {
         User userManager = createUser();
 
         Membership m = userManager.getMemberships().iterator().next();

@@ -16,6 +16,8 @@ import edu.ualberta.med.biobank.common.action.security.GroupGetAllOutput;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.AssertMore;
 import edu.ualberta.med.biobank.test.action.TestAction;
@@ -123,5 +125,20 @@ public class TestGroupGetAllAction extends TestAction {
                 AssertMore.assertNotInited(u.getComments());
             }
         }
+    }
+
+    @Test
+    public void managerSpecific() {
+        Transaction tx = session.beginTransaction();
+        Site site1 = factory.createSite();
+        Study studyA = factory.createStudy();
+        Group group1A = factory.createGroup();
+        User normalUser1A = factory.createUser();
+        User managerUser1A = factory.createManager();
+
+        Site site2 = factory.createSite();
+        Study studyB = factory.createStudy();
+        Group group2B = factory.createGroup();
+        tx.commit();
     }
 }

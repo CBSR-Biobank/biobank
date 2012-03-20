@@ -44,7 +44,7 @@ public class TestAction extends TestDb {
 
         Transaction tx = session.beginTransaction();
         USER_NORMAL = factory.createUser();
-        USER_MANAGER = factory.createUserManager();
+        USER_MANAGER = factory.createManager();
         USER_ADMIN = factory.createAdmin();
         tx.commit();
 

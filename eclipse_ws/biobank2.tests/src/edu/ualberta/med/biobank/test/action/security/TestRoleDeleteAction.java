@@ -56,7 +56,7 @@ public class TestRoleDeleteAction extends TestAction {
     public void managerAccess() {
         Transaction tx = session.beginTransaction();
         Role role = factory.createRole();
-        User user = factory.createUserManager();
+        User user = factory.createManager();
         tx.commit();
 
         try {
