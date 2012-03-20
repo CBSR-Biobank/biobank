@@ -619,6 +619,10 @@ public class Factory {
         }
     }
 
+    public String getName(Class<?> klazz) {
+        return nameGenerator.next(klazz);
+    }
+
     public class NameGenerator {
         private static final String DELIMITER = "_";
 

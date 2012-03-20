@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.security.RoleGetAllAction;
 import edu.ualberta.med.biobank.common.action.security.RoleGetAllInput;
 import edu.ualberta.med.biobank.common.action.security.RoleGetAllOutput;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.action.TestAction;
@@ -95,5 +96,33 @@ public class TestRoleGetAllAction extends TestAction {
 
         Assert.assertTrue("role not removed",
             !postDeleteActionRoles.contains(newRole));
+    }
+
+    @Test
+    public void inited() {
+        Transaction tx = session.beginTransaction();
+        Role r1 = factory.createRole();
+        r1.getPermissions().addAll(PermissionEnum.valuesList());
+        session.update(r1);
+
+        Role r2 = factory.createRole();
+        r2.getPermissions().add(PermissionEnum.REPORTS);
+        session.update(r2);
+
+        factory.createRole();
+        tx.commit();
+
+        RoleGetAllOutput output =
+            exec(new RoleGetAllAction(new RoleGetAllInput()));
+
+        for (Role role : output.getAllRoles()) {
+            role.getId();
+            role.getName();
+
+            for (PermissionEnum perm : role.getPermissions()) {
+                perm.getId();
+                perm.getName();
+            }
+        }
     }
 }

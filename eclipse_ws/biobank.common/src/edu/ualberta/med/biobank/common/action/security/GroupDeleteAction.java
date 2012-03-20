@@ -10,13 +10,10 @@ import edu.ualberta.med.biobank.model.Group;
 public class GroupDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
 
-    private final Integer groupId;
+    private final GroupDeleteInput input;
 
-    public GroupDeleteAction(Group group) {
-        if (group == null) {
-            throw new IllegalArgumentException();
-        }
-        this.groupId = group.getId();
+    public GroupDeleteAction(GroupDeleteInput input) {
+        this.input = input;
     }
 
     @Override
@@ -26,7 +23,7 @@ public class GroupDeleteAction implements Action<EmptyResult> {
 
     @Override
     public EmptyResult run(ActionContext context) throws ActionException {
-        Group group = context.load(Group.class, groupId);
+        Group group = context.load(Group.class, input.getGroupId());
 
         // TODO: localise and parameterise the exception message
         if (!group.isFullyManageable(context.getUser()))
