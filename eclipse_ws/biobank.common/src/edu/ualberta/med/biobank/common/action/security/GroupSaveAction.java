@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.action.security;
 import java.util.Map;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -10,7 +11,7 @@ import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.User;
 
-public class GroupSaveAction extends PrincipalSaveAction {
+public class GroupSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
     private String name = null;
@@ -19,7 +20,6 @@ public class GroupSaveAction extends PrincipalSaveAction {
     private Set<Integer> userIds;
 
     public GroupSaveAction() {
-        super(null);
     }
 
     public void setDescription(String description) {
@@ -33,7 +33,7 @@ public class GroupSaveAction extends PrincipalSaveAction {
         group.setDescription(description);
         saveUsers(context);
 
-        return run(context, group);
+        return null;
     }
 
     private void saveUsers(ActionContext context) {
@@ -59,6 +59,12 @@ public class GroupSaveAction extends PrincipalSaveAction {
                     "group not found in user's collection");
             }
         }
+    }
+
+    @Override
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

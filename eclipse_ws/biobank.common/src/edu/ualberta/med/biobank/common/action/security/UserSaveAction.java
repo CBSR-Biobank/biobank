@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.util.IdUtil;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
 import edu.ualberta.med.biobank.util.NullHelper;
 import edu.ualberta.med.biobank.util.SetDiff;
@@ -138,9 +139,8 @@ public class UserSaveAction implements Action<IdResult> {
         User executingUser = context.getUser();
         User manager = input.getContext().getManager();
 
-        Set<Integer> contextRoleIds = input.getContext().getRoleIds();
-        Map<Integer, Role> rolesMap = context.load(Role.class, contextRoleIds);
-        Set<Role> awareOfRoles = new HashSet<Role>(rolesMap.values());
+        // TODO: reload these
+        Set<Role> contextRoles = input.getContext().getRoles();
 
         Set<PermissionEnum> perms, oldPermissionScope, newPermissionScope;
         Set<Role> roles, oldRoleScope, newRoleScope;
@@ -150,11 +150,11 @@ public class UserSaveAction implements Action<IdResult> {
 
             // the permissions and roles the user would have intended to modify
             oldPermissionScope = oldM.getManageablePermissions(manager);
-            oldRoleScope = oldM.getManageableRoles(manager, awareOfRoles);
+            oldRoleScope = oldM.getManageableRoles(manager, contextRoles);
 
             // the permissions and roles the executing user can currently modify
             newPermissionScope = newM.getManageablePermissions(executingUser);
-            newRoleScope = newM.getManageableRoles(executingUser, awareOfRoles);
+            newRoleScope = newM.getManageableRoles(executingUser, contextRoles);
 
             // ensure the old (client?) scope can still be modified by the new
             // (server?) scope
@@ -198,16 +198,17 @@ public class UserSaveAction implements Action<IdResult> {
     private void setGroups(ActionContext context, User user) {
         User executingUser = context.getUser();
 
-        Set<Integer> groupIds = input.getGroupIds();
-        Set<Integer> awareOfGroupIds = input.getContext().getGroupIds();
+        // TODO: reload these
+        Set<Group> contextGroups = input.getContext().getGroups();
+        Set<Integer> contextGroupIds = IdUtil.getIds(contextGroups);
 
-        if (!awareOfGroupIds.containsAll(groupIds)) {
+        if (!contextGroups.containsAll(input.getGroupIds())) {
             // TODO: better exception
             throw new ActionException("");
         }
 
         // add or remove every Group in the context
-        Map<Integer, Group> groups = context.load(Group.class, awareOfGroupIds);
+        Map<Integer, Group> groups = context.load(Group.class, contextGroupIds);
         for (Entry<Integer, Group> entry : groups.entrySet()) {
             Integer groupId = entry.getKey();
             Group group = entry.getValue();
@@ -217,7 +218,7 @@ public class UserSaveAction implements Action<IdResult> {
                 throw new ActionException("");
             }
 
-            if (groupIds.contains(groupId)) {
+            if (input.getGroupIds().contains(groupId)) {
                 user.getGroups().add(group);
             } else {
                 user.getGroups().remove(group);

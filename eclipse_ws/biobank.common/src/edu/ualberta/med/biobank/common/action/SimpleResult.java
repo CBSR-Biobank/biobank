@@ -12,8 +12,4 @@ public class SimpleResult<T> implements ActionResult {
     public T getResult() {
         return result;
     }
-    
-    public static <E> SimpleResult<E> of(E result) {
-        return new SimpleResult<E>(result);
-    }
 }

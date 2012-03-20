@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.action.security;
 
 import java.io.Serializable;
 
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.security.Action2p0.ActionInput;
 import edu.ualberta.med.biobank.common.action.security.Action2p0.ActionOutput;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
@@ -23,6 +24,6 @@ public interface Action2p0<I extends ActionInput, O extends ActionOutput> {
     public interface ActionInput extends Serializable, NotAProxy {
     }
 
-    public interface ActionOutput extends Serializable, NotAProxy {
+    public interface ActionOutput extends ActionResult, Serializable, NotAProxy {
     }
 }

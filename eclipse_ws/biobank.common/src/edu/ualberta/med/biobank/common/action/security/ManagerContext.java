@@ -6,7 +6,6 @@ import java.util.Set;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.model.util.IdUtil;
 
 /**
  * Used by {@link UserGetInput} and {@link UserSaveInput} so that the context
@@ -20,8 +19,8 @@ import edu.ualberta.med.biobank.model.util.IdUtil;
  */
 public class ManagerContext {
     private final User manager;
-    private final Set<Integer> roleIds;
-    private final Set<Integer> groupIds;
+    private final Set<Role> roles;
+    private final Set<Group> groups;
 
     /**
      * A snapshot of the managing {@link User} needs to be included because it
@@ -42,19 +41,30 @@ public class ManagerContext {
      */
     public ManagerContext(User manager, Set<Role> roles, Set<Group> groups) {
         this.manager = manager;
-        this.roleIds = Collections.unmodifiableSet(IdUtil.getIds(roles));
-        this.groupIds = Collections.unmodifiableSet(IdUtil.getIds(groups));
+        this.roles = Collections.unmodifiableSet(roles);
+        this.groups = Collections.unmodifiableSet(groups);
     }
 
     public User getManager() {
         return manager;
     }
 
-    public Set<Integer> getRoleIds() {
-        return roleIds;
+    /**
+     * All the {@link Role}-s the manager is aware of.
+     * 
+     * @return
+     */
+    public Set<Role> getRoles() {
+        return roles;
     }
 
-    public Set<Integer> getGroupIds() {
-        return groupIds;
+    /**
+     * All the {@link Group}-s the manager can fully manage, according to
+     * {@link Group#isFullyManageable(User)}.
+     * 
+     * @return
+     */
+    public Set<Group> getGroups() {
+        return groups;
     }
 }
