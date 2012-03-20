@@ -12,6 +12,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.junit.Assert;
 import org.junit.Before;
 
@@ -22,14 +24,31 @@ import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.test.Factory;
 import edu.ualberta.med.biobank.test.TestDb;
 
 public class TestAction extends TestDb {
     private static final LocalActionExecutor EXECUTOR;
 
+    private static final User USER_NORMAL;
+    private static final User USER_MANAGER;
+    private static final User USER_ADMIN;
+
     static {
         EXECUTOR = new LocalActionExecutor(TestDb.getSessionProvider());
         EXECUTOR.setUserId(getSuperUser().getId());
+
+        Session session = openSession();
+        Factory factory = new Factory(session, "");
+
+        Transaction tx = session.beginTransaction();
+        USER_NORMAL = factory.createUser();
+        USER_MANAGER = factory.createUserManager();
+        USER_ADMIN = factory.createAdmin();
+        tx.commit();
+
+        session.close();
     }
 
     @Override
@@ -41,13 +60,39 @@ public class TestAction extends TestDb {
         getExecutor().setUserId(getSuperUser().getId());
     }
 
-    protected IActionExecutor getExecutor() {
+    protected static IActionExecutor getExecutor() {
         return EXECUTOR;
     }
 
-    protected <T extends ActionResult> T exec(Action<T> action)
+    protected static <T extends ActionResult> T exec(Action<T> action)
         throws ActionException {
         return getExecutor().exec(action);
+    }
+
+    protected static <T extends ActionResult> T execAs(User user,
+        Action<T> action) throws ActionException {
+        Integer oldUserId = getExecutor().getUserId();
+        try {
+            getExecutor().setUserId(user.getId());
+            return getExecutor().exec(action);
+        } finally {
+            getExecutor().setUserId(oldUserId);
+        }
+    }
+
+    protected static <T extends ActionResult> T execAsNormal(Action<T> action)
+        throws ActionException {
+        return execAs(USER_NORMAL, action);
+    }
+
+    protected static <T extends ActionResult> T execAsManager(Action<T> action)
+        throws ActionException {
+        return execAs(USER_MANAGER, action);
+    }
+
+    protected static <T extends ActionResult> T execAsAdmin(Action<T> action)
+        throws ActionException {
+        return execAs(USER_ADMIN, action);
     }
 
     private static Date convertToGmt(Date localDate) {

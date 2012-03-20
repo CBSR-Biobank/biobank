@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.action.security.RoleSaveAction;
 import edu.ualberta.med.biobank.common.action.security.RoleSaveInput;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.action.TestAction;
 
 public class TestRoleSaveAction extends TestAction {
@@ -29,12 +28,10 @@ public class TestRoleSaveAction extends TestAction {
     public void adminAccess() {
         Transaction tx = session.beginTransaction();
         Role role = factory.createRole();
-        User user = factory.createAdmin();
         tx.commit();
 
         try {
-            getExecutor().setUserId(user.getId());
-            exec(new RoleSaveAction(new RoleSaveInput(role)));
+            execAsAdmin(new RoleSaveAction(new RoleSaveInput(role)));
             Assert.fail();
         } catch (AccessDeniedException e) {
         }
@@ -44,12 +41,10 @@ public class TestRoleSaveAction extends TestAction {
     public void normalAccess() {
         Transaction tx = session.beginTransaction();
         Role role = factory.createRole();
-        User user = factory.createUser();
         tx.commit();
 
         try {
-            getExecutor().setUserId(user.getId());
-            exec(new RoleSaveAction(new RoleSaveInput(role)));
+            execAsNormal(new RoleSaveAction(new RoleSaveInput(role)));
             Assert.fail();
         } catch (AccessDeniedException e) {
         }
@@ -59,12 +54,10 @@ public class TestRoleSaveAction extends TestAction {
     public void managerAccess() {
         Transaction tx = session.beginTransaction();
         Role role = factory.createRole();
-        User user = factory.createUserManager();
         tx.commit();
 
         try {
-            getExecutor().setUserId(user.getId());
-            exec(new RoleSaveAction(new RoleSaveInput(role)));
+            execAsManager(new RoleSaveAction(new RoleSaveInput(role)));
             Assert.fail();
         } catch (AccessDeniedException e) {
         }

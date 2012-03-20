@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,6 +65,10 @@ public class Factory {
     private Principal defaultPrincipal;
     private Membership defaultMembership;
     private Role defaultRole;
+
+    public Factory(Session session) {
+        this(session, new BigInteger(130, R).toString(32));
+    }
 
     public Factory(Session session, String root) {
         this.session = session;
