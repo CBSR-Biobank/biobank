@@ -241,16 +241,26 @@ public class Membership extends AbstractBiobankModel {
      * Return true if the given {@link User} is able to manage <em>all</em> of
      * the {@link PermissionEnum}-s and {@link Role}-s that this
      * {@link Membership} has, otherwise false.
+     * <p>
+     * Require at least one {@link PermissionEnum} or {@link Role} to be
+     * manageable, otherwise an empty {@link Membership} is fully manageable by
+     * default.
      * 
      * @param u other
      * @return
      */
     @Transient
     public boolean isFullyManageable(User u) {
-        if (!getManageablePermissions(u).containsAll(getPermissions()))
+        Set<PermissionEnum> manageablePerms = getManageablePermissions(u);
+        if (!manageablePerms.containsAll(getPermissions())) return false;
+
+        Set<Role> manageableRoles = getManageableRoles(u, getRoles());
+        if (!manageableRoles.containsAll(getRoles())) return false;
+
+        // otherwise an empty membership is fully manageable by default
+        if (manageablePerms.isEmpty() && manageableRoles.isEmpty())
             return false;
-        if (!getManageableRoles(u, getRoles()).containsAll(getRoles()))
-            return false;
+
         return true;
     }
 
