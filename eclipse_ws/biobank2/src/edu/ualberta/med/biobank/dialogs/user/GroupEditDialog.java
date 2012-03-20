@@ -164,7 +164,7 @@ public class GroupEditDialog extends BgcBaseDialog {
         try {
             originalGroup
                 .addToUserCollection(usersWidget.getAddedToSelection());
-            originalGroup.persist();
+            // originalGroup.persist();
             close();
         } catch (Exception e) {
             if (e.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$

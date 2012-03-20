@@ -25,8 +25,6 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
-import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
@@ -79,14 +77,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
     private boolean renamingChildren;
 
     private ContainerInfo containerInfo;
-
-    private BgcEntryFormWidgetListener listener =
-        new BgcEntryFormWidgetListener() {
-            @Override
-            public void selectionChanged(MultiSelectEvent event) {
-                setDirty(true);
-            }
-        };
 
     private CommentsInfoTable commentEntryTable;
 

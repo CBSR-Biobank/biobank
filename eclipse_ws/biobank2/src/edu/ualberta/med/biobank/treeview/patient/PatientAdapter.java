@@ -34,6 +34,8 @@ public class PatientAdapter extends AbstractNewAdapterBase {
 
     private Patient patient;
     private Study study;
+
+    @SuppressWarnings("unused")
     private Long ceventsCount;
 
     public PatientAdapter(AbstractAdapterBase parent, SearchedPatientInfo pinfo) {

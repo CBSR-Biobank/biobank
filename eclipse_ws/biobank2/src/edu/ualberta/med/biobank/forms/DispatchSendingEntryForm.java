@@ -34,9 +34,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
-import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -67,17 +65,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     private ShipmentInfoWrapper shipmentInfo = null;
 
-    private BgcEntryFormWidgetListener listener =
-        new BgcEntryFormWidgetListener() {
-            @Override
-            public void selectionChanged(MultiSelectEvent event) {
-                setDirty(true);
-            }
-        };
-
     private CommentsInfoTable commentEntryTable;
-
-    private BgcBaseText commentWidget;
 
     @Override
     protected void init() throws Exception {
@@ -161,10 +149,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        commentWidget =
-            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
-                SWT.MULTI,
-                Messages.Comments_add, null, comment, "message", null);
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_add, null, comment, "message", null);
 
     }
 

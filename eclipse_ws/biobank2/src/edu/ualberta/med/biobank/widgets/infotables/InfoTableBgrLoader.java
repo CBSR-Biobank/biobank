@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 import edu.ualberta.med.biobank.gui.common.widgets.Messages;
 
 public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
+    @SuppressWarnings("unused")
     private final Queue<ListUpdater> updateListQueue =
         new LinkedList<ListUpdater>();
     private final InfoTableListChangeHandler infoTableListChangeHandler =

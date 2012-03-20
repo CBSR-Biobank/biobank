@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.mvp.presenter.IPresenter;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
 // TODO: could have a single editorpart that fetches the view then adds it to the presenter. The presenter comes in the init method?
+@SuppressWarnings("unused")
 public class BiobankEditorPart implements IEditorPart {
     private IPresenter<IView> presenter;
     private IView view;

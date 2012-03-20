@@ -64,7 +64,8 @@ public class ReportAdapter extends AdapterBase {
                         ((ReportWrapper) getModelObject()).getName()));
                 if (delete) {
                     try {
-                        getModelObject().delete();
+                        // FIXME: call to delete is deprecated
+                        // getModelObject().delete();
                         parent.removeChild(ReportAdapter.this);
                         AdvancedReportsView.getCurrent().reload();
                     } catch (Exception e) {

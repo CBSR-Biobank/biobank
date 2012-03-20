@@ -298,12 +298,12 @@ public class ContainerAdapter extends AdapterBase {
                 monitor.beginTask(NLS.bind(
                     Messages.ContainerAdapter_moving_cont, oldLabel, newLabel),
                     IProgressMonitor.UNKNOWN);
-                try {
-                    container.persist();
-                } catch (Exception e) {
-                    BgcPlugin.openAsyncError(
-                        Messages.ContainerAdapter_move_error_title, e);
-                }
+                // try {
+                // container.persist();
+                // } catch (Exception e) {
+                // BgcPlugin.openAsyncError(
+                // Messages.ContainerAdapter_move_error_title, e);
+                // }
                 monitor.done();
                 BgcPlugin.openAsyncInformation(
                     Messages.ContainerAdapter_cont_moved_info_title, NLS.bind(

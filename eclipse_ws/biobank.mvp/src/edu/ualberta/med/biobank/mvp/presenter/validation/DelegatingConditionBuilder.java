@@ -11,6 +11,7 @@ public class DelegatingConditionBuilder implements ConditionBuilder {
         this.conditionDelegate = conditionDelegate;
     }
 
+    @Override
     public void when(ValueModel<Boolean> condition) {
         conditionDelegate.setDelegate(condition);
     }

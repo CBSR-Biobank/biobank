@@ -5,7 +5,6 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.mvp.exception.InitPresenterException;
 import edu.ualberta.med.biobank.mvp.presenter.HasState;
 import edu.ualberta.med.biobank.mvp.presenter.IStatefulPresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter.View;
@@ -18,6 +17,8 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View>
     implements IStatefulPresenter {
     private final static OptionLabeller LABELLER = new OptionLabeller();
     private final ModelState state = new ModelState();
+
+    @SuppressWarnings("unused")
     private final Dispatcher dispatcher;
 
     public interface View extends IView {
@@ -52,14 +53,13 @@ public class ActivityStatusComboPresenter extends AbstractPresenter<View>
         return view.getActivityStatus().getValue();
     }
 
-    public void setActivityStatus(ActivityStatus activityStatus)
-        throws InitPresenterException {
+    public void setActivityStatus(ActivityStatus activityStatus) {
         loadOptions();
 
         view.getActivityStatus().setValue(activityStatus);
     }
 
-    private void loadOptions() throws InitPresenterException {
+    private void loadOptions() {
         view.getActivityStatus()
             .setOptions(ActivityStatus.valuesList());
     }

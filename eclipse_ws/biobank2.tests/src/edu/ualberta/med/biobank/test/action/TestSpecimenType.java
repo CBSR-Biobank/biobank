@@ -1,14 +1,13 @@
 package edu.ualberta.med.biobank.test.action;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeDeleteAction;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 public class TestSpecimenType extends TestAction {
 
@@ -22,7 +21,7 @@ public class TestSpecimenType extends TestAction {
     }
 
     @Test
-    public void mangleTypes() throws ApplicationException {
+    public void mangleTypes() {
         SpecimenTypeGetAllAction action = new SpecimenTypeGetAllAction();
         Integer size = EXECUTOR.exec(action).getList().size();
 

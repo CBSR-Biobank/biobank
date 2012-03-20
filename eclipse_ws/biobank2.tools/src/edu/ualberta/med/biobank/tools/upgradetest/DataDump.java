@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -38,7 +37,7 @@ public class DataDump {
         dbconnection.close();
     }
 
-    public static Date getDateFromStr(String str) throws ParseException {
+    public static Date getDateFromStr(String str) {
         if (str == null)
             return null;
         Date date = DateFormatter.parseToDateTime(str);
