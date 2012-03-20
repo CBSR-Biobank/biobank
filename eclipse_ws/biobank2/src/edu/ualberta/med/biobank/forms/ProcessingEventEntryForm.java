@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +19,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
@@ -37,6 +37,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
@@ -295,37 +296,32 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                     Messages.ProcessingEventEntryForm_spec_study_allowed_only_error_msg,
                                     specimen.getCollectionEvent().getPatient()
                                         .getStudy().getNameShort()));
-                        else if (pevent.getSpecimenCollection(false).size() > 0
-                            && !pevent
-                                .getSpecimenCollection(false)
-                                .get(0)
-                                .getCollectionEvent()
-                                .getPatient()
-                                .getStudy()
-                                .equals(
+                        else if (specimens.size() > 0) {
+                            try {
+                                Study study =
+                                    SessionManager
+                                        .getAppService()
+                                        .doAction(
+                                            new SpecimenGetInfoAction(specimens
+                                                .get(0).specimen.getId()))
+                                        .getSpecimen().getCollectionEvent()
+                                        .getPatient().getStudy();
+                                if (!study.equals(
                                     specimen.getCollectionEvent().getPatient()
                                         .getStudy()))
-                            throw new VetoException(
-                                Messages.ProcessingEventEntryForm_study_spec_error_msg);
-                        break;
+                                    throw new VetoException(
+                                        Messages.ProcessingEventEntryForm_study_spec_error_msg);
+                            } catch (Exception e) {
+                                BgcPlugin
+                                    .openAsyncError(
+                                        Messages.ProcessingEventEntryForm_error,
+                                        e);
+                            }
+                            break;
+                        }
                     case POST_ADD:
                         specimen.setProcessingEvent(pevent);
                         specimen.setActivityStatus(closedActivityStatus);
-                        pevent.addToSpecimenCollection(Arrays.asList(specimen));
-                        break;
-                    case PRE_DELETE:
-                        if (specimen.getChildSpecimenCollection(false).size() > 0) {
-                            boolean ok =
-                                BgcPlugin
-                                    .openConfirm(
-                                        Messages.ProcessingEventEntryForm_confirm_remove_title,
-                                        Messages.ProcessingEventEntryForm_confirm_remove_msg);
-                            event.doit = ok;
-                        }
-                        break;
-                    case POST_DELETE:
-                        pevent.removeFromSpecimenCollection(Arrays
-                            .asList(specimen));
                         break;
                     }
                 }
@@ -346,10 +342,14 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        Set<Integer> ids = new HashSet<Integer>();
-        for (SpecimenInfo spc : specimens) {
-            ids.add(spc.specimen.getId());
-        }
+        Set<Integer> added = new HashSet<Integer>();
+        Set<Integer> removed = new HashSet<Integer>();
+
+        for (SpecimenInfo spec : specimenEntryWidget.getAddedSpecimens())
+            added.add(spec.specimen.getId());
+
+        for (SpecimenInfo spec : specimenEntryWidget.getRemovedSpecimens())
+            removed.add(spec.specimen.getId());
 
         Integer peventId =
             SessionManager
@@ -359,7 +359,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                         .getCenter().getId(), pevent.getCreatedAt(), pevent
                         .getWorksheet(), pevent.getActivityStatus(), comment
                         .getMessage(),
-                        ids)).getId();
+                        added, removed)).getId();
         pevent.setId(peventId);
         ((AdapterBase) adapter).setModelObject(pevent);
     }

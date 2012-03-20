@@ -167,14 +167,14 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                 ispecimen.specimen = bspecimen.getSpecimen();
                 ispecimen.parentLabel =
                     bspecimen.getParents().size() > 0 ? bspecimen.getParents()
-                        .pop().getLabel() : "";
+                        .pop().getLabel() : ""; //$NON-NLS-1$
                 ispecimen.positionString =
                     bspecimen.getSpecimen().getSpecimenPosition() != null ?
                         bspecimen.getSpecimen().getSpecimenPosition()
                             .getPositionString() : null;
                 ispecimen.comments =
-                    bspecimen.getSpecimen().getComments().size() == 0 ? "N"
-                        : "Y";
+                    bspecimen.getSpecimen().getComments().size() == 0 ? Messages.SpecimenEntryWidget_no
+                        : Messages.SpecimenEntryWidget_yes;
 
                 if (ispecimen != null)
                     try {
@@ -187,7 +187,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
                     Messages.SpecimenEntryWidget_retrieve_error_title,
-                    "Specimen not found.");
+                    Messages.SpecimenEntryWidget_notfound);
             }
         }
     }
