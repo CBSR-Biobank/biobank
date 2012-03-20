@@ -114,7 +114,6 @@ public class UserSmartSaveAction implements Action<IdResult> {
             Membership membership = domain.getMembership();
             checkFullyManageable(context, membership);
 
-            membership.reducePermissions();
             user.getMemberships().add(membership);
             membership.setPrincipal(user);
         }
@@ -123,12 +122,15 @@ public class UserSmartSaveAction implements Action<IdResult> {
             Membership membership = domain.getMembership();
             checkFullyManageable(context, membership);
 
-            membership.reducePermissions();
             user.getMemberships().remove(membership);
             membership.setPrincipal(null);
         }
 
         mergeMemberships(context, diff.getIntersection());
+
+        for (Membership m : user.getMemberships()) {
+            m.reducePermissions();
+        }
     }
 
     private void mergeMemberships(ActionContext context,
@@ -140,16 +142,17 @@ public class UserSmartSaveAction implements Action<IdResult> {
         Map<Integer, Role> rolesMap = context.load(Role.class, contextRoleIds);
         Set<Role> awareOfRoles = new HashSet<Role>(rolesMap.values());
 
-        // the permissions and roles the user would have intended to modify
-        Set<PermissionEnum> oldPermissionScope, newPermissionScope;
-        Set<Role> oldRoleScope, newRoleScope;
+        Set<PermissionEnum> perms, oldPermissionScope, newPermissionScope;
+        Set<Role> roles, oldRoleScope, newRoleScope;
         for (Pair<MembershipDomain> conflict : conflicts) {
             Membership oldM = conflict.getOld().getMembership();
             Membership newM = conflict.getNew().getMembership();
 
+            // the permissions and roles the user would have intended to modify
             oldPermissionScope = oldM.getManageablePermissions(manager);
             oldRoleScope = oldM.getManageableRoles(manager, awareOfRoles);
 
+            // the permissions and roles the executing user can currently modify
             newPermissionScope = newM.getManageablePermissions(executingUser);
             newRoleScope = newM.getManageableRoles(executingUser, awareOfRoles);
 
@@ -165,10 +168,15 @@ public class UserSmartSaveAction implements Action<IdResult> {
             oldM.getPermissions().removeAll(oldPermissionScope);
             oldM.getRoles().removeAll(oldRoleScope);
 
-            // LEFT OFF HERE!!!!!
-            // oldM.getPermissions().addAll(c)
+            perms = new HashSet<PermissionEnum>();
+            perms.addAll(newM.getPermissions());
+            perms.retainAll(oldPermissionScope);
+            oldM.getPermissions().addAll(perms);
 
-            oldM.reducePermissions();
+            roles = new HashSet<Role>();
+            roles.addAll(newM.getRoles());
+            roles.retainAll(newM.getRoles());
+            oldM.getRoles().addAll(roles);
         }
     }
 
