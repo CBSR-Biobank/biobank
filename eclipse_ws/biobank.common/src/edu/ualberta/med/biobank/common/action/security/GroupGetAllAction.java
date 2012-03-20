@@ -5,6 +5,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -39,13 +41,16 @@ public class GroupGetAllAction implements Action<GroupGetAllOutput> {
     @Override
     public GroupGetAllOutput run(ActionContext context)
         throws ActionException {
-        Criteria c = context.getSession().createCriteria(Group.class, "g")
-            .createAlias("g.memberships", "m", Criteria.LEFT_JOIN)
-            .createAlias("m.center", "c", Criteria.LEFT_JOIN)
-            .createAlias("m.study", "s", Criteria.LEFT_JOIN)
-            .createAlias("m.roles", "r", Criteria.LEFT_JOIN)
-            .createAlias("g.users", "u", Criteria.LEFT_JOIN)
-            .addOrder(Order.asc("name"));
+        Criteria c = context.getSession()
+            .createCriteria(Group.class, "g")
+            .setFetchMode("memberships", FetchMode.JOIN)
+            .setFetchMode("users", FetchMode.JOIN)
+            .createCriteria("memberships")
+            .setFetchMode("center", FetchMode.JOIN)
+            .setFetchMode("study", FetchMode.JOIN)
+            .setFetchMode("roles", FetchMode.JOIN)
+            .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+            .addOrder(Order.asc("g.name"));
 
         User user = context.getUser();
         SortedSet<Group> groups = new TreeSet<Group>(Group.NAME_COMPARATOR);

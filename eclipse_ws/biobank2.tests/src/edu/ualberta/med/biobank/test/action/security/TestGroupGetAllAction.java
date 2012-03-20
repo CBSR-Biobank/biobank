@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.action.security.GroupGetAllInput;
 import edu.ualberta.med.biobank.common.action.security.GroupGetAllOutput;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -128,17 +129,36 @@ public class TestGroupGetAllAction extends TestAction {
     }
 
     @Test
-    public void managerSpecific() {
+    public void domainSpecific() {
         Transaction tx = session.beginTransaction();
         Site site1 = factory.createSite();
         Study studyA = factory.createStudy();
         Group group1A = factory.createGroup();
-        User normalUser1A = factory.createUser();
-        User managerUser1A = factory.createManager();
+        User man1A = factory.createManager();
+
+        Membership man1Amembership = man1A.getMemberships().iterator().next();
+        man1Amembership.getPermissions().add(PermissionEnum.CLINIC_READ);
 
         Site site2 = factory.createSite();
         Study studyB = factory.createStudy();
         Group group2B = factory.createGroup();
+        User man2B = factory.createManager();
         tx.commit();
+
+        GroupGetAllOutput actual;
+        final Set<Group> expected = new HashSet<Group>();
+
+        expected.clear();
+        expected.add(group1A);
+        actual = execAs(man1A, new GroupGetAllAction(new GroupGetAllInput()));
+
+        Assert.assertEquals("wrong groups",
+            expected, actual.getAllManageableGroups());
+
+        expected.clear();
+        actual = execAs(man2B, new GroupGetAllAction(new GroupGetAllInput()));
+
+        Assert.assertEquals("wrong groups",
+            expected, actual.getAllManageableGroups());
     }
 }
