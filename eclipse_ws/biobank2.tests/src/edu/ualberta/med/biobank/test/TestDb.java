@@ -12,8 +12,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.test.action.SessionProvider;
-import edu.ualberta.med.biobank.test.action.SessionProvider.Mode;
+import edu.ualberta.med.biobank.test.SessionProvider.Mode;
 
 public class TestDb extends TestBase {
     private static final String SUPER_USER_LOGIN = "superadmin";

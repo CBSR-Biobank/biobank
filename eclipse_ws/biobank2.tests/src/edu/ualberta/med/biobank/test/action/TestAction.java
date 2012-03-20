@@ -13,6 +13,7 @@ import javax.validation.ConstraintViolationException;
 
 import org.hibernate.Query;
 import org.junit.Assert;
+import org.junit.Before;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionResult;
@@ -29,6 +30,15 @@ public class TestAction extends TestDb {
     static {
         EXECUTOR = new LocalActionExecutor(TestDb.getSessionProvider());
         EXECUTOR.setUserId(getSuperUser().getId());
+    }
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+
+        // by default, always execute as the super user
+        getExecutor().setUserId(getSuperUser().getId());
     }
 
     protected IActionExecutor getExecutor() {

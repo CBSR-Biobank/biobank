@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test;
 
 import java.util.Date;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -8,18 +9,25 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Group;
+import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Principal;
+import edu.ualberta.med.biobank.model.Rank;
+import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.User;
 
 /**
  * Tries to make setting up test data easier by requiring the absolute minimum
@@ -30,11 +38,14 @@ import edu.ualberta.med.biobank.model.Study;
  * 
  */
 public class Factory {
+    private static final Random R = new Random();
+
     private final ContainerLabelingSchemeGetter schemeGetter;
     private final NameGenerator nameGenerator;
     private final Session session;
 
     private Site defaultSite;
+    private Center defaultCenter;
     private ContainerType defaultTopContainerType;
     private ContainerType defaultContainerType;
     private SpecimenType defaultSpecimenType;
@@ -48,11 +59,82 @@ public class Factory {
     private Patient defaultPatient;
     private CollectionEvent defaultCollectionEvent;
     private OriginInfo defaultOriginInfo;
+    private User defaultUser;
+    private Group defaultGroup;
+    private Principal defaultPrincipal;
+    private Membership defaultMembership;
+    private Role defaultRole;
 
     public Factory(Session session, String root) {
         this.session = session;
         this.nameGenerator = new NameGenerator(root);
         this.schemeGetter = new ContainerLabelingSchemeGetter();
+    }
+
+    public Role getDefaultRole() {
+        if (defaultRole == null) {
+            defaultRole = createRole();
+        }
+        return defaultRole;
+    }
+
+    public void setDefaultRole(Role defaultRole) {
+        this.defaultRole = defaultRole;
+    }
+
+    public Center getDefaultCenter() {
+        if (defaultCenter == null) {
+            defaultCenter = createSite();
+        }
+        return defaultCenter;
+    }
+
+    public void setDefaultCenter(Center defaultCenter) {
+        this.defaultCenter = defaultCenter;
+    }
+
+    public Group getDefaultGroup() {
+        if (defaultGroup == null) {
+            defaultGroup = createGroup();
+        }
+        return defaultGroup;
+    }
+
+    public void setDefaultGroup(Group defaultGroup) {
+        this.defaultGroup = defaultGroup;
+    }
+
+    public Principal getDefaultPrincipal() {
+        if (defaultPrincipal == null) {
+            defaultPrincipal = createUser();
+        }
+        return defaultPrincipal;
+    }
+
+    public void setDefaultPrincipal(Principal defaultPrincipal) {
+        this.defaultPrincipal = defaultPrincipal;
+    }
+
+    public User getDefaultUser() {
+        if (defaultUser == null) {
+            defaultUser = createUser();
+        }
+        return defaultUser;
+    }
+
+    public void setDefaultUser(User defaultUser) {
+        this.defaultUser = defaultUser;
+    }
+
+    public Membership getDefaultMembership() {
+        if (defaultMembership == null) {
+            defaultMembership = createMembership();
+        }
+        return defaultMembership;
+    }
+
+    public void setDefaultMembership(Membership defaultMembership) {
+        this.defaultMembership = defaultMembership;
     }
 
     public Container getDefaultParentContainer() {
@@ -426,6 +508,95 @@ public class Factory {
         session.save(originInfo);
         session.flush();
         return originInfo;
+    }
+
+    public User createUser() {
+        String name = nameGenerator.next(User.class);
+
+        User user = new User();
+        user.setLogin(name);
+        user.setEmail(name);
+        user.setFullName("joe testonson");
+
+        // cheap fix to avoid actually having to create a CSM user
+        user.setCsmUserId(-Math.abs(R.nextLong()));
+
+        // must contain at least one Membership
+        Membership m = new Membership();
+        m.setCenter(getDefaultCenter());
+        m.setStudy(getDefaultStudy());
+        m.setPrincipal(user);
+        user.getMemberships().add(m);
+
+        setDefaultUser(user);
+        setDefaultPrincipal(user);
+        session.save(user);
+        session.flush();
+        return user;
+    }
+
+    public User createUserManager() {
+        User userManager = createUser();
+
+        Membership m = userManager.getMemberships().iterator().next();
+        m.setRank(Rank.USER_MANAGER);
+
+        session.update(userManager);
+        session.flush();
+        return userManager;
+    }
+
+    public User createAdmin() {
+        User admin = createUser();
+
+        Membership m = admin.getMemberships().iterator().next();
+        m.setRank(Rank.ADMINISTRATOR);
+
+        session.update(admin);
+        session.flush();
+        return admin;
+    }
+
+    public Group createGroup() {
+        String name = nameGenerator.next(Group.class);
+
+        Group group = new Group();
+        group.setName(name);
+        group.setDescription(name);
+
+        setDefaultGroup(group);
+        setDefaultPrincipal(group);
+        session.save(group);
+        session.flush();
+        return group;
+    }
+
+    public Membership createMembership() {
+        Membership membership = new Membership();
+        membership.setCenter(getDefaultCenter());
+        membership.setStudy(getDefaultStudy());
+
+        Principal p = getDefaultPrincipal();
+        p.getMemberships().add(membership);
+        membership.setPrincipal(p);
+
+        setDefaultMembership(membership);
+        session.save(membership);
+        session.flush();
+        return membership;
+    }
+
+    public Role createRole() {
+        String name = nameGenerator.next(Role.class);
+
+        Role role = new Role();
+
+        role.setName(name);
+
+        setDefaultRole(role);
+        session.save(role);
+        session.flush();
+        return role;
     }
 
     public ContainerLabelingSchemeGetter getScheme() {
