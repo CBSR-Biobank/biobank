@@ -52,7 +52,10 @@ public class UserGetAction implements Action<UserGetOutput> {
 
         Set<Role> allRoles = new RoleGetAllAction(new RoleGetAllInput())
             .run(context).getAllRoles();
-        Set<Group> manageableGroups = null;
+        Set<Group> manageableGroups = new GroupGetAllAction(
+            new GroupGetAllInput())
+            .run(context)
+            .getAllManageableGroups();
 
         return new ManagerContext(manager, allRoles, manageableGroups);
     }
