@@ -52,15 +52,15 @@ public abstract class AbstractBiobankModel implements IBiobankModel {
     public boolean equals(Object that) {
         if (that == this) return true;
         if (that == null) return false;
-
-        Class<?> thisClass = proxiedClass(this);
-        Class<?> thatClass = proxiedClass(that);
-        if (thisClass != thatClass) return false;
-
-        if (that instanceof IBiobankModel) {
-            Integer thatId = ((IBiobankModel) that).getId();
-            if (getId() != null && getId().equals(thatId)) return true;
-        }
+        // FIXME: Necessary for inheritance with proxies, works for now
+        // Need to come up with a better solution that does not fail when
+        // subclasses have their own tables
+        if (proxiedClass(that).isAssignableFrom(proxiedClass(this))
+            || proxiedClass(this).isAssignableFrom(proxiedClass(that)))
+            if (that instanceof IBiobankModel) {
+                Integer thatId = ((IBiobankModel) that).getId();
+                if (getId() != null && getId().equals(thatId)) return true;
+            }
         return false;
     }
 
