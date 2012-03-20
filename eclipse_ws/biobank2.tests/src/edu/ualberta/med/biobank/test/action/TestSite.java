@@ -13,6 +13,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.SetResult;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
@@ -38,6 +39,7 @@ import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSav
 import edu.ualberta.med.biobank.common.action.site.SiteDeleteAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypeInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenDeleteAction;
@@ -54,6 +56,7 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
+import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
@@ -614,4 +617,39 @@ public class TestSite extends TestAction {
         EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 
+    @Test
+    public void getStudyInfo() throws Exception {
+        Set<Integer> studyIds = new HashSet<Integer>();
+        studyIds.add(StudyHelper.createStudy(EXECUTOR,
+            name + Utils.getRandomString(5), ActivityStatus.ACTIVE));
+        Integer siteId =
+            SiteHelper.createSite(EXECUTOR, name + Utils.getRandomString(5),
+                "Edmo", ActivityStatus.ACTIVE, studyIds);
+
+        Integer patients = R.nextInt(5);
+        Integer collectionEvents = R.nextInt(5);
+
+        for (int i = 0; i < patients; i++) {
+            Integer patient =
+                PatientHelper.createPatient(EXECUTOR,
+                    name + Utils.getRandomString(5), studyIds.iterator()
+                        .next());
+            for (int j = 0; j < collectionEvents; j++)
+                CollectionEventHelper.createCEventWithSourceSpecimens(EXECUTOR,
+                    patient, siteId);
+        }
+        SiteGetStudyInfoAction action = new SiteGetStudyInfoAction(siteId);
+        ListResult<StudyCountInfo> studies = EXECUTOR.exec(action);
+
+        Assert
+            .assertTrue(studies.getList().get(0).getCollectionEventCount()
+                .intValue()
+            == (collectionEvents * patients));
+        Assert
+            .assertTrue(studies.getList().get(0).getCollectionEventCount()
+                .intValue()
+            == (patients));
+        Assert.assertTrue(studies.getList().get(0).getStudy().getId()
+            .equals(studyIds.iterator().next()));
+    }
 }
