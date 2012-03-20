@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
-import edu.ualberta.med.biobank.test.AllTests;
+import edu.ualberta.med.biobank.test.AllTestsSuite;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.GroupHelper;
@@ -57,7 +57,7 @@ public class TestUser extends TestDatabase {
         Assert.assertFalse(csmUser.getPassword().isEmpty());
 
         // check user can connect
-        BiobankApplicationService newUserAppService = AllTests.connect(name,
+        BiobankApplicationService newUserAppService = AllTestsSuite.connect(name,
             password);
         // check user can access a biobank object using the new appService
         try {
@@ -213,7 +213,7 @@ public class TestUser extends TestDatabase {
         UserWrapper user = UserHelper.addUser(name, password, true);
 
         // check user can connect
-        BiobankApplicationService newUserAppService = AllTests.connect(name,
+        BiobankApplicationService newUserAppService = AllTestsSuite.connect(name,
             password);
         String newPwd = "new123";
         // search the user again otherwise the appService will still try with
@@ -223,7 +223,7 @@ public class TestUser extends TestDatabase {
 
         // check user can't connect with old password
         try {
-            AllTests.connect(name, password);
+            AllTestsSuite.connect(name, password);
             Assert
                 .fail("Should not be able to connect with the old password anymore");
         } catch (ApplicationException ae) {
@@ -231,7 +231,7 @@ public class TestUser extends TestDatabase {
                 .getMessage().contains("Error authenticating user"));
         }
         // check user can't connect with new password
-        AllTests.connect(name, newPwd);
+        AllTestsSuite.connect(name, newPwd);
     }
 
     @Test

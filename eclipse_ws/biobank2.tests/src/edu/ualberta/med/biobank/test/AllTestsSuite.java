@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.test.validation.ValidationSuite;
 
 @RunWith(Suite.class)
 @SuiteClasses({ ActionSuite.class, ValidationSuite.class })
-public class AllTests {
+public class AllTestsSuite {
     public static BiobankApplicationService appService = null;
     public static final String userLogin = "testuser";
     public static final String userPwd = "test";
