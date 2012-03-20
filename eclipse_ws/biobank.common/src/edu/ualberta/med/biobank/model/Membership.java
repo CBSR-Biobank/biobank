@@ -293,7 +293,7 @@ public class Membership extends AbstractBiobankModel {
      * {@link PermissionEnum} or {@link Role}, otherwise it can't manage
      * anything.
      * <li>the given {@link Membership} has a {@link Rank} of at least
-     * {@link Rank#USER_MANAGER}</li>
+     * {@link Rank#MANAGER}</li>
      * <li>this {@link Membership} has a {@link Rank} less than that of the
      * given {@link Membership} or an equal {@link Rank} but a lesser
      * {@link #getLevel()} than the given {@link Membership}. This will prevent
@@ -313,7 +313,7 @@ public class Membership extends AbstractBiobankModel {
         if (that.getPermissions().isEmpty()
             && that.getRoles().isEmpty()) return false;
 
-        if (that.getRank().isLt(Rank.USER_MANAGER)) return false;
+        if (that.getRank().isLt(Rank.MANAGER)) return false;
 
         if (that.getRank().isLt(getRank())) return false;
         if (that.getRank().equals(getRank()) && that.getLevel() <= getLevel())

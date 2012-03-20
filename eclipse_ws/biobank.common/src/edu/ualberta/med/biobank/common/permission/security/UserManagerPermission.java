@@ -13,7 +13,7 @@ public class UserManagerPermission implements Permission {
     public boolean isAllowed(ActionContext context) {
         User user = context.getUser();
         for (Membership membership : user.getAllMemberships()) {
-            if (membership.isRankGe(Rank.USER_MANAGER)) return true;
+            if (membership.isRankGe(Rank.MANAGER)) return true;
         }
         return false;
     }

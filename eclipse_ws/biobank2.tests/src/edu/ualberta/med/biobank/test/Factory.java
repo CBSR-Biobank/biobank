@@ -544,7 +544,7 @@ public class Factory {
         User userManager = createUser();
 
         Membership m = userManager.getMemberships().iterator().next();
-        m.setRank(Rank.USER_MANAGER);
+        m.setRank(Rank.MANAGER);
 
         session.update(userManager);
         session.flush();
