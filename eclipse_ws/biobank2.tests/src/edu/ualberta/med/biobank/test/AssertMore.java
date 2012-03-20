@@ -9,6 +9,8 @@ import javax.validation.ConstraintViolationException;
 
 import junit.framework.Assert;
 
+import org.hibernate.Hibernate;
+
 public class AssertMore {
     public static void assertContainsTemplate(ConstraintViolationException e,
         String messageTemplate) {
@@ -31,6 +33,34 @@ public class AssertMore {
             Assert.fail("Expected exception " + t.getClass().getName()
                 + "' to contain the substring '" + substring
                 + "' but instead got message: '" + t.getMessage() + "'");
+        }
+    }
+
+    public static void assertInited(Object o) {
+        if (!Hibernate.isInitialized(o)) {
+            Assert.fail("Expected initialized object " + o
+                + ", but was uninitialized.");
+        }
+    }
+
+    public static void assertNotInited(Object o) {
+        if (Hibernate.isInitialized(o)) {
+            Assert.fail("Expected uninitialized object " + o
+                + ", but was initialized.");
+        }
+    }
+
+    public static void assertPropertyInited(Object o, String propertyName) {
+        if (!Hibernate.isPropertyInitialized(o, propertyName)) {
+            Assert.fail("Expected initialized property named '" + propertyName
+                + "' of object " + o + ", but was uninitialized.");
+        }
+    }
+
+    public static void assertPropertyNotInited(Object o, String propertyName) {
+        if (Hibernate.isPropertyInitialized(o, propertyName)) {
+            Assert.fail("Expected uninitialized property named '"
+                + propertyName + "' of object " + o + ", but was initialized.");
         }
     }
 }

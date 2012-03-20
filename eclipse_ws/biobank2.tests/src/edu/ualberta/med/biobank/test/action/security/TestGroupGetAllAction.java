@@ -13,12 +13,11 @@ import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.security.GroupGetAllAction;
 import edu.ualberta.med.biobank.common.action.security.GroupGetAllInput;
 import edu.ualberta.med.biobank.common.action.security.GroupGetAllOutput;
-import edu.ualberta.med.biobank.common.action.security.RoleGetAllAction;
-import edu.ualberta.med.biobank.common.action.security.RoleGetAllInput;
-import edu.ualberta.med.biobank.common.action.security.RoleGetAllOutput;
 import edu.ualberta.med.biobank.model.Group;
-import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.test.AssertMore;
 import edu.ualberta.med.biobank.test.action.TestAction;
 
 public class TestGroupGetAllAction extends TestAction {
@@ -81,27 +80,47 @@ public class TestGroupGetAllAction extends TestAction {
     @Test
     public void inited() {
         Transaction tx = session.beginTransaction();
-        Role r1 = factory.createRole();
-        r1.getPermissions().addAll(PermissionEnum.valuesList());
-        session.update(r1);
-
-        Role r2 = factory.createRole();
-        r2.getPermissions().add(PermissionEnum.REPORTS);
-        session.update(r2);
-
-        factory.createRole();
+        Group g1 = factory.createGroup();
+        for (int i = 0; i < 5; i++) {
+            User u = factory.createUser();
+            g1.getUsers().add(u);
+            u.getGroups().add(g1);
+            session.update(u);
+        }
         tx.commit();
 
-        RoleGetAllOutput output =
-            exec(new RoleGetAllAction(new RoleGetAllInput()));
+        GroupGetAllOutput output =
+            exec(new GroupGetAllAction(new GroupGetAllInput()));
 
-        for (Role role : output.getAllRoles()) {
-            role.getId();
-            role.getName();
+        for (Group group : output.getAllManageableGroups()) {
+            group.getId();
+            group.getName();
+            group.getDescription();
+            group.getActivityStatus();
 
-            for (PermissionEnum perm : role.getPermissions()) {
-                perm.getId();
-                perm.getName();
+            for (Membership m : group.getMemberships()) {
+                m.getCenter();
+                m.getStudy();
+                m.getRank();
+                m.getLevel();
+
+                for (Role r : m.getRoles()) {
+                    r.getName();
+
+                    AssertMore.assertInited(r.getPermissions());
+                }
+            }
+
+            for (User u : group.getUsers()) {
+                u.getId();
+                u.getActivityStatus();
+                u.getLogin();
+                u.getEmail();
+                u.getFullName();
+
+                AssertMore.assertNotInited(u.getGroups());
+                AssertMore.assertNotInited(u.getMemberships());
+                AssertMore.assertNotInited(u.getComments());
             }
         }
     }

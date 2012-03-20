@@ -40,7 +40,7 @@ public class TestAction extends TestDb {
         EXECUTOR.setUserId(getSuperUser().getId());
 
         Session session = openSession();
-        Factory factory = new Factory(session, "");
+        Factory factory = new Factory(session);
 
         Transaction tx = session.beginTransaction();
         USER_NORMAL = factory.createUser();
