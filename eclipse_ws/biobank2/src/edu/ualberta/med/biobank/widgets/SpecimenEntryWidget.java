@@ -50,7 +50,6 @@ import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListen
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SpecimenEntryWidget extends BgcBaseWidget {
-    private WritableApplicationService appService;
     private List<SpecimenInfo> specimens;
     private List<SpecimenInfo> addedSpecimens =
         new ArrayList<SpecimenInfo>();
@@ -89,7 +88,6 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         boolean editable) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null"); //$NON-NLS-1$
-        this.appService = appService;
         this.editable = editable;
 
         setLayout(new GridLayout(2, false));
@@ -176,14 +174,13 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                     bspecimen.getSpecimen().getComments().size() == 0 ? Messages.SpecimenEntryWidget_no
                         : Messages.SpecimenEntryWidget_yes;
 
-                if (ispecimen != null)
-                    try {
-                        addSpecimen(ispecimen);
-                    } catch (VetoException e) {
-                        BgcPlugin.openAsyncError(
-                            Messages.SpecimenEntryWidget_error_title,
-                            e.getMessage());
-                    }
+                try {
+                    addSpecimen(ispecimen);
+                } catch (VetoException e) {
+                    BgcPlugin.openAsyncError(
+                        Messages.SpecimenEntryWidget_error_title,
+                        e.getMessage());
+                }
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
                     Messages.SpecimenEntryWidget_retrieve_error_title,

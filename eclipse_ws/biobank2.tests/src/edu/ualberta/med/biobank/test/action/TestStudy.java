@@ -472,8 +472,7 @@ public class TestStudy extends TestAction {
     }
 
     private static Set<AliquotedSpecimenSaveInfo> addAliquotedSpecimens(
-        int numAliquotedSpecimens, List<SpecimenType> specimenTypes)
-        throws ApplicationException {
+        int numAliquotedSpecimens, List<SpecimenType> specimenTypes) {
         Set<AliquotedSpecimenSaveInfo> result =
             new HashSet<AliquotedSpecimenSaveInfo>();
         for (int i = 0; i < numAliquotedSpecimens; ++i) {
@@ -699,7 +698,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void delete() throws ApplicationException {
+    public void delete() {
         // delete a study with no patients and no other associations
         Integer studyId = EXECUTOR.exec(studySaveAction).getId();
         StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));

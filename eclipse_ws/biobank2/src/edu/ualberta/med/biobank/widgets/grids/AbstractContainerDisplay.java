@@ -77,7 +77,7 @@ public abstract class AbstractContainerDisplay {
      * the cell position and the containerType.
      */
     protected String getDefaultTextForBox(
-        @SuppressWarnings("unused") Map<RowColPos, ? extends AbstractUICell> cells,
+        Map<RowColPos, ? extends AbstractUICell> cells,
         int indexRow, int indexCol) {
         RowColPos rowcol = new RowColPos(indexRow, indexCol);
         String parentLabel = ""; //$NON-NLS-1$
@@ -90,7 +90,6 @@ public abstract class AbstractContainerDisplay {
         return ""; //$NON-NLS-1$
     }
 
-    @SuppressWarnings("unused")
     public void setStorageSize(int rows, int columns) {
         //
     }

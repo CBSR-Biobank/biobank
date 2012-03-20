@@ -75,8 +75,7 @@ public class PatientSearchedNode extends NewAbstractSearchedNode {
     public void removePatient(Integer patientId) {
         List<Integer> studyToRemove = new ArrayList<Integer>();
         for (Entry<Integer, StudyNodeInfo> sentry : studyPatientsMap.entrySet()) {
-            SearchedPatientInfo i = sentry.getValue().patients
-                .remove(patientId);
+            sentry.getValue().patients.remove(patientId);
             if (sentry.getValue().patients.size() == 0)
                 studyToRemove.add(sentry.getKey());
         }

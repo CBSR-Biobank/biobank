@@ -97,9 +97,10 @@ public class TestStuff {
     public static class Handler implements PreUpdateEventListener {
         private static final long serialVersionUID = 1L;
 
+        @SuppressWarnings("unused")
         @Override
         public boolean onPreUpdate(PreUpdateEvent event) {
-            Session session = event.getSession();
+            // Session session = event.getSession();
 
             // int[] dirty =
             // event.getPersister().findDirty(event.getState(),

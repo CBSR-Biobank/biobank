@@ -665,8 +665,7 @@ public class TestSite extends TestDatabase {
         Assert.assertTrue(SiteQuery.getWorkingClinicCollectionSize(site) == 0);
         StudyWrapper study = StudyHelper.addStudy("testStudy");
         ClinicWrapper clinic = ClinicHelper.addClinic("testClinic");
-        ContactWrapper contact = ContactHelper
-            .addContact(clinic, "testContact");
+        ContactHelper.addContact(clinic, "testContact");
         clinic.reload();
         study.addToContactCollection(clinic.getContactCollection(false));
         site.addToStudyCollection(Arrays.asList(study));

@@ -24,7 +24,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
-import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -133,8 +132,8 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
     }
 
     public void saveRequest() throws Exception {
-        RequestWrapper request =
-            new RequestWrapper(SessionManager.getAppService());
+        // RequestWrapper request =
+        // new RequestWrapper(SessionManager.getAppService());
 
         FileReader f = new FileReader(csvSelector.getFilePath());
         int newLines = 0;

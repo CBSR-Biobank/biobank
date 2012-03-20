@@ -12,7 +12,6 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
@@ -209,7 +208,7 @@ public class TestContainerLabelingScheme extends TestDatabase {
         }
 
         try {
-            RowColPos pos = ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
+            ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
                 appService, "aa", totalRows, totalCols, "test");
             Assert.fail("should not be allowed to use lower case characters");
         } catch (Exception e) {
@@ -254,7 +253,7 @@ public class TestContainerLabelingScheme extends TestDatabase {
         }
 
         try {
-            RowColPos pos = ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
+            ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
                 appService, "aa", totalRows, totalCols, "test");
             Assert.fail("should not be allowed to use lower case characters");
         } catch (Exception e) {
@@ -348,7 +347,7 @@ public class TestContainerLabelingScheme extends TestDatabase {
     @Test
     public void testDelete() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testSite");
-        ContainerWrapper container = ContainerHelper.addContainer("01AA",
+        ContainerHelper.addContainer("01AA",
             "asd", site, ContainerTypeHelper.addContainerType(site, "testCT",
                 "tct", ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA, 1,
                 1, true));

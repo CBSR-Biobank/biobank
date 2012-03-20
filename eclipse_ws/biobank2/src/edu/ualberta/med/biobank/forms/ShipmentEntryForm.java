@@ -110,14 +110,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private CommentsInfoTable commentEntryTable;
 
-    private BgcEntryFormWidgetListener listener =
-        new BgcEntryFormWidgetListener() {
-            @Override
-            public void selectionChanged(MultiSelectEvent event) {
-                setDirty(true);
-            }
-        };
-
     private ShipmentReadInfo oiInfo;
 
     private OriginInfoWrapper originInfo = new OriginInfoWrapper(

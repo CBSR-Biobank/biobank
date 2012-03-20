@@ -212,8 +212,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         }
     }
 
-    protected EditingSupport getEditingSupport(
-        @SuppressWarnings("unused") int index) {
+    protected EditingSupport getEditingSupport(int index) {
         return null;
     }
 

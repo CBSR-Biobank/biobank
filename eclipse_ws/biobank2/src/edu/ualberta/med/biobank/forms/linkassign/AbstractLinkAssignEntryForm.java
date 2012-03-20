@@ -151,7 +151,7 @@ public abstract class AbstractLinkAssignEntryForm extends
         form.layout(true, true);
     }
 
-    protected void setFirstControl(@SuppressWarnings("unused") Mode mode) {
+    protected void setFirstControl(Mode mode) {
         // default does nothing
     }
 
@@ -163,8 +163,7 @@ public abstract class AbstractLinkAssignEntryForm extends
         // default does nothing
     }
 
-    protected void setNeedSinglePosition(
-        @SuppressWarnings("unused") boolean position) {
+    protected void setNeedSinglePosition(boolean position) {
         // default does nothing
     }
 
@@ -317,8 +316,7 @@ public abstract class AbstractLinkAssignEntryForm extends
         book.reflow(true);
     }
 
-    protected Composite getFocusedComposite(
-        @SuppressWarnings("unused") boolean single) {
+    protected Composite getFocusedComposite(boolean single) {
         return null;
     }
 

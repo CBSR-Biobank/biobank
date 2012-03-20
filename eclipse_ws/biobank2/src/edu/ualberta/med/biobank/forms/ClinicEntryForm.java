@@ -129,7 +129,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     }
 
-    private void createClinicInfoSection() throws ApplicationException {
+    private void createClinicInfoSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;

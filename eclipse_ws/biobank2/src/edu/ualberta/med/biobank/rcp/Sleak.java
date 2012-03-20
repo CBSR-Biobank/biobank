@@ -102,9 +102,9 @@ public class Sleak {
         shell.open();
     }
 
-    @SuppressWarnings("unused")
     void refreshLabel() {
-        int colors = 0, cursors = 0, fonts = 0, gcs = 0, images = 0, regions = 0;
+        int colors = 0, cursors = 0, fonts = 0, gcs = 0, images = 0;
+        // int regions = 0;
         for (int i = 0; i < objects.length; i++) {
             Object object = objects[i];
             if (object instanceof Color)
@@ -117,8 +117,8 @@ public class Sleak {
                 gcs++;
             if (object instanceof Image)
                 images++;
-            if (object instanceof Region)
-                regions++;
+            // if (object instanceof Region)
+            // regions++;
         }
         String string = ""; //$NON-NLS-1$
         if (colors != 0)
@@ -142,7 +142,8 @@ public class Sleak {
     void refreshDifference() {
         DeviceData info = display.getDeviceData();
         if (!info.tracking) {
-            MessageBox dialog = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
+            MessageBox dialog =
+                new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
             dialog.setText(shell.getText());
             dialog
                 .setMessage("Warning: Device is not tracking resource allocation"); //$NON-NLS-1$

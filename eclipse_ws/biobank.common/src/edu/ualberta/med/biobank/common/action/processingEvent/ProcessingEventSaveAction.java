@@ -33,8 +33,6 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
 
     private String commentText;
 
-    private Set<Integer> specimenIds;
-
     private Set<Integer> addedSpecimenIds;
 
     private Set<Integer> removedSpecimenIds;
@@ -59,7 +57,7 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         if (peventId == null) {
             permission = new ProcessingEventCreatePermission();
         } else {
-            permission = new ProcessingEventUpdatePermission(peventId);
+            permission = new ProcessingEventUpdatePermission();
         }
         return permission.isAllowed(context);
     }

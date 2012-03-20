@@ -1331,6 +1331,7 @@ public class TestContainer extends TestDatabase {
         }
     }
 
+    @SuppressWarnings("unused")
     @Test
     public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();
@@ -1353,7 +1354,7 @@ public class TestContainer extends TestDatabase {
             ActivityStatus.ACTIVE, Utils.getRandomDate(),
             ce, site);
 
-        PatientWrapper patient = PatientHelper.addPatient(
+        PatientHelper.addPatient(
             Utils.getRandomString(5), StudyHelper.addStudy(name));
 
         ProcessingEventWrapper pe = ProcessingEventHelper.addProcessingEvent(

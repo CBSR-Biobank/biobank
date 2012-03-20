@@ -27,6 +27,7 @@ public class ContainerEmptyLocationsTest extends AbstractReportTest {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected Collection<Object> getExpectedResults() throws Exception {
         final String containerLabel = (String) getReport().getParams().get(0);

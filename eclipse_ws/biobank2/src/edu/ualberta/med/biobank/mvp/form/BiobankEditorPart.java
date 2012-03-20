@@ -76,6 +76,7 @@ public class BiobankEditorPart implements IEditorPart {
 
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Object getAdapter(Class adapter) {
         // TODO Auto-generated method stub

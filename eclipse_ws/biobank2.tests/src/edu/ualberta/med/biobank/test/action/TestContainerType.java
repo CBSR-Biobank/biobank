@@ -11,8 +11,6 @@ import javax.validation.ConstraintViolationException;
 import junit.framework.Assert;
 
 import org.hibernate.Query;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,10 +24,7 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAct
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;

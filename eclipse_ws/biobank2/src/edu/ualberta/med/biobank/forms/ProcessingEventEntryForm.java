@@ -48,7 +48,6 @@ import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.Event;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingEventEntryForm extends BiobankEntryForm {
 
@@ -147,7 +146,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         createSpecimensSection();
     }
 
-    private void createMainSection() throws ApplicationException {
+    private void createMainSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;

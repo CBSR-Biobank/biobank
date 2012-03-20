@@ -1,10 +1,10 @@
 package edu.ualberta.med.biobank.server.system.util;
 
-import java.lang.reflect.Field;
-import java.util.Collection;
-
 import gov.nih.nci.system.dao.QueryException;
 import gov.nih.nci.system.util.ClassCache;
+
+import java.lang.reflect.Field;
+import java.util.Collection;
 
 public class BiobankClassCache extends ClassCache {
     @Override
@@ -20,14 +20,10 @@ public class BiobankClassCache extends ClassCache {
                 if (classFields[i].getName().equals(attribName))
                 {
                     Class<?> type = classFields[i].getType();
-                    if (Collection.class.isAssignableFrom(type))
-                    {
+                    if (Collection.class.isAssignableFrom(type)) {
                         return true;
                     }
-                    else
-                    { 
-                        return false;
-                    }
+                    return false;
                 }
             }
             return false;

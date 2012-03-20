@@ -45,12 +45,10 @@ public class ProcessingEventAdapter extends AdapterBase {
             this.isReadable =
                 SessionManager.getAppService()
                     .isAllowed(
-                        new ProcessingEventReadPermission(getModelObject()
-                            .getId()));
+                        new ProcessingEventReadPermission());
             this.isEditable =
                 SessionManager.getAppService().isAllowed(
-                    new ProcessingEventUpdatePermission(getModelObject()
-                        .getId()));
+                    new ProcessingEventUpdatePermission());
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Permission Error",
                 "Unable to retrieve user permissions");

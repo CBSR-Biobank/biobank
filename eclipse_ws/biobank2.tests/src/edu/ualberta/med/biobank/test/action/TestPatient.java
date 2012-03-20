@@ -43,7 +43,6 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestPatient extends TestAction {
 
@@ -289,9 +288,7 @@ public class TestPatient extends TestAction {
     }
 
     private void createCEventWithSpecimens(Provisioning provisioning,
-        Integer patientId,
-        Integer visitNber, Integer specType, int specNber)
-        throws ApplicationException {
+        Integer patientId, Integer visitNber, Integer specType, int specNber) {
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper
                 .createSaveCEventSpecimenInfoRandomList(specNber, specType,

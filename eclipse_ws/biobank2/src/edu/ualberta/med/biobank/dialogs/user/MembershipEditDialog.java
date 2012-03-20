@@ -262,8 +262,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
             setErrorMessage(null);
     }
 
-    private void createPermissionWidgets(Composite contents)
-        throws ApplicationException {
+    private void createPermissionWidgets(Composite contents) {
         permissionsTree = new PermissionCheckTreeWidget(contents, false,
             PermissionEnum.valuesList());
         permissionsTree.setSelections(ms.getPermissionCollection());

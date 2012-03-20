@@ -23,7 +23,6 @@ import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicViewForm extends AddressViewFormCommon {
     public static final String ID =
@@ -150,7 +149,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(commentTable);
     }
 
-    protected void createStudiesSection() throws ApplicationException {
+    protected void createStudiesSection() {
         Composite client =
             createSectionWithClient(Messages.ClinicViewForm_studies_title);
 

@@ -29,7 +29,7 @@ public class DispatchSpecimenWrapper extends DispatchSpecimenBaseWrapper
     // TODO: uhhhh, don't override equals?
     @Override
     public boolean equals(Object object) {
-        if (object instanceof DispatchSpecimenWrapper && object != null) {
+        if (object instanceof DispatchSpecimenWrapper) {
             DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) object;
             if (isNew() && dsa.isNew()) {
                 return getSpecimen() != null && dsa.getSpecimen() != null

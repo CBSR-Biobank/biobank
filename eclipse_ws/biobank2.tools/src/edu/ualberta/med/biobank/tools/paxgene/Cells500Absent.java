@@ -1,9 +1,7 @@
 package edu.ualberta.med.biobank.tools.paxgene;
 
 import java.io.FileReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -299,8 +297,9 @@ public class Cells500Absent {
     private void processSpecimens(List<SpecimenData> specimenDataList)
         throws Exception {
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String todaysDate = dateFormat.format(Calendar.getInstance().getTime());
+        // SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        // String todaysDate =
+        // dateFormat.format(Calendar.getInstance().getTime());
 
         for (SpecimenData specimenData : specimenDataList) {
             SpecimenWrapper spc = SpecimenWrapper.getSpecimen(appService,

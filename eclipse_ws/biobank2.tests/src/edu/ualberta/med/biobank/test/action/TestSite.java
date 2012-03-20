@@ -57,7 +57,6 @@ import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestSite extends TestAction {
 
@@ -161,14 +160,10 @@ public class TestSite extends TestAction {
         HashSet<Integer> added = new HashSet<Integer>();
         added.add(sourceSpecs.get(0).specimen.getId());
 
-        Integer pEventId =
-            EXECUTOR.exec(
-                new ProcessingEventSaveAction(
-                    null, provisioning.siteId, Utils.getRandomDate(), Utils
-                        .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
-                    added,
-                    new HashSet<Integer>()))
-                .getId();
+        EXECUTOR.exec(new ProcessingEventSaveAction(
+            null, provisioning.siteId, Utils.getRandomDate(), Utils
+                .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
+            added, new HashSet<Integer>())).getId();
 
         SiteInfo siteInfo =
             EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
@@ -388,7 +383,7 @@ public class TestSite extends TestAction {
     }
 
     @Test
-    public void delete() throws ApplicationException {
+    public void delete() {
         Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
         SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
         EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
@@ -402,8 +397,7 @@ public class TestSite extends TestAction {
         Assert.assertTrue(result.equals(0L));
     }
 
-    private Provisioning createSiteWithContainerType()
-        throws ApplicationException {
+    private Provisioning createSiteWithContainerType() {
         Provisioning provisioning = new Provisioning(EXECUTOR, name);
         provisioning.addContainerType(EXECUTOR, name,
             getContainerLabelingSchemes().values().iterator().next()
@@ -434,7 +428,7 @@ public class TestSite extends TestAction {
     }
 
     @Test
-    public void deleteWithContainerTypes() throws ApplicationException {
+    public void deleteWithContainerTypes() {
         Provisioning provisioning = createSiteWithContainerType();
         SiteInfo siteInfo =
             EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
@@ -457,7 +451,7 @@ public class TestSite extends TestAction {
     }
 
     @Test
-    public void deleteWithContainers() throws ApplicationException {
+    public void deleteWithContainers() {
         Provisioning provisioning = createSiteWithContainerType();
         Integer containerTypeId = provisioning.containerTypeIds.get(0);
         Integer containerId =

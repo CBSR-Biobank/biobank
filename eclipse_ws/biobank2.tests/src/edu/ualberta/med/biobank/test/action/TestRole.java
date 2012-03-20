@@ -53,7 +53,7 @@ public class TestRole extends TestAction {
 
         tx = session.beginTransaction();
 
-        Site loaded = (Site) session.load(Site.class, siteId);
+        session.load(Site.class, siteId);
 
         tx.commit();
     }
@@ -140,7 +140,7 @@ public class TestRole extends TestAction {
         Transaction tx = session.beginTransaction();
 
         String nameA = getMethodNameR();
-        String nameB = getMethodNameR();
+        // String nameB = getMethodNameR();
 
         Role roleA = new Role();
         roleA.setName(nameA);

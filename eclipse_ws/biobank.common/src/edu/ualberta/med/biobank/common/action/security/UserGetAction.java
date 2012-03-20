@@ -40,6 +40,7 @@ public class UserGetAction implements Action<UserGetResult> {
         return new UserGetResult(user);
     }
 
+    @SuppressWarnings("unused")
     public static class UserDTO {
         private String login;
         private boolean recvBulkEmails = true;
@@ -53,9 +54,9 @@ public class UserGetAction implements Action<UserGetResult> {
         public UserDTO(User user) {
             // go through Membership-s, find if any PermissionEnum-s in it, then
             // add it to the collection if so.
-            for (Membership membership : user.getMemberships()) {
-
-            }
+            // for (Membership membership : user.getMemberships()) {
+            //
+            // }
         }
 
         public static class MembershipDTO {

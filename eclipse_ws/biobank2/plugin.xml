@@ -1751,13 +1751,6 @@
             name="%DecodeImage.editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.SpecimenListViewForm"
-            default="false"
-            icon="icons/specimen.png"
-            id="edu.ualberta.med.biobank.forms.SpecimenListViewForm"
-            name="SpecimenList.editor">
-      </editor>
-      <editor
             class="edu.ualberta.med.biobank.forms.PeListViewForm"
             default="false"
             icon="icons/collectionEvent.png"

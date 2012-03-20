@@ -44,7 +44,9 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
 
     private boolean patientExists = false;
     private List<ProcessingEvent> processingEvents = Collections.emptyList();
+    @SuppressWarnings("unused")
     private List<CollectionEvent> collectionEvents = Collections.emptyList();
+    @SuppressWarnings("unused")
     private List<SourceSpecimen> sourceSpecimens = Collections.emptyList();
 
     public interface View extends IEntryFormView {
