@@ -180,6 +180,7 @@ public class ValidContainerTypeValidator
         List<?> results = getEventSource()
             .createCriteria(ContainerPosition.class)
             .add(Restrictions.in("containerType", removed))
+            .add(Restrictions.eq("parentContainerType", ct))
             .setProjection(Projections.rowCount())
             .list();
 
@@ -207,6 +208,7 @@ public class ValidContainerTypeValidator
         List<?> results = getEventSource()
             .createCriteria(SpecimenPosition.class)
             .add(Restrictions.in("specimenType", removed))
+            .add(Restrictions.eq("containerType", ct))
             .setProjection(Projections.rowCount())
             .list();
 

@@ -124,17 +124,21 @@ public class ContainerAdapter extends AdapterBase {
         addEditMenu(menu, Messages.ContainerAdapter_container_label);
         addViewMenu(menu, Messages.ContainerAdapter_container_label);
 
-        Boolean topLevel = getContainer().getContainerType().getTopLevel();
-        if (isEditable() && (topLevel == null || !topLevel)) {
-            MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.ContainerAdapter_move_label);
-            mi.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    moveContainer(null);
-                }
-            });
-        }
+        // FIXME: issue 1557
+        //
+        // Commenting out for now
+        // Boolean topLevel = getContainer().getContainerType().getTopLevel();
+        //
+        // if (isEditable() && (topLevel == null || !topLevel)) {
+        // MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        // mi.setText(Messages.ContainerAdapter_move_label);
+        // mi.addSelectionListener(new SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent event) {
+        // moveContainer(null);
+        // }
+        // });
+        // }
 
         if (isEditable() && getContainer().hasSpecimens()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
