@@ -20,6 +20,11 @@ public class UserSaveInput {
     private final ManagerContext context;
 
     public UserSaveInput(User user, ManagerContext context) {
+        if (user == null)
+            throw new IllegalArgumentException("null user");
+        if (context == null)
+            throw new IllegalArgumentException("null context");
+        
         this.userId = user.getId();
 
         this.login = user.getLogin();
