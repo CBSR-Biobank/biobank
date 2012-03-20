@@ -24,7 +24,7 @@ public class DispatchCenterAdapter extends AdapterBase {
         out.setParent(this);
         this.addChild(out);
 
-        inc = new IncomingNode(this, 1, center);
+        inc = new IncomingNode(this, 1);
         inc.setParent(this);
         this.addChild(inc);
     }

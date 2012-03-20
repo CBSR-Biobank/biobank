@@ -4,8 +4,6 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
 
-import org.hibernate.Session;
-
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
@@ -160,7 +158,7 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
                     scanCell.setSpecimenId(foundSpecimen.getId());
                     if (expectedSpecimen != null
                         || data.getPallet(session) == null) {
-                        checkCanAddSpecimen(session, scanCell, foundSpecimen,
+                        checkCanAddSpecimen(scanCell, foundSpecimen,
                             sender, checkAlreadyAdded);
                     } else {
                         // should not be there
@@ -187,8 +185,7 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
      * @param checkAlreadyAdded
      * @throws Exception
      */
-    private void checkCanAddSpecimen(Session session, CellInfo cell,
-        Specimen specimen,
+    private void checkCanAddSpecimen(CellInfo cell, Specimen specimen,
         Center sender, boolean checkAlreadyAdded) {
         if (specimen.getId() == null) {
             cell.setStatus(CellInfoStatus.ERROR);
