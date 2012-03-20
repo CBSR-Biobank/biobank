@@ -7,6 +7,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.proxy.HibernateProxyHelper;
 
@@ -53,8 +54,12 @@ public abstract class AbstractBiobankModel implements IBiobankModel {
         if (that == this) return true;
         if (that == null) return false;
 
-        Class<?> thisClass = proxiedClass(this);
-        Class<?> thatClass = proxiedClass(that);
+        // note that HibernateProxyHelper.getClassWithoutInitializingProxy(o)
+        // does not seem to work properly in terms of returning the actual
+        // class, it may return a superclass, such as, Center. However,
+        // Hibernate.getClass() seems to always return the correct instance.
+        Class<?> thisClass = Hibernate.getClass(this);
+        Class<?> thatClass = Hibernate.getClass(that);
         if (thisClass != thatClass) return false;
 
         if (that instanceof IBiobankModel) {
