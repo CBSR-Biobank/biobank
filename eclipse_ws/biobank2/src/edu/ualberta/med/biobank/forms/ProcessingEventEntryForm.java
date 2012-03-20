@@ -346,9 +346,9 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        Set<Integer> specimens = new HashSet<Integer>();
-        for (SpecimenWrapper spc : pevent.getSpecimenCollection(false)) {
-            specimens.add(spc.getId());
+        Set<Integer> ids = new HashSet<Integer>();
+        for (SpecimenInfo spc : specimens) {
+            ids.add(spc.specimen.getId());
         }
 
         Integer peventId =
@@ -359,7 +359,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                         .getCenter().getId(), pevent.getCreatedAt(), pevent
                         .getWorksheet(), pevent.getActivityStatus(), comment
                         .getMessage(),
-                        specimens)).getId();
+                        ids)).getId();
         pevent.setId(peventId);
         ((AdapterBase) adapter).setModelObject(pevent);
     }

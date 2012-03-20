@@ -29,6 +29,8 @@ import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyDeleteAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction.StudiesInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyInfo;
@@ -801,5 +803,33 @@ public class TestStudy extends TestAction {
         EXECUTOR.exec(new StudyDeleteAction(studyInfo.getStudy()));
         Assert.assertTrue(getStudyEventAttrCount(studyId).equals(0L));
 
+    }
+
+    @Test
+    public void getAllStudiesAction() throws ApplicationException {
+
+        StudyGetAllAction action = new StudyGetAllAction();
+        StudiesInfo infos = EXECUTOR.exec(action);
+
+        Integer startSize = infos.getStudies().size();
+
+        Integer firstStudy = StudyHelper.createStudy(EXECUTOR,
+            name + Utils.getRandomNumericString(15), ActivityStatus.ACTIVE);
+
+        infos = EXECUTOR.exec(action);
+        Assert.assertTrue(infos.getStudies().size() == startSize + 1);
+
+        StudyHelper.createStudy(EXECUTOR,
+            name + Utils.getRandomNumericString(15), ActivityStatus.ACTIVE);
+
+        infos = EXECUTOR.exec(action);
+        Assert.assertTrue(infos.getStudies().size() == startSize + 2);
+
+        Study study = new Study();
+        study.setId(firstStudy);
+        EXECUTOR.exec(new StudyDeleteAction(study));
+
+        infos = EXECUTOR.exec(action);
+        Assert.assertTrue(infos.getStudies().size() == startSize + 1);
     }
 }
