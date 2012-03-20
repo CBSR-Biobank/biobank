@@ -158,14 +158,17 @@ public class TestSite extends TestAction {
         CEventInfo ceventInfo =
             EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
         List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
+        HashSet<Integer> added = new HashSet<Integer>();
+        added.add(sourceSpecs.get(0).specimen.getId());
 
-        Integer pEventId = EXECUTOR.exec(
-            new ProcessingEventSaveAction(
-                null, provisioning.siteId, Utils.getRandomDate(), Utils
-                    .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
-                new HashSet<Integer>(
-                    Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
-            .getId();
+        Integer pEventId =
+            EXECUTOR.exec(
+                new ProcessingEventSaveAction(
+                    null, provisioning.siteId, Utils.getRandomDate(), Utils
+                        .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
+                    added,
+                    new HashSet<Integer>()))
+                .getId();
 
         SiteInfo siteInfo =
             EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
@@ -501,13 +504,15 @@ public class TestSite extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimens
-        Integer peventId = EXECUTOR.exec(
-            new ProcessingEventSaveAction(
-                null, provisioning.siteId, Utils.getRandomDate(), Utils
-                    .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
-                new HashSet<Integer>(
-                    Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
-            .getId();
+        Integer peventId =
+            EXECUTOR.exec(
+                new ProcessingEventSaveAction(
+                    null, provisioning.siteId, Utils.getRandomDate(), Utils
+                        .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
+                    new HashSet<Integer>(
+                        Arrays.asList(sourceSpecs.get(0).specimen.getId())),
+                    new HashSet<Integer>()))
+                .getId();
 
         SiteInfo siteInfo =
             EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
