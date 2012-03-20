@@ -564,6 +564,13 @@ public class Factory {
         group.setName(name);
         group.setDescription(name);
 
+        // must contain at least one Membership
+        Membership m = new Membership();
+        m.setCenter(getDefaultCenter());
+        m.setStudy(getDefaultStudy());
+        m.setPrincipal(group);
+        group.getMemberships().add(m);
+
         setDefaultGroup(group);
         setDefaultPrincipal(group);
         session.save(group);
