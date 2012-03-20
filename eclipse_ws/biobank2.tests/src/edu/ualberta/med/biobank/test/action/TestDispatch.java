@@ -46,18 +46,18 @@ public class TestDispatch extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + R.nextInt();
+        name = testname.getMethodName() + getR().nextInt();
         studyId =
             StudyHelper
-                .createStudy(EXECUTOR, name, ActivityStatus.ACTIVE);
+                .createStudy(getExecutor(), name, ActivityStatus.ACTIVE);
         siteId =
-            SiteHelper.createSite(EXECUTOR, name + "1", "Edmonton",
+            SiteHelper.createSite(getExecutor(), name + "1", "Edmonton",
                 ActivityStatus.ACTIVE, new HashSet<Integer>(studyId));
         centerId =
-            SiteHelper.createSite(EXECUTOR, name + "2", "Calgary",
+            SiteHelper.createSite(getExecutor(), name + "2", "Calgary",
                 ActivityStatus.ACTIVE, new HashSet<Integer>(studyId));
         patientId =
-            EXECUTOR.exec(new PatientSaveAction(null, studyId, name,
+            exec(new PatientSaveAction(null, studyId, name,
                 Utils.getRandomDate(), null)).getId();
     }
 
@@ -65,20 +65,20 @@ public class TestDispatch extends TestAction {
     public void saveWithSpecs() throws Exception {
 
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
+            DispatchHelper.createSaveDispatchInfoRandom(getExecutor(), siteId,
                 centerId, DispatchState.CREATION.getId(),
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
-            DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
                 patientId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
+            ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
         Integer id =
-            EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+            exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
         DispatchReadInfo info =
-            EXECUTOR.exec(new DispatchGetInfoAction(id));
+            exec(new DispatchGetInfoAction(id));
 
         Assert.assertTrue(info.dispatch.getReceiverCenter().getId()
             .equals(d.receiverId));
@@ -95,7 +95,7 @@ public class TestDispatch extends TestAction {
 
         // test duplicates
         specs =
-            DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
                 patientId, centerId);
         Iterator<DispatchSpecimenInfo> it = specs.iterator();
 
@@ -103,7 +103,7 @@ public class TestDispatch extends TestAction {
         it.next().specimenId = specId;
 
         id =
-            EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+            exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
         // test null
@@ -113,7 +113,7 @@ public class TestDispatch extends TestAction {
 
         try {
             id =
-                EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+                exec(new DispatchSaveAction(d, specs, shipsave))
                     .getId();
             Assert.fail("test should fail");
         } catch (ConstraintViolationException e) {
@@ -124,11 +124,11 @@ public class TestDispatch extends TestAction {
 
         specs = new HashSet<DispatchSpecimenInfo>();
         id =
-            EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+            exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
         info =
-            EXECUTOR.exec(new DispatchGetInfoAction(id));
+            exec(new DispatchGetInfoAction(id));
 
         Assert.assertTrue(info.specimens.size() == 0);
 
@@ -137,43 +137,43 @@ public class TestDispatch extends TestAction {
     @Test
     public void testStateChange() throws Exception {
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
+            DispatchHelper.createSaveDispatchInfoRandom(getExecutor(), siteId,
                 centerId, DispatchState.CREATION.getId(),
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
-            DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
                 patientId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
+            ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
         Integer id =
-            EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+            exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
-        EXECUTOR.exec(new DispatchChangeStateAction(id,
+        exec(new DispatchChangeStateAction(id,
             DispatchState.IN_TRANSIT, shipsave));
         Assert
-            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch
+            .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
                 .equals(DispatchState.IN_TRANSIT.getId()));
 
-        EXECUTOR.exec(new DispatchChangeStateAction(id,
+        exec(new DispatchChangeStateAction(id,
             DispatchState.LOST, shipsave));
         Assert
-            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch
+            .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
                 .equals(DispatchState.LOST.getId()));
 
-        EXECUTOR.exec(new DispatchChangeStateAction(id,
+        exec(new DispatchChangeStateAction(id,
             DispatchState.CLOSED, shipsave));
         Assert
-            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch
+            .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
                 .equals(DispatchState.CLOSED.getId()));
 
-        EXECUTOR.exec(new DispatchChangeStateAction(id,
+        exec(new DispatchChangeStateAction(id,
             DispatchState.RECEIVED, shipsave));
         Assert
-            .assertTrue(EXECUTOR.exec(new DispatchGetInfoAction(id)).dispatch
+            .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
                 .equals(DispatchState.RECEIVED.getId()));
 
@@ -182,21 +182,21 @@ public class TestDispatch extends TestAction {
     @Test
     public void testDelete() throws Exception {
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
+            DispatchHelper.createSaveDispatchInfoRandom(getExecutor(), siteId,
                 centerId, DispatchState.IN_TRANSIT.getId(),
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
-            DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
                 patientId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
+            ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
         Integer id =
-            EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+            exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
-        DispatchReadInfo info = EXECUTOR.exec(new DispatchGetInfoAction(id));
+        DispatchReadInfo info = exec(new DispatchGetInfoAction(id));
         try {
-            EXECUTOR.exec(new DispatchDeleteAction(info.dispatch));
+            exec(new DispatchDeleteAction(info.dispatch));
             Assert.fail();
         } catch (ActionException e) {
             Assert.assertTrue(true);
@@ -204,38 +204,38 @@ public class TestDispatch extends TestAction {
 
         DispatchChangeStateAction stateChange =
             new DispatchChangeStateAction(id, DispatchState.CREATION, shipsave);
-        EXECUTOR.exec(stateChange);
-        EXECUTOR.exec(new DispatchDeleteAction(info.dispatch));
+        exec(stateChange);
+        exec(new DispatchDeleteAction(info.dispatch));
     }
 
     @Test
     public void testComment() throws Exception {
 
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
+            DispatchHelper.createSaveDispatchInfoRandom(getExecutor(), siteId,
                 centerId, DispatchState.IN_TRANSIT.getId(),
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
-            DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
                 patientId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
+            ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
         Integer id =
-            EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+            exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
         d.id = id;
 
-        DispatchReadInfo info = EXECUTOR.exec(new DispatchGetInfoAction(id));
+        DispatchReadInfo info = exec(new DispatchGetInfoAction(id));
         Assert.assertEquals(1, info.dispatch.getComments().size());
-        EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+        exec(new DispatchSaveAction(d, specs, shipsave))
             .getId();
         info =
-            EXECUTOR.exec(new DispatchGetInfoAction(id));
+            exec(new DispatchGetInfoAction(id));
         Assert.assertEquals(2, info.dispatch.getComments().size());
-        EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
+        exec(new DispatchSaveAction(d, specs, shipsave))
             .getId();
         info =
-            EXECUTOR.exec(new DispatchGetInfoAction(id));
+            exec(new DispatchGetInfoAction(id));
         Assert.assertEquals(3, info.dispatch.getComments().size());
     }
 }

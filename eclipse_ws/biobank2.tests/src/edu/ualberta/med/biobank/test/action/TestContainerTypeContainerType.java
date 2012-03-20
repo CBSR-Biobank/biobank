@@ -62,7 +62,7 @@ public class TestContainerTypeContainerType extends TestAction {
 
         session.save(ct2);
         session.flush();
-        
+
         session.save(ct3);
         session.flush();
 
@@ -75,7 +75,7 @@ public class TestContainerTypeContainerType extends TestAction {
         tx.commit();
         session.close();
 
-        session = SESSION_PROVIDER.openSession();
+        session = openSession();
         tx = session.beginTransaction();
 
         Container c1 = new Container();
@@ -112,7 +112,7 @@ public class TestContainerTypeContainerType extends TestAction {
         session.saveOrUpdate(ct1);
         session.flush();
         // hope the above causes some collection event?
-        
+
         c2.setContainerType(ct1);
         session.saveOrUpdate(c2);
         session.flush();

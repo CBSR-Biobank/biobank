@@ -48,12 +48,12 @@ public class TestRequest extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + R.nextInt();
+        name = testname.getMethodName() + getR().nextInt();
         studyId =
             StudyHelper
-                .createStudy(EXECUTOR, name, ActivityStatus.ACTIVE);
+                .createStudy(getExecutor(), name, ActivityStatus.ACTIVE);
         rgId =
-            ResearchGroupHelper.createResearchGroup(EXECUTOR,
+            ResearchGroupHelper.createResearchGroup(getExecutor(),
                 name + "rg",
                 name + "rg",
                 studyId);
@@ -64,36 +64,37 @@ public class TestRequest extends TestAction {
 
         ResearchGroupGetInfoAction rgInfo =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = EXECUTOR.exec(rgInfo);
+        ResearchGroupReadInfo rg = exec(rgInfo);
 
         // create specs
         Integer p =
-            PatientHelper.createPatient(EXECUTOR, name + "_patient",
+            PatientHelper.createPatient(getExecutor(), name + "_patient",
                 rg.researchGroup.getStudy().getId());
         Integer ceId =
-            CollectionEventHelper.createCEventWithSourceSpecimens(EXECUTOR,
+            CollectionEventHelper.createCEventWithSourceSpecimens(
+                getExecutor(),
                 p, rgId);
 
         CollectionEventGetInfoAction ceReader =
             new CollectionEventGetInfoAction(ceId);
-        CEventInfo ceInfo = EXECUTOR.exec(ceReader);
+        CEventInfo ceInfo = exec(ceReader);
         List<String> specs = new ArrayList<String>();
         for (SpecimenInfo specInfo : ceInfo.sourceSpecimenInfos)
             specs.add(specInfo.specimen.getInventoryId());
 
         Assert.assertTrue(ceInfo.sourceSpecimenInfos.size() >= 2);
-        specs.remove(Math.abs(R.nextInt()) % specs.size());
-        specs.remove(Math.abs(R.nextInt()) % specs.size());
+        specs.remove(Math.abs(getR().nextInt()) % specs.size());
+        specs.remove(Math.abs(getR().nextInt()) % specs.size());
 
         // request specs
         RequestSubmitAction action =
             new RequestSubmitAction(rgId, specs);
-        Integer rId = EXECUTOR.exec(action).getId();
+        Integer rId = exec(action).getId();
 
         // make sure you got what was requested
         RequestGetSpecimenInfosAction specAction =
             new RequestGetSpecimenInfosAction(rId);
-        List<Object[]> specInfo = EXECUTOR.exec(specAction).getList();
+        List<Object[]> specInfo = exec(specAction).getList();
 
         for (int i = 0; i < specInfo.size(); i++) {
             RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
@@ -104,11 +105,11 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testClaim() throws Exception {
-        Integer rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
+        Integer rId = RequestHelper.createRequest(session, getExecutor(), rgId);
 
         RequestGetSpecimenInfosAction specAction =
             new RequestGetSpecimenInfosAction(rId);
-        List<Object[]> specInfo = EXECUTOR.exec(specAction).getList();
+        List<Object[]> specInfo = exec(specAction).getList();
         List<Integer> ids = new ArrayList<Integer>();
 
         for (int i = 0; i < specInfo.size(); i++) {
@@ -118,9 +119,9 @@ public class TestRequest extends TestAction {
 
         RequestClaimAction claimAction =
             new RequestClaimAction(ids);
-        EXECUTOR.exec(claimAction);
+        exec(claimAction);
 
-        specInfo = EXECUTOR.exec(specAction).getList();
+        specInfo = exec(specAction).getList();
         for (int i = 0; i < specInfo.size(); i++) {
             RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
             Assert.assertTrue(spec.getClaimedBy() != null
@@ -131,11 +132,11 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testStateChanges() throws Exception {
-        Integer rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
+        Integer rId = RequestHelper.createRequest(session, getExecutor(), rgId);
 
         RequestGetSpecimenInfosAction specAction =
             new RequestGetSpecimenInfosAction(rId);
-        List<Object[]> specInfo = EXECUTOR.exec(specAction).getList();
+        List<Object[]> specInfo = exec(specAction).getList();
         List<Integer> ids = new ArrayList<Integer>();
 
         for (int i = 0; i < specInfo.size(); i++) {
@@ -146,9 +147,9 @@ public class TestRequest extends TestAction {
         RequestStateChangeAction dispatchAction =
             new RequestStateChangeAction(ids,
                 RequestSpecimenState.DISPATCHED_STATE);
-        EXECUTOR.exec(dispatchAction);
+        exec(dispatchAction);
 
-        specInfo = EXECUTOR.exec(specAction).getList();
+        specInfo = exec(specAction).getList();
         for (int i = 0; i < specInfo.size(); i++) {
             RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
             Assert.assertTrue(RequestSpecimenState.getState(spec.getState())
@@ -158,23 +159,23 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testDelete() throws Exception {
-        Integer rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
+        Integer rId = RequestHelper.createRequest(session, getExecutor(), rgId);
 
-        RequestReadInfo reqInfo = EXECUTOR.exec(new RequestGetInfoAction(rId));
+        RequestReadInfo reqInfo = exec(new RequestGetInfoAction(rId));
         RequestDeleteAction delete = new RequestDeleteAction(reqInfo.request);
-        EXECUTOR.exec(delete);
+        exec(delete);
 
-        rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
+        rId = RequestHelper.createRequest(session, getExecutor(), rgId);
         session.beginTransaction();
         Request r = (Request) session.get(Request.class, rId);
         r.setSubmitted(new Date());
         session.saveOrUpdate(r);
         session.getTransaction().commit();
-        reqInfo = EXECUTOR.exec(new RequestGetInfoAction(rId));
+        reqInfo = exec(new RequestGetInfoAction(rId));
         delete = new RequestDeleteAction(reqInfo.request);
 
         try {
-            EXECUTOR.exec(delete);
+            exec(delete);
             Assert.fail("should not be allowed to delete the request");
         } catch (ConstraintViolationException e) {
             // good

@@ -81,7 +81,7 @@ public class TestSite extends TestAction {
         // null name
         siteSaveAction.setName(null);
         try {
-            EXECUTOR.exec(siteSaveAction);
+            exec(siteSaveAction);
             Assert.fail("should not be allowed to add site with no name");
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(TestAction.contains(e, NotEmpty.class,
@@ -93,7 +93,7 @@ public class TestSite extends TestAction {
         siteSaveAction.setName(name);
         siteSaveAction.setNameShort(null);
         try {
-            EXECUTOR.exec(siteSaveAction);
+            exec(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no short name");
         } catch (ConstraintViolationException e) {
@@ -103,7 +103,7 @@ public class TestSite extends TestAction {
         siteSaveAction.setNameShort(name);
         siteSaveAction.setActivityStatus(null);
         try {
-            EXECUTOR.exec(siteSaveAction);
+            exec(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add Site with no activity status");
         } catch (ConstraintViolationException e) {
@@ -113,7 +113,7 @@ public class TestSite extends TestAction {
         siteSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
         siteSaveAction.setAddress(null);
         try {
-            EXECUTOR.exec(siteSaveAction);
+            exec(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no address");
         } catch (ConstraintViolationException e) {
@@ -128,7 +128,7 @@ public class TestSite extends TestAction {
         studyIds.add(null);
         siteSaveAction.setStudyIds(studyIds);
         try {
-            EXECUTOR.exec(siteSaveAction);
+            exec(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with a null site id");
         } catch (ModelNotFoundException e) {
@@ -139,7 +139,7 @@ public class TestSite extends TestAction {
         studyIds.add(-1);
         siteSaveAction.setStudyIds(studyIds);
         try {
-            EXECUTOR.exec(siteSaveAction);
+            exec(siteSaveAction);
             Assert.fail(
                 "should not be allowed to add site with an invalid site id");
         } catch (ModelNotFoundException e) {
@@ -148,21 +148,21 @@ public class TestSite extends TestAction {
 
         // success path
         siteSaveAction.setStudyIds(new HashSet<Integer>());
-        EXECUTOR.exec(siteSaveAction);
+        exec(siteSaveAction);
     }
 
     @Test
     public void checkGetAction() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
 
         Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(EXECUTOR,
+            .createCEventWithSourceSpecimens(getExecutor(),
                 provisioning.patientIds.get(0), provisioning.clinicId);
         CEventInfo ceventInfo =
-            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+            exec(new CollectionEventGetInfoAction(ceventId));
         List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
 
-        Integer pEventId = EXECUTOR.exec(
+        Integer pEventId = exec(
             new ProcessingEventSaveAction(
                 null, provisioning.siteId, Utils.getRandomDate(), Utils
                     .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
@@ -171,7 +171,7 @@ public class TestSite extends TestAction {
             .getId();
 
         SiteInfo siteInfo =
-            EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
+            exec(new SiteGetInfoAction(provisioning.siteId));
 
         Assert.assertEquals(name + "_site_city", siteInfo.getSite()
             .getAddress()
@@ -185,25 +185,25 @@ public class TestSite extends TestAction {
 
     @Test
     public void nameChecks() throws Exception {
-        Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
+        Integer siteId = exec(siteSaveAction).getId();
 
         // ensure we can change name on existing clinic
-        SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        SiteInfo siteInfo = exec(new SiteGetInfoAction(siteId));
         siteInfo.getSite().setName(name + "_2");
         siteSaveAction = SiteHelper.getSaveAction(siteInfo);
-        EXECUTOR.exec(siteSaveAction);
+        exec(siteSaveAction);
 
         // ensure we can change short name on existing site
-        siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        siteInfo = exec(new SiteGetInfoAction(siteId));
         siteInfo.getSite().setNameShort(name + "_2");
         siteSaveAction = SiteHelper.getSaveAction(siteInfo);
-        EXECUTOR.exec(siteSaveAction);
+        exec(siteSaveAction);
 
         // test for duplicate name
         SiteSaveAction saveSite = SiteHelper.getSaveAction(name + "_2", name,
             ActivityStatus.ACTIVE);
         try {
-            EXECUTOR.exec(saveSite);
+            exec(saveSite);
             Assert.fail("should not be allowed to add site with same name");
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
@@ -214,7 +214,7 @@ public class TestSite extends TestAction {
         saveSite.setNameShort(name + "_2");
 
         try {
-            EXECUTOR.exec(saveSite);
+            exec(saveSite);
             Assert.fail(
                 "should not be allowed to add site with same name short");
         } catch (ConstraintViolationException e) {
@@ -225,8 +225,8 @@ public class TestSite extends TestAction {
     @Test
     public void comments() {
         // save with no comments
-        Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
-        SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        Integer siteId = exec(siteSaveAction).getId();
+        SiteInfo siteInfo = exec(new SiteGetInfoAction(siteId));
         Assert.assertEquals(0, siteInfo.getSite().getComments().size());
 
         siteInfo = addComment(siteId);
@@ -244,10 +244,10 @@ public class TestSite extends TestAction {
 
     private SiteInfo addComment(Integer siteId) {
         SiteSaveAction siteSaveAction = SiteHelper.getSaveAction(
-            EXECUTOR.exec(new SiteGetInfoAction(siteId)));
+            exec(new SiteGetInfoAction(siteId)));
         siteSaveAction.setCommentText(Utils.getRandomString(20, 30));
-        EXECUTOR.exec(siteSaveAction).getId();
-        return EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        exec(siteSaveAction).getId();
+        return exec(new SiteGetInfoAction(siteId));
     }
 
     @Test
@@ -259,7 +259,7 @@ public class TestSite extends TestAction {
 
         for (int i = 0; i < 20; ++i) {
             Integer id = StudyHelper.createStudy(
-                EXECUTOR, name + "_study" + i, ActivityStatus.ACTIVE);
+                getExecutor(), name + "_study" + i, ActivityStatus.ACTIVE);
             allStudyIds.add(id);
             if (i < 10) {
                 studyIdsSet1.add(id);
@@ -269,9 +269,9 @@ public class TestSite extends TestAction {
         }
 
         // add study set 1 one by one
-        Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
+        Integer siteId = exec(siteSaveAction).getId();
         SiteInfo siteInfo =
-            EXECUTOR.exec(new SiteGetInfoAction(siteId));
+            exec(new SiteGetInfoAction(siteId));
         Set<Integer> expectedStudyIds = new HashSet<Integer>();
 
         for (Integer studyId : studyIdsSet1) {
@@ -281,31 +281,31 @@ public class TestSite extends TestAction {
             studyIds = getStudyIds(siteInfo.getStudyCountInfos());
             studyIds.add(studyId);
             siteSaveAction.setStudyIds(studyIds);
-            EXECUTOR.exec(siteSaveAction);
-            siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+            exec(siteSaveAction);
+            siteInfo = exec(new SiteGetInfoAction(siteId));
             Assert.assertEquals(expectedStudyIds,
                 getStudyIds(siteInfo.getStudyCountInfos()));
         }
 
         // create a second site, site 2, with the second set of studies
-        Integer siteId2 = SiteHelper.createSite(EXECUTOR, name + "_2",
+        Integer siteId2 = SiteHelper.createSite(getExecutor(), name + "_2",
             Utils.getRandomString(8, 12),
             ActivityStatus.ACTIVE, studyIdsSet2);
-        siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId2));
+        siteInfo = exec(new SiteGetInfoAction(siteId2));
         expectedStudyIds.clear();
         expectedStudyIds.addAll(studyIdsSet2);
         Assert.assertEquals(expectedStudyIds,
             getStudyIds(siteInfo.getStudyCountInfos()));
 
         // make sure site 1 still has same collection
-        siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        siteInfo = exec(new SiteGetInfoAction(siteId));
         expectedStudyIds.clear();
         expectedStudyIds.addAll(studyIdsSet1);
         Assert.assertEquals(expectedStudyIds,
             getStudyIds(siteInfo.getStudyCountInfos()));
 
         // delete studies one by one from Site 1
-        siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        siteInfo = exec(new SiteGetInfoAction(siteId));
         for (Integer studyId : studyIdsSet1) {
             expectedStudyIds.remove(studyId);
 
@@ -313,29 +313,29 @@ public class TestSite extends TestAction {
             studyIds = getStudyIds(siteInfo.getStudyCountInfos());
             studyIds.remove(studyId);
             siteSaveAction.setStudyIds(studyIds);
-            EXECUTOR.exec(siteSaveAction);
-            siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+            exec(siteSaveAction);
+            siteInfo = exec(new SiteGetInfoAction(siteId));
             Assert.assertEquals(expectedStudyIds,
                 getStudyIds(siteInfo.getStudyCountInfos()));
         }
 
         // delete studies from Site 2
-        siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId2));
+        siteInfo = exec(new SiteGetInfoAction(siteId2));
         studyIds = getStudyIds(siteInfo.getStudyCountInfos());
         studyIds.removeAll(studyIdsSet2);
         siteSaveAction = SiteHelper.getSaveAction(siteInfo);
-        EXECUTOR.exec(siteSaveAction);
-        siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        exec(siteSaveAction);
+        siteInfo = exec(new SiteGetInfoAction(siteId));
         Assert.assertTrue(getStudyIds(siteInfo.getStudyCountInfos()).isEmpty());
 
         // attempt to add an invalid study ID
-        siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        siteInfo = exec(new SiteGetInfoAction(siteId));
         SiteSaveAction siteSaveAction = SiteHelper.getSaveAction(siteInfo);
         studyIds = getStudyIds(siteInfo.getStudyCountInfos());
         studyIds.add(-1);
         siteSaveAction.setStudyIds(studyIds);
         try {
-            EXECUTOR.exec(siteSaveAction);
+            exec(siteSaveAction);
             Assert.fail("should not be allowed to add an invalid study id");
         } catch (ModelNotFoundException e) {
             Assert.assertTrue(true);
@@ -344,7 +344,7 @@ public class TestSite extends TestAction {
 
     @Test
     public void containerTypes() {
-        Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
+        Integer siteId = exec(siteSaveAction).getId();
 
         List<ContainerLabelingScheme> labelingSchemes =
             new ArrayList<ContainerLabelingScheme>(
@@ -354,10 +354,10 @@ public class TestSite extends TestAction {
 
         ContainerTypeSaveAction ctSaveAction =
             ContainerTypeHelper.getSaveAction(ctName, ctName, siteId, true, 6,
-                10, labelingSchemes.get(0).getId(), R.nextDouble());
-        Integer ctId = EXECUTOR.exec(ctSaveAction).getId();
+                10, labelingSchemes.get(0).getId(), getR().nextDouble());
+        Integer ctId = exec(ctSaveAction).getId();
 
-        SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        SiteInfo siteInfo = exec(new SiteGetInfoAction(siteId));
         Assert.assertEquals(1, siteInfo.getContainerTypeCount().longValue());
         Assert.assertEquals(ctId, siteInfo.getContainerTypeInfos().get(0)
             .getContainerType().getId());
@@ -368,10 +368,10 @@ public class TestSite extends TestAction {
         ctName += "_2";
         ctSaveAction =
             ContainerTypeHelper.getSaveAction(ctName, ctName, siteId, true, 3,
-                8, labelingSchemes.get(1).getId(), R.nextDouble());
-        ctId = EXECUTOR.exec(ctSaveAction).getId();
+                8, labelingSchemes.get(1).getId(), getR().nextDouble());
+        ctId = exec(ctSaveAction).getId();
 
-        siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        siteInfo = exec(new SiteGetInfoAction(siteId));
         Assert.assertEquals(2, siteInfo.getContainerTypeCount().longValue());
         Assert.assertEquals(ctId, siteInfo.getContainerTypeInfos().get(1)
             .getContainerType().getId());
@@ -389,9 +389,9 @@ public class TestSite extends TestAction {
 
     @Test
     public void delete() throws ApplicationException {
-        Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
-        SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
-        EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
+        Integer siteId = exec(siteSaveAction).getId();
+        SiteInfo siteInfo = exec(new SiteGetInfoAction(siteId));
+        exec(new SiteDeleteAction(siteInfo.getSite()));
 
         // hql query for site should return empty
         Query q =
@@ -404,10 +404,10 @@ public class TestSite extends TestAction {
 
     private Provisioning createSiteWithContainerType()
         throws ApplicationException {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
-        provisioning.addContainerType(EXECUTOR, name,
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        provisioning.addContainerType(getExecutor(), name,
             getContainerLabelingSchemes().values().iterator().next()
-                .getId(), R.nextDouble());
+                .getId(), getR().nextDouble());
         return provisioning;
     }
 
@@ -415,7 +415,7 @@ public class TestSite extends TestAction {
     public void checkSiteGetCtypeInfoAction() throws Exception {
         Provisioning provisioning = createSiteWithContainerType();
 
-        List<SiteContainerTypeInfo> ctypeInfo = EXECUTOR.exec(
+        List<SiteContainerTypeInfo> ctypeInfo = exec(
             new SiteGetContainerTypeInfoAction(provisioning.siteId))
             .getList();
 
@@ -423,9 +423,9 @@ public class TestSite extends TestAction {
             .longValue());
 
         Integer containerTypeId = provisioning.containerTypeIds.get(0);
-        provisioning.addContainer(EXECUTOR, containerTypeId, "01");
+        provisioning.addContainer(getExecutor(), containerTypeId, "01");
 
-        ctypeInfo = EXECUTOR.exec(
+        ctypeInfo = exec(
             new SiteGetContainerTypeInfoAction(provisioning.siteId))
             .getList();
 
@@ -437,9 +437,9 @@ public class TestSite extends TestAction {
     public void deleteWithContainerTypes() throws ApplicationException {
         Provisioning provisioning = createSiteWithContainerType();
         SiteInfo siteInfo =
-            EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
+            exec(new SiteGetInfoAction(provisioning.siteId));
         try {
-            EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
+            exec(new SiteDeleteAction(siteInfo.getSite()));
             Assert
                 .fail(
                 "should not be allowed to delete a site with container types");
@@ -449,11 +449,11 @@ public class TestSite extends TestAction {
 
         // delete container type followed by site - should work now
         ContainerTypeInfo containerTypeInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(
+            exec(new ContainerTypeGetInfoAction(
                 provisioning.containerTypeIds.get(0)));
-        EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeInfo
+        exec(new ContainerTypeDeleteAction(containerTypeInfo
             .getContainerType()));
-        EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
+        exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 
     @Test
@@ -461,12 +461,12 @@ public class TestSite extends TestAction {
         Provisioning provisioning = createSiteWithContainerType();
         Integer containerTypeId = provisioning.containerTypeIds.get(0);
         Integer containerId =
-            provisioning.addContainer(EXECUTOR, containerTypeId, "01");
+            provisioning.addContainer(getExecutor(), containerTypeId, "01");
 
         SiteInfo siteInfo =
-            EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
+            exec(new SiteGetInfoAction(provisioning.siteId));
         try {
-            EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
+            exec(new SiteDeleteAction(siteInfo.getSite()));
             Assert
                 .fail(
                 "should not be allowed to delete a site with containers");
@@ -475,36 +475,36 @@ public class TestSite extends TestAction {
         }
 
         List<Container> topContainers =
-            EXECUTOR.exec(new SiteGetTopContainersAction(provisioning.siteId))
+            exec(new SiteGetTopContainersAction(provisioning.siteId))
                 .getList();
         Assert.assertEquals(1, topContainers.size());
 
         // delete container followed by site - should work now
         ContainerInfo containerInfo =
-            EXECUTOR.exec(new ContainerGetInfoAction(containerId));
-        EXECUTOR.exec(new ContainerDeleteAction(containerInfo.container));
+            exec(new ContainerGetInfoAction(containerId));
+        exec(new ContainerDeleteAction(containerInfo.container));
         ContainerTypeInfo containerTypeInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
-        EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeInfo
+            exec(new ContainerTypeGetInfoAction(containerTypeId));
+        exec(new ContainerTypeDeleteAction(containerTypeInfo
             .getContainerType()));
-        EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
+        exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 
     @Test
     public void deleteWithProcessingEvents() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
 
         // create a collection event
         Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(EXECUTOR,
+            .createCEventWithSourceSpecimens(getExecutor(),
                 provisioning.patientIds.get(0), provisioning.clinicId);
         CEventInfo ceventInfo =
-            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+            exec(new CollectionEventGetInfoAction(ceventId));
         List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
 
         // create a processing event with one of the collection event source
         // specimens
-        Integer peventId = EXECUTOR.exec(
+        Integer peventId = exec(
             new ProcessingEventSaveAction(
                 null, provisioning.siteId, Utils.getRandomDate(), Utils
                     .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
@@ -513,9 +513,9 @@ public class TestSite extends TestAction {
             .getId();
 
         SiteInfo siteInfo =
-            EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
+            exec(new SiteGetInfoAction(provisioning.siteId));
         try {
-            EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
+            exec(new SiteDeleteAction(siteInfo.getSite()));
             Assert
                 .fail(
                 "should not be allowed to delete a site with processing events");
@@ -525,33 +525,33 @@ public class TestSite extends TestAction {
 
         // delete the processing event
         PEventInfo peventInfo =
-            EXECUTOR.exec(new ProcessingEventGetInfoAction(peventId));
-        EXECUTOR.exec(new ProcessingEventDeleteAction(peventInfo.pevent));
-        EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
+            exec(new ProcessingEventGetInfoAction(peventId));
+        exec(new ProcessingEventDeleteAction(peventInfo.pevent));
+        exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 
     @Test
     public void deleteWithSrcDispatch() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
 
         Integer dispatchId1 =
-            DispatchHelper.createDispatch(EXECUTOR, provisioning.clinicId,
+            DispatchHelper.createDispatch(getExecutor(), provisioning.clinicId,
                 provisioning.siteId,
                 provisioning.patientIds.get(0));
 
         // create a second site to dispatch to
-        Integer siteId2 = EXECUTOR.exec(
+        Integer siteId2 = exec(
             SiteHelper.getSaveAction(name + "_site2", name + "_site2",
                 ActivityStatus.ACTIVE)).getId();
 
         Integer dispatchId2 =
-            DispatchHelper.createDispatch(EXECUTOR, provisioning.siteId,
+            DispatchHelper.createDispatch(getExecutor(), provisioning.siteId,
                 siteId2, provisioning.patientIds.get(0));
 
         SiteInfo siteInfo =
-            EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
+            exec(new SiteGetInfoAction(provisioning.siteId));
         try {
-            EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
+            exec(new SiteDeleteAction(siteInfo.getSite()));
             Assert
                 .fail(
                 "should not be allowed to delete a site which is a source of dispatches");
@@ -562,47 +562,47 @@ public class TestSite extends TestAction {
         // delete the dispatch and then the site
         Set<Specimen> specimens = new HashSet<Specimen>();
         SetResult<DispatchSpecimen> dispatchSpecimens =
-            EXECUTOR
+            getExecutor()
                 .exec(new DispatchGetSpecimenInfosAction(dispatchId1));
         for (DispatchSpecimen dspec : dispatchSpecimens.getSet()) {
             specimens.add(dspec.getSpecimen());
         }
 
         dispatchSpecimens =
-            EXECUTOR
+            getExecutor()
                 .exec(new DispatchGetSpecimenInfosAction(dispatchId2));
         for (DispatchSpecimen dspec : dispatchSpecimens.getSet()) {
             specimens.add(dspec.getSpecimen());
         }
 
         DispatchReadInfo dispatchInfo =
-            EXECUTOR.exec(new DispatchGetInfoAction(dispatchId2));
-        EXECUTOR.exec(new DispatchDeleteAction(dispatchInfo.dispatch));
+            exec(new DispatchGetInfoAction(dispatchId2));
+        exec(new DispatchDeleteAction(dispatchInfo.dispatch));
         dispatchInfo =
-            EXECUTOR.exec(new DispatchGetInfoAction(dispatchId1));
-        EXECUTOR.exec(new DispatchDeleteAction(dispatchInfo.dispatch));
+            exec(new DispatchGetInfoAction(dispatchId1));
+        exec(new DispatchDeleteAction(dispatchInfo.dispatch));
 
         for (Specimen specimen : specimens) {
-            EXECUTOR.exec(new SpecimenDeleteAction(specimen));
+            exec(new SpecimenDeleteAction(specimen));
         }
 
         deleteOriginInfos(provisioning.siteId);
-        EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
+        exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 
     @Test
     public void deleteWithDstDispatch() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
 
         Integer dispatchId =
-            DispatchHelper.createDispatch(EXECUTOR, provisioning.clinicId,
+            DispatchHelper.createDispatch(getExecutor(), provisioning.clinicId,
                 provisioning.siteId,
                 provisioning.patientIds.get(0));
 
         SiteInfo siteInfo =
-            EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
+            exec(new SiteGetInfoAction(provisioning.siteId));
         try {
-            EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
+            exec(new SiteDeleteAction(siteInfo.getSite()));
             Assert
                 .fail(
                 "should not be allowed to delete a site which is a destination for dispatches");
@@ -613,9 +613,9 @@ public class TestSite extends TestAction {
         // delete the dispatch and then the site - no need to delete dispatch
         // specimens
         DispatchReadInfo dispatchInfo =
-            EXECUTOR.exec(new DispatchGetInfoAction(dispatchId));
-        EXECUTOR.exec(new DispatchDeleteAction(dispatchInfo.dispatch));
-        EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
+            exec(new DispatchGetInfoAction(dispatchId));
+        exec(new DispatchDeleteAction(dispatchInfo.dispatch));
+        exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 
 }

@@ -57,7 +57,7 @@ public class TestProcessingEvent extends TestAction {
     public void setUp() throws Exception {
         super.setUp();
         name = getMethodNameR();
-        provisioning = new Provisioning(EXECUTOR, name);
+        provisioning = new Provisioning(getExecutor(), name);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class TestProcessingEvent extends TestAction {
         String commentText = Utils.getRandomString(20, 30);
         Date date = Utils.getRandomDate();
         Integer pEventId =
-            EXECUTOR.exec(
+            exec(
                 new ProcessingEventSaveAction(
                     null, provisioning.siteId, date, worksheet,
                     ActivityStatus.ACTIVE, commentText,
@@ -74,7 +74,7 @@ public class TestProcessingEvent extends TestAction {
 
         // Check ProcessingEvent is in database with correct values
         PEventInfo peventInfo =
-            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
+            exec(new ProcessingEventGetInfoAction(pEventId));
 
         Assert.assertEquals(worksheet, peventInfo.pevent.getWorksheet());
         Assert.assertEquals(1, peventInfo.pevent.getComments().size());
@@ -91,10 +91,10 @@ public class TestProcessingEvent extends TestAction {
 
         // create a collection event from a clinic
         Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(EXECUTOR,
+            .createCEventWithSourceSpecimens(getExecutor(),
                 provisioning.patientIds.get(0), provisioning.clinicId);
         CEventInfo ceventInfo =
-            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+            exec(new CollectionEventGetInfoAction(ceventId));
         List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
 
         // ship the specimens to the site
@@ -105,12 +105,12 @@ public class TestProcessingEvent extends TestAction {
             null, Utils.getRandomString(2, 5), Utils.getRandomDate(),
             Utils.getRandomDate(), Utils.getRandomString(2, 5),
             getShippingMethods().get(0).getId());
-        EXECUTOR
+        getExecutor()
             .exec(new OriginInfoSaveAction(oiSaveInfo, shipSaveInfo));
 
         // create a processing event with one of the collection event source
         // specimen
-        Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
+        Integer pEventId = exec(new ProcessingEventSaveAction(
             null, provisioning.siteId, date, worksheet,
             ActivityStatus.ACTIVE, commentText,
             new HashSet<Integer>(
@@ -120,7 +120,7 @@ public class TestProcessingEvent extends TestAction {
         // create aliquoted specimens by doing a scan link
         Set<AliquotedSpecimenInfo> aliquotedSpecimenInfos =
             new HashSet<AliquotedSpecimenInfo>();
-        for (int i = 0, n = R.nextInt(5) + 1; i < n; i++) {
+        for (int i = 0, n = getR().nextInt(5) + 1; i < n; i++) {
             AliquotedSpecimenInfo aliquotedSpecimenInfo =
                 new AliquotedSpecimenInfo();
             aliquotedSpecimenInfo.inventoryId = Utils.getRandomString(10, 15);
@@ -133,12 +133,12 @@ public class TestProcessingEvent extends TestAction {
             aliquotedSpecimenInfos.add(aliquotedSpecimenInfo);
         }
 
-        EXECUTOR.exec(new SpecimenLinkSaveAction(provisioning.siteId,
+        exec(new SpecimenLinkSaveAction(provisioning.siteId,
             provisioning.studyId, aliquotedSpecimenInfos));
 
         // Check ProcessingEvent is in database with correct values
         PEventInfo peventInfo =
-            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
+            exec(new ProcessingEventGetInfoAction(pEventId));
 
         Assert.assertEquals(worksheet, peventInfo.pevent.getWorksheet());
         Assert.assertEquals(1, peventInfo.pevent.getComments().size());
@@ -147,11 +147,11 @@ public class TestProcessingEvent extends TestAction {
             .assertEquals(1, peventInfo.sourceSpecimenInfos.size());
 
         ClinicInfo clinicInfo =
-            EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
+            exec(new ClinicGetInfoAction(provisioning.clinicId));
         SiteInfo siteInfo =
-            EXECUTOR.exec(new SiteGetInfoAction(provisioning.siteId));
+            exec(new SiteGetInfoAction(provisioning.siteId));
         PatientInfo patientInfo =
-            EXECUTOR.exec(new PatientGetInfoAction(provisioning.patientIds
+            exec(new PatientGetInfoAction(provisioning.patientIds
                 .get(0)));
 
         // check eager loaded associations
@@ -184,14 +184,14 @@ public class TestProcessingEvent extends TestAction {
     public void saveSameWorksheet() throws Exception {
         String worksheet = Utils.getRandomString(50);
         Date date = Utils.getRandomDate();
-        EXECUTOR.exec(new ProcessingEventSaveAction(
+        exec(new ProcessingEventSaveAction(
             null, provisioning.siteId, date, worksheet,
             ActivityStatus.ACTIVE, null,
             new HashSet<Integer>()));
 
         // try to save another pevent with the same worksheet
         try {
-            EXECUTOR.exec(new ProcessingEventSaveAction(null,
+            exec(new ProcessingEventSaveAction(null,
                 provisioning.siteId, new Date(), worksheet,
                 ActivityStatus.ACTIVE, null,
                 new HashSet<Integer>()));
@@ -204,17 +204,17 @@ public class TestProcessingEvent extends TestAction {
 
     @Test
     public void delete() throws Exception {
-        Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
+        Integer pEventId = exec(new ProcessingEventSaveAction(
             null, provisioning.siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), ActivityStatus.ACTIVE, null,
             new HashSet<Integer>())).getId();
 
         PEventInfo peventInfo =
-            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
-        EXECUTOR.exec(new ProcessingEventDeleteAction(peventInfo.pevent));
+            exec(new ProcessingEventGetInfoAction(pEventId));
+        exec(new ProcessingEventDeleteAction(peventInfo.pevent));
 
         try {
-            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
+            exec(new ProcessingEventGetInfoAction(pEventId));
             Assert
                 .fail("one of the source specimen of this pevent has children. "
                     + "Can't delete the processing event");
@@ -227,16 +227,16 @@ public class TestProcessingEvent extends TestAction {
     public void deleteWithSourcesSpecimens() throws Exception {
         // add cevent and source specimens
         Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(EXECUTOR,
+            .createCEventWithSourceSpecimens(getExecutor(),
                 provisioning.patientIds.get(0), provisioning.siteId);
         CEventInfo ceventInfo =
-            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+            exec(new CollectionEventGetInfoAction(ceventId));
         List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
         Integer spcId = sourceSpecs.get(0).specimen.getId();
 
         // create a processing event with one of the collection event source
         // specimen.
-        Integer pEventId = EXECUTOR.exec(new ProcessingEventSaveAction(
+        Integer pEventId = exec(new ProcessingEventSaveAction(
             null, provisioning.siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), ActivityStatus.ACTIVE, null,
             new HashSet<Integer>(Arrays.asList(spcId)))).getId();
@@ -249,11 +249,11 @@ public class TestProcessingEvent extends TestAction {
         // delete this processing event. Can do it since the specimen has no
         // children
         PEventInfo peventInfo =
-            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
-        EXECUTOR.exec(new ProcessingEventDeleteAction(peventInfo.pevent));
+            exec(new ProcessingEventGetInfoAction(pEventId));
+        exec(new ProcessingEventDeleteAction(peventInfo.pevent));
 
         try {
-            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
+            exec(new ProcessingEventGetInfoAction(pEventId));
             Assert.fail("processing event still exists");
         } catch (ModelNotFoundException e) {
             Assert.assertTrue(true);
@@ -274,9 +274,9 @@ public class TestProcessingEvent extends TestAction {
     public void deleteWithAliquotedSpecimens() throws Exception {
         // add cevent and source specimens
         Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(EXECUTOR,
+            .createCEventWithSourceSpecimens(getExecutor(),
                 provisioning.patientIds.get(0), provisioning.siteId);
-        List<SpecimenInfo> sourceSpecs = EXECUTOR.exec(
+        List<SpecimenInfo> sourceSpecs = exec(
             new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
             .getList();
         Integer spcId = sourceSpecs.get(0).specimen.getId();
@@ -285,7 +285,7 @@ public class TestProcessingEvent extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimen.
-        Integer pEventId = EXECUTOR.exec(
+        Integer pEventId = exec(
             new ProcessingEventSaveAction(
                 null, provisioning.siteId, Utils.getRandomDate(),
                 Utils.getRandomString(50), ActivityStatus.ACTIVE, null,
@@ -299,9 +299,9 @@ public class TestProcessingEvent extends TestAction {
         // delete this processing event. Can do it since the specimen has no
         // children
         PEventInfo peventInfo =
-            EXECUTOR.exec(new ProcessingEventGetInfoAction(pEventId));
+            exec(new ProcessingEventGetInfoAction(pEventId));
         try {
-            EXECUTOR.exec(new ProcessingEventDeleteAction(peventInfo.pevent));
+            exec(new ProcessingEventDeleteAction(peventInfo.pevent));
             Assert
                 .fail("one of the source specimen of this pevent has children. "
                     + "Can't delete the processing event");

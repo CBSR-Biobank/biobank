@@ -30,7 +30,7 @@ public class TestSpecimen extends TestAction {
     public void setUp() throws Exception {
         super.setUp();
         name = getMethodNameR();
-        provisioning = new Provisioning(EXECUTOR, name);
+        provisioning = new Provisioning(getExecutor(), name);
     }
 
     @Test
@@ -43,24 +43,24 @@ public class TestSpecimen extends TestAction {
         final Integer typeId = getSpecimenTypes().get(0).getId();
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,
-                typeId, EXECUTOR.getUserId(), provisioning.siteId);
+                typeId, getExecutor().getUserId(), provisioning.siteId);
 
         // Save a new cevent
-        final Integer ceventId = EXECUTOR.exec(
+        final Integer ceventId = exec(
             new CollectionEventSaveAction(null, provisioning.patientIds
                 .get(0),
-                R.nextInt(20) + 1, ActivityStatus.ACTIVE, null,
+                getR().nextInt(20) + 1, ActivityStatus.ACTIVE, null,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
                 null))
             .getId();
 
         CEventInfo ceventInfo =
-            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+            exec(new CollectionEventGetInfoAction(ceventId));
 
         SpecimenInfo specimenInfo = ceventInfo.sourceSpecimenInfos.get(0);
 
         SpecimenBriefInfo specimenBriefInfo =
-            EXECUTOR.exec(new SpecimenGetInfoAction(specimenInfo.specimen
+            exec(new SpecimenGetInfoAction(specimenInfo.specimen
                 .getId()));
 
         Assert.assertEquals(specimenInfo.specimen,

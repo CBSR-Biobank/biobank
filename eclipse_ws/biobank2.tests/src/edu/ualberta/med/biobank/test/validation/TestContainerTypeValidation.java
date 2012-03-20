@@ -15,9 +15,11 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.test.AssertMore;
+import edu.ualberta.med.biobank.test.TestDb;
 import edu.ualberta.med.biobank.validator.constraint.model.impl.ValidContainerTypeValidator;
 
-public class TestContainerTypeValidation extends TestValidation {
+public class TestContainerTypeValidation extends TestDb {
     @Test
     public void removeUsedChildContainerType() {
         Transaction tx = session.beginTransaction();

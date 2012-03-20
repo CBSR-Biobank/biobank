@@ -11,8 +11,6 @@ import javax.validation.ConstraintViolationException;
 import junit.framework.Assert;
 
 import org.hibernate.Query;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,10 +24,7 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAct
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
@@ -49,20 +44,20 @@ public class TestContainerType extends TestAction {
         super.setUp();
         name = getMethodNameR();
 
-        siteId = EXECUTOR.exec(SiteHelper.getSaveAction(
+        siteId = exec(SiteHelper.getSaveAction(
             name, name, ActivityStatus.ACTIVE)).getId();
 
         containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
             "FREEZER_3x10", "FR3x10", siteId, true, 3, 10,
             getContainerLabelingSchemes().get("CBSR 2 char alphabetic")
-                .getId(), R.nextDouble());
+                .getId(), getR().nextDouble());
     }
 
     @Test
     public void saveNew() throws Exception {
         containerTypeSaveAction.setName(null);
         try {
-            EXECUTOR.exec(containerTypeSaveAction);
+            exec(containerTypeSaveAction);
             Assert
                 .fail("should not be allowed to add container type with no name");
         } catch (ConstraintViolationException e) {
@@ -72,7 +67,7 @@ public class TestContainerType extends TestAction {
         containerTypeSaveAction.setName(name);
         containerTypeSaveAction.setNameShort(null);
         try {
-            EXECUTOR.exec(containerTypeSaveAction);
+            exec(containerTypeSaveAction);
             Assert
                 .fail("should not be allowed to add container type with no name short");
         } catch (ConstraintViolationException e) {
@@ -82,7 +77,7 @@ public class TestContainerType extends TestAction {
         containerTypeSaveAction.setNameShort(name);
         containerTypeSaveAction.setSiteId(null);
         try {
-            EXECUTOR.exec(containerTypeSaveAction);
+            exec(containerTypeSaveAction);
             Assert
                 .fail("should not be allowed to add container type with no site");
         } catch (ConstraintViolationException e) {
@@ -92,7 +87,7 @@ public class TestContainerType extends TestAction {
         containerTypeSaveAction.setSiteId(siteId);
         containerTypeSaveAction.setRowCapacity(null);
         try {
-            EXECUTOR.exec(containerTypeSaveAction);
+            exec(containerTypeSaveAction);
             Assert
                 .fail("should not be allowed to add container type with null for row capacity");
         } catch (ConstraintViolationException e) {
@@ -102,7 +97,7 @@ public class TestContainerType extends TestAction {
         containerTypeSaveAction.setRowCapacity(3);
         containerTypeSaveAction.setColCapacity(null);
         try {
-            EXECUTOR.exec(containerTypeSaveAction);
+            exec(containerTypeSaveAction);
             Assert
                 .fail("should not be allowed to add container type with null for column capacity");
         } catch (ConstraintViolationException e) {
@@ -112,7 +107,7 @@ public class TestContainerType extends TestAction {
         containerTypeSaveAction.setColCapacity(10);
         containerTypeSaveAction.setChildLabelingSchemeId(null);
         try {
-            EXECUTOR.exec(containerTypeSaveAction);
+            exec(containerTypeSaveAction);
             Assert
                 .fail("should not be allowed to add container type with null for child labeling scheme");
         } catch (ConstraintViolationException e) {
@@ -125,7 +120,7 @@ public class TestContainerType extends TestAction {
                 .getId());
         containerTypeSaveAction.setActivityStatus(null);
         try {
-            EXECUTOR.exec(containerTypeSaveAction);
+            exec(containerTypeSaveAction);
             Assert
                 .fail("should not be allowed to add container type with null for activity status");
         } catch (ConstraintViolationException e) {
@@ -134,15 +129,15 @@ public class TestContainerType extends TestAction {
 
         // test success path
         containerTypeSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
-        EXECUTOR.exec(containerTypeSaveAction);
+        exec(containerTypeSaveAction);
     }
 
     @Test
     public void checkGetAction() throws Exception {
         Integer containerTypeId =
-            EXECUTOR.exec(containerTypeSaveAction).getId();
+            exec(containerTypeSaveAction).getId();
         ContainerTypeInfo topContainerTypeInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+            exec(new ContainerTypeGetInfoAction(containerTypeId));
 
         Assert.assertEquals("FREEZER_3x10",
             topContainerTypeInfo.getContainerType().getName());
@@ -162,10 +157,10 @@ public class TestContainerType extends TestAction {
             ContainerTypeHelper.getSaveAction(
                 "HOTEL13", "H13", siteId, false, 13, 1,
                 getContainerLabelingSchemes().get("2 char numeric").getId(),
-                R.nextDouble());
-        EXECUTOR.exec(containerTypeSaveAction).getId();
+                getR().nextDouble());
+        exec(containerTypeSaveAction).getId();
         topContainerTypeInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+            exec(new ContainerTypeGetInfoAction(containerTypeId));
 
     }
 
@@ -173,28 +168,28 @@ public class TestContainerType extends TestAction {
     public void nameChecks() throws Exception {
         // ensure we can change name on existing container type
         Integer containerTypeId =
-            EXECUTOR.exec(containerTypeSaveAction).getId();
+            exec(containerTypeSaveAction).getId();
 
         containerTypeSaveAction =
-            ContainerTypeHelper.getSaveAction(EXECUTOR
-                .exec(new ContainerTypeGetInfoAction(containerTypeId)));
+            ContainerTypeHelper.getSaveAction(
+                exec(new ContainerTypeGetInfoAction(containerTypeId)));
         containerTypeSaveAction.setName("FREEZER_4x12");
-        EXECUTOR.exec(containerTypeSaveAction);
+        exec(containerTypeSaveAction);
 
         containerTypeSaveAction =
-            ContainerTypeHelper.getSaveAction(EXECUTOR
-                .exec(new ContainerTypeGetInfoAction(containerTypeId)));
+            ContainerTypeHelper.getSaveAction(
+                exec(new ContainerTypeGetInfoAction(containerTypeId)));
         containerTypeSaveAction.setNameShort("FR4x12");
-        EXECUTOR.exec(containerTypeSaveAction);
+        exec(containerTypeSaveAction);
 
         // test for duplicate name
 
         containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
             "FREEZER_4x12", "FR5x10", siteId, true, 3, 10,
             getContainerLabelingSchemes().get("CBSR 2 char alphabetic")
-                .getId(), R.nextDouble());
+                .getId(), getR().nextDouble());
         try {
-            EXECUTOR.exec(containerTypeSaveAction);
+            exec(containerTypeSaveAction);
             Assert
                 .fail("should not be allowed to add a second container type with same name");
         } catch (ConstraintViolationException e) {
@@ -205,7 +200,7 @@ public class TestContainerType extends TestAction {
         containerTypeSaveAction.setName("FREEZER_5x10");
         containerTypeSaveAction.setNameShort("FR4x12");
         try {
-            EXECUTOR.exec(containerTypeSaveAction);
+            exec(containerTypeSaveAction);
             Assert
                 .fail("should not be allowed to add a second container type with same name");
         } catch (ConstraintViolationException e) {
@@ -232,9 +227,9 @@ public class TestContainerType extends TestAction {
             set1.add(allSpecimenTypes.get(i).getId());
 
             containerTypeSaveAction.setSpecimenTypeIds(ctSpecimenTypeIds);
-            containerTypeId = EXECUTOR.exec(containerTypeSaveAction).getId();
+            containerTypeId = exec(containerTypeSaveAction).getId();
             containerTypeInfo =
-                EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+                exec(new ContainerTypeGetInfoAction(containerTypeId));
             Assert.assertEquals(ctSpecimenTypeIds,
                 getSpecimenTypeIds(containerTypeInfo));
             containerTypeSaveAction =
@@ -248,9 +243,9 @@ public class TestContainerType extends TestAction {
         }
 
         containerTypeSaveAction.setSpecimenTypeIds(ctSpecimenTypeIds);
-        containerTypeId = EXECUTOR.exec(containerTypeSaveAction).getId();
+        containerTypeId = exec(containerTypeSaveAction).getId();
         containerTypeInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+            exec(new ContainerTypeGetInfoAction(containerTypeId));
         Assert.assertEquals(ctSpecimenTypeIds,
             getSpecimenTypeIds(containerTypeInfo));
 
@@ -258,9 +253,9 @@ public class TestContainerType extends TestAction {
         for (Integer specimenTypeId : set1) {
             ctSpecimenTypeIds.remove(specimenTypeId);
             containerTypeSaveAction.setSpecimenTypeIds(ctSpecimenTypeIds);
-            EXECUTOR.exec(containerTypeSaveAction);
+            exec(containerTypeSaveAction);
             containerTypeInfo =
-                EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+                exec(new ContainerTypeGetInfoAction(containerTypeId));
             Assert.assertEquals(ctSpecimenTypeIds,
                 getSpecimenTypeIds(containerTypeInfo));
         }
@@ -268,9 +263,9 @@ public class TestContainerType extends TestAction {
         // remove set2 all at once
         ctSpecimenTypeIds.removeAll(set2);
         containerTypeSaveAction.setSpecimenTypeIds(ctSpecimenTypeIds);
-        EXECUTOR.exec(containerTypeSaveAction);
+        exec(containerTypeSaveAction);
         containerTypeInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+            exec(new ContainerTypeGetInfoAction(containerTypeId));
         Assert.assertEquals(0, containerTypeInfo.getContainerType()
             .getSpecimenTypes().size());
     }
@@ -304,9 +299,9 @@ public class TestContainerType extends TestAction {
 
             containerTypeSaveAction
                 .setChildContainerTypeIds(ctContainerTypeIds);
-            containerTypeId = EXECUTOR.exec(containerTypeSaveAction).getId();
+            containerTypeId = exec(containerTypeSaveAction).getId();
             containerTypeInfo =
-                EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+                exec(new ContainerTypeGetInfoAction(containerTypeId));
             Assert.assertEquals(ctContainerTypeIds,
                 getChildContainerTypeIds(containerTypeInfo));
             containerTypeSaveAction =
@@ -320,9 +315,9 @@ public class TestContainerType extends TestAction {
         }
 
         containerTypeSaveAction.setChildContainerTypeIds(ctContainerTypeIds);
-        containerTypeId = EXECUTOR.exec(containerTypeSaveAction).getId();
+        containerTypeId = exec(containerTypeSaveAction).getId();
         containerTypeInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+            exec(new ContainerTypeGetInfoAction(containerTypeId));
         Assert.assertEquals(ctContainerTypeIds,
             getChildContainerTypeIds(containerTypeInfo));
 
@@ -331,9 +326,9 @@ public class TestContainerType extends TestAction {
             ctContainerTypeIds.remove(specimenTypeId);
             containerTypeSaveAction
                 .setChildContainerTypeIds(ctContainerTypeIds);
-            EXECUTOR.exec(containerTypeSaveAction);
+            exec(containerTypeSaveAction);
             containerTypeInfo =
-                EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+                exec(new ContainerTypeGetInfoAction(containerTypeId));
             Assert.assertEquals(ctContainerTypeIds,
                 getChildContainerTypeIds(containerTypeInfo));
         }
@@ -341,9 +336,9 @@ public class TestContainerType extends TestAction {
         // remove set2 all at once
         ctContainerTypeIds.removeAll(set2);
         containerTypeSaveAction.setChildContainerTypeIds(ctContainerTypeIds);
-        EXECUTOR.exec(containerTypeSaveAction);
+        exec(containerTypeSaveAction);
         containerTypeInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+            exec(new ContainerTypeGetInfoAction(containerTypeId));
         Assert.assertEquals(0, containerTypeInfo.getContainerType()
             .getChildContainerTypes().size());
     }
@@ -369,37 +364,37 @@ public class TestContainerType extends TestAction {
             ContainerTypeHelper.getSaveAction(
                 "HOTEL12", "H12", siteId, false, 12, 1,
                 getContainerLabelingSchemes().get("2 char numeric").getId(),
-                R.nextDouble());
-        Integer ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
+                getR().nextDouble());
+        Integer ctId = exec(hotelCtSaveAction).getId();
         ContainerTypeInfo containerTypeInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
+            exec(new ContainerTypeGetInfoAction(ctId));
         result.add(containerTypeInfo.getContainerType());
 
         hotelCtSaveAction =
             ContainerTypeHelper.getSaveAction(
                 "HOTEL13", "H13", siteId, false, 13, 1,
                 getContainerLabelingSchemes().get("2 char numeric").getId(),
-                R.nextDouble());
-        ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
-        containerTypeInfo = EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
+                getR().nextDouble());
+        ctId = exec(hotelCtSaveAction).getId();
+        containerTypeInfo = exec(new ContainerTypeGetInfoAction(ctId));
         result.add(containerTypeInfo.getContainerType());
 
         hotelCtSaveAction =
             ContainerTypeHelper.getSaveAction(
                 "HOTEL18", "H18", siteId, false, 18, 1,
                 getContainerLabelingSchemes().get("2 char numeric").getId(),
-                R.nextDouble());
-        ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
-        containerTypeInfo = EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
+                getR().nextDouble());
+        ctId = exec(hotelCtSaveAction).getId();
+        containerTypeInfo = exec(new ContainerTypeGetInfoAction(ctId));
         result.add(containerTypeInfo.getContainerType());
 
         hotelCtSaveAction =
             ContainerTypeHelper.getSaveAction(
                 "HOTEL19", "H19", siteId, false, 19, 1,
                 getContainerLabelingSchemes().get("2 char numeric").getId(),
-                R.nextDouble());
-        ctId = EXECUTOR.exec(hotelCtSaveAction).getId();
-        containerTypeInfo = EXECUTOR.exec(new ContainerTypeGetInfoAction(ctId));
+                getR().nextDouble());
+        ctId = exec(hotelCtSaveAction).getId();
+        containerTypeInfo = exec(new ContainerTypeGetInfoAction(ctId));
         result.add(containerTypeInfo.getContainerType());
 
         return result;
@@ -409,9 +404,9 @@ public class TestContainerType extends TestAction {
     public void comments() {
         // save with no comments
         Integer containerTypeId =
-            EXECUTOR.exec(containerTypeSaveAction).getId();
+            exec(containerTypeSaveAction).getId();
         ContainerTypeInfo containerTypeInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+            exec(new ContainerTypeGetInfoAction(containerTypeId));
         Assert.assertEquals(0, containerTypeInfo.getContainerType()
             .getComments().size());
 
@@ -433,7 +428,7 @@ public class TestContainerType extends TestAction {
 
     private Container createTypeWithContainer() {
         Integer containerTypeId =
-            EXECUTOR.exec(containerTypeSaveAction).getId();
+            exec(containerTypeSaveAction).getId();
 
         ContainerSaveAction containerSaveAction = new ContainerSaveAction();
         containerSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
@@ -441,9 +436,9 @@ public class TestContainerType extends TestAction {
         containerSaveAction.setLabel("01");
         containerSaveAction.setSiteId(siteId);
         containerSaveAction.setTypeId(containerTypeId);
-        Integer containerId = EXECUTOR.exec(containerSaveAction).getId();
+        Integer containerId = exec(containerSaveAction).getId();
         ContainerInfo containerInfo =
-            EXECUTOR.exec(new ContainerGetInfoAction(containerId));
+            exec(new ContainerGetInfoAction(containerId));
 
         return containerInfo.container;
     }
@@ -451,21 +446,21 @@ public class TestContainerType extends TestAction {
     private ContainerTypeInfo addComment(Integer containerTypeId) {
         ContainerTypeSaveAction containerTypeSaveAction =
             ContainerTypeHelper.getSaveAction(
-                EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId)));
+                exec(new ContainerTypeGetInfoAction(containerTypeId)));
         containerTypeSaveAction
             .setCommentMessage(Utils.getRandomString(20, 30));
-        EXECUTOR.exec(containerTypeSaveAction).getId();
-        return EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+        exec(containerTypeSaveAction).getId();
+        return exec(new ContainerTypeGetInfoAction(containerTypeId));
     }
 
     @Test
     public void delete() {
         // save with no comments
         Integer containerTypeId =
-            EXECUTOR.exec(containerTypeSaveAction).getId();
+            exec(containerTypeSaveAction).getId();
         ContainerTypeInfo containerTypeInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
-        EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeInfo
+            exec(new ContainerTypeGetInfoAction(containerTypeId));
+        exec(new ContainerTypeDeleteAction(containerTypeInfo
             .getContainerType()));
 
         // hql query for container type should return empty
@@ -487,18 +482,18 @@ public class TestContainerType extends TestAction {
         }
 
         containerTypeSaveAction.setChildContainerTypeIds(childContainerTypeIds);
-        Integer parentCtId = EXECUTOR.exec(containerTypeSaveAction).getId();
+        Integer parentCtId = exec(containerTypeSaveAction).getId();
         ContainerTypeInfo containerTypeInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(parentCtId));
+            exec(new ContainerTypeGetInfoAction(parentCtId));
         Integer childCtId =
             containerTypeInfo.getContainerType()
                 .getChildContainerTypes()
                 .iterator().next().getId();
 
         ContainerTypeInfo childCtInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(childCtId));
+            exec(new ContainerTypeGetInfoAction(childCtId));
         try {
-            EXECUTOR.exec(new ContainerTypeDeleteAction(childCtInfo
+            exec(new ContainerTypeDeleteAction(childCtInfo
                 .getContainerType()));
             Assert
                 .fail(
@@ -514,9 +509,9 @@ public class TestContainerType extends TestAction {
         Integer containerTypeId = container.getContainerType().getId();
 
         ContainerTypeInfo containerTypeInfo =
-            EXECUTOR.exec(new ContainerTypeGetInfoAction(containerTypeId));
+            exec(new ContainerTypeGetInfoAction(containerTypeId));
         try {
-            EXECUTOR.exec(new ContainerTypeDeleteAction(containerTypeInfo
+            exec(new ContainerTypeDeleteAction(containerTypeInfo
                 .getContainerType()));
             Assert
                 .fail(

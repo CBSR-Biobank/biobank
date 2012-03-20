@@ -44,28 +44,29 @@ public class TestShipment extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + R.nextInt();
+        name = testname.getMethodName() + getR().nextInt();
         studyId =
             StudyHelper
-                .createStudy(EXECUTOR, name, ActivityStatus.ACTIVE);
+                .createStudy(getExecutor(), name, ActivityStatus.ACTIVE);
         siteId =
-            SiteHelper.createSite(EXECUTOR, name + "1", "Edmonton",
+            SiteHelper.createSite(getExecutor(), name + "1", "Edmonton",
                 ActivityStatus.ACTIVE, new HashSet<Integer>(studyId));
         centerId =
-            SiteHelper.createSite(EXECUTOR, name + "2", "Calgary",
+            SiteHelper.createSite(getExecutor(), name + "2", "Calgary",
                 ActivityStatus.ACTIVE, new HashSet<Integer>(studyId));
         patientId =
-            EXECUTOR.exec(new PatientSaveAction(null, studyId, name,
+            exec(new PatientSaveAction(null, studyId, name,
                 Utils.getRandomDate(), null)).getId();
     }
 
     @Test
     public void saveWithSpecs() throws Exception {
         OriginInfoSaveInfo oisave =
-            OriginInfoHelper.createSaveOriginInfoSpecimenInfoRandom(EXECUTOR,
+            OriginInfoHelper.createSaveOriginInfoSpecimenInfoRandom(
+                getExecutor(),
                 patientId, siteId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
+            ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
 
         for (Integer spec : oisave.addedSpecIds) {
             Assert.assertTrue(((Specimen) session.load(Specimen.class, spec))
@@ -74,11 +75,11 @@ public class TestShipment extends TestAction {
         }
 
         Integer id =
-            EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+            exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
 
         ShipmentReadInfo info =
-            EXECUTOR.exec(new ShipmentGetInfoAction(id));
+            exec(new ShipmentGetInfoAction(id));
 
         Assert.assertTrue(info.originInfo.getCenter().getId()
             .equals(oisave.centerId));
@@ -102,11 +103,11 @@ public class TestShipment extends TestAction {
         oisave.removedSpecIds = oisave.addedSpecIds;
         oisave.addedSpecIds = new HashSet<Integer>();
         id =
-            EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+            exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
 
         info =
-            EXECUTOR.exec(new ShipmentGetInfoAction(id));
+            exec(new ShipmentGetInfoAction(id));
 
         Assert.assertTrue(info.specimens.size() == 0);
 
@@ -114,18 +115,18 @@ public class TestShipment extends TestAction {
 
         // Empty
         oisave.addedSpecIds = mut.getEmpty();
-        EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+        exec(new OriginInfoSaveAction(oisave, shipsave))
             .getId();
 
         // Null
         oisave.addedSpecIds = mut.getNull();
-        EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+        exec(new OriginInfoSaveAction(oisave, shipsave))
             .getId();
 
         // Set of null
         try {
             oisave.addedSpecIds = mut.getSetWithNull();
-            EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+            exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
             Assert.fail();
         } catch (ActionException e) {
@@ -135,7 +136,7 @@ public class TestShipment extends TestAction {
         // Out of Bounds
         try {
             oisave.addedSpecIds = mut.getOutOfBounds();
-            EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+            exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
             Assert.fail();
         } catch (ModelNotFoundException e) {
@@ -145,12 +146,13 @@ public class TestShipment extends TestAction {
     @Test
     public void testDelete() throws Exception {
         OriginInfoSaveInfo oisave =
-            OriginInfoHelper.createSaveOriginInfoSpecimenInfoRandom(EXECUTOR,
+            OriginInfoHelper.createSaveOriginInfoSpecimenInfoRandom(
+                getExecutor(),
                 patientId, siteId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
+            ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
         Integer id =
-            EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+            exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
 
         for (Integer spec : oisave.addedSpecIds) {
@@ -166,14 +168,14 @@ public class TestShipment extends TestAction {
                 .equals(siteId));
         }
 
-        ShipmentReadInfo info = EXECUTOR.exec(new ShipmentGetInfoAction(id));
-        SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        ShipmentReadInfo info = exec(new ShipmentGetInfoAction(id));
+        SiteInfo siteInfo = exec(new SiteGetInfoAction(siteId));
         OriginInfoDeleteAction action =
             new OriginInfoDeleteAction(info.originInfo, siteInfo.getSite());
-        EXECUTOR.exec(action);
+        exec(action);
 
         session.close();
-        session = SESSION_PROVIDER.openSession();
+        session = openSession();
 
         for (Integer spec : oisave.addedSpecIds) {
             Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
@@ -190,29 +192,30 @@ public class TestShipment extends TestAction {
     @Test
     public void testComment() throws Exception {
         OriginInfoSaveInfo oisave =
-            OriginInfoHelper.createSaveOriginInfoSpecimenInfoRandom(EXECUTOR,
+            OriginInfoHelper.createSaveOriginInfoSpecimenInfoRandom(
+                getExecutor(),
                 patientId, siteId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
+            ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
         Integer id =
-            EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+            exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
 
         oisave.oiId = id;
 
         ShipmentReadInfo info =
-            EXECUTOR.exec(new ShipmentGetInfoAction(id));
+            exec(new ShipmentGetInfoAction(id));
 
         Assert.assertEquals(1, info.originInfo.getComments().size());
-        EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+        exec(new OriginInfoSaveAction(oisave, shipsave))
             .getId();
         info =
-            EXECUTOR.exec(new ShipmentGetInfoAction(id));
+            exec(new ShipmentGetInfoAction(id));
         Assert.assertEquals(2, info.originInfo.getComments().size());
-        EXECUTOR.exec(new OriginInfoSaveAction(oisave, shipsave))
+        exec(new OriginInfoSaveAction(oisave, shipsave))
             .getId();
         info =
-            EXECUTOR.exec(new ShipmentGetInfoAction(id));
+            exec(new ShipmentGetInfoAction(id));
         Assert.assertEquals(3, info.originInfo.getComments().size());
     }
 }
