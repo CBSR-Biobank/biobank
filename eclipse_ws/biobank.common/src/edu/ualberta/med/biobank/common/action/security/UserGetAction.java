@@ -12,10 +12,10 @@ public class UserGetAction implements Action<SimpleResult<User>> {
     private static final long serialVersionUID = 1L;
     private static final Permission PERMISSION = new UserManagerPermission();
 
-    private Integer userId;
+    private final UserGetInput input;
 
-    public UserGetAction(User user, User manager) {
-        this.userId = user.getId();
+    public UserGetAction(UserGetInput input) {
+        this.input = input;
     }
 
     @Override
@@ -25,7 +25,7 @@ public class UserGetAction implements Action<SimpleResult<User>> {
 
     @Override
     public SimpleResult<User> run(ActionContext context) throws ActionException {
-        User user = context.load(User.class, userId);
+        User user = context.load(User.class, input.getUserId());
 
         User dto = new User();
         

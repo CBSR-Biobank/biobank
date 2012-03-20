@@ -28,14 +28,14 @@ import edu.ualberta.med.biobank.util.SetDiff;
 import edu.ualberta.med.biobank.util.SetDiff.Pair;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class UserSmartSaveAction implements Action<IdResult> {
+public class UserSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
     private static final Permission PERMISSION = new UserManagerPermission();
 
-    private final UserSaveData data;
+    private final UserSaveInput input;
 
-    public UserSmartSaveAction(UserSaveData data) {
-        this.data = data;
+    public UserSaveAction(UserSaveInput input) {
+        this.input = input;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class UserSmartSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        User user = context.load(User.class, data.getUserId());
+        User user = context.load(User.class, input.getUserId());
 
         createCsmUser(context, user);
 
@@ -62,7 +62,7 @@ public class UserSmartSaveAction implements Action<IdResult> {
         if (user.isNew()) return;
         if (user.getCsmUserId() != null) return;
         try {
-            String password = data.getPassword();
+            String password = input.getPassword();
             Long csmUserId = BiobankCSMSecurityUtil.persistUser(user, password);
             user.setCsmUserId(csmUserId);
 
@@ -76,17 +76,17 @@ public class UserSmartSaveAction implements Action<IdResult> {
     private void setProperties(ActionContext context, User user) {
         User executingUser = context.getUser();
         // whether the manager _could_ have modified the user properties
-        if (user.isFullyManageable(data.getContext().getManager())
+        if (user.isFullyManageable(input.getContext().getManager())
             // whether the manager (executing user) _still_ can
             && user.isFullyManageable(executingUser)) {
 
-            user.setLogin(data.getLogin());
-            user.setEmail(data.getEmail());
-            user.setFullName(data.getFullName());
-            user.setNeedPwdChange(data.isNeedPwdChange());
-            user.setRecvBulkEmails(data.isRecvBulkEmails());
+            user.setLogin(input.getLogin());
+            user.setEmail(input.getEmail());
+            user.setFullName(input.getFullName());
+            user.setNeedPwdChange(input.isNeedPwdChange());
+            user.setRecvBulkEmails(input.isRecvBulkEmails());
 
-            String newPw = data.getPassword();
+            String newPw = input.getPassword();
             if (!user.isNew() && newPw != null) {
                 try {
                     String login = user.getLogin();
@@ -136,9 +136,9 @@ public class UserSmartSaveAction implements Action<IdResult> {
     private void mergeMemberships(ActionContext context,
         Set<Pair<MembershipDomain>> conflicts) {
         User executingUser = context.getUser();
-        User manager = data.getContext().getManager();
+        User manager = input.getContext().getManager();
 
-        Set<Integer> contextRoleIds = data.getContext().getRoleIds();
+        Set<Integer> contextRoleIds = input.getContext().getRoleIds();
         Map<Integer, Role> rolesMap = context.load(Role.class, contextRoleIds);
         Set<Role> awareOfRoles = new HashSet<Role>(rolesMap.values());
 
@@ -190,7 +190,7 @@ public class UserSmartSaveAction implements Action<IdResult> {
 
     private SetDiff<MembershipDomain> diffMemberships(User user) {
         final Set<MembershipDomain> oldDomains, newDomains;
-        oldDomains = MembershipDomain.from(data.getMemberships());
+        oldDomains = MembershipDomain.from(input.getMemberships());
         newDomains = MembershipDomain.from(user.getMemberships());
         return new SetDiff<MembershipDomain>(oldDomains, newDomains);
     }
@@ -198,8 +198,8 @@ public class UserSmartSaveAction implements Action<IdResult> {
     private void setGroups(ActionContext context, User user) {
         User executingUser = context.getUser();
 
-        Set<Integer> groupIds = data.getGroupIds();
-        Set<Integer> awareOfGroupIds = data.getContext().getGroupIds();
+        Set<Integer> groupIds = input.getGroupIds();
+        Set<Integer> awareOfGroupIds = input.getContext().getGroupIds();
 
         if (!awareOfGroupIds.containsAll(groupIds)) {
             // TODO: better exception

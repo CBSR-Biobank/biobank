@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.action.security;
 
+import java.util.Collections;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.model.Group;
@@ -8,6 +9,12 @@ import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.util.IdUtil;
 
 /**
+ * Used by {@link UserGetInput} and {@link UserSaveInput} so that the context
+ * between getting {@link User} data and saving that data remains constant,
+ * preventing assumptions to be made about potentially missing data. This is to
+ * avoid problems where the {@link Role}-s, {@link Group}-s, or the manager's
+ * power change from getting information to saving it. If power did change,
+ * accidental modifications would likely occur.
  * 
  * @author Jonathan Ferland
  */
@@ -35,8 +42,8 @@ public class ManagerContext {
      */
     public ManagerContext(User manager, Set<Role> roles, Set<Group> groups) {
         this.manager = manager;
-        this.roleIds = IdUtil.getIds(roles);
-        this.groupIds = IdUtil.getIds(groups);
+        this.roleIds = Collections.unmodifiableSet(IdUtil.getIds(roles));
+        this.groupIds = Collections.unmodifiableSet(IdUtil.getIds(groups));
     }
 
     public User getManager() {

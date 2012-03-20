@@ -7,7 +7,7 @@ import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.util.IdUtil;
 
-public class UserSaveData {
+public class UserSaveInput {
     private final Integer userId;
     private final String login;
     private final String password = null; // TODO: get this, use hash?
@@ -19,7 +19,7 @@ public class UserSaveData {
     private final Set<Integer> groupIds;
     private final ManagerContext context;
 
-    public UserSaveData(User user, ManagerContext context) {
+    public UserSaveInput(User user, ManagerContext context) {
         this.userId = user.getId();
 
         this.login = user.getLogin();
