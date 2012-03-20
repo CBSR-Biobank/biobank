@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
+@SuppressWarnings({ "unused", "deprecation" })
 @Deprecated
 public class SpecimenHelper extends DbHelper {
 

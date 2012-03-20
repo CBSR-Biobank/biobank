@@ -56,6 +56,7 @@ public class SpecimenPosition extends AbstractPosition {
             : null;
     }
 
+    @SuppressWarnings("unused")
     void setContainerType(ContainerType containerType) {
     }
 
@@ -98,6 +99,7 @@ public class SpecimenPosition extends AbstractPosition {
             : null;
     }
 
+    @SuppressWarnings("unused")
     void setSpecimenType(SpecimenType specimenType) {
     }
 

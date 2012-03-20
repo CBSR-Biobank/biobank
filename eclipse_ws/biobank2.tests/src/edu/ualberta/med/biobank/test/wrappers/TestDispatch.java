@@ -349,7 +349,6 @@ public class TestDispatch extends TestDatabase {
         return spcs;
     }
 
-    @SuppressWarnings("unused")
     @Test
     public void testGetSetSpecimenCollection() throws Exception {
         String name = "testGetSetSpecimenCollection" + r.nextInt();

@@ -79,6 +79,7 @@ public abstract class AbstractAdministrationView extends
 
     protected abstract String getTreeTextToolTip();
 
+    @SuppressWarnings("unused")
     protected void createTreeTextOptions(Composite parent) {
         // default do nothing
     }

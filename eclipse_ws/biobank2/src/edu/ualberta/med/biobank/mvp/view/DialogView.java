@@ -9,6 +9,7 @@ public class DialogView {
     private TitleAreaDialog dialog;
 
     // TODO: separate open() method for DialogView?
+    @SuppressWarnings("unused")
     public void create(Composite parent) {
         dialog = new Dialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell());

@@ -47,7 +47,6 @@ import edu.ualberta.med.biobank.widgets.infotables.entry.NewSpecimenEntryInfoTab
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SpecimenEntryWidget extends BgcBaseWidget {
     private List<SpecimenInfo> specimens;
@@ -84,8 +83,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
     }
 
     public SpecimenEntryWidget(Composite parent, int style,
-        FormToolkit toolkit, WritableApplicationService appService,
-        boolean editable) {
+        FormToolkit toolkit, boolean editable) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null"); //$NON-NLS-1$
         this.editable = editable;

@@ -65,8 +65,8 @@ public class TestDispatch extends TestAction {
     public void saveWithSpecs() throws Exception {
 
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
-                centerId, DispatchState.CREATION.getId(),
+            DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
+                DispatchState.CREATION.getId(),
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
@@ -137,8 +137,8 @@ public class TestDispatch extends TestAction {
     @Test
     public void testStateChange() throws Exception {
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
-                centerId, DispatchState.CREATION.getId(),
+            DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
+                DispatchState.CREATION.getId(),
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
@@ -182,8 +182,8 @@ public class TestDispatch extends TestAction {
     @Test
     public void testDelete() throws Exception {
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
-                centerId, DispatchState.IN_TRANSIT.getId(),
+            DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
+                DispatchState.IN_TRANSIT.getId(),
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
@@ -212,8 +212,8 @@ public class TestDispatch extends TestAction {
     public void testComment() throws Exception {
 
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(EXECUTOR, siteId,
-                centerId, DispatchState.IN_TRANSIT.getId(),
+            DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
+                DispatchState.IN_TRANSIT.getId(),
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,

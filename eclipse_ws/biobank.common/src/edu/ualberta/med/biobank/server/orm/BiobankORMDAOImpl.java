@@ -47,6 +47,7 @@ import org.springframework.orm.hibernate3.HibernateCallback;
  * See build.properties of the sdk for the generator configuration +
  * application-config*.xml for the generated files.
  */
+@SuppressWarnings("unused")
 public class BiobankORMDAOImpl extends WritableORMDAOImpl {
     private static AtomicInteger nextHandleId = new AtomicInteger(0);
     private static final HashMap<QueryHandle, QueryProcess> queryMap =

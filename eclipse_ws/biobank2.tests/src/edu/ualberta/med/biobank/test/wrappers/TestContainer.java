@@ -51,6 +51,7 @@ import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
+@SuppressWarnings({ "unused", "deprecation" })
 @Deprecated
 public class TestContainer extends TestDatabase {
 
@@ -1331,7 +1332,6 @@ public class TestContainer extends TestDatabase {
         }
     }
 
-    @SuppressWarnings("unused")
     @Test
     public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();

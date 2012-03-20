@@ -79,7 +79,6 @@ import org.eclipse.swt.widgets.Widget;
  * 
  */
 
-@SuppressWarnings("unused")
 public class TableCombo extends Composite {
     private Shell popup;
     private Button arrow;

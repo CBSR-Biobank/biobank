@@ -202,6 +202,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         // default does nothing
     }
 
+    @SuppressWarnings("unused")
     protected void afterScanAndProcess(Integer rowToProcess) {
         // default does nothing
     }
@@ -373,6 +374,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         widgetCreator.setBinding(PLATE_VALIDATOR, show && needPlate());
     }
 
+    @SuppressWarnings("unused")
     protected void createFakeOptions(Composite fieldsComposite) {
         // default does nothing
     }
@@ -547,6 +549,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         scanTubeAloneSwitch.setVisible(false);
     }
 
+    @SuppressWarnings("unused")
     protected void showScanTubeAloneSwitch(boolean show) {
         // FIXME: see issue #1230. deactivate this button until the users say we
         // can really remove it
@@ -627,6 +630,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             && currentScanState != UICellStatus.ERROR);
     }
 
+    @SuppressWarnings("unused")
     protected void processCellResult(RowColPos rcp, PalletCell palletCell) {
         // nothing done by default
     }

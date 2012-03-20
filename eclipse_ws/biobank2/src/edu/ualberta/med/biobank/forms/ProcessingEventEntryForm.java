@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.loggers.ProcessingEventLogProvider;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -72,22 +71,15 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     private CommentsInfoTable commentEntryTable;
 
-    private BgcEntryFormWidgetListener listener =
-        new BgcEntryFormWidgetListener() {
-            @Override
-            public void selectionChanged(MultiSelectEvent event) {
-                setDirty(true);
-            }
-        };
-
     private ProcessingEventWrapper pevent = new ProcessingEventWrapper(
         SessionManager.getAppService());
 
     private CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
-    private ProcessingEventLogProvider logProvider =
-        new ProcessingEventLogProvider();
+    // FIXME: this action should be logged in the user actions log
+    // private ProcessingEventLogProvider logProvider =
+    // new ProcessingEventLogProvider();
 
     private List<SpecimenInfo> specimens;
 
@@ -228,8 +220,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         specimenEntryWidget =
-            new SpecimenEntryWidget(client, SWT.NONE, toolkit,
-                SessionManager.getAppService(), true);
+            new SpecimenEntryWidget(client, SWT.NONE, toolkit, true);
         specimenEntryWidget
             .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
                 @Override

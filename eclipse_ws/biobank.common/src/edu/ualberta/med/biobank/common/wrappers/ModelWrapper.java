@@ -39,6 +39,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
 
+@SuppressWarnings("unused")
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     final Map<Property<?, ?>, Object> propertyCache =
         new HashMap<Property<?, ?>, Object>();

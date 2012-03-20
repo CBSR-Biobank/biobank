@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,7 +35,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -92,8 +90,7 @@ public class DispatchViewForm extends BiobankViewForm {
             DispatchReadInfo read =
                 SessionManager.getAppService().doAction(
                     new DispatchGetInfoAction(adapter.getId()));
-            read.dispatch
-                .setDispatchSpecimens((Set<DispatchSpecimen>) read.specimens);
+            read.dispatch.setDispatchSpecimens(read.specimens);
             dispatch.setWrappedObject(read.dispatch);
             SessionManager.logLookup(read.dispatch);
         }

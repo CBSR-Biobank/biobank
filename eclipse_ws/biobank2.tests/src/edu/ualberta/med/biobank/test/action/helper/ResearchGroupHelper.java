@@ -9,13 +9,13 @@ import edu.ualberta.med.biobank.test.action.LocalActionExecutor;
 public class ResearchGroupHelper extends Helper {
 
     public static Integer createResearchGroup(
-        LocalActionExecutor actionExecutor,
-        String name, String nameShort, Integer studyId) throws Exception {
+        LocalActionExecutor actionExecutor, String name, String nameShort,
+        Integer studyId) throws Exception {
         AddressSaveInfo addressSaveInfo =
             new AddressSaveInfo(null, "test", "test", "test", "test", "test",
                 "test", "test", "test", "test");
         ResearchGroupSaveInfo save =
-            new ResearchGroupSaveInfo(null, name + "rg", name + "rg",
+            new ResearchGroupSaveInfo(null, name + "rg", nameShort + "rg",
                 studyId, "comment", addressSaveInfo,
                 ActivityStatus.ACTIVE);
         ResearchGroupSaveAction rgSave = new ResearchGroupSaveAction(save);

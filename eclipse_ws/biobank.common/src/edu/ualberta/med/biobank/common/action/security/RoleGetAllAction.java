@@ -24,10 +24,8 @@ public class RoleGetAllAction implements Action<ListResult<Role>> {
     @Override
     public ListResult<Role> run(ActionContext context) throws ActionException {
         @SuppressWarnings("unchecked")
-        List<Role> roles = (List<Role>) context.getSession()
-            .createCriteria(Role.class)
-            .setFetchMode("permissions", FetchMode.JOIN)
-            .list();
+        List<Role> roles = context.getSession().createCriteria(Role.class)
+            .setFetchMode("permissions", FetchMode.JOIN).list();
 
         return new ListResult<Role>(roles);
     }

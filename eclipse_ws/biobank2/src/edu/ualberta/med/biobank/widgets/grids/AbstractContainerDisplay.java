@@ -76,6 +76,7 @@ public abstract class AbstractContainerDisplay {
      * Get the text to write inside the cell. This default implementation use
      * the cell position and the containerType.
      */
+    @SuppressWarnings("unused")
     protected String getDefaultTextForBox(
         Map<RowColPos, ? extends AbstractUICell> cells,
         int indexRow, int indexCol) {
@@ -90,6 +91,7 @@ public abstract class AbstractContainerDisplay {
         return ""; //$NON-NLS-1$
     }
 
+    @SuppressWarnings("unused")
     public void setStorageSize(int rows, int columns) {
         //
     }

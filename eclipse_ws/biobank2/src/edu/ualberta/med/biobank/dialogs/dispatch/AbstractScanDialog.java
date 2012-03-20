@@ -211,10 +211,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         }
     }
 
+    @SuppressWarnings("unused")
     protected void specificScanPosProcess(PalletCell palletCell) {
         // default do nothing
     }
 
+    @SuppressWarnings("unused")
     protected boolean checkBeforeProcessing(CenterWrapper<?> currentCenter)
         throws Exception {
         return true;
@@ -284,6 +286,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
     }
 
+    @SuppressWarnings("unused")
     protected void createCustomDialogPreContents(Composite parent) {
         // default does nothing
     }

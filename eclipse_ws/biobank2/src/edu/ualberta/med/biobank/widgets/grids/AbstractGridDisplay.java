@@ -153,12 +153,14 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
     }
 
+    @SuppressWarnings("unused")
     protected Color getDefaultBackgroundColor(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
         int indexRow, int indexCol) {
         return UICellStatus.EMPTY.getColor();
     }
 
+    @SuppressWarnings("unused")
     protected String getTopTextForBox(
         Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
         int indexCol) {
@@ -171,6 +173,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         return getDefaultTextForBox(cells, indexRow, indexCol);
     }
 
+    @SuppressWarnings("unused")
     protected String getBottomTextForBox(
         Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
         int indexCol) {

@@ -26,6 +26,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
      * @deprecated use {@link Membership#setRank(Rank)} with
      *             {@link Rank#ADMINISTRATOR} instead.
      */
+    @Deprecated
     ADMINISTRATION(1),
 
     SPECIMEN_CREATE(2),
@@ -93,6 +94,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
      * @deprecated use {@link Membership#setRank(Rank)} with
      *             {@link Rank#USER_MANAGER} instead.
      */
+    @Deprecated
     USER_MANAGEMENT(51),
 
     CONTAINER_TYPE_CREATE(52),

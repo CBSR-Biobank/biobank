@@ -56,7 +56,7 @@ public class DispatchRetrievalAction implements Action<ListResult<Dispatch>> {
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         return PermissionEnum.DISPATCH_READ.isAllowed(context.getUser(),
-            (Center) context.load(Center.class, centerId));
+            context.load(Center.class, centerId));
     }
 
     @Override
