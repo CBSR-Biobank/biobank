@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.action.processingEvent;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -78,10 +77,10 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         peventToSave.setCreatedAt(createdAt);
         peventToSave.setWorksheet(worksheet);
 
-        Map<Integer, Specimen> specimens =
+        Set<Specimen> specimens =
             context.load(Specimen.class, specimenIds);
         SetDifference<Specimen> specimensDiff = new SetDifference<Specimen>(
-            peventToSave.getSpecimens(), specimens.values());
+            peventToSave.getSpecimens(), specimens);
         peventToSave.setSpecimens(specimensDiff.getNewSet());
 
         // set processing event on added specimens

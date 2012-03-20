@@ -37,7 +37,7 @@ public class GroupSaveAction implements Action<IdResult> {
     }
 
     private void saveUsers(ActionContext context) {
-        Map<Integer, User> users = context.load(User.class, userIds);
+        Set<User> users = context.load(User.class, userIds);
 
         // TODO: localise and parameterise the exception message
         if (!group.isFullyManageable(context.getUser()))
@@ -45,8 +45,7 @@ public class GroupSaveAction implements Action<IdResult> {
                 "you do not have adequate permissions to modify this group");
 
         SetDifference<User> usersDiff =
-            new SetDifference<User>(group.getUsers(),
-                users.values());
+            new SetDifference<User>(group.getUsers(), users);
         group.setUsers(usersDiff.getNewSet());
 
         // remove this group from users in removed list

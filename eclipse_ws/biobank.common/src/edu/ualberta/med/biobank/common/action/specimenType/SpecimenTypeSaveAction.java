@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.action.specimenType;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -73,11 +72,11 @@ public class SpecimenTypeSaveAction implements Action<IdResult> {
     }
 
     private void saveChildSpecimenTypes(ActionContext context) {
-        Map<Integer, SpecimenType> studies =
+        Set<SpecimenType> studies =
             context.load(SpecimenType.class, childSpecimenTypeIds);
         SetDifference<SpecimenType> sitesDiff =
             new SetDifference<SpecimenType>(
-                specimenType.getChildSpecimenTypes(), studies.values());
+                specimenType.getChildSpecimenTypes(), studies);
         specimenType.setChildSpecimenTypes(sitesDiff.getNewSet());
         for (SpecimenType childType : sitesDiff.getRemoveSet()) {
             context.getSession().delete(childType);

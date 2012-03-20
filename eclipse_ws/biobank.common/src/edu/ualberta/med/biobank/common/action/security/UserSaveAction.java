@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.common.action.security;
 
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.transaction.Synchronization;
@@ -204,21 +202,18 @@ public class UserSaveAction implements Action<IdResult> {
 
         if (!contextGroups.containsAll(input.getGroupIds())) {
             // TODO: better exception
-            throw new ActionException("");
+            throw new ActionException("found groups out of context");
         }
 
         // add or remove every Group in the context
-        Map<Integer, Group> groups = context.load(Group.class, contextGroupIds);
-        for (Entry<Integer, Group> entry : groups.entrySet()) {
-            Integer groupId = entry.getKey();
-            Group group = entry.getValue();
-
+        Set<Group> groups = context.load(Group.class, contextGroupIds);
+        for (Group group : groups) {
             if (!group.isFullyManageable(executingUser)) {
                 // TODO: throw exception
-                throw new ActionException("");
+                throw new ActionException("modifying unmanageable group");
             }
 
-            if (input.getGroupIds().contains(groupId)) {
+            if (input.getGroupIds().contains(group.getId())) {
                 user.getGroups().add(group);
             } else {
                 user.getGroups().remove(group);

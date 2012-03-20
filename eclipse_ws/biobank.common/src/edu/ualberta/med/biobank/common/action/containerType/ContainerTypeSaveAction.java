@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.action.containerType;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -178,17 +177,15 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
 
     private void setSpecimenTypes(ActionContext context,
         ContainerType containerType) {
-        Map<Integer, SpecimenType> specimenTypes =
+        Set<SpecimenType> specimenTypes =
             context.load(SpecimenType.class, specimenTypeIds);
-        containerType.setSpecimenTypes(new HashSet<SpecimenType>(
-            specimenTypes.values()));
+        containerType.setSpecimenTypes(specimenTypes);
     }
 
     private void setChildContainerTypes(ActionContext context,
         ContainerType containerType) {
-        Map<Integer, ContainerType> childContainerTypes =
+        Set<ContainerType> childContainerTypes =
             context.load(ContainerType.class, childContainerTypeIds);
-        containerType.setChildContainerTypes(
-            new HashSet<ContainerType>(childContainerTypes.values()));
+        containerType.setChildContainerTypes(childContainerTypes);
     }
 }
