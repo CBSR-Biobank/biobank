@@ -320,7 +320,7 @@ public class Membership extends AbstractBiobankModel {
     public boolean isManageable(Membership that) {
         if (equals(that)) return false;
 
-        if (that.getPermissions().isEmpty()
+        if (that.getAllPermissions().isEmpty()
             && that.getRoles().isEmpty()) return false;
 
         if (that.getRank().isLt(Rank.MANAGER)) return false;
