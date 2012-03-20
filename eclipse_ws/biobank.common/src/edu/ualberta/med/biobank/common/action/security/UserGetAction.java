@@ -1,24 +1,20 @@
 package edu.ualberta.med.biobank.common.action.security;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
+import edu.ualberta.med.biobank.common.action.SimpleResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
-import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
 
-public class UserGetAction implements Action<ManagedUser> {
+public class UserGetAction implements Action<SimpleResult<User>> {
     private static final long serialVersionUID = 1L;
     private static final Permission PERMISSION = new UserManagerPermission();
 
     private Integer userId;
 
-    public UserGetAction(User user) {
+    public UserGetAction(User user, User manager) {
         this.userId = user.getId();
     }
 
@@ -28,16 +24,18 @@ public class UserGetAction implements Action<ManagedUser> {
     }
 
     @Override
-    public ManagedUser run(ActionContext context) throws ActionException {
+    public SimpleResult<User> run(ActionContext context) throws ActionException {
         User user = context.load(User.class, userId);
 
-        @SuppressWarnings("unchecked")
-        Set<Role> allRoles = new HashSet<Role>((List<Role>) context
-            .getSession().createCriteria(Role.class).list());
+        User dto = new User();
+        
+        dto.setId(user.getId());
+        dto.setLogin(user.getLogin());
+        dto.setFullName(user.getFullName());
+        dto.setEmail(user.getEmail());
+        dto.setNeedPwdChange(user.getNeedPwdChange());
+        dto.setRecvBulkEmails(user.getRecvBulkEmails());
 
-        // ManagedUser managedUser =
-        // new ManagedUser(user, context.getUser(), allRoles);
-
-        return null;
+        return SimpleResult.of(dto);
     }
 }
