@@ -11,7 +11,7 @@ public class GlobalAdminPermission implements Permission {
     @Override
     public boolean isAllowed(ActionContext context) {
         User user = context.getUser();
-        for (Membership membership : user.getMemberships()) {
+        for (Membership membership : user.getAllMemberships()) {
             boolean isAdmin = membership.isRankGe(Rank.ADMINISTRATOR);
             boolean isGlobal = membership.isGlobal();
             if (isAdmin && isGlobal) return true;
