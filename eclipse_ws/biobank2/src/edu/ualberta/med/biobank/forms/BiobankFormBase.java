@@ -171,6 +171,7 @@ public abstract class BiobankFormBase extends BgcFormBase {
         addSectionToolbar(section, tooltip, listener, wrapperTypeToAdd, null);
     }
 
+    @SuppressWarnings("unused")
     protected void addSectionToolbar(Section section, String tooltip,
         SelectionListener listener, Class<?> wrapperTypeToAdd, String imageKey) {
         ((WidgetCreator) widgetCreator).addSectionToolbar(section, tooltip,
