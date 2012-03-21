@@ -435,7 +435,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.EditShippingMethodsHandler"
+            class="edu.ualberta.med.biobank.handlers.ShippingMethodsEditHandler"
             commandId="edu.ualberta.med.biobank.commands.editShippingMethods">
          <activeWhen>
             <and>

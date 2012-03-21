@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.permission.shipment.ShippingMethodPermission;
+import edu.ualberta.med.biobank.common.permission.GlobalAdminPermission;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 
 public class ShippingMethodDeleteAction implements Action<EmptyResult> {
@@ -21,7 +21,7 @@ public class ShippingMethodDeleteAction implements Action<EmptyResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ShippingMethodPermission().isAllowed(context);
+        return new GlobalAdminPermission().isAllowed(context);
     }
 
     @Override

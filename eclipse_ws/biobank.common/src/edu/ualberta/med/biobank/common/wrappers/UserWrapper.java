@@ -120,6 +120,7 @@ public class UserWrapper extends UserBaseWrapper {
             + users.size() + " results."); //$NON-NLS-1$
     }
 
+    @Deprecated
     public boolean isInSuperAdminMode() {
         return inSuperAdminMode;
     }

@@ -9,7 +9,6 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.permission.shipment.ShippingMethodPermission;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 
 public class ShippingMethodGetInfoAction implements
@@ -21,7 +20,8 @@ public class ShippingMethodGetInfoAction implements
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ShippingMethodPermission().isAllowed(context);
+        // all users are allowed to get the shipping methods
+        return true;
     }
 
     @Override
