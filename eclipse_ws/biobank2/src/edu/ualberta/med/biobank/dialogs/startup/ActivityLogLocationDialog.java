@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.dialogs.startup;
 import java.io.File;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -59,8 +60,8 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         activityLogDirBtn = new Button(contents, SWT.CHECK);
-        activityLogDirBtn
-            .setText(Messages.ActivityLogLocationDialog_button_save_label);
+        activityLogDirBtn.setText(
+            Messages.ActivityLogLocationDialog_button_save_label);
         activityLogDirBtn.setSelection(true);
         activityLogDirBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -77,7 +78,8 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
 
     private void createFileLocationSelector(final Composite parent,
         String labelText) {
-        final Composite fileSelectionComposite = new Composite(parent, SWT.NONE);
+        final Composite fileSelectionComposite =
+            new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(3, false);
         fileSelectionComposite.setLayout(layout);
         fileSelectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
@@ -117,41 +119,29 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
 
     @Override
     protected void okPressed() {
+        IPreferenceStore pstore =
+            BiobankPlugin.getDefault().getPreferenceStore();
 
         String activityLogDir = activityLogDirText.getText();
 
         if (activityLogDirBtn.getSelection()) {
-
             File activityLogDirFile = new File(activityLogDir);
 
             if (!FilePromptUtil.isWritableDir(activityLogDirFile)) {
                 return;
             }
 
-            BiobankPlugin
-                .getDefault()
-                .getPreferenceStore()
-                .setValue(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
-                    activityLogDir.toString());
-            BiobankPlugin
-                .getDefault()
-                .getPreferenceStore()
-                .setValue(
-                    PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE,
-                    true);
+            pstore.setValue(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
+                activityLogDir.toString());
+            pstore.setValue(
+                PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE, true);
             super.okPressed();
 
         } else { /* don't save to a log file */
-            BiobankPlugin
-                .getDefault()
-                .getPreferenceStore()
-                .setValue(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, ""); //$NON-NLS-1$
-            BiobankPlugin
-                .getDefault()
-                .getPreferenceStore()
-                .setValue(
-                    PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE,
-                    false);
+            pstore.setValue(
+                PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, ""); //$NON-NLS-1$
+            pstore.setValue(
+                PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE, false);
             super.okPressed();
         }
 

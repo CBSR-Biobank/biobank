@@ -7,14 +7,14 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.shipment.ShippingMethodPermission;
+import edu.ualberta.med.biobank.common.permission.GlobalAdminPermission;
 import edu.ualberta.med.biobank.forms.ShippingMethodViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class EditShippingMethodsHandler extends AbstractHandler {
+public class ShippingMethodsEditHandler extends AbstractHandler {
     public static final String ID =
         "edu.ualberta.med.biobank.commands.editShipmentMethods"; //$NON-NLS-1$
     private Boolean createAllowed;
@@ -44,10 +44,9 @@ public class EditShippingMethodsHandler extends AbstractHandler {
         try {
             if (createAllowed == null)
                 createAllowed = SessionManager.getAppService().isAllowed(
-                    new ShippingMethodPermission());
-            return SessionManager.getUser().isInSuperAdminMode()
-                && createAllowed
-                && (SessionManager.getInstance().getSession() != null);
+                    new GlobalAdminPermission());
+            return (createAllowed
+            && (SessionManager.getInstance().getSession() != null));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
             return false;

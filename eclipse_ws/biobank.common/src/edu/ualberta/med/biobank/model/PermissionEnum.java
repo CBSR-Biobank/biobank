@@ -22,13 +22,6 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
  * 
  */
 public enum PermissionEnum implements NotAProxy, Serializable {
-    /**
-     * @deprecated use {@link Membership#setRank(Rank)} with
-     *             {@link Rank#ADMINISTRATOR} instead.
-     */
-    @Deprecated
-    ADMINISTRATION(1),
-
     SPECIMEN_CREATE(2),
     SPECIMEN_READ(3),
     SPECIMEN_UPDATE(4),
@@ -90,13 +83,6 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     CLINIC_UPDATE(49),
     CLINIC_DELETE(50),
 
-    /**
-     * @deprecated use {@link Membership#setRank(Rank)} with
-     *             {@link Rank#USER_MANAGER} instead.
-     */
-    @Deprecated
-    USER_MANAGEMENT(51),
-
     CONTAINER_TYPE_CREATE(52),
     CONTAINER_TYPE_READ(53),
     CONTAINER_TYPE_UPDATE(54),
@@ -127,6 +113,12 @@ public enum PermissionEnum implements NotAProxy, Serializable {
             new HashMap<Integer, PermissionEnum>();
 
         for (PermissionEnum permissionEnum : values()) {
+            PermissionEnum check = map.get(permissionEnum.getId());
+            if (check != null) {
+                throw new RuntimeException("permission enum value "
+                    + permissionEnum.getId() + " used multiple times");
+            }
+
             map.put(permissionEnum.getId(), permissionEnum);
         }
 

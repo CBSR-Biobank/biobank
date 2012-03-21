@@ -138,12 +138,15 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     private boolean initWithProduct = false;
 
+    public SpecimenAssignEntryForm() {
+        currentMultipleContainer = new ContainerWrapper(
+            SessionManager.getAppService());
+    }
+
     @Override
     protected void init() throws Exception {
         super.init();
         setCanLaunchScan(true);
-        currentMultipleContainer = new ContainerWrapper(
-            SessionManager.getAppService());
         initPalletValues();
     }
 

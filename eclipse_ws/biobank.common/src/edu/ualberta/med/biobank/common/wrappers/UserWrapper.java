@@ -8,6 +8,7 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
+import edu.ualberta.med.biobank.common.permission.GlobalAdminPermission;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.actions.DeleteCsmUserAction;
 import edu.ualberta.med.biobank.common.wrappers.actions.PersistCsmUserAction;
@@ -143,14 +144,12 @@ public class UserWrapper extends UserBaseWrapper {
     }
 
     public boolean isSuperAdmin() {
-        // try {
-        // return super.hasPrivilegeOnKeyDesc(
-        // PrivilegeWrapper.getAllowedPrivilege(appService), null, null,
-        // ADMIN_KEY_DESC);
-        // } catch (Exception e) {
-        // throw new RuntimeException(e);
-        // }
-        return true;
+        try {
+            return ((BiobankApplicationService) appService).isAllowed(
+                new GlobalAdminPermission());
+        } catch (ApplicationException e) {
+            return false;
+        }
     }
 
     public boolean needChangePassword() {
