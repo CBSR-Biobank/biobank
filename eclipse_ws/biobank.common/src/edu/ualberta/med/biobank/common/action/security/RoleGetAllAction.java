@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.hibernate.Criteria;
-
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -34,7 +32,6 @@ public class RoleGetAllAction implements Action<RoleGetAllOutput> {
         @SuppressWarnings("unchecked")
         List<Role> results = (List<Role>) context.getSession()
             .createCriteria(Role.class)
-            .createAlias("permissions", "p", Criteria.LEFT_JOIN)
             .list();
 
         SortedSet<Role> roles = new TreeSet<Role>(Role.NAME_COMPARATOR);
