@@ -100,11 +100,9 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
         if (pos != null) {
             Container container = pos.getContainer();
             while (container != null) {
-                if (container != null) {
-                    container.getContainerType().getChildLabelingScheme()
-                        .getName();
-                    container.getContainerType().getCapacity().getRowCapacity();
-                }
+                container.getContainerType().getChildLabelingScheme()
+                    .getName();
+                container.getContainerType().getCapacity().getRowCapacity();
                 parents.push(container);
                 container = container.getParentContainer();
             }

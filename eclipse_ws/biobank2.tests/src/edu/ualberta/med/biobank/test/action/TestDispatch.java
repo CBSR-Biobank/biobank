@@ -65,16 +65,16 @@ public class TestDispatch extends TestAction {
     public void saveWithSpecs() throws Exception {
 
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(getExecutor(), siteId,
-                centerId, DispatchState.CREATION.getId(),
+            DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
+                DispatchState.CREATION.getId(),
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
-            DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
                 patientId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
+            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
         Integer id =
-            exec(new DispatchSaveAction(d, specs, shipsave))
+            EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
         DispatchReadInfo info =
@@ -137,19 +137,19 @@ public class TestDispatch extends TestAction {
     @Test
     public void testStateChange() throws Exception {
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(getExecutor(), siteId,
-                centerId, DispatchState.CREATION.getId(),
+            DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
+                DispatchState.CREATION.getId(),
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
-            DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
                 patientId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
+            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
         Integer id =
-            exec(new DispatchSaveAction(d, specs, shipsave))
+            EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
-        exec(new DispatchChangeStateAction(id,
+        EXECUTOR.exec(new DispatchChangeStateAction(id,
             DispatchState.IN_TRANSIT, shipsave));
         Assert
             .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
@@ -182,19 +182,19 @@ public class TestDispatch extends TestAction {
     @Test
     public void testDelete() throws Exception {
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(getExecutor(), siteId,
-                centerId, DispatchState.IN_TRANSIT.getId(),
+            DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
+                DispatchState.IN_TRANSIT.getId(),
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
-            DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
                 patientId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
+            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
         Integer id =
-            exec(new DispatchSaveAction(d, specs, shipsave))
+            EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
 
-        DispatchReadInfo info = exec(new DispatchGetInfoAction(id));
+        DispatchReadInfo info = EXECUTOR.exec(new DispatchGetInfoAction(id));
         try {
             exec(new DispatchDeleteAction(info.dispatch));
             Assert.fail();
@@ -212,16 +212,16 @@ public class TestDispatch extends TestAction {
     public void testComment() throws Exception {
 
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(getExecutor(), siteId,
-                centerId, DispatchState.IN_TRANSIT.getId(),
+            DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
+                DispatchState.IN_TRANSIT.getId(),
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
-            DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
+            DispatchHelper.createSaveDispatchSpecimenInfoRandom(EXECUTOR,
                 patientId, centerId);
         ShipmentInfoSaveInfo shipsave =
-            ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
+            ShipmentInfoHelper.createRandomShipmentInfo(EXECUTOR);
         Integer id =
-            exec(new DispatchSaveAction(d, specs, shipsave))
+            EXECUTOR.exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
         d.id = id;
 

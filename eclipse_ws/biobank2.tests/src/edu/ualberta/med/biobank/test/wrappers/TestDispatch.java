@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
@@ -378,7 +377,7 @@ public class TestDispatch extends TestDatabase {
             topContainerType);
         ContainerWrapper container = ContainerHelper.addContainer(null, name,
             topContainer, senderSite, containerType, 0, 0);
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        PatientHelper.addPatient(name, study);
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
@@ -443,7 +442,7 @@ public class TestDispatch extends TestDatabase {
             topContainerType);
         ContainerWrapper container = ContainerHelper.addContainer(null, name,
             topContainer, senderSite, containerType, 0, 0);
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        PatientHelper.addPatient(name, study);
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
@@ -472,7 +471,7 @@ public class TestDispatch extends TestDatabase {
     @Test
     public void testStringOutputs() throws Exception {
         String name = "testRandomStrings" + r.nextInt();
-        StudyWrapper study = StudyHelper.addStudy(name);
+        StudyHelper.addStudy(name);
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
         ClinicWrapper senderClinic = ClinicHelper.addClinic("Fake");
         DispatchWrapper dispatch = DispatchHelper.addDispatch(senderClinic,
@@ -704,7 +703,7 @@ public class TestDispatch extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(null, name,
             topContainer, senderSite, containerType, 0, 0);
 
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        PatientHelper.addPatient(name, study);
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));

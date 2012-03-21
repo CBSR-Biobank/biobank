@@ -205,7 +205,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     public List<SpecimenWrapper> getAliquotedSpecimenCollection(boolean sort) {
         List<SpecimenWrapper> aliquotedSpecimens =
             new ArrayList<SpecimenWrapper>(
-                getAllSpecimenCollection(true));
+                getAllSpecimenCollection(sort));
         aliquotedSpecimens.removeAll(getOriginalSpecimenCollection(false));
         return aliquotedSpecimens;
     }

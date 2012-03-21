@@ -9,7 +9,6 @@ import edu.ualberta.med.biobank.common.peer.PrincipalPeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.PrincipalBaseWrapper;
 import edu.ualberta.med.biobank.model.Principal;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class PrincipalWrapper<T extends Principal> extends
@@ -94,8 +93,9 @@ public abstract class PrincipalWrapper<T extends Principal> extends
         return centers;
     }
 
+    @SuppressWarnings("unused")
     protected List<CenterWrapper<?>> getAllCentersForPermission(
-        String permissionClassName) throws ApplicationException {
+        String permissionClassName) {
         // BbRightWrapper right = BbRightWrapper.getRightWithKeyDesc(appService,
         // keyDesc);
         List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>();

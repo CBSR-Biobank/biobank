@@ -16,6 +16,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeDeleteAction;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -83,7 +84,12 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
         if (dlg.open() == Dialog.OK) {
             if (addEditOk(specimenType)) {
                 try {
-                    specimenType.persist();
+                    SpecimenTypeSaveAction save =
+                        new SpecimenTypeSaveAction(specimenType.getName(),
+                            specimenType.getNameShort());
+                    save.setId(specimenType.getId());
+                    specimenType.setId(SessionManager.getAppService().doAction(
+                        save).getId());
                     if (add) {
                         // only add to the collection when adding and not
                         // editing

@@ -20,6 +20,7 @@ import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.impl.CriteriaImpl;
+import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
 import edu.ualberta.med.biobank.common.reports.ReportsUtil;
@@ -39,13 +40,15 @@ public class ReportRunner {
     private static final String PROPERTY_DELIMITER = "."; //$NON-NLS-1$
     private static final String ALIAS_DELIMITER = "__"; //$NON-NLS-1$
     private static final String PROPERTY_VALUE_TOKEN = "{value}"; //$NON-NLS-1$
-    private static final String MODIFIED_PROPERTY_ALIAS = "_modifiedPropertyAlias"; //$NON-NLS-1$
-    private static final Comparator<ReportColumn> COMPARE_REPORT_COLUMN_POSITION = new Comparator<ReportColumn>() {
-        @Override
-        public int compare(ReportColumn lhs, ReportColumn rhs) {
-            return lhs.getPosition() - rhs.getPosition();
-        }
-    };
+    private static final String MODIFIED_PROPERTY_ALIAS =
+        "_modifiedPropertyAlias"; //$NON-NLS-1$
+    private static final Comparator<ReportColumn> COMPARE_REPORT_COLUMN_POSITION =
+        new Comparator<ReportColumn>() {
+            @Override
+            public int compare(ReportColumn lhs, ReportColumn rhs) {
+                return lhs.getPosition() - rhs.getPosition();
+            }
+        };
 
     private final Session session;
     private final Report report;
@@ -116,7 +119,7 @@ public class ReportRunner {
             // results
             pList.add(Projections.sqlProjection("NULL as null_value_", //$NON-NLS-1$
                 new String[] { "null_value_" }, //$NON-NLS-1$
-                new Type[] { Hibernate.INTEGER }));
+                new Type[] { StandardBasicTypes.INTEGER }));
         }
 
         int colNum = 1;
@@ -142,11 +145,11 @@ public class ReportRunner {
                     projection = Projections.sqlGroupProjection(
                         modifiedProperty + " as " + sqlAlias, sqlAlias, //$NON-NLS-1$
                         new String[] { sqlAlias },
-                        new Type[] { Hibernate.STRING });
+                        new Type[] { StandardBasicTypes.STRING });
                 } else {
                     projection = Projections.sqlProjection(modifiedProperty
                         + " as " + sqlAlias, new String[] { sqlAlias }, //$NON-NLS-1$
-                        new Type[] { Hibernate.STRING });
+                        new Type[] { StandardBasicTypes.STRING });
                 }
             } else {
                 if (isCount()) {

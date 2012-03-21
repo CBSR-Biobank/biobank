@@ -169,7 +169,8 @@ public class DispatchCreateScanDialog extends
     }
 
     protected ShipmentProcessInfo getProcessData() {
-        return new ShipmentProcessInfo(currentPallet.getWrappedObject(),
+        return new ShipmentProcessInfo(currentPallet == null ? null
+            : currentPallet.getWrappedObject(),
             currentShipment, false);
     }
 

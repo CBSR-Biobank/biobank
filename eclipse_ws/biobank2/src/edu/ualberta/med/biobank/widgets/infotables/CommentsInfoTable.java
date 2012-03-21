@@ -57,6 +57,7 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
          * efficient as possible.
          */
         table.addListener(SWT.MeasureItem, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 TableItem item = (TableItem) event.item;
                 String text = item.getText(event.index);
@@ -66,11 +67,13 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
             }
         });
         table.addListener(SWT.EraseItem, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 event.detail &= ~SWT.FOREGROUND;
             }
         });
         table.addListener(SWT.PaintItem, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 TableItem item = (TableItem) event.item;
                 String text = item.getText(event.index);

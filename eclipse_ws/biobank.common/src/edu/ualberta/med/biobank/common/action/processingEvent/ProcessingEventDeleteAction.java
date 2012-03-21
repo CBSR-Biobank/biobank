@@ -24,13 +24,12 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new ProcessingEventDeletePermission(peventId).isAllowed(context);
+        return new ProcessingEventDeletePermission().isAllowed(context);
     }
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        ProcessingEvent pevent = (ProcessingEvent) context.load(
-            ProcessingEvent.class, peventId);
+        ProcessingEvent pevent = context.load(ProcessingEvent.class, peventId);
 
         // if no aliquoted specimen, then ok to remove the specimens and to
         // delete the processing event

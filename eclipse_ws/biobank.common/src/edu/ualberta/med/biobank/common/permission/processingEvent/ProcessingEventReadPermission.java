@@ -6,11 +6,6 @@ import edu.ualberta.med.biobank.model.PermissionEnum;
 
 public class ProcessingEventReadPermission implements Permission {
     private static final long serialVersionUID = 1L;
-    private Integer peventId;
-
-    public ProcessingEventReadPermission(Integer peventId) {
-        this.peventId = peventId;
-    }
 
     @Override
     public boolean isAllowed(ActionContext context) {

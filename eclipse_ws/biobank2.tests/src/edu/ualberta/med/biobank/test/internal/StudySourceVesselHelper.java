@@ -4,6 +4,7 @@ import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
+@SuppressWarnings({ "unused", "deprecation" })
 @Deprecated
 public class StudySourceVesselHelper extends DbHelper {
 

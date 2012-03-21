@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestClinic extends TestAction {
 
@@ -254,8 +253,7 @@ public class TestClinic extends TestAction {
     }
 
     private Set<String> getContactNamesFromSaveInfo(
-        Collection<ContactSaveInfo> contactSaveInfos)
-        throws ApplicationException {
+        Collection<ContactSaveInfo> contactSaveInfos) {
         Set<String> result = new HashSet<String>();
         for (ContactSaveInfo contactSaveInfo : contactSaveInfos) {
             result.add(contactSaveInfo.name);
@@ -263,8 +261,7 @@ public class TestClinic extends TestAction {
         return result;
     }
 
-    private Set<String> getContactNames(Collection<Contact> contacts)
-        throws ApplicationException {
+    private Set<String> getContactNames(Collection<Contact> contacts) {
         Set<String> result = new HashSet<String>();
         for (Contact contact : contacts) {
             result.add(contact.getName());
@@ -273,7 +270,7 @@ public class TestClinic extends TestAction {
     }
 
     @Test
-    public void delete() throws ApplicationException {
+    public void delete() {
         // delete a study with no patients and no other associations
         Integer clinicId = exec(clinicSaveAction).getId();
         ClinicInfo clinicInfo =
@@ -291,12 +288,12 @@ public class TestClinic extends TestAction {
     }
 
     @Test
-    public void deleteWithStudies() throws ApplicationException {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+    public void deleteWithStudies() {
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
         ClinicInfo clinicInfo =
-            exec(new ClinicGetInfoAction(provisioning.clinicId));
+            EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
         try {
-            exec(new ClinicDeleteAction(clinicInfo.clinic));
+            EXECUTOR.exec(new ClinicDeleteAction(clinicInfo.clinic));
             Assert
                 .fail("should not be allowed to delete a clinic linked to a study");
         } catch (ConstraintViolationException e) {

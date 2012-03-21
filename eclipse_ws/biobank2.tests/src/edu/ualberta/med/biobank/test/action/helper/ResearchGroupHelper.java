@@ -15,7 +15,7 @@ public class ResearchGroupHelper extends Helper {
             new AddressSaveInfo(null, "test", "test", "test", "test", "test",
                 "test", "test", "test", "test");
         ResearchGroupSaveInfo save =
-            new ResearchGroupSaveInfo(null, name + "rg", name + "rg",
+            new ResearchGroupSaveInfo(null, name + "rg", nameShort + "rg",
                 studyId, "comment", addressSaveInfo,
                 ActivityStatus.ACTIVE);
         ResearchGroupSaveAction rgSave = new ResearchGroupSaveAction(save);

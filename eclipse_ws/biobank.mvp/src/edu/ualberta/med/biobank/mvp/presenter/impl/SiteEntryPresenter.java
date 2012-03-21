@@ -134,7 +134,7 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         return load(new SiteEdit(siteId));
     }
 
-    private void editSite(SiteInfo siteInfo) throws InitPresenterException {
+    private void editSite(SiteInfo siteInfo) {
         view.getIdentifier().setValue(siteId);
         view.getStudies().setElements(siteInfo.getStudyCountInfos());
 

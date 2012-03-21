@@ -23,6 +23,7 @@ public class SiteAddHandler extends AbstractHandler {
 
     // private EventBus eventBus;
 
+    @SuppressWarnings("unused")
     @Inject
     public void setEventBus(EventBus eventBus) {
         // this.eventBus = eventBus;

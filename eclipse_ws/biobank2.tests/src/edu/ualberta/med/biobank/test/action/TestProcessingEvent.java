@@ -70,7 +70,7 @@ public class TestProcessingEvent extends TestAction {
                 new ProcessingEventSaveAction(
                     null, provisioning.siteId, date, worksheet,
                     ActivityStatus.ACTIVE, commentText,
-                    new HashSet<Integer>())).getId();
+                    new HashSet<Integer>(), new HashSet<Integer>())).getId();
 
         // Check ProcessingEvent is in database with correct values
         PEventInfo peventInfo =
@@ -110,12 +110,15 @@ public class TestProcessingEvent extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimen
-        Integer pEventId = exec(new ProcessingEventSaveAction(
-            null, provisioning.siteId, date, worksheet,
-            ActivityStatus.ACTIVE, commentText,
-            new HashSet<Integer>(
-                Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
-            .getId();
+        Integer pEventId =
+            EXECUTOR.exec(
+                new ProcessingEventSaveAction(
+                    null, provisioning.siteId, date, worksheet,
+                    ActivityStatus.ACTIVE, commentText,
+                    new HashSet<Integer>(
+                        Arrays.asList(sourceSpecs.get(0).specimen.getId())),
+                    new HashSet<Integer>()))
+                .getId();
 
         // create aliquoted specimens by doing a scan link
         Set<AliquotedSpecimenInfo> aliquotedSpecimenInfos =
@@ -187,14 +190,14 @@ public class TestProcessingEvent extends TestAction {
         exec(new ProcessingEventSaveAction(
             null, provisioning.siteId, date, worksheet,
             ActivityStatus.ACTIVE, null,
-            new HashSet<Integer>()));
+            new HashSet<Integer>(), new HashSet<Integer>()));
 
         // try to save another pevent with the same worksheet
         try {
             exec(new ProcessingEventSaveAction(null,
                 provisioning.siteId, new Date(), worksheet,
                 ActivityStatus.ACTIVE, null,
-                new HashSet<Integer>()));
+                new HashSet<Integer>(), new HashSet<Integer>()));
             Assert
                 .fail("should not be able to use the same worksheet to 2 different pevents");
         } catch (ConstraintViolationException e) {
@@ -207,7 +210,7 @@ public class TestProcessingEvent extends TestAction {
         Integer pEventId = exec(new ProcessingEventSaveAction(
             null, provisioning.siteId, Utils.getRandomDate(), Utils
                 .getRandomString(50), ActivityStatus.ACTIVE, null,
-            new HashSet<Integer>())).getId();
+            new HashSet<Integer>(), new HashSet<Integer>())).getId();
 
         PEventInfo peventInfo =
             exec(new ProcessingEventGetInfoAction(pEventId));
@@ -236,10 +239,13 @@ public class TestProcessingEvent extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimen.
-        Integer pEventId = exec(new ProcessingEventSaveAction(
-            null, provisioning.siteId, Utils.getRandomDate(), Utils
-                .getRandomString(50), ActivityStatus.ACTIVE, null,
-            new HashSet<Integer>(Arrays.asList(spcId)))).getId();
+        Integer pEventId =
+            EXECUTOR.exec(
+                new ProcessingEventSaveAction(
+                    null, provisioning.siteId, Utils.getRandomDate(), Utils
+                        .getRandomString(50), ActivityStatus.ACTIVE, null,
+                    new HashSet<Integer>(Arrays.asList(spcId)),
+                    new HashSet<Integer>())).getId();
 
         Specimen spc = (Specimen) session.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);
@@ -285,11 +291,13 @@ public class TestProcessingEvent extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimen.
-        Integer pEventId = exec(
-            new ProcessingEventSaveAction(
-                null, provisioning.siteId, Utils.getRandomDate(),
-                Utils.getRandomString(50), ActivityStatus.ACTIVE, null,
-                new HashSet<Integer>(Arrays.asList(spcId)))).getId();
+        Integer pEventId =
+            EXECUTOR.exec(
+                new ProcessingEventSaveAction(
+                    null, provisioning.siteId, Utils.getRandomDate(),
+                    Utils.getRandomString(50), ActivityStatus.ACTIVE, null,
+                    new HashSet<Integer>(Arrays.asList(spcId)),
+                    new HashSet<Integer>())).getId();
 
         Specimen spc = (Specimen) session.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);

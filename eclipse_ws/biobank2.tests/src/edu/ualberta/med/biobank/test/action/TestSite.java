@@ -14,6 +14,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.SetResult;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
@@ -39,6 +40,7 @@ import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSav
 import edu.ualberta.med.biobank.common.action.site.SiteDeleteAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypeInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenDeleteAction;
@@ -55,10 +57,10 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
+import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestSite extends TestAction {
 
@@ -161,14 +163,13 @@ public class TestSite extends TestAction {
         CEventInfo ceventInfo =
             exec(new CollectionEventGetInfoAction(ceventId));
         List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
+        HashSet<Integer> added = new HashSet<Integer>();
+        added.add(sourceSpecs.get(0).specimen.getId());
 
-        Integer pEventId = exec(
-            new ProcessingEventSaveAction(
-                null, provisioning.siteId, Utils.getRandomDate(), Utils
-                    .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
-                new HashSet<Integer>(
-                    Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
-            .getId();
+        EXECUTOR.exec(new ProcessingEventSaveAction(
+            null, provisioning.siteId, Utils.getRandomDate(), Utils
+                .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
+            added, new HashSet<Integer>())).getId();
 
         SiteInfo siteInfo =
             exec(new SiteGetInfoAction(provisioning.siteId));
@@ -388,10 +389,10 @@ public class TestSite extends TestAction {
     }
 
     @Test
-    public void delete() throws ApplicationException {
-        Integer siteId = exec(siteSaveAction).getId();
-        SiteInfo siteInfo = exec(new SiteGetInfoAction(siteId));
-        exec(new SiteDeleteAction(siteInfo.getSite()));
+    public void delete() {
+        Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
+        SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
+        EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
 
         // hql query for site should return empty
         Query q =
@@ -402,10 +403,9 @@ public class TestSite extends TestAction {
         Assert.assertTrue(result.equals(0L));
     }
 
-    private Provisioning createSiteWithContainerType()
-        throws ApplicationException {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
-        provisioning.addContainerType(getExecutor(), name,
+    private Provisioning createSiteWithContainerType() {
+        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        provisioning.addContainerType(EXECUTOR, name,
             getContainerLabelingSchemes().values().iterator().next()
                 .getId(), getR().nextDouble());
         return provisioning;
@@ -434,7 +434,7 @@ public class TestSite extends TestAction {
     }
 
     @Test
-    public void deleteWithContainerTypes() throws ApplicationException {
+    public void deleteWithContainerTypes() {
         Provisioning provisioning = createSiteWithContainerType();
         SiteInfo siteInfo =
             exec(new SiteGetInfoAction(provisioning.siteId));
@@ -457,7 +457,7 @@ public class TestSite extends TestAction {
     }
 
     @Test
-    public void deleteWithContainers() throws ApplicationException {
+    public void deleteWithContainers() {
         Provisioning provisioning = createSiteWithContainerType();
         Integer containerTypeId = provisioning.containerTypeIds.get(0);
         Integer containerId =
@@ -504,13 +504,15 @@ public class TestSite extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimens
-        Integer peventId = exec(
-            new ProcessingEventSaveAction(
-                null, provisioning.siteId, Utils.getRandomDate(), Utils
-                    .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
-                new HashSet<Integer>(
-                    Arrays.asList(sourceSpecs.get(0).specimen.getId()))))
-            .getId();
+        Integer peventId =
+            EXECUTOR.exec(
+                new ProcessingEventSaveAction(
+                    null, provisioning.siteId, Utils.getRandomDate(), Utils
+                        .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
+                    new HashSet<Integer>(
+                        Arrays.asList(sourceSpecs.get(0).specimen.getId())),
+                    new HashSet<Integer>()))
+                .getId();
 
         SiteInfo siteInfo =
             exec(new SiteGetInfoAction(provisioning.siteId));
@@ -618,4 +620,39 @@ public class TestSite extends TestAction {
         exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 
+    @Test
+    public void getStudyInfo() throws Exception {
+        Set<Integer> studyIds = new HashSet<Integer>();
+        studyIds.add(StudyHelper.createStudy(EXECUTOR,
+            name + Utils.getRandomString(5), ActivityStatus.ACTIVE));
+        Integer siteId =
+            SiteHelper.createSite(EXECUTOR, name + Utils.getRandomString(5),
+                "Edmo", ActivityStatus.ACTIVE, studyIds);
+
+        Integer patients = R.nextInt(5);
+        Integer collectionEvents = R.nextInt(5);
+
+        for (int i = 0; i < patients; i++) {
+            Integer patient =
+                PatientHelper.createPatient(EXECUTOR,
+                    name + Utils.getRandomString(5), studyIds.iterator()
+                        .next());
+            for (int j = 0; j < collectionEvents; j++)
+                CollectionEventHelper.createCEventWithSourceSpecimens(EXECUTOR,
+                    patient, siteId);
+        }
+        SiteGetStudyInfoAction action = new SiteGetStudyInfoAction(siteId);
+        ListResult<StudyCountInfo> studies = EXECUTOR.exec(action);
+
+        Assert
+            .assertTrue(studies.getList().get(0).getCollectionEventCount()
+                .intValue()
+            == (collectionEvents * patients));
+        Assert
+            .assertTrue(studies.getList().get(0).getCollectionEventCount()
+                .intValue()
+            == (patients));
+        Assert.assertTrue(studies.getList().get(0).getStudy().getId()
+            .equals(studyIds.iterator().next()));
+    }
 }

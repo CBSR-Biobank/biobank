@@ -331,6 +331,8 @@ public class Messages extends NLS {
 
     public static String ProcessingEventEntryForm_creation_msg;
     public static String ProcessingEventEntryForm_edition_msg;
+
+    public static String ProcessingEventEntryForm_error;
     public static String ProcessingEventEntryForm_title_edit_worksheet;
     public static String ProcessingEventEntryForm_title_edit_noworksheet;
 

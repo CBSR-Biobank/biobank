@@ -19,6 +19,7 @@ public class FormViewEditorInput implements IEditorInput {
         return formView;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Object getAdapter(Class adapter) {
         return null;

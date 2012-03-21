@@ -98,9 +98,8 @@ public class ComboBox<T> extends AbstractValueField<T>
     private IStructuredSelection getStructuredSelection() {
         if (getValue() != null) {
             return new StructuredSelection(getValue());
-        } else {
-            return new StructuredSelection();
         }
+        return new StructuredSelection();
     }
 
     private T getSelectedValue() {

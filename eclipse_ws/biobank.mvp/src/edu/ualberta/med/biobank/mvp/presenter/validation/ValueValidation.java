@@ -43,6 +43,7 @@ public class ValueValidation<T> extends AbstractValidation implements
         validators.add(conditionalValidator);
     }
 
+    @Override
     public void bindValidationTo(ValidationDisplay validationDisplay) {
         ValidationBinding binding = new ValidationBinding(validationDisplay);
         handlerRegistry.add(addValidationHandler(binding));

@@ -126,14 +126,20 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                     new StudyGetAliquotedSpecimensAction(specimenInfo
                         .getSpecimen().getCollectionEvent().
                         getPatient().getStudy().getId())).getList();
-            containerSpecimenTypeList =
-                SessionManager
-                    .getAppService()
-                    .doAction(
-                        new ContainerTypeGetInfoAction(specimenInfo
-                            .getSpecimen().getSpecimenPosition().getContainer()
-                            .getContainerType().getId())).getContainerType()
-                    .getSpecimenTypes();
+            if (specimenInfo
+                .getSpecimen().getSpecimenPosition() != null)
+                containerSpecimenTypeList =
+                    SessionManager
+                        .getAppService()
+                        .doAction(
+                            new ContainerTypeGetInfoAction(specimenInfo
+                                .getSpecimen().getSpecimenPosition()
+                                .getContainer()
+                                .getContainerType().getId()))
+                        .getContainerType()
+                        .getSpecimenTypes();
+            else
+                containerSpecimenTypeList = new HashSet<SpecimenType>();
             specimen.setWrappedObject(specimenInfo.getSpecimen());
         } else {
             specimenInfo = new SpecimenBriefInfo();

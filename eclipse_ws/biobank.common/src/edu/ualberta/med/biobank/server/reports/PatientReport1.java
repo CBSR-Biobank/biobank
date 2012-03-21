@@ -16,22 +16,23 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PatientReport1 extends AbstractReport {
 
-    public static String QUERY_STRING = "SELECT study_name, clinic_name, sum(pvCount=1), sum(pvCount=2)," //$NON-NLS-1$
-        + " sum(pvCount=3), sum(pvCount=4), sum(pvCount >=5), sum(pvCount), count(patient_number)" //$NON-NLS-1$
-        + " FROM (SELECT t.name_short as study_name," //$NON-NLS-1$
-        + "         c.name_short as clinic_name," //$NON-NLS-1$
-        + "         p.pnumber as patient_number," //$NON-NLS-1$
-        + "         count(distinct ce.id) as pvCount" //$NON-NLS-1$
-        + "     FROM collection_event ce" //$NON-NLS-1$
-        + "         join specimen s on s.original_collection_event_id=ce.id" // "source vessels" //$NON-NLS-1$
-        + "         join origin_info oi on s.origin_info_id=oi.id" //$NON-NLS-1$
-        + "         join center c on oi.center_id=c.id" //$NON-NLS-1$
-        + "         join patient p on ce.patient_id=p.id" //$NON-NLS-1$
-        + "         join study t on t.id=p.study_id" //$NON-NLS-1$
-        + "     WHERE s.created_at between ? and ?" //$NON-NLS-1$
-        + "     GROUP BY t.name_short, c.name_short, p.pnumber) as filteredPvs" //$NON-NLS-1$
-        + " GROUP BY study_name, clinic_name" //$NON-NLS-1$
-        + " ORDER BY study_name, clinic_name"; //$NON-NLS-1$
+    public static String QUERY_STRING =
+        "SELECT study_name, clinic_name, sum(pvCount=1), sum(pvCount=2)," //$NON-NLS-1$
+            + " sum(pvCount=3), sum(pvCount=4), sum(pvCount >=5), sum(pvCount), count(patient_number)" //$NON-NLS-1$
+            + " FROM (SELECT t.name_short as study_name," //$NON-NLS-1$
+            + "         c.name_short as clinic_name," //$NON-NLS-1$
+            + "         p.pnumber as patient_number," //$NON-NLS-1$
+            + "         count(distinct ce.id) as pvCount" //$NON-NLS-1$
+            + "     FROM collection_event ce" //$NON-NLS-1$
+            + "         join specimen s on s.original_collection_event_id=ce.id" // "source vessels" //$NON-NLS-1$
+            + "         join origin_info oi on s.origin_info_id=oi.id" //$NON-NLS-1$
+            + "         join center c on oi.center_id=c.id" //$NON-NLS-1$
+            + "         join patient p on ce.patient_id=p.id" //$NON-NLS-1$
+            + "         join study t on t.id=p.study_id" //$NON-NLS-1$
+            + "     WHERE s.created_at between ? and ?" //$NON-NLS-1$
+            + "     GROUP BY t.name_short, c.name_short, p.pnumber) as filteredPvs" //$NON-NLS-1$
+            + " GROUP BY study_name, clinic_name" //$NON-NLS-1$
+            + " ORDER BY study_name, clinic_name"; //$NON-NLS-1$
 
     public PatientReport1(BiobankReport report) {
         super(QUERY_STRING, report);

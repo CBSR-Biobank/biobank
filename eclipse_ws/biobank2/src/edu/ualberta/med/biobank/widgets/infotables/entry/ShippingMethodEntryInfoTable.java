@@ -10,6 +10,8 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodDeleteAction;
+import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodSaveAction;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -83,7 +85,9 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                     selectedShippingMethod.add(shippingMethod);
                 }
                 try {
-                    shippingMethod.persist();
+                    SessionManager.getAppService().doAction(
+                        new ShippingMethodSaveAction(shippingMethod.getId(),
+                            shippingMethod.getName()));
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
                         Messages.ShippingMethodEntryInfoTable_save_error_title,
@@ -152,7 +156,9 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                         // equals method now compare toString() results if both
                         // ids are null.
                         selectedShippingMethod.remove(type);
-                        type.delete();
+                        SessionManager.getAppService().doAction(
+                            new ShippingMethodDeleteAction(
+                                type.getId()));
                         setList(selectedShippingMethod);
                     } catch (final RemoteConnectFailureException exp) {
                         BgcPlugin.openRemoteConnectErrorMessage(exp);

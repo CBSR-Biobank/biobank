@@ -35,6 +35,7 @@ import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
+@SuppressWarnings("unused")
 public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
     private final Dispatcher dispatcher;
     private final ActivityStatusComboPresenter activityStatusComboPresenter;
@@ -152,7 +153,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         return load(new StudyEdit(studyId));
     }
 
-    private void editStudy(StudyInfo studyInfo) throws InitPresenterException {
+    private void editStudy(StudyInfo studyInfo) {
         Study study = studyInfo.getStudy();
         view.getName().setValue(study.getName());
         view.getNameShort().setValue(study.getNameShort());

@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
+@SuppressWarnings({ "unused", "deprecation" })
 @Deprecated
 public class RequestHelper extends DbHelper {
 

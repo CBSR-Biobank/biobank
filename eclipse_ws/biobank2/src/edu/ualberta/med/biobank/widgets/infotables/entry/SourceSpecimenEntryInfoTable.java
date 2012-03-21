@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.widgets.infotables.SourceSpecimenInfoTable;
 
 public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
 
+    @SuppressWarnings("unused")
     private static BgcLogger LOGGER = BgcLogger
         .getLogger(SourceSpecimenEntryInfoTable.class.getName());
 

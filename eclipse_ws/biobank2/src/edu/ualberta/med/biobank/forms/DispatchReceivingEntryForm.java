@@ -27,8 +27,6 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
-import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
@@ -41,14 +39,6 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     private List<SpecimenWrapper> receivedOrExtraSpecimens =
         new ArrayList<SpecimenWrapper>();
     private CommentsInfoTable commentEntryTable;
-
-    private BgcEntryFormWidgetListener listener =
-        new BgcEntryFormWidgetListener() {
-            @Override
-            public void selectionChanged(MultiSelectEvent event) {
-                setDirty(true);
-            }
-        };
 
     @Override
     protected void createFormContent() throws Exception {

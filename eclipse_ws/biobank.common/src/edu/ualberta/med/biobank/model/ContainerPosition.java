@@ -54,6 +54,7 @@ public class ContainerPosition extends AbstractPosition {
             : null;
     }
 
+    @SuppressWarnings("unused")
     void setParentContainerType(ContainerType parentContainerType) {
     }
 
@@ -86,6 +87,7 @@ public class ContainerPosition extends AbstractPosition {
             : null;
     }
 
+    @SuppressWarnings("unused")
     void setContainerType(ContainerType containerType) {
     }
 

@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.IActionExecutor;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteHelper extends Helper {
 
@@ -43,7 +42,7 @@ public class SiteHelper extends Helper {
 
     public static Integer createSite(IActionExecutor actionExecutor,
         String name, String city, ActivityStatus activityStatus,
-        Set<Integer> studyIds) throws ApplicationException {
+        Set<Integer> studyIds) {
 
         Address address = new Address();
         address.setCity(city);
@@ -60,8 +59,7 @@ public class SiteHelper extends Helper {
 
     public static List<Integer> createSites(
         IActionExecutor actionExecutor,
-        String name, ActivityStatus activityStatus, int numToCreate)
-        throws ApplicationException {
+        String name, ActivityStatus activityStatus, int numToCreate) {
         List<Integer> result = new ArrayList<Integer>();
         for (int i = 0; i < numToCreate; ++i) {
             result.add(createSite(actionExecutor, name,
@@ -101,8 +99,7 @@ public class SiteHelper extends Helper {
         public List<Integer> patientIds;
         public List<Integer> containerTypeIds;
 
-        public Provisioning(IActionExecutor actionExecutor, String basename)
-            throws ApplicationException {
+        public Provisioning(IActionExecutor actionExecutor, String basename) {
             patientIds = new ArrayList<Integer>();
             containerTypeIds = new ArrayList<Integer>();
 
@@ -136,8 +133,7 @@ public class SiteHelper extends Helper {
         }
 
         public Integer addContainerType(IActionExecutor executor,
-            String name, Integer containerLabelingSchemeId, double defaultTemp)
-            throws ApplicationException {
+            String name, Integer containerLabelingSchemeId, double defaultTemp) {
             ContainerTypeSaveAction ctSaveAction =
                 ContainerTypeHelper.getSaveAction(name, name, siteId,
                     true, 3, 10,
@@ -148,14 +144,14 @@ public class SiteHelper extends Helper {
         }
 
         public Integer addContainer(IActionExecutor executor,
-            Integer containerTypeId, String label)
-            throws ApplicationException {
+            Integer containerTypeId, String label) {
             ContainerSaveAction containerSaveAction = new ContainerSaveAction();
             containerSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
             containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
             containerSaveAction.setLabel("01");
             containerSaveAction.setSiteId(siteId);
             containerSaveAction.setTypeId(containerTypeId);
+            containerSaveAction.setLabel(label);
             return executor.exec(containerSaveAction).getId();
         }
     }

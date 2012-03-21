@@ -80,6 +80,7 @@ public class ContainerCapacityTest extends AbstractReportTest {
         checkResults(EnumSet.of(CompareResult.SIZE));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected Collection<Object> getExpectedResults() throws Exception {
         Collection<ContainerWrapper> filteredContainers = PredicateUtil.filter(

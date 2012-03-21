@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.internal;
 
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselTypeWrapper;
 
+@SuppressWarnings({ "unused", "deprecation" })
 @Deprecated
 public class SourceVesselTypeHelper extends DbHelper {
 

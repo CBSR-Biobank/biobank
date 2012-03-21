@@ -138,7 +138,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             Messages.Comments_add, null, comment, "message", null);
     }
 
-    private void createSiteSection() throws ApplicationException {
+    private void createSiteSection() {
         toolkit.createLabel(page, Messages.SiteEntryForm_main_description,
             SWT.LEFT);
 

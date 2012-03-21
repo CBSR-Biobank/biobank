@@ -23,9 +23,8 @@ public class ContainerDeletePermission implements Permission {
             Container container = context.load(Container.class, containerId);
             return PermissionEnum.CONTAINER_DELETE.isAllowed(context.getUser(),
                 container.getSite());
-        } else {
-            return PermissionEnum.CONTAINER_DELETE.isAllowed(context.getUser());
         }
+        return PermissionEnum.CONTAINER_DELETE.isAllowed(context.getUser());
     }
 
 }

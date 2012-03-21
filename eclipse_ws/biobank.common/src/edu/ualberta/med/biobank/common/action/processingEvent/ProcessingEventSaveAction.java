@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventCreatePermission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventUpdatePermission;
-import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
@@ -34,18 +33,22 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
 
     private String commentText;
 
-    private Set<Integer> specimenIds;
+    private Set<Integer> addedSpecimenIds;
+
+    private Set<Integer> removedSpecimenIds;
 
     public ProcessingEventSaveAction(Integer peventId, Integer centerId,
         Date createdAt, String worksheet, ActivityStatus activityStatus,
-        String commentText, Set<Integer> specimenIds) {
+        String commentText, Set<Integer> addedSpecimenIds,
+        Set<Integer> removedSpecimenIds) {
         this.peventId = peventId;
         this.centerId = centerId;
         this.createdAt = createdAt;
         this.worksheet = worksheet;
         this.activityStatus = activityStatus;
         this.commentText = commentText;
-        this.specimenIds = specimenIds;
+        this.addedSpecimenIds = addedSpecimenIds;
+        this.removedSpecimenIds = removedSpecimenIds;
     }
 
     @Override
@@ -54,7 +57,7 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         if (peventId == null) {
             permission = new ProcessingEventCreatePermission();
         } else {
-            permission = new ProcessingEventUpdatePermission(peventId);
+            permission = new ProcessingEventUpdatePermission();
         }
         return permission.isAllowed(context);
     }
@@ -84,13 +87,16 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         peventToSave.setSpecimens(specimensDiff.getNewSet());
 
         // set processing event on added specimens
-        for (Specimen specimen : specimensDiff.getAddSet()) {
-            specimen.setProcessingEvent(peventToSave);
+        for (Integer specimen : addedSpecimenIds) {
+            Specimen spec = context.load(Specimen.class, specimen);
+            spec.setProcessingEvent(peventToSave);
+            context.getSession().saveOrUpdate(spec);
         }
 
-        // remove processing event on removed specimens
-        for (Specimen specimen : specimensDiff.getRemoveSet()) {
-            specimen.setProcessingEvent(null);
+        for (Integer specimen : removedSpecimenIds) {
+            Specimen spec = context.load(Specimen.class, specimen);
+            spec.setProcessingEvent(null);
+            context.getSession().saveOrUpdate(spec);
         }
 
         context.getSession().saveOrUpdate(peventToSave);

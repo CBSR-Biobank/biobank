@@ -98,14 +98,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
-    private BgcEntryFormWidgetListener listener =
-        new BgcEntryFormWidgetListener() {
-            @Override
-            public void selectionChanged(MultiSelectEvent event) {
-                setDirty(true);
-            }
-        };
-
     public ContainerTypeEntryForm() {
         super();
         multiSelectListener = new BgcEntryFormWidgetListener() {

@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerTypeBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.ContainerTypePostPersistChecks;
 import edu.ualberta.med.biobank.common.wrappers.checks.ContainerTypePrePersistChecks;
-import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import gov.nih.nci.system.applicationservice.ApplicationException;

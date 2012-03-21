@@ -228,7 +228,8 @@ public abstract class AbstractAdapterBase implements
             removeChildInternal(itemToRemove.getId());
     }
 
-    protected void removeChildInternal(@SuppressWarnings("unused") Integer id) {
+    @SuppressWarnings("unused")
+    protected void removeChildInternal(Integer id) {
         // do mothing by default
     }
 

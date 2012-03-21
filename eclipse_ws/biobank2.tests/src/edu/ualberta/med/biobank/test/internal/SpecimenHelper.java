@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
+@SuppressWarnings({ "unused", "deprecation" })
 @Deprecated
 public class SpecimenHelper extends DbHelper {
 
@@ -38,7 +39,8 @@ public class SpecimenHelper extends DbHelper {
 
     public static SpecimenWrapper newSpecimen(SpecimenTypeWrapper specimenType)
         throws Exception {
-        return newSpecimen(specimenType, ActivityStatus.ACTIVE, Utils.getRandomDate());
+        return newSpecimen(specimenType, ActivityStatus.ACTIVE,
+            Utils.getRandomDate());
     }
 
     public static SpecimenWrapper newSpecimen(String specimenTypeName)
@@ -98,7 +100,8 @@ public class SpecimenHelper extends DbHelper {
     }
 
     public static SpecimenWrapper addSpecimen(SpecimenTypeWrapper specimenType,
-        ActivityStatus activityStatus, Date createdAt, CollectionEventWrapper cevent,
+        ActivityStatus activityStatus, Date createdAt,
+        CollectionEventWrapper cevent,
         CenterWrapper<?> center) throws Exception {
         SpecimenWrapper specimen = newSpecimen(specimenType, activityStatus,
             createdAt);
@@ -157,7 +160,7 @@ public class SpecimenHelper extends DbHelper {
         SpecimenWrapper parentSpc, int spcCount,
         List<SpecimenTypeWrapper> spcTypes) throws Exception {
 
-        CollectionEventWrapper ce = parentSpc.getCollectionEvent();
+        parentSpc.getCollectionEvent();
 
         ProcessingEventWrapper pe = ProcessingEventHelper.addProcessingEvent(
             site, Utils.getRandomDate());
@@ -212,7 +215,7 @@ public class SpecimenHelper extends DbHelper {
             throw new Exception("cannot fit number of specimens: " + spcCount);
         }
 
-        CollectionEventWrapper ce = parentSpc.getCollectionEvent();
+        parentSpc.getCollectionEvent();
 
         ProcessingEventWrapper pe = ProcessingEventHelper.addProcessingEvent(
             container.getSite(), Utils.getRandomDate());

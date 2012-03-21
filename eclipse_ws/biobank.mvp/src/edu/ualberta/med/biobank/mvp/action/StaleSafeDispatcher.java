@@ -29,8 +29,10 @@ import edu.ualberta.med.biobank.mvp.action.StaleSafeDispatcher.AsyncContext.Call
  * @author jferland
  * 
  */
+@SuppressWarnings("unused")
 public class StaleSafeDispatcher implements Dispatcher {
     private final Dispatcher dispatcher;
+
     private final Map<Object, AsyncContext> contexts =
         new HashMap<Object, AsyncContext>();
 
@@ -79,9 +81,8 @@ public class StaleSafeDispatcher implements Dispatcher {
                 if (place > lastFinished) {
                     lastFinished = place;
                     return true;
-                } else {
-                    return false;
                 }
+                return false;
             }
         }
     }

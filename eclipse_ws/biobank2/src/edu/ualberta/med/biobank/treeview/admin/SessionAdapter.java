@@ -203,7 +203,7 @@ public class SessionAdapter extends AdapterBase {
         return null;
     }
 
-    public List<ClinicWrapper> getClinicCollection(boolean sort) {
+    public List<ClinicWrapper> getClinicCollection() {
         try {
             return ClinicWrapper.getAllClinics(appService);
         } catch (ApplicationException e) {

@@ -68,13 +68,11 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
 
     protected boolean useDefaultEditItem;
 
-    private Class<?> wrapperClass;
-
+    @SuppressWarnings("unused")
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int rowsPerPage, Class<?> wrapperClass) {
         super(parent, collection, headings, null, rowsPerPage);
 
-        this.wrapperClass = wrapperClass;
         addTableClickListener();
         useDefaultEditItem = false;
     }

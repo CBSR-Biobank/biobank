@@ -165,7 +165,7 @@ public class VPanel extends VControl {
         return layout;
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({ "unchecked", "unused" })
     public <T extends VLayout> T getLayout(Class<T> clazz) {
         return (T) layout;
     }

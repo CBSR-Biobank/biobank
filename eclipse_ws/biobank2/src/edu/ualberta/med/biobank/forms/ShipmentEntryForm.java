@@ -110,14 +110,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private CommentsInfoTable commentEntryTable;
 
-    private BgcEntryFormWidgetListener listener =
-        new BgcEntryFormWidgetListener() {
-            @Override
-            public void selectionChanged(MultiSelectEvent event) {
-                setDirty(true);
-            }
-        };
-
     private ShipmentReadInfo oiInfo;
 
     private OriginInfoWrapper originInfo = new OriginInfoWrapper(
@@ -346,8 +338,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         specimenEntryWidget =
-            new SpecimenEntryWidget(client, SWT.NONE, toolkit,
-                SessionManager.getAppService(), true);
+            new SpecimenEntryWidget(client, SWT.NONE, toolkit, true);
         specimenEntryWidget
             .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
                 @Override

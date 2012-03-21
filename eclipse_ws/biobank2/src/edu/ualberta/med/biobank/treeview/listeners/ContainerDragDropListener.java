@@ -122,31 +122,29 @@ public class ContainerDragDropListener implements DropTargetListener,
 
         if (wrapper != null && (wrapper instanceof ContainerWrapper)) {
             ContainerWrapper dstContainer = (ContainerWrapper) wrapper;
-            if (dstContainer != null) {
-                try {
-                    /* sanity checks */
-                    if (dstContainer.getContainerType()
-                        .getChildContainerTypeCollection()
-                        .contains(srcContainer.getContainerType())
-                        && !dstContainer.isContainerFull()) {
+            try {
+                /* sanity checks */
+                if (dstContainer.getContainerType()
+                    .getChildContainerTypeCollection()
+                    .contains(srcContainer.getContainerType())
+                    && !dstContainer.isContainerFull()) {
 
-                        // TODO implement the moving of containers here.
-                        System.out.println("Valid Drag Detected:"); //$NON-NLS-1$
-                        System.out.println(srcContainer + " --> " //$NON-NLS-1$
-                            + dstContainer);
-                        srcContainerAdapter.moveContainer(dstContainer);
-                        return;
-                    }
-                    BgcPlugin
-                        .openError(
-                            Messages.ContainerDragDropListener_state_error_title,
-                            Messages.ContainerDragDropListener_state_error_msg);
-                } catch (Exception ex) {
-                    BgcPlugin
-                        .openAsyncError(
-                            Messages.ContainerDragDropListener_drop_error_title,
-                            ex);
+                    // TODO implement the moving of containers here.
+                    System.out.println("Valid Drag Detected:"); //$NON-NLS-1$
+                    System.out.println(srcContainer + " --> " //$NON-NLS-1$
+                        + dstContainer);
+                    srcContainerAdapter.moveContainer(dstContainer);
+                    return;
                 }
+                BgcPlugin
+                    .openError(
+                        Messages.ContainerDragDropListener_state_error_title,
+                        Messages.ContainerDragDropListener_state_error_msg);
+            } catch (Exception ex) {
+                BgcPlugin
+                    .openAsyncError(
+                        Messages.ContainerDragDropListener_drop_error_title,
+                        ex);
             }
         }
         event.detail = DND.DROP_NONE;

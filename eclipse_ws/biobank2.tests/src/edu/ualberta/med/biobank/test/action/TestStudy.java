@@ -29,6 +29,8 @@ import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyDeleteAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction.StudiesInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyInfo;
@@ -50,7 +52,6 @@ import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * This test suite assumes that the association between Sites and Studies is
@@ -326,9 +327,8 @@ public class TestStudy extends TestAction {
         }
     }
 
-    private void studyAddContacts(Integer studyId, List<Integer> newContactIds)
-        throws ApplicationException {
-        StudyInfo studyInfo = exec(new StudyGetInfoAction(studyId));
+    private void studyAddContacts(Integer studyId, List<Integer> newContactIds) {
+        StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
         Set<Integer> contactIds = new HashSet<Integer>();
         for (ClinicInfo clinicInfo : studyInfo.getClinicInfos()) {
             for (Contact c : clinicInfo.getContacts()) {
@@ -343,7 +343,7 @@ public class TestStudy extends TestAction {
     }
 
     private void studyRemoveContacts(Integer studyId,
-        List<Integer> contactIdsToRemove) throws ApplicationException {
+        List<Integer> contactIdsToRemove) {
         // get a list of current contact IDs
         StudyInfo studyInfo =
             exec(new StudyGetInfoAction(studyId));
@@ -358,12 +358,11 @@ public class TestStudy extends TestAction {
         StudySaveAction studySave =
             StudyHelper.getSaveAction(studyInfo);
         studySave.setContactIds(studyContactIds);
-        exec(studySave);
+        EXECUTOR.exec(studySave);
     }
 
-    private Set<Integer> getStudyContactIds(Integer studyId)
-        throws ApplicationException {
-        StudyInfo studyInfo = exec(new StudyGetInfoAction(studyId));
+    private Set<Integer> getStudyContactIds(Integer studyId) {
+        StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
         Set<Integer> contactIds = new HashSet<Integer>();
         for (ClinicInfo clinicInfo : studyInfo.getClinicInfos()) {
             for (Contact c : clinicInfo.getContacts()) {
@@ -374,8 +373,7 @@ public class TestStudy extends TestAction {
     }
 
     private static Set<SourceSpecimenSaveInfo> getSourceSpecimens(
-        int numSourceSpecimens, List<SpecimenType> specimenType)
-        throws ApplicationException {
+        int numSourceSpecimens, List<SpecimenType> specimenType) {
         Set<SourceSpecimenSaveInfo> result =
             new HashSet<SourceSpecimenSaveInfo>();
         for (int i = 0; i < numSourceSpecimens; ++i) {
@@ -470,8 +468,7 @@ public class TestStudy extends TestAction {
     }
 
     private static Set<AliquotedSpecimenSaveInfo> addAliquotedSpecimens(
-        int numAliquotedSpecimens, List<SpecimenType> specimenTypes)
-        throws ApplicationException {
+        int numAliquotedSpecimens, List<SpecimenType> specimenTypes) {
         Set<AliquotedSpecimenSaveInfo> result =
             new HashSet<AliquotedSpecimenSaveInfo>();
         for (int i = 0; i < numAliquotedSpecimens; ++i) {
@@ -592,8 +589,7 @@ public class TestStudy extends TestAction {
         return globalEventAttrs;
     }
 
-    private Set<StudyEventAttrSaveInfo> getStudyEventAttrSaveInfosAll()
-        throws ApplicationException {
+    private Set<StudyEventAttrSaveInfo> getStudyEventAttrSaveInfosAll() {
         HashSet<StudyEventAttrSaveInfo> result =
             new HashSet<StudyEventAttrSaveInfo>();
 
@@ -697,7 +693,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void delete() throws ApplicationException {
+    public void delete() {
         // delete a study with no patients and no other associations
         Integer studyId = exec(studySaveAction).getId();
         StudyInfo studyInfo = exec(new StudyGetInfoAction(studyId));
@@ -713,7 +709,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void deleteWithPatients() throws ApplicationException {
+    public void deleteWithPatients() {
         // add patients to study
         Integer studyId = exec(studySaveAction).getId();
         PatientSaveAction patientSaveAction =
@@ -737,7 +733,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void deleteWithContacts() throws ApplicationException {
+    public void deleteWithContacts() {
         // add contact to study - should be allowed to delete
         //
         // there should be none for this study after the delete
@@ -768,7 +764,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void deleteWithSourceSpecimens() throws ApplicationException {
+    public void deleteWithSourceSpecimens() {
         // add source specimens to study
         Integer studyId = exec(studySaveAction).getId();
         getSourceSpecimens(5, getSpecimenTypes());
@@ -778,7 +774,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void deleteWithAliquotedSpecimens() throws ApplicationException {
+    public void deleteWithAliquotedSpecimens() {
         // add source specimens to study
         //
         // there should be none for this study after the delete
@@ -790,7 +786,7 @@ public class TestStudy extends TestAction {
     }
 
     @Test
-    public void deleteWithStudyEventAttrs() throws ApplicationException {
+    public void deleteWithStudyEventAttrs() {
         // add study event attributes to study
         //
         // there should be none for this study after the delete
@@ -801,5 +797,33 @@ public class TestStudy extends TestAction {
         exec(new StudyDeleteAction(studyInfo.getStudy()));
         Assert.assertTrue(getStudyEventAttrCount(studyId).equals(0L));
 
+    }
+
+    @Test
+    public void getAllStudiesAction() {
+
+        StudyGetAllAction action = new StudyGetAllAction();
+        StudiesInfo infos = EXECUTOR.exec(action);
+
+        Integer startSize = infos.getStudies().size();
+
+        Integer firstStudy = StudyHelper.createStudy(EXECUTOR,
+            name + Utils.getRandomNumericString(15), ActivityStatus.ACTIVE);
+
+        infos = EXECUTOR.exec(action);
+        Assert.assertTrue(infos.getStudies().size() == startSize + 1);
+
+        StudyHelper.createStudy(EXECUTOR,
+            name + Utils.getRandomNumericString(15), ActivityStatus.ACTIVE);
+
+        infos = EXECUTOR.exec(action);
+        Assert.assertTrue(infos.getStudies().size() == startSize + 2);
+
+        Study study = new Study();
+        study.setId(firstStudy);
+        EXECUTOR.exec(new StudyDeleteAction(study));
+
+        infos = EXECUTOR.exec(action);
+        Assert.assertTrue(infos.getStudies().size() == startSize + 1);
     }
 }

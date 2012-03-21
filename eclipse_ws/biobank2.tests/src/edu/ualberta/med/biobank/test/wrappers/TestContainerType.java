@@ -40,6 +40,7 @@ import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@SuppressWarnings({ "unused", "deprecation" })
 @Deprecated
 public class TestContainerType extends TestDatabase {
     private static final int CONTAINER_TOP_ROWS = 5;

@@ -76,8 +76,9 @@ public abstract class AbstractContainerDisplay {
      * Get the text to write inside the cell. This default implementation use
      * the cell position and the containerType.
      */
+    @SuppressWarnings("unused")
     protected String getDefaultTextForBox(
-        @SuppressWarnings("unused") Map<RowColPos, ? extends AbstractUICell> cells,
+        Map<RowColPos, ? extends AbstractUICell> cells,
         int indexRow, int indexCol) {
         RowColPos rowcol = new RowColPos(indexRow, indexCol);
         String parentLabel = ""; //$NON-NLS-1$

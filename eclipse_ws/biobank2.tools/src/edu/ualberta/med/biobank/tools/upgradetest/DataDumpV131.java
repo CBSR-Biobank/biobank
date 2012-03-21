@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.Properties;
 
 public class DataDumpV131 extends DataDump {
@@ -34,8 +33,7 @@ public class DataDumpV131 extends DataDump {
         bw.flush();
     }
 
-    public void getPvSourceVessels() throws SQLException, IOException,
-        ParseException {
+    public void getPvSourceVessels() throws SQLException, IOException {
         PreparedStatement ps = dbconnection.prepareStatement(queryProps
             .getProperty("v131.getPvSourceVessels"));
 
@@ -54,8 +52,7 @@ public class DataDumpV131 extends DataDump {
         bw.flush();
     }
 
-    public void getAliquotStorageSite() throws SQLException, IOException,
-        ParseException {
+    public void getAliquotStorageSite() throws SQLException, IOException {
         PreparedStatement ps = dbconnection.prepareStatement(queryProps
             .getProperty("v131.getAliquotStorageSite"));
 
@@ -70,8 +67,7 @@ public class DataDumpV131 extends DataDump {
         bw.flush();
     }
 
-    public void getSiteStudies() throws SQLException, IOException,
-        ParseException {
+    public void getSiteStudies() throws SQLException, IOException {
         PreparedStatement ps = dbconnection.prepareStatement(queryProps
             .getProperty("v131.getSiteStudies"));
 
@@ -86,8 +82,7 @@ public class DataDumpV131 extends DataDump {
         bw.flush();
     }
 
-    public void getStudyContacts() throws SQLException, IOException,
-        ParseException {
+    public void getStudyContacts() throws SQLException, IOException {
         PreparedStatement ps = dbconnection.prepareStatement(queryProps
             .getProperty("v131.getStudyContacts"));
 
@@ -103,8 +98,7 @@ public class DataDumpV131 extends DataDump {
         bw.flush();
     }
 
-    public void getSiteContainers() throws SQLException, IOException,
-        ParseException {
+    public void getSiteContainers() throws SQLException, IOException {
         PreparedStatement ps = dbconnection.prepareStatement(queryProps
             .getProperty("v131.getSiteContainers"));
 
@@ -119,8 +113,7 @@ public class DataDumpV131 extends DataDump {
         bw.flush();
     }
 
-    public void getClinicShipments() throws SQLException, IOException,
-        ParseException {
+    public void getClinicShipments() throws SQLException, IOException {
         PreparedStatement ps = dbconnection.prepareStatement(queryProps
             .getProperty("v131.getClinicShipments"));
 
@@ -139,8 +132,7 @@ public class DataDumpV131 extends DataDump {
         bw.flush();
     }
 
-    public void getDispatchAliquots() throws SQLException, IOException,
-        ParseException {
+    public void getDispatchAliquots() throws SQLException, IOException {
         PreparedStatement ps = dbconnection.prepareStatement(queryProps
             .getProperty("v131.getDispatchAliquots"));
 
@@ -159,8 +151,7 @@ public class DataDumpV131 extends DataDump {
         bw.flush();
     }
 
-    public void getPatientVisits() throws SQLException, IOException,
-        ParseException {
+    public void getPatientVisits() throws SQLException, IOException {
         PreparedStatement ps = dbconnection.prepareStatement(queryProps
             .getProperty("v131.getPatientVisits"));
 

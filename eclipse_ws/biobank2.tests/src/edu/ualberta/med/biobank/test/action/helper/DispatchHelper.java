@@ -36,8 +36,8 @@ public class DispatchHelper extends Helper {
         return infos;
     }
 
-    public static DispatchSaveInfo createSaveDispatchInfoRandom(
-        IActionExecutor actionExecutor, Integer siteId, Integer centerId,
+    public static DispatchSaveInfo createSaveDispatchInfoRandom(Integer siteId,
+        Integer centerId,
         Integer state, String comment) {
         return new DispatchSaveInfo(null, siteId, centerId, state, comment);
     }
@@ -46,8 +46,8 @@ public class DispatchHelper extends Helper {
         Integer srcCenterId, Integer dstCenterId, Integer patientId)
         throws Exception {
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(actionExecutor,
-                dstCenterId, srcCenterId, DispatchState.CREATION.getId(),
+            DispatchHelper.createSaveDispatchInfoRandom(dstCenterId,
+                srcCenterId, DispatchState.CREATION.getId(),
                 Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(actionExecutor,

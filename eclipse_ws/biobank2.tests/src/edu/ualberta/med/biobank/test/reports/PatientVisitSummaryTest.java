@@ -139,10 +139,9 @@ public class PatientVisitSummaryTest extends AbstractReportTest {
         Collection<ProcessingEventWrapper> patientVisits = getPatientVisits();
 
         Collection<ProcessingEventWrapper> filteredPatientVisits =
-            PredicateUtil
-                .filter(patientVisits, PredicateUtil.andPredicate(
-                    patientVisitProcessedBetween(after, before),
-                    patientVisitSite(isInSite(), getSiteId())));
+            PredicateUtil.filter(patientVisits, PredicateUtil.andPredicate(
+                patientVisitProcessedBetween(after, before),
+                patientVisitSite(isInSite(), getSiteId())));
 
         Map<List<String>, PvCount> pvCountByStudyClincPatient = MapperUtil.map(
             filteredPatientVisits, PV_COUNT_BY_STUDY_CLINIC_PATIENT);
