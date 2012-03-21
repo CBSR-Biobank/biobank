@@ -539,6 +539,7 @@ public class Factory {
 
         // remove membership
         user.getMemberships().clear();
+        session.delete(m);
 
         session.update(user);
         session.flush();
@@ -565,6 +566,7 @@ public class Factory {
 
         // remove membership
         group.getMemberships().clear();
+        session.delete(m);
 
         session.update(group);
         session.flush();
