@@ -46,8 +46,6 @@ public class UserSaveAction implements Action<IdResult> {
     public IdResult run(ActionContext context) throws ActionException {
         User user = context.load(User.class, input.getUserId(), new User());
 
-        createCsmUser(context, user);
-
         setProperties(context, user);
         setMemberships(context, user);
         setGroups(context, user);
@@ -58,7 +56,7 @@ public class UserSaveAction implements Action<IdResult> {
     }
 
     private void createCsmUser(ActionContext context, User user) {
-        if (user.isNew()) return;
+        if (!user.isNew()) return;
         if (user.getCsmUserId() != null) return;
         try {
             String password = input.getPassword();
@@ -84,6 +82,8 @@ public class UserSaveAction implements Action<IdResult> {
             user.setFullName(input.getFullName());
             user.setNeedPwdChange(input.isNeedPwdChange());
             user.setRecvBulkEmails(input.isRecvBulkEmails());
+
+            createCsmUser(context, user);
 
             String newPw = input.getPassword();
             if (!user.isNew() && newPw != null) {
@@ -188,8 +188,8 @@ public class UserSaveAction implements Action<IdResult> {
 
     private SetDiff<MembershipDomain> diffMemberships(User user) {
         final Set<MembershipDomain> oldDomains, newDomains;
-        oldDomains = MembershipDomain.from(input.getMemberships());
-        newDomains = MembershipDomain.from(user.getMemberships());
+        oldDomains = MembershipDomain.from(user.getMemberships());
+        newDomains = MembershipDomain.from(input.getMemberships());
         return new SetDiff<MembershipDomain>(oldDomains, newDomains);
     }
 
@@ -281,7 +281,7 @@ public class UserSaveAction implements Action<IdResult> {
      * 
      * @author Jonathan Ferland
      */
-    private static class MembershipDomain {
+    public static class MembershipDomain {
         private final Membership membership;
         private final Integer centerId;
         private final Integer studyId;
