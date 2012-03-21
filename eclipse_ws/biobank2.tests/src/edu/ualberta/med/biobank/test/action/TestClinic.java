@@ -289,11 +289,11 @@ public class TestClinic extends TestAction {
 
     @Test
     public void deleteWithStudies() {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
         ClinicInfo clinicInfo =
-            EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
+            exec(new ClinicGetInfoAction(provisioning.clinicId));
         try {
-            EXECUTOR.exec(new ClinicDeleteAction(clinicInfo.clinic));
+            exec(new ClinicDeleteAction(clinicInfo.clinic));
             Assert
                 .fail("should not be allowed to delete a clinic linked to a study");
         } catch (ConstraintViolationException e) {

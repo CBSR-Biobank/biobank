@@ -23,19 +23,19 @@ public class TestSpecimenType extends TestAction {
     @Test
     public void mangleTypes() {
         SpecimenTypeGetAllAction action = new SpecimenTypeGetAllAction();
-        Integer size = EXECUTOR.exec(action).getList().size();
+        Integer size = exec(action).getList().size();
 
         final Integer typeId =
-            EXECUTOR.exec(new SpecimenTypeSaveAction(name, name)).getId();
+            exec(new SpecimenTypeSaveAction(name, name)).getId();
 
-        Assert.assertTrue(size + 1 == EXECUTOR.exec(action).getList().size());
+        Assert.assertTrue(size + 1 == exec(action).getList().size());
 
         SpecimenTypeDeleteAction delete =
             new SpecimenTypeDeleteAction((SpecimenType) session.load(
                 SpecimenType.class,
                 typeId));
-        EXECUTOR.exec(delete);
+        exec(delete);
 
-        Assert.assertTrue(size == EXECUTOR.exec(action).getList().size());
+        Assert.assertTrue(size == exec(action).getList().size());
     }
 }

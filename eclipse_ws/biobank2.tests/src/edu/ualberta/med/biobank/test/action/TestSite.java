@@ -166,7 +166,7 @@ public class TestSite extends TestAction {
         HashSet<Integer> added = new HashSet<Integer>();
         added.add(sourceSpecs.get(0).specimen.getId());
 
-        EXECUTOR.exec(new ProcessingEventSaveAction(
+        exec(new ProcessingEventSaveAction(
             null, provisioning.siteId, Utils.getRandomDate(), Utils
                 .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
             added, new HashSet<Integer>())).getId();
@@ -390,9 +390,9 @@ public class TestSite extends TestAction {
 
     @Test
     public void delete() {
-        Integer siteId = EXECUTOR.exec(siteSaveAction).getId();
-        SiteInfo siteInfo = EXECUTOR.exec(new SiteGetInfoAction(siteId));
-        EXECUTOR.exec(new SiteDeleteAction(siteInfo.getSite()));
+        Integer siteId = exec(siteSaveAction).getId();
+        SiteInfo siteInfo = exec(new SiteGetInfoAction(siteId));
+        exec(new SiteDeleteAction(siteInfo.getSite()));
 
         // hql query for site should return empty
         Query q =
@@ -404,8 +404,8 @@ public class TestSite extends TestAction {
     }
 
     private Provisioning createSiteWithContainerType() {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
-        provisioning.addContainerType(EXECUTOR, name,
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        provisioning.addContainerType(getExecutor(), name,
             getContainerLabelingSchemes().values().iterator().next()
                 .getId(), getR().nextDouble());
         return provisioning;
@@ -505,7 +505,7 @@ public class TestSite extends TestAction {
         // create a processing event with one of the collection event source
         // specimens
         Integer peventId =
-            EXECUTOR.exec(
+            exec(
                 new ProcessingEventSaveAction(
                     null, provisioning.siteId, Utils.getRandomDate(), Utils
                         .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
@@ -623,26 +623,28 @@ public class TestSite extends TestAction {
     @Test
     public void getStudyInfo() throws Exception {
         Set<Integer> studyIds = new HashSet<Integer>();
-        studyIds.add(StudyHelper.createStudy(EXECUTOR,
+        studyIds.add(StudyHelper.createStudy(getExecutor(),
             name + Utils.getRandomString(5), ActivityStatus.ACTIVE));
         Integer siteId =
-            SiteHelper.createSite(EXECUTOR, name + Utils.getRandomString(5),
+            SiteHelper.createSite(getExecutor(),
+                name + Utils.getRandomString(5),
                 "Edmo", ActivityStatus.ACTIVE, studyIds);
 
-        Integer patients = R.nextInt(5);
-        Integer collectionEvents = R.nextInt(5);
+        Integer patients = getR().nextInt(5);
+        Integer collectionEvents = getR().nextInt(5);
 
         for (int i = 0; i < patients; i++) {
             Integer patient =
-                PatientHelper.createPatient(EXECUTOR,
+                PatientHelper.createPatient(getExecutor(),
                     name + Utils.getRandomString(5), studyIds.iterator()
                         .next());
             for (int j = 0; j < collectionEvents; j++)
-                CollectionEventHelper.createCEventWithSourceSpecimens(EXECUTOR,
+                CollectionEventHelper.createCEventWithSourceSpecimens(
+                    getExecutor(),
                     patient, siteId);
         }
         SiteGetStudyInfoAction action = new SiteGetStudyInfoAction(siteId);
-        ListResult<StudyCountInfo> studies = EXECUTOR.exec(action);
+        ListResult<StudyCountInfo> studies = exec(action);
 
         Assert
             .assertTrue(studies.getList().get(0).getCollectionEventCount()

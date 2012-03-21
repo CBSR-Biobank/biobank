@@ -80,12 +80,6 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         peventToSave.setCreatedAt(createdAt);
         peventToSave.setWorksheet(worksheet);
 
-        Set<Specimen> specimens =
-            context.load(Specimen.class, specimenIds);
-        SetDifference<Specimen> specimensDiff = new SetDifference<Specimen>(
-            peventToSave.getSpecimens(), specimens);
-        peventToSave.setSpecimens(specimensDiff.getNewSet());
-
         // set processing event on added specimens
         for (Integer specimen : addedSpecimenIds) {
             Specimen spec = context.load(Specimen.class, specimen);

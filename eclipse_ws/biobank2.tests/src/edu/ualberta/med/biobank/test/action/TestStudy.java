@@ -328,7 +328,7 @@ public class TestStudy extends TestAction {
     }
 
     private void studyAddContacts(Integer studyId, List<Integer> newContactIds) {
-        StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
+        StudyInfo studyInfo = exec(new StudyGetInfoAction(studyId));
         Set<Integer> contactIds = new HashSet<Integer>();
         for (ClinicInfo clinicInfo : studyInfo.getClinicInfos()) {
             for (Contact c : clinicInfo.getContacts()) {
@@ -358,11 +358,11 @@ public class TestStudy extends TestAction {
         StudySaveAction studySave =
             StudyHelper.getSaveAction(studyInfo);
         studySave.setContactIds(studyContactIds);
-        EXECUTOR.exec(studySave);
+        exec(studySave);
     }
 
     private Set<Integer> getStudyContactIds(Integer studyId) {
-        StudyInfo studyInfo = EXECUTOR.exec(new StudyGetInfoAction(studyId));
+        StudyInfo studyInfo = exec(new StudyGetInfoAction(studyId));
         Set<Integer> contactIds = new HashSet<Integer>();
         for (ClinicInfo clinicInfo : studyInfo.getClinicInfos()) {
             for (Contact c : clinicInfo.getContacts()) {
@@ -803,27 +803,27 @@ public class TestStudy extends TestAction {
     public void getAllStudiesAction() {
 
         StudyGetAllAction action = new StudyGetAllAction();
-        StudiesInfo infos = EXECUTOR.exec(action);
+        StudiesInfo infos = exec(action);
 
         Integer startSize = infos.getStudies().size();
 
-        Integer firstStudy = StudyHelper.createStudy(EXECUTOR,
+        Integer firstStudy = StudyHelper.createStudy(getExecutor(),
             name + Utils.getRandomNumericString(15), ActivityStatus.ACTIVE);
 
-        infos = EXECUTOR.exec(action);
+        infos = exec(action);
         Assert.assertTrue(infos.getStudies().size() == startSize + 1);
 
-        StudyHelper.createStudy(EXECUTOR,
+        StudyHelper.createStudy(getExecutor(),
             name + Utils.getRandomNumericString(15), ActivityStatus.ACTIVE);
 
-        infos = EXECUTOR.exec(action);
+        infos = exec(action);
         Assert.assertTrue(infos.getStudies().size() == startSize + 2);
 
         Study study = new Study();
         study.setId(firstStudy);
-        EXECUTOR.exec(new StudyDeleteAction(study));
+        exec(new StudyDeleteAction(study));
 
-        infos = EXECUTOR.exec(action);
+        infos = exec(action);
         Assert.assertTrue(infos.getStudies().size() == startSize + 1);
     }
 }

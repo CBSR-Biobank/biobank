@@ -111,7 +111,7 @@ public class TestProcessingEvent extends TestAction {
         // create a processing event with one of the collection event source
         // specimen
         Integer pEventId =
-            EXECUTOR.exec(
+            exec(
                 new ProcessingEventSaveAction(
                     null, provisioning.siteId, date, worksheet,
                     ActivityStatus.ACTIVE, commentText,
@@ -240,7 +240,7 @@ public class TestProcessingEvent extends TestAction {
         // create a processing event with one of the collection event source
         // specimen.
         Integer pEventId =
-            EXECUTOR.exec(
+            exec(
                 new ProcessingEventSaveAction(
                     null, provisioning.siteId, Utils.getRandomDate(), Utils
                         .getRandomString(50), ActivityStatus.ACTIVE, null,
@@ -292,7 +292,7 @@ public class TestProcessingEvent extends TestAction {
         // create a processing event with one of the collection event source
         // specimen.
         Integer pEventId =
-            EXECUTOR.exec(
+            exec(
                 new ProcessingEventSaveAction(
                     null, provisioning.siteId, Utils.getRandomDate(),
                     Utils.getRandomString(50), ActivityStatus.ACTIVE, null,

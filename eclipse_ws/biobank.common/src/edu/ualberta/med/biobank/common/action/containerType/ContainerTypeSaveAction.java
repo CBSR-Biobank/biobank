@@ -188,6 +188,6 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
             context.load(ContainerType.class, childContainerTypeIds);
         containerType.getChildContainerTypes().clear();
         containerType.getChildContainerTypes().addAll(
-            new HashSet<ContainerType>(childContainerTypes.values()));
+            new HashSet<ContainerType>(childContainerTypes));
     }
 }
