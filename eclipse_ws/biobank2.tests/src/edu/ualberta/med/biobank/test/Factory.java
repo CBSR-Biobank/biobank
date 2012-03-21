@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Role;
@@ -545,6 +546,9 @@ public class Factory {
 
         Membership m = userManager.getMemberships().iterator().next();
         m.setRank(Rank.MANAGER);
+
+        // they need something to manage
+        m.getPermissions().add(PermissionEnum.CLINIC_READ);
 
         session.update(userManager);
         session.flush();

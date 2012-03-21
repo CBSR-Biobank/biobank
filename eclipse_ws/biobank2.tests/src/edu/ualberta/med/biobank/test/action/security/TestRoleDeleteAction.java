@@ -30,10 +30,11 @@ public class TestRoleDeleteAction extends TestAction {
     public void adminAccess() {
         Transaction tx = session.beginTransaction();
         Role role = factory.createRole();
+        User admin = factory.createAdmin();
         tx.commit();
 
         try {
-            execAsAdmin(new RoleDeleteAction(new RoleDeleteInput(role)));
+            execAs(admin, new RoleDeleteAction(new RoleDeleteInput(role)));
             Assert.fail();
         } catch (AccessDeniedException e) {
         }
@@ -43,10 +44,11 @@ public class TestRoleDeleteAction extends TestAction {
     public void normalAccess() {
         Transaction tx = session.beginTransaction();
         Role role = factory.createRole();
+        User user = factory.createUser();
         tx.commit();
 
         try {
-            execAsNormal(new RoleDeleteAction(new RoleDeleteInput(role)));
+            execAs(user, new RoleDeleteAction(new RoleDeleteInput(role)));
             Assert.fail();
         } catch (AccessDeniedException e) {
         }
@@ -56,12 +58,11 @@ public class TestRoleDeleteAction extends TestAction {
     public void managerAccess() {
         Transaction tx = session.beginTransaction();
         Role role = factory.createRole();
-        User user = factory.createManager();
+        User manager = factory.createManager();
         tx.commit();
 
         try {
-            getExecutor().setUserId(user.getId());
-            exec(new RoleDeleteAction(new RoleDeleteInput(role)));
+            execAs(manager, new RoleDeleteAction(new RoleDeleteInput(role)));
             Assert.fail();
         } catch (AccessDeniedException e) {
         }

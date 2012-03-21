@@ -31,13 +31,21 @@ public class TestGroupGetAllAction extends TestAction {
 
     @Test
     public void adminAccess() {
-        execAsAdmin(new GroupGetAllAction(new GroupGetAllInput()));
+        Transaction tx = session.beginTransaction();
+        User admin = factory.createAdmin();
+        tx.commit();
+        
+        execAs(admin, new GroupGetAllAction(new GroupGetAllInput()));
     }
 
     @Test
     public void normalAccess() {
+        Transaction tx = session.beginTransaction();
+        User user = factory.createUser();
+        tx.commit();
+        
         try {
-            execAsNormal(new GroupGetAllAction(new GroupGetAllInput()));
+            execAs(user, new GroupGetAllAction(new GroupGetAllInput()));
             Assert.fail();
         } catch (AccessDeniedException e) {
         }
@@ -45,7 +53,11 @@ public class TestGroupGetAllAction extends TestAction {
 
     @Test
     public void managerAccess() {
-        execAsManager(new GroupGetAllAction(new GroupGetAllInput()));
+        Transaction tx = session.beginTransaction();
+        User manager = factory.createManager();
+        tx.commit();
+        
+        execAs(manager, new GroupGetAllAction(new GroupGetAllInput()));
     }
 
     @Test

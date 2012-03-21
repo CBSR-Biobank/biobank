@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.action.security.GroupDeleteAction;
 import edu.ualberta.med.biobank.common.action.security.GroupDeleteInput;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.action.TestAction;
 
 public class TestGroupDeleteAction extends TestAction {
@@ -30,19 +31,21 @@ public class TestGroupDeleteAction extends TestAction {
     public void adminAccess() {
         Transaction tx = session.beginTransaction();
         Group group = factory.createGroup();
+        User admin = factory.createAdmin();
         tx.commit();
 
-        execAsAdmin(new GroupDeleteAction(new GroupDeleteInput(group)));
+        execAs(admin, new GroupDeleteAction(new GroupDeleteInput(group)));
     }
 
     @Test
     public void normalAccess() {
         Transaction tx = session.beginTransaction();
         Group group = factory.createGroup();
+        User user = factory.createUser();
         tx.commit();
 
         try {
-            execAsNormal(new GroupDeleteAction(new GroupDeleteInput(group)));
+            execAs(user, new GroupDeleteAction(new GroupDeleteInput(group)));
             Assert.fail();
         } catch (AccessDeniedException e) {
         }
@@ -52,9 +55,10 @@ public class TestGroupDeleteAction extends TestAction {
     public void managerAccess() {
         Transaction tx = session.beginTransaction();
         Group group = factory.createGroup();
+        User manager = factory.createManager();
         tx.commit();
 
-        execAsManager(new GroupDeleteAction(new GroupDeleteInput(group)));
+        execAs(manager, new GroupDeleteAction(new GroupDeleteInput(group)));
     }
 
     @Test
