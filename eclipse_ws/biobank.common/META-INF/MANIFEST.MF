@@ -99,6 +99,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.common.action.scanprocess.data,
  edu.ualberta.med.biobank.common.action.scanprocess.result,
  edu.ualberta.med.biobank.common.action.search,
+ edu.ualberta.med.biobank.common.action.security,
  edu.ualberta.med.biobank.common.action.shipment,
  edu.ualberta.med.biobank.common.action.site,
  edu.ualberta.med.biobank.common.action.specimen,

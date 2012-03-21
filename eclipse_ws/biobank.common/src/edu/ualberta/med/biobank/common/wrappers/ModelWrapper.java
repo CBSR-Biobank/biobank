@@ -315,7 +315,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             return list.get(0);
         }
         throw new BiobankException(MessageFormat.format(
-            "Found {0} objects of type {1} with id={2}" + list.size(), //$NON-NLS-1$
+            "Found {0} objects of type {1} with id={2}", list.size(), //$NON-NLS-1$
             getWrappedClass().getName(), id));
     }
 
