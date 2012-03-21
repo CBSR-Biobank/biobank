@@ -16,7 +16,7 @@ insert into csm_user_group_role_pg (user_id, role_id, protection_group_id, updat
        where login_name = 'testreader';
 
 -- add limited access group 'Technician Level 1'
-insert into principal values ('Group', 157, 0, 1, NULL, 'Technician Level 1', NULL, NULL, NULL, NULL, NULL, NULL);	   
+insert into principal values ('BbGroup', 157, 0, 1, NULL, 'Technician Level 1', NULL, NULL, NULL, NULL, NULL, NULL);	   
 	   
 -- add testuser to group 'Technician Level 1'
 insert into group_user(user_id, group_id)
