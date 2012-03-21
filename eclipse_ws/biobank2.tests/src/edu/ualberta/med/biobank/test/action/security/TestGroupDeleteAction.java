@@ -13,8 +13,10 @@ import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.security.GroupDeleteAction;
 import edu.ualberta.med.biobank.common.action.security.GroupDeleteInput;
 import edu.ualberta.med.biobank.model.Group;
+import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.test.Factory.Domain;
 import edu.ualberta.med.biobank.test.action.TestAction;
 
 public class TestGroupDeleteAction extends TestAction {
@@ -31,10 +33,11 @@ public class TestGroupDeleteAction extends TestAction {
     public void adminAccess() {
         Transaction tx = session.beginTransaction();
         Group group = factory.createGroup();
-        User admin = factory.createAdmin();
+        User user = factory.createUser();
+        factory.createMembership(Domain.CENTER_STUDY, Rank.ADMINISTRATOR);
         tx.commit();
 
-        execAs(admin, new GroupDeleteAction(new GroupDeleteInput(group)));
+        execAs(user, new GroupDeleteAction(new GroupDeleteInput(group)));
     }
 
     @Test
@@ -55,10 +58,11 @@ public class TestGroupDeleteAction extends TestAction {
     public void managerAccess() {
         Transaction tx = session.beginTransaction();
         Group group = factory.createGroup();
-        User manager = factory.createManager();
+        User user = factory.createUser();
+        factory.createMembership(Domain.CENTER_STUDY, Rank.MANAGER);
         tx.commit();
 
-        execAs(manager, new GroupDeleteAction(new GroupDeleteInput(group)));
+        execAs(user, new GroupDeleteAction(new GroupDeleteInput(group)));
     }
 
     @Test

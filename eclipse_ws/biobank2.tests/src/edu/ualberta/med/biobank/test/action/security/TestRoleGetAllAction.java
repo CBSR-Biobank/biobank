@@ -14,8 +14,10 @@ import edu.ualberta.med.biobank.common.action.security.RoleGetAllAction;
 import edu.ualberta.med.biobank.common.action.security.RoleGetAllInput;
 import edu.ualberta.med.biobank.common.action.security.RoleGetAllOutput;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.test.Factory.Domain;
 import edu.ualberta.med.biobank.test.action.TestAction;
 
 public class TestRoleGetAllAction extends TestAction {
@@ -27,11 +29,12 @@ public class TestRoleGetAllAction extends TestAction {
     @Test
     public void adminAccess() {
         Transaction tx = session.beginTransaction();
-        User admin = factory.createAdmin();
+        User user = factory.createUser();
+        factory.createMembership(Domain.CENTER_STUDY, Rank.ADMINISTRATOR);
         tx.commit();
         
         try {
-            execAs(admin, new RoleGetAllAction(new RoleGetAllInput()));
+            execAs(user, new RoleGetAllAction(new RoleGetAllInput()));
             Assert.fail();
         } catch (AccessDeniedException e) {
         }

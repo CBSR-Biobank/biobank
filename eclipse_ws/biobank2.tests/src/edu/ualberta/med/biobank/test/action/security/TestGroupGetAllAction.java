@@ -16,11 +16,13 @@ import edu.ualberta.med.biobank.common.action.security.GroupGetAllOutput;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.AssertMore;
+import edu.ualberta.med.biobank.test.Factory.Domain;
 import edu.ualberta.med.biobank.test.action.TestAction;
 
 public class TestGroupGetAllAction extends TestAction {
@@ -32,10 +34,11 @@ public class TestGroupGetAllAction extends TestAction {
     @Test
     public void adminAccess() {
         Transaction tx = session.beginTransaction();
-        User admin = factory.createAdmin();
+        User user = factory.createUser();
+        factory.createMembership(Domain.CENTER_STUDY, Rank.ADMINISTRATOR);
         tx.commit();
         
-        execAs(admin, new GroupGetAllAction(new GroupGetAllInput()));
+        execAs(user, new GroupGetAllAction(new GroupGetAllInput()));
     }
 
     @Test
@@ -54,10 +57,11 @@ public class TestGroupGetAllAction extends TestAction {
     @Test
     public void managerAccess() {
         Transaction tx = session.beginTransaction();
-        User manager = factory.createManager();
+        User user = factory.createUser();
+        factory.createMembership(Domain.CENTER_STUDY, Rank.MANAGER);
         tx.commit();
         
-        execAs(manager, new GroupGetAllAction(new GroupGetAllInput()));
+        execAs(user, new GroupGetAllAction(new GroupGetAllInput()));
     }
 
     @Test
@@ -146,7 +150,9 @@ public class TestGroupGetAllAction extends TestAction {
         Site site1 = factory.createSite();
         Study studyA = factory.createStudy();
         Group group1A = factory.createGroup();
-        User man1A = factory.createManager();
+        factory.createMembership();
+        User man1A = factory.createUser();
+        factory.createMembership(Domain.CENTER_STUDY, Rank.MANAGER);
 
         Membership man1Amembership = man1A.getMemberships().iterator().next();
         man1Amembership.getPermissions().add(PermissionEnum.CLINIC_READ);
@@ -154,7 +160,9 @@ public class TestGroupGetAllAction extends TestAction {
         Site site2 = factory.createSite();
         Study studyB = factory.createStudy();
         Group group2B = factory.createGroup();
-        User man2B = factory.createManager();
+        factory.createMembership();
+        User man2B = factory.createUser();
+        factory.createMembership(Domain.CENTER_STUDY, Rank.MANAGER);
         tx.commit();
 
         GroupGetAllOutput actual;

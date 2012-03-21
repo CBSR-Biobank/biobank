@@ -527,10 +527,8 @@ public class Factory {
         // cheap fix to avoid actually having to create a CSM user
         user.setCsmUserId(-Math.abs(R.nextLong()));
 
-        // must contain at least one Membership
+        // temporary membership, for creating
         Membership m = new Membership();
-        m.setCenter(getDefaultCenter());
-        m.setStudy(getDefaultStudy());
         m.setPrincipal(user);
         user.getMemberships().add(m);
 
@@ -538,32 +536,13 @@ public class Factory {
         setDefaultPrincipal(user);
         session.save(user);
         session.flush();
+
+        // remove membership
+        user.getMemberships().clear();
+
+        session.update(user);
+        session.flush();
         return user;
-    }
-
-    public User createManager() {
-        User userManager = createUser();
-
-        Membership m = userManager.getMemberships().iterator().next();
-        m.setRank(Rank.MANAGER);
-
-        // they need something to manage
-        m.getPermissions().add(PermissionEnum.CLINIC_READ);
-
-        session.update(userManager);
-        session.flush();
-        return userManager;
-    }
-
-    public User createAdmin() {
-        User admin = createUser();
-
-        Membership m = admin.getMemberships().iterator().next();
-        m.setRank(Rank.ADMINISTRATOR);
-
-        session.update(admin);
-        session.flush();
-        return admin;
     }
 
     public Group createGroup() {
@@ -573,28 +552,55 @@ public class Factory {
         group.setName(name);
         group.setDescription(name);
 
-        // must contain at least one Membership
+        // temporary membership, for creating
         Membership m = new Membership();
-        m.setCenter(getDefaultCenter());
-        m.setStudy(getDefaultStudy());
         m.setPrincipal(group);
         group.getMemberships().add(m);
 
         setDefaultGroup(group);
         setDefaultPrincipal(group);
+
         session.save(group);
+        session.flush();
+
+        // remove membership
+        group.getMemberships().clear();
+
+        session.update(group);
         session.flush();
         return group;
     }
 
     public Membership createMembership() {
+        return createMembership(Domain.CENTER_STUDY, Rank.NORMAL);
+    }
+
+    public enum Domain {
+        GLOBAL,
+        CENTER,
+        STUDY,
+        CENTER_STUDY;
+    }
+
+    public Membership createMembership(Domain domain, Rank rank) {
         Membership membership = new Membership();
-        membership.setCenter(getDefaultCenter());
-        membership.setStudy(getDefaultStudy());
+
+        if (domain == Domain.CENTER || domain == Domain.CENTER_STUDY) {
+            membership.setCenter(getDefaultCenter());
+        }
+        if (domain == Domain.STUDY || domain == Domain.CENTER_STUDY) {
+            membership.setStudy(getDefaultStudy());
+        }
 
         Principal p = getDefaultPrincipal();
         p.getMemberships().add(membership);
         membership.setPrincipal(p);
+        membership.setRank(rank);
+
+        if (Rank.MANAGER.equals(rank)) {
+            // needs at least one permission or role to manage
+            membership.getPermissions().add(PermissionEnum.CLINIC_READ);
+        }
 
         setDefaultMembership(membership);
         session.save(membership);
