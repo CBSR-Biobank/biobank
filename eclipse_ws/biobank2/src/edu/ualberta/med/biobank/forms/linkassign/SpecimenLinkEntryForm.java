@@ -95,12 +95,15 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     // source/type hierarchy selected (use rows order)
     private List<SpecimenHierarchyInfo> preSelections;
 
+    public SpecimenLinkEntryForm() {
+        linkFormPatientManagement = new LinkFormPatientManagement(
+            widgetCreator, this);
+    }
+
     @Override
     protected void init() throws Exception {
         super.init();
         setPartName(Messages.SpecimenLinkEntryForm_tab_title);
-        linkFormPatientManagement = new LinkFormPatientManagement(
-            widgetCreator, this);
         setCanLaunchScan(true);
 
         // If the current center is a site, and if this site defines containers

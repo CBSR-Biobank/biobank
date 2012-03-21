@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -280,12 +281,14 @@ public class LinkFormPatientManagement {
     }
 
     public void reset(boolean resetAll) {
-        if (viewerProcessingEvents != null) {
-            viewerProcessingEvents.setInput(null);
-            viewerCollectionEvents.setInput(null);
-        }
+        Assert.isNotNull(viewerProcessingEvents);
+        Assert.isNotNull(patientNumberText);
+
+        viewerProcessingEvents.setInput(null);
+        viewerCollectionEvents.setInput(null);
+
         currentPatient = null;
-        if (resetAll && (patientNumberText != null))
+        if (resetAll)
             patientNumberText.setText(""); //$NON-NLS-1$
     }
 
