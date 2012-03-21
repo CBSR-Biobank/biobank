@@ -50,6 +50,8 @@ public class GroupSaveAction implements Action<IdResult> {
 
         checkFullyManageable(group, executingUser);
 
+        context.getSession().saveOrUpdate(group);
+
         return new IdResult(group.getId());
     }
 

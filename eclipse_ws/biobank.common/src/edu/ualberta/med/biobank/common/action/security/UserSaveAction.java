@@ -44,7 +44,7 @@ public class UserSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        User user = context.load(User.class, input.getUserId());
+        User user = context.load(User.class, input.getUserId(), new User());
 
         createCsmUser(context, user);
 
@@ -200,7 +200,7 @@ public class UserSaveAction implements Action<IdResult> {
         Set<Group> contextGroups = input.getContext().getGroups();
         Set<Integer> contextGroupIds = IdUtil.getIds(contextGroups);
 
-        if (!contextGroups.containsAll(input.getGroupIds())) {
+        if (!contextGroupIds.containsAll(input.getGroupIds())) {
             // TODO: better exception
             throw new ActionException("found groups out of context");
         }
@@ -333,7 +333,7 @@ public class UserSaveAction implements Action<IdResult> {
             Set<MembershipDomain> domains = new HashSet<MembershipDomain>();
             for (Membership m : memberships) {
                 MembershipDomain d = new MembershipDomain(m);
-                if (domains.add(d)) {
+                if (!domains.add(d)) {
                     throw new IllegalArgumentException("duplicate domain " + d);
                 }
             }
