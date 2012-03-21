@@ -30,7 +30,7 @@ public class TestAction extends TestDb {
 
     static {
         EXECUTOR = new LocalActionExecutor(TestDb.getSessionProvider());
-        EXECUTOR.setUserId(getSuperUser().getId());
+        EXECUTOR.setUserId(getGlobalAdmin().getId());
     }
 
     @Override
@@ -39,7 +39,7 @@ public class TestAction extends TestDb {
         super.setUp();
 
         // by default, always execute as the super user
-        getExecutor().setUserId(getSuperUser().getId());
+        getExecutor().setUserId(getGlobalAdmin().getId());
     }
 
     protected static IActionExecutor getExecutor() {

@@ -15,13 +15,13 @@ import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.SessionProvider.Mode;
 
 public class TestDb extends TestBase {
-    private static final String SUPER_USER_LOGIN = "superadmin";
-    private static final User SUPER_USER;
+    private static final String GLOBAL_ADMIN_LOGIN = "globaladmin";
+    private static final User GLOBAL_ADMIN;
     private static final SessionProvider SESSION_PROVIDER;
 
     static {
         SESSION_PROVIDER = new SessionProvider(Mode.RUN);
-        SUPER_USER = getOrCreateSuperUser();
+        GLOBAL_ADMIN = getOrCreateSuperUser();
     }
 
     protected Session session;
@@ -47,8 +47,8 @@ public class TestDb extends TestBase {
         return SESSION_PROVIDER.openSession();
     }
 
-    protected static User getSuperUser() {
-        return SUPER_USER;
+    protected static User getGlobalAdmin() {
+        return GLOBAL_ADMIN;
     }
 
     private static User getOrCreateSuperUser() {
@@ -57,35 +57,35 @@ public class TestDb extends TestBase {
         // check if user already exists
         @SuppressWarnings("unchecked")
         List<User> users = session.createCriteria(User.class)
-            .add(Restrictions.eq("login", SUPER_USER_LOGIN))
+            .add(Restrictions.eq("login", GLOBAL_ADMIN_LOGIN))
             .list();
 
         if (users.size() >= 1) return users.get(0);
 
         Transaction tx = session.beginTransaction();
 
-        User superUser = new User();
-        superUser.setLogin(SUPER_USER_LOGIN);
-        superUser.setCsmUserId(-1L);
-        superUser.setRecvBulkEmails(false);
-        superUser.setFullName("super admin");
-        superUser.setEmail(Utils.getRandomString(5, 10));
-        superUser.setNeedPwdChange(false);
-        superUser.setNeedPwdChange(false);
-        superUser.setActivityStatus(ActivityStatus.ACTIVE);
+        User globalAdmin = new User();
+        globalAdmin.setLogin(GLOBAL_ADMIN_LOGIN);
+        globalAdmin.setCsmUserId(-1L);
+        globalAdmin.setRecvBulkEmails(false);
+        globalAdmin.setFullName(GLOBAL_ADMIN_LOGIN);
+        globalAdmin.setEmail(GLOBAL_ADMIN_LOGIN);
+        globalAdmin.setNeedPwdChange(false);
+        globalAdmin.setNeedPwdChange(false);
+        globalAdmin.setActivityStatus(ActivityStatus.ACTIVE);
 
-        session.save(superUser);
+        session.save(globalAdmin);
 
         Membership membership = new Membership();
         membership.setRank(Rank.ADMINISTRATOR);
-        membership.setPrincipal(superUser);
-        superUser.getMemberships().add(membership);
+        membership.setPrincipal(globalAdmin);
+        globalAdmin.getMemberships().add(membership);
 
         session.save(membership);
 
         tx.commit();
         session.close();
 
-        return superUser;
+        return globalAdmin;
     }
 }
