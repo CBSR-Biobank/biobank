@@ -133,7 +133,8 @@ public class LinkFormPatientManagement {
             null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    currentPEventSelected = (ProcessingEventWrapper) selectedObject;
+                    currentPEventSelected =
+                        (ProcessingEventWrapper) selectedObject;
                     setCollectionEventListFromPEvent();
                 }
             }, new BiobankLabelProvider());
@@ -156,11 +157,12 @@ public class LinkFormPatientManagement {
         viewerProcessingEvents.getCombo().addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                IStructuredSelection selection = (IStructuredSelection) viewerProcessingEvents
-                    .getSelection();
+                IStructuredSelection selection = (IStructuredSelection)
+                    viewerProcessingEvents.getSelection();
                 if (selection != null && selection.size() > 0) {
-                    ProcessingEventWrapper pe = (ProcessingEventWrapper) selection
-                        .getFirstElement();
+                    ProcessingEventWrapper pe =
+                        (ProcessingEventWrapper) selection
+                            .getFirstElement();
                     if (pe != null) {
                         specimenAdminForm.appendLog(NLS
                             .bind(
@@ -205,7 +207,8 @@ public class LinkFormPatientManagement {
             null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    currentCEventSelected = (CollectionEventWrapper) selectedObject;
+                    currentCEventSelected =
+                        (CollectionEventWrapper) selectedObject;
                     if (cEventComboCallback != null && !settingCollectionEvent)
                         cEventComboCallback.selectionChanged();
                 }
@@ -219,11 +222,13 @@ public class LinkFormPatientManagement {
         viewerCollectionEvents.getCombo().addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                IStructuredSelection selection = (IStructuredSelection) viewerCollectionEvents
-                    .getSelection();
+                IStructuredSelection selection =
+                    (IStructuredSelection) viewerCollectionEvents
+                        .getSelection();
                 if (selection != null && selection.size() > 0) {
-                    CollectionEventWrapper ce = (CollectionEventWrapper) selection
-                        .getFirstElement();
+                    CollectionEventWrapper ce =
+                        (CollectionEventWrapper) selection
+                            .getFirstElement();
                     if (ce != null) {
                         specimenAdminForm.appendLog(NLS
                             .bind(
@@ -275,10 +280,12 @@ public class LinkFormPatientManagement {
     }
 
     public void reset(boolean resetAll) {
-        viewerProcessingEvents.setInput(null);
-        viewerCollectionEvents.setInput(null);
+        if (viewerProcessingEvents != null) {
+            viewerProcessingEvents.setInput(null);
+            viewerCollectionEvents.setInput(null);
+        }
         currentPatient = null;
-        if (resetAll)
+        if (resetAll && (patientNumberText != null))
             patientNumberText.setText(""); //$NON-NLS-1$
     }
 
@@ -343,10 +350,10 @@ public class LinkFormPatientManagement {
     }
 
     public boolean fieldsValid() {
-        IStructuredSelection pEventSelection = (IStructuredSelection) viewerProcessingEvents
-            .getSelection();
-        IStructuredSelection cEventSelection = (IStructuredSelection) viewerCollectionEvents
-            .getSelection();
+        IStructuredSelection pEventSelection =
+            (IStructuredSelection) viewerProcessingEvents.getSelection();
+        IStructuredSelection cEventSelection =
+            (IStructuredSelection) viewerCollectionEvents.getSelection();
         if (patientNumberText.isDisposed())
             return false;
         return patientValidator.validate(patientNumberText.getText()).equals(
@@ -376,8 +383,8 @@ public class LinkFormPatientManagement {
                 viewerProcessingEvents.setInput(collection);
                 viewerProcessingEvents.getCombo().setFocus();
                 if (collection != null && collection.size() == 1) {
-                    viewerProcessingEvents
-                        .setSelection(new StructuredSelection(collection.get(0)));
+                    viewerProcessingEvents.setSelection(
+                        new StructuredSelection(collection.get(0)));
                     currentPEventSelected = collection.get(0);
                 } else {
                     viewerProcessingEvents.getCombo().deselectAll();
@@ -399,8 +406,9 @@ public class LinkFormPatientManagement {
             if (currentPEventSelected != null) {
                 List<CollectionEventWrapper> collection = null;
                 try {
-                    collection = currentPEventSelected
-                        .getCollectionEventFromSpecimensAndPatient(currentPatient);
+                    collection =
+                        currentPEventSelected
+                            .getCollectionEventFromSpecimensAndPatient(currentPatient);
                 } catch (ApplicationException e) {
                     BgcPlugin
                         .openAsyncError(
@@ -471,10 +479,12 @@ public class LinkFormPatientManagement {
 
         List<SpecimenTypeWrapper> studiesAliquotedTypes;
         try {
-            studiesAliquotedTypes = study
-                .getAuthorizedActiveAliquotedTypes(authorizedSpecimenTypesInContainer);
+            studiesAliquotedTypes =
+                study
+                    .getAuthorizedActiveAliquotedTypes(authorizedSpecimenTypesInContainer);
             if (studiesAliquotedTypes.size() == 0) {
-                String studyNameShort = Messages.LinkFormPatientManagement_study_unknown_label;
+                String studyNameShort =
+                    Messages.LinkFormPatientManagement_study_unknown_label;
                 if (getCurrentPatient() != null)
                     studyNameShort = study.getNameShort();
                 BgcPlugin
