@@ -43,7 +43,7 @@ public class GroupSaveAction implements Action<IdResult> {
         group.getUsers().clear();
         group.getUsers().addAll(users);
 
-        setMemberships(group);
+        setMemberships(context, group);
 
         checkFullyManageable(group, executingUser);
 
@@ -59,17 +59,18 @@ public class GroupSaveAction implements Action<IdResult> {
         }
     }
 
-    private void setMemberships(Group group) {
+    private void setMemberships(ActionContext context, Group group) {
         SetDiff<Membership> diff = new SetDiff<Membership>(
             group.getMemberships(), input.getMemberships());
+
+        for (Membership m : diff.getRemovals()) {
+            group.getMemberships().remove(m);
+            context.getSession().delete(m);
+        }
 
         for (Membership m : diff.getAdditions()) {
             group.getMemberships().add(m);
             m.setPrincipal(group);
-        }
-
-        for (Membership m : diff.getRemovals()) {
-            group.getMemberships().remove(m);
         }
 
         for (Pair<Membership> pair : diff.getIntersection()) {

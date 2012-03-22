@@ -109,20 +109,20 @@ public class UserSaveAction implements Action<IdResult> {
     private void setMemberships(ActionContext context, User user) {
         SetDiff<MembershipDomain> diff = diffMemberships(user);
 
+        for (MembershipDomain domain : diff.getRemovals()) {
+            Membership membership = domain.getMembership();
+            checkFullyManageable(context, membership);
+
+            user.getMemberships().remove(membership);
+            context.getSession().delete(membership);
+        }
+
         for (MembershipDomain domain : diff.getAdditions()) {
             Membership membership = domain.getMembership();
             checkFullyManageable(context, membership);
 
             user.getMemberships().add(membership);
             membership.setPrincipal(user);
-        }
-
-        for (MembershipDomain domain : diff.getRemovals()) {
-            Membership membership = domain.getMembership();
-            checkFullyManageable(context, membership);
-
-            user.getMemberships().remove(membership);
-            membership.setPrincipal(null);
         }
 
         mergeMemberships(context, diff.getIntersection());
@@ -157,7 +157,7 @@ public class UserSaveAction implements Action<IdResult> {
             // ensure the old (client?) scope can still be modified by the new
             // (server?) scope
             if (!newPermissionScope.containsAll(oldPermissionScope)
-                || newRoleScope.containsAll(oldRoleScope)) {
+                || !newRoleScope.containsAll(oldRoleScope)) {
                 // TODO: better exception
                 throw new ActionException("reduced scope");
             }

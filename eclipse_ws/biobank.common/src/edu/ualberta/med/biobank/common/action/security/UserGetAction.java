@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.common.action.security;
 
 import java.util.Set;
 
+import org.hibernate.Hibernate;
+
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -65,6 +67,9 @@ public class UserGetAction implements Action<UserGetOutput> {
             if (m.isPartiallyManageable(executingUser)) {
                 Membership copy = new Membership(m, dst);
                 copy.setId(m.getId());
+
+                Hibernate.initialize(copy.getCenter());
+                Hibernate.initialize(copy.getStudy());
 
                 // limit permission and role scope to manageable ones
                 permsScope = m.getManageablePermissions(executingUser);
