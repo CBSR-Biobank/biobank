@@ -31,6 +31,8 @@ public class Messages extends NLS {
     public static String ContainerTypeAdapter_delete_confirm_msg;
     public static String ContainerTypeAdapter_type_label;
     public static String ContainerTypeGroup_add_label;
+    public static String ContainerTypeGroup_error;
+    public static String ContainerTypeGroup_message;
     public static String ContainerTypeGroup_types_node_label;
     public static String ResearchGroupAdapter_delete_confirm_msg;
     public static String ResearchGroupAdapter_menu_label;

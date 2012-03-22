@@ -126,8 +126,10 @@ public class ContainerViewForm extends BiobankViewForm {
                 .getContainerType().getNameShort()));
         initCells();
         canCreate =
-            SessionManager.getAppService().isAllowed(new
-                ContainerCreatePermission());
+            SessionManager.getAppService().isAllowed(
+                new
+                ContainerCreatePermission(SessionManager.getUser()
+                    .getCurrentWorkingCenter().getId()));
         canDelete = SessionManager.getAppService().isAllowed(new
             ContainerDeletePermission());
     }

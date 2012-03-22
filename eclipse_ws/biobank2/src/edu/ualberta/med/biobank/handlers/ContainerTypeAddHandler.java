@@ -37,12 +37,13 @@ public class ContainerTypeAddHandler extends AbstractHandler {
             if (createAllowed == null)
                 createAllowed =
                     SessionManager.getAppService().isAllowed(
-                        new ContainerTypeCreatePermission());
-            return SessionManager.getUser().getCurrentWorkingSite() != null
-                && SessionManager.getInstance().getSession() != null &&
+                        new ContainerTypeCreatePermission(SessionManager
+                            .getUser().getCurrentWorkingCenter().getId()));
+            return SessionManager.getInstance().getSession() != null &&
                 createAllowed;
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
+                Messages.HandlerPermission_message);
             return false;
         }
     }

@@ -43,7 +43,7 @@ public class ContainerGroup extends AdapterBase {
         try {
             this.createAllowed =
                 SessionManager.getAppService().isAllowed(
-                    new ContainerCreatePermission());
+                    new ContainerCreatePermission(parent.getId()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
         }

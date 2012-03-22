@@ -72,7 +72,7 @@ public class ContainerSaveAction implements Action<IdResult> {
     public boolean isAllowed(ActionContext context) {
         Permission permission;
         if (containerId == null)
-            permission = new ContainerCreatePermission();
+            permission = new ContainerCreatePermission(siteId);
         else
             permission = new ContainerUpdatePermission(containerId);
         return permission.isAllowed(context);
