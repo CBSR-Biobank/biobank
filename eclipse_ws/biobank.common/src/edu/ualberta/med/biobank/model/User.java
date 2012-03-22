@@ -125,8 +125,8 @@ public class User extends Principal {
     }
 
     /**
-     * Retuns all of this {@link User}'s {@link Memberships}, i.e. from both the
-     * {@link User} directly and from the {@link Group}-s.
+     * Returns all of this {@link User}'s {@link Memberships}, i.e. from both
+     * the {@link User} directly and from the {@link Group}-s.
      * 
      * @return
      */
