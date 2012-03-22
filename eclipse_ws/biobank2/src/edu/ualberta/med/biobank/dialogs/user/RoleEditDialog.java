@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
+import java.util.HashSet;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -83,16 +85,16 @@ public class RoleEditDialog extends BgcBaseDialog {
     @Override
     protected void okPressed() {
         try {
-            PermissionTreeRes res = tree.getAddedAndRemovedNodes();
-
-            role.addToPermissionCollection(res.addedPermissions);
-            role.removeFromPermissionCollection(res.removedPermissions);
 
             Role roleModel = role.getWrappedObject();
 
             Role unproxied =
                 (Role) new BiobankProxyHelperImpl()
                     .convertToObject(roleModel);
+
+            PermissionTreeRes res = tree.getAddedAndRemovedNodes();
+            roleModel.setPermissions(new HashSet<PermissionEnum>(
+                res.addedPermissions));
 
             SessionManager.getAppService().doAction(
                 new RoleSaveAction(new RoleSaveInput(unproxied)));
