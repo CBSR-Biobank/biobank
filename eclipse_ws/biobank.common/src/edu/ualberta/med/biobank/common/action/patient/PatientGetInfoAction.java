@@ -63,21 +63,13 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
         Query query = context.getSession().createQuery(PATIENT_INFO_HQL);
         query.setParameter(0, patientId);
 
-        @SuppressWarnings("unchecked")
-        List<Object[]> rows = query.list();
-        if (rows.size() == 1) {
-            Object[] row = rows.get(0);
+        Object[] results = (Object[]) query.uniqueResult();
 
-            pInfo.patient = (Patient) row[0];
-            pInfo.sourceSpecimenCount = (Long) row[1];
-            pInfo.aliquotedSpecimenCount = (Long) row[2];
-            pInfo.ceventInfos =
-                new PatientGetCollectionEventInfosAction(patientId)
-                    .run(context).getList();
-
-        } else {
-            throw new ActionException("No patient found with id:" + patientId); //$NON-NLS-1$
-        }
+        pInfo.patient = (Patient) results[0];
+        pInfo.sourceSpecimenCount = (Long) results[1];
+        pInfo.aliquotedSpecimenCount = (Long) results[2];
+        pInfo.ceventInfos = new PatientGetCollectionEventInfosAction(patientId)
+            .run(context).getList();
 
         return pInfo;
     }

@@ -170,12 +170,13 @@ public enum PermissionEnum implements NotAProxy, Serializable {
         return false;
     }
 
+    // FIXME:
     private boolean isMembershipAllowed(Membership membership, Center center,
         Study study) {
-        boolean hasCenter = membership.getCenter() == null
-            || membership.getCenter().equals(center);
-        boolean hasStudy = membership.getStudy() == null
-            || membership.getStudy().equals(study);
+        boolean hasCenter = center == null || membership.getCenter() == null
+            || center.equals(membership.getCenter());
+        boolean hasStudy = study == null || membership.getStudy() == null
+            || study.equals(membership.getStudy());
         boolean hasPermission = membership.getAllPermissions().contains(this);
 
         boolean isAllowed = hasCenter && hasStudy && hasPermission;
