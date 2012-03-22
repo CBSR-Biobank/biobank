@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -33,6 +35,7 @@ import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -40,11 +43,16 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget;
 import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget.PermissionTreeRes;
 import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class MembershipEditDialog extends BgcBaseDialog {
     private final String currentTitle;
@@ -166,7 +174,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
             Messages.MembershipAddDialog_all_centers_label);
         centers.add(noCenterSelection);
         centers
-            .addAll(CenterWrapper.getCenters(SessionManager.getAppService()));
+            .addAll(getCenterOptions());
         centersViewer = createComboViewer(groupComp,
             Messages.MembershipAddDialog_selected_center_label, centers,
             ms.getCenter() == null ? noCenterSelection : ms.getCenter(), null,
@@ -183,7 +191,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
-                    studiesViewer.refresh();
+                    updateStudyOptions();
                 }
             });
         GridData gd = (GridData) centersViewer.getControl().getLayoutData();
@@ -341,6 +349,79 @@ public class MembershipEditDialog extends BgcBaseDialog {
         if (ms.isNew())
             ms.setPrincipal(null);
         super.cancelPressed();
+    }
+
+    private List<CenterWrapper<?>> getCenterOptions() {
+        Set<Center> options = new HashSet<Center>();
+
+        User manager = context.getManager();
+        for (Membership m : manager.getAllMemberships()) {
+            if (m.getCenter() == null) {
+                HQLCriteria criteria =
+                    new HQLCriteria("from " + Center.class.getName(),
+                        new ArrayList<Object>());
+
+                try {
+                    List<Center> centers =
+                        SessionManager.getAppService().query(criteria);
+                    options.addAll(centers);
+                } catch (ApplicationException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                break;
+            } else {
+                options.add(m.getCenter());
+            }
+        }
+
+        List<CenterWrapper<?>> wrappedOptions =
+            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+                options, null);
+
+        return wrappedOptions;
+    }
+
+    public void updateStudyOptions() {
+        CenterWrapper<?> selectedCenter = getCenterSelection();
+        Center modelCenter = selectedCenter.getWrappedObject();
+
+        Set<Study> studies = new HashSet<Study>();
+
+        for (Membership m : context.getManager().getAllMemberships()) {
+            Center mCenter = m.getCenter();
+            if (mCenter == null || mCenter.equals(modelCenter)) {
+                Study study = m.getStudy();
+                if (study == null) {
+                    HQLCriteria criteria =
+                        new HQLCriteria("from " + Study.class.getName(),
+                            new ArrayList<Object>());
+
+                    try {
+                        List<Study> centers =
+                            SessionManager.getAppService().query(criteria);
+                        studies.addAll(centers);
+                    } catch (ApplicationException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                    break;
+                } else {
+                    studies.add(study);
+                }
+            }
+        }
+
+        List<StudyWrapper> wrappedStudies =
+            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+                studies, StudyWrapper.class);
+
+        StudyWrapper oldSelection = getStudySelection();
+        studiesViewer.setInput(wrappedStudies);
+        studiesViewer.setSelection(new StructuredSelection(oldSelection));
+        studiesViewer.refresh();
     }
 
 }
