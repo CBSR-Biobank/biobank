@@ -11,12 +11,8 @@ public class ContainerTypeReadPermission implements Permission {
 
     private final Integer siteId;
 
-    public ContainerTypeReadPermission(Integer siteId) {
-        this.siteId = siteId;
-    }
-
     public ContainerTypeReadPermission(ContainerType type) {
-        this(type.getSite());
+        this.siteId = type.getSite().getId();
     }
 
     public ContainerTypeReadPermission(Site site) {

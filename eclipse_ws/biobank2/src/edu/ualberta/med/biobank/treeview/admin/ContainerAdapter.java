@@ -62,13 +62,16 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public void init() {
         try {
-            Integer id = ((ContainerWrapper) getModelObject()).getId();
+            ContainerWrapper container = (ContainerWrapper) getModelObject();
+            Integer id = container.getId();
+
             this.isDeletable =
                 SessionManager.getAppService().isAllowed(
                     new ContainerDeletePermission(id));
             this.isReadable =
                 SessionManager.getAppService().isAllowed(
-                    new ContainerReadPermission(id));
+                    new ContainerReadPermission(container.getSite()
+                        .getWrappedObject()));
             this.isEditable =
                 SessionManager.getAppService().isAllowed(
                     new ContainerUpdatePermission(id));

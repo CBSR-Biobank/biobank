@@ -40,10 +40,10 @@ public class ContainerTypeGroup extends AdapterBase {
         try {
             this.createAllowed =
                 SessionManager.getAppService().isAllowed(
-                    new ContainerTypeCreatePermission(SessionManager.getUser()
-                        .getCurrentWorkingCenter().getId()));
+                    new ContainerTypeCreatePermission(parent.getId()));
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.ContainerTypeGroup_error, Messages.ContainerTypeGroup_message);
+            BgcPlugin.openAsyncError(Messages.ContainerTypeGroup_error,
+                Messages.ContainerTypeGroup_message);
         }
     }
 

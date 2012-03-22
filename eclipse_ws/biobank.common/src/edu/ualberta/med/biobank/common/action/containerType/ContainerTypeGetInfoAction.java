@@ -54,7 +54,9 @@ public class ContainerTypeGetInfoAction implements Action<ContainerTypeInfo> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ContainerTypeReadPermission(ctypeId).isAllowed(context);
+        ContainerType ctype = context.load(ContainerType.class, ctypeId);
+        return new ContainerTypeReadPermission(ctype.getSite())
+            .isAllowed(context);
     }
 
     @Override

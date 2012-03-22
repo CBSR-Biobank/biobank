@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypesAction.SiteGetContainerTypesResult;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeReadPermission;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Site;
 
 public class SiteGetContainerTypesAction implements
     Action<SiteGetContainerTypesResult> {
@@ -47,7 +48,8 @@ public class SiteGetContainerTypesAction implements
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ContainerTypeReadPermission(siteId).isAllowed(context);
+        Site site = context.load(Site.class, siteId);
+        return new ContainerTypeReadPermission(site).isAllowed(context);
     }
 
     @Override

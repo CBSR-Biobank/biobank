@@ -11,16 +11,12 @@ public class ContainerReadPermission implements Permission {
 
     private final Integer siteId;
 
-    public ContainerReadPermission(Integer siteId) {
-        this.siteId = siteId;
-    }
-
     public ContainerReadPermission(Site site) {
-        this(site.getId());
+        this.siteId = site.getId();
     }
 
     public ContainerReadPermission(Container container) {
-        this(container.getSite().getId());
+        this.siteId = container.getSite().getId();
     }
 
     @Override
