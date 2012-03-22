@@ -7,6 +7,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.client.util.BiobankProxyHelperImpl;
+import edu.ualberta.med.biobank.common.action.security.RoleSaveAction;
+import edu.ualberta.med.biobank.common.action.security.RoleSaveInput;
 import edu.ualberta.med.biobank.common.peer.RolePeer;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -14,6 +18,7 @@ import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget;
 import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget.PermissionTreeRes;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -79,19 +84,31 @@ public class RoleEditDialog extends BgcBaseDialog {
     protected void okPressed() {
         try {
             PermissionTreeRes res = tree.getAddedAndRemovedNodes();
+
             role.addToPermissionCollection(res.addedPermissions);
             role.removeFromPermissionCollection(res.removedPermissions);
-            role.persist();
+
+            Role roleModel = role.getWrappedObject();
+
+            Role unproxied =
+                (Role) new BiobankProxyHelperImpl()
+                    .convertToObject(roleModel);
+
+            SessionManager.getAppService().doAction(
+                new RoleSaveAction(new RoleSaveInput(unproxied)));
+
             close();
-        } catch (Exception e) {
-            if (e.getMessage() != null
-                && e.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
+        } catch (Throwable t) {
+            if (t.getMessage() != null
+                && t.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
                 BgcPlugin.openAsyncError(
                     Messages.RoleEditDialog_msg_persit_error,
                     Messages.RoleEditDialog_msg_error_name_used);
             } else {
+                String message = t.getMessage();
+
                 BgcPlugin.openAsyncError(
-                    Messages.RoleEditDialog_msg_persit_error, e);
+                    Messages.RoleEditDialog_msg_persit_error, message);
             }
         }
     }
