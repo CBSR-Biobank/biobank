@@ -16,9 +16,9 @@ import edu.ualberta.med.biobank.model.Request;
 public class RequestRetrievalAction implements Action<ListResult<Request>> {
 
     private static final String REQUEST_HQL =
-        "SELECT r FROM " + Request.class.getName() + " r"
-            + " INNER JOIN FETCH r.requestSpecimens rs"
-            + " WHERE rs.specimen.currentCenter.id=?";
+        "SELECT r FROM " + Request.class.getName() + " r" //$NON-NLS-1$//$NON-NLS-2$
+            + " INNER JOIN FETCH r.requestSpecimens rs" //$NON-NLS-1$
+            + " WHERE rs.specimen.currentCenter.id=?"; //$NON-NLS-1$
 
     private static final long serialVersionUID = 5306372891238576571L;
 
@@ -30,7 +30,7 @@ public class RequestRetrievalAction implements Action<ListResult<Request>> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return PermissionEnum.REQUEST_PROCESS.isAllowed(context.getUser(),
+        return PermissionEnum.REQUEST_READ.isAllowed(context.getUser(),
             (Center) context.getSession().load(Center.class, centerId));
     }
 
