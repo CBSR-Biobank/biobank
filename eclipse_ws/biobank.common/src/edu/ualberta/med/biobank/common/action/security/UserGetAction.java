@@ -41,7 +41,9 @@ public class UserGetAction implements Action<UserGetOutput> {
         copyMemberships(user, copy, context, managerContext.getRoles());
         copyGroups(user, copy, context);
 
-        return new UserGetOutput(copy, managerContext);
+        boolean isFullyManageable = user.isFullyManageable(context.getUser());
+
+        return new UserGetOutput(copy, managerContext, isFullyManageable);
     }
 
     private void copyProperties(User src, User dst) {

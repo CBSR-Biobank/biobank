@@ -1,17 +1,21 @@
 package edu.ualberta.med.biobank.common.action.security;
 
 import edu.ualberta.med.biobank.common.action.security.Action2p0.ActionOutput;
+import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
 
 public class UserGetOutput implements ActionOutput {
     private static final long serialVersionUID = 1L;
-    
-    public final User user;
-    public final ManagerContext context;
 
-    public UserGetOutput(User user, ManagerContext context) {
+    private final User user;
+    private final ManagerContext context;
+    private final boolean isFullyManageable;
+
+    public UserGetOutput(User user, ManagerContext context,
+        boolean isFullyManageable) {
         this.user = user;
         this.context = context;
+        this.isFullyManageable = isFullyManageable;
     }
 
     public User getUser() {
@@ -20,5 +24,18 @@ public class UserGetOutput implements ActionOutput {
 
     public ManagerContext getContext() {
         return context;
+    }
+
+    /**
+     * Because the {@link Membership}-s and {@link Group}-s of the returned user
+     * have been restricted to those this {@link ManagerContext} can see, he
+     * will think he's able to fully manage the {@link User} (via
+     * {@link User#isFullyManageable(User)}. This indicates whether he
+     * <em>truely</em> can.
+     * 
+     * @return
+     */
+    public boolean isFullyManageable() {
+        return isFullyManageable;
     }
 }
