@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
@@ -48,16 +49,19 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class MembershipEditDialog extends BgcBaseDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
+    private final ManagerContext context;
     private ComboViewer centersViewer;
     private ComboViewer studiesViewer;
     private MultiSelectWidget<RoleWrapper> rolesWidget;
     private MembershipWrapper ms;
     private PermissionCheckTreeWidget permissionsTree;
 
-    public MembershipEditDialog(Shell parent, MembershipWrapper ms) {
+    public MembershipEditDialog(Shell parent, MembershipWrapper ms,
+        ManagerContext context) {
         super(parent);
         Assert.isNotNull(ms);
         this.ms = ms;
+        this.context = context;
         currentTitle = Messages.MembershipAddDialog_title;
         titleAreaMessage = Messages.MembershipAddDialog_description;
     }
@@ -319,9 +323,10 @@ public class MembershipEditDialog extends BgcBaseDialog {
             IStructuredSelection structSel = (IStructuredSelection) sel;
             if (structSel.size() > 0) {
                 Object selection = structSel.getFirstElement();
-                if (selection instanceof String)
-                    return null;
-                return (CenterWrapper) selection;
+                CenterWrapper center =
+                    (selection instanceof String) ? null
+                        : (CenterWrapper) selection;
+                return center;
             }
         }
         return null;

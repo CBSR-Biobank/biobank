@@ -22,6 +22,9 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.client.util.BiobankProxyHelperImpl;
 import edu.ualberta.med.biobank.common.action.security.GroupSaveAction;
 import edu.ualberta.med.biobank.common.action.security.GroupSaveInput;
+import edu.ualberta.med.biobank.common.action.security.ManagerContextGetAction;
+import edu.ualberta.med.biobank.common.action.security.ManagerContextGetInput;
+import edu.ualberta.med.biobank.common.action.security.ManagerContextGetOutput;
 import edu.ualberta.med.biobank.common.peer.GroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
@@ -153,8 +156,18 @@ public class GroupEditDialog extends BgcBaseDialog {
                     .getAppService());
                 ms.setPrincipal(group);
 
-                MembershipEditDialog dlg = new MembershipEditDialog(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(), ms);
+                ManagerContextGetOutput mcOutput = null;
+                try {
+                    mcOutput = SessionManager.getAppService()
+                        .doAction(new ManagerContextGetAction(
+                            new ManagerContextGetInput()));
+                } catch (ApplicationException e) {
+                }
+
+                MembershipEditDialog dlg =
+                    new MembershipEditDialog(PlatformUI
+                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                        ms, mcOutput.getContext());
                 int res = dlg.open();
                 if (res == Status.OK) {
                     membershipInfoTable.reloadCollection(

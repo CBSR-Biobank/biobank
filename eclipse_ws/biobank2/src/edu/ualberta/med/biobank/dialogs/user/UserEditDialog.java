@@ -224,8 +224,10 @@ public class UserEditDialog extends BgcBaseDialog {
                     .getAppService());
                 ms.setPrincipal(originalUser);
 
-                MembershipEditDialog dlg = new MembershipEditDialog(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(), ms);
+                MembershipEditDialog dlg =
+                    new MembershipEditDialog(PlatformUI
+                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                        ms, managerContext);
                 int res = dlg.open();
                 if (res == Status.OK) {
                     membershipInfoTable.reloadCollection(
