@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
@@ -61,7 +62,10 @@ public class Group extends Principal {
         this.users = users;
     }
 
-    private static class NameComparator implements Comparator<Group> {
+    private static class NameComparator
+        implements Comparator<Group>, Serializable {
+        private static final long serialVersionUID = 1L;
+
         @Override
         public int compare(Group a, Group b) {
             if (a == null && b == null) return 0;
