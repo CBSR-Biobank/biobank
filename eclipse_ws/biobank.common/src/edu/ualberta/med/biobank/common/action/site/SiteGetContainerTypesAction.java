@@ -47,7 +47,7 @@ public class SiteGetContainerTypesAction implements
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ContainerTypeReadPermission().isAllowed(context);
+        return new ContainerTypeReadPermission(siteId).isAllowed(context);
     }
 
     @Override

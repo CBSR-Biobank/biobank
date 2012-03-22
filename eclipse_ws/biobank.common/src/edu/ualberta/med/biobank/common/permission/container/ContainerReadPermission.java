@@ -4,32 +4,32 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Site;
 
 public class ContainerReadPermission implements Permission {
     private static final long serialVersionUID = 1L;
 
-    private final Integer containerId;
+    private final Integer siteId;
 
-    public ContainerReadPermission() {
-        this.containerId = null;
+    public ContainerReadPermission(Integer siteId) {
+        this.siteId = siteId;
     }
 
-    public ContainerReadPermission(Integer containerId) {
-        this.containerId = containerId;
+    public ContainerReadPermission(Site site) {
+        this(site.getId());
     }
 
     public ContainerReadPermission(Container container) {
-        this(container.getId());
+        this(container.getSite().getId());
     }
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        if (this.containerId != null) {
-            Container container = context.load(Container.class, containerId);
-            return PermissionEnum.CONTAINER_READ.isAllowed(context.getUser(),
-                container.getSite());
+        Site site = null;
+        if (this.siteId != null) {
+            site = context.load(Site.class, siteId);
         }
 
-        return PermissionEnum.CONTAINER_READ.isAllowed(context.getUser());
+        return PermissionEnum.CONTAINER_READ.isAllowed(context.getUser(), site);
     }
 }
