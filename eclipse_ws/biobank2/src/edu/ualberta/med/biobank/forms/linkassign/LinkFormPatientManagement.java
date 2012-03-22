@@ -385,7 +385,7 @@ public class LinkFormPatientManagement {
                         currentPatient
                             .getProcessingEventCollection(SessionManager
                                 .getUser().getCurrentWorkingCenter()
-                                .getWrappedObject(), true);
+                                , true);
                 viewerProcessingEvents.setInput(collection);
                 viewerProcessingEvents.getCombo().setFocus();
                 if (collection != null && collection.size() == 1) {
