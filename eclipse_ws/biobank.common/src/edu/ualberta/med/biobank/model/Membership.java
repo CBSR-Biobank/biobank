@@ -71,6 +71,7 @@ public class Membership extends AbstractBiobankModel {
 
     public Membership(Membership m, Principal p) {
         setPrincipal(p);
+        p.getMemberships().add(this);
 
         setCenter(m.getCenter());
         setStudy(m.getStudy());
