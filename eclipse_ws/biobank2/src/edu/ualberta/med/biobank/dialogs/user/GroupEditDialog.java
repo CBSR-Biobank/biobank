@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
+import javax.validation.ConstraintViolationException;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.SWT;
@@ -17,6 +19,9 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.client.util.BiobankProxyHelperImpl;
+import edu.ualberta.med.biobank.common.action.security.GroupSaveAction;
+import edu.ualberta.med.biobank.common.action.security.GroupSaveInput;
 import edu.ualberta.med.biobank.common.peer.GroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
@@ -25,6 +30,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.widgets.infotables.MembershipInfoTable;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -33,14 +39,15 @@ public class GroupEditDialog extends BgcBaseDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
 
-    private GroupWrapper originalGroup;
+    private GroupWrapper group;
     private MembershipInfoTable membershipInfoTable;
     private MultiSelectWidget<UserWrapper> usersWidget;
 
     public GroupEditDialog(Shell parent, GroupWrapper originalGroup) {
         super(parent);
         Assert.isNotNull(originalGroup);
-        this.originalGroup = originalGroup;
+        this.group = originalGroup;
+
         if (originalGroup.isNew()) {
             currentTitle = Messages.GroupEditDialog_title_add;
             titleAreaMessage = Messages.GroupEditDialog_titlearea_add;
@@ -89,7 +96,7 @@ public class GroupEditDialog extends BgcBaseDialog {
     private void createGeneralFields(Composite createTabItem) {
         createBoundWidgetWithLabel(createTabItem, BgcBaseText.class,
             SWT.BORDER, Messages.GroupEditDialog_property_title_name, null,
-            originalGroup, GroupPeer.NAME.getName(),
+            group, GroupPeer.NAME.getName(),
             new NonEmptyStringValidator(
                 Messages.GroupEditDialog_msg_name_required));
     }
@@ -108,7 +115,7 @@ public class GroupEditDialog extends BgcBaseDialog {
         gd.horizontalAlignment = SWT.RIGHT;
         addButton.setLayoutData(gd);
 
-        membershipInfoTable = new MembershipInfoTable(contents, originalGroup);
+        membershipInfoTable = new MembershipInfoTable(contents, group);
     }
 
     private void createUsersSection(Composite contents)
@@ -126,7 +133,7 @@ public class GroupEditDialog extends BgcBaseDialog {
 
         usersWidget.setSelections(
             UserWrapper.getAllUsers(SessionManager.getAppService()),
-            originalGroup.getUserCollection(false));
+            group.getUserCollection(false));
     }
 
     private Composite createTabItem(TabFolder tb, String title, int columns) {
@@ -144,14 +151,14 @@ public class GroupEditDialog extends BgcBaseDialog {
             public void run() {
                 MembershipWrapper ms = new MembershipWrapper(SessionManager
                     .getAppService());
-                ms.setPrincipal(originalGroup);
+                ms.setPrincipal(group);
 
                 MembershipEditDialog dlg = new MembershipEditDialog(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(), ms);
                 int res = dlg.open();
                 if (res == Status.OK) {
                     membershipInfoTable.reloadCollection(
-                        originalGroup.getMembershipCollection(true), null);
+                        group.getMembershipCollection(true), null);
                 }
             }
         });
@@ -162,18 +169,34 @@ public class GroupEditDialog extends BgcBaseDialog {
         // try saving or updating the group inside this dialog so that if there
         // is an error the entered information is not lost
         try {
-            originalGroup
-                .addToUserCollection(usersWidget.getAddedToSelection());
-            // originalGroup.persist();
+            group.addToUserCollection(usersWidget.getAddedToSelection());
+            Group groupModel = group.getWrappedObject();
+
+            // for now it's faster to use the name as the description
+            groupModel.setDescription(groupModel.getName());
+
+            Group unproxied =
+                (Group) new BiobankProxyHelperImpl()
+                    .convertToObject(groupModel);
+
+            SessionManager.getAppService().doAction(
+                new GroupSaveAction(new GroupSaveInput(unproxied)));
             close();
-        } catch (Exception e) {
-            if (e.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
+        } catch (Throwable t) {
+            if (t.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
                 BgcPlugin.openAsyncError(
                     Messages.GroupEditDialog_msg_persit_error,
                     Messages.GroupEditDialog_msg_error_name_used);
             } else {
+                String message = t.getMessage();
+                if (t.getCause() instanceof ConstraintViolationException) {
+                    message =
+                        ((ConstraintViolationException) t.getCause())
+                            .getMessage();
+                }
                 BgcPlugin.openAsyncError(
-                    Messages.GroupEditDialog_msg_persit_error, e);
+                    Messages.GroupEditDialog_msg_persit_error, message);
+                t.printStackTrace();
             }
         }
     }
@@ -181,7 +204,7 @@ public class GroupEditDialog extends BgcBaseDialog {
     @Override
     protected void cancelPressed() {
         try {
-            originalGroup.reset();
+            group.reset();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

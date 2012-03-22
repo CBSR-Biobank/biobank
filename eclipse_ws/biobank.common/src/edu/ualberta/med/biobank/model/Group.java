@@ -40,7 +40,7 @@ public class Group extends Principal {
         this.name = name;
     }
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.BbGroup.name.NotEmpty}")
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.BbGroup.description.NotEmpty}")
     @Column(name = "DESCRIPTION")
     public String getDescription() {
         return this.description;
