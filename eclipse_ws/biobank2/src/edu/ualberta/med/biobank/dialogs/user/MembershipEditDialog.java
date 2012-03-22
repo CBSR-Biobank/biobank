@@ -37,7 +37,6 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
@@ -46,6 +45,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
@@ -60,7 +60,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
     private final ManagerContext context;
     private ComboViewer centersViewer;
     private ComboViewer studiesViewer;
-    private MultiSelectWidget<RoleWrapper> rolesWidget;
+    private MultiSelectWidget<Role> rolesWidget;
     private MembershipWrapper ms;
     private PermissionCheckTreeWidget permissionsTree;
 
@@ -148,6 +148,13 @@ public class MembershipEditDialog extends BgcBaseDialog {
                     .isCenterStudyAlreadyUsed(getCenterSelection(), study);
             }
         });
+        studiesViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    updateRoleAndPermissionOptions();
+                }
+            });
     }
 
     private void createCentersCombo(Composite contents)
@@ -244,17 +251,17 @@ public class MembershipEditDialog extends BgcBaseDialog {
     private void createRolesWidget(Composite contents)
         throws ApplicationException {
         GridData gd;
-        rolesWidget = new MultiSelectWidget<RoleWrapper>(contents, SWT.NONE,
+        rolesWidget = new MultiSelectWidget<Role>(contents, SWT.NONE,
             Messages.MembershipAddDialog_roles_available_label,
             Messages.MembershipAddDialog_roles_selected_label, 300) {
             @Override
-            protected String getTextForObject(RoleWrapper nodeObject) {
+            protected String getTextForObject(Role nodeObject) {
                 return nodeObject.getName();
             }
         };
         rolesWidget.setSelections(
-            RoleWrapper.getAllRoles(SessionManager.getAppService()),
-            ms.getRoleCollection(false));
+            new ArrayList<Role>(context.getRoles()),
+            new ArrayList<Role>(ms.getWrappedObject().getRoles()));
         gd = (GridData) rolesWidget.getLayoutData();
         gd.horizontalSpan = 2;
         rolesWidget
@@ -300,8 +307,10 @@ public class MembershipEditDialog extends BgcBaseDialog {
             checkedRolesOrPermissionsSelected();
             return;
         }
-        ms.addToRoleCollection(rolesWidget.getAddedToSelection());
-        ms.removeFromRoleCollection(rolesWidget.getRemovedFromSelection());
+        ms.getWrappedObject().getRoles()
+            .removeAll(rolesWidget.getRemovedFromSelection());
+        ms.getWrappedObject().getRoles()
+            .addAll(rolesWidget.getAddedToSelection());
         PermissionTreeRes res = permissionsTree.getAddedAndRemovedNodes();
         ms.addToPermissionCollection(res.addedPermissions);
         ms.removeFromPermissionCollection(res.removedPermissions);
@@ -426,4 +435,17 @@ public class MembershipEditDialog extends BgcBaseDialog {
         studiesViewer.refresh();
     }
 
+    private void updateRoleAndPermissionOptions() {
+        User user = context.getManager();
+        Membership m = ms.getWrappedObject();
+
+        Set<PermissionEnum> mPerms = m.getManageablePermissions(user);
+        Set<Role> mRoles = m.getManageableRoles(user, context.getRoles());
+
+        List<PermissionEnum> mPermsList = new ArrayList<PermissionEnum>(mPerms);
+        List<Role> mRolesList = new ArrayList<Role>(mRoles);
+
+        rolesWidget.setSelections(mRolesList, rolesWidget.getSelected());
+        permissionsTree.setInput(mPermsList);
+    }
 }

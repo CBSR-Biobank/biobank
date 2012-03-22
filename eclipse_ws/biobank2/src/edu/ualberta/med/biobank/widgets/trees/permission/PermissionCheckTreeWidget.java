@@ -85,10 +85,15 @@ public class PermissionCheckTreeWidget extends Composite {
         treeviewer.expandToLevel(2);
     }
 
+    public void setInput(Collection<PermissionEnum> perms) {
+        treeviewer.setInput(buildContent(perms));
+    }
+
     private List<PermissionRootNode> buildContent(
-        List<PermissionEnum> allPermissions) {
+        Collection<PermissionEnum> allPermissions) {
         rootNode = new PermissionRootNode();
-        final Map<PermissionEnum, PermissionNode> nodes = new HashMap<PermissionEnum, PermissionNode>();
+        final Map<PermissionEnum, PermissionNode> nodes =
+            new HashMap<PermissionEnum, PermissionNode>();
         for (PermissionEnum r : allPermissions) {
             PermissionNode node = new PermissionNode(rootNode, r);
             nodes.put(r, node);
@@ -98,7 +103,8 @@ public class PermissionCheckTreeWidget extends Composite {
     }
 
     public void setSelections(Collection<PermissionEnum> permissions) {
-        List<IPermissionCheckTreeNode> checkedNodes = new ArrayList<IPermissionCheckTreeNode>();
+        List<IPermissionCheckTreeNode> checkedNodes =
+            new ArrayList<IPermissionCheckTreeNode>();
         for (PermissionEnum permission : permissions) {
             PermissionNode rNode = rootNode.getNode(permission);
             checkedNodes.add(rNode);
@@ -113,8 +119,10 @@ public class PermissionCheckTreeWidget extends Composite {
     }
 
     public class PermissionTreeRes {
-        public List<PermissionEnum> addedPermissions = new ArrayList<PermissionEnum>();
-        public List<PermissionEnum> removedPermissions = new ArrayList<PermissionEnum>();
+        public List<PermissionEnum> addedPermissions =
+            new ArrayList<PermissionEnum>();
+        public List<PermissionEnum> removedPermissions =
+            new ArrayList<PermissionEnum>();
 
         public void buildRes() {
             removedPermissions.addAll(allPossiblePermissions);
