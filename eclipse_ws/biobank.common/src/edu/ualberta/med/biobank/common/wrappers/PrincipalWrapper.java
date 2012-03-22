@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.wrappers.base.PrincipalBaseWrapper;
 import edu.ualberta.med.biobank.model.Principal;
@@ -37,8 +39,8 @@ public abstract class PrincipalWrapper<T extends Principal> extends
 
     protected abstract PrincipalWrapper<T> createDuplicate();
 
-    protected List<CenterWrapper<?>> getAllCentersInvolved() throws Exception {
-        List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>();
+    protected Set<CenterWrapper<?>> getAllCentersInvolved() throws Exception {
+        Set<CenterWrapper<?>> centers = new HashSet<CenterWrapper<?>>();
         for (MembershipWrapper ms : getMembershipCollection(false)) {
             CenterWrapper<?> center = ms.getCenter();
             if (center == null)
@@ -55,7 +57,7 @@ public abstract class PrincipalWrapper<T extends Principal> extends
             .get(WORKING_CENTERS_KEY);
         if (workingCenters == null) {
             workingCenters = new ArrayList<CenterWrapper<?>>();
-            List<CenterWrapper<?>> setOfWorkingCenter =
+            Set<CenterWrapper<?>> setOfWorkingCenter =
                 getAllCentersInvolved();
             workingCenters.addAll(setOfWorkingCenter);
             cache.put(WORKING_CENTERS_KEY, workingCenters);

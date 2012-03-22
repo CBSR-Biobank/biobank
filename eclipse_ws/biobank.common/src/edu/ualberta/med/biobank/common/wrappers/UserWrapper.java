@@ -2,7 +2,9 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
@@ -196,8 +198,8 @@ public class UserWrapper extends UserBaseWrapper {
     }
 
     @Override
-    protected List<CenterWrapper<?>> getAllCentersInvolved() throws Exception {
-        List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>();
+    protected Set<CenterWrapper<?>> getAllCentersInvolved() throws Exception {
+        Set<CenterWrapper<?>> centers = new HashSet<CenterWrapper<?>>();
         for (GroupWrapper g : getGroupCollection(false)) {
             centers.addAll(g.getAllCentersInvolved());
         }
