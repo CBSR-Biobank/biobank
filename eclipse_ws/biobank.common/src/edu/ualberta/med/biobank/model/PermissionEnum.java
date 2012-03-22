@@ -151,18 +151,49 @@ public enum PermissionEnum implements NotAProxy, Serializable {
         return valuesMap().get(id);
     }
 
+    /**
+     * Whether the given {@link User} has this {@link PermissionEnum} on
+     * <em>any</em> {@link Center} or {@link Study}.
+     *
+     * @see {@link #isMembershipAllowed(Membership, Center, Study)}
+     * @param user
+     * @return
+     */
     public boolean isAllowed(User user) {
         return isAllowed(user, null, null);
     }
 
+    /**
+     * Whether the given {@link User} has this {@link PermissionEnum} on
+     * <em>any</em> {@link Center}, but a specific {@link Study}.
+     *
+     * @see {@link #isAllowed(User)}
+     * @param user
+     * @return
+     */
     public boolean isAllowed(User user, Study study) {
         return isAllowed(user, null, study);
     }
 
+    /**
+     * Whether the given {@link User} has this {@link PermissionEnum} on
+     * <em>any</em> {@link Study}, but a specific {@link Center}.
+     *
+     * @see {@link #isAllowed(User)}
+     * @param user
+     * @return
+     */
     public boolean isAllowed(User user, Center center) {
         return isAllowed(user, center, null);
     }
 
+    /**
+     *
+     * @param user
+     * @param center if null, {@link Center} does not matter.
+     * @param study if null, {@link Study} does not matter.
+     * @return
+     */
     public boolean isAllowed(User user, Center center, Study study) {
         for (Membership m : user.getAllMemberships()) {
             if (isMembershipAllowed(m, center, study)) return true;
