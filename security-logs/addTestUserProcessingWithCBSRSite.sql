@@ -28,8 +28,8 @@ insert into csm_user_group_role_pg (user_id, role_id, protection_group_id, updat
 insert into principal (id, version, discriminator, name, activity_status_id)
 		select coalesce(MAX(p.id), 0)+1, 0, @GROUP_DISCRIMINATOR, @GROUP_NAME, 1
 		from principal p;
-	   
-	   
+
+
 -- add user to group
 insert into group_user(user_id, group_id)
        select u.id, g.id
@@ -49,8 +49,17 @@ insert into role (id, version, name)
 
 -- Add read permissions to the role
 create temporary table TECHNICIAN_PROCESS (perm int);
-insert into TECHNICIAN_PROCESS values (2), (3), (5), (6), (7), (12), (13), (14), (15), (17), (18), (19), (20), (21), (22),
- (23), (24), (25), (26), (27), (28), (29), (30), (31), (32), (33), (43), (44), (46), (66), (67);
+insert into TECHNICIAN_PROCESS values
+        (2), (3), (4), (5), (6), (7),
+        (12), (13), (14), (15),
+        (17), (18), (19), (20),
+        (21), (22), (23), (24),
+        (25), (26), (27), (28),
+        (29), (30), (31), (32), (33),
+        (43), (44), (46),
+        (52), (53), (54), (55),
+        (56), (57), (58), (59),
+        (66), (67);
 insert into role_permission (id, permission_id)
        select coalesce(MAX(r.id), 0), t.perm
        from role r, TECHNICIAN_PROCESS t;
