@@ -42,7 +42,7 @@ public class RequestSpecimenWrapper extends RequestSpecimenBaseWrapper
 
     @Override
     public boolean equals(Object object) {
-        if (object instanceof RequestSpecimenWrapper && object != null) {
+        if (object instanceof RequestSpecimenWrapper) {
             RequestSpecimenWrapper dsa = (RequestSpecimenWrapper) object;
             if (isNew() && dsa.isNew()) {
                 return getSpecimen() != null && dsa.getSpecimen() != null

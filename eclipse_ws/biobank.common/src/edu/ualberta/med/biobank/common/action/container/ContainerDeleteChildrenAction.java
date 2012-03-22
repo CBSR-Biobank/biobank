@@ -69,7 +69,7 @@ public class ContainerDeleteChildrenAction extends ContainerChildAction {
         }
 
         ContainerDeleteAction containerDeleteAction =
-            new ContainerDeleteAction(childContainer.getId());
+            new ContainerDeleteAction(childContainer);
         containerDeleteAction.run(context);
 
         return true;

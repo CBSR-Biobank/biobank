@@ -16,6 +16,7 @@ public class EventAttrCustom {
     private EventAttrTypeEnum type;
     private String[] allowedValues;
     private String value;
+    private String origValue;
     private GlobalEventAttr globalEventAttr;
 
     protected PropertyChangeSupport propertyChangeSupport =
@@ -69,6 +70,15 @@ public class EventAttrCustom {
     public void setValue(String value) {
         propertyChangeSupport.firePropertyChange("value", this.value, //$NON-NLS-1$
             this.value = value);
+    }
+
+    public String getOrigValue() {
+        return origValue;
+    }
+
+    public void setOrigValue(String value) {
+        propertyChangeSupport.firePropertyChange("value", this.value, //$NON-NLS-1$
+            this.origValue = value);
     }
 
     public void addPropertyChangeListener(String propertyName,

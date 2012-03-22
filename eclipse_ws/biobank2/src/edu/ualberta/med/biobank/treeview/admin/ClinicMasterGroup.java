@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -19,13 +18,13 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicMasterGroup extends AbstractClinicGroup {
 
+    @SuppressWarnings("unused")
     private static BgcLogger LOGGER = BgcLogger
         .getLogger(ClinicMasterGroup.class.getName());
 
@@ -59,32 +58,13 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
     }
 
     @Override
-    public void performExpand() {
-        try {
-            clinicsInfo = SessionManager.getAppService().doAction(
-                new ClinicGetAllAction());
-            super.performExpand();
-        } catch (ApplicationException e) {
-            // TODO: open an error dialog here?
-            LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
-        }
-    }
-
-    @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        List<ClinicWrapper> result = new ArrayList<ClinicWrapper>();
+        clinicsInfo = SessionManager.getAppService().doAction(
+            new ClinicGetAllAction());
 
-        if (clinicsInfo != null) {
-            // return results only if this node has been expanded
-            for (Clinic clinic : clinicsInfo.getClinics()) {
-                ClinicWrapper wrapper =
-                    new ClinicWrapper(SessionManager.getAppService(), clinic);
-                result.add(wrapper);
-            }
-        }
-
-        return result;
+        return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+            clinicsInfo.getClinics(), ClinicWrapper.class);
     }
 
     public void addClinic() {
@@ -92,11 +72,6 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
             new ClinicWrapper(SessionManager.getAppService());
         ClinicAdapter adapter = new ClinicAdapter(this, clinic);
         adapter.openEntryForm();
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return (int) ClinicWrapper.getCount(SessionManager.getAppService());
     }
 
     @Override

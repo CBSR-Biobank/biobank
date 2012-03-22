@@ -121,7 +121,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private NonEmptyStringValidator palletLabelValidator;
     private BgcBaseText palletPositionText;
     protected boolean useNewProductBarcode;
-    private ContainerWrapper containerToRemove;
     private ComboViewer palletTypesViewer;
     protected boolean palletPositionTextModified;
     private List<ContainerTypeWrapper> palletContainerTypes;
@@ -138,12 +137,15 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     private boolean initWithProduct = false;
 
+    public SpecimenAssignEntryForm() {
+        currentMultipleContainer = new ContainerWrapper(
+            SessionManager.getAppService());
+    }
+
     @Override
     protected void init() throws Exception {
         super.init();
         setCanLaunchScan(true);
-        currentMultipleContainer = new ContainerWrapper(
-            SessionManager.getAppService());
         initPalletValues();
     }
 
@@ -203,7 +205,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ID;
     }
 
@@ -962,13 +964,12 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         else
             saveMultipleSpecimens();
         setFinished(false);
+        SessionManager.log(Messages.SpecimenLinkAssign_save, null,
+            Messages.SpecimenLinkAssign_assign);
     }
 
     private void saveMultipleSpecimens() throws Exception {
         if (saveEvenIfMissing) {
-            if (containerToRemove != null) {
-                containerToRemove.delete();
-            }
             SpecimenAssignResInfo res;
             try {
                 Map<RowColPos, PalletCell> cells = getCells();
@@ -991,7 +992,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 }
                 if (currentMultipleContainer.getId() == null) {
                     ContainerSaveAction csAction = new ContainerSaveAction();
-                    csAction.label = currentMultipleContainer.getLabel();
                     csAction.parentId =
                         currentMultipleContainer.getParentContainer()
                             .getId();

@@ -36,7 +36,7 @@ public class RequestHelper extends Helper {
         // create specs
         Integer p =
             PatientHelper.createPatient(actionExecutor, name + "_patient",
-                rg.rg.getStudy().getId());
+                rg.researchGroup.getStudy().getId());
         Integer ceId =
             CollectionEventHelper.createCEventWithSourceSpecimens(actionExecutor,
                 p, rgId);

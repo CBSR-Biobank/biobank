@@ -41,15 +41,14 @@ public abstract class AbstractProcessPalletInfo implements Serializable,
         return pallet;
     }
 
-    @SuppressWarnings("nls")
-    private static final String SPECIMEN_SEARCH_QRY = "select spec from "
-        + Specimen.class.getName() + " as spec"
-        + " left join spec." + SpecimenPeer.SPECIMEN_POSITION.getName()
-        + " as pos " + " where pos." + SpecimenPositionPeer.ROW.getName()
-        + "= :row" + " and pos." + SpecimenPositionPeer.COL.getName()
-        + "= :col" + " and pos." + Property
+    private static final String SPECIMEN_SEARCH_QRY = "select spec from " //$NON-NLS-1$
+        + Specimen.class.getName() + " as spec" //$NON-NLS-1$
+        + " left join spec." + SpecimenPeer.SPECIMEN_POSITION.getName() //$NON-NLS-1$
+        + " as pos " + " where pos." + SpecimenPositionPeer.ROW.getName() //$NON-NLS-1$ //$NON-NLS-2$
+        + "= :row" + " and pos." + SpecimenPositionPeer.COL.getName() //$NON-NLS-1$ //$NON-NLS-2$
+        + "= :col" + " and pos." + Property //$NON-NLS-1$ //$NON-NLS-2$
             .concatNames(SpecimenPositionPeer.CONTAINER, ContainerPeer.ID)
-        + "= :contId";
+        + "= :contId"; //$NON-NLS-1$
 
     public Specimen getSpecimen(Session session,
         Integer row, Integer col) {

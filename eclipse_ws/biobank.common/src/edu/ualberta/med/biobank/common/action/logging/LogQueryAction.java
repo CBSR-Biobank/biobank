@@ -102,7 +102,7 @@ public class LogQueryAction implements Action<ListResult<Log>> {
 
         Query query = context.getSession().createQuery(qry.toString());
         for (int i = 0, n = parametersArgs.size(); i < n; i++) {
-            query.setParameter(i, parametersArgs.get(i++));
+            query.setParameter(i, parametersArgs.get(i));
         }
 
         List<Log> rows = query.list();

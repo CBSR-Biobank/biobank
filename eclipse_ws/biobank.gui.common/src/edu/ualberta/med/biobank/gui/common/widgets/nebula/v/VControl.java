@@ -51,6 +51,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.nebula.IControlPainter;
  * oval).</li>
  * </ul>
  */
+@SuppressWarnings("unused")
 public abstract class VControl {
 
     public enum Type {

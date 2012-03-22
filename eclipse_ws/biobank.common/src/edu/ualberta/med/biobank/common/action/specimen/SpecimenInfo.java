@@ -16,6 +16,7 @@ public class SpecimenInfo implements ActionResult {
     public String parentLabel;
     public String positionString;
     public String topContainerTypeNameShort;
+    public String comments;
 
     public String getPositionString(boolean fullString,
         boolean addTopParentShortName) {

@@ -7,7 +7,8 @@ import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
+import edu.ualberta.med.biobank.common.permission.labelPrinting.LabelPrintingPermission;
+import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -24,8 +25,8 @@ public class SessionState extends AbstractSourceProvider {
         "edu.ualberta.med.biobank.sourceprovider.isSuperAdminMode"; //$NON-NLS-1$
     public final static String HAS_WORKING_CENTER_SOURCE_NAME =
         "edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter"; //$NON-NLS-1$
-    public final static String HAS_PRINTER_LABELS_RIGHTS =
-        "edu.ualberta.med.biobank.sourceprovider.hasPrinterLabelsRights"; //$NON-NLS-1$
+    public final static String HAS_LABEL_PRINTING_RIGHTS =
+        "edu.ualberta.med.biobank.sourceprovider.hasLabelPrintingRights"; //$NON-NLS-1$
     public final static String HAS_USER_MANAGEMENT_RIGHTS =
         "edu.ualberta.med.biobank.sourceprovider.hasUserManagementRights"; //$NON-NLS-1$
     public final static String CURRENT_CENTER_TYPE =
@@ -41,7 +42,7 @@ public class SessionState extends AbstractSourceProvider {
     public String[] getProvidedSourceNames() {
         return new String[] { SESSION_STATE_SOURCE_NAME,
             IS_SUPER_ADMIN_MODE_SOURCE_NAME, HAS_WORKING_CENTER_SOURCE_NAME,
-            HAS_PRINTER_LABELS_RIGHTS, CURRENT_CENTER_TYPE };
+            HAS_LABEL_PRINTING_RIGHTS, CURRENT_CENTER_TYPE };
     }
 
     @Override
@@ -51,7 +52,7 @@ public class SessionState extends AbstractSourceProvider {
             Boolean.toString((isSuperAdminMode)));
         currentStateMap.put(HAS_WORKING_CENTER_SOURCE_NAME,
             Boolean.toString(hasWorkingCenter));
-        currentStateMap.put(HAS_PRINTER_LABELS_RIGHTS,
+        currentStateMap.put(HAS_LABEL_PRINTING_RIGHTS,
             Boolean.toString(hasPrinterLabelsRights));
         currentStateMap.put(CURRENT_CENTER_TYPE, currentCenterType);
         return currentStateMap;
@@ -81,11 +82,11 @@ public class SessionState extends AbstractSourceProvider {
             hasWorkingCenter);
     }
 
-    private void setHasPrinterLabelsRights(boolean hasPrinterLabelsRights) {
+    private void setHasLabelPrintingRights(boolean hasPrinterLabelsRights) {
         if (this.hasPrinterLabelsRights == hasPrinterLabelsRights)
             return; // no change
         this.hasPrinterLabelsRights = hasPrinterLabelsRights;
-        fireSourceChanged(ISources.WORKBENCH, HAS_PRINTER_LABELS_RIGHTS,
+        fireSourceChanged(ISources.WORKBENCH, HAS_LABEL_PRINTING_RIGHTS,
             hasPrinterLabelsRights);
     }
 
@@ -114,15 +115,14 @@ public class SessionState extends AbstractSourceProvider {
             setSuperAdminMode(user != null && user.isInSuperAdminMode());
             setHasWorkingCenter(user != null
                 && user.getCurrentWorkingCenter() != null);
-            setCurrentCenterType((user == null) ? null : user
-                .getCurrentWorkingCenter());
-            // setHasPrinterLabelsRights(user != null
-            // && SessionManager.getAppService().isAllowed(
-            // new PrinterLabelPermission()));
-            // FIXME need this permission implemented
+            setCurrentCenterType((user == null)
+                ? null : user.getCurrentWorkingCenter());
+            setHasLabelPrintingRights(user != null
+                && SessionManager.getAppService().isAllowed(
+                    new LabelPrintingPermission()));
             setHasUserManagementRights(user != null
                 && SessionManager.getAppService().isAllowed(
-                    new UserManagementPermission()));
+                    new UserManagerPermission()));
         } catch (Exception e) {
             logger.error("Error setting session state", e); //$NON-NLS-1$
         }

@@ -55,10 +55,10 @@ public class TestDatabase {
     @BeforeClass
     public static void setUpClass() throws Exception {
         r = new Random();
-        appService = AllTests.appService;
+        appService = AllTestsSuite.appService;
         if (appService == null) {
-            AllTests.setUp();
-            appService = AllTests.appService;
+            AllTestsSuite.setUp();
+            appService = AllTestsSuite.appService;
             Assert.assertNotNull("setUp: appService is null", appService);
         }
     }

@@ -219,7 +219,8 @@ public class UserEditDialog extends BgcBaseDialog {
             // add into group after persisting because user needs to be created
             // first
 
-            tx.commit();
+            // FIXME: commented this out to get rid of warning - NL
+            // tx.commit();
 
             if (SessionManager.getUser().equals(originalUser)) {
                 // if the User is making changes to himself, logout

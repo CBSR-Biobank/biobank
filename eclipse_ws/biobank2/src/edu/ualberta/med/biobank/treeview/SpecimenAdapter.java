@@ -7,15 +7,40 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenDeletePermission;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenReadPermission;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.SpecimenEntryForm;
 import edu.ualberta.med.biobank.forms.SpecimenViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenAdapter extends AdapterBase {
 
     public SpecimenAdapter(AdapterBase parent, SpecimenWrapper sample) {
         super(parent, sample);
+    }
+
+    @Override
+    public void init() {
+        try {
+            Integer id = ((SpecimenWrapper) getModelObject()).getId();
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new SpecimenDeletePermission(id));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new SpecimenReadPermission(id));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new SpecimenUpdatePermission(id));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     @Override
@@ -53,11 +78,6 @@ public class SpecimenAdapter extends AdapterBase {
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return 0;
     }
 
     @Override

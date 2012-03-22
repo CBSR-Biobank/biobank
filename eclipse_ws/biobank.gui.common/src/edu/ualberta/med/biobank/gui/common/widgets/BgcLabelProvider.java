@@ -30,8 +30,7 @@ public abstract class BgcLabelProvider extends LabelProvider implements
      * @param len
      * @return
      */
-    public static String[] wrapText(String text, int len)
-    {
+    public static String[] wrapText(String text, int len) {
         // return empty array for null text
         if (text == null)
             return new String[] {};
@@ -80,7 +79,7 @@ public abstract class BgcLabelProvider extends LabelProvider implements
         String[] ret = new String[lines.size()];
         int c = 0; // counter
         for (Enumeration<String> e = lines.elements(); e.hasMoreElements(); c++) {
-            ret[c] = (String) e.nextElement();
+            ret[c] = e.nextElement();
         }
 
         return ret;

@@ -64,7 +64,8 @@ public class ReportAdapter extends AdapterBase {
                         ((ReportWrapper) getModelObject()).getName()));
                 if (delete) {
                     try {
-                        getModelObject().delete();
+                        // FIXME: call to delete is deprecated
+                        // getModelObject().delete();
                         parent.removeChild(ReportAdapter.this);
                         AdvancedReportsView.getCurrent().reload();
                     } catch (Exception e) {
@@ -84,7 +85,8 @@ public class ReportAdapter extends AdapterBase {
             int userId = SessionManager.getUser().getId().intValue();
             report.setUserId(userId);
 
-            ReportAdapter reportAdapter = new ReportAdapter(getParent(), report);
+            ReportAdapter reportAdapter =
+                new ReportAdapter(getParent(), report);
             reportAdapter.openEntryForm();
         }
     }
@@ -103,11 +105,6 @@ public class ReportAdapter extends AdapterBase {
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return 0;
     }
 
     @Override

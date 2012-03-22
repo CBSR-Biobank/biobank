@@ -10,10 +10,13 @@ import edu.ualberta.med.biobank.model.Specimen;
 public class SpecimenDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
 
-    private Integer specimenId = null;
+    private final Integer specimenId;
 
-    public SpecimenDeleteAction(Integer id) {
-        this.specimenId = id;
+    public SpecimenDeleteAction(Specimen specimen) {
+        if (specimen == null) {
+            throw new IllegalArgumentException();
+        }
+        this.specimenId = specimen.getId();
     }
 
     @Override

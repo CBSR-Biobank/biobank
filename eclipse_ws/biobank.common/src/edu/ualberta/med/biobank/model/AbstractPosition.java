@@ -7,9 +7,11 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.validator.constraint.model.InBounds;
 
 @MappedSuperclass
-public class AbstractPosition extends AbstractBiobankModel {
+@InBounds
+public abstract class AbstractPosition extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private Integer row;
@@ -41,4 +43,10 @@ public class AbstractPosition extends AbstractBiobankModel {
     public RowColPos getPosition() {
         return new RowColPos(getRow(), getCol());
     }
+
+    // AbstractPosition _SHOULD_ have a parentContainer property so it has more
+    // meaning, but this method is a band-aid until ParentContainer is pulled
+    // into this class.
+    @Transient
+    public abstract Container getHoldingContainer();
 }

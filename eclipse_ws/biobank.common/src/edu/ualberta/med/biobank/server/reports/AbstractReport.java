@@ -52,11 +52,13 @@ public class AbstractReport {
     /**
      * Post process the whole collection after its retrieval
      */
+    @SuppressWarnings("unused")
     public List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
         return results;
     }
 
+    @SuppressWarnings("unused")
     public List<Object> executeQuery(WritableApplicationService appService)
         throws ApplicationException {
         if (report.getOp() != null)

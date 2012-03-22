@@ -87,8 +87,9 @@ public class TestCenter extends TestDatabase {
             .addProcessingEvent(site, new Date());
         SpecimenTypeWrapper testtype = SpecimenTypeHelper
             .addSpecimenType("testTypeAliquoted");
-        SpecimenWrapper parent = SpecimenHelper.newSpecimen(testtype, ActivityStatus.ACTIVE,
-            new Date());
+        SpecimenWrapper parent =
+            SpecimenHelper.newSpecimen(testtype, ActivityStatus.ACTIVE,
+                new Date());
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
             site, PatientHelper.addPatient("testP",
                 StudyHelper.addStudy("testStudy")), 0, parent);
@@ -121,7 +122,6 @@ public class TestCenter extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite("testCentersSite" + r.nextInt());
         ResearchGroupWrapper rg = ResearchGroupHelper.addResearchGroup(
             "testCentersRG", true);
-        ClinicWrapper clinic = ClinicHelper.addClinic("testCentersClinic");
         Assert.assertEquals(3, CenterWrapper.getCenters(appService).size());
         Assert.assertEquals(rg.getId().intValue(), CenterWrapper
             .getCenterFromId(appService, rg.getId()).getId().intValue());

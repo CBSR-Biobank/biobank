@@ -39,7 +39,8 @@ import edu.ualberta.med.biobank.common.action.container.ContainerCreateChildrenA
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteChildrenAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetSpecimenListInfoAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -48,14 +49,11 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ContainerPosition;
-import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
-import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
 import edu.ualberta.med.biobank.widgets.grids.cell.ContainerCell;
@@ -63,9 +61,9 @@ import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionSpecificBehaviour;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerViewForm extends BiobankViewForm {
@@ -76,7 +74,7 @@ public class ContainerViewForm extends BiobankViewForm {
     private static BgcLogger logger = BgcLogger
         .getLogger(ContainerViewForm.class.getName());
 
-    private SpecimenInfoTable specimensWidget;
+    private NewSpecimenInfoTable specimensWidget;
 
     private BgcBaseText siteLabel;
 
@@ -106,11 +104,13 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ComboViewer deleteCv;
 
-    private CommentCollectionInfoTable commentTable;
+    private CommentsInfoTable commentTable;
 
     private ContainerInfo containerInfo;
 
     private ContainerAdapter containerAdapter;
+
+    private ArrayList<SpecimenInfo> specInfo;
 
     @Override
     public void init() throws Exception {
@@ -136,6 +136,9 @@ public class ContainerViewForm extends BiobankViewForm {
         Assert.isNotNull(adapter.getId());
         containerInfo = SessionManager.getAppService().doAction(
             new ContainerGetInfoAction(adapter.getId()));
+        specInfo = SessionManager.getAppService().doAction(
+            new ContainerGetSpecimenListInfoAction(containerInfo.container
+                .getId())).getList();
         Assert.isNotNull(containerInfo);
         Assert.isNotNull(containerInfo.container);
     }
@@ -198,7 +201,7 @@ public class ContainerViewForm extends BiobankViewForm {
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
         commentTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 ModelWrapper.wrapModelCollection(
                     SessionManager.getAppService(),
                     containerInfo.container.getComments(),
@@ -558,36 +561,30 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void openFormFor(ContainerCell cell) {
-        try {
-            ContainerAdapter newAdapter = null;
-            if (cell.getStatus() == UICellStatus.NOT_INITIALIZED) {
-                if (canCreate) {
-                    ContainerWrapper containerToOpen = cell.getContainer();
-                    if (containerToOpen == null) {
-                        containerToOpen =
-                            new ContainerWrapper(SessionManager.getAppService());
-                    }
-                    containerToOpen
-                        .setSite((SiteWrapper) containerAdapter
-                            .getParentFromClass(SiteAdapter.class)
-                            .getModelObject());
-                    RowColPos pos = new RowColPos(cell.getRow(), cell.getCol());
-                    containerToOpen.setParent(
-                        new ContainerWrapper(SessionManager.getAppService(),
-                            containerInfo.container), pos);
-                    newAdapter =
-                        new ContainerAdapter(containerAdapter, containerToOpen);
-                    newAdapter.openEntryForm(true);
+        ContainerAdapter newAdapter = null;
+        if (cell.getStatus() == UICellStatus.NOT_INITIALIZED) {
+            if (canCreate) {
+                ContainerWrapper containerToOpen = cell.getContainer();
+                if (containerToOpen == null) {
+                    containerToOpen =
+                        new ContainerWrapper(SessionManager.getAppService());
                 }
-            } else {
-                ContainerWrapper child = cell.getContainer();
-                Assert.isNotNull(child);
-                SessionManager.openViewForm(child);
+                containerToOpen.setSite(new SiteWrapper(SessionManager
+                    .getAppService(), containerInfo.container.getSite()));
+                RowColPos pos = new RowColPos(cell.getRow(), cell.getCol());
+                containerToOpen.setParentInternal(
+                    new ContainerWrapper(SessionManager.getAppService(),
+                        containerInfo.container), pos);
+                newAdapter =
+                    new ContainerAdapter(containerAdapter, containerToOpen);
+                newAdapter.openEntryForm(true);
             }
-            containerAdapter.performExpand();
-        } catch (BiobankCheckException e) {
-            BgcPlugin.openAsyncError(Messages.ContainerViewForm_error_title, e);
+        } else {
+            ContainerWrapper child = cell.getContainer();
+            Assert.isNotNull(child);
+            SessionManager.openViewForm(child);
         }
+        containerAdapter.performExpand();
     }
 
     private void setContainerValues() {
@@ -603,16 +600,6 @@ public class ContainerViewForm extends BiobankViewForm {
             .getTopContainer().getTemperature());
     }
 
-    private List<SpecimenWrapper> getSpecimenWrappers() {
-        List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
-        for (SpecimenPosition pos : containerInfo.container
-            .getSpecimenPositions()) {
-            specimens.add(new SpecimenWrapper(SessionManager.getAppService(),
-                pos.getSpecimen()));
-        }
-        return specimens;
-    }
-
     List<ContainerTypeWrapper> getChildContainerTypes() {
         return ModelWrapper.wrapModelCollection(
             SessionManager.getAppService(),
@@ -626,8 +613,8 @@ public class ContainerViewForm extends BiobankViewForm {
         Composite parent =
             createSectionWithClient(Messages.ContainerViewForm_specimens_title);
         specimensWidget =
-            new SpecimenInfoTable(parent, getSpecimenWrappers(),
-                ColumnsShown.ALL, 20);
+            new NewSpecimenInfoTable(parent, specInfo,
+                ColumnsShown.CEVENT_SOURCE_SPECIMENS, 20);
         specimensWidget.adaptToToolkit(toolkit, true);
         specimensWidget.addClickListener(collectionDoubleClickListener);
         specimensWidget.createDefaultEditItem();
@@ -661,7 +648,7 @@ public class ContainerViewForm extends BiobankViewForm {
         }
 
         if (specimensWidget != null) {
-            specimensWidget.reloadCollection(getSpecimenWrappers());
+            specimensWidget.reloadCollection(specInfo);
         }
         commentTable.setList(
             ModelWrapper.wrapModelCollection(

@@ -38,6 +38,7 @@ import edu.ualberta.med.biobank.common.action.reports.ReportAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.common.util.HQLCriteriaListProxy;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
@@ -45,6 +46,7 @@ import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.forms.BgcEntryFormActions;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 
@@ -220,6 +222,10 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     private void generate() {
         try {
             initReport();
+            Log logMessage = new Log();
+            logMessage.setType("report"); //$NON-NLS-1$
+            logMessage.setAction(report.getName());
+            SessionManager.getAppService().logActivity(logMessage);
         } catch (Exception e1) {
             BgcPlugin.openAsyncError("Failed to load parameters", e1); //$NON-NLS-1$
         }
@@ -239,6 +245,10 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                                         SessionManager.getAppService()
                                             .doAction(new ReportAction(report))
                                             .getList();
+                                    if (reportData instanceof AbstractBiobankListProxy)
+                                        ((AbstractBiobankListProxy<?>) reportData)
+                                            .setAppService(SessionManager
+                                                .getAppService());
                                 } catch (Exception e) {
                                     reportData = new ArrayList<Object>();
                                     BgcPlugin.openAsyncError("Query Error", e); //$NON-NLS-1$
@@ -372,8 +382,8 @@ public abstract class ReportsEditor extends BiobankEntryForm {
 
         if (exportCSV == false
             && ((reportData instanceof HQLCriteriaListProxy && (((HQLCriteriaListProxy<?>) reportData)
-                .getRealSize() == -1 || ((HQLCriteriaListProxy<?>) reportData)
-                .getRealSize() > 1000)) || reportData.size() > 1000)) {
+                .size() == -1 || ((HQLCriteriaListProxy<?>) reportData)
+                .size() > 1000)) || reportData.size() > 1000)) {
             throw new Exception(Messages.ReportsEditor_exceed_1000_msg);
         }
 
@@ -407,8 +417,6 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                     : new String[] { ".pdf" }; //$NON-NLS-1$
                 path = runExportDialog(fileName, filterExt);
                 if (path == null) {
-                    BgcPlugin.openAsyncError("Exporting canceled.", //$NON-NLS-1$
-                        "Select a valid path and try again."); //$NON-NLS-1$
                     return;
                 }
             }
@@ -585,7 +593,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ID;
     }
 

@@ -22,14 +22,15 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ContainerTypeViewForm"; //$NON-NLS-1$
 
-    private ContainerTypeWrapper containerType;
+    private ContainerTypeWrapper containerType = new ContainerTypeWrapper(
+        SessionManager.getAppService());
 
     private BgcBaseText siteLabel;
 
@@ -53,7 +54,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private ListViewer childContainerTypesViewer;
 
-    private CommentCollectionInfoTable commentTable;
+    private CommentsInfoTable commentTable;
 
     private ContainerTypeInfo containerTypeInfo;
 
@@ -76,9 +77,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         containerTypeInfo = SessionManager.getAppService().doAction(
             new ContainerTypeGetInfoAction(adapter.getId()));
         Assert.isNotNull(containerTypeInfo);
-        containerType =
-            new ContainerTypeWrapper(SessionManager.getAppService(),
-                containerTypeInfo.getContainerType());
+        containerType.setWrappedObject(containerTypeInfo.getContainerType());
     }
 
     @Override
@@ -145,7 +144,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
         commentTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 containerType.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);

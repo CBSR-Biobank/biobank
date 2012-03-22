@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.test.SessionProvider;
 
 public class LocalActionExecutor implements IActionExecutor {
     private final SessionProvider sessionProvider;

@@ -12,9 +12,8 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
@@ -209,7 +208,7 @@ public class TestContainerLabelingScheme extends TestDatabase {
         }
 
         try {
-            RowColPos pos = ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
+            ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
                 appService, "aa", totalRows, totalCols, "test");
             Assert.fail("should not be allowed to use lower case characters");
         } catch (Exception e) {
@@ -254,7 +253,7 @@ public class TestContainerLabelingScheme extends TestDatabase {
         }
 
         try {
-            RowColPos pos = ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
+            ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
                 appService, "aa", totalRows, totalCols, "test");
             Assert.fail("should not be allowed to use lower case characters");
         } catch (Exception e) {
@@ -348,7 +347,7 @@ public class TestContainerLabelingScheme extends TestDatabase {
     @Test
     public void testDelete() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testSite");
-        ContainerWrapper container = ContainerHelper.addContainer("01AA",
+        ContainerHelper.addContainer("01AA",
             "asd", site, ContainerTypeHelper.addContainerType(site, "testCT",
                 "tct", ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA, 1,
                 1, true));
@@ -386,14 +385,14 @@ public class TestContainerLabelingScheme extends TestDatabase {
             Assert.fail("Should be out of bounds");
 
         // test canlabel
-        CapacityWrapper cap = new CapacityWrapper(appService);
-        cap.setCol(4);
-        cap.setRow(2);
+        Capacity cap = new Capacity();
+        cap.setColCapacity(4);
+        cap.setRowCapacity(2);
 
         Assert.assertTrue(ContainerLabelingSchemeWrapper.canLabel(
             ContainerLabelingSchemeWrapper.getLabelingSchemeById(appService,
                 ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA)
-                .getWrappedObject(), cap.getWrappedObject()));
+                .getWrappedObject(), cap));
 
     }
 

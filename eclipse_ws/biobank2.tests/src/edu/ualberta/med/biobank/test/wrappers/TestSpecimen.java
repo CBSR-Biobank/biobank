@@ -14,7 +14,6 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -817,8 +816,7 @@ public class TestSpecimen extends TestDatabase {
     }
 
     @Test
-    public void testFlagged() throws BiobankFailedQueryException,
-        ApplicationException {
+    public void testFlagged() {
         Assert.assertFalse(parentSpc.isFlagged());
         parentSpc.setActivityStatus(ActivityStatus.FLAGGED);
         Assert.assertTrue(parentSpc.isFlagged());

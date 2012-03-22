@@ -11,9 +11,9 @@ import com.google.web.bindery.event.shared.EventBus;
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecimenSaveInfo;
@@ -35,6 +35,7 @@ import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.IEntryFormView;
 import edu.ualberta.med.biobank.mvp.view.IView;
 
+@SuppressWarnings("unused")
 public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
     private final Dispatcher dispatcher;
     private final ActivityStatusComboPresenter activityStatusComboPresenter;
@@ -152,7 +153,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         return load(new StudyEdit(studyId));
     }
 
-    private void editStudy(StudyInfo studyInfo) throws InitPresenterException {
+    private void editStudy(StudyInfo studyInfo) {
         Study study = studyInfo.getStudy();
         view.getName().setValue(study.getName());
         view.getNameShort().setValue(study.getNameShort());

@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 
+@SuppressWarnings({ "unused", "deprecation" })
 @Deprecated
 public class SourceSpecimenHelper extends DbHelper {
 

@@ -28,8 +28,8 @@ public class SessionInterceptor extends EmptyInterceptor {
 
     private void log(Object entity, String action) {
         try {
-            WrapperLogProvider<?> logProvider = BiobankObjectStateLogger
-                .getLogProvider(entity.getClass());
+            WrapperLogProvider<?> logProvider =
+                BiobankObjectStateLogger.getLogProvider(entity.getClass());
             if (logProvider != null) {
                 BiobankObjectStateLogger
                     .logMessage(logProvider, entity, action);
@@ -92,8 +92,7 @@ public class SessionInterceptor extends EmptyInterceptor {
     @Override
     public void afterTransactionBegin(Transaction tx) {
         LocalInfo userInfo = BiobankThreadVariable.get();
-        if (null == userInfo)
-            userInfo = new LocalInfo();
+        if (null == userInfo) userInfo = new LocalInfo();
         userInfo.setIsIntransaction(true);
         BiobankThreadVariable.set(userInfo);
     }

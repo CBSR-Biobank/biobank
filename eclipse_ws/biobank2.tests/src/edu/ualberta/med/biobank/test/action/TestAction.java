@@ -1,106 +1,65 @@
 package edu.ualberta.med.biobank.test.action;
 
+import java.lang.annotation.Annotation;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.TimeZone;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestName;
 
-import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionResult;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.OriginInfo;
-import edu.ualberta.med.biobank.model.PermissionEnum;
-import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.action.SessionProvider.Mode;
+import edu.ualberta.med.biobank.test.TestDb;
 
-public class TestAction {
-    @Rule
-    public final TestName testName = new TestName();
-
-    protected static final String SUPER_ADMIN_LOGIN = "superadmin";
-    protected static final Random R = new Random();
-    protected static final SessionProvider SESSION_PROVIDER;
-    protected static final LocalActionExecutor EXECUTOR;
-
-    protected Session session;
+public class TestAction extends TestDb {
+    private static final LocalActionExecutor EXECUTOR;
 
     static {
-        SESSION_PROVIDER = new SessionProvider(Mode.RUN);
-        EXECUTOR = new LocalActionExecutor(SESSION_PROVIDER);
-
-        User user = getSuperAdminUser();
-        EXECUTOR.setUserId(user.getId());
+        EXECUTOR = new LocalActionExecutor(TestDb.getSessionProvider());
+        EXECUTOR.setUserId(getGlobalAdmin().getId());
     }
 
-    /**
-     * Done for each test of this class.
-     */
+    @Override
     @Before
     public void setUp() throws Exception {
-        session = SESSION_PROVIDER.openSession();
+        super.setUp();
+
+        // by default, always execute as the super user
+        getExecutor().setUserId(getGlobalAdmin().getId());
     }
 
-    /**
-     * Done for each test of this class.
-     */
-    @After
-    public void tearDown() throws Exception {
-        session.close();
+    protected static IActionExecutor getExecutor() {
+        return EXECUTOR;
     }
 
-    public static User getSuperAdminUser() {
-        Session session = SESSION_PROVIDER.openSession();
+    protected static <T extends ActionResult> T exec(Action<T> action)
+        throws ActionException {
+        return getExecutor().exec(action);
+    }
 
-        // check if user already exists
-        @SuppressWarnings("unchecked")
-        List<User> users = session.createCriteria(User.class)
-            .add(Restrictions.eq("login", SUPER_ADMIN_LOGIN))
-            .list();
-
-        if (users.size() >= 1) return users.get(0);
-
-        session.beginTransaction();
-
-        User superAdmin = new User();
-        superAdmin.setLogin(SUPER_ADMIN_LOGIN);
-        superAdmin.setCsmUserId(-1L);
-        superAdmin.setRecvBulkEmails(false);
-        superAdmin.setFullName("super admin");
-        superAdmin.setEmail(Utils.getRandomString(5, 10));
-        superAdmin.setNeedPwdChange(false);
-        superAdmin.setNeedPwdChange(false);
-        superAdmin.setActivityStatus(ActivityStatus.ACTIVE);
-
-        session.save(superAdmin);
-
-        Membership membership = new Membership();
-        membership.setRank(Rank.ADMINISTRATOR);
-        membership.setPrincipal(superAdmin);
-        superAdmin.getMemberships().add(membership);
-        membership.getPermissions().add(PermissionEnum.ADMINISTRATION);
-
-        session.save(membership);
-
-        session.getTransaction().commit();
-        session.close();
-
-        return superAdmin;
+    protected static <T extends ActionResult> T execAs(User user,
+        Action<T> action) throws ActionException {
+        Integer oldUserId = getExecutor().getUserId();
+        try {
+            getExecutor().setUserId(user.getId());
+            return getExecutor().exec(action);
+        } finally {
+            getExecutor().setUserId(oldUserId);
+        }
     }
 
     private static Date convertToGmt(Date localDate) {
@@ -181,11 +140,33 @@ public class TestAction {
         session.getTransaction().commit();
     }
 
-    protected String getMethodName() {
-        return testName.getMethodName();
+    public static boolean contains(ConstraintViolationException e,
+        Class<? extends Annotation> annotationKlazz, Class<?> klazz) {
+        Annotation annotation = klazz.getAnnotation(annotationKlazz);
+        return contains(e, annotation);
     }
 
-    protected String getMethodNameR() {
-        return testName.getMethodName() + R.nextInt();
+    public static boolean contains(ConstraintViolationException e,
+        Class<? extends Annotation> annotationKlazz, Class<?> klazz,
+        String methodName) {
+        Annotation annotation;
+        try {
+            annotation = klazz.getMethod(methodName)
+                .getAnnotation(annotationKlazz);
+        } catch (Throwable caught) {
+            throw new RuntimeException(caught);
+        }
+        return contains(e, annotation);
+    }
+
+    public static boolean contains(ConstraintViolationException e, Annotation a) {
+        if (a == null) {
+            throw new NullPointerException("annotation cannot be null");
+        }
+        for (ConstraintViolation<?> cv : e.getConstraintViolations()) {
+            if (cv.getConstraintDescriptor().getAnnotation().equals(a))
+                return true;
+        }
+        return false;
     }
 }

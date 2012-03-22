@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 
+@SuppressWarnings({ "unused", "deprecation" })
 @Deprecated
 public class CollectionEventHelper extends DbHelper {
 

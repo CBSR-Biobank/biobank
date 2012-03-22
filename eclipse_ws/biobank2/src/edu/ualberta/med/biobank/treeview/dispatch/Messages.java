@@ -3,7 +3,8 @@ package edu.ualberta.med.biobank.treeview.dispatch;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.treeview.dispatch.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME =
+        "edu.ualberta.med.biobank.treeview.dispatch.messages"; //$NON-NLS-1$
     public static String DispatchAdapter_check_error_msg;
     public static String DispatchAdapter_delete_confirm_msg;
     public static String DispatchAdapter_dispatch_label;
@@ -23,6 +24,7 @@ public class Messages extends NLS {
     public static String ReceivingWithErrorsDispatchGroup_error_node_label;
     public static String SentInTransitDispatchGroup_sent_node_label;
     public static String DispatchCenterAdapter_site_label;
+    public static String DispatchAdapter_close_label;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

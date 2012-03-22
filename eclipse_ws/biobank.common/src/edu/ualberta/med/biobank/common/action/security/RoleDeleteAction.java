@@ -12,10 +12,10 @@ public class RoleDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
     private static final Permission PERMISSION = new RoleManagementPermission();
 
-    private final Integer roleId;
+    private final RoleDeleteInput input;
 
-    public RoleDeleteAction(Integer id) {
-        this.roleId = id;
+    public RoleDeleteAction(RoleDeleteInput input) {
+        this.input = input;
     }
 
     @Override
@@ -25,7 +25,7 @@ public class RoleDeleteAction implements Action<EmptyResult> {
 
     @Override
     public EmptyResult run(ActionContext context) throws ActionException {
-        Role role = context.load(Role.class, roleId);
+        Role role = context.load(Role.class, input.getRoleId());
 
         context.getSession().delete(role);
 

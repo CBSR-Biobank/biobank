@@ -10,20 +10,23 @@ import edu.ualberta.med.biobank.model.Request;
 public class RequestDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
 
-    protected Integer rId = null;
+    protected final Integer requestId;
 
-    public RequestDeleteAction(Integer id) {
-        this.rId = id;
+    public RequestDeleteAction(Request request) {
+        if (request == null) {
+            throw new IllegalArgumentException();
+        }
+        this.requestId = request.getId();
     }
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new RequestDeletePermission(rId).isAllowed(context);
+        return new RequestDeletePermission(requestId).isAllowed(context);
     }
 
     @Override
     public EmptyResult run(ActionContext context) throws ActionException {
-        Request r = context.get(Request.class, rId);
+        Request r = context.get(Request.class, requestId);
         context.getSession().delete(r);
         return new EmptyResult();
     }

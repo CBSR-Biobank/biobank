@@ -18,7 +18,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-discovery-0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-lang-2.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-logging-1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/hibernate3.jar" sourcepath="/home/jferland/Downloads/hibernate-distribution-3.6.9.Final/project/hibernate-core.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/hibernate3.jar" sourcepath="/Users/jferland/Source/Java/hibernate-distribution-3.6.9.Final/project/hibernate-core"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/jaxrpc.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/log4j-1.2.14.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/sdk-client-framework.jar"/>
@@ -36,8 +36,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/slf4j-api-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-jpa-2.0-api-1.0.1.Final.jar" sourcepath="/home/jferland/.m2/repository/org/hibernate/javax/persistence/hibernate-jpa-2.0-api/1.0.1.Final/hibernate-jpa-2.0-api-1.0.1.Final-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/javassist-3.12.0.GA.jar" sourcepath="/home/jferland/.m2/repository/javassist/javassist/3.12.0.GA/javassist-3.12.0.GA-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/jta-1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-validator-4.2.0.Final.jar" sourcepath="/home/jferland/.m2/repository/org/hibernate/hibernate-validator/4.2.0.Final/hibernate-validator-4.2.0.Final-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/jta-1.1.jar" sourcepath="/home/jferland/Downloads/hibernate-distribution-3.6.9.Final/project/hibernate-core"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-validator-4.2.0.Final.jar" sourcepath="/Users/jferland/Source/Java/hibernate-distribution-3.6.9.Final/project/hibernate-core"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/validation-api-1.0.0.GA.jar" sourcepath="/home/jferland/.m2/repository/javax/validation/validation-api/1.0.0.GA/validation-api-1.0.0.GA-sources.jar"/>
 	<classpathentry kind="lib" path="lib/client/ognl-2.6.7.jar"/>
 	<classpathentry kind="output" path="bin"/>

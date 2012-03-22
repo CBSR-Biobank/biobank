@@ -13,18 +13,17 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentViewForm extends BiobankViewForm {
@@ -51,12 +50,12 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private SpecimenEntryWidget specimenWidget;
 
-    private CommentCollectionInfoTable commentEntryTable;
+    private CommentsInfoTable commentEntryTable;
 
     private ShipmentInfoWrapper shipmentInfo = new ShipmentInfoWrapper(
         SessionManager.getAppService());
 
-    private List<SpecimenWrapper> specimens;
+    private List<SpecimenInfo> specimens;
 
     @Override
     protected void init() throws Exception {
@@ -73,17 +72,15 @@ public class ShipmentViewForm extends BiobankViewForm {
             oi.setShipmentInfo(new ShipmentInfo());
             originInfo.setWrappedObject(oi);
             shipmentInfo.setWrappedObject(oi.getShipmentInfo());
-            specimens = new ArrayList<SpecimenWrapper>();
+            specimens = new ArrayList<SpecimenInfo>();
         } else {
             ShipmentReadInfo read =
                 SessionManager.getAppService().doAction(
                     new ShipmentGetInfoAction(id));
-            originInfo.setWrappedObject(read.oi);
-            shipmentInfo.setWrappedObject(read.oi.getShipmentInfo());
-            specimens =
-                ModelWrapper.wrapModelCollection(
-                    SessionManager.getAppService(), read.specimens,
-                    SpecimenWrapper.class);
+            originInfo.setWrappedObject(read.originInfo);
+            shipmentInfo.setWrappedObject(read.originInfo.getShipmentInfo());
+            specimens = read.specimens;
+            SessionManager.logLookup(read.originInfo);
         }
 
     }
@@ -105,8 +102,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
         specimenWidget =
-            new SpecimenEntryWidget(client, SWT.NONE, toolkit,
-                SessionManager.getAppService(), false);
+            new SpecimenEntryWidget(client, SWT.NONE, toolkit, false);
         specimenWidget.setSpecimens(specimens);
         specimenWidget.addDoubleClickListener(collectionDoubleClickListener);
     }
@@ -154,7 +150,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
         client.setLayout(gl);
         commentEntryTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 originInfo.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;

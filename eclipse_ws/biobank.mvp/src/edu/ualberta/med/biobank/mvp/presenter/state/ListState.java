@@ -42,20 +42,17 @@ public class ListState<E> extends AbstractState {
     private boolean computeDirty() {
         List<E> value = source.asUnmodifiableList();
 
-        if (value.size() != checkpointValue.size())
-        {
+        if (value.size() != checkpointValue.size()) {
             return true;
         }
-        else
-        {
-            for (int i = 0; i < checkpointValue.size(); i++) {
-                if (!areEqual(value.get(i), checkpointValue.get(i))) {
-                    return true;
-                }
-            }
 
-            return false;
+        for (int i = 0; i < checkpointValue.size(); i++) {
+            if (!areEqual(value.get(i), checkpointValue.get(i))) {
+                return true;
+            }
         }
+
+        return false;
     }
 
     private class SourceMonitor implements ListChangeHandler<E> {

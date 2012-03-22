@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerTypeBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.ContainerTypePostPersistChecks;
 import edu.ualberta.med.biobank.common.wrappers.checks.ContainerTypePrePersistChecks;
-import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -129,28 +128,19 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     }
 
     public Integer getRowCapacity() {
-        return getProperty(getCapacity(), CapacityPeer.ROW_CAPACITY);
+        return getCapacity().getRowCapacity();
     }
 
     public Integer getColCapacity() {
-        return getProperty(getCapacity(), CapacityPeer.COL_CAPACITY);
-    }
-
-    private CapacityWrapper initCapacity() {
-        CapacityWrapper capacity = getCapacity();
-        if (capacity == null) {
-            capacity = new CapacityWrapper(appService);
-            setCapacity(capacity);
-        }
-        return capacity;
+        return getCapacity().getColCapacity();
     }
 
     public void setRowCapacity(Integer maxRows) {
-        initCapacity().setProperty(CapacityPeer.ROW_CAPACITY, maxRows);
+        getCapacity().setRowCapacity(maxRows);
     }
 
     public void setColCapacity(Integer maxCols) {
-        initCapacity().setProperty(CapacityPeer.COL_CAPACITY, maxCols);
+        getCapacity().setColCapacity(maxCols);
     }
 
     public Integer getChildLabelingSchemeId() {

@@ -13,16 +13,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
+import edu.ualberta.med.biobank.treeview.patient.StudyWithPatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SourceSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
 
@@ -34,7 +35,8 @@ public class StudyViewForm extends BiobankViewForm {
     private static final String DATE_PROCESSED_INFO_FIELD_NAME =
         Messages.study_visit_info_dateProcessed;
 
-    private StudyWrapper study;
+    private StudyWrapper study =
+        new StudyWrapper(SessionManager.getAppService());
 
     private BgcBaseText nameLabel;
     private BgcBaseText nameShortLabel;
@@ -54,13 +56,15 @@ public class StudyViewForm extends BiobankViewForm {
 
     private List<StudyEventAttrCustomInfo> pvCustomInfoList;
 
-    private CommentCollectionInfoTable commentTable;
+    private CommentsInfoTable commentTable;
 
     @Override
     public void init() throws Exception {
-        Assert.isTrue((adapter instanceof StudyAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
-                + adapter.getClass().getName());
+        Assert
+            .isTrue(
+                (adapter instanceof StudyAdapter || adapter instanceof StudyWithPatientAdapter),
+                "Invalid editor input: object of type " //$NON-NLS-1$
+                    + adapter.getClass().getName());
 
         updateStudyInfo();
         setPartName(NLS
@@ -71,9 +75,9 @@ public class StudyViewForm extends BiobankViewForm {
     private void updateStudyInfo() throws Exception {
         studyInfo = SessionManager.getAppService().doAction(
             new StudyGetInfoAction(adapter.getId()));
-        study =
-            new StudyWrapper(SessionManager.getAppService(),
-                studyInfo.getStudy());
+        Assert.isNotNull(studyInfo.getStudy());
+        study.setWrappedObject(studyInfo.getStudy());
+        SessionManager.logLookup(studyInfo.getStudy());
     }
 
     @Override
@@ -118,7 +122,7 @@ public class StudyViewForm extends BiobankViewForm {
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
         commentTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 study.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
@@ -133,30 +137,6 @@ public class StudyViewForm extends BiobankViewForm {
         contactsTable.createDefaultEditItem();
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
-
-        // contactsTable.addClickListener(new IDoubleClickListener() {
-        // @Override
-        // public void doubleClick(DoubleClickEvent event) {
-        // Object selection = event.getSelection();
-        // if (selection instanceof InfoTableSelection) {
-        // Object obj = ((InfoTableSelection) selection).getObject();
-        // if (obj instanceof ClinicWrapper) {
-        // ClinicWrapper c = (ClinicWrapper) obj;
-        // DoubleClickEvent newEvent = new DoubleClickEvent(
-        // (Viewer) event.getSource(), new InfoTableSelection(
-        // c));
-        // collectionDoubleClickListener.doubleClick(newEvent);
-        // } else {
-        // Assert.isTrue(false,
-        //                            "invalid InfoTableSelection class:" //$NON-NLS-1$
-        // + obj.getClass().getName());
-        // }
-        // } else {
-        //                    Assert.isTrue(false, "invalid class for event selection:" //$NON-NLS-1$
-        // + event.getClass().getName());
-        // }
-        // }
-        // });
     }
 
     private void setStudySectionValues() throws Exception {
@@ -210,7 +190,8 @@ public class StudyViewForm extends BiobankViewForm {
             }
             combinedStudyEventAttrInfo = new StudyEventAttrCustomInfo();
             combinedStudyEventAttrInfo.setLabel(label);
-            combinedStudyEventAttrInfo.setType(study.getStudyEventAttrType(label));
+            combinedStudyEventAttrInfo.setType(study
+                .getStudyEventAttrType(label));
             combinedStudyEventAttrInfo.setAllowedValues(study
                 .getStudyEventAttrPermissible(label));
             pvCustomInfoList.add(combinedStudyEventAttrInfo);

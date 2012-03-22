@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
-import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.PaginationWidget;
@@ -165,12 +164,7 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
     @Override
     protected void init(List<T> list) {
         if (paginationWidget.getTotalPages() == PaginationWidget.TOTAL_PAGES_UNKNOWN) {
-            int size;
-            if (list instanceof AbstractBiobankListProxy) {
-                size = ((AbstractBiobankListProxy<?>) list).getRealSize();
-            } else {
-                size = list.size();
-            }
+            int size = list.size();
 
             if (size > 0) {
                 paginationWidget.setTableMaxRows(size);

@@ -8,6 +8,7 @@ public class LocalizableBundle {
         this.bundleName = bundleName;
     }
 
+    @SuppressWarnings("unused")
     protected LocalizablePattern getPattern(String key) {
         return null;
     }

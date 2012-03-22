@@ -36,12 +36,20 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * Manageable means that <em>some</em> portion of the {@link Membership} can be
  * manipulated (e.g. some {@link PermissionEnum}-s or {@link Role}-s can be
  * added or removed).
+ * <p>
+ * Also note that it is easier to <em>Directly</em> modify the elements of a
+ * collection (e.g. a {@link Membership})
  * 
  * @author Jonathan Ferland
  */
 @Entity
 @Table(name = "MEMBERSHIP",
     uniqueConstraints = {
+        // TODO: consider adding 'RANK' so can be admin on 1, user manager on 1
+        // and a normal user for all? But there's no point of being an admin and
+        // a user manager on the same center/ study combo, since admin
+        // completely encompases manager. Actually, how about an "isManager"
+        // field and an "isAllPermissions" field?
         @UniqueConstraint(columnNames = { "PRINCIPAL_ID", "NOT_NULL_CENTER_ID",
             "NOT_NULL_STUDY_ID" }) })
 @Unique(properties = { "principal", "notNullCenterId", "notNullStudyId" }, groups = PrePersist.class)
@@ -57,6 +65,11 @@ public class Membership extends AbstractBiobankModel {
     private Principal principal;
     private Rank rank = Rank.NORMAL;
     private short level = MIN_LEVEL;
+
+    @Transient
+    public boolean equalsDomain(Membership membership) {
+        return false;
+    }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Membership.rank.NotNull}")
     @Column(name = "RANK", nullable = false)
@@ -181,6 +194,20 @@ public class Membership extends AbstractBiobankModel {
     }
 
     /**
+     * Removes redundant {@link PermissionEnum}-s that are already reachable
+     * through a {@link Role}.
+     */
+    @Transient
+    public void reducePermissions() {
+        Set<PermissionEnum> nonRedundantPerms = new HashSet<PermissionEnum>();
+        nonRedundantPerms.addAll(getPermissions());
+        for (Role role : getRoles()) {
+            nonRedundantPerms.removeAll(role.getPermissions());
+        }
+        getPermissions().retainAll(nonRedundantPerms);
+    }
+
+    /**
      * Returns a {@link Set} of all the <strong>existing</strong> {@link Role}-s
      * on this {@link Membership} that the given {@link User} is allowed to
      * manage (add or remove from this {@link Membership}).
@@ -192,15 +219,17 @@ public class Membership extends AbstractBiobankModel {
      * 
      * @param user the manager, who is allowed to modify the returned
      *            {@link Role}-s
+     * @param defaultAdminRoles which {@link Role}-s to add to the set if the
+     *            {@link User} is an {@link Rank#ADMINISTRATOR}.
      * @return the {@link Role}-s that the manager can manipulate
      */
     @Transient
-    public Set<Role> getManageableRoles(User user) {
+    public Set<Role> getManageableRoles(User user, Set<Role> defaultAdminRoles) {
         Set<Role> roles = new HashSet<Role>();
         for (Membership membership : user.getAllMemberships()) {
             if (isManageable(membership)) {
                 if (Rank.ADMINISTRATOR.equals(membership.getRank())) {
-                    roles.addAll(getRoles());
+                    roles.addAll(defaultAdminRoles);
                 }
                 roles.addAll(membership.getRoles());
             }
@@ -212,17 +241,55 @@ public class Membership extends AbstractBiobankModel {
      * Return true if the given {@link User} is able to manage <em>all</em> of
      * the {@link PermissionEnum}-s and {@link Role}-s that this
      * {@link Membership} has, otherwise false.
+     * <p>
+     * Require at least one {@link PermissionEnum} or {@link Role} to be
+     * manageable, otherwise an empty {@link Membership} is fully manageable by
+     * default.
      * 
      * @param u other
      * @return
      */
     @Transient
     public boolean isFullyManageable(User u) {
-        if (!getManageablePermissions(u).containsAll(getPermissions()))
+        Set<PermissionEnum> manageablePerms = getManageablePermissions(u);
+        if (!manageablePerms.containsAll(getPermissions())) return false;
+
+        Set<Role> manageableRoles = getManageableRoles(u, getRoles());
+        if (!manageableRoles.containsAll(getRoles())) return false;
+
+        // otherwise an empty membership is fully manageable by default
+        if (manageablePerms.isEmpty() && manageableRoles.isEmpty())
             return false;
-        if (!getManageableRoles(u).containsAll(getRoles()))
-            return false;
+
         return true;
+    }
+
+    @Transient
+    public boolean isPartiallyManageable(User u) {
+        for (Membership membership : u.getAllMemberships()) {
+            if (isManageable(membership)) return true;
+        }
+        return false;
+    }
+
+    @Transient
+    public boolean isRankGe(Rank rank) {
+        return rank.isLe(getRank());
+    }
+
+    @Transient
+    public boolean isGlobal() {
+        return isAllCenters() && isAllStudies();
+    }
+
+    @Transient
+    public boolean isAllCenters() {
+        return getCenter() == null;
+    }
+
+    @Transient
+    public boolean isAllStudies() {
+        return getStudy() == null;
     }
 
     /**
@@ -236,7 +303,7 @@ public class Membership extends AbstractBiobankModel {
      * {@link PermissionEnum} or {@link Role}, otherwise it can't manage
      * anything.
      * <li>the given {@link Membership} has a {@link Rank} of at least
-     * {@link Rank#USER_MANAGER}</li>
+     * {@link Rank#MANAGER}</li>
      * <li>this {@link Membership} has a {@link Rank} less than that of the
      * given {@link Membership} or an equal {@link Rank} but a lesser
      * {@link #getLevel()} than the given {@link Membership}. This will prevent
@@ -253,10 +320,10 @@ public class Membership extends AbstractBiobankModel {
     public boolean isManageable(Membership that) {
         if (equals(that)) return false;
 
-        if (that.getPermissions().isEmpty()
+        if (that.getAllPermissions().isEmpty()
             && that.getRoles().isEmpty()) return false;
 
-        if (that.getRank().isLt(Rank.USER_MANAGER)) return false;
+        if (that.getRank().isLt(Rank.MANAGER)) return false;
 
         if (that.getRank().isLt(getRank())) return false;
         if (that.getRank().equals(getRank()) && that.getLevel() <= getLevel())

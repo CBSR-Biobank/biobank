@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,6 +15,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.util.NullHelper;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
@@ -22,6 +24,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Unique(properties = "name", groups = PrePersist.class)
 // TODO: check that no Membership uses this role before deleting
 public class Role extends AbstractBiobankModel {
+    public static final NameComparator NAME_COMPARATOR = new NameComparator();
     private static final long serialVersionUID = 1L;
 
     private String name;
@@ -48,5 +51,14 @@ public class Role extends AbstractBiobankModel {
 
     public void setPermissions(Set<PermissionEnum> permissions) {
         this.permissions = permissions;
+    }
+
+    private static class NameComparator implements Comparator<Role> {
+        @Override
+        public int compare(Role a, Role b) {
+            if (a == null && b == null) return 0;
+            if (a == null ^ b == null) return (a == null) ? -1 : 1;
+            return NullHelper.safeCompareTo(a.getName(), b.getName());
+        }
     }
 }

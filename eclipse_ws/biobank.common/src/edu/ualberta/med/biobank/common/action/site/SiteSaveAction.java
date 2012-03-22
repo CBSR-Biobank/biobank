@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.site;
 
-import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -45,9 +44,9 @@ public class SiteSaveAction extends CenterSaveAction {
 
         // TODO: check that the user has access to at least the studies they are
         // removing or adding?
-        Map<Integer, Study> studies = context.load(Study.class, studyIds);
+        Set<Study> studies = context.load(Study.class, studyIds);
         SetDifference<Study> sitesDiff = new SetDifference<Study>(
-            site.getStudies(), studies.values());
+            site.getStudies(), studies);
         site.setStudies(sitesDiff.getNewSet());
         for (Study study : sitesDiff.getRemoveSet()) {
             context.getSession().delete(study);

@@ -31,9 +31,7 @@ public class PdfDataExporter extends GuiDataExporter {
         super.canExport(data);
 
         if (data.getRows() instanceof AbstractBiobankListProxy) {
-            AbstractBiobankListProxy<?> proxy = (AbstractBiobankListProxy<?>) data
-                .getRows();
-            if (proxy.getRealSize() == -1) {
+            if (data.getRows().size() > 0 && data.getRows().size() <= 1000) {
                 throw new DataExportException(
                     Messages.PdfDataExporter_toomanyrows_error_msg);
             }
@@ -45,10 +43,15 @@ public class PdfDataExporter extends GuiDataExporter {
         IProgressMonitor monitor) throws DataExportException {
         canExport(data);
 
+        List<Map<String, String>> maps;
         String path = getPath(data, VALID_EXTS);
-        List<Map<String, String>> maps = getPropertyMaps(data, labelProvider,
-            monitor, true);
-
+        try {
+            maps = getPropertyMaps(data, labelProvider,
+                monitor, true);
+        } catch (Exception e) {
+            // canceled
+            return;
+        }
         try {
             JasperPrint jasperPrint = ReportingUtils.createDynamicReport(
                 data.getTitle(), data.getDescription(), data.getColumnNames(),
@@ -74,13 +77,12 @@ public class PdfDataExporter extends GuiDataExporter {
      */
     protected static List<Map<String, String>> getPropertyMaps(Data data,
         ITableLabelProvider labelProvider, IProgressMonitor monitor,
-        boolean useIntegerProperties) throws DataExportException {
+        boolean useIntegerProperties) throws Exception {
         List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
 
         for (Object row : data.getRows()) {
             if (monitor.isCanceled()) {
-                throw new DataExportException(
-                    Messages.PdfDataExporter_cancel_msg);
+                throw new Exception();
             }
 
             Map<String, String> map = getPropertyMap(data, row, labelProvider,

@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Map;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -9,15 +11,24 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewCollectionEventInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
     public static final String ID =
@@ -39,7 +50,7 @@ public class PatientViewForm extends BiobankViewForm {
 
     private BgcBaseText commentLabel;
 
-    private CommentCollectionInfoTable commentEntryTable;
+    private CommentsInfoTable commentEntryTable;
 
     @Override
     public void init() throws Exception {
@@ -48,16 +59,14 @@ public class PatientViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         updatePatientInfo();
-        // FIXME log edit action?
-        // SessionManager.logLookup(patientInfo.patient);
         setPartName(NLS.bind(Messages.PatientViewForm_title,
             patientInfo.patient.getPnumber()));
     }
 
     private void updatePatientInfo() throws Exception {
-        patientInfo =
-            SessionManager.getAppService().doAction(
-                new PatientGetInfoAction(adapter.getId()));
+        patientInfo = SessionManager.getAppService().doAction(
+            new PatientGetInfoAction(adapter.getId()));
+        SessionManager.logLookup(patientInfo.patient);
     }
 
     @Override
@@ -79,7 +88,7 @@ public class PatientViewForm extends BiobankViewForm {
 
         client.setLayout(gl);
         commentEntryTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 ModelWrapper.wrapModelCollection(
                     SessionManager.getAppService(),
                     patientInfo.patient.getComments(),
@@ -125,7 +134,38 @@ public class PatientViewForm extends BiobankViewForm {
         section.setClient(collectionEventTable);
         collectionEventTable.adaptToToolkit(toolkit, true);
         collectionEventTable.addClickListener(collectionDoubleClickListener);
-        collectionEventTable.createDefaultEditItem();
+        collectionEventTable
+            .addEditItemListener(new IInfoTableEditItemListener<PatientCEventInfo>() {
+
+                @Override
+                public void editItem(InfoTableEvent<PatientCEventInfo> event) {
+                    CollectionEvent ce =
+                        (CollectionEvent) event.getInfoTable().getSelection();
+                    if (ce != null) {
+                        try {
+                            Map<Integer, SimpleCEventInfo> map =
+                                SessionManager
+                                    .getAppService()
+                                    .doAction(
+                                        new PatientGetSimpleCollectionEventInfosAction(
+                                            ce
+                                                .getPatient().getId()))
+                                    .getMap();
+
+                            CollectionEventAdapter adapter =
+                                new CollectionEventAdapter(
+                                    PatientViewForm.this.adapter, map.get(ce
+                                        .getId()));
+                            adapter.openEntryForm();
+                        } catch (ApplicationException e) {
+                            BgcPlugin.openAsyncError("Unable to open form",
+                                "Error loading collection event.");
+                        }
+                    }
+                    return;
+                }
+
+            });
     }
 
     @Override

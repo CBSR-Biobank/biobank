@@ -15,15 +15,14 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
-    private static final String DISPATCH_HQL =
-        "SELECT distinct dispatch "
-            + "FROM " + Dispatch.class.getName() + " dispatch"
-            + " LEFT JOIN FETCH dispatch.shipmentInfo si"
-            + " LEFT JOIN FETCH si.shippingMethod"
-            + " INNER JOIN FETCH dispatch.receiverCenter"
-            + " INNER JOIN FETCH dispatch.senderCenter"
-            + " LEFT JOIN fetch dispatch.comments comments"
-            + " WHERE dispatch.id=?";
+    private static final String DISPATCH_HQL = "SELECT distinct dispatch "
+        + "FROM " + Dispatch.class.getName() + " dispatch"
+        + " LEFT JOIN FETCH dispatch.shipmentInfo si"
+        + " LEFT JOIN FETCH si.shippingMethod"
+        + " INNER JOIN FETCH dispatch.receiverCenter"
+        + " INNER JOIN FETCH dispatch.senderCenter"
+        + " LEFT JOIN fetch dispatch.comments comments"
+        + " WHERE dispatch.id=?";
 
     private Integer id;
 
@@ -37,8 +36,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
     }
 
     @Override
-    public DispatchReadInfo run(ActionContext context)
-        throws ActionException {
+    public DispatchReadInfo run(ActionContext context) throws ActionException {
         DispatchReadInfo sInfo = new DispatchReadInfo();
 
         Query query = context.getSession().createQuery(DISPATCH_HQL);
@@ -51,12 +49,10 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
 
             sInfo.dispatch = (Dispatch) row;
             sInfo.specimens =
-                new DispatchGetSpecimenInfosAction(id).run(context)
-                    .getSet();
+                new DispatchGetSpecimenInfosAction(id).run(context).getSet();
 
         } else {
-            throw new ActionException(
-                "No dispatch found for id:" + id); //$NON-NLS-1$
+            throw new ActionException("No dispatch found for id:" + id); //$NON-NLS-1$
         }
 
         return sInfo;

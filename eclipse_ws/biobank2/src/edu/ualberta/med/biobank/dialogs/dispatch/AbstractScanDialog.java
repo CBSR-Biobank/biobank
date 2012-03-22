@@ -140,7 +140,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         if (isOn) {
             scanButton.setText(Messages.AbstractScanDialog_retryScan_label);
         } else {
-            String scanButtonText = Messages.AbstractScanDialog_launchScan_label;
+            String scanButtonText =
+                Messages.AbstractScanDialog_launchScan_label;
             if (!BiobankPlugin.isRealScanEnabled()) {
                 scanButtonText = Messages.AbstractScanDialog_fakeScan_label;
             }
@@ -165,9 +166,11 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         if (checkBeforeProcessing(currentCenter)) {
             Map<RowColPos, PalletCell> cells = getCells();
             // conversion for server side call
-            Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> serverCells = null;
+            Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> serverCells =
+                null;
             if (cells != null) {
-                serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo>();
+                serverCells =
+                    new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo>();
                 for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
                     serverCells.put(entry.getKey(), entry.getValue()
                         .transformIntoServerCell());
@@ -227,11 +230,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
         createCustomDialogPreContents(contents);
 
-        plateToScanText = (BgcBaseText) createBoundWidgetWithLabel(contents,
-            BgcBaseText.class, SWT.NONE,
-            Messages.AbstractScanDialog_plateToScan_label, new String[0], this,
-            "plateToScan", new ScannerBarcodeValidator( //$NON-NLS-1$
-                Messages.AbstractScanDialog_plateToScan_validationMsg));
+        plateToScanText =
+            (BgcBaseText) createBoundWidgetWithLabel(contents,
+                BgcBaseText.class, SWT.NONE,
+                Messages.AbstractScanDialog_plateToScan_label, new String[0],
+                this, "plateToScan", new ScannerBarcodeValidator( //$NON-NLS-1$
+                    Messages.AbstractScanDialog_plateToScan_validationMsg));
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {

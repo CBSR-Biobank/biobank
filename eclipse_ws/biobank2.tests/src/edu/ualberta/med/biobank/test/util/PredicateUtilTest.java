@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 
 public class PredicateUtilTest {
+    @SuppressWarnings("unchecked")
     @Test
     public void test() {
         Predicate<Integer> le3 = new Predicate<Integer>() {

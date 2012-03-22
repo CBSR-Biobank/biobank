@@ -27,10 +27,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
-import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
 public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
@@ -40,15 +38,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     private DispatchSpecimensTreeTable specimensTree;
     private List<SpecimenWrapper> receivedOrExtraSpecimens =
         new ArrayList<SpecimenWrapper>();
-    private CommentCollectionInfoTable commentEntryTable;
-
-    private BgcEntryFormWidgetListener listener =
-        new BgcEntryFormWidgetListener() {
-            @Override
-            public void selectionChanged(MultiSelectEvent event) {
-                setDirty(true);
-            }
-        };
+    private CommentsInfoTable commentEntryTable;
 
     @Override
     protected void createFormContent() throws Exception {
@@ -59,16 +49,14 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createMainSection();
-        boolean editSpecimens = !dispatch.isInClosedState()
-            && !dispatch.isInLostState();
-
+        boolean editSpecimens = true;
         setFirstControl(form);
 
         if (editSpecimens)
             createSpecimensSelectionActions(page, true);
         specimensTree =
             new DispatchSpecimensTreeTable(page, dispatch,
-                editSpecimens, true);
+                editSpecimens);
         specimensTree.addSelectionChangedListener(biobankListener);
         specimensTree.addClickListener();
     }
@@ -112,7 +100,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentCollectionInfoTable(client,
+        commentEntryTable = new CommentsInfoTable(client,
             dispatch.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
@@ -233,7 +221,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return DispatchViewForm.ID;
     }
 

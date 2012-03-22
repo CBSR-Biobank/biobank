@@ -10,10 +10,13 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 public class CollectionEventDeleteAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
-    private Integer ceventId;
+    private final Integer ceventId;
 
-    public CollectionEventDeleteAction(Integer ceventId) {
-        this.ceventId = ceventId;
+    public CollectionEventDeleteAction(CollectionEvent cevent) {
+        if (cevent == null) {
+            throw new IllegalArgumentException();
+        }
+        this.ceventId = cevent.getId();
     }
 
     @Override

@@ -1,31 +1,28 @@
 package edu.ualberta.med.biobank.common.action.security;
 
+import java.util.Set;
+
+import org.hibernate.Hibernate;
+
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
-import edu.ualberta.med.biobank.common.permission.security.UserManagementPermission;
+import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
 
-/**
- * Return a {@link User} only with the {@link Membership}-s, {@link Group}-s,
- * {@link Role}-s, and {@link PermissionEnum}-s that the executing {@link User}
- * is able to manage.
- * 
- * @author Jonathan Ferland
- */
-public class UserGetAction implements Action<UserGetResult> {
+public class UserGetAction implements Action<UserGetOutput> {
     private static final long serialVersionUID = 1L;
-    private static final Permission PERMISSION = new UserManagementPermission();
+    private static final Permission PERMISSION = new UserManagerPermission();
 
-    private Integer userId;
+    private final UserGetInput input;
 
-    public UserGetAction(Integer userId) {
-        this.userId = userId;
+    public UserGetAction(UserGetInput input) {
+        this.input = input;
     }
 
     @Override
@@ -34,33 +31,102 @@ public class UserGetAction implements Action<UserGetResult> {
     }
 
     @Override
-    public UserGetResult run(ActionContext context) throws ActionException {
-        User user = context.load(User.class, userId);
+    public UserGetOutput run(ActionContext context) throws ActionException {
+        User user = context.load(User.class, input.getUserId());
 
-        return new UserGetResult(user);
+        User copy = new User();
+
+        ManagerContext managerContext = getManagerContext(context);
+
+        copyProperties(user, copy);
+        copyMemberships(user, copy, context, managerContext.getRoles());
+        copyGroups(user, copy, context);
+
+        return new UserGetOutput(copy, managerContext);
     }
 
-    public static class UserDTO {
-        private String login;
-        private boolean recvBulkEmails = true;
-        private String fullName;
-        private String email;
-        private boolean needPwdChange = true;
+    private ManagerContext getManagerContext(ActionContext context) {
+        User manager = context.getUser();
 
-        private WorkingSet<Group> groups;
-        private WorkingSet<Membership> memberships;
+        initManager(manager);
 
-        public UserDTO(User user) {
-            // go through Membership-s, find if any PermissionEnum-s in it, then
-            // add it to the collection if so.
-            for (Membership membership : user.getMemberships()) {
+        Set<Role> allRoles = new RoleGetAllAction(new RoleGetAllInput())
+            .run(context).getAllRoles();
+        Set<Group> manageableGroups = new GroupGetAllAction(
+            new GroupGetAllInput())
+            .run(context)
+            .getAllManageableGroups();
 
+        return new ManagerContext(manager, allRoles, manageableGroups);
+    }
+
+    /**
+     * Ensure all necessary areas of the {@link User} are initialized.
+     * 
+     * @param manager
+     */
+    private void initManager(User manager) {
+        Hibernate.initialize(manager);
+        initMemberships(manager.getMemberships());
+        for (Group group : manager.getGroups()) {
+            initMemberships(group.getMemberships());
+        }
+    }
+
+    private void initMemberships(Set<Membership> memberships) {
+        for (Membership membership : memberships) {
+            Hibernate.initialize(membership.getPermissions());
+            Hibernate.initialize(membership.getRoles());
+            for (Role role : membership.getRoles()) {
+                Hibernate.initialize(role.getPermissions());
             }
         }
+    }
 
-        public static class MembershipDTO {
-            private WorkingSet<Role> roles;
-            private WorkingSet<PermissionEnum> permissions;
+    private void copyProperties(User src, User dst) {
+        dst.setId(src.getId());
+        dst.setLogin(src.getLogin());
+        dst.setFullName(src.getFullName());
+        dst.setEmail(src.getEmail());
+        dst.setNeedPwdChange(src.getNeedPwdChange());
+        dst.setRecvBulkEmails(src.getRecvBulkEmails());
+    }
+
+    private void copyMemberships(User src, User dst, ActionContext context,
+        Set<Role> allRoles) {
+        User executingUser = context.getUser();
+
+        Set<PermissionEnum> permsScope;
+        Set<Role> rolesScope;
+        for (Membership m : src.getMemberships()) {
+            if (m.isPartiallyManageable(executingUser)) {
+                // TODO: what are the implications of evict?
+                context.getSession().evict(m);
+                context.getSession().evict(m.getPermissions());
+                context.getSession().evict(m.getRoles());
+
+                dst.getMemberships().add(m);
+                m.setPrincipal(dst);
+
+                // limit permission and role scope to manageable ones
+                permsScope = m.getManageablePermissions(executingUser);
+                rolesScope = m.getManageableRoles(executingUser, allRoles);
+
+                m.getPermissions().retainAll(permsScope);
+                m.getRoles().retainAll(rolesScope);
+            }
+        }
+    }
+
+    private void copyGroups(User src, User dst, ActionContext context) {
+        User executingUser = context.getUser();
+
+        for (Group g : src.getGroups()) {
+            if (g.isFullyManageable(executingUser)) {
+                // TODO: what are the implications of evict?
+                context.getSession().evict(g);
+                dst.getGroups().add(g);
+            }
         }
     }
 }

@@ -141,7 +141,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         doSaveInternal(monitor);
     }
 
-    protected void doSaveInternal(final IProgressMonitor monitor) {
+    @SuppressWarnings("unused")
+    protected void doSaveInternal(IProgressMonitor monitor) {
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
         try {
@@ -435,9 +436,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         int entryIndex = linkedForms.indexOf(this);
         PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
             .closeEditor(this, saveOnClose);
-        if (openView && getNextOpenedFormID() != null) {
-            AdapterBase.openForm(new FormInput(getAdapter()),
-                getNextOpenedFormID(), true);
+        String nextFormId = getNextOpenedFormId();
+
+        if (openView && (nextFormId != null)) {
+            AdapterBase.openForm(new FormInput(getAdapter()), nextFormId, true);
 
             int previousFormIndex = entryIndex - 1;
             if (previousFormIndex >= 0
@@ -466,6 +468,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
      * Return the ID of the form that should be opened after the save action is
      * performed and the current form closed
      */
-    public abstract String getNextOpenedFormID();
+    public abstract String getNextOpenedFormId();
 
 }

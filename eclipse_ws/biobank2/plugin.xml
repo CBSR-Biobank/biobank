@@ -275,8 +275,21 @@
              name="Add Research Group">
        </command>
    </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+       	  class="edu.ualberta.med.biobank.handlers.DisabledNewEditorHandler"
+          commandId="org.eclipse.ui.window.newEditor">
+       		<enabledWhen>
+          		<count value="-1">
+          		</count>
+       		</enabledWhen>
+       		<activeWhen>
+          		<not>
+             		<count value="-1">
+             		</count>
+          		</not>
+       		</activeWhen>
+      </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.LoginHandler"
             commandId="edu.ualberta.med.biobank.commands.login">
@@ -422,7 +435,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.EditShippingMethodsHandler"
+            class="edu.ualberta.med.biobank.handlers.ShippingMethodsEditHandler"
             commandId="edu.ualberta.med.biobank.commands.editShippingMethods">
          <activeWhen>
             <and>
@@ -1069,18 +1082,30 @@
          </separator>
       </menuContribution>
          <menuContribution
-            locationURI="menu:help?after=additions">
+            locationURI="menu:biobank.help?after=additions">
             <separator
                   name="edu.ualberta.med.biobank.menu.update.separatorA"
                   visible="true">
             </separator>
+            <command
+                  commandId="org.eclipse.equinox.p2.ui.sdk.update"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.equinox.p2.ui.sdk.install"
+                  style="push">
+            </command>
+            <separator
+                  name="edu.ualberta.med.biobank.menu.update.separatorB"
+                  visible="true">
+            </separator>  
             <command
                   commandId="edu.ualberta.med.biobank.commands.cbsrHelp"
                   label="%CbsrHelp.command"
                   id="edu.ualberta.med.biobank.menu.cbsrHelp">
             </command>
             <separator
-                  name="edu.ualberta.med.biobank.menu.update.separatorB"
+                  name="edu.ualberta.med.biobank.menu.update.separatorC"
                   visible="true">
             </separator>  
             <command
@@ -1726,13 +1751,6 @@
             name="%DecodeImage.editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.SpecimenListViewForm"
-            default="false"
-            icon="icons/specimen.png"
-            id="edu.ualberta.med.biobank.forms.SpecimenListViewForm"
-            name="SpecimenList.editor">
-      </editor>
-      <editor
             class="edu.ualberta.med.biobank.forms.PeListViewForm"
             default="false"
             icon="icons/collectionEvent.png"
@@ -2323,9 +2341,9 @@
           </with>
        </definition>
       <definition
-            id="biobank.hasPrinterLabelsRights">
+            id="biobank.hasLabelPrintingRights">
          <with
-               variable="edu.ualberta.med.biobank.sourceprovider.hasPrinterLabelsRights">
+               variable="edu.ualberta.med.biobank.sourceprovider.hasLabelPrintingRights">
             <equals
                   value="true">
             </equals>
@@ -2428,5 +2446,17 @@
          id="edu.ualberta.med.biobank.perspective.linkAssign"
          name="Link or Assign perspective">
    </context>  
+   </extension>
+   <extension
+         id="product1"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="biobank.biobank"
+            name="Biobank">
+         <property
+               name="appName"
+               value="Biobank">
+         </property>
+      </product>
    </extension>
 </plugin>

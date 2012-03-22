@@ -34,6 +34,8 @@ public class PatientAdapter extends AbstractNewAdapterBase {
 
     private Patient patient;
     private Study study;
+
+    @SuppressWarnings("unused")
     private Long ceventsCount;
 
     public PatientAdapter(AbstractAdapterBase parent, SearchedPatientInfo pinfo) {
@@ -133,11 +135,6 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     }
 
     @Override
-    protected int getChildrenCount() throws Exception {
-        return ceventsCount.intValue();
-    }
-
-    @Override
     public String getEntryFormId() {
         return PatientEntryForm.ID;
     }
@@ -171,7 +168,10 @@ public class PatientAdapter extends AbstractNewAdapterBase {
             this.patient = pinfo.patient;
             this.study = pinfo.study;
             this.ceventsCount = pinfo.ceventsCount;
-            if (patient.getId() != null) init();
+            if (patient.getId() != null) {
+                setId(patient.getId());
+                init();
+            }
         }
 
     }
@@ -179,7 +179,7 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     @Override
     protected void runDelete() throws Exception {
         SessionManager.getAppService().doAction(
-            new PatientDeleteAction(getId()));
+            new PatientDeleteAction(patient));
     }
 
 }

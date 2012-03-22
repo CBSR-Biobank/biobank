@@ -1,22 +1,23 @@
 package edu.ualberta.med.biobank.validator.constraint.impl;
 
-import java.text.MessageFormat;
 import java.util.List;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import org.hibernate.Criteria;
 import org.hibernate.EntityMode;
-import org.hibernate.Query;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.util.StringHelper;
 
-import edu.ualberta.med.biobank.validator.SessionAwareConstraintValidator;
+import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 
-public class NotUsedValidator extends SessionAwareConstraintValidator<Object>
+public class NotUsedValidator extends
+    EventSourceAwareConstraintValidator<Object>
     implements ConstraintValidator<NotUsed, Object> {
-    private static final String USAGE_QUERY_TEMPLATE =
-        "SELECT COUNT(*) FROM {0} o WHERE o.{1} = ?";
-
     private Class<?> by;
     private String property;
 
@@ -27,13 +28,13 @@ public class NotUsedValidator extends SessionAwareConstraintValidator<Object>
     }
 
     @Override
-    public boolean isValidInSession(Object value,
+    public boolean isValidInEventSource(Object value,
         ConstraintValidatorContext context) {
         if (value == null) {
             return true;
         }
 
-        boolean unused = countRows(value) == 0;
+        boolean unused = countRows(value, property) == 0;
 
         if (!unused) {
             overrideEmptyMessageTemplate(value, context);
@@ -47,7 +48,7 @@ public class NotUsedValidator extends SessionAwareConstraintValidator<Object>
         String defaultTemplate = context.getDefaultConstraintMessageTemplate();
 
         if (defaultTemplate.isEmpty()) {
-            ClassMetadata meta = getSession().getSessionFactory()
+            ClassMetadata meta = getEventSource().getSessionFactory()
                 .getClassMetadata(value.getClass());
 
             StringBuilder template = new StringBuilder();
@@ -57,7 +58,7 @@ public class NotUsedValidator extends SessionAwareConstraintValidator<Object>
             template.append(".");
             template.append(NotUsed.class.getSimpleName());
             template.append(".");
-            template.append(by);
+            template.append(by.getSimpleName());
             template.append(".");
             template.append(property);
             template.append("}");
@@ -68,18 +69,22 @@ public class NotUsedValidator extends SessionAwareConstraintValidator<Object>
         }
     }
 
-    private int countRows(Object value) {
-        ClassMetadata meta = getSession().getSessionFactory()
-            .getClassMetadata(by);
+    private int countRows(Object value, String property) {
+        Criteria criteria = getEventSource().createCriteria(by);
+        
+        String association = StringHelper.root(property);
+        while (!association.equals(property)) {
+            criteria = criteria.createCriteria(association);
+            property = StringHelper.unroot(property);
+            association = StringHelper.root(property);
+        }
 
-        String hql = MessageFormat.format(USAGE_QUERY_TEMPLATE,
-            meta.getMappedClass(EntityMode.POJO).getName(), property);
+        List<?> results = criteria
+            .add(Restrictions.eq(property, value))
+            .setProjection(Projections.rowCount())
+            .list();
 
-        Query query = getSession().createQuery(hql).setParameter(0, value);
-
-        List<?> results = query.list();
         Number count = (Number) results.iterator().next();
-
         return count.intValue();
     }
 }

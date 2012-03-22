@@ -22,57 +22,6 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
 
     public static enum ColumnsShown {
-        // ALL(new String[] { Messages.SpecimenInfoTable_inventoryid_label,
-        // Messages.SpecimenInfoTable_type_label,
-        // Messages.SpecimenInfoTable_patient_label,
-        // Messages.SpecimenInfoTable_visitNber_label,
-        // Messages.SpecimenInfoTable_origin_center_label,
-        // Messages.SpecimenInfoTable_current_center_label,
-        // Messages.SpecimenInfoTable_position_label,
-        // Messages.SpecimenInfoTable_created_label,
-        // Messages.SpecimenInfoTable_quantity_label,
-        // Messages.SpecimenInfoTable_status_label,
-        // Messages.SpecimenInfoTable_comments_label }) {
-        // @Override
-        // public String getColumnValue(SpecimenInfo row, int columnIndex) {
-        // switch (columnIndex) {
-        // case 0:
-        // return row.specimen.inventoryId;
-        // case 1:
-        // return row.specimen.type;
-        // case 2:
-        // return row.specimen.getCollectionEvent().getPatient();
-        // case 3:
-        // return row.pvNumber;
-        // case 4:
-        // return row.originCenter;
-        // case 5:
-        // return row.center;
-        // case 6:
-        // return row.position;
-        // case 7:
-        // return row.createdAt;
-        // case 8:
-        // return NumberFormatter.format(row.quantity);
-        // case 9:
-        // return row.activityStatus;
-        // case 10:
-        // return row.comment;
-        // default:
-        //                    return ""; //$NON-NLS-1$
-        // }
-        // }
-        //
-        // @Override
-        // public Image getColumnImage(TableRowData row, int columnIndex) {
-        // if (columnIndex == 9
-        // && ActivityStatusWrapper.FLAGGED_STATUS_STRING
-        // .equals(row.activityStatus))
-        // return BgcPlugin.getDefault().getImageRegistry()
-        // .get(BgcPlugin.IMG_ERROR);
-        // return null;
-        // }
-        // },
         PEVENT_SOURCE_SPECIMENS(new String[] {
             Messages.SpecimenInfoTable_inventoryid_label,
             Messages.SpecimenInfoTable_type_label,
@@ -113,7 +62,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 case 9:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 10:
-                    return getCommentLetter(row);
+                    return row.comments;
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -165,7 +114,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 case 8:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 9:
-                    return getCommentLetter(row);
+                    return row.comments;
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -219,7 +168,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 case 8:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 9:
-                    return getCommentLetter(row);
+                    return row.comments;
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -361,9 +310,4 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
         };
     }
 
-    private static String getCommentLetter(SpecimenInfo si) {
-        return (si.specimen.getComments() == null || si.specimen
-            .getComments().size() == 0) ? Messages.SpecimenInfoTable_no_first_letter
-            : Messages.SpecimenInfoTable_yes_first_letter;
-    }
 }

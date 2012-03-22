@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.action;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -101,29 +102,21 @@ public class ActionContext {
     }
 
     /**
-     * The same as {@link #get(Class, Serializable, Object)}, but throws a
-     * {@link ModelNotFoundException} if any object in the given set of ids does
-     * not exist
+     * The same as {@link #load(Class, Serializable)}, but done on a {@link Set}
+     * of ids and returns a {@link Set} of model objects.
      * 
      * @param klazz
      * @param ids
      * @return
      * @throws ModelNotFoundException
      */
-    public <K extends Serializable, V> Map<K, V> load(Class<V> klazz, Set<K> ids)
+    public <K extends Serializable, V> Set<V> load(Class<V> klazz, Set<K> ids)
         throws ModelNotFoundException {
-        Map<K, V> results = new HashMap<K, V>();
-
+        Set<V> results = new HashSet<V>();
         for (K id : ids) {
-            V result = get(klazz, id);
-
-            if (result == null) {
-                throw new ModelNotFoundException(klazz, id);
-            }
-
-            results.put(id, result);
+            V result = load(klazz, id);
+            results.add(result);
         }
-
         return results;
     }
 

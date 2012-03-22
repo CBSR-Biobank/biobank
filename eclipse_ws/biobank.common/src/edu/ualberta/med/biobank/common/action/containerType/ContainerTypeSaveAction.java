@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.action.containerType;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -122,10 +121,10 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         containerType.getCapacity().setRowCapacity(rowCapacity);
         containerType.getCapacity().setColCapacity(colCapacity);
         containerType.setDefaultTemperature(defaultTemperature);
+        containerType.setActivityStatus(activityStatus);
 
         addComment(context, containerType);
         setChildLabelingScheme(context, containerType);
-        setActivityStatus(context, containerType);
         setContents(context, containerType);
 
         context.getSession().save(containerType);
@@ -161,11 +160,6 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         containerType.setChildLabelingScheme(childLabelingScheme);
     }
 
-    private void setActivityStatus(ActionContext context,
-        ContainerType containerType) {
-        containerType.setActivityStatus(activityStatus);
-    }
-
     private void setContents(ActionContext context, ContainerType containerType) {
         if ((specimenTypeIds.size() > 0) &&
             (childContainerTypeIds.size() > 0)) {
@@ -178,17 +172,17 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
 
     private void setSpecimenTypes(ActionContext context,
         ContainerType containerType) {
-        Map<Integer, SpecimenType> specimenTypes =
+        Set<SpecimenType> specimenTypes =
             context.load(SpecimenType.class, specimenTypeIds);
-        containerType.setSpecimenTypes(new HashSet<SpecimenType>(
-            specimenTypes.values()));
+        containerType.setSpecimenTypes(specimenTypes);
     }
 
     private void setChildContainerTypes(ActionContext context,
         ContainerType containerType) {
-        Map<Integer, ContainerType> childContainerTypes =
+        Set<ContainerType> childContainerTypes =
             context.load(ContainerType.class, childContainerTypeIds);
-        containerType.setChildContainerTypes(
-            new HashSet<ContainerType>(childContainerTypes.values()));
+        containerType.getChildContainerTypes().clear();
+        containerType.getChildContainerTypes().addAll(
+            new HashSet<ContainerType>(childContainerTypes));
     }
 }

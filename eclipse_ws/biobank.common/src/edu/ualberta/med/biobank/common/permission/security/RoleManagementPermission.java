@@ -1,14 +1,7 @@
 package edu.ualberta.med.biobank.common.permission.security;
 
-import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.permission.Permission;
-import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.common.permission.GlobalAdminPermission;
 
-public class RoleManagementPermission implements Permission {
+public class RoleManagementPermission extends GlobalAdminPermission {
     private static final long serialVersionUID = 1L;
-
-    @Override
-    public boolean isAllowed(ActionContext context) {
-        return PermissionEnum.ADMINISTRATION.isAllowed(context.getUser());
-    }
 }

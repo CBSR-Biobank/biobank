@@ -30,7 +30,8 @@ public class TestMembership extends TestDatabase {
         UserWrapper user = UserHelper.addUser(name, null, true);
 
         RoleWrapper role1 = RoleHelper.newRole(name + "_1");
-        role1.addToPermissionCollection(Arrays.asList(PermissionEnum.ADMINISTRATION));
+        role1.addToPermissionCollection(Arrays
+            .asList(PermissionEnum.CLINIC_CREATE));
         role1.persist();
         RoleHelper.createdRoles.add(role1);
 

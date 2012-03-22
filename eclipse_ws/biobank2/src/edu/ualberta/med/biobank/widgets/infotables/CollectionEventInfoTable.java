@@ -45,7 +45,8 @@ public class CollectionEventInfoTable extends
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -78,8 +79,9 @@ public class CollectionEventInfoTable extends
             .getSourceSpecimensCount(true);
         info.aliquotedSpecimenCount = info.collectionEvent
             .getAliquotedSpecimensCount(true);
-        info.comment = info.collectionEvent.getCommentCollection(false)
-            .toString();
+        info.comment =
+            info.collectionEvent.getCommentCollection(false).size() == 0 ? Messages.SpecimenInfoTable_no_first_letter
+                : Messages.SpecimenInfoTable_yes_first_letter;
         return info;
     }
 

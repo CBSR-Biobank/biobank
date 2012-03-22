@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.action.shipment;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -9,11 +9,9 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
-import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
-import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.model.OriginInfo;
-import edu.ualberta.med.biobank.model.Specimen;
 
 /**
  * Retrieve a patient information using a patient id
@@ -23,16 +21,15 @@ import edu.ualberta.med.biobank.model.Specimen;
  */
 public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
     private static final long serialVersionUID = 1L;
-    // @formatter:off
+
     @SuppressWarnings("nls")
-    private static final String ORIGIN_INFO_HQL = "select distinct oi from "
-    + OriginInfo.class.getName() 
-    + " oi join fetch oi." + OriginInfoPeer.SHIPMENT_INFO.getName()
-    + " si join fetch si." + ShipmentInfoPeer.SHIPPING_METHOD.getName()
-    + " join fetch oi." + OriginInfoPeer.CENTER.getName() 
-    + " left join fetch oi." + OriginInfoPeer.COMMENTS.getName()
-    + " where oi." + OriginInfoPeer.ID.getName()+"=?";
-    // @formatter:on
+    private static final String ORIGIN_INFO_HQL =
+        "SELECT DISTINCT oi FROM " + OriginInfo.class.getName() + " oi"
+            + " INNER JOIN FETCH oi.shipmentInfo si"
+            + " INNER JOIN FETCH si.shippingMethod"
+            + " INNER JOIN FETCH oi.center"
+            + " LEFT JOIN FETCH oi.comments"
+            + " WHERE oi.id=?";
 
     private final Integer oiId;
 
@@ -58,9 +55,9 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
         if (rows.size() == 1) {
             Object row = rows.get(0);
 
-            sInfo.oi = (OriginInfo) row;
-            sInfo.specimens = new HashSet<Specimen>(
-                new ShipmentGetSpecimenInfosAction(oiId).run(context)
+            sInfo.originInfo = (OriginInfo) row;
+            sInfo.specimens = new ArrayList<SpecimenInfo>(
+                new ShipmentGetSpecimenListInfoAction(oiId).run(context)
                     .getList());
 
         } else {

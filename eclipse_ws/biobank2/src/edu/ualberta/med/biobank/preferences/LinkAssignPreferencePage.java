@@ -30,19 +30,24 @@ public class LinkAssignPreferencePage extends FieldEditorPreferencePage
     @Override
     public void createFieldEditors() {
         addField(new StringFieldEditor(PreferenceConstants.GENERAL_CONFIRM,
-            Messages.LinkAssignPreferencePage_confirm_barcode_label, getFieldEditorParent()));
+            Messages.LinkAssignPreferencePage_confirm_barcode_label,
+            getFieldEditorParent()));
         addField(new StringFieldEditor(PreferenceConstants.GENERAL_CANCEL,
-            Messages.LinkAssignPreferencePage_cancel_barcode_label, getFieldEditorParent()));
+            Messages.LinkAssignPreferencePage_cancel_barcode_label,
+            getFieldEditorParent()));
         addField(new BooleanFieldEditor(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE,
-            Messages.LinkAssignPreferencePage_save_logs_label, getFieldEditorParent()));
+            Messages.LinkAssignPreferencePage_save_logs_label,
+            getFieldEditorParent()));
         logPath = new DirectoryFieldEditor(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
-            Messages.LinkAssignPreferencePage_logs_path_label, getFieldEditorParent());
+            Messages.LinkAssignPreferencePage_logs_path_label,
+            getFieldEditorParent());
         addField(logPath);
         addField(new BooleanFieldEditor(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT,
-            Messages.LinkAssignPreferencePage_ask_print_label, getFieldEditorParent()));
+            Messages.LinkAssignPreferencePage_ask_print_label,
+            getFieldEditorParent()));
     }
 
     /*

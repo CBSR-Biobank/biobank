@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGet
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
@@ -36,6 +35,7 @@ import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.Search
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
@@ -43,7 +43,6 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestPatient extends TestAction {
 
@@ -61,10 +60,10 @@ public class TestPatient extends TestAction {
 
     @Test
     public void saveNew() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
-        final Integer id = EXECUTOR.exec(new PatientSaveAction(null,
+        final Integer id = exec(new PatientSaveAction(null,
             provisioning.studyId, pnumber, date, null)).getId();
 
         // Check patient is in database with correct values
@@ -76,17 +75,17 @@ public class TestPatient extends TestAction {
 
     @Test
     public void update() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
         // create a new patient
-        final Integer id = EXECUTOR.exec(new PatientSaveAction(null,
+        final Integer id = exec(new PatientSaveAction(null,
             provisioning.studyId, pnumber, date, null)).getId();
 
         final String newPNumber = name + "_2";
         final Date newDate = Utils.getRandomDate();
         // update this patient
-        EXECUTOR.exec(new PatientSaveAction(id, provisioning.studyId,
+        exec(new PatientSaveAction(id, provisioning.studyId,
             newPNumber, newDate, null));
 
         // Check patient is in database with correct values
@@ -97,29 +96,29 @@ public class TestPatient extends TestAction {
 
     @Test
     public void checkGetAction() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
 
         Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(EXECUTOR,
+            .createCEventWithSourceSpecimens(getExecutor(),
                 provisioning.patientIds.get(0), provisioning.clinicId);
         CEventInfo ceventInfo =
-            EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+            exec(new CollectionEventGetInfoAction(ceventId));
         List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
 
         // save some comments on the colection event
         CollectionEventSaveAction ceventSaveAction =
             CollectionEventHelper.getSaveAction(ceventInfo);
         ceventSaveAction.setCommentText(Utils.getRandomString(20, 30));
-        EXECUTOR.exec(ceventSaveAction);
-        ceventInfo = EXECUTOR.exec(new CollectionEventGetInfoAction(ceventId));
+        exec(ceventSaveAction);
+        ceventInfo = exec(new CollectionEventGetInfoAction(ceventId));
 
         StudyInfo studyInfo =
-            EXECUTOR.exec(new StudyGetInfoAction(provisioning.studyId));
+            exec(new StudyGetInfoAction(provisioning.studyId));
         PatientInfo patientInfo =
-            EXECUTOR.exec(new PatientGetInfoAction(provisioning.patientIds
+            exec(new PatientGetInfoAction(provisioning.patientIds
                 .get(0)));
 
-        Assert.assertEquals(studyInfo.study.getName(), patientInfo.patient
+        Assert.assertEquals(studyInfo.getStudy().getName(), patientInfo.patient
             .getStudy().getName());
         Assert.assertEquals(1, patientInfo.ceventInfos.size());
         Assert.assertEquals(new Long(sourceSpecs.size()),
@@ -138,10 +137,10 @@ public class TestPatient extends TestAction {
 
     @Test
     public void saveSamePnumber() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
-        final Integer id = EXECUTOR.exec(new PatientSaveAction(null,
+        final Integer id = exec(new PatientSaveAction(null,
             provisioning.studyId, pnumber, date, null)).getId();
 
         // Check patient is in database with correct values
@@ -150,7 +149,7 @@ public class TestPatient extends TestAction {
 
         // try to save with same pnumber
         try {
-            EXECUTOR.exec(new PatientSaveAction(null, provisioning.studyId,
+            exec(new PatientSaveAction(null, provisioning.studyId,
                 pnumber, new Date(), null));
             Assert.fail("should not be able to use the same pnumber twice");
         } catch (ConstraintViolationException e) {
@@ -160,15 +159,16 @@ public class TestPatient extends TestAction {
 
     @Test
     public void delete() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
         // create a new patient
-        final Integer id = EXECUTOR.exec(new PatientSaveAction(null,
+        final Integer id = exec(new PatientSaveAction(null,
             provisioning.studyId, pnumber, date, null)).getId();
 
         // delete the patient
-        EXECUTOR.exec(new PatientDeleteAction(id));
+        PatientInfo patientInfo = exec(new PatientGetInfoAction(id));
+        exec(new PatientDeleteAction(patientInfo.patient));
 
         Patient patient = (Patient) session.get(Patient.class, id);
         Assert.assertNull(patient);
@@ -176,19 +176,21 @@ public class TestPatient extends TestAction {
 
     @Test
     public void deleteWithCevents() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
         // create a new patient
-        final Integer patientId = EXECUTOR.exec(new PatientSaveAction(
+        final Integer patientId = exec(new PatientSaveAction(
             null, provisioning.studyId, pnumber, date, null)).getId();
         // add a cevent to the patient:
-        EXECUTOR.exec(new CollectionEventSaveAction(null, patientId, R
+        exec(new CollectionEventSaveAction(null, patientId, getR()
             .nextInt(20) + 1, ActivityStatus.ACTIVE, null, null, null));
 
         // delete the patient
+        PatientInfo patientInfo =
+            exec(new PatientGetInfoAction(patientId));
         try {
-            EXECUTOR.exec(new PatientDeleteAction(patientId));
+            exec(new PatientDeleteAction(patientInfo.patient));
             Assert
                 .fail("should throw an exception since the patient still has on cevent");
         } catch (ConstraintViolationException ae) {
@@ -201,12 +203,12 @@ public class TestPatient extends TestAction {
 
     @Test
     public void merge() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
         final String string = name;
 
         // add specimen type
         final Integer typeId =
-            EXECUTOR.exec(new SpecimenTypeSaveAction(name, name)).getId();
+            exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         // create a new patient 1
         final Integer patientId1 = provisioning.patientIds.get(0);
@@ -215,7 +217,7 @@ public class TestPatient extends TestAction {
         createCEventWithSpecimens(provisioning, patientId1, 2, typeId, 2);
 
         // create a new patient 2
-        final Integer patientId2 = EXECUTOR.exec(
+        final Integer patientId2 = exec(
             new PatientSaveAction(
                 null, provisioning.studyId, string + "2", Utils
                     .getRandomDate(), null)).getId();
@@ -224,7 +226,7 @@ public class TestPatient extends TestAction {
         createCEventWithSpecimens(provisioning, patientId2, 3, typeId, 7);
 
         // merge patient1 into patient2
-        EXECUTOR.exec(new PatientMergeAction(patientId1, patientId2));
+        exec(new PatientMergeAction(patientId1, patientId2));
 
         Patient p1 = (Patient) session.get(Patient.class, patientId1);
         Assert.assertNotNull(p1);
@@ -254,10 +256,10 @@ public class TestPatient extends TestAction {
 
     @Test
     public void mergeDifferentStudies() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
         // add specimen type
         final Integer typeId =
-            EXECUTOR.exec(new SpecimenTypeSaveAction(name, name)).getId();
+            exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         // create a new patient 1
         final Integer patientId1 = provisioning.patientIds.get(0);
@@ -266,9 +268,9 @@ public class TestPatient extends TestAction {
         createCEventWithSpecimens(provisioning, patientId1, 2, typeId, 2);
 
         // create a new patient 2
-        Integer studyId2 = StudyHelper.createStudy(EXECUTOR, name + "_2",
+        Integer studyId2 = StudyHelper.createStudy(getExecutor(), name + "_2",
             ActivityStatus.ACTIVE);
-        final Integer patientId2 = EXECUTOR.exec(new PatientSaveAction(
+        final Integer patientId2 = exec(new PatientSaveAction(
             null, studyId2, name + "2", Utils.getRandomDate(), null)).getId();
         // create cevents in patient2
         createCEventWithSpecimens(provisioning, patientId2, 1, typeId, 5);
@@ -276,7 +278,7 @@ public class TestPatient extends TestAction {
 
         // merge patient1 into patient2
         try {
-            EXECUTOR.exec(new PatientMergeAction(patientId1, patientId2));
+            exec(new PatientMergeAction(patientId1, patientId2));
             Assert
                 .fail("Should not be able to merge when patients are from different studies");
         } catch (PatientMergeException pme) {
@@ -286,41 +288,39 @@ public class TestPatient extends TestAction {
     }
 
     private void createCEventWithSpecimens(Provisioning provisioning,
-        Integer patientId,
-        Integer visitNber, Integer specType, int specNber)
-        throws ApplicationException {
+        Integer patientId, Integer visitNber, Integer specType, int specNber) {
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper
                 .createSaveCEventSpecimenInfoRandomList(specNber, specType,
-                    EXECUTOR.getUserId(), provisioning.siteId);
+                    getExecutor().getUserId(), provisioning.siteId);
         // Save a new cevent
-        EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
+        exec(new CollectionEventSaveAction(null, patientId,
             visitNber, ActivityStatus.ACTIVE, null,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
     }
 
     @Test
     public void patientGetSimpleCEventInfoAction() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
         final Integer patientId = provisioning.patientIds.get(0);
 
         // add specimen type
         final Integer typeId =
-            EXECUTOR.exec(new SpecimenTypeSaveAction(name, name)).getId();
+            exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
             .createSaveCEventSpecimenInfoRandomList(5, typeId,
-                EXECUTOR.getUserId(), provisioning.siteId);
+                getExecutor().getUserId(), provisioning.siteId);
 
         // Save a new cevent with specimens
-        final Integer ceventId = EXECUTOR.exec(
+        final Integer ceventId = exec(
             new CollectionEventSaveAction(null, patientId,
-                R.nextInt(20) + 1, ActivityStatus.ACTIVE, null,
+                getR().nextInt(20) + 1, ActivityStatus.ACTIVE, null,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
                 null)).getId();
 
         Map<Integer, SimpleCEventInfo> ceventInfos =
-            EXECUTOR
+            getExecutor()
                 .exec(new PatientGetSimpleCollectionEventInfosAction(
                     patientId)).getMap();
         Assert.assertEquals(1, ceventInfos.size());
@@ -340,24 +340,24 @@ public class TestPatient extends TestAction {
 
     @Test
     public void patientGetCEventInfoAction() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
         final Integer patientId = provisioning.patientIds.get(0);
 
         // add specimen type
         final Integer typeId =
-            EXECUTOR.exec(new SpecimenTypeSaveAction(name, name)).getId();
+            exec(new SpecimenTypeSaveAction(name, name)).getId();
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
             .createSaveCEventSpecimenInfoRandomList(5, typeId,
-                EXECUTOR.getUserId(), provisioning.siteId);
+                getExecutor().getUserId(), provisioning.siteId);
 
         // Save a new cevent with specimens
-        EXECUTOR.exec(new CollectionEventSaveAction(null, patientId, R
+        exec(new CollectionEventSaveAction(null, patientId, getR()
             .nextInt(20), ActivityStatus.ACTIVE, null,
             new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
 
-        ArrayList<PatientCEventInfo> infos =
-            EXECUTOR
+        List<PatientCEventInfo> infos =
+            getExecutor()
                 .exec(new PatientGetCollectionEventInfosAction(patientId))
                 .getList();
         Assert.assertEquals(1, infos.size());
@@ -380,31 +380,31 @@ public class TestPatient extends TestAction {
 
     @Test
     public void nextVisitNumber() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
         final Integer patientId = provisioning.patientIds.get(0);
 
-        Integer visitNumber = R.nextInt(20);
-        EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
+        Integer visitNumber = getR().nextInt(20) + 1;
+        exec(new CollectionEventSaveAction(null, patientId,
             visitNumber, ActivityStatus.ACTIVE, null, null, null));
 
-        Integer next = EXECUTOR.exec(new PatientNextVisitNumberAction(
+        Integer next = exec(new PatientNextVisitNumberAction(
             patientId)).getNextVisitNumber();
         Assert.assertEquals(visitNumber + 1, next.intValue());
     }
 
     @Test
     public void search() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
-        final Integer patientId = EXECUTOR.exec(new PatientSaveAction(
+        final Integer patientId = exec(new PatientSaveAction(
             null, provisioning.studyId, pnumber, date, null)).getId();
 
         // add 2 cevents to this patient:
-        int vnber = R.nextInt(20);
-        EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
+        int vnber = getR().nextInt(20);
+        exec(new CollectionEventSaveAction(null, patientId,
             vnber, ActivityStatus.ACTIVE, null, null, null));
-        EXECUTOR.exec(new CollectionEventSaveAction(null, patientId,
+        exec(new CollectionEventSaveAction(null, patientId,
             vnber + 1, ActivityStatus.ACTIVE, null, null, null));
 
         // Check patient is in database
@@ -412,7 +412,7 @@ public class TestPatient extends TestAction {
         Assert.assertNotNull(p);
 
         // search for it using the pnumber:
-        SearchedPatientInfo info = EXECUTOR.exec(new PatientSearchAction(
+        SearchedPatientInfo info = exec(new PatientSearchAction(
             pnumber));
         Assert.assertNotNull(info.patient);
         Assert.assertEquals(patientId, info.patient.getId());

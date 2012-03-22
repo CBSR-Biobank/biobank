@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.IActionExecutor;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicHelper extends Helper {
 
@@ -36,8 +35,7 @@ public class ClinicHelper extends Helper {
     }
 
     public static Integer createClinic(IActionExecutor actionExecutor,
-        String name, ActivityStatus activityStatus)
-        throws ApplicationException {
+        String name, ActivityStatus activityStatus) {
 
         ClinicSaveAction clinicSave = new ClinicSaveAction();
         clinicSave.setName(name);
@@ -54,8 +52,7 @@ public class ClinicHelper extends Helper {
     }
 
     public static Integer createClinicWithContacts(
-        IActionExecutor actionExecutor, String name, int numContacts)
-        throws ApplicationException {
+        IActionExecutor actionExecutor, String name, int numContacts) {
         Set<ContactSaveInfo> contactsAll = new HashSet<ContactSaveInfo>();
 
         for (int i = 0; i < numContacts; ++i) {
@@ -72,8 +69,7 @@ public class ClinicHelper extends Helper {
 
     public static Set<Integer> createClinicsWithContacts(
         IActionExecutor actionExecutor, String name, int numClinics,
-        int numContactsPerClinic)
-        throws ApplicationException {
+        int numContactsPerClinic) {
         Set<Integer> result = new HashSet<Integer>();
 
         for (int i = 0; i < numClinics; ++i) {

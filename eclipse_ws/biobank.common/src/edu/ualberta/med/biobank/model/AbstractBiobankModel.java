@@ -4,9 +4,12 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.proxy.HibernateProxyHelper;
 
 @MappedSuperclass
 public abstract class AbstractBiobankModel implements IBiobankModel {
@@ -46,21 +49,39 @@ public abstract class AbstractBiobankModel implements IBiobankModel {
         this.version = version;
     }
 
-    // TODO: does this actually work? Test (especially with hibernate proxies)
     @Override
-    public boolean equals(Object obj) {
-        return equals(obj, getClass());
-    }
+    public boolean equals(Object that) {
+        if (that == this) return true;
+        if (that == null) return false;
 
-    protected <T extends IBiobankModel> boolean equals(Object o, Class<T> klazz) {
-        if (o == this) return true;
-        if (o == null) return false;
-        if (klazz.isAssignableFrom(o.getClass())) {
-            T t = klazz.cast(o);
-            if (getId() != null && getId().equals(t.getId())) {
-                return true;
-            }
+        // note that HibernateProxyHelper.getClassWithoutInitializingProxy(o)
+        // does not seem to work properly in terms of returning the actual
+        // class, it may return a superclass, such as, Center. However,
+        // Hibernate.getClass() seems to always return the correct instance.
+        Class<?> thisClass = Hibernate.getClass(this);
+        Class<?> thatClass = Hibernate.getClass(that);
+        if (thisClass != thatClass) return false;
+
+        if (that instanceof IBiobankModel) {
+            Integer thatId = ((IBiobankModel) that).getId();
+            if (getId() != null && getId().equals(thatId)) return true;
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        if (getId() == null) return 0;
+        return getId().hashCode();
+    }
+
+    @Transient
+    public boolean isNew() {
+        return getId() == null;
+    }
+
+    @SuppressWarnings("unused")
+    private static Class<?> proxiedClass(Object o) {
+        return HibernateProxyHelper.getClassWithoutInitializingProxy(o);
     }
 }

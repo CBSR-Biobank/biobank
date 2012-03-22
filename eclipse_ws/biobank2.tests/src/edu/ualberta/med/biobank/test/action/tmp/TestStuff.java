@@ -99,7 +99,7 @@ public class TestStuff {
 
         @Override
         public boolean onPreUpdate(PreUpdateEvent event) {
-            Session session = event.getSession();
+            // Session session = event.getSession();
 
             // int[] dirty =
             // event.getPersister().findDirty(event.getState(),

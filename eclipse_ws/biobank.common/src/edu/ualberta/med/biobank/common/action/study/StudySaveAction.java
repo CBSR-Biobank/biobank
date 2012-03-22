@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.action.study;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -247,10 +246,10 @@ public class StudySaveAction implements Action<IdResult> {
     }
 
     private void saveSites(ActionContext context) {
-        Map<Integer, Site> sites = context.load(Site.class, siteIds);
+        Set<Site> sites = context.load(Site.class, siteIds);
 
         SetDifference<Site> sitesDiff =
-            new SetDifference<Site>(study.getSites(), sites.values());
+            new SetDifference<Site>(study.getSites(), sites);
         study.setSites(sitesDiff.getNewSet());
 
         // remove this study from sites in removed list
@@ -266,11 +265,11 @@ public class StudySaveAction implements Action<IdResult> {
     }
 
     private void saveContacts(ActionContext context) {
-        Map<Integer, Contact> contacts =
+        Set<Contact> contacts =
             context.load(Contact.class, contactIds);
         SetDifference<Contact> contactsDiff =
             new SetDifference<Contact>(study.getContacts(),
-                contacts.values());
+                contacts);
         study.setContacts(contactsDiff.getNewSet());
 
         for (Contact contact : contactsDiff.getAddSet()) {
@@ -328,9 +327,7 @@ public class StudySaveAction implements Action<IdResult> {
                     asSaveInfo.id);
             }
             newAsCollection.add(asSaveInfo.populateAliquotedSpecimen(study, as,
-
-                asSaveInfo.activityStatus,
-                context.load(SpecimenType.class,
+                asSaveInfo.activityStatus, context.load(SpecimenType.class,
                     asSaveInfo.specimenTypeId)));
         }
 

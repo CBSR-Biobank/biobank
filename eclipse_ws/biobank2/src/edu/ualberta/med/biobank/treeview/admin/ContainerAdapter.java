@@ -12,7 +12,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
@@ -22,8 +21,12 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetChildrenAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerMoveSpecimensAction;
+import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
+import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
+import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -41,6 +44,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerAdapter extends AdapterBase {
 
+    @SuppressWarnings("unused")
     private static BgcLogger LOGGER = BgcLogger
         .getLogger(ContainerAdapter.class.getName());
 
@@ -56,26 +60,28 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    public void executeDoubleClick() {
-        performExpand();
-        openViewForm();
+    public void init() {
+        try {
+            Integer id = ((ContainerWrapper) getModelObject()).getId();
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new ContainerDeletePermission(id));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new ContainerReadPermission(id));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new ContainerUpdatePermission(id));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     @Override
-    public void performExpand() {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    childContainers = SessionManager.getAppService().doAction(
-                        new ContainerGetChildrenAction(getId())).getList();
-                    ContainerAdapter.super.performExpand();
-                } catch (ApplicationException e) {
-                    // TODO: open an error dialog here?
-                    LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
-                }
-            }
-        });
+    public void executeDoubleClick() {
+        performExpand();
+        openViewForm();
     }
 
     @Override
@@ -118,17 +124,21 @@ public class ContainerAdapter extends AdapterBase {
         addEditMenu(menu, Messages.ContainerAdapter_container_label);
         addViewMenu(menu, Messages.ContainerAdapter_container_label);
 
-        Boolean topLevel = getContainer().getContainerType().getTopLevel();
-        if (isEditable() && (topLevel == null || !topLevel)) {
-            MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.ContainerAdapter_move_label);
-            mi.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    moveContainer(null);
-                }
-            });
-        }
+        // FIXME: issue 1557
+        //
+        // Commenting out for now
+        // Boolean topLevel = getContainer().getContainerType().getTopLevel();
+        //
+        // if (isEditable() && (topLevel == null || !topLevel)) {
+        // MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        // mi.setText(Messages.ContainerAdapter_move_label);
+        // mi.addSelectionListener(new SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent event) {
+        // moveContainer(null);
+        // }
+        // });
+        // }
 
         if (isEditable() && getContainer().hasSpecimens()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
@@ -202,18 +212,6 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     protected String getConfirmDeleteMessage() {
         return Messages.ContainerAdapter_delete_confirm_msg;
-    }
-
-    @Override
-    public boolean isEditable() {
-        // TODO: this needs to be implemented correctly
-        return true;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        // TODO: this needs to be implemented correctly
-        return true;
     }
 
     public void moveContainer(ContainerWrapper destParentContainer) {
@@ -300,12 +298,12 @@ public class ContainerAdapter extends AdapterBase {
                 monitor.beginTask(NLS.bind(
                     Messages.ContainerAdapter_moving_cont, oldLabel, newLabel),
                     IProgressMonitor.UNKNOWN);
-                try {
-                    container.persist();
-                } catch (Exception e) {
-                    BgcPlugin.openAsyncError(
-                        Messages.ContainerAdapter_move_error_title, e);
-                }
+                // try {
+                // container.persist();
+                // } catch (Exception e) {
+                // BgcPlugin.openAsyncError(
+                // Messages.ContainerAdapter_move_error_title, e);
+                // }
                 monitor.done();
                 BgcPlugin.openAsyncInformation(
                     Messages.ContainerAdapter_cont_moved_info_title, NLS.bind(
@@ -351,24 +349,10 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        List<ContainerWrapper> result = new ArrayList<ContainerWrapper>();
-
-        if (childContainers != null) {
-            // return results only if this node has been expanded
-            for (Container container : childContainers) {
-                ContainerWrapper wrapper =
-                    new ContainerWrapper(SessionManager.getAppService(),
-                        container);
-                result.add(wrapper);
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return (int) getContainer().getChildCount(true);
+        childContainers = SessionManager.getAppService().doAction(
+            new ContainerGetChildrenAction(getId())).getList();
+        return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+            childContainers, ContainerWrapper.class);
     }
 
     @Override
@@ -386,5 +370,13 @@ public class ContainerAdapter extends AdapterBase {
         if (o instanceof ContainerAdapter)
             return internalCompareTo(o);
         return 0;
+    }
+
+    @Override
+    protected void runDelete() throws Exception {
+        SessionManager.getAppService().doAction(
+            new ContainerDeleteAction((Container) getModelObject()
+                .getWrappedObject()));
+        SessionManager.updateAllSimilarNodes(getParent(), true);
     }
 }

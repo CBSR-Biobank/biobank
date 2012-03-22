@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import edu.ualberta.med.biobank.test.AllTests;
+import edu.ualberta.med.biobank.test.AllTestsSuite;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 @RunWith(Suite.class)
@@ -21,11 +21,11 @@ public final class TestReportsOnExistingData {
     @BeforeClass
     public static void setUp() throws Exception {
         try {
-            AllTests.setUp();
+            AllTestsSuite.setUp();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        WritableApplicationService appService = AllTests.appService;
+        WritableApplicationService appService = AllTestsSuite.appService;
         Assert.assertNotNull("setUp: appService is null", appService);
 
         ReportDataSource dataSource = new CachedReportDataSource(appService);

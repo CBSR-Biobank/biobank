@@ -194,11 +194,6 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    protected int getWrapperChildCount() {
-        return 0;
-    }
-
-    @Override
     public String getEntryFormId() {
         return null;
     }
@@ -208,8 +203,7 @@ public class SessionAdapter extends AdapterBase {
         return null;
     }
 
-    @SuppressWarnings("unused")
-    public List<ClinicWrapper> getClinicCollection(boolean sort) {
+    public List<ClinicWrapper> getClinicCollection() {
         try {
             return ClinicWrapper.getAllClinics(appService);
         } catch (ApplicationException e) {

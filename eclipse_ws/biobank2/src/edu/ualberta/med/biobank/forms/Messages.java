@@ -249,6 +249,8 @@ public class Messages extends NLS {
     public static String PatientEntryForm_field_study_validation_msg;
     public static String PatientEntryForm_field_pNumber_label;
 
+    public static String PatientMergeForm_arrow;
+
     public static String PatientMergeForm_confirm_dialog_msg;
 
     public static String PatientMergeForm_confirm_dialog_title;
@@ -261,11 +263,17 @@ public class Messages extends NLS {
 
     public static String PatientMergeForm_form_title;
 
+    public static String PatientMergeForm_merge;
+
     public static String PatientMergeForm_merge_error_title;
+
+    public static String PatientMergeForm_notfound;
 
     public static String PatientMergeForm_notValid_msg;
 
     public static String PatientMergeForm_ok_msg;
+
+    public static String PatientMergeForm_patient;
 
     public static String PatientMergeForm_pnber_invalid_error_msg;
 
@@ -323,6 +331,8 @@ public class Messages extends NLS {
 
     public static String ProcessingEventEntryForm_creation_msg;
     public static String ProcessingEventEntryForm_edition_msg;
+
+    public static String ProcessingEventEntryForm_error;
     public static String ProcessingEventEntryForm_title_edit_worksheet;
     public static String ProcessingEventEntryForm_title_edit_noworksheet;
 

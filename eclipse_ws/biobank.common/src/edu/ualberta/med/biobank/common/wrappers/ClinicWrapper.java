@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.checks.ClinicPreDeleteChecks;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.util.NullHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -88,7 +89,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         if (wrapper instanceof ClinicWrapper) {
             String myName = wrappedObject.getName();
             String wrapperName = wrapper.wrappedObject.getName();
-            return ModelWrapper.nullSafeComparator(myName, wrapperName);
+            return NullHelper.safeCompareTo(myName, wrapperName);
         }
         return 0;
     }

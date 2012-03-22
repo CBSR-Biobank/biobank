@@ -113,6 +113,7 @@ public abstract class BgcFormBase extends EditorPart implements
         } catch (ActionException e) {
             BgcPlugin.openAsyncError("Action Failed", e);
         } catch (Exception e) {
+            BgcPlugin.openAsyncError("Exception in form initialization", e);
             logger.error("BgcFormBase.createPartControl Error", e); //$NON-NLS-1$
         }
         getSite().setSelectionProvider(this);

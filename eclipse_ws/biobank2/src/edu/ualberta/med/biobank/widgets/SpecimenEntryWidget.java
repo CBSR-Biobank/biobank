@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.databinding.UpdateValueStrategy;
@@ -32,6 +31,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.search.SpecimenByInventorySearchAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -40,22 +41,20 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
-import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
+import edu.ualberta.med.biobank.widgets.infotables.entry.NewSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SpecimenEntryWidget extends BgcBaseWidget {
-    private WritableApplicationService appService;
-    private List<SpecimenWrapper> specimens;
-    private List<SpecimenWrapper> addedSpecimens =
-        new ArrayList<SpecimenWrapper>();
-    private List<SpecimenWrapper> removedSpecimens =
-        new ArrayList<SpecimenWrapper>();
-    private SpecimenInfoTable specTable;
+    private List<SpecimenInfo> specimens;
+    private List<SpecimenInfo> addedSpecimens =
+        new ArrayList<SpecimenInfo>();
+    private List<SpecimenInfo> removedSpecimens =
+        new ArrayList<SpecimenInfo>();
+    private NewSpecimenInfoTable specTable;
     private BgcBaseText newSpecimenInventoryId;
     private boolean editable;
     private Button addButton;
@@ -84,11 +83,9 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
     }
 
     public SpecimenEntryWidget(Composite parent, int style,
-        FormToolkit toolkit, WritableApplicationService appService,
-        boolean editable) {
+        FormToolkit toolkit, boolean editable) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null"); //$NON-NLS-1$
-        this.appService = appService;
         this.editable = editable;
 
         setLayout(new GridLayout(2, false));
@@ -123,11 +120,11 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         }
 
         if (editable) {
-            specTable = new SpecimenEntryInfoTable(this, null,
-                ColumnsShown.SOURCE_SPECIMENS);
+            specTable = new NewSpecimenEntryInfoTable(this, null,
+                ColumnsShown.PEVENT_SOURCE_SPECIMENS);
         } else {
-            specTable = new SpecimenInfoTable(this, null,
-                ColumnsShown.SOURCE_SPECIMENS, 20);
+            specTable = new NewSpecimenInfoTable(this, null,
+                ColumnsShown.PEVENT_SOURCE_SPECIMENS, 20);
         }
 
         specTable.adaptToToolkit(toolkit, true);
@@ -139,63 +136,81 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         addDeleteSupport();
     }
 
-    public List<SpecimenWrapper> getAddedSpecimens() {
-        return new ArrayList<SpecimenWrapper>(addedSpecimens);
+    public List<SpecimenInfo> getAddedSpecimens() {
+        return new ArrayList<SpecimenInfo>(addedSpecimens);
     }
 
-    public List<SpecimenWrapper> getRemovedSpecimens() {
-        return new ArrayList<SpecimenWrapper>(removedSpecimens);
+    public List<SpecimenInfo> getRemovedSpecimens() {
+        return new ArrayList<SpecimenInfo>(removedSpecimens);
     }
 
     private void addSpecimen() {
         BiobankApplicationService appService = SessionManager.getAppService();
         String inventoryId = newSpecimenInventoryId.getText().trim();
         if (!inventoryId.isEmpty()) {
-            SpecimenWrapper specimen = null;
+            SpecimenBriefInfo bspecimen = null;
             try {
                 Integer specId = appService.doAction(
                     new SpecimenByInventorySearchAction(inventoryId,
                         SessionManager.getUser().getCurrentWorkingCenter()
                             .getId())).getList().get(0);
-                specimen = new SpecimenWrapper(appService,
+                bspecimen =
                     appService.doAction(
-                        new SpecimenGetInfoAction(specId)).getSpecimen());
-            } catch (Exception e) {
-                BgcPlugin.openAsyncError(
-                    Messages.SpecimenEntryWidget_retrieve_error_title,
-                    "Specimen not found.");
-            }
-            if (specimen != null)
+                        new SpecimenGetInfoAction(specId));
+                // Need to convert to table type
+                SpecimenInfo ispecimen =
+                    new SpecimenInfo();
+                ispecimen.specimen = bspecimen.getSpecimen();
+                ispecimen.parentLabel =
+                    bspecimen.getParents().size() > 0 ? bspecimen.getParents()
+                        .pop().getLabel() : ""; //$NON-NLS-1$
+                ispecimen.positionString =
+                    bspecimen.getSpecimen().getSpecimenPosition() != null ?
+                        bspecimen.getSpecimen().getSpecimenPosition()
+                            .getPositionString() : null;
+                ispecimen.comments =
+                    bspecimen.getSpecimen().getComments().size() == 0 ? Messages.SpecimenEntryWidget_no
+                        : Messages.SpecimenEntryWidget_yes;
+
                 try {
-                    addSpecimen(specimen);
+                    addSpecimen(ispecimen);
                 } catch (VetoException e) {
                     BgcPlugin.openAsyncError(
                         Messages.SpecimenEntryWidget_error_title,
                         e.getMessage());
                 }
+            } catch (Exception e) {
+                BgcPlugin.openAsyncError(
+                    Messages.SpecimenEntryWidget_retrieve_error_title,
+                    Messages.SpecimenEntryWidget_notfound);
+            }
         }
     }
 
-    public void addSpecimen(SpecimenWrapper specimen) throws VetoException {
+    public void addSpecimen(SpecimenInfo specimen) throws VetoException {
         if (specimen != null && specimens.contains(specimen)) {
             BgcPlugin.openAsyncError(Messages.SpecimenEntryWidget_error_title,
                 NLS.bind(Messages.SpecimenEntryWidget_already_added_error_msg,
-                    specimen.getInventoryId()));
+                    specimen.specimen.getInventoryId()));
             return;
         }
 
+        SpecimenWrapper wrap =
+            new SpecimenWrapper(SessionManager.getAppService(),
+                specimen.specimen);
+
         VetoListenerSupport.Event<ItemAction, SpecimenWrapper> preAdd =
             VetoListenerSupport.Event
-                .newEvent(ItemAction.PRE_ADD, specimen);
+                .newEvent(ItemAction.PRE_ADD, wrap);
 
         VetoListenerSupport.Event<ItemAction, SpecimenWrapper> postAdd =
             VetoListenerSupport.Event
-                .newEvent(ItemAction.POST_ADD, specimen);
+                .newEvent(ItemAction.POST_ADD, wrap);
 
         vetoListenerSupport.notifyListeners(preAdd);
 
         specimens.add(specimen);
-        Collections.sort(specimens);
+        // FIXME: sorting? Collections.sort(specimens);
         specTable.setList(specimens);
         addedSpecimens.add(specimen);
         removedSpecimens.remove(specimen);
@@ -211,10 +226,10 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
             return;
 
         specTable
-            .addDeleteItemListener(new IInfoTableDeleteItemListener<SpecimenWrapper>() {
+            .addDeleteItemListener(new IInfoTableDeleteItemListener<SpecimenInfo>() {
                 @Override
-                public void deleteItem(InfoTableEvent<SpecimenWrapper> event) {
-                    SpecimenWrapper specimen = specTable.getSelection();
+                public void deleteItem(InfoTableEvent<SpecimenInfo> event) {
+                    SpecimenInfo specimen = specTable.getSelection();
                     if (specimen != null) {
                         if (!MessageDialog.openConfirm(
                             PlatformUI.getWorkbench()
@@ -222,7 +237,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                             Messages.SpecimenEntryWidget_delete_question_title,
                             NLS.bind(
                                 Messages.SpecimenEntryWidget_delete_question_msg,
-                                specimen.getInventoryId()))) {
+                                specimen.specimen.getInventoryId()))) {
                             return;
                         }
 
@@ -239,19 +254,23 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
             });
     }
 
-    public void removeSpecimen(SpecimenWrapper specimen) throws VetoException {
+    public void removeSpecimen(SpecimenInfo specimen) throws VetoException {
+        SpecimenWrapper wrap =
+            new SpecimenWrapper(SessionManager.getAppService(),
+                specimen.specimen);
+
         VetoListenerSupport.Event<ItemAction, SpecimenWrapper> preDelete =
             VetoListenerSupport.Event
-                .newEvent(ItemAction.PRE_DELETE, specimen);
+                .newEvent(ItemAction.PRE_DELETE, wrap);
 
         VetoListenerSupport.Event<ItemAction, SpecimenWrapper> postDelete =
             VetoListenerSupport.Event
-                .newEvent(ItemAction.POST_DELETE, specimen);
+                .newEvent(ItemAction.POST_DELETE, wrap);
 
         vetoListenerSupport.notifyListeners(preDelete);
         if (preDelete.doit) {
             specimens.remove(specimen);
-            Collections.sort(specimens);
+            // FIXME: sorting? Collections.sort(specimens);
             specTable.setList(specimens);
             removedSpecimens.add(specimen);
             addedSpecimens.remove(specimen);
@@ -263,15 +282,15 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         }
     }
 
-    public void setSpecimens(List<SpecimenWrapper> specimens) {
+    public void setSpecimens(List<SpecimenInfo> specimens) {
         // don't want to work on exactly the same list. This will be the gui
         // list only.
-        this.specimens = new ArrayList<SpecimenWrapper>(specimens);
+        this.specimens = new ArrayList<SpecimenInfo>(specimens);
 
         if (specimens != null)
             specTable.setList(specimens);
         else
-            specTable.setList(new ArrayList<SpecimenWrapper>());
+            specTable.setList(new ArrayList<SpecimenInfo>());
 
         addedSpecimens.clear();
         removedSpecimens.clear();

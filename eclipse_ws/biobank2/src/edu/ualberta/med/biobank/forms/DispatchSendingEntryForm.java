@@ -34,13 +34,11 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
-import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
@@ -67,17 +65,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     private ShipmentInfoWrapper shipmentInfo = null;
 
-    private BgcEntryFormWidgetListener listener =
-        new BgcEntryFormWidgetListener() {
-            @Override
-            public void selectionChanged(MultiSelectEvent event) {
-                setDirty(true);
-            }
-        };
-
-    private CommentCollectionInfoTable commentEntryTable;
-
-    private BgcBaseText commentWidget;
+    private CommentsInfoTable commentEntryTable;
 
     @Override
     protected void init() throws Exception {
@@ -138,6 +126,10 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
                 Messages.DispatchSendingEntryForm_waybill_label, null,
                 shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
+
+            createDateTimeWidget(client,
+                Messages.DispatchReceivingEntryForm_departed_label, null,
+                shipmentInfo, ShipmentInfoPeer.PACKED_AT.getName(), null);
         }
 
         createCommentSection();
@@ -150,17 +142,15 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentCollectionInfoTable(client,
+        commentEntryTable = new CommentsInfoTable(client,
             dispatch.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        commentWidget =
-            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
-                SWT.MULTI,
-                Messages.Comments_add, null, comment, "message", null);
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_add, null, comment, "message", null);
 
     }
 
@@ -219,8 +209,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         } else {
             specimensTreeTable =
                 new DispatchSpecimensTreeTable(page, dispatch,
-                    !dispatch.isInClosedState() && !dispatch.isInLostState(),
-                    true);
+                    !dispatch.isInClosedState() && !dispatch.isInLostState());
             specimensTreeTable.addSelectionChangedListener(biobankListener);
             specimensTreeTable.addClickListener();
         }
@@ -314,7 +303,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return DispatchViewForm.ID;
     }
 

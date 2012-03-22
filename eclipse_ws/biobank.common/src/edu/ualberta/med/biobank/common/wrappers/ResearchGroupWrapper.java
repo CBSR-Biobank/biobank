@@ -14,6 +14,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+@SuppressWarnings("unused")
 public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
 
     public ResearchGroupWrapper(WritableApplicationService appService,

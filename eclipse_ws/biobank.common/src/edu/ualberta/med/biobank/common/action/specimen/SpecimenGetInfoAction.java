@@ -30,6 +30,7 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
             + " INNER JOIN FETCH cevent.patient patient"
             + " INNER JOIN FETCH patient.study"
             + " LEFT JOIN FETCH spc.specimenPosition pos"
+            + " LEFT JOIN FETCH originInfo.shipmentInfo"
             + " LEFT JOIN FETCH pos.container"
             + " LEFT JOIN FETCH spc.dispatchSpecimens ds"
             + " LEFT JOIN FETCH ds.dispatch"
@@ -43,6 +44,9 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
 
         private Specimen specimen;
         private Stack<Container> parents = new Stack<Container>();
+
+        public SpecimenBriefInfo() {
+        }
 
         public SpecimenBriefInfo(Specimen specimen, Stack<Container> parents) {
             this.specimen = specimen;
@@ -96,11 +100,9 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
         if (pos != null) {
             Container container = pos.getContainer();
             while (container != null) {
-                if (container != null) {
-                    container.getContainerType().getChildLabelingScheme()
-                        .getName();
-                    container.getContainerType().getCapacity().getRowCapacity();
-                }
+                container.getContainerType().getChildLabelingScheme()
+                    .getName();
+                container.getContainerType().getCapacity().getRowCapacity();
                 parents.push(container);
                 container = container.getParentContainer();
             }

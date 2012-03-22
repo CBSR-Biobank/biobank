@@ -20,11 +20,11 @@ public class DispatchCenterAdapter extends AdapterBase {
 
     public DispatchCenterAdapter(AdapterBase parent, CenterWrapper<?> center) {
         super(parent, center);
-        out = new OutgoingNode(this, 0, center);
+        out = new OutgoingNode(this, 0);
         out.setParent(this);
         this.addChild(out);
 
-        inc = new IncomingNode(this, 1, center);
+        inc = new IncomingNode(this, 1);
         inc.setParent(this);
         this.addChild(inc);
     }
@@ -69,11 +69,6 @@ public class DispatchCenterAdapter extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren() {
         return null;
-    }
-
-    @Override
-    protected int getWrapperChildCount() {
-        return 0;
     }
 
     @Override

@@ -34,7 +34,7 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
             null, null, false);
         this.ceventInfo = ceventInfo;
 
-        init();
+        if (ceventInfo.cevent.getId() != null) init();
     }
 
     @Override
@@ -125,11 +125,6 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     }
 
     @Override
-    protected int getChildrenCount() throws Exception {
-        return 0;
-    }
-
-    @Override
     public String getEntryFormId() {
         return CollectionEventEntryForm.ID;
     }
@@ -173,12 +168,13 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     @Override
     protected void runDelete() throws Exception {
         SessionManager.getAppService().doAction(
-            new CollectionEventDeleteAction(getId()));
+            new CollectionEventDeleteAction(ceventInfo.cevent));
     }
 
     @Override
     public void setValue(Object val) {
         this.ceventInfo = (SimpleCEventInfo) val;
+        setId(ceventInfo.cevent.getId());
         if (ceventInfo.cevent.getId() != null) init();
     }
 }

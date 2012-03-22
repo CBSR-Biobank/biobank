@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +19,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
@@ -36,17 +36,17 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget.ItemAction;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.Event;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingEventEntryForm extends BiobankEntryForm {
 
@@ -69,21 +69,17 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     private ActivityStatus closedActivityStatus;
 
-    private CommentCollectionInfoTable commentEntryTable;
-
-    private BgcEntryFormWidgetListener listener =
-        new BgcEntryFormWidgetListener() {
-            @Override
-            public void selectionChanged(MultiSelectEvent event) {
-                setDirty(true);
-            }
-        };
+    private CommentsInfoTable commentEntryTable;
 
     private ProcessingEventWrapper pevent = new ProcessingEventWrapper(
         SessionManager.getAppService());
 
     private CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
+
+    // FIXME: this action should be logged in the user actions log
+    // private ProcessingEventLogProvider logProvider =
+    // new ProcessingEventLogProvider();
 
     private List<SpecimenInfo> specimens;
 
@@ -129,6 +125,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     new ProcessingEventGetInfoAction(adapter.getId()));
             pevent.setWrappedObject(read.pevent);
             specimens = read.sourceSpecimenInfos;
+            SessionManager.logLookup(read.pevent);
         }
     }
 
@@ -141,7 +138,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         createSpecimensSection();
     }
 
-    private void createMainSection() throws ApplicationException {
+    private void createMainSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -202,7 +199,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
         client.setLayout(gl);
         commentEntryTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 pevent.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
@@ -222,14 +219,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
         toolkit.paintBordersFor(client);
 
-        List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>();
-        for (SpecimenInfo info : specimens)
-            specs.add(new SpecimenWrapper(SessionManager.getAppService(),
-                info.specimen));
-
         specimenEntryWidget =
-            new SpecimenEntryWidget(client, SWT.NONE, toolkit,
-                SessionManager.getAppService(), true);
+            new SpecimenEntryWidget(client, SWT.NONE, toolkit, true);
         specimenEntryWidget
             .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
                 @Override
@@ -295,37 +286,32 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                     Messages.ProcessingEventEntryForm_spec_study_allowed_only_error_msg,
                                     specimen.getCollectionEvent().getPatient()
                                         .getStudy().getNameShort()));
-                        else if (pevent.getSpecimenCollection(false).size() > 0
-                            && !pevent
-                                .getSpecimenCollection(false)
-                                .get(0)
-                                .getCollectionEvent()
-                                .getPatient()
-                                .getStudy()
-                                .equals(
+                        else if (specimens.size() > 0) {
+                            try {
+                                Study study =
+                                    SessionManager
+                                        .getAppService()
+                                        .doAction(
+                                            new SpecimenGetInfoAction(specimens
+                                                .get(0).specimen.getId()))
+                                        .getSpecimen().getCollectionEvent()
+                                        .getPatient().getStudy();
+                                if (!study.equals(
                                     specimen.getCollectionEvent().getPatient()
                                         .getStudy()))
-                            throw new VetoException(
-                                Messages.ProcessingEventEntryForm_study_spec_error_msg);
-                        break;
+                                    throw new VetoException(
+                                        Messages.ProcessingEventEntryForm_study_spec_error_msg);
+                            } catch (Exception e) {
+                                BgcPlugin
+                                    .openAsyncError(
+                                        Messages.ProcessingEventEntryForm_error,
+                                        e);
+                            }
+                            break;
+                        }
                     case POST_ADD:
                         specimen.setProcessingEvent(pevent);
                         specimen.setActivityStatus(closedActivityStatus);
-                        pevent.addToSpecimenCollection(Arrays.asList(specimen));
-                        break;
-                    case PRE_DELETE:
-                        if (specimen.getChildSpecimenCollection(false).size() > 0) {
-                            boolean ok =
-                                BgcPlugin
-                                    .openConfirm(
-                                        Messages.ProcessingEventEntryForm_confirm_remove_title,
-                                        Messages.ProcessingEventEntryForm_confirm_remove_msg);
-                            event.doit = ok;
-                        }
-                        break;
-                    case POST_DELETE:
-                        pevent.removeFromSpecimenCollection(Arrays
-                            .asList(specimen));
                         break;
                     }
                 }
@@ -341,15 +327,19 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         specimenEntryWidget.addVetoListener(ItemAction.POST_DELETE,
             vetoListener);
 
-        specimenEntryWidget.setSpecimens(specs);
+        specimenEntryWidget.setSpecimens(specimens);
     }
 
     @Override
     protected void saveForm() throws Exception {
-        Set<Integer> specimens = new HashSet<Integer>();
-        for (SpecimenWrapper spc : pevent.getSpecimenCollection(false)) {
-            specimens.add(spc.getId());
-        }
+        Set<Integer> added = new HashSet<Integer>();
+        Set<Integer> removed = new HashSet<Integer>();
+
+        for (SpecimenInfo spec : specimenEntryWidget.getAddedSpecimens())
+            added.add(spec.specimen.getId());
+
+        for (SpecimenInfo spec : specimenEntryWidget.getRemovedSpecimens())
+            removed.add(spec.specimen.getId());
 
         Integer peventId =
             SessionManager
@@ -359,7 +349,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                         .getCenter().getId(), pevent.getCreatedAt(), pevent
                         .getWorksheet(), pevent.getActivityStatus(), comment
                         .getMessage(),
-                        specimens)).getId();
+                        added, removed)).getId();
         pevent.setId(peventId);
         ((AdapterBase) adapter).setModelObject(pevent);
     }
@@ -375,7 +365,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ProcessingEventViewForm.ID;
     }
 
@@ -388,6 +378,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             pevent.setActivityStatus(ActivityStatus.ACTIVE);
         }
         GuiUtil.reset(activityStatusComboViewer, pevent.getActivityStatus());
-        specimenEntryWidget.setSpecimens(pevent.getSpecimenCollection(true));
+        specimenEntryWidget.setSpecimens(specimens);
     }
 }

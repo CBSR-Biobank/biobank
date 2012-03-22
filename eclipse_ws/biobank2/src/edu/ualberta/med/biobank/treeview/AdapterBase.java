@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -163,32 +164,38 @@ public abstract class AdapterBase extends AbstractAdapterBase {
      * @param updateNode If not null, the node in the treeview to update.
      */
     @Override
-    public void loadChildren(boolean updateNode) {
-        try {
-            Collection<? extends ModelWrapper<?>> children =
-                getWrapperChildren();
-            if (children != null) {
-                for (ModelWrapper<?> child : children) {
-                    AbstractAdapterBase node = getChild(child.getId());
-                    if (node == null) {
-                        node = createChildNode(child);
-                        addChild(node);
+    public void loadChildren(final boolean updateNode) {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Collection<? extends ModelWrapper<?>> children =
+                        getWrapperChildren();
+                    if (children != null) {
+                        for (ModelWrapper<?> child : children) {
+                            AbstractAdapterBase node = getChild(child.getId());
+                            if (node == null) {
+                                node = createChildNode(child);
+                                addChild(node);
+                            }
+                            if (updateNode) {
+                                SessionManager.updateAdapterTreeNode(node);
+                            }
+                        }
+                        SessionManager.refreshTreeNode(AdapterBase.this);
                     }
-                    if (updateNode) {
-                        SessionManager.updateAdapterTreeNode(node);
+                } catch (final RemoteAccessException exp) {
+                    BgcPlugin.openRemoteAccessErrorMessage(exp);
+                } catch (Exception e) {
+                    String text = getClass().getName();
+                    if (getModelObject() != null) {
+                        text = getModelObject().toString();
                     }
+                    logger.error(
+                        "Error while loading children of node " + text, e); //$NON-NLS-1$
                 }
-                SessionManager.refreshTreeNode(AdapterBase.this);
             }
-        } catch (final RemoteAccessException exp) {
-            BgcPlugin.openRemoteAccessErrorMessage(exp);
-        } catch (Exception e) {
-            String text = getClass().getName();
-            if (getModelObject() != null) {
-                text = getModelObject().toString();
-            }
-            logger.error("Error while loading children of node " + text, e); //$NON-NLS-1$
-        }
+        });
     }
 
     /**
@@ -207,13 +214,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
             map.put(model.getId(), model);
         }
         return map;
-    }
-
-    protected abstract int getWrapperChildCount() throws Exception;
-
-    @Override
-    protected int getChildrenCount() throws Exception {
-        return getWrapperChildCount();
     }
 
     public static boolean closeEditor(FormInput input) {

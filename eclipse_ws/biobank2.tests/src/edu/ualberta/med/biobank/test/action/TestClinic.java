@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestClinic extends TestAction {
 
@@ -46,14 +45,14 @@ public class TestClinic extends TestAction {
         name = getMethodNameR();
 
         clinicSaveAction = ClinicHelper.getSaveAction(name, name,
-            ActivityStatus.ACTIVE, R.nextBoolean());
+            ActivityStatus.ACTIVE, getR().nextBoolean());
     }
 
     @Test
     public void saveNew() throws Exception {
         clinicSaveAction.setName(null);
         try {
-            EXECUTOR.exec(clinicSaveAction);
+            exec(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no name");
         } catch (ConstraintViolationException e) {
@@ -64,7 +63,7 @@ public class TestClinic extends TestAction {
         clinicSaveAction.setName(name);
         clinicSaveAction.setNameShort(null);
         try {
-            EXECUTOR.exec(clinicSaveAction);
+            exec(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no short name");
         } catch (ConstraintViolationException e) {
@@ -74,7 +73,7 @@ public class TestClinic extends TestAction {
         clinicSaveAction.setNameShort(name);
         clinicSaveAction.setActivityStatus(null);
         try {
-            EXECUTOR.exec(clinicSaveAction);
+            exec(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add Clinic with no activity status");
         } catch (ConstraintViolationException e) {
@@ -84,7 +83,7 @@ public class TestClinic extends TestAction {
         clinicSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
         clinicSaveAction.setAddress(null);
         try {
-            EXECUTOR.exec(clinicSaveAction);
+            exec(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add site with no address");
         } catch (ConstraintViolationException e) {
@@ -96,7 +95,7 @@ public class TestClinic extends TestAction {
         clinicSaveAction.setAddress(address);
         clinicSaveAction.setContactSaveInfos(null);
         try {
-            EXECUTOR.exec(clinicSaveAction);
+            exec(clinicSaveAction);
             Assert.fail(
                 "should not be allowed to add site with null site ids");
         } catch (NullPointerException e) {
@@ -106,18 +105,18 @@ public class TestClinic extends TestAction {
         // success path
         clinicSaveAction
             .setContactSaveInfos(new HashSet<ContactSaveInfo>());
-        EXECUTOR.exec(clinicSaveAction);
+        exec(clinicSaveAction);
     }
 
     @Test
     public void checkGetAction() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
 
-        CollectionEventHelper.createCEventWithSourceSpecimens(EXECUTOR,
+        CollectionEventHelper.createCEventWithSourceSpecimens(getExecutor(),
             provisioning.patientIds.get(0), provisioning.clinicId);
 
         ClinicInfo clinicInfo =
-            EXECUTOR.exec(new ClinicGetInfoAction(provisioning.clinicId));
+            exec(new ClinicGetInfoAction(provisioning.clinicId));
 
         Assert.assertEquals(ActivityStatus.ACTIVE,
             clinicInfo.clinic.getActivityStatus());
@@ -133,26 +132,26 @@ public class TestClinic extends TestAction {
     @Test
     public void nameChecks() throws Exception {
         // ensure we can change name on existing clinic
-        Integer clinicId = EXECUTOR.exec(clinicSaveAction).getId();
+        Integer clinicId = exec(clinicSaveAction).getId();
         ClinicInfo clinicInfo =
-            EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
+            exec(new ClinicGetInfoAction(clinicId));
         clinicInfo.clinic.setName(name + "_2");
         ClinicSaveAction clinicSave =
             ClinicHelper.getSaveAction(clinicInfo);
-        EXECUTOR.exec(clinicSave);
+        exec(clinicSave);
 
         // ensure we can change short name on existing clinic
-        clinicInfo = EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
+        clinicInfo = exec(new ClinicGetInfoAction(clinicId));
         clinicInfo.clinic.setNameShort(name + "_2");
         clinicSave = ClinicHelper.getSaveAction(clinicInfo);
-        EXECUTOR.exec(clinicSave);
+        exec(clinicSave);
 
         // test for duplicate name
         ClinicSaveAction saveClinic2 =
             ClinicHelper.getSaveAction(name + "_2", name,
                 ActivityStatus.ACTIVE, false);
         try {
-            EXECUTOR.exec(saveClinic2);
+            exec(saveClinic2);
             Assert.fail("should not be allowed to add clinic with same name");
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
@@ -163,7 +162,7 @@ public class TestClinic extends TestAction {
         saveClinic2.setNameShort(name + "_2");
 
         try {
-            EXECUTOR.exec(saveClinic2);
+            exec(saveClinic2);
             Assert
                 .fail("should not be allowed to add clinic with same name short");
         } catch (ConstraintViolationException e) {
@@ -175,9 +174,9 @@ public class TestClinic extends TestAction {
     @Test
     public void comments() {
         // save with no comments
-        Integer clinicId = EXECUTOR.exec(clinicSaveAction).getId();
+        Integer clinicId = exec(clinicSaveAction).getId();
         ClinicInfo clinicInfo =
-            EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
+            exec(new ClinicGetInfoAction(clinicId));
         Assert.assertEquals(0, clinicInfo.clinic.getComments().size());
 
         clinicInfo = addComment(clinicId);
@@ -194,10 +193,10 @@ public class TestClinic extends TestAction {
 
     private ClinicInfo addComment(Integer clinicId) {
         ClinicSaveAction clinicSaveAction = ClinicHelper.getSaveAction(
-            EXECUTOR.exec(new ClinicGetInfoAction(clinicId)));
+            exec(new ClinicGetInfoAction(clinicId)));
         clinicSaveAction.setCommentText(Utils.getRandomString(20, 30));
-        EXECUTOR.exec(clinicSaveAction).getId();
-        return EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
+        exec(clinicSaveAction).getId();
+        return exec(new ClinicGetInfoAction(clinicId));
     }
 
     @Test
@@ -219,10 +218,10 @@ public class TestClinic extends TestAction {
         }
 
         clinicSaveAction.setContactSaveInfos(contactsAll);
-        Integer clinicId = EXECUTOR.exec(clinicSaveAction).getId();
+        Integer clinicId = exec(clinicSaveAction).getId();
 
         ClinicInfo clinicInfo =
-            EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
+            exec(new ClinicGetInfoAction(clinicId));
         Assert.assertEquals(getContactNamesFromSaveInfo(contactsAll),
             getContactNames(clinicInfo.contacts));
 
@@ -230,9 +229,9 @@ public class TestClinic extends TestAction {
         clinicSaveAction =
             ClinicHelper.getSaveAction(clinicInfo);
         clinicSaveAction.setContactSaveInfos(set1);
-        EXECUTOR.exec(clinicSaveAction);
+        exec(clinicSaveAction);
 
-        clinicInfo = EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
+        clinicInfo = exec(new ClinicGetInfoAction(clinicId));
         Assert.assertEquals(getContactNamesFromSaveInfo(set1),
             getContactNames(clinicInfo.contacts));
 
@@ -240,9 +239,9 @@ public class TestClinic extends TestAction {
         clinicSaveAction =
             ClinicHelper.getSaveAction(clinicInfo);
         clinicSaveAction.setContactSaveInfos(new HashSet<ContactSaveInfo>());
-        EXECUTOR.exec(clinicSaveAction);
+        exec(clinicSaveAction);
 
-        clinicInfo = EXECUTOR.exec(new ClinicGetInfoAction(clinicId));
+        clinicInfo = exec(new ClinicGetInfoAction(clinicId));
         Assert.assertTrue(clinicInfo.contacts.isEmpty());
 
         // check that this clinic no longer has any contacts
@@ -254,8 +253,7 @@ public class TestClinic extends TestAction {
     }
 
     private Set<String> getContactNamesFromSaveInfo(
-        Collection<ContactSaveInfo> contactSaveInfos)
-        throws ApplicationException {
+        Collection<ContactSaveInfo> contactSaveInfos) {
         Set<String> result = new HashSet<String>();
         for (ContactSaveInfo contactSaveInfo : contactSaveInfos) {
             result.add(contactSaveInfo.name);
@@ -263,8 +261,7 @@ public class TestClinic extends TestAction {
         return result;
     }
 
-    private Set<String> getContactNames(Collection<Contact> contacts)
-        throws ApplicationException {
+    private Set<String> getContactNames(Collection<Contact> contacts) {
         Set<String> result = new HashSet<String>();
         for (Contact contact : contacts) {
             result.add(contact.getName());
@@ -273,10 +270,12 @@ public class TestClinic extends TestAction {
     }
 
     @Test
-    public void delete() throws ApplicationException {
+    public void delete() {
         // delete a study with no patients and no other associations
-        Integer clinicId = EXECUTOR.exec(clinicSaveAction).getId();
-        EXECUTOR.exec(new ClinicDeleteAction(clinicId));
+        Integer clinicId = exec(clinicSaveAction).getId();
+        ClinicInfo clinicInfo =
+            exec(new ClinicGetInfoAction(clinicId));
+        exec(new ClinicDeleteAction(clinicInfo.clinic));
 
         // hql query for clinic should return empty
         Query q =
@@ -289,11 +288,12 @@ public class TestClinic extends TestAction {
     }
 
     @Test
-    public void deleteWithStudies() throws ApplicationException {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+    public void deleteWithStudies() {
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        ClinicInfo clinicInfo =
+            exec(new ClinicGetInfoAction(provisioning.clinicId));
         try {
-            EXECUTOR.exec(new ClinicDeleteAction(
-                provisioning.clinicId));
+            exec(new ClinicDeleteAction(clinicInfo.clinic));
             Assert
                 .fail("should not be allowed to delete a clinic linked to a study");
         } catch (ConstraintViolationException e) {
@@ -303,15 +303,16 @@ public class TestClinic extends TestAction {
 
     @Test
     public void deleteWithSrcDispatch() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        ClinicInfo clinicInfo =
+            exec(new ClinicGetInfoAction(provisioning.clinicId));
 
-        DispatchHelper.createDispatch(EXECUTOR, provisioning.clinicId,
+        DispatchHelper.createDispatch(getExecutor(), provisioning.clinicId,
             provisioning.siteId,
             provisioning.patientIds.get(0));
 
         try {
-            EXECUTOR.exec(new ClinicDeleteAction(
-                provisioning.clinicId));
+            exec(new ClinicDeleteAction(clinicInfo.clinic));
             Assert
                 .fail(
                 "should not be allowed to delete a clinic which is a source of dispatches");
@@ -322,21 +323,23 @@ public class TestClinic extends TestAction {
 
     @Test
     public void deleteWithDstDispatch() throws Exception {
-        Provisioning provisioning = new Provisioning(EXECUTOR, name);
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
 
         // add second clinic to be the destination of the dispatch
 
         ClinicSaveAction csa2 =
             ClinicHelper.getSaveAction(name + "_clinic2", name,
-                ActivityStatus.ACTIVE, R.nextBoolean());
-        Integer clinicId2 = EXECUTOR.exec(csa2).getId();
+                ActivityStatus.ACTIVE, getR().nextBoolean());
+        Integer clinicId2 = exec(csa2).getId();
+        ClinicInfo clinic2Info =
+            exec(new ClinicGetInfoAction(clinicId2));
 
-        DispatchHelper.createDispatch(EXECUTOR, provisioning.clinicId,
+        DispatchHelper.createDispatch(getExecutor(), provisioning.clinicId,
             clinicId2,
             provisioning.patientIds.get(0));
 
         try {
-            EXECUTOR.exec(new ClinicDeleteAction(clinicId2));
+            exec(new ClinicDeleteAction(clinic2Info.clinic));
             Assert
                 .fail(
                 "should not be allowed to delete a clinic which is a destination for dispatches");

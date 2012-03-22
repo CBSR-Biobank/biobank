@@ -22,9 +22,8 @@ import org.supercsv.prefs.CsvPreference;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
-import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
-import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
+import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -34,7 +33,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ResearchGroupViewForm extends AddressViewFormCommon implements
@@ -57,7 +56,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
     private Button uploadButton;
 
-    private CommentCollectionInfoTable commentTable;
+    private CommentsInfoTable commentTable;
 
     @Override
     protected void init() throws Exception {
@@ -79,7 +78,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             ResearchGroupReadInfo read =
                 SessionManager.getAppService().doAction(
                     new ResearchGroupGetInfoAction(id));
-            researchGroup.setWrappedObject(read.rg);
+            researchGroup.setWrappedObject(read.researchGroup);
         }
     }
 
@@ -133,8 +132,8 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
     }
 
     public void saveRequest() throws Exception {
-        RequestWrapper request =
-            new RequestWrapper(SessionManager.getAppService());
+        // RequestWrapper request =
+        // new RequestWrapper(SessionManager.getAppService());
 
         FileReader f = new FileReader(csvSelector.getFilePath());
         int newLines = 0;
@@ -209,7 +208,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
         commentTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 researchGroup.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);

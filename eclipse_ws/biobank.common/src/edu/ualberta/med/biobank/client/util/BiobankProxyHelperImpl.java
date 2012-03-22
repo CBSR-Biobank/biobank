@@ -275,7 +275,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
             Class<?>[] params = new Class[] { field.getType() };
             Method setter = getMethod(bean,
                 "set" + method.getName().substring(3), params); //$NON-NLS-1$
-            if (setter != null && params != null && params.length == 1)
+            if (setter != null && params.length == 1)
                 setter.invoke(bean, new Object[] { value });
 
             return value;

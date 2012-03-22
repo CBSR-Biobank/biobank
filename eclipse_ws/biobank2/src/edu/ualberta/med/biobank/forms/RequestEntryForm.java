@@ -71,8 +71,6 @@ public class RequestEntryForm extends BiobankViewForm {
 
         setRequestInfo(adapter.getId());
 
-        SessionManager.logEdit(request);
-
         setPartName(Messages.RequestEntryForm_title
             + request.getId().toString());
     }
@@ -82,10 +80,10 @@ public class RequestEntryForm extends BiobankViewForm {
             Request r = new Request();
             request.setWrappedObject(r);
         } else {
-            RequestReadInfo read =
-                SessionManager.getAppService().doAction(
-                    new RequestGetInfoAction(id));
-            request.setWrappedObject(read.request);
+            RequestReadInfo reqInfo = SessionManager.getAppService().doAction(
+                new RequestGetInfoAction(id));
+            request.setWrappedObject(reqInfo.request);
+            SessionManager.logLookup(reqInfo.request);
         }
     }
 
@@ -129,7 +127,7 @@ public class RequestEntryForm extends BiobankViewForm {
         s.setClient(c);
         c.setLayout(new GridLayout());
         c.setLayoutData(new GridData());
-        createSpecimensSelectionActions(c, false);
+        createSpecimensSelectionActions(c);
 
         specimensTree = new RequestSpecimensTreeTable(c, request);
         specimensTree.addListener(SWT.CHANGED, new Listener() {
@@ -243,8 +241,7 @@ public class RequestEntryForm extends BiobankViewForm {
         return dispatchTable.getSelection();
     }
 
-    protected void createSpecimensSelectionActions(Composite composite,
-        boolean setAsFirstControl) {
+    protected void createSpecimensSelectionActions(Composite composite) {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
         toolkit.createLabel(addComposite,

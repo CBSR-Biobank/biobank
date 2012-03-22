@@ -4,8 +4,6 @@ import jargs.gnu.CmdLineParser;
 import jargs.gnu.CmdLineParser.Option;
 import jargs.gnu.CmdLineParser.OptionException;
 
-import java.net.URISyntaxException;
-
 public class GenericAppArgs {
     public boolean help = false;
     public boolean verbose = false;
@@ -20,7 +18,7 @@ public class GenericAppArgs {
     /*
      * Parses the command line arguments and returns them in an AppArgs object.
      */
-    public GenericAppArgs(String argv[]) throws URISyntaxException {
+    public GenericAppArgs(String argv[]) {
 
         CmdLineParser parser = new CmdLineParser();
         Option helpOpt = parser.addBooleanOption('h', "help");

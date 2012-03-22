@@ -47,7 +47,7 @@ public class TestEquals extends TestAction {
         tx.commit();
         session.close();
 
-        session = SESSION_PROVIDER.openSession();
+        session = openSession();
         tx = session.beginTransaction();
 
         Site site1loaded = (Site) session.load(Site.class, site1.getId());
@@ -127,7 +127,7 @@ public class TestEquals extends TestAction {
         tx.commit();
         session.close();
 
-        session = SESSION_PROVIDER.openSession();
+        session = openSession();
         tx = session.beginTransaction();
 
         // System.out.println("start1");
@@ -139,7 +139,7 @@ public class TestEquals extends TestAction {
         tx.commit();
         session.close();
 
-        session = SESSION_PROVIDER.openSession();
+        session = openSession();
         tx = session.beginTransaction();
 
         // PROBREM:

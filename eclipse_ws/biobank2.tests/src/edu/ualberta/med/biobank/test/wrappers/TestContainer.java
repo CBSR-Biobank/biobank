@@ -51,6 +51,7 @@ import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
+@SuppressWarnings({ "unused", "deprecation" })
 @Deprecated
 public class TestContainer extends TestDatabase {
 
@@ -1353,7 +1354,7 @@ public class TestContainer extends TestDatabase {
             ActivityStatus.ACTIVE, Utils.getRandomDate(),
             ce, site);
 
-        PatientWrapper patient = PatientHelper.addPatient(
+        PatientHelper.addPatient(
             Utils.getRandomString(5), StudyHelper.addStudy(name));
 
         ProcessingEventWrapper pe = ProcessingEventHelper.addProcessingEvent(

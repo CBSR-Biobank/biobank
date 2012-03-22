@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 
+@SuppressWarnings({ "unused", "deprecation" })
 @Deprecated
 public class AliquotedSpecimenHelper extends DbHelper {
 

@@ -14,6 +14,7 @@ public class NotNullValidator implements Validator<Object> {
         this.label = label;
     }
 
+    @Override
     public void validate(Object value, ValidationResultCollector results) {
         if (value == null) {
             String message = MessageFormat.format(MESSAGE, label);

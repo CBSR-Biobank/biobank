@@ -17,10 +17,10 @@ import edu.ualberta.med.biobank.common.action.info.AddressSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestGetSpecimenInfosAction;
+import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupDeleteAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
-import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Request;
@@ -44,69 +44,71 @@ public class TestResearchGroup extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + R.nextInt();
+        name = testname.getMethodName() + getR().nextInt();
         studyId =
             StudyHelper
-                .createStudy(EXECUTOR, name, ActivityStatus.ACTIVE);
+                .createStudy(getExecutor(), name, ActivityStatus.ACTIVE);
     }
 
     @Test
     public void saveResearchGroup() throws Exception {
 
         Integer rgId =
-            ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
+            ResearchGroupHelper.createResearchGroup(getExecutor(), name,
                 name,
                 studyId);
 
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
+        ResearchGroupReadInfo rg = exec(reader);
 
-        Assert.assertTrue(rg.rg.getName().equals(name + "rg"));
-        Assert.assertTrue(rg.rg.getNameShort().equals(name + "rg"));
-        Assert.assertTrue(rg.rg.getStudy().getId().equals(studyId));
-        Assert.assertTrue(rg.rg.getActivityStatus() == ActivityStatus.ACTIVE);
+        Assert.assertTrue(rg.researchGroup.getName().equals(name + "rg"));
+        Assert.assertTrue(rg.researchGroup.getNameShort().equals(name + "rg"));
+        Assert.assertTrue(rg.researchGroup.getStudy().getId().equals(studyId));
+        Assert
+            .assertTrue(rg.researchGroup.getActivityStatus() == ActivityStatus.ACTIVE);
 
     }
 
     @Test
     public void testUpload() throws Exception {
         Integer rgId =
-            ResearchGroupHelper.createResearchGroup(EXECUTOR, name + "rg",
+            ResearchGroupHelper.createResearchGroup(getExecutor(), name + "rg",
                 name + "rg",
                 studyId);
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
+        ResearchGroupReadInfo rg = exec(reader);
 
         // create specs
         Integer p =
-            PatientHelper.createPatient(EXECUTOR, name + "_patient",
-                rg.rg.getStudy().getId());
+            PatientHelper.createPatient(getExecutor(), name + "_patient",
+                rg.researchGroup.getStudy().getId());
         Integer ceId =
-            CollectionEventHelper.createCEventWithSourceSpecimens(EXECUTOR,
+            CollectionEventHelper.createCEventWithSourceSpecimens(
+                getExecutor(),
                 p, rgId);
 
         CollectionEventGetInfoAction ceReader =
             new CollectionEventGetInfoAction(ceId);
-        CEventInfo ceInfo = EXECUTOR.exec(ceReader);
+        CEventInfo ceInfo = exec(ceReader);
         List<String> specs = new ArrayList<String>();
         for (SpecimenInfo specInfo : ceInfo.sourceSpecimenInfos)
             specs.add(specInfo.specimen.getInventoryId());
 
         Assert.assertTrue(ceInfo.sourceSpecimenInfos.size() >= 2);
-        specs.remove(Math.abs(R.nextInt()) % specs.size());
-        specs.remove(Math.abs(R.nextInt()) % specs.size());
+        specs.remove(Math.abs(getR().nextInt()) % specs.size());
+        specs.remove(Math.abs(getR().nextInt()) % specs.size());
 
         // request specs
         RequestSubmitAction action =
             new RequestSubmitAction(rgId, specs);
-        Integer rId = EXECUTOR.exec(action).getId();
+        Integer rId = exec(action).getId();
 
         // make sure you got what was requested
         RequestGetSpecimenInfosAction specAction =
             new RequestGetSpecimenInfosAction(rId);
-        List<Object[]> specInfo = EXECUTOR.exec(specAction).getList();
+        List<Object[]> specInfo = exec(specAction).getList();
 
         for (int i = 0; i < specInfo.size(); i++) {
             RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
@@ -120,20 +122,22 @@ public class TestResearchGroup extends TestAction {
         // only one failure case specific to rg, rest are in center
 
         Integer rgId =
-            ResearchGroupHelper.createResearchGroup(EXECUTOR, name,
+            ResearchGroupHelper.createResearchGroup(getExecutor(), name,
                 name,
                 studyId);
-        Integer rId = RequestHelper.createRequest(session, EXECUTOR, rgId);
+        Integer rId = RequestHelper.createRequest(session, getExecutor(), rgId);
+        ResearchGroupReadInfo rg =
+            exec(new ResearchGroupGetInfoAction(rgId));
         ResearchGroupDeleteAction delete =
-            new ResearchGroupDeleteAction(rgId);
+            new ResearchGroupDeleteAction(rg.researchGroup);
         try {
-            EXECUTOR.exec(delete);
+            exec(delete);
             Assert.fail();
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
         session.close();
-        session = SESSION_PROVIDER.openSession();
+        session = openSession();
         session.beginTransaction();
 
         Request r = (Request) session.load(Request.class, rId);
@@ -146,7 +150,7 @@ public class TestResearchGroup extends TestAction {
         session.delete(r);
         session.getTransaction().commit();
 
-        EXECUTOR.exec(delete);
+        exec(delete);
         // should be fine
     }
 
@@ -161,19 +165,19 @@ public class TestResearchGroup extends TestAction {
                 ActivityStatus.ACTIVE);
         ResearchGroupSaveAction rgSave = new ResearchGroupSaveAction(save);
 
-        Integer rgId = EXECUTOR.exec(rgSave).getId();
+        Integer rgId = exec(rgSave).getId();
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = EXECUTOR.exec(reader);
+        ResearchGroupReadInfo rg = exec(reader);
 
         save.id = rgId;
 
-        Assert.assertEquals(1, rg.rg.getComments().size());
-        EXECUTOR.exec(rgSave);
-        rg = EXECUTOR.exec(reader);
-        Assert.assertEquals(2, rg.rg.getComments().size());
-        EXECUTOR.exec(rgSave);
-        rg = EXECUTOR.exec(reader);
-        Assert.assertEquals(3, rg.rg.getComments().size());
+        Assert.assertEquals(1, rg.researchGroup.getComments().size());
+        exec(rgSave);
+        rg = exec(reader);
+        Assert.assertEquals(2, rg.researchGroup.getComments().size());
+        exec(rgSave);
+        rg = exec(reader);
+        Assert.assertEquals(3, rg.researchGroup.getComments().size());
     }
 }

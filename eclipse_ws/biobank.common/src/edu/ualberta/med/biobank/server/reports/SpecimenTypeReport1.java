@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.server.reports;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 
@@ -22,6 +23,8 @@ public class SpecimenTypeReport1 extends AbstractReport {
             + SENT_SAMPLES_FREEZER_NAME
             + "'"
             + ")) and ce.patient.study.nameShort like ?"
+            + " and s.activityStatus != "
+            + ActivityStatus.CLOSED.getId()
             + " GROUP BY ce, s.specimenType "
             + " ORDER BY ce.patient.pnumber, min(s.parentSpecimen.processingEvent.createdAt)";
 

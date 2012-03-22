@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
-import edu.ualberta.med.biobank.test.AllTests;
+import edu.ualberta.med.biobank.test.AllTestsSuite;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
@@ -96,11 +96,11 @@ public final class TestReportsProcedurallyGeneratedData implements
 
     private TestReportsProcedurallyGeneratedData() {
         try {
-            AllTests.setUp();
+            AllTestsSuite.setUp();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        appService = AllTests.appService;
+        appService = AllTestsSuite.appService;
         Assert.assertNotNull("setUp: appService is null", appService);
     }
 

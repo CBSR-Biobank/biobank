@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.validator.constraint.impl;
 
 import java.io.Serializable;
 import java.util.List;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -9,13 +10,13 @@ import org.hibernate.EntityMode;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.engine.SessionImplementor;
 import org.hibernate.metadata.ClassMetadata;
 
-import edu.ualberta.med.biobank.validator.SessionAwareConstraintValidator;
+import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 
-public class UniqueValidator extends SessionAwareConstraintValidator<Object>
+public class UniqueValidator extends
+    EventSourceAwareConstraintValidator<Object>
     implements ConstraintValidator<Unique, Object> {
 
     private String[] properties;
@@ -26,7 +27,7 @@ public class UniqueValidator extends SessionAwareConstraintValidator<Object>
     }
 
     @Override
-    public boolean isValidInSession(Object value,
+    public boolean isValidInEventSource(Object value,
         ConstraintValidatorContext context) {
         if (value == null) {
             return true;
@@ -44,7 +45,7 @@ public class UniqueValidator extends SessionAwareConstraintValidator<Object>
         String defaultTemplate = context.getDefaultConstraintMessageTemplate();
 
         if (defaultTemplate.isEmpty()) {
-            ClassMetadata meta = getSession().getSessionFactory()
+            ClassMetadata meta = getEventSource().getSessionFactory()
                 .getClassMetadata(value.getClass());
 
             StringBuilder template = new StringBuilder();
@@ -69,11 +70,10 @@ public class UniqueValidator extends SessionAwareConstraintValidator<Object>
     }
 
     private int countRows(Object value) {
-        ClassMetadata meta = getSession().getSessionFactory()
+        ClassMetadata meta = getEventSource().getSessionFactory()
             .getClassMetadata(value.getClass());
         String idName = meta.getIdentifierPropertyName();
-        Serializable id = meta.getIdentifier(value,
-            (SessionImplementor) getSession());
+        Serializable id = meta.getIdentifier(value, getEventSource());
 
         DetachedCriteria criteria = DetachedCriteria.forClass(value.getClass());
         for (String property : properties) {
@@ -87,7 +87,8 @@ public class UniqueValidator extends SessionAwareConstraintValidator<Object>
 
         criteria.setProjection(Projections.rowCount());
 
-        List<?> results = criteria.getExecutableCriteria(getSession()).list();
+        List<?> results =
+            criteria.getExecutableCriteria(getEventSource()).list();
         Number count = (Number) results.iterator().next();
 
         // Because actions are queued, it is possible for two objects to have

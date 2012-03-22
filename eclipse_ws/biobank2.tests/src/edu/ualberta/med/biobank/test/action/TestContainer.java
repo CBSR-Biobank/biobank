@@ -29,13 +29,13 @@ public class TestContainer extends TestAction {
         super.setUp();
         name = getMethodNameR();
 
-        siteId = EXECUTOR.exec(SiteHelper.getSaveAction(
+        siteId = exec(SiteHelper.getSaveAction(
             name, name, ActivityStatus.ACTIVE)).getId();
 
-        containerTypeId = EXECUTOR.exec(ContainerTypeHelper.getSaveAction(
+        containerTypeId = exec(ContainerTypeHelper.getSaveAction(
             "FREEZER_3x10", "FR3x10", siteId, true, 3, 10,
             getContainerLabelingSchemes().get("CBSR 2 char alphabetic")
-                .getId(), R.nextDouble())).getId();
+                .getId(), getR().nextDouble())).getId();
 
         containerSaveAction = new ContainerSaveAction();
         containerSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
@@ -52,9 +52,9 @@ public class TestContainer extends TestAction {
 
     @Test
     public void checkGetAction() throws Exception {
-        Integer containerId = EXECUTOR.exec(containerSaveAction).getId();
+        Integer containerId = exec(containerSaveAction).getId();
         ContainerInfo containerInfo =
-            EXECUTOR.exec(new ContainerGetInfoAction(containerId));
+            exec(new ContainerGetInfoAction(containerId));
 
         Assert.assertEquals("01", containerInfo.container.getLabel());
         Assert.assertEquals("FREEZER_3x10", containerInfo.container
@@ -68,7 +68,8 @@ public class TestContainer extends TestAction {
             .getSpecimenPositions().size());
         Assert.assertEquals(0, containerInfo.container.getComments()
             .size());
-
     }
+
+    // TODO: need tests for container labels
 
 }

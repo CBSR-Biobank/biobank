@@ -19,9 +19,12 @@ import org.eclipse.ui.services.ISourceProviderService;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
+import edu.ualberta.med.biobank.common.wrappers.loggers.WrapperLogProvider;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcSessionState;
+import edu.ualberta.med.biobank.model.IBiobankModel;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.PerspectiveSecurity;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -250,22 +253,32 @@ public class SessionManager {
             type);
     }
 
-    public static void logLookup(ModelWrapper<?> wrapper) throws Exception {
-        if (!wrapper.isNew())
-            wrapper.logLookup(getUser().getCurrentWorkingCenter() == null ? "" //$NON-NLS-1$
-                : getUser().getCurrentWorkingCenter().getNameShort());
-    }
-
-    public static void logEdit(ModelWrapper<?> wrapper) throws Exception {
-        if (!wrapper.isNew())
-            wrapper.logEdit(getUser().getCurrentWorkingCenter() == null ? "" //$NON-NLS-1$
-                : getUser().getCurrentWorkingCenter().getNameShort());
+    public static void logLookup(IBiobankModel object) {
+        try {
+            Class<?> clazz = object.getClass();
+            StringBuilder loggerName =
+                new StringBuilder(clazz.getSimpleName());
+            loggerName.append("LogProvider");
+            loggerName.insert(0,
+                "edu.ualberta.med.biobank.common.wrappers.loggers.");
+            WrapperLogProvider<?> provider =
+                (WrapperLogProvider<?>) Class
+                    .forName(
+                        loggerName.toString())
+                    .getConstructor().newInstance();
+            Log log = provider.getObjectLog(object);
+            log.setAction("select");
+            log.setType(clazz.getSimpleName());
+            getAppService().logActivity(log);
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError("Logging failed", e);
+        }
     }
 
     /**
      * do an update on node holding the same wrapper than the given adapter.
      * 
-     * @param canRest if true, then the node found will be reloaded from the
+     * @param canReset if true, then the node found will be reloaded from the
      *            database (might not want that if the object could be open in
      *            an entry form).
      * @param expandParent if true will expand the parent node of 'adapter'
@@ -281,8 +294,9 @@ public class SessionManager {
                     AbstractAdapterBase parent = adapter.getParent();
                     if (parent != null)
                         parent.addChild(adapter);
-                    List<AbstractAdapterBase> res = searchNodes(
-                        adapter.getClass(), adapter.getId());
+                    Integer id = adapter.getId();
+                    List<AbstractAdapterBase> res =
+                        searchNodes(adapter.getClass(), id);
                     final AbstractViewWithAdapterTree view =
                         getCurrentAdapterViewWithTree();
                     if (view != null) {

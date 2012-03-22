@@ -19,15 +19,16 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.info.StudyInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.SourceSpecimenSaveInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction.StudyEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.GlobalEventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -42,12 +43,14 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.EventAttrWidget;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.AliquotedSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ClinicAddInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SourceSpecimenEntryInfoTable;
@@ -74,15 +77,14 @@ public class StudyEntryForm extends BiobankEntryForm {
         public boolean inStudy;
     }
 
-    private StudyWrapper study;
+    private StudyWrapper study = new StudyWrapper(
+        SessionManager.getAppService());
 
     private ClinicAddInfoTable contactEntryTable;
 
     private List<StudyEventAttrCustom> pvCustomInfoList;
 
     private AliquotedSpecimenEntryInfoTable aliquotedSpecimenEntryTable;
-
-    private BgcBaseText commentText;
 
     private BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
@@ -96,7 +98,10 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private SourceSpecimenEntryInfoTable sourceSpecimenEntryTable;
 
-    private CommentCollectionInfoTable commentEntryTable;
+    private CommentsInfoTable commentEntryTable;
+
+    private CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
 
     private StudyInfo studyInfo;
 
@@ -120,26 +125,30 @@ public class StudyEntryForm extends BiobankEntryForm {
             tabName = Messages.StudyEntryForm_title_new;
             study.setActivityStatus(ActivityStatus.ACTIVE);
         } else {
-            tabName = NLS.bind(Messages.StudyEntryForm_title_edit,
-                study.getNameShort());
+            tabName =
+                NLS.bind(Messages.StudyEntryForm_title_edit,
+                    study.getNameShort());
         }
         setPartName(tabName);
     }
 
     private void updateStudyInfo(Integer id) throws Exception {
         if (id != null) {
-            studyInfo = SessionManager.getAppService().doAction(
-                new StudyGetInfoAction(id));
-            study = new StudyWrapper(SessionManager.getAppService(),
-                studyInfo.study);
+            studyInfo =
+                SessionManager.getAppService().doAction(
+                    new StudyGetInfoAction(id));
+            study.setWrappedObject(studyInfo.getStudy());
+            SessionManager.logLookup(studyInfo.getStudy());
         } else {
             studyInfo = new StudyInfo();
-            study = new StudyWrapper(SessionManager.getAppService());
+            study.setWrappedObject(new Study());
         }
 
+        comment.setWrappedObject(new Comment());
+
         List<SpecimenType> specimenTypes =
-            SessionManager.getAppService().doAction(
-                new SpecimenTypeGetAllAction()).getList();
+            SessionManager.getAppService()
+                .doAction(new SpecimenTypeGetAllAction()).getList();
         specimenTypeWrappers =
             ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
                 specimenTypes, SpecimenTypeWrapper.class);
@@ -170,16 +179,17 @@ public class StudyEntryForm extends BiobankEntryForm {
             StudyPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 Messages.StudyEntryForm_nameShort_validator_msg));
 
-        activityStatusComboViewer = createComboViewer(client,
-            Messages.label_activity, ActivityStatus.valuesList(),
-            study.getActivityStatus(),
-            Messages.StudyEntryForm_activity_validator_msg,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    study.setActivityStatus((ActivityStatus) selectedObject);
-                }
-            });
+        activityStatusComboViewer =
+            createComboViewer(client, Messages.label_activity,
+                ActivityStatus.valuesList(), study.getActivityStatus(),
+                Messages.StudyEntryForm_activity_validator_msg,
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        study
+                            .setActivityStatus((ActivityStatus) selectedObject);
+                    }
+                });
 
         createCommentSection();
         createClinicSection();
@@ -210,22 +220,23 @@ public class StudyEntryForm extends BiobankEntryForm {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentCollectionInfoTable(client,
-            study.getCommentCollection(false));
+        commentEntryTable =
+            new CommentsInfoTable(client, study.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        commentText = (BgcBaseText) createLabelledWidget(
-            client, BgcBaseText.class, SWT.MULTI, Messages.Comments_add);
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
+            Messages.Comments_add, null, comment, "message", null);
     }
 
     private void createSourceSpecimensSection() {
         Section section =
             createSection(Messages.StudyEntryForm_source_specimens_title);
-        sourceSpecimenEntryTable = new SourceSpecimenEntryInfoTable(section,
-            study, specimenTypeWrappers);
+        sourceSpecimenEntryTable =
+            new SourceSpecimenEntryInfoTable(section, study,
+                specimenTypeWrappers);
         sourceSpecimenEntryTable.adaptToToolkit(toolkit, true);
         sourceSpecimenEntryTable.addSelectionChangedListener(listener);
 
@@ -243,8 +254,8 @@ public class StudyEntryForm extends BiobankEntryForm {
     private void createAliquotedSpecimensSection() {
         Section section =
             createSection(Messages.StudyEntryForm_aliquoted_specimens_title);
-        aliquotedSpecimenEntryTable = new AliquotedSpecimenEntryInfoTable(
-            section, study);
+        aliquotedSpecimenEntryTable =
+            new AliquotedSpecimenEntryInfoTable(section, study);
         aliquotedSpecimenEntryTable.adaptToToolkit(toolkit, true);
         aliquotedSpecimenEntryTable.addSelectionChangedListener(listener);
 
@@ -270,8 +281,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         StudyEventAttrCustom studyEventAttrCustom;
 
-        List<String> studyEventInfoLabels = Arrays.asList(study
-            .getStudyEventAttrLabels());
+        List<String> studyEventInfoLabels =
+            Arrays.asList(study.getStudyEventAttrLabels());
 
         for (GlobalEventAttrWrapper geAttr : GlobalEventAttrWrapper
             .getAllGlobalEventAttrs(SessionManager.getAppService())) {
@@ -286,12 +297,14 @@ public class StudyEntryForm extends BiobankEntryForm {
                     .getStudyEventAttr(label).getId());
                 studyEventAttrCustom.setAllowedValues(study
                     .getStudyEventAttrPermissible(label));
-                selected = study.getStudyEventAttrActivityStatus(label).equals(
-                    ActivityStatus.ACTIVE);
+                selected =
+                    study.getStudyEventAttrActivityStatus(label).equals(
+                        ActivityStatus.ACTIVE);
             }
             studyEventAttrCustom.setIsDefault(false);
-            studyEventAttrCustom.widget = new EventAttrWidget(client, SWT.NONE,
-                studyEventAttrCustom, selected);
+            studyEventAttrCustom.widget =
+                new EventAttrWidget(client, SWT.NONE, studyEventAttrCustom,
+                    selected);
             studyEventAttrCustom.widget.addSelectionChangedListener(listener);
             studyEventAttrCustom.inStudy = studyEventInfoLabels.contains(label);
             pvCustomInfoList.add(studyEventAttrCustom);
@@ -329,13 +342,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         saveAction.setSourceSpecimenSaveInfo(getSourceSpecimenInfos());
         saveAction.setAliquotSpecimenSaveInfo(getAliquotedSpecimenInfos());
         saveAction.setStudyEventAttrSaveInfo(getStudyEventAttrInfos());
-
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                saveAction.setCommentText(commentText.getText());
-            }
-        });
+        saveAction.setCommentText(comment.getMessage());
 
         Integer id =
             SessionManager.getAppService().doAction(saveAction).getId();
@@ -443,7 +450,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return StudyViewForm.ID;
     }
 
@@ -457,13 +464,13 @@ public class StudyEntryForm extends BiobankEntryForm {
         contactEntryTable.reload();
         aliquotedSpecimenEntryTable.reload();
         sourceSpecimenEntryTable.reload();
-        commentText.setText(null);
+        commentEntryTable.setList(study.getCommentCollection(false));
         resetPvCustomInfo();
     }
 
     private void resetPvCustomInfo() throws Exception {
-        List<String> studyPvInfoLabels = Arrays.asList(study
-            .getStudyEventAttrLabels());
+        List<String> studyPvInfoLabels =
+            Arrays.asList(study.getStudyEventAttrLabels());
 
         for (StudyEventAttrCustom studyPvAttrCustom : pvCustomInfoList) {
             boolean selected = false;

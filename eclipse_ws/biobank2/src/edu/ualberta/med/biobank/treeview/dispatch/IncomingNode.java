@@ -6,7 +6,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -19,7 +18,7 @@ public class IncomingNode extends AdapterBase {
     private ReceivingWithErrorsDispatchGroup receivingWithErrorsNode;
     private ReceivingRequestGroup requestNode;
 
-    public IncomingNode(AdapterBase parent, int id, CenterWrapper<?> center) {
+    public IncomingNode(AdapterBase parent, int id) {
         super(parent, id, Messages.IncomingNode_incoming_node_label, true);
         receivedTransitNode = new ReceivingInTransitDispatchGroup(this, 0);
         receivedTransitNode.setParent(this);
@@ -68,11 +67,6 @@ public class IncomingNode extends AdapterBase {
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return 0;
     }
 
     @Override

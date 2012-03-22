@@ -21,15 +21,15 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.CommentCollectionInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicViewForm extends AddressViewFormCommon {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ClinicViewForm"; //$NON-NLS-1$
 
-    private ClinicWrapper clinic;
+    private ClinicWrapper clinic =
+        new ClinicWrapper(SessionManager.getAppService());
 
     private ContactInfoTable contactsTable;
 
@@ -43,7 +43,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private BgcBaseText activityStatusLabel;
 
-    private CommentCollectionInfoTable commentTable;
+    private CommentsInfoTable commentTable;
 
     private BgcBaseText patientTotal;
 
@@ -70,8 +70,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
             new ClinicGetInfoAction(adapter.getId()));
         Assert.isNotNull(clinicInfo);
         Assert.isNotNull(clinicInfo.clinic);
-        clinic =
-            new ClinicWrapper(SessionManager.getAppService(), clinicInfo.clinic);
+        clinic.setWrappedObject(clinicInfo.clinic);
 
         studyCountInfo =
             SessionManager.getAppService().doAction(
@@ -144,13 +143,13 @@ public class ClinicViewForm extends AddressViewFormCommon {
     private void createCommentsSection() {
         Composite client = createSectionWithClient(Messages.label_comments);
         commentTable =
-            new CommentCollectionInfoTable(client,
+            new CommentsInfoTable(client,
                 clinic.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
     }
 
-    protected void createStudiesSection() throws ApplicationException {
+    protected void createStudiesSection() {
         Composite client =
             createSectionWithClient(Messages.ClinicViewForm_studies_title);
 
