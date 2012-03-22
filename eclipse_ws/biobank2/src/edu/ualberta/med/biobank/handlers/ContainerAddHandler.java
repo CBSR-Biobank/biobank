@@ -19,7 +19,9 @@ public class ContainerAddHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        ContainerAdapter containerAdapter = new ContainerAdapter(null, null);
+        ContainerAdapter containerAdapter =
+            new ContainerAdapter(null, new ContainerWrapper(
+                SessionManager.getAppService()));
         ((ContainerWrapper) containerAdapter.getModelObject())
             .setSite(SessionManager.getUser().getCurrentWorkingSite());
         containerAdapter.openEntryForm(false);
@@ -37,7 +39,8 @@ public class ContainerAddHandler extends AbstractHandler {
             return SessionManager.getInstance().getSession() != null &&
                 createAllowed;
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.HandlerPermission_error, Messages.HandlerPermission_message);
+            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
+                Messages.HandlerPermission_message);
             return false;
         }
     }

@@ -39,7 +39,7 @@ insert into group_user(user_id, group_id)
 
 -- add a group membership for site CBSR (id = 34)
 insert into membership (id, version, center_id, not_null_center_id, not_null_study_id, principal_id,rank,level)
-       select coalesce(MAX(ms.id), 0)+1, 0, 34, 34, 0, max(p.id) ,2,999
+       select coalesce(MAX(ms.id), 0)+1, 0, 34, 34, 0, max(p.id) ,0,999
        from membership as ms, principal as p;
 
 -- add a role
