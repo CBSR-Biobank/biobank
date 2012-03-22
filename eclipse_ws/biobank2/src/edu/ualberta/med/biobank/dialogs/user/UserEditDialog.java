@@ -291,6 +291,8 @@ public class UserEditDialog extends BgcBaseDialog {
                             .getMessage();
                 }
 
+                t.printStackTrace();
+
                 BgcPlugin.openAsyncError(
                     Messages.UserEditDialog_save_error_title, message);
             }

@@ -288,10 +288,10 @@ public class UserSaveAction implements Action<IdResult> {
         private final Integer centerId;
         private final Integer studyId;
 
-        private MembershipDomain(Membership membership) {
-            this.membership = membership;
-            this.centerId = membership.getCenter().getId();
-            this.studyId = membership.getStudy().getId();
+        private MembershipDomain(Membership m) {
+            this.membership = m;
+            this.centerId = m.getCenter() != null ? m.getCenter().getId() : 0;
+            this.studyId = m.getStudy() != null ? m.getStudy().getId() : 0;
         }
 
         public Membership getMembership() {
