@@ -193,7 +193,8 @@ public class UserEditDialog extends BgcBaseDialog {
         gd.horizontalAlignment = SWT.RIGHT;
         addButton.setLayoutData(gd);
 
-        membershipInfoTable = new MembershipInfoTable(contents, originalUser);
+        membershipInfoTable =
+            new MembershipInfoTable(contents, originalUser, managerContext);
     }
 
     private void createGroupsSection(Composite contents)
