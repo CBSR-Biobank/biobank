@@ -63,13 +63,8 @@ public class UserGetAction implements Action<UserGetOutput> {
         Set<Role> rolesScope;
         for (Membership m : src.getMemberships()) {
             if (m.isPartiallyManageable(executingUser)) {
-                // TODO: what are the implications of evict?
-                context.getSession().evict(m);
-                context.getSession().evict(m.getPermissions());
-                context.getSession().evict(m.getRoles());
-
-                dst.getMemberships().add(m);
-                m.setPrincipal(dst);
+                Membership copy = new Membership(m, dst);
+                copy.setId(m.getId());
 
                 // limit permission and role scope to manageable ones
                 permsScope = m.getManageablePermissions(executingUser);
@@ -86,9 +81,12 @@ public class UserGetAction implements Action<UserGetOutput> {
 
         for (Group g : src.getGroups()) {
             if (g.isFullyManageable(executingUser)) {
-                // TODO: what are the implications of evict?
-                context.getSession().evict(g);
-                dst.getGroups().add(g);
+                Group copy = new Group();
+                copy.setId(g.getId());
+                copy.setName(g.getName());
+                copy.setDescription(g.getDescription());
+
+                dst.getGroups().add(copy);
             }
         }
     }
