@@ -170,11 +170,24 @@ public enum PermissionEnum implements NotAProxy, Serializable {
         return false;
     }
 
+    /**
+     * This is a confusing check. If {@link Center} is null, it means we do not
+     * care about its value. If {@link Membership#getCenter()} is null, we don't
+     * care about the {@link Center} parameter's value. If neither is null, then
+     * they must be equal, because we care about the {@link Center} paramter's
+     * value, and it must match the {@link Membership#getCenter()} value. The
+     * same applies to {@link Study}.
+     * 
+     * @param membership
+     * @param center
+     * @param study
+     * @return
+     */
     private boolean isMembershipAllowed(Membership membership, Center center,
         Study study) {
-        boolean hasCenter = membership.getCenter() == null
+        boolean hasCenter = center == null || membership.getCenter() == null
             || membership.getCenter().equals(center);
-        boolean hasStudy = membership.getStudy() == null
+        boolean hasStudy = study == null || membership.getStudy() == null
             || membership.getStudy().equals(study);
         boolean hasPermission = membership.getAllPermissions().contains(this);
 
