@@ -121,7 +121,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private NonEmptyStringValidator palletLabelValidator;
     private BgcBaseText palletPositionText;
     protected boolean useNewProductBarcode;
-    private ContainerWrapper containerToRemove;
     private ComboViewer palletTypesViewer;
     protected boolean palletPositionTextModified;
     private List<ContainerTypeWrapper> palletContainerTypes;
@@ -971,9 +970,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     private void saveMultipleSpecimens() throws Exception {
         if (saveEvenIfMissing) {
-            if (containerToRemove != null) {
-                containerToRemove.delete();
-            }
             SpecimenAssignResInfo res;
             try {
                 Map<RowColPos, PalletCell> cells = getCells();

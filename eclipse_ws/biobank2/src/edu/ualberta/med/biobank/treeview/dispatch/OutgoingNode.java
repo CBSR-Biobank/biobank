@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchCreatePermission;
-import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -25,7 +24,7 @@ public class OutgoingNode extends AdapterBase {
     private SentInTransitDispatchGroup sentTransitNode;
     private Boolean createAllowed;
 
-    public OutgoingNode(AdapterBase parent, int id, CenterWrapper<?> center) {
+    public OutgoingNode(AdapterBase parent, int id) {
         super(parent, id, Messages.OutgoingNode_outgoing_node_label, true);
         creationNode = new InCreationDispatchGroup(this, 0);
         creationNode.setParent(this);

@@ -121,10 +121,10 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         containerType.getCapacity().setRowCapacity(rowCapacity);
         containerType.getCapacity().setColCapacity(colCapacity);
         containerType.setDefaultTemperature(defaultTemperature);
+        containerType.setActivityStatus(activityStatus);
 
         addComment(context, containerType);
         setChildLabelingScheme(context, containerType);
-        setActivityStatus(context, containerType);
         setContents(context, containerType);
 
         context.getSession().save(containerType);
@@ -158,11 +158,6 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         ContainerLabelingScheme childLabelingScheme =
             context.load(ContainerLabelingScheme.class, childLabelingSchemeId);
         containerType.setChildLabelingScheme(childLabelingScheme);
-    }
-
-    private void setActivityStatus(ActionContext context,
-        ContainerType containerType) {
-        containerType.setActivityStatus(activityStatus);
     }
 
     private void setContents(ActionContext context, ContainerType containerType) {

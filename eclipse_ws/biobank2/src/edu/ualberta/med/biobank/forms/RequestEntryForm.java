@@ -127,7 +127,7 @@ public class RequestEntryForm extends BiobankViewForm {
         s.setClient(c);
         c.setLayout(new GridLayout());
         c.setLayoutData(new GridData());
-        createSpecimensSelectionActions(c, false);
+        createSpecimensSelectionActions(c);
 
         specimensTree = new RequestSpecimensTreeTable(c, request);
         specimensTree.addListener(SWT.CHANGED, new Listener() {
@@ -241,8 +241,7 @@ public class RequestEntryForm extends BiobankViewForm {
         return dispatchTable.getSelection();
     }
 
-    protected void createSpecimensSelectionActions(Composite composite,
-        boolean setAsFirstControl) {
+    protected void createSpecimensSelectionActions(Composite composite) {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
         toolkit.createLabel(addComposite,
