@@ -36,51 +36,16 @@ public class UserGetAction implements Action<UserGetOutput> {
 
         User copy = new User();
 
-        ManagerContext managerContext = getManagerContext(context);
+        ManagerContext managerContext = new ManagerContextGetAction(
+            new ManagerContextGetInput()).run(context).getContext();
 
         copyProperties(user, copy);
         copyMemberships(user, copy, context, managerContext.getRoles());
         copyGroups(user, copy, context);
 
-        return new UserGetOutput(copy, managerContext);
-    }
+        boolean isFullyManageable = user.isFullyManageable(context.getUser());
 
-    private ManagerContext getManagerContext(ActionContext context) {
-        User manager = context.getUser();
-
-        initManager(manager);
-
-        Set<Role> allRoles = new RoleGetAllAction(new RoleGetAllInput())
-            .run(context).getAllRoles();
-        Set<Group> manageableGroups = new GroupGetAllAction(
-            new GroupGetAllInput())
-            .run(context)
-            .getAllManageableGroups();
-
-        return new ManagerContext(manager, allRoles, manageableGroups);
-    }
-
-    /**
-     * Ensure all necessary areas of the {@link User} are initialized.
-     * 
-     * @param manager
-     */
-    private void initManager(User manager) {
-        Hibernate.initialize(manager);
-        initMemberships(manager.getMemberships());
-        for (Group group : manager.getGroups()) {
-            initMemberships(group.getMemberships());
-        }
-    }
-
-    private void initMemberships(Set<Membership> memberships) {
-        for (Membership membership : memberships) {
-            Hibernate.initialize(membership.getPermissions());
-            Hibernate.initialize(membership.getRoles());
-            for (Role role : membership.getRoles()) {
-                Hibernate.initialize(role.getPermissions());
-            }
-        }
+        return new UserGetOutput(copy, managerContext, isFullyManageable);
     }
 
     private void copyProperties(User src, User dst) {
@@ -100,13 +65,11 @@ public class UserGetAction implements Action<UserGetOutput> {
         Set<Role> rolesScope;
         for (Membership m : src.getMemberships()) {
             if (m.isPartiallyManageable(executingUser)) {
-                // TODO: what are the implications of evict?
-                context.getSession().evict(m);
-                context.getSession().evict(m.getPermissions());
-                context.getSession().evict(m.getRoles());
+                Membership copy = new Membership(m, dst);
+                copy.setId(m.getId());
 
-                dst.getMemberships().add(m);
-                m.setPrincipal(dst);
+                Hibernate.initialize(copy.getCenter());
+                Hibernate.initialize(copy.getStudy());
 
                 // limit permission and role scope to manageable ones
                 permsScope = m.getManageablePermissions(executingUser);
@@ -123,9 +86,12 @@ public class UserGetAction implements Action<UserGetOutput> {
 
         for (Group g : src.getGroups()) {
             if (g.isFullyManageable(executingUser)) {
-                // TODO: what are the implications of evict?
-                context.getSession().evict(g);
-                dst.getGroups().add(g);
+                Group copy = new Group();
+                copy.setId(g.getId());
+                copy.setName(g.getName());
+                copy.setDescription(g.getDescription());
+
+                dst.getGroups().add(copy);
             }
         }
     }

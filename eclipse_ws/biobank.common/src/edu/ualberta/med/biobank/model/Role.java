@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
@@ -53,7 +54,10 @@ public class Role extends AbstractBiobankModel {
         this.permissions = permissions;
     }
 
-    private static class NameComparator implements Comparator<Role> {
+    private static class NameComparator
+        implements Comparator<Role>, Serializable {
+        private static final long serialVersionUID = 1L;
+
         @Override
         public int compare(Role a, Role b) {
             if (a == null && b == null) return 0;

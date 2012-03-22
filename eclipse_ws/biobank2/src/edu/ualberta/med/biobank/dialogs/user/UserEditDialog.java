@@ -1,7 +1,11 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+
+import javax.validation.ConstraintViolationException;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
@@ -17,6 +21,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
@@ -24,18 +29,24 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.client.util.BiobankProxyHelperImpl;
+import edu.ualberta.med.biobank.common.action.security.ManagerContext;
+import edu.ualberta.med.biobank.common.action.security.UserGetOutput;
+import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
+import edu.ualberta.med.biobank.common.action.security.UserSaveInput;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
-import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.validators.EmailValidator;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.handlers.LogoutHandler;
+import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.validators.EmptyStringValidator;
 import edu.ualberta.med.biobank.validators.MatchingTextValidator;
 import edu.ualberta.med.biobank.validators.OrValidator;
@@ -50,17 +61,22 @@ public class UserEditDialog extends BgcBaseDialog {
 
     private static final String MSG_PASSWORD_REQUIRED = NLS.bind(
         Messages.UserEditDialog_passwords_length_msg, PASSWORD_LENGTH_MIN);
+    private ManagerContext managerContext;
+    private final boolean isFullyManageable;
 
     private UserWrapper originalUser = new UserWrapper(null);
     private MembershipInfoTable membershipInfoTable;
     private MultiSelectWidget<GroupWrapper> groupsWidget;
 
-    public UserEditDialog(Shell parent, UserWrapper originalUser) {
+    public UserEditDialog(Shell parent, UserGetOutput output) {
         super(parent);
 
         Assert.isNotNull(originalUser);
 
-        this.originalUser = originalUser;
+        this.managerContext = output.getContext();
+        this.originalUser =
+            new UserWrapper(SessionManager.getAppService(), output.getUser());
+        this.isFullyManageable = output.isFullyManageable();
 
         if (originalUser.isNew()) {
             originalUser.setNeedPwdChange(true);
@@ -118,27 +134,47 @@ public class UserEditDialog extends BgcBaseDialog {
     }
 
     private void createUserFields(Composite contents) {
-        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
+        int readOnly = 0;
+
+        if (!isFullyManageable) {
+            readOnly = SWT.READ_ONLY;
+        }
+
+        Collection<Control> controls = new ArrayList<Control>();
+
+        controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
+            SWT.BORDER | readOnly,
             Messages.UserEditDialog_login_label, null, originalUser,
             UserPeer.LOGIN.getName(), new NonEmptyStringValidator(
-                Messages.UserEditDialog_loginName_validation_msg));
+                Messages.UserEditDialog_loginName_validation_msg)));
 
-        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
+        controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
+            SWT.BORDER | readOnly,
             Messages.UserEditDialog_firstName_label, null, originalUser,
             UserPeer.FULL_NAME.getName(), new NonEmptyStringValidator(
-                Messages.UserEditDialog_fullName_validator_msg));
+                Messages.UserEditDialog_fullName_validator_msg)));
 
-        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
+        controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
+            SWT.BORDER | readOnly,
             Messages.UserEditDialog_Email_label, null, originalUser,
             UserPeer.EMAIL.getName(), new EmailValidator(
-                Messages.UserEditDialog_email_validator_msg));
+                Messages.UserEditDialog_email_validator_msg)));
 
-        createBoundWidgetWithLabel(contents, Button.class, SWT.CHECK,
+        Control checkbox = createBoundWidgetWithLabel(contents, Button.class,
+            SWT.CHECK | readOnly,
             Messages.UserEditDialog_bulkemail_label, null, originalUser,
             UserPeer.RECV_BULK_EMAILS.getName(), null);
+        controls.add(checkbox);
 
-        if (!originalUser.equals(SessionManager.getUser()))
-            createPasswordWidgets(contents);
+        if (!isFullyManageable) {
+            for (Control c : controls) {
+                c.setBackground(BgcWidgetCreator.READ_ONLY_TEXT_BGR);
+            }
+            checkbox.setEnabled(false);
+        } else {
+            if (!originalUser.equals(SessionManager.getUser()))
+                createPasswordWidgets(contents);
+        }
     }
 
     private void createMembershipsSection(Composite contents) {
@@ -198,29 +234,21 @@ public class UserEditDialog extends BgcBaseDialog {
         // try saving or updating the user inside this dialog so that if there
         // is an error the entered information is not lost
         try {
-            // FIXME tried to add
-            // "tasks.persistAdded(this, UserPeer.GROUP_COLLECTION);" in
-            // "addPersistTasks" method of userwrapper but didn't work.
-            // The following is working fine, but do we want to generalize it?
 
-            WrapperTransaction tx = new WrapperTransaction(
-                SessionManager.getAppService());
-            tx.persist(originalUser);
+            originalUser.addToGroupCollection(groupsWidget
+                .getAddedToSelection());
+            originalUser.removeFromGroupCollection(groupsWidget
+                .getRemovedFromSelection());
 
-            for (GroupWrapper g : groupsWidget.getAddedToSelection()) {
-                g.addToUserCollection(Arrays.asList(originalUser));
-                tx.persist(g);
-            }
+            User userModel = originalUser.getWrappedObject();
 
-            for (GroupWrapper g : groupsWidget.getRemovedFromSelection()) {
-                g.removeFromUserCollection(Arrays.asList(originalUser));
-                tx.persist(g);
-            }
-            // add into group after persisting because user needs to be created
-            // first
+            User unproxied = (User) new BiobankProxyHelperImpl()
+                .convertToObject(userModel);
 
-            // FIXME: commented this out to get rid of warning - NL
-            // tx.commit();
+            SessionManager.getAppService()
+                .doAction(
+                    new UserSaveAction(new UserSaveInput(unproxied,
+                        managerContext)));
 
             if (SessionManager.getUser().equals(originalUser)) {
                 // if the User is making changes to himself, logout
@@ -238,15 +266,24 @@ public class UserEditDialog extends BgcBaseDialog {
                 setReturnCode(OK);
             }
             close();
-        } catch (Exception e) {
-            if (e.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
+        } catch (Throwable t) {
+            if (t.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
+                t.printStackTrace();
                 BgcPlugin.openAsyncError(
                     Messages.UserEditDialog_save_error_title, MessageFormat
                         .format(Messages.UserEditDialog_login_unique_error_msg,
                             originalUser.getLogin()));
             } else {
+                String message = t.getMessage();
+
+                if (t.getCause() instanceof ConstraintViolationException) {
+                    message =
+                        ((ConstraintViolationException) t.getCause())
+                            .getMessage();
+                }
+
                 BgcPlugin.openAsyncError(
-                    Messages.UserEditDialog_save_error_title, e);
+                    Messages.UserEditDialog_save_error_title, message);
             }
         }
     }

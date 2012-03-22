@@ -3,11 +3,14 @@ package edu.ualberta.med.biobank.common.action.security;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.common.action.security.Action2p0.ActionInput;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.util.IdUtil;
 
-public class UserSaveInput {
+public class UserSaveInput implements ActionInput {
+    private static final long serialVersionUID = 1L;
+
     private final Integer userId;
     private final String login;
     private final String password = null; // TODO: get this, use hash?
@@ -24,7 +27,7 @@ public class UserSaveInput {
             throw new IllegalArgumentException("null user");
         if (context == null)
             throw new IllegalArgumentException("null context");
-        
+
         this.userId = user.getId();
 
         this.login = user.getLogin();

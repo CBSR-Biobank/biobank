@@ -11,6 +11,8 @@ import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.util.SetDiff;
+import edu.ualberta.med.biobank.util.SetDiff.Pair;
 
 public class GroupSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
@@ -41,14 +43,11 @@ public class GroupSaveAction implements Action<IdResult> {
         group.getUsers().clear();
         group.getUsers().addAll(users);
 
-        /** Overwrite all {@link Membership}-s. */
-        group.getMemberships().clear();
-        for (Membership m : input.getMemberships()) {
-            m.setPrincipal(group);
-            group.getMemberships().add(m);
-        }
+        setMemberships(context, group);
 
         checkFullyManageable(group, executingUser);
+
+        context.getSession().saveOrUpdate(group);
 
         return new IdResult(group.getId());
     }
@@ -57,6 +56,41 @@ public class GroupSaveAction implements Action<IdResult> {
         if (!group.isFullyManageable(executingUser)) {
             // TODO: better message
             throw new ActionException("group is not manageable");
+        }
+    }
+
+    private void setMemberships(ActionContext context, Group group) {
+        SetDiff<Membership> diff = new SetDiff<Membership>(
+            group.getMemberships(), input.getMemberships());
+
+        for (Membership m : diff.getRemovals()) {
+            group.getMemberships().remove(m);
+            context.getSession().delete(m);
+        }
+
+        for (Membership m : diff.getAdditions()) {
+            group.getMemberships().add(m);
+            m.setPrincipal(group);
+        }
+
+        for (Pair<Membership> pair : diff.getIntersection()) {
+            Membership oldM = pair.getOld();
+            Membership newM = pair.getNew();
+
+            oldM.getPermissions().clear();
+            oldM.getPermissions().addAll(newM.getPermissions());
+
+            oldM.getRoles().clear();
+            oldM.getRoles().addAll(newM.getRoles());
+
+            oldM.setRank(newM.getRank());
+            oldM.setLevel(newM.getLevel());
+            oldM.setCenter(newM.getCenter());
+            oldM.setStudy(newM.getStudy());
+        }
+
+        for (Membership m : group.getMemberships()) {
+            m.reducePermissions();
         }
     }
 }

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.action.security;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
 
@@ -17,7 +18,9 @@ import edu.ualberta.med.biobank.model.User;
  * 
  * @author Jonathan Ferland
  */
-public class ManagerContext {
+public class ManagerContext implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final User manager;
     private final Set<Role> roles;
     private final Set<Group> groups;

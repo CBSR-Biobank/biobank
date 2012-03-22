@@ -12,12 +12,18 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.security.ManagerContext;
+import edu.ualberta.med.biobank.common.action.security.ManagerContextGetAction;
+import edu.ualberta.med.biobank.common.action.security.ManagerContextGetInput;
+import edu.ualberta.med.biobank.common.action.security.ManagerContextGetOutput;
+import edu.ualberta.med.biobank.common.action.security.UserGetOutput;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogWithPages;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.TableFilter;
 import edu.ualberta.med.biobank.widgets.infotables.UserInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class UsersPage extends BgcDialogPage {
 
@@ -88,10 +94,22 @@ public abstract class UsersPage extends BgcDialogPage {
                     .getAppService());
                 user.setRecvBulkEmails(true);
 
+                ManagerContextGetOutput mcOutput = null;
+                try {
+                    mcOutput = SessionManager.getAppService()
+                        .doAction(new ManagerContextGetAction(
+                            new ManagerContextGetInput()));
+                } catch (ApplicationException e) {
+                }
+
+                ManagerContext context = mcOutput.getContext();
+                UserGetOutput output =
+                    new UserGetOutput(user.getWrappedObject(), context, true);
+
                 UserEditDialog dlg =
                     new UserEditDialog(PlatformUI
                         .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                        user);
+                        output);
                 int res = dlg.open();
                 if (res == Status.OK) {
                     BgcPlugin.openAsyncInformation(

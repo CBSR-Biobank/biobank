@@ -44,9 +44,7 @@ public class UserSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        User user = context.load(User.class, input.getUserId());
-
-        createCsmUser(context, user);
+        User user = context.load(User.class, input.getUserId(), new User());
 
         setProperties(context, user);
         setMemberships(context, user);
@@ -58,7 +56,7 @@ public class UserSaveAction implements Action<IdResult> {
     }
 
     private void createCsmUser(ActionContext context, User user) {
-        if (user.isNew()) return;
+        if (!user.isNew()) return;
         if (user.getCsmUserId() != null) return;
         try {
             String password = input.getPassword();
@@ -85,6 +83,8 @@ public class UserSaveAction implements Action<IdResult> {
             user.setNeedPwdChange(input.isNeedPwdChange());
             user.setRecvBulkEmails(input.isRecvBulkEmails());
 
+            createCsmUser(context, user);
+
             String newPw = input.getPassword();
             if (!user.isNew() && newPw != null) {
                 try {
@@ -109,20 +109,20 @@ public class UserSaveAction implements Action<IdResult> {
     private void setMemberships(ActionContext context, User user) {
         SetDiff<MembershipDomain> diff = diffMemberships(user);
 
+        for (MembershipDomain domain : diff.getRemovals()) {
+            Membership membership = domain.getMembership();
+            checkFullyManageable(context, membership);
+
+            user.getMemberships().remove(membership);
+            context.getSession().delete(membership);
+        }
+
         for (MembershipDomain domain : diff.getAdditions()) {
             Membership membership = domain.getMembership();
             checkFullyManageable(context, membership);
 
             user.getMemberships().add(membership);
             membership.setPrincipal(user);
-        }
-
-        for (MembershipDomain domain : diff.getRemovals()) {
-            Membership membership = domain.getMembership();
-            checkFullyManageable(context, membership);
-
-            user.getMemberships().remove(membership);
-            membership.setPrincipal(null);
         }
 
         mergeMemberships(context, diff.getIntersection());
@@ -157,7 +157,7 @@ public class UserSaveAction implements Action<IdResult> {
             // ensure the old (client?) scope can still be modified by the new
             // (server?) scope
             if (!newPermissionScope.containsAll(oldPermissionScope)
-                || newRoleScope.containsAll(oldRoleScope)) {
+                || !newRoleScope.containsAll(oldRoleScope)) {
                 // TODO: better exception
                 throw new ActionException("reduced scope");
             }
@@ -188,8 +188,8 @@ public class UserSaveAction implements Action<IdResult> {
 
     private SetDiff<MembershipDomain> diffMemberships(User user) {
         final Set<MembershipDomain> oldDomains, newDomains;
-        oldDomains = MembershipDomain.from(input.getMemberships());
-        newDomains = MembershipDomain.from(user.getMemberships());
+        oldDomains = MembershipDomain.from(user.getMemberships());
+        newDomains = MembershipDomain.from(input.getMemberships());
         return new SetDiff<MembershipDomain>(oldDomains, newDomains);
     }
 
@@ -200,7 +200,7 @@ public class UserSaveAction implements Action<IdResult> {
         Set<Group> contextGroups = input.getContext().getGroups();
         Set<Integer> contextGroupIds = IdUtil.getIds(contextGroups);
 
-        if (!contextGroups.containsAll(input.getGroupIds())) {
+        if (!contextGroupIds.containsAll(input.getGroupIds())) {
             // TODO: better exception
             throw new ActionException("found groups out of context");
         }
@@ -281,7 +281,7 @@ public class UserSaveAction implements Action<IdResult> {
      * 
      * @author Jonathan Ferland
      */
-    private static class MembershipDomain {
+    public static class MembershipDomain {
         private final Membership membership;
         private final Integer centerId;
         private final Integer studyId;
@@ -333,7 +333,7 @@ public class UserSaveAction implements Action<IdResult> {
             Set<MembershipDomain> domains = new HashSet<MembershipDomain>();
             for (Membership m : memberships) {
                 MembershipDomain d = new MembershipDomain(m);
-                if (domains.add(d)) {
+                if (!domains.add(d)) {
                     throw new IllegalArgumentException("duplicate domain " + d);
                 }
             }

@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Hibernate;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
 
@@ -303,6 +304,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             id = getId();
 
             DetachedCriteria c = DetachedCriteria.forClass(getWrappedClass())
+                .setResultTransformer(
+                    CriteriaSpecification.DISTINCT_ROOT_ENTITY)
                 .add(Restrictions.idEq(id));
 
             list = appService.query(c);
@@ -315,7 +318,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             return list.get(0);
         }
         throw new BiobankException(MessageFormat.format(
-            "Found {0} objects of type {1} with id={2}" + list.size(), //$NON-NLS-1$
+            "Found {0} objects of type {1} with id={2}", list.size(), //$NON-NLS-1$
             getWrappedClass().getName(), id));
     }
 

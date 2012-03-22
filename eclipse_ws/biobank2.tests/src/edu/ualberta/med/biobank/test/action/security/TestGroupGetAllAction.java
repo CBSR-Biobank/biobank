@@ -37,7 +37,7 @@ public class TestGroupGetAllAction extends TestAction {
         User user = factory.createUser();
         factory.createMembership(Domain.CENTER_STUDY, Rank.ADMINISTRATOR);
         tx.commit();
-        
+
         execAs(user, new GroupGetAllAction(new GroupGetAllInput()));
     }
 
@@ -46,7 +46,7 @@ public class TestGroupGetAllAction extends TestAction {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
         tx.commit();
-        
+
         try {
             execAs(user, new GroupGetAllAction(new GroupGetAllInput()));
             Assert.fail();
@@ -60,7 +60,7 @@ public class TestGroupGetAllAction extends TestAction {
         User user = factory.createUser();
         factory.createMembership(Domain.CENTER_STUDY, Rank.MANAGER);
         tx.commit();
-        
+
         execAs(user, new GroupGetAllAction(new GroupGetAllInput()));
     }
 
@@ -111,6 +111,9 @@ public class TestGroupGetAllAction extends TestAction {
         GroupGetAllOutput output =
             exec(new GroupGetAllAction(new GroupGetAllInput()));
 
+        Assert.assertFalse("expected at least one group",
+            output.getAllManageableGroups().isEmpty());
+
         for (Group group : output.getAllManageableGroups()) {
             group.getId();
             group.getName();
@@ -144,6 +147,7 @@ public class TestGroupGetAllAction extends TestAction {
         }
     }
 
+    @SuppressWarnings("unused")
     @Test
     public void domainSpecific() {
         Transaction tx = session.beginTransaction();

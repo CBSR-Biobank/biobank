@@ -78,6 +78,7 @@ public class TestDb extends TestBase {
 
         Membership membership = new Membership();
         membership.setRank(Rank.ADMINISTRATOR);
+        membership.setLevel(Membership.MAX_LEVEL);
         membership.setPrincipal(globalAdmin);
         globalAdmin.getMemberships().add(membership);
 

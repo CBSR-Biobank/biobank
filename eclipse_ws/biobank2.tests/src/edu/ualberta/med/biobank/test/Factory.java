@@ -301,6 +301,7 @@ public class Factory {
         site.getAddress().setCity("testville");
 
         setDefaultSite(site);
+        setDefaultCenter(site);
         session.save(site);
         session.flush();
         return site;
