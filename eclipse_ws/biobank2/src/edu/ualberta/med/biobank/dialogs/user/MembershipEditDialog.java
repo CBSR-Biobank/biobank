@@ -420,7 +420,9 @@ public class MembershipEditDialog extends BgcBaseDialog {
 
         StudyWrapper oldSelection = getStudySelection();
         studiesViewer.setInput(wrappedStudies);
-        studiesViewer.setSelection(new StructuredSelection(oldSelection));
+        if (oldSelection != null) {
+            studiesViewer.setSelection(new StructuredSelection(oldSelection));
+        }
         studiesViewer.refresh();
     }
 
