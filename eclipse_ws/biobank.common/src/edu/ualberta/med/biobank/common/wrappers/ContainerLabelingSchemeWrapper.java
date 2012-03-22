@@ -569,6 +569,10 @@ public class ContainerLabelingSchemeWrapper extends
         case 5:
             // Box81
             return cbsrSbsToRowCol(appService, position);
+        case 6:
+            // 2 char alphabetic
+            return twoCharToRowCol(appService, position, rowCapacity,
+                colCapacity, null);
         }
         return null;
     }
