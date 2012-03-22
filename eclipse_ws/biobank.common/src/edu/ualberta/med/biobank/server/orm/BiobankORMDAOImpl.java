@@ -175,9 +175,10 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
     }
 
     public Boolean isAllowed(Permission permission) {
+        Session s = getSession();
         return permission.isAllowed(new ActionContext(
-            getCurrentUser(getSession()),
-            getSession(),
+            getCurrentUser(s),
+            s,
             null));
     }
 

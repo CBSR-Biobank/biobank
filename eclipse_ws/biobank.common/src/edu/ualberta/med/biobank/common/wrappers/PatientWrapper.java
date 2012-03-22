@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.base.PatientBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.CollectionIsEmptyCheck;
 import edu.ualberta.med.biobank.common.wrappers.checks.NotUsedCheck;
 import edu.ualberta.med.biobank.common.wrappers.loggers.PatientLogProvider;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
@@ -280,22 +281,25 @@ public class PatientWrapper extends PatientBaseWrapper {
     }
 
     public List<ProcessingEventWrapper> getProcessingEventCollection(
+        Center workingCenter,
         boolean originalOnly) {
         List<CollectionEventWrapper> ces = getCollectionEventCollection(false);
         Set<ProcessingEventWrapper> pes = new HashSet<ProcessingEventWrapper>();
         for (CollectionEventWrapper ce : ces)
             if (originalOnly)
                 addProcessingEvents(pes,
-                    ce.getOriginalSpecimenCollection(false));
+                    ce.getOriginalSpecimenCollection(false), workingCenter);
             else
-                addProcessingEvents(pes, ce.getAllSpecimenCollection(false));
+                addProcessingEvents(pes, ce.getAllSpecimenCollection(false),
+                    workingCenter);
         return new ArrayList<ProcessingEventWrapper>(pes);
     }
 
     private void addProcessingEvents(Set<ProcessingEventWrapper> pes,
-        List<SpecimenWrapper> specimens) {
+        List<SpecimenWrapper> specimens, Center workingCenter) {
         for (SpecimenWrapper spec : specimens) {
-            if (spec.getProcessingEvent() != null)
+            if (spec.getProcessingEvent() != null
+                && spec.getProcessingEvent().getCenter().equals(workingCenter))
                 pes.add(spec.getProcessingEvent());
         }
     }

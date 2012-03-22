@@ -26,11 +26,10 @@ insert into csm_user_group_role_pg (user_id, role_id, protection_group_id, updat
 
 -- add limited access group
 insert into principal (id, version, discriminator, name, activity_status_id)
-        select coalesce(MAX(p.id), 0)+1, 0, @GROUP_DISCRIMINATOR, @GROUP_NAME, 1
-        from principal p;
-set @PRINCIPAL_ID = LAST_INSERT_ID();
-
-
+		select coalesce(MAX(p.id), 0)+1, 0, @GROUP_DISCRIMINATOR, @GROUP_NAME, 1
+		from principal p;
+	   
+	   
 -- add user to group
 insert into group_user(user_id, group_id)
        select u.id, g.id
@@ -40,8 +39,8 @@ insert into group_user(user_id, group_id)
 
 -- add a group membership for site CBSR (id = 34)
 insert into membership (id, version, center_id, not_null_center_id, not_null_study_id, principal_id,rank,level)
-       select coalesce(MAX(ms.id), 0)+1, 0, 34, 34, 0, @PRINCIPAL_ID ,2,999
-       from membership as ms;
+       select coalesce(MAX(ms.id), 0)+1, 0, 34, 34, max(p.id) ,2,999
+       from membership as ms, principal as p;
 
 -- add a role
 insert into role (id, version, name)
@@ -58,5 +57,5 @@ insert into role_permission (id, permission_id)
 
 -- add the role to the membership
 insert into membership_role (membership_id, role_id)
-       select max(m.id), max(r.id) from member m, role r
+	select max(m.id), max(r.id) from membership m, role r;
 

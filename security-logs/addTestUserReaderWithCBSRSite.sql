@@ -5,7 +5,7 @@ set @PASSWORD = 'orDBlaojDQE=';
 set @GROUP_NAME = 'CBSR Technician Level 1';
 set @GROUP_DISCRIMINATOR ='BbGroup';
 set @USER_DISCRIMINATOR ='User';
-set @READALL='READ_ALL';
+set @READPERM='READ_ALL';
 
 -- create csm_user
 insert into csm_user (USER_ID, LOGIN_NAME, MIGRATED_FLAG, FIRST_NAME, LAST_NAME, PASSWORD, UPDATE_DATE)
@@ -43,7 +43,7 @@ insert into membership (id, version, center_id, not_null_center_id, not_null_stu
 
 -- add a role
 insert into role (id, version, name)
-       select coalesce(MAX(r.id), 0)+1, 0, @READALL
+		select coalesce(MAX(r.id), 0)+1, 0, @READPERM
        from role r;
 
 -- Add read permissions to the role
