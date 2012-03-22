@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.dialogs.user;
 
 import java.util.HashSet;
 
+import javax.validation.ConstraintViolationException;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -108,6 +110,12 @@ public class RoleEditDialog extends BgcBaseDialog {
                     Messages.RoleEditDialog_msg_error_name_used);
             } else {
                 String message = t.getMessage();
+
+                if (t.getCause() instanceof ConstraintViolationException) {
+                    message =
+                        ((ConstraintViolationException) t.getCause())
+                            .getMessage();
+                }
 
                 BgcPlugin.openAsyncError(
                     Messages.RoleEditDialog_msg_persit_error, message);
