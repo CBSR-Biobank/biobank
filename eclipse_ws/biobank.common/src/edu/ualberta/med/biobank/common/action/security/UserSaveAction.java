@@ -215,8 +215,10 @@ public class UserSaveAction implements Action<IdResult> {
 
             if (input.getGroupIds().contains(group.getId())) {
                 user.getGroups().add(group);
+                group.getUsers().add(user);
             } else {
                 user.getGroups().remove(group);
+                group.getUsers().remove(user);
             }
         }
     }
