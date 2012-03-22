@@ -50,8 +50,8 @@ insert into role (id, version, name)
 create temporary table TECHNICIAN_READ_ALL (perm int);
 insert into TECHNICIAN_READ_ALL values (3),(9),(13),(18),(22),(26),(30),(35),(39),(43),(48),(53),(57),(61),(64),(65),(66),(67);
 insert into role_permission (id, permission_id)
-       select coalesce(MAX(r.id), 0), t.perm
-       from role r, TECHNICIAN_READ_ALL t;
+       select coalesce((select MAX(r.id) from role r), 0), t.perm
+       from TECHNICIAN_READ_ALL t;
 
 -- add the role to the membership
 insert into membership_role (membership_id, role_id)

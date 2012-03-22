@@ -61,8 +61,8 @@ insert into TECHNICIAN_PROCESS values
         (56), (57), (58), (59),
         (66), (67);
 insert into role_permission (id, permission_id)
-       select coalesce(MAX(r.id), 0), t.perm
-       from role r, TECHNICIAN_PROCESS t;
+       select coalesce((select MAX(r.id) from role r), 0), t.perm
+       from TECHNICIAN_PROCESS t;
 
 -- add the role to the membership
 insert into membership_role (membership_id, role_id)
