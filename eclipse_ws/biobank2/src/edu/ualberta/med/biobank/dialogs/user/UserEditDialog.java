@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import javax.validation.ConstraintViolationException;
 
@@ -37,6 +38,7 @@ import edu.ualberta.med.biobank.common.action.security.UserSaveInput;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
@@ -205,8 +207,12 @@ public class UserEditDialog extends BgcBaseDialog {
             }
         };
 
+        List<GroupWrapper> available =
+            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+                managerContext.getGroups(), GroupWrapper.class);
+
         groupsWidget.setSelections(
-            GroupWrapper.getAllGroups(SessionManager.getAppService()),
+            available,
             originalUser.getGroupCollection(false));
     }
 
