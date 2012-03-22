@@ -17,6 +17,9 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.security.UserGetAction;
+import edu.ualberta.med.biobank.common.action.security.UserGetInput;
+import edu.ualberta.med.biobank.common.action.security.UserGetOutput;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.dialogs.user.UserEditDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -153,8 +156,19 @@ public abstract class UserInfoTable extends InfoTableWidget<UserWrapper> {
      * return an integer representing the type of result
      */
     protected int editUser(UserWrapper user) {
+        UserGetOutput output = null;
+
+        try {
+            output = SessionManager.getAppService()
+                .doAction(new UserGetAction(new UserGetInput(user
+                    .getWrappedObject())));
+        } catch (ApplicationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         UserEditDialog dlg = new UserEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), user);
+            .getActiveWorkbenchWindow().getShell(), output);
         int res = dlg.open();
         if (res == Dialog.OK) {
             reloadCollection(getList(), user);
