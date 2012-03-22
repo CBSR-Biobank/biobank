@@ -42,7 +42,8 @@ Bundle-ClassPath: conf/,
  lib/client/hibernate-jpa-2.0-api-1.0.1.Final.jar,
  lib/client/hibernate-validator-4.2.0.Final.jar,
  lib/client/validation-api-1.0.0.GA.jar,
- lib/client/ognl-2.6.7.jar
+ lib/client/ognl-2.6.7.jar,
+ lib/client/jta-1.1.jar
 Bundle-Vendor: AICML
 Export-Package: antlr;
   uses:="antlr.collections.impl,
@@ -160,6 +161,7 @@ Export-Package: antlr;
  gov.nih.nci.system.query,
  gov.nih.nci.system.query.example;uses:="gov.nih.nci.system.query",
  gov.nih.nci.system.query.hibernate,
+ javax.transaction,
  javax.validation,
  net.sf.cglib.proxy,
  org.acegisecurity;uses:="org.springframework.core,org.springframework.context.support",
