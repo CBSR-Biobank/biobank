@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.reports.AdvancedReportDeleteAction;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.forms.ReportEntryForm;
@@ -64,8 +65,10 @@ public class ReportAdapter extends AdapterBase {
                         ((ReportWrapper) getModelObject()).getName()));
                 if (delete) {
                     try {
-                        // FIXME: call to delete is deprecated
-                        // getModelObject().delete();
+                        AdvancedReportDeleteAction action =
+                            new AdvancedReportDeleteAction(getModelObject()
+                                .getId());
+                        SessionManager.getAppService().doAction(action);
                         parent.removeChild(ReportAdapter.this);
                         AdvancedReportsView.getCurrent().reload();
                     } catch (Exception e) {
