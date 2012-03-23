@@ -27,6 +27,7 @@ import org.eclipse.ui.part.ViewPart;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.LogPeer;
+import edu.ualberta.med.biobank.common.permission.logging.LoggingPermission;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.forms.LoggingForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -82,8 +83,16 @@ public class LoggingView extends ViewPart {
         }
     };
 
+    private boolean allowed;
+
     public LoggingView() {
-        //
+        try {
+            this.allowed = SessionManager.getAppService().isAllowed(
+                new LoggingPermission());
+        } catch (ApplicationException e) {
+            BgcPlugin.openAccessDeniedErrorMessage(e);
+            this.allowed = false;
+        }
     }
 
     @Override
@@ -179,30 +188,6 @@ public class LoggingView extends ViewPart {
         locationTextInput.addListener(SWT.Verify, alphaNumericListener);
         locationTextInput.addKeyListener(enterListener);
 
-        /*
-         * new Label(top, SWT.NONE); new Label(top, SWT.NONE);
-         * 
-         * label = new Label(top, SWT.NO_BACKGROUND);
-         * label.setText("Container Type:"); label.setAlignment(SWT.LEFT);
-         * 
-         * containerTypeCombo = new Combo(top, SWT.READ_ONLY);
-         * containerTypeCombo.setItems(this.loadContainerTypeList());
-         * containerTypeCombo.select(0); containerTypeCombo.setVisible(true);
-         * containerTypeCombo .setLayoutData(new
-         * GridData(GridData.FILL_HORIZONTAL));
-         * 
-         * label = new Label(top, SWT.NO_BACKGROUND);
-         * label.setText("Container Label:"); label.setAlignment(SWT.LEFT);
-         * 
-         * labelTextInput = new BiobankText(top, SWT.SINGLE | SWT.BORDER);
-         * labelTextInput.setVisible(true); labelTextInput.setLayoutData(new
-         * GridData( GridData.FILL_HORIZONTAL));
-         * labelTextInput.addListener(SWT.Verify, new Listener() { public void
-         * handleEvent(Event e) { String string = e.text; for (int i = 0; i <
-         * string.length(); i++) { // input must be alpha numeric if
-         * (!(string.matches("\\p{Alnum}+"))) { e.doit = false; return; } } }
-         * });
-         */
         label = new Label(parent, SWT.NO_BACKGROUND);
         label.setText(Messages.LoggingView_details_label);
         label.setAlignment(SWT.LEFT);
@@ -290,7 +275,7 @@ public class LoggingView extends ViewPart {
 
         // if logged in and select the site selected in "working site" combo
         // box, only if not "All Sites" are selected
-        if (SessionManager.getInstance().isConnected()) {
+        if (SessionManager.getInstance().isConnected() && allowed) {
             setEnableAllFields(true);
             loadComboFields();
         } else

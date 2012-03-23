@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.views;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.report.AbstractReportGroup;
@@ -10,13 +12,24 @@ import edu.ualberta.med.biobank.treeview.report.PrivateReportsGroup;
 import edu.ualberta.med.biobank.treeview.report.SharedReportsGroup;
 
 public class AdvancedReportsView extends AbstractAdministrationView {
-    public static final String ID = "edu.ualberta.med.biobank.views.AdvancedReportsView"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.AdvancedReportsView"; //$NON-NLS-1$
 
     private static AdvancedReportsView currentView;
+
+    private boolean allowed = false;
 
     public AdvancedReportsView() {
         currentView = this;
         SessionManager.addView(this);
+        try {
+            if (SessionManager.getInstance().isConnected())
+                this.allowed =
+                    SessionManager.getAppService().isAllowed(
+                        new ReportsPermission());
+        } catch (Exception e) {
+            BgcPlugin.openAccessDeniedErrorMessage(e);
+        }
     }
 
     @Override
@@ -42,7 +55,7 @@ public class AdvancedReportsView extends AbstractAdministrationView {
     }
 
     private void createNodes() {
-        if (SessionManager.getInstance().isConnected()) {
+        if (allowed) {
             AbstractReportGroup adapter = new PrivateReportsGroup(
                 (RootNode) rootNode, 0);
             adapter.setParent(rootNode);

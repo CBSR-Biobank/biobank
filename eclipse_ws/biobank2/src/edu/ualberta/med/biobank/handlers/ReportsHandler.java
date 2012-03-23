@@ -1,19 +1,14 @@
 package edu.ualberta.med.biobank.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
 
-public class ReportsHandler extends AbstractHandler {
-
-    private Boolean reportsAllowed;
+public class ReportsHandler extends LogoutSensitiveHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -28,20 +23,5 @@ public class ReportsHandler extends AbstractHandler {
         }
         return null;
 
-    }
-
-    @Override
-    public boolean isEnabled() {
-        if (reportsAllowed == null)
-            try {
-                if (!SessionManager.getInstance().isConnected())
-                    return false;
-                reportsAllowed =
-                    SessionManager.getAppService().isAllowed(
-                        new ReportsPermission());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        return reportsAllowed;
     }
 }
