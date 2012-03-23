@@ -182,6 +182,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
+                    ms.setStudy(getStudySelection());
                     updateRoleAndPermissionOptions();
                 }
             });
@@ -227,6 +228,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
+                    ms.setCenter(getCenterSelection());
                     updateStudyOptions();
                 }
             });
@@ -344,8 +346,6 @@ public class MembershipEditDialog extends BgcBaseDialog {
         PermissionTreeRes res = permissionsTree.getAddedAndRemovedNodes();
         ms.addToPermissionCollection(res.addedPermissions);
         ms.removeFromPermissionCollection(res.removedPermissions);
-        ms.setCenter(getCenterSelection());
-        ms.setStudy(getStudySelection());
         super.okPressed();
     }
 
