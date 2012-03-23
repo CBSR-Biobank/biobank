@@ -55,21 +55,6 @@ public class UserSaveAction implements Action<IdResult> {
         return new IdResult(user.getId());
     }
 
-    private void createCsmUser(ActionContext context, User user) {
-        if (!user.isNew()) return;
-        if (user.getCsmUserId() != null) return;
-        try {
-            String password = input.getPassword();
-            Long csmUserId = BiobankCSMSecurityUtil.persistUser(user, password);
-            user.setCsmUserId(csmUserId);
-
-            Transaction tx = context.getSession().getTransaction();
-            tx.registerSynchronization(new DeleteCsmUserOnRollback(user));
-        } catch (ApplicationException e) {
-            throw new ActionException(e);
-        }
-    }
-
     private void setProperties(ActionContext context, User user) {
         User executingUser = context.getUser();
         // whether the manager _could_ have modified the user properties
@@ -77,33 +62,54 @@ public class UserSaveAction implements Action<IdResult> {
             // whether the manager (executing user) _still_ can
             && user.isFullyManageable(executingUser)) {
 
+            User oldUserData = new User();
+            oldUserData.setId(user.getId());
+            oldUserData.setCsmUserId(user.getCsmUserId());
+            oldUserData.setLogin(user.getLogin());
+            oldUserData.setEmail(user.getEmail());
+            oldUserData.setFullName(user.getFullName());
+            oldUserData.setNeedPwdChange(user.getNeedPwdChange());
+            oldUserData.setRecvBulkEmails(user.getRecvBulkEmails());
+
             user.setLogin(input.getLogin());
             user.setEmail(input.getEmail());
             user.setFullName(input.getFullName());
             user.setNeedPwdChange(input.isNeedPwdChange());
             user.setRecvBulkEmails(input.isRecvBulkEmails());
 
-            createCsmUser(context, user);
+            setCsmUserProperties(context, user, oldUserData);
+        }
+    }
 
-            String newPw = input.getPassword();
-            if (!user.isNew() && newPw != null) {
-                try {
-                    String login = user.getLogin();
-                    String pw = BiobankCSMSecurityUtil.getUserPassword(login);
-                    if (!pw.equals(newPw)) {
-                        Long csmUserId = user.getCsmUserId();
+    private void setCsmUserProperties(ActionContext context, User user,
+        User oldUserData) {
+        try {
+            boolean newCsmUser = user.getCsmUserId() == null;
+            String pw = input.getPassword();
 
-                        BiobankCSMSecurityUtil
-                            .modifyPassword(csmUserId, pw, newPw);
+            if (newCsmUser) {
+                Long csmUserId = BiobankCSMSecurityUtil.persistUser(user, pw);
+                user.setCsmUserId(csmUserId);
 
-                        Transaction tx = context.getSession().getTransaction();
-                        tx.registerSynchronization(
-                            new RevertPasswordOnRollback(csmUserId, pw, newPw));
-                    }
-                } catch (ApplicationException e) {
-                    throw new ActionException(e);
+                if (pw == null || pw.length() < 5) {
+                    throw new ActionException(
+                        "password for new user must be set and be at least 5 characters");
                 }
+
+                Transaction tx = context.getSession().getTransaction();
+                tx.registerSynchronization(new DeleteCsmUserOnRollback(user));
+            } else {
+                String login = oldUserData.getLogin();
+                String oldPw = BiobankCSMSecurityUtil.getUserPassword(login);
+
+                BiobankCSMSecurityUtil.persistUser(user, pw);
+
+                Transaction tx = context.getSession().getTransaction();
+                tx.registerSynchronization(new PersistCsmUserOnRollback(
+                    oldUserData, oldPw));
             }
+        } catch (ApplicationException e) {
+            throw new ActionException(e);
         }
     }
 
@@ -243,24 +249,20 @@ public class UserSaveAction implements Action<IdResult> {
         }
     }
 
-    private static class RevertPasswordOnRollback extends EmptySynchronization {
-        private final Long csmUserId;
+    private static class PersistCsmUserOnRollback extends EmptySynchronization {
+        private final User user;
         private final String oldPassword;
-        private final String newPassword;
 
-        private RevertPasswordOnRollback(Long csmUserId,
-            String oldPassword, String newPassword) {
-            this.csmUserId = csmUserId;
+        private PersistCsmUserOnRollback(User user, String oldPassword) {
+            this.user = user;
             this.oldPassword = oldPassword;
-            this.newPassword = newPassword;
         }
 
         @Override
         public void afterCompletion(int status) {
             if (status == javax.transaction.Status.STATUS_ROLLEDBACK) {
                 try {
-                    BiobankCSMSecurityUtil.modifyPassword(csmUserId,
-                        newPassword, oldPassword);
+                    BiobankCSMSecurityUtil.persistUser(user, oldPassword);
                 } catch (ApplicationException e) {
                     // TODO: what to do?
                 }
