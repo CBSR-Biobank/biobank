@@ -153,9 +153,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
         List studies = new ArrayList();
         String noStudySelection = new String(
             Messages.MembershipAddDialog_all_studies_label);
-        studies.add(0, noStudySelection);
-        studies.addAll(StudyWrapper.getAllStudies(SessionManager
-            .getAppService()));
+        studies.addAll(getStudyOptions(ms.getCenter()));
         studiesViewer = createComboViewer(groupComp,
             Messages.MembershipAddDialog_selected_study_label, studies,
             ms.getStudy() == null ? noStudySelection : ms.getStudy(), null,
@@ -443,17 +441,19 @@ public class MembershipEditDialog extends BgcBaseDialog {
         return wrappedOptions;
     }
 
-    public void updateStudyOptions() {
-        CenterWrapper<?> selectedCenter = getCenterSelection();
-        Center modelCenter =
-            selectedCenter != null ? selectedCenter.getWrappedObject() : null;
+    public List<StudyWrapper> getStudyOptions(
+        CenterWrapper<?> selectedCenterWrapper) {
+
+        Center selectedCenter =
+            selectedCenterWrapper != null ? selectedCenterWrapper
+                .getWrappedObject() : null;
 
         Set<Study> studies = new HashSet<Study>();
         boolean hasAllStudies = false;
 
         for (Membership m : context.getManager().getAllMemberships()) {
             Center mCenter = m.getCenter();
-            if (mCenter == null || mCenter.equals(modelCenter)) {
+            if (mCenter == null || mCenter.equals(selectedCenter)) {
                 Study study = m.getStudy();
                 if (study == null) {
                     hasAllStudies = true;
@@ -487,6 +487,17 @@ public class MembershipEditDialog extends BgcBaseDialog {
         if (hasAllStudies) {
             wrappedStudies.add(0, noStudySelection);
         }
+
+        return wrappedStudies;
+    }
+
+    public void updateStudyOptions() {
+        CenterWrapper<?> selectedCenter = getCenterSelection();
+
+        List<StudyWrapper> wrappedStudies = getStudyOptions(selectedCenter);
+
+        String noStudySelection = new String(
+            Messages.MembershipAddDialog_all_studies_label);
 
         Object oldSelection =
             getStudySelection() != null ? getStudySelection()
