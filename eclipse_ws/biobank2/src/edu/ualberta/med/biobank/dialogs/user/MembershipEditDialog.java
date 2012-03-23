@@ -445,7 +445,8 @@ public class MembershipEditDialog extends BgcBaseDialog {
 
     public void updateStudyOptions() {
         CenterWrapper<?> selectedCenter = getCenterSelection();
-        Center modelCenter = selectedCenter.getWrappedObject();
+        Center modelCenter =
+            selectedCenter != null ? selectedCenter.getWrappedObject() : null;
 
         Set<Study> studies = new HashSet<Study>();
         boolean hasAllStudies = false;
