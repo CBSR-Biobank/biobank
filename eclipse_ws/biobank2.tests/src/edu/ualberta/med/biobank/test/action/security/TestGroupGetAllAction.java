@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.test.action.security;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -80,8 +79,7 @@ public class TestGroupGetAllAction extends TestAction {
 
         @SuppressWarnings("unchecked")
         Set<Group> dbGroups = new HashSet<Group>(
-            (List<Group>) session.createCriteria(Group.class)
-                .list());
+            session.createCriteria(Group.class).list());
         Assert.assertEquals("unexpected groups",
             postInsertGroups, dbGroups);
 

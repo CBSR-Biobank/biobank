@@ -16,9 +16,10 @@ public abstract class LogoutSensitiveHandler extends AbstractHandler {
         BiobankPlugin.getSessionStateSourceProvider()
             .addSourceProviderListener(new ISourceProviderListener() {
 
+                @SuppressWarnings("rawtypes")
                 @Override
                 public void sourceChanged(int sourcePriority,
-                    @SuppressWarnings("rawtypes") Map sourceValuesByName) {
+                    Map sourceValuesByName) {
                 }
 
                 @Override

@@ -30,8 +30,7 @@ public class RoleGetAllAction implements Action<RoleGetAllOutput> {
     @Override
     public RoleGetAllOutput run(ActionContext context) throws ActionException {
         @SuppressWarnings("unchecked")
-        List<Role> results = (List<Role>) context.getSession()
-            .createCriteria(Role.class)
+        List<Role> results = context.getSession().createCriteria(Role.class)
             .list();
 
         SortedSet<Role> roles = new TreeSet<Role>(Role.NAME_COMPARATOR);
