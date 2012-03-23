@@ -65,6 +65,7 @@ public class UserEditDialog extends BgcBaseDialog {
         Messages.UserEditDialog_passwords_length_msg, PASSWORD_LENGTH_MIN);
     private ManagerContext managerContext;
     private final boolean isFullyManageable;
+    private BgcBaseText password;
 
     private UserWrapper originalUser = new UserWrapper(null);
     private MembershipInfoTable membershipInfoTable;
@@ -254,10 +255,16 @@ public class UserEditDialog extends BgcBaseDialog {
             User unproxied = (User) new BiobankProxyHelperImpl()
                 .convertToObject(userModel);
 
+            String pw = null;
+            String pwText = password.getText();
+            if (pwText != null && !pwText.isEmpty()) {
+                pw = pwText;
+            }
+
             SessionManager.getAppService()
                 .doAction(
                     new UserSaveAction(new UserSaveInput(unproxied,
-                        managerContext)));
+                        managerContext, pw)));
 
             if (SessionManager.getUser().equals(originalUser)) {
                 // if the User is making changes to himself, logout
@@ -311,7 +318,7 @@ public class UserEditDialog extends BgcBaseDialog {
                 MSG_PASSWORD_REQUIRED);
         }
 
-        BgcBaseText password = (BgcBaseText) createBoundWidgetWithLabel(parent,
+        password = (BgcBaseText) createBoundWidgetWithLabel(parent,
             BgcBaseText.class, SWT.BORDER | SWT.PASSWORD,
             (originalUser.isNew() ? Messages.UserEditDialog_password_new_label
                 : Messages.UserEditDialog_password_label), new String[0],

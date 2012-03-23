@@ -92,6 +92,7 @@ public class UserSaveAction implements Action<IdResult> {
                     String pw = BiobankCSMSecurityUtil.getUserPassword(login);
                     if (!pw.equals(newPw)) {
                         Long csmUserId = user.getCsmUserId();
+
                         BiobankCSMSecurityUtil
                             .modifyPassword(csmUserId, pw, newPw);
 

@@ -13,7 +13,7 @@ public class UserSaveInput implements ActionInput {
 
     private final Integer userId;
     private final String login;
-    private final String password = null; // TODO: get this, use hash?
+    private final String password; // TODO: get this, use hash?
     private final boolean recvBulkEmails;
     private final String fullName;
     private final String email;
@@ -22,7 +22,7 @@ public class UserSaveInput implements ActionInput {
     private final Set<Integer> groupIds;
     private final ManagerContext context;
 
-    public UserSaveInput(User user, ManagerContext context) {
+    public UserSaveInput(User user, ManagerContext context, String password) {
         if (user == null)
             throw new IllegalArgumentException("null user");
         if (context == null)
@@ -40,6 +40,12 @@ public class UserSaveInput implements ActionInput {
         this.groupIds = new HashSet<Integer>(IdUtil.getIds(user.getGroups()));
 
         this.context = context;
+
+        this.password = password;
+    }
+
+    public UserSaveInput(User user, ManagerContext context) {
+        this(user, context, null);
     }
 
     public Integer getUserId() {

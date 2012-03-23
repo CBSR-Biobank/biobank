@@ -27,8 +27,9 @@ public class BiobankCSMSecurityUtil {
     public static void modifyPassword(Long csmUserId, String oldPassword,
         String newPassword) throws ApplicationException {
         try {
-            UserProvisioningManager upm = SecurityServiceProvider
-                .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
+            UserProvisioningManager upm =
+                SecurityServiceProvider
+                    .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
 
             Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
@@ -68,8 +69,9 @@ public class BiobankCSMSecurityUtil {
     public static Long persistUser(edu.ualberta.med.biobank.model.User user,
         String password) throws ApplicationException {
         try {
-            UserProvisioningManager upm = SecurityServiceProvider
-                .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
+            UserProvisioningManager upm =
+                SecurityServiceProvider
+                    .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
             if (user.getLogin() == null)
                 throw new ApplicationException(
                     Messages
@@ -136,8 +138,9 @@ public class BiobankCSMSecurityUtil {
     public static void deleteUser(edu.ualberta.med.biobank.model.User user)
         throws ApplicationException {
         try {
-            UserProvisioningManager upm = SecurityServiceProvider
-                .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
+            UserProvisioningManager upm =
+                SecurityServiceProvider
+                    .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
             String currentLogin = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
             if (currentLogin.equals(user.getLogin())) {
@@ -171,8 +174,9 @@ public class BiobankCSMSecurityUtil {
     public static String getUserPassword(String login)
         throws ApplicationException {
         try {
-            UserProvisioningManager upm = SecurityServiceProvider
-                .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
+            UserProvisioningManager upm =
+                SecurityServiceProvider
+                    .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
             User serverUser = upm.getUser(login);
             if (serverUser == null) {
                 throw new ApplicationException(
@@ -194,8 +198,9 @@ public class BiobankCSMSecurityUtil {
     public static boolean isUserLockedOut(Long csmUserId)
         throws ApplicationException {
         try {
-            UserProvisioningManager upm = SecurityServiceProvider
-                .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
+            UserProvisioningManager upm =
+                SecurityServiceProvider
+                    .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
             try {
                 User serverUser = upm.getUserById(csmUserId.toString());
                 return LockoutManager.getInstance().isUserLockedOut(
