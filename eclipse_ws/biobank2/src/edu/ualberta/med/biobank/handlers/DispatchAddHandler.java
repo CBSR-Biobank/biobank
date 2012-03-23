@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
@@ -13,9 +12,7 @@ import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class DispatchAddHandler extends AbstractHandler {
-
-    Boolean createAllowed;
+public class DispatchAddHandler extends LogoutSensitiveHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
@@ -14,9 +13,7 @@ import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.views.ProcessingView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ProcessingEventAddHandler extends AbstractHandler {
-
-    private Boolean createAllowed;
+public class ProcessingEventAddHandler extends LogoutSensitiveHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -40,7 +37,8 @@ public class ProcessingEventAddHandler extends AbstractHandler {
                     SessionManager.getAppService().isAllowed(
                         new ProcessingEventCreatePermission());
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
+                Messages.HandlerPermission_message);
         }
         return createAllowed;
     }

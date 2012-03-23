@@ -20,6 +20,6 @@ public class PatientCreatePermission implements Permission {
     public boolean isAllowed(ActionContext context) {
         return PermissionEnum.PATIENT_CREATE
             .isAllowed(context.getUser(),
-                context.load(Study.class, studyId));
+                context.get(Study.class, studyId));
     }
 }

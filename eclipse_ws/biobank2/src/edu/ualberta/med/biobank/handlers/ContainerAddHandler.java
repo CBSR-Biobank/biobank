@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
@@ -11,11 +10,9 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ContainerAddHandler extends AbstractHandler {
+public class ContainerAddHandler extends LogoutSensitiveHandler {
     public static final String ID =
         "edu.ualberta.med.biobank.commands.containerAdd"; //$NON-NLS-1$
-
-    private Boolean createAllowed;
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

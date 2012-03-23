@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
@@ -15,11 +14,10 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class SiteAddHandler extends AbstractHandler {
+public class SiteAddHandler extends LogoutSensitiveHandler {
     @SuppressWarnings("unused")
     private static BgcLogger LOGGER = BgcLogger.getLogger(SiteAddHandler.class
         .getName());
-    private Boolean createAllowed;
 
     // private EventBus eventBus;
 
