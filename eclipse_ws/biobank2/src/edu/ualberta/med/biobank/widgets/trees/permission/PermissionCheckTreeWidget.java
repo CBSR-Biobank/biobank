@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -134,6 +136,17 @@ public class PermissionCheckTreeWidget extends Composite {
                 }
             }
         }
+    }
+
+    public Set<PermissionEnum> getCheckedElements() {
+        Set<PermissionEnum> checked = new HashSet<PermissionEnum>();
+        for (Object checkedO : treeviewer.getCheckedElements()) {
+            if (checkedO instanceof PermissionNode) {
+                PermissionNode node = (PermissionNode) checkedO;
+                checked.add(node.getPermission());
+            }
+        }
+        return checked;
     }
 
     public boolean hasCheckedItems() {

@@ -257,7 +257,7 @@ public class UserEditDialog extends BgcBaseDialog {
                 .convertToObject(userModel);
 
             String pw = null;
-            String pwText = password.getText();
+            String pwText = password != null ? password.getText() : null;
             if (pwText != null && !pwText.isEmpty()) {
                 pw = pwText;
             }
@@ -286,7 +286,8 @@ public class UserEditDialog extends BgcBaseDialog {
             }
             close();
         } catch (Throwable t) {
-            if (t.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
+            if (t != null && t.getMessage() != null
+                && t.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
                 t.printStackTrace();
                 BgcPlugin.openAsyncError(
                     Messages.UserEditDialog_save_error_title, MessageFormat

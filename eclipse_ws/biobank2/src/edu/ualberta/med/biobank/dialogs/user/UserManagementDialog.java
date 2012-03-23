@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.action.security.GroupGetAllAction;
 import edu.ualberta.med.biobank.common.action.security.GroupGetAllInput;
 import edu.ualberta.med.biobank.common.action.security.RoleGetAllAction;
 import edu.ualberta.med.biobank.common.action.security.RoleGetAllInput;
+import edu.ualberta.med.biobank.common.permission.security.RoleManagementPermission;
 import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
@@ -71,12 +72,23 @@ public class UserManagementDialog extends BgcDialogWithPages {
                 return getGroups();
             }
         });
-        nodes.add(new RolesPage(this) {
-            @Override
-            protected List<RoleWrapper> getCurrentAllRolesList() {
-                return getRoles();
+
+        try {
+            boolean isAllowedRoleMan =
+                SessionManager.getAppService().isAllowed(
+                    new RoleManagementPermission());
+            if (isAllowedRoleMan) {
+                nodes.add(new RolesPage(this) {
+                    @Override
+                    protected List<RoleWrapper> getCurrentAllRolesList() {
+                        return getRoles();
+                    }
+                });
             }
-        });
+        } catch (ApplicationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return nodes;
     }
 

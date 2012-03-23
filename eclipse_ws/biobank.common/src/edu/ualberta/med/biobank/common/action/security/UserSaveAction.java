@@ -182,6 +182,10 @@ public class UserSaveAction implements Action<IdResult> {
             roles.addAll(newM.getRoles());
             roles.retainAll(newM.getRoles());
             oldM.getRoles().addAll(roles);
+
+            oldM.setRank(newM.getRank());
+
+            checkFullyManageable(context, oldM);
         }
     }
 
@@ -189,7 +193,8 @@ public class UserSaveAction implements Action<IdResult> {
         User executingUser = context.getUser();
         if (!m.isFullyManageable(executingUser)) {
             // TODO: better exception
-            throw new ActionException("");
+            throw new ActionException(
+                "you do not have permissions to make this change on this user");
         }
     }
 
