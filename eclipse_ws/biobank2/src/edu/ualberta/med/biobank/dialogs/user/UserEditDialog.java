@@ -31,6 +31,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.client.util.BiobankProxyHelperImpl;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.common.action.security.UserGetOutput;
 import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
@@ -261,10 +262,12 @@ public class UserEditDialog extends BgcBaseDialog {
                 pw = pwText;
             }
 
-            SessionManager.getAppService()
+            IdResult res = SessionManager.getAppService()
                 .doAction(
                     new UserSaveAction(new UserSaveInput(unproxied,
                         managerContext, pw)));
+
+            originalUser.setId(res.getId());
 
             if (SessionManager.getUser().equals(originalUser)) {
                 // if the User is making changes to himself, logout
