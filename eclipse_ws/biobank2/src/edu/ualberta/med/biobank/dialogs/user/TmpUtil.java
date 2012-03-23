@@ -28,14 +28,15 @@ public class TmpUtil {
     public static void displayException(Throwable t) {
         String message = t.getMessage();
 
-        Throwable cause = t.getCause();
-        while (t != null && cause != cause.getCause()) {
+        Throwable cause = t;
+        while (cause != null && cause != cause.getCause()) {
             if (cause instanceof ConstraintViolationException) {
                 List<String> messages =
                     getMessages((ConstraintViolationException) cause);
                 message = StringUtils.join(messages, ";");
                 break;
             }
+            cause = cause.getCause();
         }
 
         BgcPlugin.openAsyncError(
