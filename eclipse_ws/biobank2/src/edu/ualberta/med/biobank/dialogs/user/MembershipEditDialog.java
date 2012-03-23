@@ -45,6 +45,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
@@ -60,6 +61,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
     private final ManagerContext context;
     private ComboViewer centersViewer;
     private ComboViewer studiesViewer;
+    private ComboViewer ranksViewer;
     private MultiSelectWidget<Role> rolesWidget;
     private MembershipWrapper ms;
     private PermissionCheckTreeWidget permissionsTree;
@@ -111,13 +113,33 @@ public class MembershipEditDialog extends BgcBaseDialog {
 
         createPermissionWidgets(createTabItem(tb,
             Messages.MembershipAddDialog_permissions_tab_title, 1));
+
+        updateRoleAndPermissionOptions();
     }
 
     protected void createRankAndLevel(Composite parent) {
         Composite contents = new Composite(parent, SWT.NONE);
         contents.setLayout(new GridLayout(2, false));
 
-        widgetCreator.createLabel(contents, "Rank");
+        ranksViewer =
+            createComboViewer(contents,
+                "Rank",
+                Rank.valuesList(),
+                ms.getWrappedObject().getRank(), null,
+                null, new LabelProvider() {
+                    @Override
+                    public String getText(Object element) {
+                        return ((Rank) element).getName();
+                    }
+                });
+        ranksViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    ms.getWrappedObject().setRank(getRankSelection());
+                    updateRoleAndPermissionOptions();
+                }
+            });
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -131,9 +153,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
         List studies = new ArrayList();
         String noStudySelection = new String(
             Messages.MembershipAddDialog_all_studies_label);
-        studies.add(noStudySelection);
-        studies.addAll(StudyWrapper.getAllStudies(SessionManager
-            .getAppService()));
+        studies.addAll(getStudyOptions(ms.getCenter()));
         studiesViewer = createComboViewer(groupComp,
             Messages.MembershipAddDialog_selected_study_label, studies,
             ms.getStudy() == null ? noStudySelection : ms.getStudy(), null,
@@ -160,6 +180,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
+                    ms.setStudy(getStudySelection());
                     updateRoleAndPermissionOptions();
                 }
             });
@@ -187,7 +208,6 @@ public class MembershipEditDialog extends BgcBaseDialog {
         List<Object> centers = new ArrayList<Object>();
         final String noCenterSelection = new String(
             Messages.MembershipAddDialog_all_centers_label);
-        centers.add(noCenterSelection);
         centers
             .addAll(getCenterOptions());
         centersViewer = createComboViewer(groupComp,
@@ -206,6 +226,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
+                    ms.setCenter(getCenterSelection());
                     updateStudyOptions();
                 }
             });
@@ -277,6 +298,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
                     checkedRolesOrPermissionsSelected();
+                    updatePermissions();
                 }
             });
     }
@@ -322,8 +344,6 @@ public class MembershipEditDialog extends BgcBaseDialog {
         PermissionTreeRes res = permissionsTree.getAddedAndRemovedNodes();
         ms.addToPermissionCollection(res.addedPermissions);
         ms.removeFromPermissionCollection(res.removedPermissions);
-        ms.setCenter(getCenterSelection());
-        ms.setStudy(getStudySelection());
         super.okPressed();
     }
 
@@ -336,6 +356,18 @@ public class MembershipEditDialog extends BgcBaseDialog {
                 if (selection instanceof String)
                     return null;
                 return (StudyWrapper) selection;
+            }
+        }
+        return null;
+    }
+
+    private Rank getRankSelection() {
+        ISelection sel = ranksViewer.getSelection();
+        if (sel != null) {
+            IStructuredSelection structSel = (IStructuredSelection) sel;
+            if (structSel.size() > 0) {
+                Object selection = structSel.getFirstElement();
+                return (Rank) selection;
             }
         }
         return null;
@@ -368,12 +400,15 @@ public class MembershipEditDialog extends BgcBaseDialog {
         super.cancelPressed();
     }
 
-    private List<CenterWrapper<?>> getCenterOptions() {
+    private List getCenterOptions() {
         Set<Center> options = new HashSet<Center>();
 
+        boolean hasAllCenters = false;
         User manager = context.getManager();
         for (Membership m : manager.getAllMemberships()) {
             if (m.getCenter() == null) {
+                hasAllCenters = true;
+
                 HQLCriteria criteria =
                     new HQLCriteria("from " + Center.class.getName(),
                         new ArrayList<Object>());
@@ -393,32 +428,43 @@ public class MembershipEditDialog extends BgcBaseDialog {
             }
         }
 
-        List<CenterWrapper<?>> wrappedOptions =
+        List wrappedOptions =
             ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
                 options, null);
+
+        if (hasAllCenters) {
+            final String noCenterSelection = new String(
+                Messages.MembershipAddDialog_all_centers_label);
+            wrappedOptions.add(0, noCenterSelection);
+        }
 
         return wrappedOptions;
     }
 
-    public void updateStudyOptions() {
-        CenterWrapper<?> selectedCenter = getCenterSelection();
-        Center modelCenter = selectedCenter.getWrappedObject();
+    public List<StudyWrapper> getStudyOptions(
+        CenterWrapper<?> selectedCenterWrapper) {
+
+        Center selectedCenter =
+            selectedCenterWrapper != null ? selectedCenterWrapper
+                .getWrappedObject() : null;
 
         Set<Study> studies = new HashSet<Study>();
+        boolean hasAllStudies = false;
 
         for (Membership m : context.getManager().getAllMemberships()) {
             Center mCenter = m.getCenter();
-            if (mCenter == null || mCenter.equals(modelCenter)) {
+            if (mCenter == null || mCenter.equals(selectedCenter)) {
                 Study study = m.getStudy();
                 if (study == null) {
+                    hasAllStudies = true;
                     HQLCriteria criteria =
                         new HQLCriteria("from " + Study.class.getName(),
                             new ArrayList<Object>());
 
                     try {
-                        List<Study> centers =
+                        List<Study> tmp =
                             SessionManager.getAppService().query(criteria);
-                        studies.addAll(centers);
+                        studies.addAll(tmp);
                     } catch (ApplicationException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -431,15 +477,33 @@ public class MembershipEditDialog extends BgcBaseDialog {
             }
         }
 
-        List<StudyWrapper> wrappedStudies =
+        @SuppressWarnings("rawtypes")
+        List wrappedStudies =
             ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
                 studies, StudyWrapper.class);
 
-        StudyWrapper oldSelection = getStudySelection();
-        studiesViewer.setInput(wrappedStudies);
-        if (oldSelection != null) {
-            studiesViewer.setSelection(new StructuredSelection(oldSelection));
+        String noStudySelection = new String(
+            Messages.MembershipAddDialog_all_studies_label);
+        if (hasAllStudies) {
+            wrappedStudies.add(0, noStudySelection);
         }
+
+        return wrappedStudies;
+    }
+
+    public void updateStudyOptions() {
+        CenterWrapper<?> selectedCenter = getCenterSelection();
+
+        List<StudyWrapper> wrappedStudies = getStudyOptions(selectedCenter);
+
+        String noStudySelection = new String(
+            Messages.MembershipAddDialog_all_studies_label);
+
+        Object oldSelection =
+            getStudySelection() != null ? getStudySelection()
+                : noStudySelection;
+        studiesViewer.setInput(wrappedStudies);
+        studiesViewer.setSelection(new StructuredSelection(oldSelection));
         studiesViewer.refresh();
     }
 
@@ -447,13 +511,30 @@ public class MembershipEditDialog extends BgcBaseDialog {
         User user = context.getManager();
         Membership m = ms.getWrappedObject();
 
-        Set<PermissionEnum> mPerms = m.getManageablePermissions(user);
         Set<Role> mRoles = m.getManageableRoles(user, context.getRoles());
 
-        List<PermissionEnum> mPermsList = new ArrayList<PermissionEnum>(mPerms);
         List<Role> mRolesList = new ArrayList<Role>(mRoles);
 
         rolesWidget.setSelections(mRolesList, rolesWidget.getSelected());
+
+        updatePermissions();
+    }
+
+    private void updatePermissions() {
+        User user = context.getManager();
+        Membership m = ms.getWrappedObject();
+        Set<PermissionEnum> mPerms = m.getManageablePermissions(user);
+
+        // only show permissions not already encompased by roles.
+        List<PermissionEnum> mPermsList = new ArrayList<PermissionEnum>(mPerms);
+        for (Role role : rolesWidget.getSelected()) {
+            mPermsList.removeAll(role.getPermissions());
+        }
+
+        Set<PermissionEnum> selPerms = permissionsTree.getCheckedElements();
+        selPerms.retainAll(mPermsList);
+
         permissionsTree.setInput(mPermsList);
+        permissionsTree.setSelections(selPerms);
     }
 }

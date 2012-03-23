@@ -329,7 +329,7 @@ public class Membership extends AbstractBiobankModel {
      */
     @Transient
     public boolean isManageable(Membership that) {
-        if (equals(that)) return false;
+        // if (equals(that)) return false;
 
         if (that.getAllPermissions().isEmpty()
             && that.getRoles().isEmpty()) return false;
@@ -337,8 +337,12 @@ public class Membership extends AbstractBiobankModel {
         if (that.getRank().isLt(Rank.MANAGER)) return false;
 
         if (that.getRank().isLt(getRank())) return false;
-        if (that.getRank().equals(getRank()) && that.getLevel() <= getLevel())
-            return false;
+
+        // FIXME: ignore level for now until a better tie-breaking system can be
+        // designed
+        // if (that.getRank().equals(getRank()) && that.getLevel() <=
+        // getLevel())
+        // return false;
 
         if (that.getCenter() != null && !that.getCenter().equals(getCenter()))
             return false;
@@ -366,7 +370,6 @@ public class Membership extends AbstractBiobankModel {
         return getCenter() != null ? getCenter().getId() : 0;
     }
 
-    @SuppressWarnings("unused")
     void setNotNullCenterId(Integer centerId) {
     }
 
@@ -381,7 +384,6 @@ public class Membership extends AbstractBiobankModel {
         return getStudy() != null ? getStudy().getId() : 0;
     }
 
-    @SuppressWarnings("unused")
     void setNotNullStudyId(Integer studyId) {
     }
 }

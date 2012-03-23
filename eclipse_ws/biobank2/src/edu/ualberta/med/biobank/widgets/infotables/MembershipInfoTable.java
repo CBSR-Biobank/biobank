@@ -10,19 +10,20 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.dialogs.user.MembershipEditDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Role;
 
 public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
     public static final int ROWS_PER_PAGE = 7;
     private static final String[] HEADINGS = new String[] {
         Messages.MembershipInfoTable_center_label,
         Messages.MembershipInfoTable_study_label,
+        "Rank",
         Messages.MembershipInfoTable_role_label,
         Messages.MembershipInfoTable_permissions_label };
 
@@ -32,11 +33,12 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
         String study;
         String roles;
         String permissions;
+        String rank;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { center, study, roles,
-                permissions }, "\t"); //$NON-NLS-1$
+                permissions, rank }, "\t"); //$NON-NLS-1$
         }
     }
 
@@ -105,6 +107,7 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
         info.study =
             info.ms.getStudy() == null ? Messages.MembershipInfoTable_all_label
                 : info.ms.getStudy().getNameShort();
+        info.rank = info.ms.getWrappedObject().getRank().getName();
         info.roles = getRolesString(info.ms);
         info.permissions = getPermissionsString(info.ms);
         return info;
@@ -113,7 +116,7 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
     public String getRolesString(MembershipWrapper ms) {
         StringBuffer sb = new StringBuffer();
         boolean first = true;
-        for (RoleWrapper r : ms.getRoleCollection(true)) {
+        for (Role r : ms.getWrappedObject().getRoles()) {
             if (sb.length() > 25) {
                 sb.setLength(25);
                 sb.append("..."); //$NON-NLS-1$
@@ -173,8 +176,10 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
                 case 1:
                     return info.study;
                 case 2:
-                    return info.roles;
+                    return info.rank;
                 case 3:
+                    return info.roles;
+                case 4:
                     return info.permissions;
                 default:
                     return ""; //$NON-NLS-1$

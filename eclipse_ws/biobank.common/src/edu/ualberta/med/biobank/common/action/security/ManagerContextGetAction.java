@@ -62,6 +62,8 @@ public class ManagerContextGetAction implements Action<ManagerContextGetOutput> 
 
     private void initMemberships(Set<Membership> memberships) {
         for (Membership membership : memberships) {
+            Hibernate.initialize(membership.getCenter());
+            Hibernate.initialize(membership.getStudy());
             Hibernate.initialize(membership.getPermissions());
             Hibernate.initialize(membership.getRoles());
             for (Role role : membership.getRoles()) {

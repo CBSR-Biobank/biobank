@@ -1,12 +1,9 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
-import javax.validation.ConstraintViolationException;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
@@ -257,7 +254,7 @@ public class UserEditDialog extends BgcBaseDialog {
                 .convertToObject(userModel);
 
             String pw = null;
-            String pwText = password.getText();
+            String pwText = password != null ? password.getText() : null;
             if (pwText != null && !pwText.isEmpty()) {
                 pw = pwText;
             }
@@ -286,26 +283,7 @@ public class UserEditDialog extends BgcBaseDialog {
             }
             close();
         } catch (Throwable t) {
-            if (t.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
-                t.printStackTrace();
-                BgcPlugin.openAsyncError(
-                    Messages.UserEditDialog_save_error_title, MessageFormat
-                        .format(Messages.UserEditDialog_login_unique_error_msg,
-                            originalUser.getLogin()));
-            } else {
-                String message = t.getMessage();
-
-                if (t.getCause() instanceof ConstraintViolationException) {
-                    message =
-                        ((ConstraintViolationException) t.getCause())
-                            .getMessage();
-                }
-
-                t.printStackTrace();
-
-                BgcPlugin.openAsyncError(
-                    Messages.UserEditDialog_save_error_title, message);
-            }
+            TmpUtil.displayException(t);
         }
     }
 
