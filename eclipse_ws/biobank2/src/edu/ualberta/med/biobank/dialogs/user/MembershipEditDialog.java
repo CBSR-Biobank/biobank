@@ -102,6 +102,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
 
         Composite centerStudyComp = createTabItem(tb,
             Messages.MembershipAddDialog_centerStudy_tab_title, 1);
+        createRankAndLevel(centerStudyComp);
         createCentersCombo(centerStudyComp);
         createStudysCombo(centerStudyComp);
 
@@ -110,6 +111,13 @@ public class MembershipEditDialog extends BgcBaseDialog {
 
         createPermissionWidgets(createTabItem(tb,
             Messages.MembershipAddDialog_permissions_tab_title, 1));
+    }
+
+    protected void createRankAndLevel(Composite parent) {
+        Composite contents = new Composite(parent, SWT.NONE);
+        contents.setLayout(new GridLayout(2, false));
+
+        widgetCreator.createLabel(contents, "Rank");
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
