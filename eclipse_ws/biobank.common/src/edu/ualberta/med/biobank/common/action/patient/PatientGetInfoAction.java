@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Patient;
 
 /**
@@ -29,7 +30,6 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
             + " FROM " + Patient.class.getName() + " patient"
             + " INNER JOIN FETCH patient.study study"
             + " LEFT JOIN patient.collectionEvents cevents"
-            + " LEFT JOIN FETCH patient.comments comments"
             + " LEFT JOIN cevents.originalSpecimens sourceSpecs"
             + " LEFT JOIN cevents.allSpecimens allSpecs"
             + " WHERE patient.id = ?"
@@ -70,6 +70,11 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
         pInfo.aliquotedSpecimenCount = (Long) results[2];
         pInfo.ceventInfos = new PatientGetCollectionEventInfosAction(patientId)
             .run(context).getList();
+
+        // get all comments
+        for (Comment c : pInfo.patient.getComments()) {
+            c.getUser().getLogin();
+        }
 
         return pInfo;
     }
