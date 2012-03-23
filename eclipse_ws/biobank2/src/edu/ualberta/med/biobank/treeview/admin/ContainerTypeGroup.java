@@ -38,10 +38,12 @@ public class ContainerTypeGroup extends AdapterBase {
     public ContainerTypeGroup(SiteAdapter parent, int id) {
         super(parent, id, Messages.ContainerTypeGroup_types_node_label, true);
         try {
-            this.createAllowed = SessionManager.getAppService().isAllowed(
-                new ContainerTypeCreatePermission());
+            this.createAllowed =
+                SessionManager.getAppService().isAllowed(
+                    new ContainerTypeCreatePermission(parent.getId()));
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            BgcPlugin.openAsyncError(Messages.ContainerTypeGroup_error,
+                Messages.ContainerTypeGroup_message);
         }
     }
 

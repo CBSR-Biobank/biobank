@@ -20,7 +20,7 @@ public class DispatchCenterAdapter extends AdapterBase {
 
     public DispatchCenterAdapter(AdapterBase parent, CenterWrapper<?> center) {
         super(parent, center);
-        out = new OutgoingNode(this, 0, center);
+        out = new OutgoingNode(this, 0);
         out.setParent(this);
         this.addChild(out);
 

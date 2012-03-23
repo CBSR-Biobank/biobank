@@ -217,9 +217,9 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     private boolean isMembershipAllowed(Membership membership, Center center,
         Study study) {
         boolean hasCenter = center == null || membership.getCenter() == null
-            || membership.getCenter().equals(center);
+            || center.equals(membership.getCenter());
         boolean hasStudy = study == null || membership.getStudy() == null
-            || membership.getStudy().equals(study);
+            || study.equals(membership.getStudy());
         boolean hasPermission = membership.getAllPermissions().contains(this);
 
         boolean isAllowed = hasCenter && hasStudy && hasPermission;

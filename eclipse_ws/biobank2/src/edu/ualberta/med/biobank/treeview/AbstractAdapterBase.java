@@ -350,7 +350,7 @@ public abstract class AbstractAdapterBase implements
                                 (ConstraintViolationException) e.getCause());
                             BgcPlugin.openAsyncError(
                                 Messages.AdapterBase_delete_error_title,
-                                StringUtils.join(msgs, "\n"));
+                                StringUtils.join(msgs, "\n")); //$NON-NLS-1$
 
                         } else {
                             BgcPlugin.openAsyncError(

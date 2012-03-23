@@ -366,6 +366,7 @@ public class Membership extends AbstractBiobankModel {
         return getCenter() != null ? getCenter().getId() : 0;
     }
 
+    @SuppressWarnings("unused")
     void setNotNullCenterId(Integer centerId) {
     }
 
@@ -380,6 +381,7 @@ public class Membership extends AbstractBiobankModel {
         return getStudy() != null ? getStudy().getId() : 0;
     }
 
+    @SuppressWarnings("unused")
     void setNotNullStudyId(Integer studyId) {
     }
 }

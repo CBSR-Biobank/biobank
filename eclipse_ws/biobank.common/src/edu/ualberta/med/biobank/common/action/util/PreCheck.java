@@ -25,6 +25,7 @@ public class PreCheck<E> {
 
     }
 
+    @SuppressWarnings("unused")
     public <T> void unique(Property<T, ? super E> property)
         throws ActionException {
 

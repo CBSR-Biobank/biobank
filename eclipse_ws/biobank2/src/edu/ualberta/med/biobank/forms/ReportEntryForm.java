@@ -338,8 +338,8 @@ public class ReportEntryForm extends BiobankEntryForm {
                     });
 
                     Log logMessage = new Log();
-                    logMessage.setType("report");
-                    logMessage.setAction(rawReport.getName()); //$NON-NLS-1$
+                    logMessage.setType(Messages.ReportEntryForm_report);
+                    logMessage.setAction(rawReport.getName());
                     SessionManager.getAppService().logActivity(logMessage);
                     addPrintAction();
 

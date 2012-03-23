@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.model.Request;
 
 public class RequestRetrievalAction implements Action<ListResult<Request>> {
 
+    @SuppressWarnings("nls")
     private static final String REQUEST_HQL =
         "SELECT r FROM " + Request.class.getName() + " r"
             + " INNER JOIN FETCH r.requestSpecimens rs"
@@ -30,7 +31,7 @@ public class RequestRetrievalAction implements Action<ListResult<Request>> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return PermissionEnum.REQUEST_PROCESS.isAllowed(context.getUser(),
+        return PermissionEnum.REQUEST_READ.isAllowed(context.getUser(),
             (Center) context.getSession().load(Center.class, centerId));
     }
 

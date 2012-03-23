@@ -66,7 +66,8 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ContainerReadPermission(containerId).isAllowed(context);
+        Container c = context.load(Container.class, containerId);
+        return new ContainerReadPermission(c.getSite()).isAllowed(context);
     }
 
     @Override

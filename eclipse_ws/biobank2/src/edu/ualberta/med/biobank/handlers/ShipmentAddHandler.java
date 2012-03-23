@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
@@ -13,9 +12,7 @@ import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ShipmentAddHandler extends AbstractHandler {
-
-    private Boolean createAllowed;
+public class ShipmentAddHandler extends LogoutSensitiveHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

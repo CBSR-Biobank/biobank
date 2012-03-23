@@ -126,7 +126,8 @@ public class FTAReportTest extends AbstractReportTest {
 
         for (StudyWrapper study : getStudies()) {
             for (PatientWrapper patient : study.getPatientCollection(false)) {
-                pevents = patient.getProcessingEventCollection(false);
+                // FIXME: this method signature has changed
+                pevents = patient.getProcessingEventCollection(null, false);
                 if ((pevents != null) && !pevents.isEmpty()) {
                     // check before, on, and after each patient's first patient
                     // visit

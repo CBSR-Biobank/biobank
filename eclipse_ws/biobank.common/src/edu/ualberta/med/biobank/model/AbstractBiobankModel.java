@@ -80,6 +80,7 @@ public abstract class AbstractBiobankModel implements IBiobankModel {
         return getId() == null;
     }
 
+    @SuppressWarnings("unused")
     private static Class<?> proxiedClass(Object o) {
         return HibernateProxyHelper.getClassWithoutInitializingProxy(o);
     }

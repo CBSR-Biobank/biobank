@@ -381,8 +381,11 @@ public class LinkFormPatientManagement {
                                 e);
                     }
                 else
-                    collection = currentPatient
-                        .getProcessingEventCollection(true);
+                    collection =
+                        currentPatient
+                            .getProcessingEventCollection(SessionManager
+                                .getUser().getCurrentWorkingCenter()
+                                , true);
                 viewerProcessingEvents.setInput(collection);
                 viewerProcessingEvents.getCombo().setFocus();
                 if (collection != null && collection.size() == 1) {

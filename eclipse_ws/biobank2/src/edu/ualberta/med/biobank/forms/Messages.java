@@ -579,6 +579,8 @@ public class Messages extends NLS {
 
     public static String ReportEntryForm_querying;
 
+    public static String ReportEntryForm_report;
+
     public static String ReportEntryForm_report_name;
 
     public static String ReportEntryForm_report_name_count;

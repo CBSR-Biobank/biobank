@@ -38,6 +38,7 @@ import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimensAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -109,6 +110,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     Map<Integer, StudyEventAttrInfo> studyAttrInfos;
 
+    private CollectionEventWrapper cevent = new CollectionEventWrapper(
+        SessionManager.getAppService());
+
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof CollectionEventAdapter,
@@ -162,6 +166,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             sourceSpecimens =
                 new ArrayList<SpecimenInfo>(ceventInfo.sourceSpecimenInfos);
         }
+        cevent.setWrappedObject(ceventCopy);
         comment.setWrappedObject(new Comment());
     }
 
@@ -184,9 +189,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
         client.setLayout(gl);
         commentEntryTable =
-            new CommentsInfoTable(client, ModelWrapper.wrapModelCollection(
-                SessionManager.getAppService(), ceventCopy.getComments(),
-                CommentWrapper.class));
+            new CommentsInfoTable(client, cevent.getCommentCollection(true));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
@@ -206,11 +209,11 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.CollectionEventEntryForm_field_study_label, ceventCopy
+            Messages.CollectionEventEntryForm_field_study_label, cevent
                 .getPatient().getStudy().getName());
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.CollectionEventEntryForm_field_patient_label, ceventCopy
+            Messages.CollectionEventEntryForm_field_patient_label, cevent
                 .getPatient().getPnumber());
 
         visitNumberText =
@@ -220,11 +223,11 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 SWT.NONE,
                 Messages.CollectionEventEntryForm_field_visitNumber_label,
                 null,
-                ceventCopy,
+                cevent,
                 CollectionEventPeer.VISIT_NUMBER.getName(),
                 new IntegerNumberValidator(
                     Messages.CollectionEventEntryForm_field_visitNumber_validation_msg,
-                    false), false);
+                    false));
 
         visitNumberText.addSelectionChangedListener(listener);
         setFirstControl(visitNumberText);
@@ -234,15 +237,15 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 client,
                 Messages.label_activity,
                 ActivityStatus.valuesList(),
-                ceventCopy.getActivityStatus(),
+                cevent.getActivityStatus(),
                 Messages.CollectionEventEntryForm_field_activity_validation_msg,
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
-                        if (selectedObject != ceventCopy.getActivityStatus()) {
+                        if (selectedObject != cevent.getActivityStatus()) {
                             setDirty(true);
                         }
-                        ceventCopy
+                        cevent
                             .setActivityStatus((ActivityStatus) selectedObject);
                     }
                 });
@@ -473,7 +476,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     @Override
     public void setValues() throws Exception {
         GuiUtil
-            .reset(activityStatusComboViewer, ceventCopy.getActivityStatus());
+            .reset(activityStatusComboViewer, cevent.getActivityStatus());
         specimensTable.reload(sourceSpecimens);
         commentEntryTable.setList(ModelWrapper.wrapModelCollection(
             SessionManager.getAppService(), ceventInfo.cevent.getComments(),

@@ -46,7 +46,8 @@ public class SiteGetTopContainersAction implements
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new ContainerReadPermission().isAllowed(context);
+        Site site = context.load(Site.class, siteId);
+        return new ContainerReadPermission(site).isAllowed(context);
     }
 
     @Override

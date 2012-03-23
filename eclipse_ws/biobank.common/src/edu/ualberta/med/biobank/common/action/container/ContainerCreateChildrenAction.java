@@ -28,7 +28,7 @@ public class ContainerCreateChildrenAction extends ContainerChildAction {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ContainerCreatePermission().isAllowed(context);
+        return new ContainerCreatePermission(siteId).isAllowed(context);
     }
 
     @Override

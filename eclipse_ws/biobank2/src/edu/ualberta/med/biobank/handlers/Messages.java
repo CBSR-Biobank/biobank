@@ -3,7 +3,8 @@ package edu.ualberta.med.biobank.handlers;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.handlers.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME =
+        "edu.ualberta.med.biobank.handlers.messages"; //$NON-NLS-1$
     public static String CbsrHelp_browser_error_msg;
     public static String CbsrHelp_url_error_msg;
     public static String DecodePlateHandler_decode_label;
@@ -12,6 +13,8 @@ public class Messages extends NLS {
     public static String EditActivityStatusHandler_handler_error_msg;
     public static String EditShippingMethodsHandler_handler_error_msg;
     public static String EditSpecimenTypesHandler_handler_error_msg;
+    public static String HandlerPermission_error;
+    public static String HandlerPermission_message;
     public static String LinkAssignCommonHandler_link_assign_open_error_msg;
     public static String LoggingHandler_view_open_error;
     public static String MainAdministrationHandler_main_persp_error;

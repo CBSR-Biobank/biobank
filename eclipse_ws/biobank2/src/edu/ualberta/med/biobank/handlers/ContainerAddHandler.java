@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
@@ -11,15 +10,15 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ContainerAddHandler extends AbstractHandler {
+public class ContainerAddHandler extends LogoutSensitiveHandler {
     public static final String ID =
         "edu.ualberta.med.biobank.commands.containerAdd"; //$NON-NLS-1$
 
-    private Boolean createAllowed;
-
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        ContainerAdapter containerAdapter = new ContainerAdapter(null, null);
+        ContainerAdapter containerAdapter =
+            new ContainerAdapter(null, new ContainerWrapper(
+                SessionManager.getAppService()));
         ((ContainerWrapper) containerAdapter.getModelObject())
             .setSite(SessionManager.getUser().getCurrentWorkingSite());
         containerAdapter.openEntryForm(false);
@@ -32,12 +31,13 @@ public class ContainerAddHandler extends AbstractHandler {
             if (createAllowed == null)
                 createAllowed =
                     SessionManager.getAppService().isAllowed(
-                        new ContainerCreatePermission());
-            return SessionManager.getUser().getCurrentWorkingSite() != null
-                && SessionManager.getInstance().getSession() != null &&
+                        new ContainerCreatePermission(SessionManager.getUser()
+                            .getCurrentWorkingCenter().getId()));
+            return SessionManager.getInstance().getSession() != null &&
                 createAllowed;
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
+                Messages.HandlerPermission_message);
             return false;
         }
     }

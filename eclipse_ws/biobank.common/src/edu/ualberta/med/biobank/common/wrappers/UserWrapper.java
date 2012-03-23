@@ -9,17 +9,11 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.permission.GlobalAdminPermission;
-import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
-import edu.ualberta.med.biobank.common.wrappers.actions.DeleteCsmUserAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.PersistCsmUserAction;
 import edu.ualberta.med.biobank.common.wrappers.base.UserBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.tasks.QueryTask;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class UserWrapper extends UserBaseWrapper {
@@ -36,48 +30,6 @@ public class UserWrapper extends UserBaseWrapper {
 
     public UserWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Deprecated
-    @Override
-    protected void addPersistTasks(TaskList tasks) {
-        // TODO problem= if persist fail, then the csm user is created anyway
-        tasks.add(new QueryTask() {
-            @Override
-            public SDKQuery getSDKQuery() {
-                return new PersistCsmUserAction(UserWrapper.this,
-                    UserWrapper.this.getPassword());
-            }
-
-            @Override
-            public void afterExecute(SDKQueryResult result) {
-                // TODO Auto-generated method stub
-            }
-        });
-        super.addPersistTasks(tasks);
-        // tasks.persistAdded(this, UserPeer.GROUP_COLLECTION);
-    }
-
-    @Deprecated
-    @Override
-    protected void addDeleteTasks(TaskList tasks) {
-        // should remove this user from its groups
-        for (GroupWrapper group : getGroupCollection(false)) {
-            group.removeFromUserCollection(Arrays.asList(this));
-            group.addPersistTasks(tasks);
-        }
-        super.addDeleteTasks(tasks);
-        tasks.add(new QueryTask() {
-            @Override
-            public SDKQuery getSDKQuery() {
-                return new DeleteCsmUserAction(UserWrapper.this);
-            }
-
-            @Override
-            public void afterExecute(SDKQueryResult result) {
-                // TODO Auto-generated method stub
-            }
-        });
     }
 
     public void setPassword(String password) {
@@ -241,26 +193,17 @@ public class UserWrapper extends UserBaseWrapper {
     }
 
     @Override
-    protected Set<CenterWrapper<?>> getWorkingCentersInternal() {
-        if (isInSuperAdminMode()) {
-            try {
-                return new HashSet<CenterWrapper<?>>(
-                    CenterWrapper.getCenters(appService));
-            } catch (ApplicationException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        Set<CenterWrapper<?>> setOfWorkingCenter = super
-            .getWorkingCentersInternal();
-        for (GroupWrapper g : getGroupCollection(false)) {
-            setOfWorkingCenter.addAll(g.getWorkingCentersInternal());
-        }
-        return setOfWorkingCenter;
-    }
-
-    @Override
     public String toString() {
         return getLogin();
     }
 
+    @Override
+    protected Set<CenterWrapper<?>> getAllCentersInvolved() throws Exception {
+        Set<CenterWrapper<?>> centers = new HashSet<CenterWrapper<?>>();
+        for (GroupWrapper g : getGroupCollection(false)) {
+            centers.addAll(g.getAllCentersInvolved());
+        }
+        centers.addAll(super.getAllCentersInvolved());
+        return centers;
+    }
 }

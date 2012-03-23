@@ -1,13 +1,16 @@
 package edu.ualberta.med.biobank.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermission;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class PatientAddHandler extends AbstractHandler {
+public class PatientAddHandler extends LogoutSensitiveHandler {
 
     private static BgcLogger logger = BgcLogger
         .getLogger(PatientAddHandler.class.getName());
@@ -25,8 +28,17 @@ public class PatientAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return true;
-        // checks are done for patient at save time
+        try {
+            if (createAllowed == null)
+                createAllowed =
+                    SessionManager.getAppService().isAllowed(
+                        new PatientCreatePermission(null));
+            return SessionManager.getInstance().getSession() != null &&
+                createAllowed;
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
+                Messages.HandlerPermission_message);
+            return false;
+        }
     }
-
 }

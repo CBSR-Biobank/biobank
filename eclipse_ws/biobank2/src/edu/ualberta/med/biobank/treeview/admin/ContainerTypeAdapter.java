@@ -33,7 +33,9 @@ public class ContainerTypeAdapter extends AdapterBase {
     @Override
     public void init() {
         try {
-            Integer id = ((ContainerTypeWrapper) getModelObject()).getId();
+            ContainerTypeWrapper ctype =
+                (ContainerTypeWrapper) getModelObject();
+            Integer id = ctype.getId();
             if (id == null) return;
 
             this.isDeletable =
@@ -41,7 +43,8 @@ public class ContainerTypeAdapter extends AdapterBase {
                     new ContainerTypeDeletePermission(id));
             this.isReadable =
                 SessionManager.getAppService().isAllowed(
-                    new ContainerTypeReadPermission(id));
+                    new ContainerTypeReadPermission(ctype.getSite()
+                        .getWrappedObject()));
             this.isEditable =
                 SessionManager.getAppService().isAllowed(
                     new ContainerTypeUpdatePermission(id));

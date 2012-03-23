@@ -95,7 +95,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
     public boolean isAllowed(ActionContext context) throws ActionException {
         Permission permission;
         if (containerTypeId == null)
-            permission = new ContainerTypeCreatePermission();
+            permission = new ContainerTypeCreatePermission(siteId);
         else
             permission = new ContainerTypeUpdatePermission(containerTypeId);
         return permission.isAllowed(context);
@@ -121,10 +121,10 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         containerType.getCapacity().setRowCapacity(rowCapacity);
         containerType.getCapacity().setColCapacity(colCapacity);
         containerType.setDefaultTemperature(defaultTemperature);
+        containerType.setActivityStatus(activityStatus);
 
         addComment(context, containerType);
         setChildLabelingScheme(context, containerType);
-        setActivityStatus(context, containerType);
         setContents(context, containerType);
 
         context.getSession().save(containerType);
@@ -158,11 +158,6 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         ContainerLabelingScheme childLabelingScheme =
             context.load(ContainerLabelingScheme.class, childLabelingSchemeId);
         containerType.setChildLabelingScheme(childLabelingScheme);
-    }
-
-    private void setActivityStatus(ActionContext context,
-        ContainerType containerType) {
-        containerType.setActivityStatus(activityStatus);
     }
 
     private void setContents(ActionContext context, ContainerType containerType) {

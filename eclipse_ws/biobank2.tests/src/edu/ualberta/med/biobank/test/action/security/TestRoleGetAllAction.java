@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.test.action.security;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -32,7 +31,7 @@ public class TestRoleGetAllAction extends TestAction {
         User user = factory.createUser();
         factory.createMembership(Domain.CENTER_STUDY, Rank.ADMINISTRATOR);
         tx.commit();
-        
+
         try {
             execAs(user, new RoleGetAllAction(new RoleGetAllInput()));
             Assert.fail();
@@ -45,7 +44,7 @@ public class TestRoleGetAllAction extends TestAction {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
         tx.commit();
-        
+
         try {
             execAs(user, new RoleGetAllAction(new RoleGetAllInput()));
             Assert.fail();
@@ -58,7 +57,7 @@ public class TestRoleGetAllAction extends TestAction {
         Transaction tx = session.beginTransaction();
         User manager = factory.createUser();
         tx.commit();
-        
+
         try {
             execAs(manager, new RoleGetAllAction(new RoleGetAllInput()));
             Assert.fail();
@@ -81,8 +80,8 @@ public class TestRoleGetAllAction extends TestAction {
             postInsertActionRoles.contains(newRole));
 
         @SuppressWarnings("unchecked")
-        Set<Role> dbRoles = new HashSet<Role>(
-            (List<Role>) session.createCriteria(Role.class)
+        Set<Role> dbRoles =
+            new HashSet<Role>(session.createCriteria(Role.class)
                 .list());
         Assert.assertEquals("unexpected roles",
             postInsertActionRoles, dbRoles);
