@@ -518,6 +518,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
         }
 
         Set<PermissionEnum> selPerms = permissionsTree.getCheckedElements();
+        selPerms.retainAll(mPermsList);
 
         permissionsTree.setInput(mPermsList);
         permissionsTree.setSelections(selPerms);
