@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.mvp.event.ExceptionHandler;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.rcp.Application;
-import edu.ualberta.med.biobank.sourceproviders.SessionState;
+import edu.ualberta.med.biobank.sourceproviders.UserState;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
@@ -398,13 +398,13 @@ public class BiobankPlugin extends AbstractUIPlugin {
         }
     }
 
-    public static SessionState getSessionStateSourceProvider() {
+    public static UserState getSessionStateSourceProvider() {
         IWorkbenchWindow window = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
-        return (SessionState) service
-            .getSourceProvider(SessionState.SESSION_STATE_SOURCE_NAME);
+        return (UserState) service
+            .getSourceProvider(UserState.HAS_USER_MANAGEMENT_RIGHTS);
     }
 
 }

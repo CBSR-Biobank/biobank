@@ -29,8 +29,8 @@ public class DispatchAddHandler extends LogoutSensitiveHandler {
     @Override
     public boolean isEnabled() {
         try {
-            if (createAllowed == null)
-                createAllowed = SessionManager.getAppService().isAllowed(
+            if (allowed == null)
+                allowed = SessionManager.getAppService().isAllowed(
                     new
                     DispatchCreatePermission(SessionManager.getUser()
                         .getCurrentWorkingCenter().getId()));
@@ -38,7 +38,7 @@ public class DispatchAddHandler extends LogoutSensitiveHandler {
             BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
             return false;
         }
-        return createAllowed;
+        return allowed;
     }
 
 }

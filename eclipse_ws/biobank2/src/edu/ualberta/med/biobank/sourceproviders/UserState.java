@@ -5,6 +5,9 @@ import java.util.Map;
 
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.labelPrinting.LabelPrintingPermission;
@@ -12,13 +15,11 @@ import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.LoginSessionState;
 
-public class SessionState extends AbstractSourceProvider {
+public class UserState extends AbstractSourceProvider {
 
-    public final static String SESSION_STATE_SOURCE_NAME =
-        "edu.ualberta.med.biobank.sourceprovider.loginState"; //$NON-NLS-1$
-
-    private static BgcLogger logger = BgcLogger.getLogger(SessionState.class
+    private static BgcLogger logger = BgcLogger.getLogger(UserState.class
         .getName());
 
     public final static String IS_SUPER_ADMIN_MODE_SOURCE_NAME =
@@ -40,8 +41,9 @@ public class SessionState extends AbstractSourceProvider {
 
     @Override
     public String[] getProvidedSourceNames() {
-        return new String[] { SESSION_STATE_SOURCE_NAME,
-            IS_SUPER_ADMIN_MODE_SOURCE_NAME, HAS_WORKING_CENTER_SOURCE_NAME,
+        return new String[] { HAS_USER_MANAGEMENT_RIGHTS,
+            IS_SUPER_ADMIN_MODE_SOURCE_NAME,
+            HAS_WORKING_CENTER_SOURCE_NAME,
             HAS_LABEL_PRINTING_RIGHTS, CURRENT_CENTER_TYPE };
     }
 
@@ -127,4 +129,14 @@ public class SessionState extends AbstractSourceProvider {
             logger.error("Error setting session state", e); //$NON-NLS-1$
         }
     }
+
+    public static AbstractSourceProvider getUserStateSourceProvider() {
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+        return (LoginSessionState) service
+            .getSourceProvider(UserState.HAS_USER_MANAGEMENT_RIGHTS);
+    }
+
 }

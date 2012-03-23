@@ -40,10 +40,10 @@ public class ShippingMethodsEditHandler extends LogoutSensitiveHandler {
     @Override
     public boolean isEnabled() {
         try {
-            if (createAllowed == null)
-                createAllowed = SessionManager.getAppService().isAllowed(
+            if (allowed == null)
+                allowed = SessionManager.getAppService().isAllowed(
                     new GlobalAdminPermission());
-            return (createAllowed
+            return (allowed
             && (SessionManager.getInstance().getSession() != null));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");

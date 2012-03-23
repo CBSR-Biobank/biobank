@@ -28,13 +28,13 @@ public class ContainerAddHandler extends LogoutSensitiveHandler {
     @Override
     public boolean isEnabled() {
         try {
-            if (createAllowed == null)
-                createAllowed =
+            if (allowed == null)
+                allowed =
                     SessionManager.getAppService().isAllowed(
                         new ContainerCreatePermission(SessionManager.getUser()
                             .getCurrentWorkingCenter().getId()));
             return SessionManager.getInstance().getSession() != null &&
-                createAllowed;
+                allowed;
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
                 Messages.HandlerPermission_message);

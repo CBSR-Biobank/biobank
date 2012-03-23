@@ -32,15 +32,15 @@ public class ProcessingEventAddHandler extends LogoutSensitiveHandler {
     @Override
     public boolean isEnabled() {
         try {
-            if (createAllowed == null)
-                createAllowed =
+            if (allowed == null)
+                allowed =
                     SessionManager.getAppService().isAllowed(
                         new ProcessingEventCreatePermission());
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
                 Messages.HandlerPermission_message);
         }
-        return createAllowed;
+        return allowed;
     }
 
 }

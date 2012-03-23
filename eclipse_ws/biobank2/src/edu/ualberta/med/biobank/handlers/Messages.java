@@ -28,7 +28,11 @@ public class Messages extends NLS {
     public static String ResetHandler_reset_error;
     public static String ScanPlateHandler_scan_label;
     public static String SearchHandler_view_open_error;
+    public static String SpecimenAssignHandler_error_message;
+    public static String SpecimenAssignHandler_log_location;
     public static String SpecimenAssignHandler_specimenAssign_label;
+    public static String SpecimenLinkHandler_error_message;
+    public static String SpecimenLinkHandler_log_location;
     public static String SpecimenLinkHandler_specimen_link_label;
     static {
         // initialize resource bundle

@@ -29,12 +29,12 @@ public class PatientAddHandler extends LogoutSensitiveHandler {
     @Override
     public boolean isEnabled() {
         try {
-            if (createAllowed == null)
-                createAllowed =
+            if (allowed == null)
+                allowed =
                     SessionManager.getAppService().isAllowed(
                         new PatientCreatePermission(null));
             return SessionManager.getInstance().getSession() != null &&
-                createAllowed;
+                allowed;
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
                 Messages.HandlerPermission_message);

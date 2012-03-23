@@ -12,13 +12,11 @@ import edu.ualberta.med.biobank.treeview.processing.SpecimenAssignAdapter;
 
 public class SpecimenAssignHandler extends LinkAssignCommonHandler {
 
-    private Boolean assignAllowed;
-
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         if (!SpecimenLinkHandler.checkActivityLogSavePathValid()) {
-            BgcPlugin.openAsyncError("Activity Log Location",
-                "Invalid path selected. Cannot proceed with specimen assign.");
+            BgcPlugin.openAsyncError(Messages.SpecimenAssignHandler_log_location,
+                Messages.SpecimenAssignHandler_error_message);
             return null;
         }
 
@@ -31,18 +29,18 @@ public class SpecimenAssignHandler extends LinkAssignCommonHandler {
 
     @Override
     protected boolean canUserPerformAction(UserWrapper user) {
-        if (assignAllowed == null)
+        if (allowed == null)
             try {
                 if (!SessionManager.getInstance().isConnected()
                     || user.getCurrentWorkingSite() == null)
                     return false;
-                assignAllowed =
+                allowed =
                     SessionManager.getAppService().isAllowed(
                         new SpecimenAssignPermission(user
                             .getCurrentWorkingSite().getId()));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        return assignAllowed;
+        return allowed;
     }
 }

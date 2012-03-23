@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.jface.action.IContributionItem;
@@ -24,7 +23,8 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
  * Open a form in patient administration like scan link, scan assign or cabinet
  * like/assign
  */
-public abstract class LinkAssignCommonHandler extends AbstractHandler implements
+public abstract class LinkAssignCommonHandler extends LogoutSensitiveHandler
+    implements
     IHandler {
 
     public Object openLinkAssignPerspective(String editorId, AdapterBase adapter)

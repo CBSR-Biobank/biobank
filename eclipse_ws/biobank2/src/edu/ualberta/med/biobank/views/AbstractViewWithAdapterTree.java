@@ -17,7 +17,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.BgcSessionState;
+import edu.ualberta.med.biobank.gui.common.LoginSessionState;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
 
@@ -39,11 +39,12 @@ public abstract class AbstractViewWithAdapterTree extends
             public void sourceChanged(int sourcePriority, String sourceName,
                 Object sourceValue) {
                 if (sourceName
-                    .equals(BgcSessionState.SESSION_STATE_SOURCE_NAME)) {
+                    .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)) {
                     if (sourceValue != null) {
-                        if (sourceValue.equals(BgcSessionState.LOGGED_IN))
+                        if (sourceValue.equals(LoginSessionState.LOGGED_IN))
                             reload();
-                        else if (sourceValue.equals(BgcSessionState.LOGGED_OUT))
+                        else if (sourceValue
+                            .equals(LoginSessionState.LOGGED_OUT))
                             clear();
                     }
                 }
@@ -55,7 +56,7 @@ public abstract class AbstractViewWithAdapterTree extends
                 //
             }
         };
-        BgcPlugin.getSessionStateSourceProvider().addSourceProviderListener(
+        BgcPlugin.getLoginStateSourceProvider().addSourceProviderListener(
             sourceListener);
     }
 
@@ -140,7 +141,7 @@ public abstract class AbstractViewWithAdapterTree extends
     @Override
     public void dispose() {
         if (sourceListener != null)
-            BgcPlugin.getSessionStateSourceProvider()
+            BgcPlugin.getLoginStateSourceProvider()
                 .removeSourceProviderListener(sourceListener);
         super.dispose();
     }

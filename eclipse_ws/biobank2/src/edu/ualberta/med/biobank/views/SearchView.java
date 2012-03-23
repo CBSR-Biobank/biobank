@@ -23,7 +23,7 @@ import org.eclipse.ui.part.ViewPart;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.BgcSessionState;
+import edu.ualberta.med.biobank.gui.common.LoginSessionState;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.utils.SearchType;
 
@@ -54,13 +54,13 @@ public class SearchView extends ViewPart {
             public void sourceChanged(int sourcePriority, String sourceName,
                 Object sourceValue) {
                 if (sourceName
-                    .equals(BgcSessionState.SESSION_STATE_SOURCE_NAME)) {
-                    loggedIn = sourceValue.equals(BgcSessionState.LOGGED_IN);
+                    .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)) {
+                    loggedIn = sourceValue.equals(LoginSessionState.LOGGED_IN);
                     setEnabled();
                 }
             }
         };
-        BgcPlugin.getSessionStateSourceProvider().addSourceProviderListener(
+        BgcPlugin.getLoginStateSourceProvider().addSourceProviderListener(
             sourceProviderListener);
 
         searchTypeCombo = new ComboViewer(parent);
@@ -96,9 +96,9 @@ public class SearchView extends ViewPart {
             }
         });
 
-        loggedIn = BgcPlugin.getSessionStateSourceProvider().getCurrentState()
-            .get(BgcSessionState.SESSION_STATE_SOURCE_NAME)
-            .equals(BgcSessionState.LOGGED_IN);
+        loggedIn = BgcPlugin.getLoginStateSourceProvider().getCurrentState()
+            .get(LoginSessionState.LOGIN_STATE_SOURCE_NAME)
+            .equals(LoginSessionState.LOGGED_IN);
         setEnabled();
 
     }
@@ -111,7 +111,7 @@ public class SearchView extends ViewPart {
     @Override
     public void dispose() {
         if (sourceProviderListener != null)
-            BgcPlugin.getSessionStateSourceProvider()
+            BgcPlugin.getLoginStateSourceProvider()
                 .removeSourceProviderListener(sourceProviderListener);
         super.dispose();
     }

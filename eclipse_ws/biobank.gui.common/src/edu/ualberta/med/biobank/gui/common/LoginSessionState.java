@@ -6,9 +6,9 @@ import java.util.Map;
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
-public class BgcSessionState extends AbstractSourceProvider {
+public class LoginSessionState extends AbstractSourceProvider {
 
-    public final static String SESSION_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.gui.common.sourceprovider.loginState"; //$NON-NLS-1$
+    public final static String LOGIN_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.gui.common.sourceprovider.loginState"; //$NON-NLS-1$
 
     public final static String LOGGED_IN = "loggedIn"; //$NON-NLS-1$
 
@@ -18,7 +18,7 @@ public class BgcSessionState extends AbstractSourceProvider {
 
     @Override
     public String[] getProvidedSourceNames() {
-        return new String[] { SESSION_STATE_SOURCE_NAME };
+        return new String[] { LOGIN_STATE_SOURCE_NAME };
     }
 
     @Override
@@ -29,7 +29,7 @@ public class BgcSessionState extends AbstractSourceProvider {
     public Map<String, String> getCurrentState() {
         Map<String, String> currentStateMap = new HashMap<String, String>(1);
         String currentState = loggedIn ? LOGGED_IN : LOGGED_OUT;
-        currentStateMap.put(SESSION_STATE_SOURCE_NAME, currentState);
+        currentStateMap.put(LOGIN_STATE_SOURCE_NAME, currentState);
         return currentStateMap;
     }
 
@@ -38,7 +38,7 @@ public class BgcSessionState extends AbstractSourceProvider {
             return; // no change
         this.loggedIn = loggedIn;
         String currentState = loggedIn ? LOGGED_IN : LOGGED_OUT;
-        fireSourceChanged(ISources.WORKBENCH, SESSION_STATE_SOURCE_NAME,
+        fireSourceChanged(ISources.WORKBENCH, LOGIN_STATE_SOURCE_NAME,
             currentState);
     }
 

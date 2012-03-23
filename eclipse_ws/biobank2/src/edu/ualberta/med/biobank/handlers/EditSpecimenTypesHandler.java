@@ -40,11 +40,11 @@ public class EditSpecimenTypesHandler extends LogoutSensitiveHandler {
     @Override
     public boolean isEnabled() {
         try {
-            if (createAllowed == null)
-                createAllowed = SessionManager.getAppService().isAllowed(
+            if (allowed == null)
+                allowed = SessionManager.getAppService().isAllowed(
                     new SpecimenTypeCreatePermission());
             return SessionManager.getUser().isInSuperAdminMode()
-                && createAllowed
+                && allowed
                 && (SessionManager.getInstance().getSession() != null);
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");

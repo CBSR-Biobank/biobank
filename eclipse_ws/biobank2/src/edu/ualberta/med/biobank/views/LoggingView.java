@@ -31,7 +31,7 @@ import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.forms.LoggingForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.BgcSessionState;
+import edu.ualberta.med.biobank.gui.common.LoginSessionState;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.logs.LogQuery;
@@ -303,9 +303,9 @@ public class LoggingView extends ViewPart {
             @Override
             public void sourceChanged(int sourcePriority, String sourceName,
                 Object sourceValue) {
-                if (sourceValue.equals(BgcSessionState.LOGGED_OUT)) {
+                if (sourceValue.equals(LoginSessionState.LOGGED_OUT)) {
                     setEnableAllFields(false);
-                } else if (sourceValue.equals(BgcSessionState.LOGGED_IN)) {
+                } else if (sourceValue.equals(LoginSessionState.LOGGED_IN)) {
                     loadComboFields();
                     setEnableAllFields(true);
                 }
@@ -318,7 +318,7 @@ public class LoggingView extends ViewPart {
             }
         };
 
-        BgcPlugin.getSessionStateSourceProvider().addSourceProviderListener(
+        BgcPlugin.getLoginStateSourceProvider().addSourceProviderListener(
             siteStateListener);
     }
 
@@ -326,7 +326,7 @@ public class LoggingView extends ViewPart {
     public void dispose() {
         super.dispose();
         if (siteStateListener != null) {
-            BgcPlugin.getSessionStateSourceProvider()
+            BgcPlugin.getLoginStateSourceProvider()
                 .removeSourceProviderListener(siteStateListener);
         }
     }

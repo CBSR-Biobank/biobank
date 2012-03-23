@@ -60,11 +60,15 @@ public class BgcPlugin extends AbstractUIPlugin {
     public static final String IMG_SESSIONS = "sessions"; //$NON-NLS-1$
     public static final String IMG_CLINIC_SHIPMENT = "shipment"; //$NON-NLS-1$
     public static final String IMG_DISPATCH_SHIPMENT = "dispatch"; //$NON-NLS-1$
-    public static final String IMG_DISPATCH_SHIPMENT_CREATION = "dispatchCreation"; //$NON-NLS-1$
-    public static final String IMG_DISPATCH_SHIPMENT_TRANSIT = "dispatchTransit"; //$NON-NLS-1$
-    public static final String IMG_DISPATCH_SHIPMENT_RECEIVING = "dispatchReceiving"; //$NON-NLS-1$
+    public static final String IMG_DISPATCH_SHIPMENT_CREATION =
+        "dispatchCreation"; //$NON-NLS-1$
+    public static final String IMG_DISPATCH_SHIPMENT_TRANSIT =
+        "dispatchTransit"; //$NON-NLS-1$
+    public static final String IMG_DISPATCH_SHIPMENT_RECEIVING =
+        "dispatchReceiving"; //$NON-NLS-1$
     public static final String IMG_DISPATCH_SHIPMENT_ERROR = "dispatchError"; //$NON-NLS-1$
-    public static final String IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN = "dispatchAddSpecimen"; //$NON-NLS-1$
+    public static final String IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN =
+        "dispatchAddSpecimen"; //$NON-NLS-1$
     public static final String IMG_SITE = "site"; //$NON-NLS-1$
     public static final String IMG_SITES = "sites"; //$NON-NLS-1$
     public static final String IMG_STUDIES = "studies"; //$NON-NLS-1$
@@ -411,13 +415,13 @@ public class BgcPlugin extends AbstractUIPlugin {
         }
     }
 
-    public static BgcSessionState getSessionStateSourceProvider() {
+    public static LoginSessionState getLoginStateSourceProvider() {
         IWorkbenchWindow window = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
-        return (BgcSessionState) service
-            .getSourceProvider(BgcSessionState.SESSION_STATE_SOURCE_NAME);
+        return (LoginSessionState) service
+            .getSourceProvider(LoginSessionState.LOGIN_STATE_SOURCE_NAME);
     }
 
 }

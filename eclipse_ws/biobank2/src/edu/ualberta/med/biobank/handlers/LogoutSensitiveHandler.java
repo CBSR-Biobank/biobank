@@ -5,15 +5,15 @@ import java.util.Map;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.ui.ISourceProviderListener;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.gui.common.BgcSessionState;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.LoginSessionState;
 
 public abstract class LogoutSensitiveHandler extends AbstractHandler {
-    protected Boolean createAllowed = null;
+    protected Boolean allowed = null;
 
     public LogoutSensitiveHandler() {
         super();
-        BiobankPlugin.getSessionStateSourceProvider()
+        BgcPlugin.getLoginStateSourceProvider()
             .addSourceProviderListener(new ISourceProviderListener() {
 
                 @SuppressWarnings("rawtypes")
@@ -26,9 +26,9 @@ public abstract class LogoutSensitiveHandler extends AbstractHandler {
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
                     if (sourceName
-                        .equals(BgcSessionState.SESSION_STATE_SOURCE_NAME)
-                        && sourceValue.equals(BgcSessionState.LOGGED_OUT))
-                        createAllowed = null;
+                        .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)
+                        && sourceValue.equals(LoginSessionState.LOGGED_OUT))
+                        allowed = null;
                 }
             });
     }
