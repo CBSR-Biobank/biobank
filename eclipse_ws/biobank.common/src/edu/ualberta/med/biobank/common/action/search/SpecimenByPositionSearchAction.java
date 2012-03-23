@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.action.search;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import org.hibernate.Query;
 
@@ -37,19 +37,22 @@ public class SpecimenByPositionSearchAction implements
         // FIXME: ??? what to do
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ListResult<Integer> run(ActionContext context)
         throws ActionException {
-        String container =
-            positionString.substring(0, positionString.length() - 2);
-        String specimen = positionString.substring(positionString.length() - 2);
-        Query q =
-            context.getSession().createQuery(SPEC_BASE_QRY);
-        q.setParameter(0, container);
-        q.setParameter(1, specimen);
-        q.setParameter(2, currentCenter);
-        @SuppressWarnings("unchecked")
-        List<Integer> rows = q.list();
-        return new ListResult<Integer>(rows);
+        if (positionString.length() > 2) {
+            String container =
+                positionString.substring(0, positionString.length() - 2);
+            String specimen =
+                positionString.substring(positionString.length() - 2);
+            Query q =
+                context.getSession().createQuery(SPEC_BASE_QRY);
+            q.setParameter(0, container);
+            q.setParameter(1, specimen);
+            q.setParameter(2, currentCenter);
+            return new ListResult<Integer>(q.list());
+        }
+        return new ListResult<Integer>(new ArrayList<Integer>());
     }
 }

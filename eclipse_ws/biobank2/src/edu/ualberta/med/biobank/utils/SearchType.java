@@ -82,8 +82,14 @@ public enum SearchType {
                 ContainerByBarcodeSearchAction action =
                     new ContainerByBarcodeSearchAction(searchString,
                         center.getId());
-                return wrapIds(SessionManager.getAppService()
-                    .doAction(action).getList(), ContainerWrapper.class);
+                List<ModelWrapper<?>> list =
+                    new ArrayList<ModelWrapper<?>>(
+                        ModelWrapper.wrapModelCollection(SessionManager
+                            .getAppService(),
+                            SessionManager.getAppService().doAction(action)
+                                .getList(),
+                            ContainerWrapper.class));
+                return list;
             }
             return null;
         }

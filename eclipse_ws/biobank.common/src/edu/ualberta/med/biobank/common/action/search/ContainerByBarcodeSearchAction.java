@@ -11,14 +11,14 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.Container;
 
 public class ContainerByBarcodeSearchAction implements
-    Action<ListResult<Integer>> {
+    Action<ListResult<Object>> {
 
     @SuppressWarnings("nls")
     protected static final String CONTAINER_BASE_QRY =
-        "SELECT c.id FROM "
+        "SELECT c FROM "
             + Container.class.getName()
-            + " c"
-            + " where c.barcode=? and c.site.id=?";
+            + " c inner join fetch c.site"
+            + " where c.productBarcode=? and c.site.id=?";
 
     private static final long serialVersionUID = 1L;
     private String barcode;
@@ -38,14 +38,14 @@ public class ContainerByBarcodeSearchAction implements
     }
 
     @Override
-    public ListResult<Integer> run(ActionContext context)
+    public ListResult<Object> run(ActionContext context)
         throws ActionException {
         Query q =
             context.getSession().createQuery(CONTAINER_BASE_QRY);
         q.setParameter(0, barcode);
         q.setParameter(1, currentCenter);
         @SuppressWarnings("unchecked")
-        List<Integer> rows = q.list();
-        return new ListResult<Integer>(rows);
+        List<Object> rows = q.list();
+        return new ListResult<Object>(rows);
     }
 }

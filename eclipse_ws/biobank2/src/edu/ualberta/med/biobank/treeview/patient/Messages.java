@@ -22,6 +22,10 @@ public class Messages extends NLS {
 
     public static String PatientAdapter_delete_confirm_msg;
 
+    public static String PatientAdapter_error;
+
+    public static String PatientAdapter_message;
+
     public static String PatientAdapter_patient_label;
 
     static {

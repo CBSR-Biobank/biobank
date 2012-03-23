@@ -76,8 +76,8 @@ public class ContainerAdapter extends AdapterBase {
                 SessionManager.getAppService().isAllowed(
                     new ContainerUpdatePermission(id));
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
+            BgcPlugin.openAsyncError(Messages.ContainerAdapter_error,
+                Messages.ContainerAdapter_message);
         }
     }
 

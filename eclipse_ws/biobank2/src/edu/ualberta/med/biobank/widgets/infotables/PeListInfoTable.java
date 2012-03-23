@@ -5,17 +5,17 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventBriefInfo;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
+public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
 
     private static final int PAGE_SIZE_ROWS = 24;
 
     protected class TableRowData {
-        ProcessingEventWrapper pe;
+        ProcessingEventBriefInfo pe;
         public String startDate;
         public String studyNameShort;
         public Long numSVs;
@@ -34,9 +34,9 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
         Messages.PeListInfoTable_sources_label,
         Messages.PeListInfoTable_aliquoteds_label };
 
-    public PeListInfoTable(Composite parent, List<ProcessingEventWrapper> pvs) {
+    public PeListInfoTable(Composite parent, List<ProcessingEventBriefInfo> pvs) {
         super(parent, pvs, HEADINGS, PAGE_SIZE_ROWS,
-            ProcessingEventWrapper.class);
+            ProcessingEventBriefInfo.class);
     }
 
     @Override
@@ -44,7 +44,8 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -70,17 +71,12 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
     @Override
     public TableRowData getCollectionModelObject(Object o) throws Exception {
         TableRowData info = new TableRowData();
-        info.pe = (ProcessingEventWrapper) o;
-        info.startDate = info.pe.getFormattedCreatedAt();
-        StudyWrapper study = info.pe.getSpecimenCollection(false).get(0)
-            .getCollectionEvent().getPatient().getStudy();
-        if (study != null) {
-            info.studyNameShort = study.getNameShort();
-        } else {
-            info.studyNameShort = ""; //$NON-NLS-1$
-        }
-        info.numSVs = info.pe.getSpecimenCount(false);
-        info.numAliquots = info.pe.getChildSpecimenCount();
+        info.pe = (ProcessingEventBriefInfo) o;
+        info.startDate =
+            DateFormatter.formatAsDateTime(info.pe.e.getCreatedAt());
+        info.studyNameShort = info.pe.study;
+        info.numSVs = info.pe.svs;
+        info.numAliquots = info.pe.aliquots;
         return info;
     }
 
@@ -92,7 +88,7 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
     }
 
     @Override
-    public ProcessingEventWrapper getSelection() {
+    public ProcessingEventBriefInfo getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;

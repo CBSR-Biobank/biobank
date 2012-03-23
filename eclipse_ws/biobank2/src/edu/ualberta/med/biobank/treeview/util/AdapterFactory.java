@@ -52,8 +52,6 @@ public class AdapterFactory {
             }
             throw new Exception("No adapter class found:" + adapterClassName); //$NON-NLS-1$
         } catch (Exception e) {
-            if (object instanceof ModelWrapper)
-                return getAdapter(((ModelWrapper<?>) object));
             throw new RuntimeException(
                 "error in invoking adapter for object: " + objectClassName //$NON-NLS-1$
                     + " (adapter name is " + adapterClassName + "). ", e); //$NON-NLS-1$ //$NON-NLS-2$

@@ -10,6 +10,7 @@ public class Messages extends NLS {
     public static String ClinicMasterGroup_clinics_node_label;
     public static String ContainerAdapter_container_label;
     public static String ContainerAdapter_delete_confirm_msg;
+    public static String ContainerAdapter_message;
     public static String ContainerAdapter_move_cont_error_title;
     public static String ContainerAdapter_move_empty_error_msg;
     public static String ContainerAdapter_move_erro_title;
@@ -22,6 +23,7 @@ public class Messages extends NLS {
     public static String ContainerAdapter_moving_cont;
     public static String ContainerAdapter_moving_specs;
     public static String ContainerAdapter_cont_moved_info_title;
+    public static String ContainerAdapter_error;
     public static String ContainerAdapter_spec_moved_info_msg;
     public static String ContainerAdapter_spec_moved_info_title;
     public static String ContainerGroup_add_label;

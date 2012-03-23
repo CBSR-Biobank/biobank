@@ -59,8 +59,8 @@ public class PatientAdapter extends AbstractNewAdapterBase {
                 SessionManager.getAppService().isAllowed(
                     new PatientUpdatePermission(patient.getId()));
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
+            BgcPlugin.openAsyncError(Messages.PatientAdapter_error,
+                Messages.PatientAdapter_message);
         }
     }
 
