@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -29,35 +31,45 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget;
 import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget.PermissionTreeRes;
 import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class MembershipEditDialog extends BgcBaseDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
+    private final ManagerContext context;
     private ComboViewer centersViewer;
     private ComboViewer studiesViewer;
-    private MultiSelectWidget<RoleWrapper> rolesWidget;
+    private MultiSelectWidget<Role> rolesWidget;
     private MembershipWrapper ms;
     private PermissionCheckTreeWidget permissionsTree;
 
-    public MembershipEditDialog(Shell parent, MembershipWrapper ms) {
+    public MembershipEditDialog(Shell parent, MembershipWrapper ms,
+        ManagerContext context) {
         super(parent);
         Assert.isNotNull(ms);
         this.ms = ms;
+        this.context = context;
         currentTitle = Messages.MembershipAddDialog_title;
         titleAreaMessage = Messages.MembershipAddDialog_description;
     }
@@ -90,6 +102,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
 
         Composite centerStudyComp = createTabItem(tb,
             Messages.MembershipAddDialog_centerStudy_tab_title, 1);
+        createRankAndLevel(centerStudyComp);
         createCentersCombo(centerStudyComp);
         createStudysCombo(centerStudyComp);
 
@@ -98,6 +111,13 @@ public class MembershipEditDialog extends BgcBaseDialog {
 
         createPermissionWidgets(createTabItem(tb,
             Messages.MembershipAddDialog_permissions_tab_title, 1));
+    }
+
+    protected void createRankAndLevel(Composite parent) {
+        Composite contents = new Composite(parent, SWT.NONE);
+        contents.setLayout(new GridLayout(2, false));
+
+        widgetCreator.createLabel(contents, "Rank");
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -136,6 +156,13 @@ public class MembershipEditDialog extends BgcBaseDialog {
                     .isCenterStudyAlreadyUsed(getCenterSelection(), study);
             }
         });
+        studiesViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    updateRoleAndPermissionOptions();
+                }
+            });
     }
 
     private void createCentersCombo(Composite contents)
@@ -162,7 +189,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
             Messages.MembershipAddDialog_all_centers_label);
         centers.add(noCenterSelection);
         centers
-            .addAll(CenterWrapper.getCenters(SessionManager.getAppService()));
+            .addAll(getCenterOptions());
         centersViewer = createComboViewer(groupComp,
             Messages.MembershipAddDialog_selected_center_label, centers,
             ms.getCenter() == null ? noCenterSelection : ms.getCenter(), null,
@@ -179,7 +206,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
-                    studiesViewer.refresh();
+                    updateStudyOptions();
                 }
             });
         GridData gd = (GridData) centersViewer.getControl().getLayoutData();
@@ -232,17 +259,17 @@ public class MembershipEditDialog extends BgcBaseDialog {
     private void createRolesWidget(Composite contents)
         throws ApplicationException {
         GridData gd;
-        rolesWidget = new MultiSelectWidget<RoleWrapper>(contents, SWT.NONE,
+        rolesWidget = new MultiSelectWidget<Role>(contents, SWT.NONE,
             Messages.MembershipAddDialog_roles_available_label,
             Messages.MembershipAddDialog_roles_selected_label, 300) {
             @Override
-            protected String getTextForObject(RoleWrapper nodeObject) {
+            protected String getTextForObject(Role nodeObject) {
                 return nodeObject.getName();
             }
         };
         rolesWidget.setSelections(
-            RoleWrapper.getAllRoles(SessionManager.getAppService()),
-            ms.getRoleCollection(false));
+            new ArrayList<Role>(context.getRoles()),
+            new ArrayList<Role>(ms.getWrappedObject().getRoles()));
         gd = (GridData) rolesWidget.getLayoutData();
         gd.horizontalSpan = 2;
         rolesWidget
@@ -288,8 +315,10 @@ public class MembershipEditDialog extends BgcBaseDialog {
             checkedRolesOrPermissionsSelected();
             return;
         }
-        ms.addToRoleCollection(rolesWidget.getAddedToSelection());
-        ms.removeFromRoleCollection(rolesWidget.getRemovedFromSelection());
+        ms.getWrappedObject().getRoles()
+            .removeAll(rolesWidget.getRemovedFromSelection());
+        ms.getWrappedObject().getRoles()
+            .addAll(rolesWidget.getAddedToSelection());
         PermissionTreeRes res = permissionsTree.getAddedAndRemovedNodes();
         ms.addToPermissionCollection(res.addedPermissions);
         ms.removeFromPermissionCollection(res.removedPermissions);
@@ -319,9 +348,10 @@ public class MembershipEditDialog extends BgcBaseDialog {
             IStructuredSelection structSel = (IStructuredSelection) sel;
             if (structSel.size() > 0) {
                 Object selection = structSel.getFirstElement();
-                if (selection instanceof String)
-                    return null;
-                return (CenterWrapper) selection;
+                CenterWrapper center =
+                    (selection instanceof String) ? null
+                        : (CenterWrapper) selection;
+                return center;
             }
         }
         return null;
@@ -338,4 +368,92 @@ public class MembershipEditDialog extends BgcBaseDialog {
         super.cancelPressed();
     }
 
+    private List<CenterWrapper<?>> getCenterOptions() {
+        Set<Center> options = new HashSet<Center>();
+
+        User manager = context.getManager();
+        for (Membership m : manager.getAllMemberships()) {
+            if (m.getCenter() == null) {
+                HQLCriteria criteria =
+                    new HQLCriteria("from " + Center.class.getName(),
+                        new ArrayList<Object>());
+
+                try {
+                    List<Center> centers =
+                        SessionManager.getAppService().query(criteria);
+                    options.addAll(centers);
+                } catch (ApplicationException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                break;
+            } else {
+                options.add(m.getCenter());
+            }
+        }
+
+        List<CenterWrapper<?>> wrappedOptions =
+            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+                options, null);
+
+        return wrappedOptions;
+    }
+
+    public void updateStudyOptions() {
+        CenterWrapper<?> selectedCenter = getCenterSelection();
+        Center modelCenter = selectedCenter.getWrappedObject();
+
+        Set<Study> studies = new HashSet<Study>();
+
+        for (Membership m : context.getManager().getAllMemberships()) {
+            Center mCenter = m.getCenter();
+            if (mCenter == null || mCenter.equals(modelCenter)) {
+                Study study = m.getStudy();
+                if (study == null) {
+                    HQLCriteria criteria =
+                        new HQLCriteria("from " + Study.class.getName(),
+                            new ArrayList<Object>());
+
+                    try {
+                        List<Study> centers =
+                            SessionManager.getAppService().query(criteria);
+                        studies.addAll(centers);
+                    } catch (ApplicationException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                    break;
+                } else {
+                    studies.add(study);
+                }
+            }
+        }
+
+        List<StudyWrapper> wrappedStudies =
+            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+                studies, StudyWrapper.class);
+
+        StudyWrapper oldSelection = getStudySelection();
+        studiesViewer.setInput(wrappedStudies);
+        if (oldSelection != null) {
+            studiesViewer.setSelection(new StructuredSelection(oldSelection));
+        }
+        studiesViewer.refresh();
+    }
+
+    private void updateRoleAndPermissionOptions() {
+        User user = context.getManager();
+        Membership m = ms.getWrappedObject();
+
+        Set<PermissionEnum> mPerms = m.getManageablePermissions(user);
+        Set<Role> mRoles = m.getManageableRoles(user, context.getRoles());
+
+        List<PermissionEnum> mPermsList = new ArrayList<PermissionEnum>(mPerms);
+        List<Role> mRolesList = new ArrayList<Role>(mRoles);
+
+        rolesWidget.setSelections(mRolesList, rolesWidget.getSelected());
+        permissionsTree.setInput(mPermsList);
+    }
 }

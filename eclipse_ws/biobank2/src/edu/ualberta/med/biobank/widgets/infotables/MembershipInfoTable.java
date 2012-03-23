@@ -7,6 +7,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
@@ -39,10 +40,14 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
         }
     }
 
+    private final ManagerContext context;
+
     public MembershipInfoTable(Composite parent,
-        final PrincipalWrapper<?> principal) {
+        final PrincipalWrapper<?> principal, ManagerContext context) {
         super(parent, principal.getMembershipCollection(true), HEADINGS,
             ROWS_PER_PAGE, MembershipWrapper.class);
+
+        this.context = context;
 
         addEditItemListener(new IInfoTableEditItemListener<MembershipWrapper>() {
             @Override
@@ -65,7 +70,7 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
 
     protected void editMembership(MembershipWrapper ms) {
         MembershipEditDialog dlg = new MembershipEditDialog(PlatformUI
-            .getWorkbench().getActiveWorkbenchWindow().getShell(), ms);
+            .getWorkbench().getActiveWorkbenchWindow().getShell(), ms, context);
         int res = dlg.open();
         if (res == Dialog.OK) {
             reloadCollection(getList(), ms);
@@ -94,10 +99,12 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
     public Object getCollectionModelObject(Object o) throws Exception {
         TableRowData info = new TableRowData();
         info.ms = (MembershipWrapper) o;
-        info.center = info.ms.getCenter() == null ? Messages.MembershipInfoTable_all_label
-            : info.ms.getCenter().getNameShort();
-        info.study = info.ms.getStudy() == null ? Messages.MembershipInfoTable_all_label
-            : info.ms.getStudy().getNameShort();
+        info.center =
+            info.ms.getCenter() == null ? Messages.MembershipInfoTable_all_label
+                : info.ms.getCenter().getNameShort();
+        info.study =
+            info.ms.getStudy() == null ? Messages.MembershipInfoTable_all_label
+                : info.ms.getStudy().getNameShort();
         info.roles = getRolesString(info.ms);
         info.permissions = getPermissionsString(info.ms);
         return info;
@@ -152,7 +159,8 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;

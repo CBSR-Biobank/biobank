@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import javax.validation.ConstraintViolationException;
 
@@ -30,6 +31,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.client.util.BiobankProxyHelperImpl;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.common.action.security.UserGetOutput;
 import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
@@ -37,6 +39,7 @@ import edu.ualberta.med.biobank.common.action.security.UserSaveInput;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
@@ -63,6 +66,7 @@ public class UserEditDialog extends BgcBaseDialog {
         Messages.UserEditDialog_passwords_length_msg, PASSWORD_LENGTH_MIN);
     private ManagerContext managerContext;
     private final boolean isFullyManageable;
+    private BgcBaseText password;
 
     private UserWrapper originalUser = new UserWrapper(null);
     private MembershipInfoTable membershipInfoTable;
@@ -191,7 +195,8 @@ public class UserEditDialog extends BgcBaseDialog {
         gd.horizontalAlignment = SWT.RIGHT;
         addButton.setLayoutData(gd);
 
-        membershipInfoTable = new MembershipInfoTable(contents, originalUser);
+        membershipInfoTable =
+            new MembershipInfoTable(contents, originalUser, managerContext);
     }
 
     private void createGroupsSection(Composite contents)
@@ -205,8 +210,12 @@ public class UserEditDialog extends BgcBaseDialog {
             }
         };
 
+        List<GroupWrapper> available =
+            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+                managerContext.getGroups(), GroupWrapper.class);
+
         groupsWidget.setSelections(
-            GroupWrapper.getAllGroups(SessionManager.getAppService()),
+            available,
             originalUser.getGroupCollection(false));
     }
 
@@ -218,8 +227,10 @@ public class UserEditDialog extends BgcBaseDialog {
                     .getAppService());
                 ms.setPrincipal(originalUser);
 
-                MembershipEditDialog dlg = new MembershipEditDialog(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(), ms);
+                MembershipEditDialog dlg =
+                    new MembershipEditDialog(PlatformUI
+                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                        ms, managerContext);
                 int res = dlg.open();
                 if (res == Status.OK) {
                     membershipInfoTable.reloadCollection(
@@ -245,10 +256,18 @@ public class UserEditDialog extends BgcBaseDialog {
             User unproxied = (User) new BiobankProxyHelperImpl()
                 .convertToObject(userModel);
 
-            SessionManager.getAppService()
+            String pw = null;
+            String pwText = password.getText();
+            if (pwText != null && !pwText.isEmpty()) {
+                pw = pwText;
+            }
+
+            IdResult res = SessionManager.getAppService()
                 .doAction(
                     new UserSaveAction(new UserSaveInput(unproxied,
-                        managerContext)));
+                        managerContext, pw)));
+
+            originalUser.setId(res.getId());
 
             if (SessionManager.getUser().equals(originalUser)) {
                 // if the User is making changes to himself, logout
@@ -282,6 +301,8 @@ public class UserEditDialog extends BgcBaseDialog {
                             .getMessage();
                 }
 
+                t.printStackTrace();
+
                 BgcPlugin.openAsyncError(
                     Messages.UserEditDialog_save_error_title, message);
             }
@@ -300,7 +321,7 @@ public class UserEditDialog extends BgcBaseDialog {
                 MSG_PASSWORD_REQUIRED);
         }
 
-        BgcBaseText password = (BgcBaseText) createBoundWidgetWithLabel(parent,
+        password = (BgcBaseText) createBoundWidgetWithLabel(parent,
             BgcBaseText.class, SWT.BORDER | SWT.PASSWORD,
             (originalUser.isNew() ? Messages.UserEditDialog_password_new_label
                 : Messages.UserEditDialog_password_label), new String[0],

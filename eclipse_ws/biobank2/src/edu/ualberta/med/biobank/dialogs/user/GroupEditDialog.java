@@ -22,6 +22,9 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.client.util.BiobankProxyHelperImpl;
 import edu.ualberta.med.biobank.common.action.security.GroupSaveAction;
 import edu.ualberta.med.biobank.common.action.security.GroupSaveInput;
+import edu.ualberta.med.biobank.common.action.security.ManagerContext;
+import edu.ualberta.med.biobank.common.action.security.ManagerContextGetAction;
+import edu.ualberta.med.biobank.common.action.security.ManagerContextGetInput;
 import edu.ualberta.med.biobank.common.peer.GroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
@@ -42,11 +45,21 @@ public class GroupEditDialog extends BgcBaseDialog {
     private GroupWrapper group;
     private MembershipInfoTable membershipInfoTable;
     private MultiSelectWidget<UserWrapper> usersWidget;
+    private ManagerContext context;
 
     public GroupEditDialog(Shell parent, GroupWrapper originalGroup) {
         super(parent);
         Assert.isNotNull(originalGroup);
         this.group = originalGroup;
+
+        try {
+            // TODO: fix this!
+            // this is horrible, but ... running out of time.
+            context = SessionManager.getAppService()
+                .doAction(new ManagerContextGetAction(
+                    new ManagerContextGetInput())).getContext();
+        } catch (ApplicationException e) {
+        }
 
         if (originalGroup.isNew()) {
             currentTitle = Messages.GroupEditDialog_title_add;
@@ -115,7 +128,7 @@ public class GroupEditDialog extends BgcBaseDialog {
         gd.horizontalAlignment = SWT.RIGHT;
         addButton.setLayoutData(gd);
 
-        membershipInfoTable = new MembershipInfoTable(contents, group);
+        membershipInfoTable = new MembershipInfoTable(contents, group, context);
     }
 
     private void createUsersSection(Composite contents)
@@ -153,8 +166,10 @@ public class GroupEditDialog extends BgcBaseDialog {
                     .getAppService());
                 ms.setPrincipal(group);
 
-                MembershipEditDialog dlg = new MembershipEditDialog(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(), ms);
+                MembershipEditDialog dlg =
+                    new MembershipEditDialog(PlatformUI
+                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                        ms, context);
                 int res = dlg.open();
                 if (res == Status.OK) {
                     membershipInfoTable.reloadCollection(
