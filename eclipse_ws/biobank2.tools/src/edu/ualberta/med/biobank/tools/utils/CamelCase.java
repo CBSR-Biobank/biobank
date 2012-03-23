@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.tools.utils;
 
+@SuppressWarnings("nls")
 public class CamelCase {
 
     public static String toCamelCase(String str, boolean firstCharUpperCase) {

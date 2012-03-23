@@ -18,15 +18,15 @@ import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.test.action.IActionExecutor;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
 public class RequestHelper extends Helper {
 
-    public static Integer createRequest(Session session, 
+    public static Integer createRequest(Session session,
         IActionExecutor actionExecutor, Integer rgId) throws Exception {
 
-    	session.beginTransaction();
+        session.beginTransaction();
         String name = Utils.getRandomString(5);
 
         ResearchGroupGetInfoAction reader =
@@ -38,11 +38,10 @@ public class RequestHelper extends Helper {
             PatientHelper.createPatient(actionExecutor, name + "_patient",
                 rg.researchGroup.getStudy().getId());
         Integer ceId =
-            CollectionEventHelper.createCEventWithSourceSpecimens(actionExecutor,
+            CollectionEventHelper.createCEventWithSourceSpecimens(
+                actionExecutor,
                 p, rgId);
 
-        
-        
         CollectionEventGetInfoAction ceReader =
             new CollectionEventGetInfoAction(ceId);
         CEventInfo ceInfo = actionExecutor.exec(ceReader);
@@ -52,7 +51,8 @@ public class RequestHelper extends Helper {
 
         // request specs
         Request request = new Request();
-        request.setResearchGroup((ResearchGroup) session.get(ResearchGroup.class, rgId));
+        request.setResearchGroup((ResearchGroup) session.get(
+            ResearchGroup.class, rgId));
         request.setCreated(new Date());
         request.setAddress(((ResearchGroup) session.get(ResearchGroup.class,
             rgId)).getAddress());

@@ -25,21 +25,23 @@ public class BbpdbLogging {
     private static final Logger LOGGER = Logger.getLogger(BbpdbLogging.class
         .getName());
 
-    private static String BBPDB_LOG_BASE_QUERY = "FROM logging JOIN users on users.user_nr=logging.user_nr "
-        + "JOIN forms ON forms.form_nr=logging.form_nr "
-        + "JOIN actions ON actions.shortform=logging.action "
-        + "JOIN patient ON patient.patient_nr=logging.patient_nr "
-        + "LEFT JOIN freezer ON freezer.index_nr=logging.findex_nr "
-        + "LEFT JOIN cabinet ON cabinet.index_nr=logging.cindex_nr "
-        + "WHERE timestamp < '2010-05-18' ORDER BY timestamp";
+    private static String BBPDB_LOG_BASE_QUERY =
+        "FROM logging JOIN users on users.user_nr=logging.user_nr "
+            + "JOIN forms ON forms.form_nr=logging.form_nr "
+            + "JOIN actions ON actions.shortform=logging.action "
+            + "JOIN patient ON patient.patient_nr=logging.patient_nr "
+            + "LEFT JOIN freezer ON freezer.index_nr=logging.findex_nr "
+            + "LEFT JOIN cabinet ON cabinet.index_nr=logging.cindex_nr "
+            + "WHERE timestamp < '2010-05-18' ORDER BY timestamp";
 
     private static String BBPDB_LOG_COUNT_QUERY = "SELECT count(*) "
         + BBPDB_LOG_BASE_QUERY;
 
-    private static String BBPDB_LOG_QUERY = "SELECT login_id,timestamp,form_name,"
-        + "actions.action,dec_chr_nr,logging.inventory_id,"
-        + "details,fnum,rack,box,cell,cnum,drawer,bin,binpos "
-        + BBPDB_LOG_BASE_QUERY;
+    private static String BBPDB_LOG_QUERY =
+        "SELECT login_id,timestamp,form_name,"
+            + "actions.action,dec_chr_nr,logging.inventory_id,"
+            + "details,fnum,rack,box,cell,cnum,drawer,bin,binpos "
+            + BBPDB_LOG_BASE_QUERY;
 
     private static String BBPDB_PV_QUERY = "SELECT dec_chr_nr, visit_nr, "
         + "clinic_site, date_received, date_taken, worksheet "
@@ -77,8 +79,9 @@ public class BbpdbLogging {
         bbpdbCon = DriverManager.getConnection("jdbc:mysql://" + args.hostname
             + ":3306/bbpdb", "dummy", "ozzy498");
 
-        biobank2Con = DriverManager.getConnection("jdbc:mysql://" + args.hostname
-            + ":3306/biobank2", "dummy", "ozzy498");
+        biobank2Con =
+            DriverManager.getConnection("jdbc:mysql://" + args.hostname
+                + ":3306/biobank2", "dummy", "ozzy498");
 
         importPass1();
         // importPass2();
@@ -174,8 +177,9 @@ public class BbpdbLogging {
             }
 
             if (newDetails != null) {
-                PreparedStatement ps = biobank2Con
-                    .prepareStatement("UPDATE log SET details = ? where id = ?");
+                PreparedStatement ps =
+                    biobank2Con
+                        .prepareStatement("UPDATE log SET details = ? where id = ?");
                 ps.setString(1, newDetails);
                 ps.setInt(2, id);
                 ps.executeUpdate();

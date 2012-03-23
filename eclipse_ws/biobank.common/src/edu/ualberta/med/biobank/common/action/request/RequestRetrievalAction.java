@@ -15,10 +15,11 @@ import edu.ualberta.med.biobank.model.Request;
 
 public class RequestRetrievalAction implements Action<ListResult<Request>> {
 
+    @SuppressWarnings("nls")
     private static final String REQUEST_HQL =
-        "SELECT r FROM " + Request.class.getName() + " r" //$NON-NLS-1$//$NON-NLS-2$
-            + " INNER JOIN FETCH r.requestSpecimens rs" //$NON-NLS-1$
-            + " WHERE rs.specimen.currentCenter.id=?"; //$NON-NLS-1$
+        "SELECT r FROM " + Request.class.getName() + " r"
+            + " INNER JOIN FETCH r.requestSpecimens rs"
+            + " WHERE rs.specimen.currentCenter.id=?";
 
     private static final long serialVersionUID = 5306372891238576571L;
 
