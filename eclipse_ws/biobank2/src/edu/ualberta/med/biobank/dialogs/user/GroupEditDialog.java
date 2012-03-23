@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
-import javax.validation.ConstraintViolationException;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.SWT;
@@ -198,21 +196,7 @@ public class GroupEditDialog extends BgcBaseDialog {
                 new GroupSaveAction(new GroupSaveInput(unproxied)));
             close();
         } catch (Throwable t) {
-            if (t.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
-                BgcPlugin.openAsyncError(
-                    Messages.GroupEditDialog_msg_persit_error,
-                    Messages.GroupEditDialog_msg_error_name_used);
-            } else {
-                String message = t.getMessage();
-                if (t.getCause() instanceof ConstraintViolationException) {
-                    message =
-                        ((ConstraintViolationException) t.getCause())
-                            .getMessage();
-                }
-                BgcPlugin.openAsyncError(
-                    Messages.GroupEditDialog_msg_persit_error, message);
-                t.printStackTrace();
-            }
+            TmpUtil.displayException(t);
         }
     }
 
