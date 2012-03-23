@@ -10,13 +10,13 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.dialogs.user.MembershipEditDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Role;
 
 public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
     public static final int ROWS_PER_PAGE = 7;
@@ -113,7 +113,7 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
     public String getRolesString(MembershipWrapper ms) {
         StringBuffer sb = new StringBuffer();
         boolean first = true;
-        for (RoleWrapper r : ms.getRoleCollection(true)) {
+        for (Role r : ms.getWrappedObject().getRoles()) {
             if (sb.length() > 25) {
                 sb.setLength(25);
                 sb.append("..."); //$NON-NLS-1$
