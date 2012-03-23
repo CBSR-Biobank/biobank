@@ -23,6 +23,7 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
     private static final String[] HEADINGS = new String[] {
         Messages.MembershipInfoTable_center_label,
         Messages.MembershipInfoTable_study_label,
+        "Rank",
         Messages.MembershipInfoTable_role_label,
         Messages.MembershipInfoTable_permissions_label };
 
@@ -32,11 +33,12 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
         String study;
         String roles;
         String permissions;
+        String rank;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { center, study, roles,
-                permissions }, "\t"); //$NON-NLS-1$
+                permissions, rank }, "\t"); //$NON-NLS-1$
         }
     }
 
@@ -105,6 +107,7 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
         info.study =
             info.ms.getStudy() == null ? Messages.MembershipInfoTable_all_label
                 : info.ms.getStudy().getNameShort();
+        info.rank = info.ms.getWrappedObject().getRank().getName();
         info.roles = getRolesString(info.ms);
         info.permissions = getPermissionsString(info.ms);
         return info;
@@ -173,8 +176,10 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
                 case 1:
                     return info.study;
                 case 2:
-                    return info.roles;
+                    return info.rank;
                 case 3:
+                    return info.roles;
+                case 4:
                     return info.permissions;
                 default:
                     return ""; //$NON-NLS-1$
