@@ -104,7 +104,6 @@ public class MembershipEditDialog extends BgcBaseDialog {
 
         Composite centerStudyComp = createTabItem(tb,
             Messages.MembershipAddDialog_centerStudy_tab_title, 1);
-        createRankAndLevel(centerStudyComp);
         createCentersCombo(centerStudyComp);
         createStudysCombo(centerStudyComp);
 
@@ -115,31 +114,6 @@ public class MembershipEditDialog extends BgcBaseDialog {
             Messages.MembershipAddDialog_permissions_tab_title, 1));
 
         updateRoleAndPermissionOptions();
-    }
-
-    protected void createRankAndLevel(Composite parent) {
-        Composite contents = new Composite(parent, SWT.NONE);
-        contents.setLayout(new GridLayout(2, false));
-
-        ranksViewer =
-            createComboViewer(contents,
-                "Rank",
-                Rank.valuesList(),
-                ms.getWrappedObject().getRank(), null,
-                null, new LabelProvider() {
-                    @Override
-                    public String getText(Object element) {
-                        return ((Rank) element).getName();
-                    }
-                });
-        ranksViewer
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    ms.getWrappedObject().setRank(getRankSelection());
-                    updateRoleAndPermissionOptions();
-                }
-            });
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
