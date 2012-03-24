@@ -21,11 +21,13 @@ import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.SearchViewPermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.LoginSessionState;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.utils.SearchType;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SearchView extends ViewPart {
 
@@ -37,6 +39,7 @@ public class SearchView extends ViewPart {
     private Button searchButton;
 
     protected boolean loggedIn;
+    protected boolean allowed;
 
     private ISourceProviderListener sourceProviderListener;
 
@@ -62,6 +65,13 @@ public class SearchView extends ViewPart {
         };
         BgcPlugin.getLoginStateSourceProvider().addSourceProviderListener(
             sourceProviderListener);
+        
+        try {
+			allowed = SessionManager.getAppService().isAllowed(new SearchViewPermission(0, 0));
+		} catch (ApplicationException e1) {
+			BgcPlugin.openAccessDeniedErrorMessage(e1);
+			allowed=false;
+		}
 
         searchTypeCombo = new ComboViewer(parent);
         searchTypeCombo.setContentProvider(new ArrayContentProvider());
@@ -146,7 +156,7 @@ public class SearchView extends ViewPart {
 
     public void setEnabled() {
         if (!searchText.isDisposed()) {
-            searchText.setEnabled(loggedIn);
+            searchText.setEnabled(loggedIn && allowed);
             searchTypeCombo.getCombo().setEnabled(loggedIn);
             searchButton.setEnabled(loggedIn);
         }
