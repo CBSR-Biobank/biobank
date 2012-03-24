@@ -77,7 +77,6 @@ public class StudyViewForm extends BiobankViewForm {
             new StudyGetInfoAction(adapter.getId()));
         Assert.isNotNull(studyInfo.getStudy());
         study.setWrappedObject(studyInfo.getStudy());
-        SessionManager.logLookup(studyInfo.getStudy());
     }
 
     @Override
