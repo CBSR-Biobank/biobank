@@ -18,7 +18,6 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
-import org.hibernate.validator.constraints.Range;
 
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
@@ -54,8 +53,6 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
             "NOT_NULL_STUDY_ID" }) })
 @Unique(properties = { "principal", "notNullCenterId", "notNullStudyId" }, groups = PrePersist.class)
 public class Membership extends AbstractBiobankModel {
-    public static final short MIN_LEVEL = 1;
-    public static final short MAX_LEVEL = 1000;
     private static final long serialVersionUID = 1L;
 
     private Set<PermissionEnum> permissions = new HashSet<PermissionEnum>(0);
@@ -63,8 +60,26 @@ public class Membership extends AbstractBiobankModel {
     private Set<Role> roles = new HashSet<Role>(0);
     private Study study;
     private Principal principal;
-    private Rank rank = Rank.NORMAL;
-    private short level = MIN_LEVEL;
+    private boolean userManager = false;
+    private boolean everyPermission = false;
+
+    @Column(name = "USER_MANAGER")
+    public boolean isUserManager() {
+        return userManager;
+    }
+
+    public void setUserManager(boolean userManager) {
+        this.userManager = userManager;
+    }
+
+    public boolean isEveryPermission() {
+        return everyPermission;
+    }
+
+    @Column(name = "EVERY_PERMISSION")
+    public void setEveryPermission(boolean everyPermission) {
+        this.everyPermission = everyPermission;
+    }
 
     public Membership() {
     }
@@ -75,32 +90,9 @@ public class Membership extends AbstractBiobankModel {
 
         setCenter(m.getCenter());
         setStudy(m.getStudy());
-        setRank(m.getRank());
-        setLevel(m.getLevel());
 
         getPermissions().addAll(m.getPermissions());
         getRoles().addAll(m.getRoles());
-    }
-
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Membership.rank.NotNull}")
-    @Column(name = "RANK", nullable = false)
-    @Type(type = "rank")
-    public Rank getRank() {
-        return rank;
-    }
-
-    public void setRank(Rank rank) {
-        this.rank = rank;
-    }
-
-    @Range(min = MIN_LEVEL, max = MAX_LEVEL, message = "{edu.ualberta.med.biobank.model.Membership.level.Range}")
-    @Column(name = "LEVEL", nullable = false)
-    public short getLevel() {
-        return level;
-    }
-
-    public void setLevel(short level) {
-        this.level = level;
     }
 
     @ElementCollection(targetClass = PermissionEnum.class, fetch = FetchType.EAGER)
@@ -193,7 +185,7 @@ public class Membership extends AbstractBiobankModel {
     @Transient
     public Set<PermissionEnum> getAllPermissions() {
         Set<PermissionEnum> permissions = new HashSet<PermissionEnum>();
-        if (Rank.ADMINISTRATOR.equals(getRank())) {
+        if (isEveryPermission()) {
             permissions.addAll(PermissionEnum.valuesList());
         } else {
             permissions.addAll(getPermissions());
@@ -239,7 +231,7 @@ public class Membership extends AbstractBiobankModel {
         Set<Role> roles = new HashSet<Role>();
         for (Membership membership : user.getAllMemberships()) {
             if (isManageable(membership)) {
-                if (Rank.ADMINISTRATOR.equals(membership.getRank())) {
+                if (isEveryPermission()) {
                     roles.addAll(defaultAdminRoles);
                 }
                 roles.addAll(membership.getRoles());
@@ -281,11 +273,6 @@ public class Membership extends AbstractBiobankModel {
             if (isManageable(membership)) return true;
         }
         return false;
-    }
-
-    @Transient
-    public boolean isRankGe(Rank rank) {
-        return rank.isLe(getRank());
     }
 
     @Transient
@@ -334,15 +321,8 @@ public class Membership extends AbstractBiobankModel {
         if (that.getAllPermissions().isEmpty()
             && that.getRoles().isEmpty()) return false;
 
-        if (that.getRank().isLt(Rank.MANAGER)) return false;
-
-        if (that.getRank().isLt(getRank())) return false;
-
-        // FIXME: ignore level for now until a better tie-breaking system can be
-        // designed
-        // if (that.getRank().equals(getRank()) && that.getLevel() <=
-        // getLevel())
-        // return false;
+        if (!that.isUserManager()) return false;
+        if (isEveryPermission() && !that.isEveryPermission()) return false;
 
         if (that.getCenter() != null && !that.getCenter().equals(getCenter()))
             return false;
