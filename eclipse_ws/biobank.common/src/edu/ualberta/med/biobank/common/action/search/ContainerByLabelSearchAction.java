@@ -11,14 +11,14 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.Container;
 
 public class ContainerByLabelSearchAction implements
-    Action<ListResult<Integer>> {
+    Action<ListResult<Container>> {
 
     @SuppressWarnings("nls")
     protected static final String CONTAINER_BASE_QRY =
-        "SELECT c.id FROM "
-            + Container.class.getName()
-            + " c"
-            + " where c.label=? and c.site.id=?";
+    "SELECT c FROM "
+        + Container.class.getName()
+        + " c inner join fetch c.site"
+        + " where c.label=? and c.site.id=?";
 
     private static final long serialVersionUID = 1L;
     private String label;
@@ -38,14 +38,14 @@ public class ContainerByLabelSearchAction implements
     }
 
     @Override
-    public ListResult<Integer> run(ActionContext context)
+    public ListResult<Container> run(ActionContext context)
         throws ActionException {
         Query q =
             context.getSession().createQuery(CONTAINER_BASE_QRY);
         q.setParameter(0, label);
         q.setParameter(1, currentCenter);
         @SuppressWarnings("unchecked")
-        List<Integer> rows = q.list();
-        return new ListResult<Integer>(rows);
+        List<Container> rows = q.list();
+        return new ListResult<Container>(rows);
     }
 }
