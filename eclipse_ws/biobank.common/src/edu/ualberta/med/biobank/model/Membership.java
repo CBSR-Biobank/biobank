@@ -63,24 +63,6 @@ public class Membership extends AbstractBiobankModel {
     private boolean userManager = false;
     private boolean everyPermission = false;
 
-    @Column(name = "USER_MANAGER")
-    public boolean isUserManager() {
-        return userManager;
-    }
-
-    public void setUserManager(boolean userManager) {
-        this.userManager = userManager;
-    }
-
-    public boolean isEveryPermission() {
-        return everyPermission;
-    }
-
-    @Column(name = "EVERY_PERMISSION")
-    public void setEveryPermission(boolean everyPermission) {
-        this.everyPermission = everyPermission;
-    }
-
     public Membership() {
     }
 
@@ -90,6 +72,8 @@ public class Membership extends AbstractBiobankModel {
 
         setCenter(m.getCenter());
         setStudy(m.getStudy());
+        setUserManager(m.isUserManager());
+        setEveryPermission(m.isEveryPermission());
 
         getPermissions().addAll(m.getPermissions());
         getRoles().addAll(m.getRoles());
@@ -149,6 +133,24 @@ public class Membership extends AbstractBiobankModel {
 
     public void setPrincipal(Principal principal) {
         this.principal = principal;
+    }
+
+    @Column(name = "USER_MANAGER")
+    public boolean isUserManager() {
+        return userManager;
+    }
+
+    public void setUserManager(boolean userManager) {
+        this.userManager = userManager;
+    }
+
+    public boolean isEveryPermission() {
+        return everyPermission;
+    }
+
+    @Column(name = "EVERY_PERMISSION")
+    public void setEveryPermission(boolean everyPermission) {
+        this.everyPermission = everyPermission;
     }
 
     /**
