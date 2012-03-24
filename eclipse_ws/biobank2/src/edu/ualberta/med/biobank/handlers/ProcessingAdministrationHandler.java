@@ -32,6 +32,6 @@ public class ProcessingAdministrationHandler extends AbstractHandler implements
 
     @Override
     public boolean isEnabled() {
-        return !(SessionManager.getUser().getCurrentWorkingCenter() instanceof ResearchGroupWrapper);
+        return true;
     }
 }

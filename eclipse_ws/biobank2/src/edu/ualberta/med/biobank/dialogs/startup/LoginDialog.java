@@ -364,6 +364,21 @@ public class LoginDialog extends TitleAreaDialog {
                             Messages.LoginDialog_superAdmin_error_msg);
                 }
                 selectWorkingCenter(sessionHelper);
+                if (sessionHelper.getUser().getCurrentWorkingCenter()==null) {
+                	   IWorkbench workbench = PlatformUI.getWorkbench();
+                       IWorkbenchWindow activeWindow = workbench
+                           .getActiveWorkbenchWindow();
+                       IWorkbenchPage page = activeWindow.getActivePage();
+                       if (!page.getPerspective().getId().equals(MainPerspective.ID)) {
+                           try {
+                               workbench.showPerspective(MainPerspective.ID,
+                                   activeWindow);
+                           } catch (WorkbenchException e) {
+                               BgcPlugin.openAsyncError(
+                                   "Error while opening main perspective", e); //$NON-NLS-1$
+                           }
+                       }
+                }
                 if (sessionHelper.getUser().isInSuperAdminMode()
                     || sessionHelper.getUser().getCurrentWorkingCenter() != null) {
                     // login successful
@@ -444,19 +459,6 @@ public class LoginDialog extends TitleAreaDialog {
                 // open the administration perspective if another
                 // perspective is open
                 sessionHelper.getUser().setInSuperAdminMode(true);
-                IWorkbench workbench = PlatformUI.getWorkbench();
-                IWorkbenchWindow activeWindow = workbench
-                    .getActiveWorkbenchWindow();
-                IWorkbenchPage page = activeWindow.getActivePage();
-                if (!page.getPerspective().getId().equals(MainPerspective.ID)) {
-                    try {
-                        workbench.showPerspective(MainPerspective.ID,
-                            activeWindow);
-                    } catch (WorkbenchException e) {
-                        BgcPlugin.openAsyncError(
-                            "Error while opening main perspective", e); //$NON-NLS-1$
-                    }
-                }
             } else {
                 // can't connect without a working center
                 BgcPlugin.openAsyncError(

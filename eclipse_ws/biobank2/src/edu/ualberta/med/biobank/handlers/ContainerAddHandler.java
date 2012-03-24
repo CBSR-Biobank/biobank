@@ -28,11 +28,14 @@ public class ContainerAddHandler extends LogoutSensitiveHandler {
     @Override
     public boolean isEnabled() {
         try {
-            if (allowed == null)
+            if (allowed == null) {
+            	Integer centerId = SessionManager.getUser()
+                .getCurrentWorkingCenter() !=null ? SessionManager.getUser()
+                        .getCurrentWorkingCenter().getId() : null;
                 allowed =
                     SessionManager.getAppService().isAllowed(
-                        new ContainerCreatePermission(SessionManager.getUser()
-                            .getCurrentWorkingCenter().getId()));
+                        new ContainerCreatePermission(centerId));
+            }
             return SessionManager.getInstance().getSession() != null &&
                 allowed;
         } catch (ApplicationException e) {
