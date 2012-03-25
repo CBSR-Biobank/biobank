@@ -14,9 +14,6 @@ import edu.ualberta.med.biobank.common.action.security.GroupGetAllInput;
 import edu.ualberta.med.biobank.common.action.security.RoleGetAllAction;
 import edu.ualberta.med.biobank.common.action.security.RoleGetAllInput;
 import edu.ualberta.med.biobank.common.permission.security.RoleManagementPermission;
-import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
@@ -30,8 +27,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class UserManagementDialog extends BgcDialogWithPages {
 
     private List<UserWrapper> currentAllUsersList;
-    private List<GroupWrapper> currentAllGroupsList;
-    private List<RoleWrapper> currentAllRolesList;
+    private List<Group> currentAllGroupsList;
+    private List<Role> currentAllRolesList;
     private List<Center> allCenters;
     private List<Study> allStudies;
 
@@ -72,7 +69,7 @@ public class UserManagementDialog extends BgcDialogWithPages {
         });
         nodes.add(new GroupsPage(this) {
             @Override
-            protected List<GroupWrapper> getCurrentAllGroupsList() {
+            protected List<Group> getCurrentAllGroupsList() {
                 return getGroups();
             }
         });
@@ -84,7 +81,7 @@ public class UserManagementDialog extends BgcDialogWithPages {
             if (isAllowedRoleMan) {
                 nodes.add(new RolesPage(this) {
                     @Override
-                    protected List<RoleWrapper> getCurrentAllRolesList() {
+                    protected List<Role> getCurrentAllRolesList() {
                         return getRoles();
                     }
                 });
@@ -114,38 +111,28 @@ public class UserManagementDialog extends BgcDialogWithPages {
         return currentAllUsersList;
     }
 
-    protected List<GroupWrapper> getGroups() {
+    protected List<Group> getGroups() {
         if (currentAllGroupsList == null)
             try {
                 SortedSet<Group> allGroups = SessionManager.getAppService()
                     .doAction(new GroupGetAllAction(new GroupGetAllInput()))
                     .getAllManageableGroups();
-                List<GroupWrapper> allWrappedGroups =
-                    ModelWrapper.wrapModelCollection(
-                        SessionManager.getAppService(),
-                        allGroups, GroupWrapper.class);
-                currentAllGroupsList = allWrappedGroups;
+                currentAllGroupsList = new ArrayList<Group>(allGroups);
             } catch (ApplicationException e) {
-                BgcPlugin.openAsyncError(
-                    Messages.UserManagementDialog_groups_load_error_title, e);
+                BgcPlugin.openAsyncError("Unable to Load Groups", e);
             }
         return currentAllGroupsList;
     }
 
-    protected List<RoleWrapper> getRoles() {
+    protected List<Role> getRoles() {
         if (currentAllRolesList == null)
             try {
                 SortedSet<Role> allRoles = SessionManager.getAppService()
                     .doAction(new RoleGetAllAction(new RoleGetAllInput()))
                     .getAllRoles();
-                List<RoleWrapper> allWrappedRoles =
-                    ModelWrapper.wrapModelCollection(
-                        SessionManager.getAppService(),
-                        allRoles, RoleWrapper.class);
-                currentAllRolesList = allWrappedRoles;
+                currentAllRolesList = new ArrayList<Role>(allRoles);
             } catch (ApplicationException e) {
-                BgcPlugin.openAsyncError(
-                    Messages.UserManagementDialog_groups_load_error_title, e);
+                BgcPlugin.openAsyncError("Unable to Load Roles", e);
             }
         return currentAllRolesList;
     }

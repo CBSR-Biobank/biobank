@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogWithPages;
@@ -35,26 +34,26 @@ public abstract class GroupsPage extends BgcDialogPage {
         Composite content = new Composite(parent, SWT.NONE);
         content.setLayout(new GridLayout(1, false));
 
-        new TableFilter<GroupWrapper>(content) {
+        new TableFilter<Group>(content) {
             @Override
-            protected boolean accept(GroupWrapper group, String text) {
+            protected boolean accept(Group group, String text) {
                 return contains(group.getName(), text);
             }
 
             @Override
-            public List<GroupWrapper> getAllCollection() {
+            public List<Group> getAllCollection() {
                 return getCurrentAllGroupsList();
             }
 
             @Override
-            public void setFilteredList(List<GroupWrapper> filteredObjects) {
+            public void setFilteredList(List<Group> filteredObjects) {
                 groupInfoTable.reloadCollection(filteredObjects);
             }
         };
 
         groupInfoTable = new GroupInfoTable(content, null) {
             @Override
-            protected boolean deleteGroup(GroupWrapper group) {
+            protected boolean deleteGroup(Group group) {
                 boolean deleted = super.deleteGroup(group);
                 if (deleted)
                     getCurrentAllGroupsList().remove(group);
@@ -62,8 +61,8 @@ public abstract class GroupsPage extends BgcDialogPage {
             }
 
             @Override
-            protected void duplicate(GroupWrapper origGroup) {
-                GroupWrapper newGroup = origGroup.duplicate();
+            protected void duplicate(Group origGroup) {
+                Group newGroup = origGroup.duplicate();
                 newGroup.setName("CopyOf" + newGroup.getName()); //$NON-NLS-1$
                 addGroup(newGroup);
             }
@@ -72,7 +71,7 @@ public abstract class GroupsPage extends BgcDialogPage {
         setControl(content);
     }
 
-    protected void addGroup(GroupWrapper newGroup) {
+    protected void addGroup(Group newGroup) {
         GroupEditDialog dlg = new GroupEditDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), newGroup);
         int res = dlg.open();
@@ -89,9 +88,9 @@ public abstract class GroupsPage extends BgcDialogPage {
 
     @Override
     public void runAddAction() {
-        addGroup(new GroupWrapper(SessionManager.getAppService()));
+        addGroup(new Group(SessionManager.getAppService()));
     }
 
-    protected abstract List<GroupWrapper> getCurrentAllGroupsList();
+    protected abstract List<Group> getCurrentAllGroupsList();
 
 }

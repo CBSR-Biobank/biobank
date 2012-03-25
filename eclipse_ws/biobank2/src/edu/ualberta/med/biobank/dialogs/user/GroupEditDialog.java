@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
-import org.eclipse.core.runtime.Assert;
+import java.util.List;
+
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -24,7 +25,6 @@ import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.common.action.security.ManagerContextGetAction;
 import edu.ualberta.med.biobank.common.action.security.ManagerContextGetInput;
 import edu.ualberta.med.biobank.common.peer.GroupPeer;
-import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
+import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.widgets.infotables.MembershipInfoTable;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -40,15 +41,17 @@ public class GroupEditDialog extends BgcBaseDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
 
-    private GroupWrapper group;
-    private MembershipInfoTable membershipInfoTable;
-    private MultiSelectWidget<UserWrapper> usersWidget;
-    private ManagerContext context;
+    private final Group group;
+    private final ManagerContext context;
+    private final List<User> allUsers;
 
-    public GroupEditDialog(Shell parent, GroupWrapper originalGroup) {
+    private MembershipInfoTable membershipInfoTable;
+    private MultiSelectWidget<User> usersWidget;
+
+    public GroupEditDialog(Shell parent, Group group, ManagerContext context) {
         super(parent);
-        Assert.isNotNull(originalGroup);
-        this.group = originalGroup;
+
+        this.group = group;
 
         try {
             // TODO: fix this!
@@ -59,7 +62,7 @@ public class GroupEditDialog extends BgcBaseDialog {
         } catch (ApplicationException e) {
         }
 
-        if (originalGroup.isNew()) {
+        if (group.isNew()) {
             currentTitle = Messages.GroupEditDialog_title_add;
             titleAreaMessage = Messages.GroupEditDialog_titlearea_add;
         } else {
