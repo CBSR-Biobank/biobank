@@ -167,7 +167,6 @@ public class MembershipEditDialog extends BgcBaseDialog {
             });
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     protected void createStudysCombo(Composite parent)
         throws ApplicationException {
         Group groupComp = new Group(parent, SWT.SHADOW_IN);
@@ -187,6 +186,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
             @Override
             public boolean select(Viewer viewer, Object parentElement,
                 Object element) {
+                @SuppressWarnings("unchecked")
                 Study study = ((NamedOption<Study>) element).getOption();
                 boolean taken = isDomainTaken(membership.getPrincipal(),
                     getCenterSelection(), study);
@@ -275,14 +275,13 @@ public class MembershipEditDialog extends BgcBaseDialog {
             checkedRolesOrPermissionsSelected();
             return;
         }
-        // TODO: copy selections over?
-        membership.getWrappedObject().getRoles()
-            .removeAll(rolesWidget.getRemovedFromSelection());
-        membership.getWrappedObject().getRoles()
-            .addAll(rolesWidget.getAddedToSelection());
+
+        membership.getRoles().removeAll(rolesWidget.getRemovedFromSelection());
+        membership.getRoles().addAll(rolesWidget.getAddedToSelection());
+
         PermissionTreeRes res = permissionsTree.getAddedAndRemovedNodes();
-        membership.addToPermissionCollection(res.addedPermissions);
-        membership.removeFromPermissionCollection(res.removedPermissions);
+        membership.getPermissions().removeAll(res.removedPermissions);
+        membership.getPermissions().addAll(res.addedPermissions);
         super.okPressed();
     }
 
@@ -300,7 +299,6 @@ public class MembershipEditDialog extends BgcBaseDialog {
         return null;
     }
 
-    @SuppressWarnings("rawtypes")
     private Center getCenterSelection() {
         ISelection sel = centersViewer.getSelection();
         if (sel != null) {

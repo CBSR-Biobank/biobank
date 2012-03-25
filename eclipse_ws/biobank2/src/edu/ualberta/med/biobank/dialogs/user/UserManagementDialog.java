@@ -21,8 +21,10 @@ import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogWithPages;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserManagementDialog extends BgcDialogWithPages {
@@ -30,6 +32,8 @@ public class UserManagementDialog extends BgcDialogWithPages {
     private List<UserWrapper> currentAllUsersList;
     private List<GroupWrapper> currentAllGroupsList;
     private List<RoleWrapper> currentAllRolesList;
+    private final List<Center> allCenters;
+    private final List<Study> allStudies;
 
     public UserManagementDialog(Shell parentShell) {
         super(parentShell);

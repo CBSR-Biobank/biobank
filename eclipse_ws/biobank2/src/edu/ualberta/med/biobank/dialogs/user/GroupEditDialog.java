@@ -25,13 +25,13 @@ import edu.ualberta.med.biobank.common.action.security.ManagerContextGetAction;
 import edu.ualberta.med.biobank.common.action.security.ManagerContextGetInput;
 import edu.ualberta.med.biobank.common.peer.GroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
-import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.Group;
+import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.widgets.infotables.MembershipInfoTable;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -126,7 +126,9 @@ public class GroupEditDialog extends BgcBaseDialog {
         gd.horizontalAlignment = SWT.RIGHT;
         addButton.setLayoutData(gd);
 
-        membershipInfoTable = new MembershipInfoTable(contents, group, context);
+        membershipInfoTable =
+            new MembershipInfoTable(contents, group.getWrappedObject(),
+                context, null, null);
     }
 
     private void createUsersSection(Composite contents)
@@ -160,18 +162,22 @@ public class GroupEditDialog extends BgcBaseDialog {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
-                MembershipWrapper ms = new MembershipWrapper(SessionManager
-                    .getAppService());
-                ms.setPrincipal(group);
-
+                Membership m = new Membership();
+                Shell shell =
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getShell();
                 MembershipEditDialog dlg =
-                    new MembershipEditDialog(PlatformUI
-                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                        ms, context);
+                    new MembershipEditDialog(shell, m, context, null, null);
+
                 int res = dlg.open();
                 if (res == Status.OK) {
-                    membershipInfoTable.reloadCollection(
-                        group.getMembershipCollection(true), null);
+                    Group group = GroupEditDialog.this.group.getWrappedObject();
+
+                    m.setPrincipal(group);
+                    group.getMemberships().add(m);
+
+                    membershipInfoTable.setCollection(group.getMemberships());
+                    membershipInfoTable.setSelection(m);
                 }
             }
         });
