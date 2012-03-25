@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.permission;
 
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.User;
 
 public class GlobalAdminPermission implements Permission {
@@ -12,7 +11,7 @@ public class GlobalAdminPermission implements Permission {
     public boolean isAllowed(ActionContext context) {
         User user = context.getUser();
         for (Membership membership : user.getAllMemberships()) {
-            boolean isAdmin = membership.isRankGe(Rank.ADMINISTRATOR);
+            boolean isAdmin = membership.isEveryPermission();
             boolean isGlobal = membership.isGlobal();
             if (isAdmin && isGlobal) return true;
         }

@@ -83,8 +83,9 @@ public class GroupSaveAction implements Action<IdResult> {
             oldM.getRoles().clear();
             oldM.getRoles().addAll(newM.getRoles());
 
-            oldM.setRank(newM.getRank());
-            oldM.setLevel(newM.getLevel());
+            oldM.setUserManager(newM.isUserManager());
+            oldM.setEveryPermission(newM.isEveryPermission());
+
             oldM.setCenter(newM.getCenter());
             oldM.setStudy(newM.getStudy());
         }
