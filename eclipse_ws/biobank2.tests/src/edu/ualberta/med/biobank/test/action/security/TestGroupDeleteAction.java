@@ -69,14 +69,6 @@ public class TestGroupDeleteAction extends TestAction {
 
         ADMIN.run(b.ranks(Rank.NORMAL, Rank.MANAGER), true);
         ADMIN.run(b.ranks(Rank.ADMINISTRATOR), false);
-
-        // break level tie
-        tx = session.beginTransaction();
-        userMembership.setLevel((short) 2);
-        session.update(userMembership);
-        tx.commit();
-
-        ADMIN.run(b.allDomains().allRanks(), true);
     }
 
     @Test
@@ -93,22 +85,6 @@ public class TestGroupDeleteAction extends TestAction {
         ADMIN.run(b.domains(Domain.CENTER, Domain.CENTER_STUDY), true);
         ADMIN.run(b.domains(Domain.STUDY, Domain.GLOBAL), false);
         ADMIN.run(b.allDomains().ranks(Rank.ADMINISTRATOR), false);
-
-        // break level tie
-        tx = session.beginTransaction();
-        userMembership.setLevel((short) 2);
-        session.update(userMembership);
-        tx.commit();
-
-        b.allRanks();
-        ADMIN.run(b.domains(Domain.CENTER, Domain.CENTER_STUDY), true);
-        ADMIN.run(b.domains(Domain.STUDY, Domain.GLOBAL), false);
-
-        tx = session.beginTransaction();
-        factory.createSite(); // new default group center
-        tx.commit();
-
-        ADMIN.run(b.allDomains().allRanks(), false);
     }
 
     @Test
@@ -125,22 +101,6 @@ public class TestGroupDeleteAction extends TestAction {
         ADMIN.run(b.domains(Domain.STUDY, Domain.CENTER_STUDY), true);
         ADMIN.run(b.domains(Domain.CENTER, Domain.GLOBAL), false);
         ADMIN.run(b.allDomains().ranks(Rank.ADMINISTRATOR), false);
-
-        // break level tie
-        tx = session.beginTransaction();
-        userMembership.setLevel((short) 2);
-        session.update(userMembership);
-        tx.commit();
-
-        b.allRanks();
-        ADMIN.run(b.domains(Domain.STUDY, Domain.CENTER_STUDY), true);
-        ADMIN.run(b.domains(Domain.CENTER, Domain.GLOBAL), false);
-
-        tx = session.beginTransaction();
-        factory.createStudy(); // new default group study
-        tx.commit();
-
-        ADMIN.run(b.allDomains().allRanks(), false);
     }
 
     @Test
@@ -157,22 +117,6 @@ public class TestGroupDeleteAction extends TestAction {
         ADMIN.run(b.domains(Domain.CENTER_STUDY), true);
         ADMIN.run(b.domains(Domain.CENTER, Domain.STUDY, Domain.GLOBAL), false);
         ADMIN.run(b.allDomains().ranks(Rank.ADMINISTRATOR), false);
-
-        // break level tie
-        tx = session.beginTransaction();
-        userMembership.setLevel((short) 2);
-        session.update(userMembership);
-        tx.commit();
-
-        b.allRanks();
-        ADMIN.run(b.domains(Domain.CENTER_STUDY), true);
-        ADMIN.run(b.domains(Domain.STUDY, Domain.CENTER, Domain.GLOBAL), false);
-
-        tx = session.beginTransaction();
-        factory.createSite(); // new default group site
-        tx.commit();
-
-        ADMIN.run(b.allDomains().allRanks(), false);
     }
 
     @Test

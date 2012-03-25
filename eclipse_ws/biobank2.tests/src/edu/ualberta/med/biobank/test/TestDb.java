@@ -10,7 +10,6 @@ import org.junit.Before;
 
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.SessionProvider.Mode;
 
@@ -77,8 +76,8 @@ public class TestDb extends TestBase {
         session.save(globalAdmin);
 
         Membership membership = new Membership();
-        membership.setRank(Rank.ADMINISTRATOR);
-        membership.setLevel(Membership.MAX_LEVEL);
+        membership.setUserManager(true);
+        membership.setEveryPermission(true);
         membership.setPrincipal(globalAdmin);
         globalAdmin.getMemberships().add(membership);
 

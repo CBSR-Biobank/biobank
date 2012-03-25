@@ -598,7 +598,10 @@ public class Factory {
         Principal p = getDefaultPrincipal();
         p.getMemberships().add(membership);
         membership.setPrincipal(p);
-        membership.setRank(rank);
+
+        membership.setUserManager(rank.isGe(Rank.MANAGER) ? true : false);
+        membership.setEveryPermission(rank.isGe(Rank.ADMINISTRATOR) ? true
+            : false);
 
         if (Rank.MANAGER.equals(rank)) {
             // needs at least one permission or role to manage
