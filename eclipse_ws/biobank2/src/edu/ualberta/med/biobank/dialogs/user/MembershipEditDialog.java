@@ -342,6 +342,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
     }
 
     private void updatePermissionOptions() {
+        // TODO: updating of Permission options
     }
 
     private void updateRoleAndPermissionOptions() {

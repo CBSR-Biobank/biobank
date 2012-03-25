@@ -12,13 +12,16 @@ import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
 import edu.ualberta.med.biobank.dialogs.user.MembershipEditDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
+import edu.ualberta.med.biobank.gui.common.widgets.DefaultAbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 
-public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
+public class MembershipInfoTable extends
+    DefaultAbstractInfoTableWidget<MembershipWrapper> {
     public static final int ROWS_PER_PAGE = 7;
     private static final String[] HEADINGS = new String[] {
         Messages.MembershipInfoTable_center_label,
@@ -46,8 +49,9 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
 
     public MembershipInfoTable(Composite parent,
         final PrincipalWrapper<?> principal, ManagerContext context) {
-        super(parent, principal.getMembershipCollection(true), HEADINGS,
-            ROWS_PER_PAGE, MembershipWrapper.class);
+        super(parent, HEADINGS, ROWS_PER_PAGE);
+
+        setList(principal.getMembershipCollection(true));
 
         this.context = context;
 
@@ -186,5 +190,16 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected boolean isEditMode() {
+        return true;
+    }
+
+    @Override
+    protected BgcTableSorter getTableSorter() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
