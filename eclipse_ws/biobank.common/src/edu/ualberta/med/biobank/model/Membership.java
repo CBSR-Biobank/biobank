@@ -144,11 +144,11 @@ public class Membership extends AbstractBiobankModel {
         this.userManager = userManager;
     }
 
+    @Column(name = "EVERY_PERMISSION")
     public boolean isEveryPermission() {
         return everyPermission;
     }
 
-    @Column(name = "EVERY_PERMISSION")
     public void setEveryPermission(boolean everyPermission) {
         this.everyPermission = everyPermission;
     }
