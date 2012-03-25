@@ -35,7 +35,6 @@ import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
 import edu.ualberta.med.biobank.common.action.security.UserSaveInput;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
-import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -46,6 +45,7 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.handlers.LogoutHandler;
+import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.validators.EmptyStringValidator;
 import edu.ualberta.med.biobank.validators.MatchingTextValidator;
@@ -193,7 +193,9 @@ public class UserEditDialog extends BgcBaseDialog {
         addButton.setLayoutData(gd);
 
         membershipInfoTable =
-            new MembershipInfoTable(contents, originalUser, managerContext);
+            new MembershipInfoTable(contents, originalUser.getWrappedObject(),
+                managerContext,
+                null, null);
     }
 
     private void createGroupsSection(Composite contents)
@@ -220,18 +222,23 @@ public class UserEditDialog extends BgcBaseDialog {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
-                MembershipWrapper ms = new MembershipWrapper(SessionManager
-                    .getAppService());
-                ms.setPrincipal(originalUser);
+                Membership m = new Membership();
 
                 MembershipEditDialog dlg =
-                    new MembershipEditDialog(PlatformUI
-                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                        ms, managerContext);
+                    new MembershipEditDialog(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(),
+                        m, managerContext, null, null);
                 int res = dlg.open();
                 if (res == Status.OK) {
-                    membershipInfoTable.reloadCollection(
-                        originalUser.getMembershipCollection(true), null);
+                    User user =
+                        UserEditDialog.this.originalUser.getWrappedObject();
+
+                    m.setPrincipal(user);
+                    user.getMemberships().add(m);
+
+                    membershipInfoTable.setCollection(user.getMemberships());
+                    membershipInfoTable.setSelection(m);
                 }
             }
         });

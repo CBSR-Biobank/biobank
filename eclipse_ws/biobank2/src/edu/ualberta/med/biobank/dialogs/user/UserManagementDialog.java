@@ -32,8 +32,8 @@ public class UserManagementDialog extends BgcDialogWithPages {
     private List<UserWrapper> currentAllUsersList;
     private List<GroupWrapper> currentAllGroupsList;
     private List<RoleWrapper> currentAllRolesList;
-    private final List<Center> allCenters;
-    private final List<Study> allStudies;
+    private List<Center> allCenters;
+    private List<Study> allStudies;
 
     public UserManagementDialog(Shell parentShell) {
         super(parentShell);

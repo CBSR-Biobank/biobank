@@ -126,8 +126,4 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget<StudyCountInfo> {
     @Override
     public void reload() throws ApplicationException {
     }
-
-    public void setCollection(List<?> object) {
-        getTableViewer().setInput(object);
-    }
 }
