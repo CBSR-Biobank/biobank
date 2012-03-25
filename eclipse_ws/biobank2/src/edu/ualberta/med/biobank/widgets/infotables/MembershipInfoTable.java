@@ -1,15 +1,14 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
-import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.dialogs.user.MembershipEditDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
@@ -17,148 +16,80 @@ import edu.ualberta.med.biobank.gui.common.widgets.DefaultAbstractInfoTableWidge
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.Study;
 
-public class MembershipInfoTable extends
-    DefaultAbstractInfoTableWidget<MembershipWrapper> {
+public class MembershipInfoTable
+    extends DefaultAbstractInfoTableWidget<Membership> {
     public static final int ROWS_PER_PAGE = 7;
     private static final String[] HEADINGS = new String[] {
         Messages.MembershipInfoTable_center_label,
         Messages.MembershipInfoTable_study_label,
-        "Rank",
-        Messages.MembershipInfoTable_role_label,
-        Messages.MembershipInfoTable_permissions_label };
-
-    protected static class TableRowData {
-        MembershipWrapper ms;
-        String center;
-        String study;
-        String roles;
-        String permissions;
-        String rank;
-
-        @Override
-        public String toString() {
-            return StringUtils.join(new String[] { center, study, roles,
-                permissions, rank }, "\t"); //$NON-NLS-1$
-        }
-    }
+        "Manager",
+        "Roles and Permissions" };
 
     private final ManagerContext context;
+    private final List<Center> allCenters;
+    private final List<Study> allStudies;
 
     public MembershipInfoTable(Composite parent,
-        final PrincipalWrapper<?> principal, ManagerContext context) {
+        final Principal principal, ManagerContext context,
+        List<Center> allCenters, List<Study> allStudies) {
         super(parent, HEADINGS, ROWS_PER_PAGE);
 
-        setList(principal.getMembershipCollection(true));
+        setCollection(principal.getMemberships());
 
         this.context = context;
+        this.allCenters = allCenters;
+        this.allStudies = allStudies;
 
-        addEditItemListener(new IInfoTableEditItemListener<MembershipWrapper>() {
+        addEditItemListener(new IInfoTableEditItemListener<Membership>() {
             @Override
-            public void editItem(InfoTableEvent<MembershipWrapper> event) {
-                MembershipWrapper user = ((TableRowData) getSelection()).ms;
-                editMembership(user);
+            public void editItem(InfoTableEvent<Membership> event) {
+                Membership membership = ((Membership) getSelection());
+                editMembership(membership);
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener<MembershipWrapper>() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<Membership>() {
             @Override
-            public void deleteItem(InfoTableEvent<MembershipWrapper> event) {
-                MembershipWrapper ms = ((TableRowData) getSelection()).ms;
-                principal.removeFromMembershipCollection(Arrays.asList(ms));
-                getList().remove(ms);
-                reloadCollection(principal.getMembershipCollection(true));
+            public void deleteItem(InfoTableEvent<Membership> event) {
+                Membership membership = ((Membership) getSelection());
+                principal.getMemberships().remove(membership);
+                getList().remove(membership);
+                setList(getList());
             }
         });
     }
 
-    protected void editMembership(MembershipWrapper ms) {
-        MembershipEditDialog dlg = new MembershipEditDialog(PlatformUI
-            .getWorkbench().getActiveWorkbenchWindow().getShell(), ms, context);
+    protected void editMembership(Membership m) {
+        MembershipEditDialog dlg = new MembershipEditDialog(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+            m, context, allCenters, allStudies);
+
         int res = dlg.open();
         if (res == Dialog.OK) {
-            reloadCollection(getList(), ms);
+            setCollection(getList());
+            setSelection(m);
             notifyListeners();
         }
     }
 
-    @SuppressWarnings("serial")
-    @Override
-    protected BiobankTableSorter getComparator() {
-        return new BiobankTableSorter() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                if (o1 instanceof MembershipWrapper
-                    && o2 instanceof MembershipWrapper) {
-                    MembershipWrapper rp1 = (MembershipWrapper) o1;
-                    MembershipWrapper rp2 = (MembershipWrapper) o2;
-                    return rp1.compareTo(rp2);
-                }
-                return 0;
-            }
-        };
-    }
-
-    @Override
-    public Object getCollectionModelObject(Object o) throws Exception {
-        TableRowData info = new TableRowData();
-        info.ms = (MembershipWrapper) o;
-        info.center =
-            info.ms.getCenter() == null ? Messages.MembershipInfoTable_all_label
-                : info.ms.getCenter().getNameShort();
-        info.study =
-            info.ms.getStudy() == null ? Messages.MembershipInfoTable_all_label
-                : info.ms.getStudy().getNameShort();
-        info.rank = info.ms.getWrappedObject().getRank().getName();
-        info.roles = getRolesString(info.ms);
-        info.permissions = getPermissionsString(info.ms);
-        return info;
-    }
-
-    public String getRolesString(MembershipWrapper ms) {
-        StringBuffer sb = new StringBuffer();
-        boolean first = true;
-        for (Role r : ms.getWrappedObject().getRoles()) {
-            if (sb.length() > 25) {
-                sb.setLength(25);
-                sb.append("..."); //$NON-NLS-1$
-                break;
-            }
-            if (first)
-                first = false;
-            else
-                sb.append(";"); //$NON-NLS-1$
-            sb.append(r.getName());
-
+    public String getRolesAndPermissionsSummary(Membership m) {
+        List<String> rolesAndPerms = new ArrayList<String>();
+        for (Role role : m.getRoles()) {
+            rolesAndPerms.add(role.getName());
         }
-        return sb.toString();
-    }
-
-    public String getPermissionsString(MembershipWrapper ms) {
-        StringBuffer sb = new StringBuffer();
-        boolean first = true;
-        for (PermissionEnum perm : ms.getPermissionCollection()) {
-            if (sb.length() > 25) {
-                sb.setLength(25);
-                sb.append("..."); //$NON-NLS-1$
-                break;
-            }
-            if (first)
-                first = false;
-            else
-                sb.append(";"); //$NON-NLS-1$
-            sb.append(perm.name()); // TODO: localize
+        for (PermissionEnum permission : m.getPermissions()) {
+            rolesAndPerms.add(permission.getName());
         }
-        return sb.toString();
-    }
-
-    @Override
-    protected String getCollectionModelObjectToString(Object o) {
-        if (o == null)
-            return null;
-        return ((TableRowData) o).toString();
+        String summary = StringUtil.join(rolesAndPerms, ", ");
+        summary = StringUtil.truncate(summary, 50, "...");
+        return summary;
     }
 
     @Override
@@ -166,25 +97,18 @@ public class MembershipInfoTable extends
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info =
-                    (TableRowData) ((BiobankCollectionModel) element).o;
-                if (info == null) {
-                    if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
-                    }
-                    return ""; //$NON-NLS-1$
-                }
+                Membership m = (Membership) element;
                 switch (columnIndex) {
                 case 0:
-                    return info.center;
+                    return m.getCenter() != null
+                        ? m.getCenter().getNameShort() : "All Centers";
                 case 1:
-                    return info.study;
+                    return m.getStudy() != null
+                        ? m.getStudy().getNameShort() : "All Studies";
                 case 2:
-                    return info.rank;
+                    return m.isUserManager() ? "Yes" : "No";
                 case 3:
-                    return info.roles;
-                case 4:
-                    return info.permissions;
+                    return getRolesAndPermissionsSummary(m);
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -199,7 +123,6 @@ public class MembershipInfoTable extends
 
     @Override
     protected BgcTableSorter getTableSorter() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

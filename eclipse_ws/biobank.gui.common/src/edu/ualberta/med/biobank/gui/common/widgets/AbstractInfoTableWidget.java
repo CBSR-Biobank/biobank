@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.gui.common.widgets;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -446,6 +448,10 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     public void setList(final List<T> list) {
         this.list.setDelegate(list);
+    }
+
+    public void setCollection(final Collection<T> list) {
+        this.list.setDelegate(new ArrayList<T>(list));
     }
 
     public List<T> getList() {
