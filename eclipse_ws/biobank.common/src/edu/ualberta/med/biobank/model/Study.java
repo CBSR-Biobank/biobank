@@ -39,7 +39,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Unique(properties = "nameShort", groups = PrePersist.class)
 })
 @Empty(property = "patients", groups = PreDelete.class)
-public class Study extends AbstractBiobankModel {
+public class Study extends AbstractBiobankModel
+    implements HasName {
     private static final long serialVersionUID = 1L;
 
     private String name;
@@ -59,6 +60,7 @@ public class Study extends AbstractBiobankModel {
     private Set<SourceSpecimen> sourceSpecimens =
         new HashSet<SourceSpecimen>(0);
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Study.name.NotEmpty}")
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
@@ -69,6 +71,7 @@ public class Study extends AbstractBiobankModel {
         this.name = name;
     }
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Study.nameShort.NotEmpty}")
     @Column(name = "NAME_SHORT", unique = true, nullable = false, length = 50)
     public String getNameShort() {
