@@ -49,6 +49,7 @@ public abstract class UserInfoTable extends
         super(parent, HEADINGS, ROWS_PER_PAGE);
 
         setList(users);
+        update();
 
         this.managerContext = managerContext;
 
