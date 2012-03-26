@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.multiselect;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -113,7 +114,8 @@ public abstract class MultiSelectWidget<T> extends BgcBaseWidget {
 
     }
 
-    public void addSelections(List<T> allObjects, List<T> selectedObjects) {
+    public void addSelections(Collection<T> allObjects,
+        Collection<T> selectedObjects) {
         allObjectsList.addAll(allObjects);
         for (T o : allObjects) {
             if (selectedObjects.contains(o)) {
@@ -129,7 +131,8 @@ public abstract class MultiSelectWidget<T> extends BgcBaseWidget {
     /**
      * same as addSelections but remove previously set elements
      */
-    public void setSelections(List<T> allObjects, List<T> selectedObjects) {
+    public void setSelections(Collection<T> allObjects,
+        Collection<T> selectedObjects) {
         selTreeRootNode.clear();
         availTreeRootNode.clear();
         addSelections(allObjects, selectedObjects);

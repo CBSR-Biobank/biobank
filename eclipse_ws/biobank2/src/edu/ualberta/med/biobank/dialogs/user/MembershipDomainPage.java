@@ -3,36 +3,40 @@ package edu.ualberta.med.biobank.dialogs.user;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizardPage;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
 public class MembershipDomainPage extends BgcWizardPage {
     private final Membership membership;
+    private final Domain domain;
     private final ManagerContext context;
 
-    private Button allCentersCheckbox;
-    private Button allStudiesCheckbox;
-    private ComboViewer centersViewer;
-    private ComboViewer studiesViewer;
+    private MultiSelectWidget<Center> centersWidget;
+    private MultiSelectWidget<Study> studiesWidget;
+    private Button userManagerButton;
+    private Button everyPermissionButton;
 
     MembershipDomainPage(Membership membership, ManagerContext context) {
         super("Domain", "Select centers and studies for this membership", null);
 
         this.membership = membership;
+        this.domain = membership.getDomain();
+
         this.context = context;
     }
 
@@ -42,98 +46,131 @@ public class MembershipDomainPage extends BgcWizardPage {
         container.setLayout(new GridLayout(2, false));
         container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        centersViewer = getWidgetCreator().createComboViewer(
-            container,
-            "Centers",
-            getCenterOptions(),
-            membership.getCenter(),
-            null,
-            null,
-            new LabelProvider() {
+        centersWidget = new MultiSelectWidget<Center>(container, SWT.NONE,
+            "Available Centers",
+            "Selected Centers", 120) {
+            @Override
+            protected String getTextForObject(Center center) {
+                return center.getNameShort();
+            }
+        };
+
+        updateCenterSelections();
+
+        studiesWidget = new MultiSelectWidget<Study>(container, SWT.NONE,
+            "Available Studies",
+            "Selected Studies", 120) {
+            @Override
+            protected String getTextForObject(Study study) {
+                return study.getNameShort();
+            }
+        };
+
+        updateStudySelections();
+
+        centersWidget.addSelectionChangedListener(
+            new BgcEntryFormWidgetListener() {
                 @Override
-                public String getText(Object element) {
-                    return ((Center) element).getNameShort();
+                public void selectionChanged(MultiSelectEvent event) {
+                    Set<Center> domainCenters = domain.getCenters();
+                    domainCenters.clear();
+                    domainCenters.addAll(centersWidget.getSelected());
+                    updateStudySelections();
+                    updateEveryPermissionOption();
                 }
             });
 
-        centersViewer.addSelectionChangedListener(
-            new ISelectionChangedListener() {
+        studiesWidget.addSelectionChangedListener(
+            new BgcEntryFormWidgetListener() {
                 @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    IStructuredSelection selection =
-                        (IStructuredSelection) event.getSelection();
-                    membership.setCenter((Center) selection.getFirstElement());
-                    updateStudyOptions();
+                public void selectionChanged(MultiSelectEvent event) {
+                    Set<Study> domainStudies = domain.getStudies();
+                    domainStudies.clear();
+                    domainStudies.addAll(studiesWidget.getSelected());
+                    updateCenterSelections();
+                    updateEveryPermissionOption();
                 }
             });
 
-        studiesViewer = createComboViewer(container,
-            "Studies",
-            getStudyOptions(membership.getCenter()),
-            membership.getStudy(),
-            null,
-            null,
-            new LabelProvider() {
-                @Override
-                public String getText(Object element) {
-                    return ((Study) element).getNameShort();
-                }
-            });
+        userManagerButton = new Button(container, SWT.CHECK);
+        userManagerButton
+            .setText("Can create other users with the granted roles and permissions");
+        userManagerButton.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                boolean userManager = userManagerButton.getSelection();
+                membership.setUserManager(userManager);
+            }
+        });
 
-        studiesViewer.addSelectionChangedListener(
-            new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    IStructuredSelection selection =
-                        (IStructuredSelection) event.getSelection();
-                    membership.setStudy((Study) selection.getFirstElement());
-                    updateRoleAndPermissionOptions();
-                }
-            });
+        everyPermissionButton = new Button(container, SWT.CHECK);
+        everyPermissionButton
+            .setText("Grant all current and future roles and permissions");
+        everyPermissionButton.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                boolean everyPermission = everyPermissionButton.getSelection();
+                membership.setEveryPermission(everyPermission);
+            }
+        });
 
         setControl(container);
     }
 
-    private Set<Center> getCenterOptions() {
-        Set<Center> options = new HashSet<Center>();
-        if (isAllCentersOption()) {
-            options.addAll(context.getCenters());
-        } else {
-            for (Membership m : context.getManager().getAllMemberships()) {
-                options.add(m.getCenter());
+    private void updateEveryPermissionOption() {
+        boolean canGrantEveryPermission = false;
+        for (Domain d : context.getManager().getManageableDomains()) {
+            if (d.isSuperset(domain)) {
+                canGrantEveryPermission = true;
+                break;
             }
         }
-        return options;
+        if (!canGrantEveryPermission) {
+            everyPermissionButton.setSelection(false);
+        }
+        everyPermissionButton.setEnabled(canGrantEveryPermission);
     }
 
-    private void updateStudyOptions() {
-        studiesViewer.setInput(getStudyOptions(membership.getCenter()));
+    private void updateCenterSelections() {
+        centersWidget.setSelections(
+            getCenterOptions(),
+            membership.getDomain().getCenters());
     }
 
-    public Set<Study> getStudyOptions(Center selectedCenter) {
-        Set<Study> options = new HashSet<Study>();
-        if (isAllStudiesOption()) {
-            options.addAll(context.getStudies());
-        } else {
-            for (Membership m : context.getManager().getAllMemberships()) {
-                if (m.getCenter().equals(selectedCenter)) {
-                    options.add(m.getStudy());
+    private void updateStudySelections() {
+        studiesWidget.setSelections(
+            getStudyOptions(),
+            membership.getDomain().getStudies());
+    }
+
+    private Set<Center> getCenterOptions() {
+        Set<Center> options = new HashSet<Center>();
+        for (Domain d : context.getManager().getManageableDomains()) {
+            if (d.containsAllStudies(domain.getStudies())) {
+                if (d.isAllCenters()) {
+                    options.addAll(context.getCenters());
+                    break;
+                } else {
+                    options.addAll(d.getCenters());
                 }
             }
         }
         return options;
     }
 
-    public boolean isAllCentersOption() {
-        for (Membership m : context.getManager().getAllMemberships())
-            if (m.getCenter() == null) return true;
-        return false;
-    }
-
-    public boolean isAllStudiesOption() {
-        for (Membership m : context.getManager().getAllMemberships())
-            if (m.getStudy() == null) return true;
-        return false;
+    private Set<Study> getStudyOptions() {
+        Set<Study> options = new HashSet<Study>();
+        for (Domain d : context.getManager().getManageableDomains()) {
+            if (d.containsAllCenters(domain.getCenters())) {
+                if (d.isAllStudies()) {
+                    options.addAll(context.getStudies());
+                    break;
+                } else {
+                    options.addAll(d.getStudies());
+                }
+            }
+        }
+        return options;
     }
 
     @Override
