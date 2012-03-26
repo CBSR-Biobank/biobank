@@ -63,8 +63,7 @@ public class MembershipContextGetAction implements
 
     static void initMemberships(Set<Membership> memberships) {
         for (Membership membership : memberships) {
-            Hibernate.initialize(membership.getCenter());
-            Hibernate.initialize(membership.getStudy());
+            Hibernate.initialize(membership.getDomain());
             Hibernate.initialize(membership.getPermissions());
             Hibernate.initialize(membership.getRoles());
             for (Role role : membership.getRoles()) {

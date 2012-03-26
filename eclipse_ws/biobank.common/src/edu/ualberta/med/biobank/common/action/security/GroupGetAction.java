@@ -32,8 +32,9 @@ public class GroupGetAction implements Action<GroupGetOutput> {
             .createCriteria(Group.class, "g")
             .createAlias("g.memberships", "m", Criteria.LEFT_JOIN)
             .createAlias("g.users", "u", Criteria.LEFT_JOIN)
-            .createAlias("m.center", "c", Criteria.LEFT_JOIN)
-            .createAlias("m.study", "s", Criteria.LEFT_JOIN)
+            .createAlias("m.domain", "d", Criteria.LEFT_JOIN)
+            .createAlias("d.centers", "c", Criteria.LEFT_JOIN)
+            .createAlias("d.studies", "s", Criteria.LEFT_JOIN)
             .createAlias("m.roles", "r", Criteria.LEFT_JOIN)
             .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
             .add(Restrictions.idEq(input.getGroupId()));

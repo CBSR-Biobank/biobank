@@ -589,10 +589,10 @@ public class Factory {
         Membership membership = new Membership();
 
         if (domain == Domain.CENTER || domain == Domain.CENTER_STUDY) {
-            membership.setCenter(getDefaultCenter());
+            membership.getDomain().getCenters().add(getDefaultCenter());
         }
         if (domain == Domain.STUDY || domain == Domain.CENTER_STUDY) {
-            membership.setStudy(getDefaultStudy());
+            membership.getDomain().getStudies().add(getDefaultStudy());
         }
 
         Principal p = getDefaultPrincipal();

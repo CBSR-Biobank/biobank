@@ -1,9 +1,14 @@
+-- add a global domain
+SELECT @domainId := COALESCE(MAX(id), 0) + 1 FROM `domain`;
+INSERT INTO `domain` (id, version, all_centers, all_studies) VALUES (@domainId, 0, b'1', b'1');
+
 -- Add a default super admin group.
-insert into principal (discriminator, id, version, name, activity_status_id)
-select 'BbGroup', coalesce(MAX(id), 0)+1, 0, 'Super Administrators', 1 from principal;
+SELECT @groupId := COALESCE(MAX(id), 0) + 1 FROM `principal`;
+INSERT INTO `principal` (discriminator, id, version, name, activity_status_id)
+ VALUES ('BbGroup', @groupId, 0, 'Global Administrators', 1);
 
 -- add a membership to this super admin role
-insert into membership(id, version, principal_id, not_null_center_id, not_null_study_id, user_manager, every_permission)
-select (select coalesce(MAX(id), 0)+1 from membership),
-0, id, 0, 0, b'1', b'1' from principal where name='Super Administrators';
+SELECT @membershipId := COALESCE(MAX(id), 0) + 1 FROM `membership`;
+INSERT INTO membership(id, version, principal_id, domain_id, user_manager, every_permission)
+  VALUES (@membershipId, 0, @groupId, @domainId, b'1', b'1');
 

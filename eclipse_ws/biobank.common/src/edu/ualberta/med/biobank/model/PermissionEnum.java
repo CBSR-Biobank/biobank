@@ -154,7 +154,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     /**
      * Whether the given {@link User} has this {@link PermissionEnum} on
      * <em>any</em> {@link Center} or {@link Study}.
-     *
+     * 
      * @see {@link #isMembershipAllowed(Membership, Center, Study)}
      * @param user
      * @return
@@ -166,7 +166,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     /**
      * Whether the given {@link User} has this {@link PermissionEnum} on
      * <em>any</em> {@link Center}, but a specific {@link Study}.
-     *
+     * 
      * @see {@link #isAllowed(User)}
      * @param user
      * @return
@@ -178,7 +178,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     /**
      * Whether the given {@link User} has this {@link PermissionEnum} on
      * <em>any</em> {@link Study}, but a specific {@link Center}.
-     *
+     * 
      * @see {@link #isAllowed(User)}
      * @param user
      * @return
@@ -188,7 +188,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     }
 
     /**
-     *
+     * 
      * @param user
      * @param center if null, {@link Center} does not matter.
      * @param study if null, {@link Study} does not matter.
@@ -203,11 +203,8 @@ public enum PermissionEnum implements NotAProxy, Serializable {
 
     /**
      * This is a confusing check. If {@link Center} is null, it means we do not
-     * care about its value. If {@link Membership#getCenter()} is null, we don't
-     * care about the {@link Center} parameter's value. If neither is null, then
-     * they must be equal, because we care about the {@link Center} paramter's
-     * value, and it must match the {@link Membership#getCenter()} value. The
-     * same applies to {@link Study}.
+     * care about its value, otherwise, {@link Domain#contains(Center)} must be
+     * true. The same applies to {@link Study}.
      * 
      * @param membership
      * @param center
@@ -216,10 +213,10 @@ public enum PermissionEnum implements NotAProxy, Serializable {
      */
     private boolean isMembershipAllowed(Membership membership, Center center,
         Study study) {
-        boolean hasCenter = center == null || membership.getCenter() == null
-            || center.equals(membership.getCenter());
-        boolean hasStudy = study == null || membership.getStudy() == null
-            || study.equals(membership.getStudy());
+        boolean hasCenter = center == null
+            || membership.getDomain().contains(center);
+        boolean hasStudy = study == null
+            || membership.getDomain().contains(study);
         boolean hasPermission = membership.getAllPermissions().contains(this);
 
         boolean isAllowed = hasCenter && hasStudy && hasPermission;

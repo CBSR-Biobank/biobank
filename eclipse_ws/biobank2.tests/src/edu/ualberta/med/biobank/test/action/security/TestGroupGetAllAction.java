@@ -119,8 +119,7 @@ public class TestGroupGetAllAction extends TestAction {
             group.getActivityStatus();
 
             for (Membership m : group.getMemberships()) {
-                m.getCenter();
-                m.getStudy();
+                m.getDomain();
                 m.isUserManager();
                 m.isEveryPermission();
 

@@ -86,8 +86,7 @@ public class GroupSaveAction implements Action<IdResult> {
             oldM.setUserManager(newM.isUserManager());
             oldM.setEveryPermission(newM.isEveryPermission());
 
-            oldM.setCenter(newM.getCenter());
-            oldM.setStudy(newM.getStudy());
+            oldM.setDomain(newM.getDomain());
         }
 
         for (Membership m : group.getMemberships()) {

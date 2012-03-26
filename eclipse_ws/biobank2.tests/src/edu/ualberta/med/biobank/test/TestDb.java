@@ -76,6 +76,9 @@ public class TestDb extends TestBase {
         session.save(globalAdmin);
 
         Membership membership = new Membership();
+        membership.getDomain().setAllCenters(true);
+        membership.getDomain().setAllStudies(true);
+
         membership.setUserManager(true);
         membership.setEveryPermission(true);
         membership.setPrincipal(globalAdmin);

@@ -59,6 +59,7 @@
 		<mapping class="edu.ualberta.med.biobank.model.ContainerType" />
 		<mapping class="edu.ualberta.med.biobank.model.Dispatch" />
 		<mapping class="edu.ualberta.med.biobank.model.DispatchSpecimen" />
+		<mapping class="edu.ualberta.med.biobank.model.Domain" />
 		<mapping class="edu.ualberta.med.biobank.model.EntityColumn" />
 		<mapping class="edu.ualberta.med.biobank.model.EntityFilter" />
 		<mapping class="edu.ualberta.med.biobank.model.Entity" />

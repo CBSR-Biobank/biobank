@@ -74,7 +74,7 @@ public class PermissionCheckTreeWidget extends Composite {
 
         treeviewer = new ContainerCheckedTreeViewer(this);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        gd.heightHint = 300;
+        gd.heightHint = 120;
         gd.horizontalSpan = 2;
         treeviewer.getTree().setLayoutData(gd);
 

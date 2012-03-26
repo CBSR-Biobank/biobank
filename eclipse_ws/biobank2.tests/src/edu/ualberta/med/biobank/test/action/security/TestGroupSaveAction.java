@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.security.GroupSaveAction;
 import edu.ualberta.med.biobank.common.action.security.GroupSaveInput;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
@@ -29,8 +30,10 @@ public class TestGroupSaveAction extends TestAction {
         tx.commit();
 
         Membership membership = new Membership();
-        membership.setCenter(center);
-        membership.setStudy(study);
+        Domain domain = membership.getDomain();
+        domain.getCenters().add(center);
+        domain.getStudies().add(study);
+
         membership.getRoles().add(role);
         membership.getPermissions().add(PermissionEnum.CLINIC_CREATE);
 
@@ -73,10 +76,7 @@ public class TestGroupSaveAction extends TestAction {
         Assert.assertEquals("membership roles",
             membership.getRoles(), savedMembership.getRoles());
 
-        Assert.assertEquals("membership center",
-            membership.getCenter(), savedMembership.getCenter());
-
-        Assert.assertEquals("membership study",
-            membership.getStudy(), savedMembership.getStudy());
+        Assert.assertTrue("membership domain",
+            domain.isEquivalent(savedMembership.getDomain()));
     }
 }

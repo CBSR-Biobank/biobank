@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -12,15 +13,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
-
-import edu.ualberta.med.biobank.validator.constraint.Unique;
-import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
  * A {@link User} should only be able to create
@@ -42,24 +40,14 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * @author Jonathan Ferland
  */
 @Entity
-@Table(name = "MEMBERSHIP",
-    uniqueConstraints = {
-        // TODO: consider adding 'RANK' so can be admin on 1, user manager on 1
-        // and a normal user for all? But there's no point of being an admin and
-        // a user manager on the same center/ study combo, since admin
-        // completely encompases manager. Actually, how about an "isManager"
-        // field and an "isAllPermissions" field?
-        @UniqueConstraint(columnNames = { "PRINCIPAL_ID", "NOT_NULL_CENTER_ID",
-            "NOT_NULL_STUDY_ID" }) })
-@Unique(properties = { "principal", "notNullCenterId", "notNullStudyId" }, groups = PrePersist.class)
+@Table(name = "MEMBERSHIP")
 public class Membership extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
-    private Set<PermissionEnum> permissions = new HashSet<PermissionEnum>(0);
-    private Center center;
-    private Set<Role> roles = new HashSet<Role>(0);
-    private Study study;
     private Principal principal;
+    private Domain domain = new Domain();
+    private Set<PermissionEnum> permissions = new HashSet<PermissionEnum>(0);
+    private Set<Role> roles = new HashSet<Role>(0);
     private boolean userManager = false;
     private boolean everyPermission = false;
 
@@ -70,13 +58,24 @@ public class Membership extends AbstractBiobankModel {
         setPrincipal(p);
         p.getMemberships().add(this);
 
-        setCenter(m.getCenter());
-        setStudy(m.getStudy());
+        setDomain(new Domain(m.domain));
+
         setUserManager(m.isUserManager());
         setEveryPermission(m.isEveryPermission());
 
         getPermissions().addAll(m.getPermissions());
         getRoles().addAll(m.getRoles());
+    }
+
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Membership.domain.NotNull}")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "DOMAIN_ID", unique = true)
+    public Domain getDomain() {
+        return domain;
+    }
+
+    public void setDomain(Domain domain) {
+        this.domain = domain;
     }
 
     @ElementCollection(targetClass = PermissionEnum.class, fetch = FetchType.EAGER)
@@ -92,16 +91,6 @@ public class Membership extends AbstractBiobankModel {
         this.permissions = permissions;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CENTER_ID")
-    public Center getCenter() {
-        return this.center;
-    }
-
-    public void setCenter(Center center) {
-        this.center = center;
-    }
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "MEMBERSHIP_ROLE",
         joinColumns = { @JoinColumn(name = "MEMBERSHIP_ID", nullable = false, updatable = false) },
@@ -112,16 +101,6 @@ public class Membership extends AbstractBiobankModel {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "STUDY_ID")
-    public Study getStudy() {
-        return this.study;
-    }
-
-    public void setStudy(Study study) {
-        this.study = study;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Membership.principal.NotNull}")
@@ -233,7 +212,7 @@ public class Membership extends AbstractBiobankModel {
         Set<Role> roles = new HashSet<Role>();
         for (Membership membership : user.getAllMemberships()) {
             if (isManageable(membership)) {
-                if (isEveryPermission()) {
+                if (membership.isEveryPermission()) {
                     roles.addAll(defaultAdminRoles);
                 }
                 roles.addAll(membership.getRoles());
@@ -277,40 +256,20 @@ public class Membership extends AbstractBiobankModel {
         return false;
     }
 
-    @Transient
-    public boolean isGlobal() {
-        return isAllCenters() && isAllStudies();
-    }
-
-    @Transient
-    public boolean isAllCenters() {
-        return getCenter() == null;
-    }
-
-    @Transient
-    public boolean isAllStudies() {
-        return getStudy() == null;
-    }
-
     /**
      * Return true if at least one {@link PermissionEnum} or {@link Role} in
      * this {@link Membership} can be managed by the given {@link Membership},
      * otherwise false. Several criteria must be met:
      * <ol>
-     * <li>this {@link Membership} is <em>not</em> equal to the given
-     * {@link Membership}, to prevent using given power to remove itself
      * <li>the given {@link Membership} must contain at least one
      * {@link PermissionEnum} or {@link Role}, otherwise it can't manage
      * anything.
-     * <li>the given {@link Membership} has a {@link Rank} of at least
-     * {@link Rank#MANAGER}</li>
-     * <li>this {@link Membership} has a {@link Rank} less than that of the
-     * given {@link Membership} or an equal {@link Rank} but a lesser
-     * {@link #getLevel()} than the given {@link Membership}. This will prevent
-     * peers of equal power from editing each other (or themselves)</li>
-     * <li>this {@link Membership} is in a smaller or equal realm of influence,
-     * i.e. the other {@link Membership} "contains" this {@link Center} and
-     * "contains" this {@link Study}
+     * <li>the given {@link Membership} must be able to manage users (i.e.
+     * {@link Membership#isUserManager()} must be true)</li>
+     * <li>if this {@link Membership} has every {@link PermissionEnum} (i.e.
+     * {@link Membership#isEveryPermission()} return true), then that
+     * {@link Membership} must also have it</li>
+     * <li>that {@link Domain} must be a superset of this {@link Domain}</li>
      * </ol>
      * 
      * @param membership
@@ -318,54 +277,14 @@ public class Membership extends AbstractBiobankModel {
      */
     @Transient
     public boolean isManageable(Membership that) {
-        // if (equals(that)) return false;
-
         if (that.getAllPermissions().isEmpty()
             && that.getRoles().isEmpty()) return false;
 
         if (!that.isUserManager()) return false;
         if (isEveryPermission() && !that.isEveryPermission()) return false;
 
-        if (that.getCenter() != null && !that.getCenter().equals(getCenter()))
-            return false;
-        if (that.getStudy() != null && !that.getStudy().equals(getStudy()))
-            return false;
+        if (!that.getDomain().isSuperset(getDomain())) return false;
 
         return true;
-    }
-
-    /**
-     * Provides a never-null {@link Center} identifier that can be used to
-     * create a unique index on. This allows a unique index to be created on (
-     * {@link #getPrincipal()}, {@link #getNotNullCenterId()}) since a null
-     * {@link Center} is converted to zero value. This is particularly important
-     * for MySQL, which would allow multiple {@link Membership} instances for
-     * the same {@link Principal} that have a null {@link Center}.
-     * 
-     * @see {@link http://bugs.mysql.com/bug.php?id=17825}
-     * @see {@link #getNotNullStudyId()}
-     * @author Jonathan Ferland
-     * @return the {@link Center} id, or null if no {@link Center}.
-     */
-    @Column(name = "NOT_NULL_CENTER_ID", nullable = false)
-    Integer getNotNullCenterId() {
-        return getCenter() != null ? getCenter().getId() : 0;
-    }
-
-    void setNotNullCenterId(Integer centerId) {
-    }
-
-    /**
-     * Functions similar to {@link #getNotNullCenterId()} for the same reason.
-     * 
-     * @see {@link #getNotNullCenterId()}
-     * @return
-     */
-    @Column(name = "NOT_NULL_STUDY_ID", nullable = false)
-    Integer getNotNullStudyId() {
-        return getStudy() != null ? getStudy().getId() : 0;
-    }
-
-    void setNotNullStudyId(Integer studyId) {
     }
 }

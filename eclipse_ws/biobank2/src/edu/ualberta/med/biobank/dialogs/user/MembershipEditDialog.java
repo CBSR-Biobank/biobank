@@ -18,10 +18,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
@@ -120,30 +117,19 @@ public class MembershipEditDialog extends BgcBaseDialog {
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        TabFolder tb = new TabFolder(contents, SWT.TOP);
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        tb.setLayoutData(gd);
-
-        Composite centerStudyComp = createTabItem(tb,
-            Messages.MembershipAddDialog_centerStudy_tab_title, 1);
-        createCentersCombo(centerStudyComp);
-        createStudysCombo(centerStudyComp);
-
-        createRolesWidget(createTabItem(tb,
-            Messages.MembershipAddDialog_roles_tab_title, 1));
-
-        createPermissionWidgets(createTabItem(tb,
-            Messages.MembershipAddDialog_permissions_tab_title, 1));
+        createCentersCombo(contents);
+        createStudysCombo(contents);
+        createRolesWidget(contents);
+        createPermissionWidgets(contents);
     }
 
-    private void createCentersCombo(Composite contents)
+    private void createCentersCombo(Composite parent)
         throws ApplicationException {
-        Group groupComp = new Group(contents, SWT.SHADOW_IN);
-        groupComp.setText(Messages.MembershipAddDialog_center_label);
-        groupComp.setLayout(new GridLayout(2, false));
-        groupComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        Composite contents = new Composite(parent, SWT.NONE);
+        contents.setLayout(new GridLayout(2, false));
+        contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        centersViewer = createComboViewer(groupComp,
+        centersViewer = createComboViewer(contents,
             Messages.MembershipAddDialog_selected_center_label,
             getCenterOptions(),
             NamedOption.create(membership.getCenter(), ALL_CENTERS_OPTION),
@@ -163,12 +149,11 @@ public class MembershipEditDialog extends BgcBaseDialog {
 
     protected void createStudysCombo(Composite parent)
         throws ApplicationException {
-        Group groupComp = new Group(parent, SWT.SHADOW_IN);
-        groupComp.setText(Messages.MembershipAddDialog_study_label);
-        groupComp.setLayout(new GridLayout(2, false));
-        groupComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        Composite contents = new Composite(parent, SWT.NONE);
+        contents.setLayout(new GridLayout(2, false));
+        contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        studiesViewer = createComboViewer(groupComp,
+        studiesViewer = createComboViewer(contents,
             Messages.MembershipAddDialog_selected_study_label,
             getStudyOptions(membership.getCenter()),
             NamedOption.create(membership.getStudy(), ALL_STUDIES_OPTION),
@@ -198,21 +183,12 @@ public class MembershipEditDialog extends BgcBaseDialog {
             });
     }
 
-    private Composite createTabItem(TabFolder tb, String title, int columns) {
-        TabItem item = new TabItem(tb, SWT.NONE);
-        item.setText(title);
-        Composite contents = new Composite(tb, SWT.NONE);
-        contents.setLayout(new GridLayout(columns, false));
-        item.setControl(contents);
-        return contents;
-    }
-
     private void createRolesWidget(Composite contents)
         throws ApplicationException {
         GridData gd;
         rolesWidget = new MultiSelectWidget<Role>(contents, SWT.NONE,
             Messages.MembershipAddDialog_roles_available_label,
-            Messages.MembershipAddDialog_roles_selected_label, 300) {
+            Messages.MembershipAddDialog_roles_selected_label, 120) {
             @Override
             protected String getTextForObject(Role nodeObject) {
                 return nodeObject.getName();
