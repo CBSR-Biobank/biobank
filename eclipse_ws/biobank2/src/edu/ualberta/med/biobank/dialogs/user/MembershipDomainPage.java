@@ -46,6 +46,8 @@ public class MembershipDomainPage extends BgcWizardPage {
         container.setLayout(new GridLayout(2, false));
         container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+        // TODO: radio buttons or check boxes for all centers and studies
+
         centersWidget = new MultiSelectWidget<Center>(container, SWT.NONE,
             "Available Centers",
             "Selected Centers", 120) {
