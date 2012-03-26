@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.security.RoleSaveAction;
 import edu.ualberta.med.biobank.common.action.security.RoleSaveInput;
 import edu.ualberta.med.biobank.common.peer.RolePeer;
@@ -99,8 +100,10 @@ public class RoleEditDialog extends BgcBaseDialog {
             PermissionTreeRes res = tree.getAddedAndRemovedNodes();
             role.getPermissions().addAll(res.addedPermissions);
 
-            SessionManager.getAppService().doAction(
+            IdResult result = SessionManager.getAppService().doAction(
                 new RoleSaveAction(new RoleSaveInput(role)));
+
+            role.setId(result.getId());
 
             close();
         } catch (Throwable t) {

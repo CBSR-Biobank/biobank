@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.security.GroupGetOutput;
 import edu.ualberta.med.biobank.common.action.security.GroupSaveAction;
 import edu.ualberta.med.biobank.common.action.security.GroupSaveInput;
@@ -182,8 +183,9 @@ public class GroupEditDialog extends BgcBaseDialog {
             // FIXME: for now it's faster to use the name as the description
             group.setDescription(group.getName());
 
-            SessionManager.getAppService().doAction(
+            IdResult result = SessionManager.getAppService().doAction(
                 new GroupSaveAction(new GroupSaveInput(group)));
+            group.setId(result.getId());
 
             close();
         } catch (Throwable t) {
