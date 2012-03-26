@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.hibernate.criterion.CriteriaSpecification;
+
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -30,7 +32,9 @@ public class RoleGetAllAction implements Action<RoleGetAllOutput> {
     @Override
     public RoleGetAllOutput run(ActionContext context) throws ActionException {
         @SuppressWarnings("unchecked")
-        List<Role> results = context.getSession().createCriteria(Role.class)
+        List<Role> results = context.getSession()
+            .createCriteria(Role.class)
+            .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
             .list();
 
         SortedSet<Role> roles = new TreeSet<Role>(Role.NAME_COMPARATOR);

@@ -226,6 +226,7 @@ public class UserEditDialog extends BgcBaseDialog {
             @Override
             public void run() {
                 Membership m = new Membership();
+                m.setPrincipal(user);
 
                 MembershipEditDialog dlg =
                     new MembershipEditDialog(PlatformUI.getWorkbench()
@@ -238,6 +239,8 @@ public class UserEditDialog extends BgcBaseDialog {
 
                     membershipInfoTable.setCollection(user.getMemberships());
                     membershipInfoTable.setSelection(m);
+                } else {
+                    m.setPrincipal(null);
                 }
             }
         });

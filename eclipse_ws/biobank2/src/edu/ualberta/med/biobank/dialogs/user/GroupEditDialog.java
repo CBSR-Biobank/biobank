@@ -155,6 +155,8 @@ public class GroupEditDialog extends BgcBaseDialog {
             @Override
             public void run() {
                 Membership m = new Membership();
+                m.setPrincipal(group);
+
                 Shell shell =
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                         .getShell();
@@ -168,6 +170,8 @@ public class GroupEditDialog extends BgcBaseDialog {
 
                     membershipInfoTable.setCollection(group.getMemberships());
                     membershipInfoTable.setSelection(m);
+                } else {
+                    m.setPrincipal(null);
                 }
             }
         });

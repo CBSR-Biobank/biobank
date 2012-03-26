@@ -35,7 +35,7 @@ public abstract class RoleInfoTable extends
         addEditItemListener(new IInfoTableEditItemListener<Role>() {
             @Override
             public void editItem(InfoTableEvent<Role> event) {
-                Role role = ((Role) getSelection());
+                Role role = getSelection();
                 editRole(role);
             }
         });
@@ -43,7 +43,7 @@ public abstract class RoleInfoTable extends
         addDeleteItemListener(new IInfoTableDeleteItemListener<Role>() {
             @Override
             public void deleteItem(InfoTableEvent<Role> event) {
-                Role role = ((Role) getSelection());
+                Role role = getSelection();
                 deleteRole(role);
             }
         });
@@ -53,7 +53,7 @@ public abstract class RoleInfoTable extends
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                Role role = ((Role) getSelection());
+                Role role = getSelection();
                 duplicate(role);
             }
         });

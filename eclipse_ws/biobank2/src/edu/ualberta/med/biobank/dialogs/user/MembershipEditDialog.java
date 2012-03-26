@@ -146,7 +146,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
         centersViewer = createComboViewer(groupComp,
             Messages.MembershipAddDialog_selected_center_label,
             getCenterOptions(),
-            new NamedOption<Center>(membership.getCenter()),
+            NamedOption.create(membership.getCenter(), ALL_CENTERS_OPTION),
             null,
             null,
             new NamedOptionLabelProvider());
@@ -171,7 +171,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
         studiesViewer = createComboViewer(groupComp,
             Messages.MembershipAddDialog_selected_study_label,
             getStudyOptions(membership.getCenter()),
-            new NamedOption<Study>(membership.getStudy()),
+            NamedOption.create(membership.getStudy(), ALL_STUDIES_OPTION),
             null,
             null,
             new NamedOptionLabelProvider());
@@ -319,11 +319,11 @@ public class MembershipEditDialog extends BgcBaseDialog {
             if (m.getCenter() == null) {
                 options.add(ALL_CENTERS_OPTION);
                 for (Center c : context.getCenters()) {
-                    options.add(new NamedOption<Center>(c));
+                    options.add(NamedOption.create(c));
                 }
                 break;
             } else {
-                options.add(new NamedOption<Center>(m.getCenter()));
+                options.add(NamedOption.create(m.getCenter()));
             }
         }
         return options;
@@ -350,11 +350,11 @@ public class MembershipEditDialog extends BgcBaseDialog {
                 if (m.getStudy() == null) {
                     options.add(ALL_STUDIES_OPTION);
                     for (Study s : context.getStudies()) {
-                        options.add(new NamedOption<Study>(s));
+                        options.add(NamedOption.create(s));
                     }
                     break;
                 } else {
-                    options.add(new NamedOption<Study>(m.getStudy()));
+                    options.add(NamedOption.create(m.getStudy()));
                 }
             }
         }
@@ -368,14 +368,9 @@ public class MembershipEditDialog extends BgcBaseDialog {
         }
     }
 
-    static class NamedOption<T extends HasName> implements
-        Comparable<NamedOption<T>> {
+    static class NamedOption<T> implements Comparable<NamedOption<T>> {
         private final T option;
         private final String name;
-
-        private NamedOption(T option) {
-            this(option, option.getNameShort());
-        }
 
         private NamedOption(T option, String name) {
             this.option = option;
@@ -388,6 +383,16 @@ public class MembershipEditDialog extends BgcBaseDialog {
 
         public String getName() {
             return name;
+        }
+
+        public static <E extends HasName> NamedOption<E> create(E named,
+            NamedOption<E> defaultValue) {
+            if (named == null) return defaultValue;
+            return new NamedOption<E>(named, named.getNameShort());
+        }
+
+        public static <E extends HasName> NamedOption<E> create(E named) {
+            return new NamedOption<E>(named, named.getNameShort());
         }
 
         @Override

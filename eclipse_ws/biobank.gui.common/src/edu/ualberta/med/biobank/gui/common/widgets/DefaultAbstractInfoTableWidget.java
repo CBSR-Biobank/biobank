@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.gui.common.widgets;
 
 import java.util.List;
 
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
@@ -100,6 +101,18 @@ public abstract class DefaultAbstractInfoTableWidget<T>
     @Override
     public boolean isEditMode() {
         return false;
+    }
+
+    @Override
+    public T getSelection() {
+        if (tableViewer.getTable().isDisposed()) return null;
+
+        IStructuredSelection selection = (IStructuredSelection) tableViewer
+            .getSelection();
+
+        @SuppressWarnings("unchecked")
+        T firstElement = (T) selection.getFirstElement();
+        return firstElement;
     }
 
     private class InfoTableListChangeHandler implements ListChangeHandler<T> {

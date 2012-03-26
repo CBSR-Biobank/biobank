@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.action.security;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -40,24 +41,28 @@ public class ManagerContextGetAction implements Action<ManagerContextGetOutput> 
         @SuppressWarnings("unchecked")
         List<Center> centers = (List<Center>) context.getSession()
             .createCriteria(Center.class)
+            .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
             .addOrder(Order.asc("name"))
             .list();
 
         @SuppressWarnings("unchecked")
         List<Study> studies = (List<Study>) context.getSession()
             .createCriteria(Study.class)
+            .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
             .addOrder(Order.asc("name"))
             .list();
 
         @SuppressWarnings("unchecked")
         List<Role> roles = (List<Role>) context.getSession()
             .createCriteria(Role.class)
+            .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
             .addOrder(Order.asc("name"))
             .list();
 
         @SuppressWarnings("unchecked")
         List<User> users = (List<User>) context.getSession()
             .createCriteria(User.class)
+            .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
             .addOrder(Order.asc("login"))
             .list();
 
