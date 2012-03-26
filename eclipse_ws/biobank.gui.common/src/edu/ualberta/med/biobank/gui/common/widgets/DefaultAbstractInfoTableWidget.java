@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.gui.common.widgets;
 
-import gov.nih.nci.system.applicationservice.ApplicationException;
-
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
@@ -44,7 +42,12 @@ public abstract class DefaultAbstractInfoTableWidget<T>
     }
 
     @Override
-    public void reload() throws ApplicationException {
+    public void reload() {
         setList(getList());
+    }
+
+    @Override
+    public boolean isEditMode() {
+        return false;
     }
 }

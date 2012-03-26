@@ -28,6 +28,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
+import edu.ualberta.med.biobank.common.action.security.MembershipContext;
 import edu.ualberta.med.biobank.common.action.security.UserGetOutput;
 import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
 import edu.ualberta.med.biobank.common.action.security.UserSaveInput;
@@ -62,6 +63,7 @@ public class UserEditDialog extends BgcBaseDialog {
 
     private final UserWrapper userWrapper;
     private final User user;
+    private final MembershipContext membershipContext;
     private final ManagerContext managerContext;
     private final boolean isFullyManageable;
 
@@ -69,11 +71,14 @@ public class UserEditDialog extends BgcBaseDialog {
     private MembershipInfoTable membershipInfoTable;
     private MultiSelectWidget<Group> groupsWidget;
 
-    public UserEditDialog(Shell parent, UserGetOutput output) {
+    public UserEditDialog(Shell parent, UserGetOutput output,
+        ManagerContext managerContext) {
         super(parent);
         this.user = output.getUser();
-        this.managerContext = output.getContext();
+        this.membershipContext = output.getContext();
         this.isFullyManageable = output.isFullyManageable();
+
+        this.managerContext = managerContext;
 
         BiobankApplicationService appService = SessionManager.getAppService();
         this.userWrapper = new UserWrapper(appService, user);
@@ -193,7 +198,8 @@ public class UserEditDialog extends BgcBaseDialog {
         addButton.setLayoutData(gd);
 
         membershipInfoTable =
-            new MembershipInfoTable(contents, user, managerContext, null, null);
+            new MembershipInfoTable(contents, user, membershipContext,
+                managerContext);
     }
 
     private void createGroupsSection(Composite contents)
@@ -208,7 +214,7 @@ public class UserEditDialog extends BgcBaseDialog {
                 }
             };
 
-        Set<Group> available = managerContext.getGroups();
+        Set<Group> available = membershipContext.getGroups();
 
         groupsWidget.setSelections(
             new ArrayList<Group>(available),
@@ -222,10 +228,9 @@ public class UserEditDialog extends BgcBaseDialog {
                 Membership m = new Membership();
 
                 MembershipEditDialog dlg =
-                    new MembershipEditDialog(
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(),
-                        m, managerContext, null, null);
+                    new MembershipEditDialog(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell(), m,
+                        managerContext);
                 int res = dlg.open();
                 if (res == Status.OK) {
                     m.setPrincipal(user);
@@ -254,7 +259,7 @@ public class UserEditDialog extends BgcBaseDialog {
 
             IdResult res = SessionManager.getAppService()
                 .doAction(new UserSaveAction(
-                    new UserSaveInput(user, managerContext, pw)));
+                    new UserSaveInput(user, membershipContext, pw)));
             user.setId(res.getId());
 
             if (SessionManager.getUser().equals(user)) {

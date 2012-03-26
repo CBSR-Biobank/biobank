@@ -36,8 +36,8 @@ public class UserGetAction implements Action<UserGetOutput> {
 
         User copy = new User();
 
-        ManagerContext managerContext = new ManagerContextGetAction(
-            new ManagerContextGetInput()).run(context).getContext();
+        MembershipContext managerContext = new MembershipContextGetAction(
+            new MembershipContextGetInput()).run(context).getContext();
 
         copyProperties(user, copy);
         copyMemberships(user, copy, context, managerContext.getRoles());

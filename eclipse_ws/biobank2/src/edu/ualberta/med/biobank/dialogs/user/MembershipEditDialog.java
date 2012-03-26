@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.dialogs.user;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -52,8 +51,6 @@ public class MembershipEditDialog extends BgcBaseDialog {
     private final Membership membership;
     private final Membership originalMembership;
     private final ManagerContext context;
-    private final List<Center> allCenters;
-    private final List<Study> allStudies;
 
     private ComboViewer centersViewer;
     private ComboViewer studiesViewer;
@@ -62,7 +59,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
     private PermissionCheckTreeWidget permissionsTree;
 
     public MembershipEditDialog(Shell parent, Membership membership,
-        ManagerContext context, List<Center> allCenters, List<Study> allStudies) {
+        ManagerContext context) {
         super(parent);
 
         this.membership = membership;
@@ -71,9 +68,6 @@ public class MembershipEditDialog extends BgcBaseDialog {
         copyMembership(membership, originalMembership);
 
         this.context = context;
-
-        this.allCenters = allCenters;
-        this.allStudies = allStudies;
 
         if (membership.isNew()) {
             this.currentTitle = Messages.MembershipAddDialog_title;
@@ -324,7 +318,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
         for (Membership m : context.getManager().getAllMemberships()) {
             if (m.getCenter() == null) {
                 options.add(ALL_CENTERS_OPTION);
-                for (Center c : allCenters) {
+                for (Center c : context.getCenters()) {
                     options.add(new NamedOption<Center>(c));
                 }
                 break;
@@ -355,7 +349,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
             if (center == null || center.equals(selectedCenter)) {
                 if (m.getStudy() == null) {
                     options.add(ALL_STUDIES_OPTION);
-                    for (Study s : allStudies) {
+                    for (Study s : context.getStudies()) {
                         options.add(new NamedOption<Study>(s));
                     }
                     break;

@@ -9,12 +9,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogWithPages;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.TableFilter;
+import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.widgets.infotables.RoleInfoTable;
 
 public abstract class RolesPage extends BgcDialogPage {
@@ -35,36 +34,36 @@ public abstract class RolesPage extends BgcDialogPage {
         Composite content = new Composite(parent, SWT.NONE);
         content.setLayout(new GridLayout(1, false));
 
-        new TableFilter<RoleWrapper>(content) {
+        new TableFilter<Role>(content) {
             @Override
-            protected boolean accept(RoleWrapper role, String text) {
+            protected boolean accept(Role role, String text) {
                 return contains(role.getName(), text);
             }
 
             @Override
-            public List<RoleWrapper> getAllCollection() {
+            public List<Role> getAllCollection() {
                 return getCurrentAllRolesList();
             }
 
             @Override
-            public void setFilteredList(List<RoleWrapper> filteredObjects) {
-                roleInfoTable.reloadCollection(filteredObjects);
+            public void setFilteredList(List<Role> filteredObjects) {
+                roleInfoTable.setList(filteredObjects);
             }
         };
 
         roleInfoTable = new RoleInfoTable(content, null) {
             @Override
-            protected boolean deleteRole(RoleWrapper role) {
+            protected boolean deleteRole(Role role) {
                 boolean deleted = super.deleteRole(role);
-                if (deleted)
-                    getCurrentAllRolesList().remove(role);
+                if (deleted) getCurrentAllRolesList().remove(role);
                 return deleted;
             }
 
             @Override
-            protected void duplicate(RoleWrapper origRole) {
-                RoleWrapper newRole = origRole.duplicate();
-                newRole.setName("CopyOf" + newRole.getName()); //$NON-NLS-1$
+            protected void duplicate(Role src) {
+                Role newRole = new Role();
+                newRole.setName("Copy of " + src.getName());
+                newRole.getPermissions().addAll(src.getPermissions());
                 addRole(newRole);
             }
         };
@@ -72,24 +71,27 @@ public abstract class RolesPage extends BgcDialogPage {
         setControl(content);
     }
 
-    protected abstract List<RoleWrapper> getCurrentAllRolesList();
+    protected abstract List<Role> getCurrentAllRolesList();
 
     @Override
     public void runAddAction() {
-        addRole(new RoleWrapper(SessionManager.getAppService()));
+        addRole(new Role());
     }
 
-    protected void addRole(RoleWrapper newRole) {
+    protected void addRole(Role role) {
         RoleEditDialog dlg = new RoleEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), newRole);
+            .getActiveWorkbenchWindow().getShell(), role);
         int res = dlg.open();
         if (res == Status.OK) {
             BgcPlugin.openAsyncInformation(
                 Messages.RolesPage_role_added_title,
                 MessageFormat.format(Messages.RolesPage_role_added_msg,
-                    newRole.getName()));
-            getCurrentAllRolesList().add(newRole);
-            roleInfoTable.reloadCollection(getCurrentAllRolesList(), newRole);
+                    role.getName()));
+
+            getCurrentAllRolesList().add(role);
+
+            roleInfoTable.reload();
+            roleInfoTable.setSelection(role);
         }
     }
 }

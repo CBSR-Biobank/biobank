@@ -10,7 +10,6 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewStudyInfoTable extends AbstractInfoTableWidget<StudyCountInfo> {
     private static final String[] HEADINGS = new String[] {
@@ -124,6 +123,6 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget<StudyCountInfo> {
     }
 
     @Override
-    public void reload() throws ApplicationException {
+    public void reload() {
     }
 }

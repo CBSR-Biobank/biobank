@@ -40,8 +40,8 @@ public class GroupGetAction implements Action<GroupGetOutput> {
 
         Group group = (Group) c.uniqueResult();
 
-        ManagerContext managerContext = new ManagerContextGetAction(
-            new ManagerContextGetInput()).run(context).getContext();
+        MembershipContext managerContext = new MembershipContextGetAction(
+            new MembershipContextGetInput()).run(context).getContext();
 
         return new GroupGetOutput(group, managerContext);
     }

@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
+import edu.ualberta.med.biobank.common.action.security.MembershipContext;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.dialogs.user.MembershipEditDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
@@ -16,12 +17,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.DefaultAbstractInfoTableWidge
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
-import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.model.Study;
 
 public class MembershipInfoTable
     extends DefaultAbstractInfoTableWidget<Membership> {
@@ -32,20 +31,18 @@ public class MembershipInfoTable
         "Manager",
         "Roles and Permissions" };
 
-    private final ManagerContext context;
-    private final List<Center> allCenters;
-    private final List<Study> allStudies;
+    private final MembershipContext context;
+    private final ManagerContext managerContext;
 
     public MembershipInfoTable(Composite parent,
-        final Principal principal, ManagerContext context,
-        List<Center> allCenters, List<Study> allStudies) {
+        final Principal principal, MembershipContext context,
+        ManagerContext managerContext) {
         super(parent, HEADINGS, ROWS_PER_PAGE);
 
         setCollection(principal.getMemberships());
 
         this.context = context;
-        this.allCenters = allCenters;
-        this.allStudies = allStudies;
+        this.managerContext = managerContext;
 
         addEditItemListener(new IInfoTableEditItemListener<Membership>() {
             @Override
@@ -69,7 +66,7 @@ public class MembershipInfoTable
     protected void editMembership(Membership m) {
         MembershipEditDialog dlg = new MembershipEditDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            m, context, allCenters, allStudies);
+            m, managerContext);
 
         int res = dlg.open();
         if (res == Dialog.OK) {
@@ -114,11 +111,6 @@ public class MembershipInfoTable
                 }
             }
         };
-    }
-
-    @Override
-    protected boolean isEditMode() {
-        return true;
     }
 
     @Override

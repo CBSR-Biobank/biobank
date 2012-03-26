@@ -32,7 +32,6 @@ import edu.ualberta.med.biobank.common.util.DelegatingList;
 import edu.ualberta.med.biobank.common.util.ListChangeHandler;
 import edu.ualberta.med.biobank.common.util.ListChangeSource;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * This abstract class is used to create most the tables used in the client. The
@@ -192,7 +191,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     protected abstract BgcTableSorter getTableSorter();
 
-    public abstract void reload() throws ApplicationException;
+    public abstract void reload();
 
     @Override
     public boolean setFocus() {

@@ -9,9 +9,9 @@ import org.hibernate.criterion.Restrictions;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.security.ManagerContext;
-import edu.ualberta.med.biobank.common.action.security.ManagerContextGetAction;
-import edu.ualberta.med.biobank.common.action.security.ManagerContextGetInput;
+import edu.ualberta.med.biobank.common.action.security.MembershipContext;
+import edu.ualberta.med.biobank.common.action.security.MembershipContextGetAction;
+import edu.ualberta.med.biobank.common.action.security.MembershipContextGetInput;
 import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
 import edu.ualberta.med.biobank.common.action.security.UserSaveInput;
 import edu.ualberta.med.biobank.model.Center;
@@ -51,8 +51,8 @@ public class TestUserSaveAction extends TestAction {
 
         user.getGroups().add(group);
 
-        ManagerContext context = exec(new ManagerContextGetAction(
-            new ManagerContextGetInput())).getContext();
+        MembershipContext context = exec(new MembershipContextGetAction(
+            new MembershipContextGetInput())).getContext();
 
         IdResult result =
             exec(new UserSaveAction(new UserSaveInput(user, context)));

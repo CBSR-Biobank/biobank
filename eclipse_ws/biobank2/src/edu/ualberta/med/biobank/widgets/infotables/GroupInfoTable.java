@@ -11,7 +11,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.security.GroupDeleteAction;
+import edu.ualberta.med.biobank.common.action.security.GroupDeleteInput;
+import edu.ualberta.med.biobank.common.action.security.GroupGetAction;
+import edu.ualberta.med.biobank.common.action.security.GroupGetInput;
+import edu.ualberta.med.biobank.common.action.security.GroupGetOutput;
+import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.dialogs.user.GroupEditDialog;
+import edu.ualberta.med.biobank.dialogs.user.TmpUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.DefaultAbstractInfoTableWidget;
@@ -26,10 +34,15 @@ public abstract class GroupInfoTable extends
     private static final String[] HEADINGS =
         new String[] { Messages.GroupInfoTable_name_label };
 
-    public GroupInfoTable(Composite parent, List<Group> collection) {
+    private final ManagerContext context;
+
+    public GroupInfoTable(Composite parent, List<Group> collection,
+        ManagerContext context) {
         super(parent, HEADINGS, ROWS_PER_PAGE);
 
         setList(collection);
+
+        this.context = context;
 
         addEditItemListener(new IInfoTableEditItemListener<Group>() {
             @Override
@@ -74,11 +87,23 @@ public abstract class GroupInfoTable extends
     }
 
     protected void editGroup(Group group) {
+        GroupGetOutput output = null;
+
+        try {
+            output = SessionManager.getAppService()
+                .doAction(new GroupGetAction(new GroupGetInput(group)));
+        } catch (Throwable t) {
+            TmpUtil.displayException(t);
+            return;
+        }
+
         GroupEditDialog dlg = new GroupEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), group);
+            .getActiveWorkbenchWindow().getShell(), output, context);
         int res = dlg.open();
         if (res == Dialog.OK) {
-            reloadCollection(getList(), group);
+            reload();
+            setSelection(group);
+
             notifyListeners();
         }
     }
@@ -92,16 +117,20 @@ public abstract class GroupInfoTable extends
 
             if (BgcPlugin.openConfirm(
                 Messages.GroupInfoTable_delete_confirm_title, message)) {
-                group.delete();
+
+                SessionManager.getAppService().doAction(
+                    new GroupDeleteAction(new GroupDeleteInput(group)));
+
                 // remove the group from the collection
                 getList().remove(group);
-                reloadCollection(getList(), null);
+
+                reload();
+
                 notifyListeners();
                 return true;
             }
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.GroupInfoTable_delete_error_msg,
-                e);
+        } catch (Throwable t) {
+            TmpUtil.displayException(t);
         }
         return false;
     }
