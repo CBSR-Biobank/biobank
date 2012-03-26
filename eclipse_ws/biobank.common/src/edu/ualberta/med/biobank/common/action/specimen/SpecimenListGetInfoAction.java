@@ -59,8 +59,8 @@ public abstract class SpecimenListGetInfoAction implements
             specInfo.parentLabel = (String) row[1];
             specInfo.positionString = (String) row[2];
             specInfo.topContainerTypeNameShort = (String) row[3];
-            specInfo.comments = ((Long) row[4]).equals(0) ? "N"
-                : "Y";
+            specInfo.comments = ((Long) row[4]).equals(new Long(0)) ? "N" //$NON-NLS-1$
+                : "Y"; //$NON-NLS-1$
             specs.add(specInfo);
         }
 

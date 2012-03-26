@@ -47,6 +47,10 @@ public class Messages extends NLS {
     public static String AliquotedSpecimenEntryInfoTable_delete_title;
     public static String AliquotedSpecimenEntryInfoTable_delete_question;
 
+    public static String CEventSpecimenEntryInfoTable_error;
+
+    public static String CEventSpecimenEntryInfoTable_message;
+
     public static String ClinicAddInfoTable_delete_confirm_msg;
 
     public static String ClinicAddInfoTable_delete_confirm_title;
