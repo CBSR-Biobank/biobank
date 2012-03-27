@@ -186,7 +186,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                             "specimen not found in collection");
                     }
                 }
-                specimen.setActivityStatus(activityStatus);
+                specimen.setActivityStatus(specInfo.activityStatus);
                 specimen.setCollectionEvent(ceventToSave);
                 // cascade will save-update the specimens from this list:
                 specimen.setOriginalCollectionEvent(ceventToSave);
