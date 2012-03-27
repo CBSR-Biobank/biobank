@@ -10,6 +10,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizardPage;
@@ -46,14 +47,8 @@ public class MembershipRolesPage extends BgcWizardPage {
         container.setLayout(new GridLayout(1, false));
         container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        rolesWidget = new MultiSelectWidget<Role>(container, SWT.NONE,
-            "Available Roles",
-            "Selected Roles", 120) {
-            @Override
-            protected String getTextForObject(Role role) {
-                return role.getName();
-            }
-        };
+        Group rolesGroup = createGroup(container, "Roles");
+        createRolesWidget(rolesGroup);
 
         rolesWidget.setSelections(
             new ArrayList<Role>(context.getRoles()),
@@ -66,12 +61,38 @@ public class MembershipRolesPage extends BgcWizardPage {
                 }
             });
 
-        permissionsTree = new PermissionCheckTreeWidget(container, false,
-            PermissionEnum.valuesList());
+//        Group permsGroup = createGroup(container, "Permissions");
+        createPermissionsTree(container);
 
         permissionsTree.setSelections(membership.getPermissions());
 
         permissionsTree.addCheckedListener(permissionsCheckStateHandler);
+        
+        setControl(container);
+    }
+
+    private Group createGroup(Composite parent, String title) {
+        Group group = new Group(parent, SWT.SHADOW_IN);
+        group.setText(title);
+        group.setLayout(new GridLayout(2, false));
+        group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        return group;
+    }
+    
+    private void createRolesWidget(Composite parent) {
+        rolesWidget = new MultiSelectWidget<Role>(parent, SWT.NONE,
+            "Available Roles",
+            "Selected Roles", 80) {
+            @Override
+            protected String getTextForObject(Role role) {
+                return role.getName();
+            }
+        };
+    }
+    
+    private void createPermissionsTree(Composite parent) {
+        permissionsTree = new PermissionCheckTreeWidget(parent, true,
+            PermissionEnum.valuesList());
     }
 
     private void updatePageComplete() {

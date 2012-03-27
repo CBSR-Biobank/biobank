@@ -9,6 +9,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
@@ -52,11 +53,13 @@ public class MembershipDomainPage extends BgcWizardPage {
         container.setLayout(new GridLayout(1, false));
         container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createAllCentersButton(container);
-        createCentersWidget(container);
-        
-        createAllStudiesButton(container);
-        createStudiesWidget(container);
+        Group centersGroup = createGroup(container, "Centers");
+        createAllCentersButton(centersGroup);
+        createCentersWidget(centersGroup);
+
+        Group studiesGroup = createGroup(container, "Studies");
+        createAllStudiesButton(studiesGroup);
+        createStudiesWidget(studiesGroup);
 
         centersWidget.addSelectionChangedListener(centersSelectionHandler);
         studiesWidget.addSelectionChangedListener(studiesSelectionHandler);
@@ -67,6 +70,14 @@ public class MembershipDomainPage extends BgcWizardPage {
         updatePageComplete();
 
         setControl(container);
+    }
+
+    private Group createGroup(Composite parent, String title) {
+        Group group = new Group(parent, SWT.SHADOW_IN);
+        group.setText(title);
+        group.setLayout(new GridLayout(2, false));
+        group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        return group;
     }
 
     private void createAllCentersButton(Composite parent) {
@@ -87,7 +98,7 @@ public class MembershipDomainPage extends BgcWizardPage {
     private void createCentersWidget(Composite parent) {
         centersWidget = new MultiSelectWidget<Center>(parent, SWT.NONE,
             "Available Centers",
-            "Selected Centers", 150) {
+            "Selected Centers", 80) {
             @Override
             protected String getTextForObject(Center center) {
                 return center.getNameShort();
@@ -116,7 +127,7 @@ public class MembershipDomainPage extends BgcWizardPage {
     private void createStudiesWidget(Composite parent) {
         studiesWidget = new MultiSelectWidget<Study>(parent, SWT.NONE,
             "Available Studies",
-            "Selected Studies", 150) {
+            "Selected Studies", 80) {
             @Override
             protected String getTextForObject(Study study) {
                 return study.getNameShort();
@@ -129,8 +140,9 @@ public class MembershipDomainPage extends BgcWizardPage {
 
     private void createUserManagerButton(Composite parent) {
         userManagerButton = new Button(parent, SWT.CHECK);
+        userManagerButton.setText("User manager");
         userManagerButton
-            .setText("Can create other users with the granted roles and permissions");
+            .setToolTipText("Can create, edit, and delete users and groups.");
         userManagerButton.setSelection(membership.isUserManager());
         userManagerButton.addListener(SWT.Selection, new Listener() {
             @Override
@@ -143,8 +155,9 @@ public class MembershipDomainPage extends BgcWizardPage {
 
     private void createEveryPermissionButton(Composite parent) {
         everyPermissionButton = new Button(parent, SWT.CHECK);
+        everyPermissionButton.setText("Grant all permissions and roles");
         everyPermissionButton
-            .setText("Grant all current and future roles and permissions");
+            .setToolTipText("Grant all current and future roles and permissions");
         everyPermissionButton.setSelection(membership.isEveryPermission());
         everyPermissionButton.addListener(SWT.Selection, new Listener() {
             @Override
