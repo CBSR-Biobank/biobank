@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -27,7 +28,6 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
@@ -78,8 +78,6 @@ public class PatientEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
         updatePatientInfo();
 
-        // FIXME log edit action?
-        // SessionManager.logEdit(patient);
         String tabName;
         if (patientInfo == null) {
             tabName = Messages.PatientEntryForm_new_title;
@@ -98,8 +96,9 @@ public class PatientEntryForm extends BiobankEntryForm {
             patient.setWrappedObject(patientInfo.patient);
             SessionManager.logLookup(patientInfo.patient);
         } else {
-            patient.setWrappedObject(new Patient());
+            patient.setWrappedObject(((PatientAdapter) adapter).getPatient());
         }
+        patient.setCreatedAt(new Date());
         comment.setWrappedObject(new Comment());
     }
 

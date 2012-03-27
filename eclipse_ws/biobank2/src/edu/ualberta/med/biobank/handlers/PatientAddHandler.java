@@ -4,9 +4,11 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermission;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -18,7 +20,9 @@ public class PatientAddHandler extends LogoutSensitiveHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         try {
-            PatientAdapter adapter = new PatientAdapter(null, null);
+            SearchedPatientInfo spi = new SearchedPatientInfo();
+            spi.patient = new Patient();
+            PatientAdapter adapter = new PatientAdapter(null, spi);
             adapter.openEntryForm();
         } catch (Exception exp) {
             logger.error(Messages.PatientAddHandler_patient_open_error, exp);
