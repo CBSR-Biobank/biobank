@@ -80,8 +80,7 @@ public abstract class GroupsPage extends BgcDialogPage {
 
                     for (Membership srcMemb : src.getMemberships()) {
                         Membership newMemb = new Membership();
-                        newMemb.setCenter(srcMemb.getCenter());
-                        newMemb.setStudy(srcMemb.getStudy());
+                        newMemb.setDomain(srcMemb.getDomain());
 
                         newMemb.setEveryPermission(srcMemb.isEveryPermission());
                         newMemb.setUserManager(srcMemb.isUserManager());

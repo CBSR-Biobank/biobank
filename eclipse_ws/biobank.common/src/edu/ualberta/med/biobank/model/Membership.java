@@ -58,7 +58,7 @@ public class Membership extends AbstractBiobankModel {
         setPrincipal(p);
         p.getMemberships().add(this);
 
-        setDomain(new Domain(m.domain));
+        setDomain(new Domain(m.getDomain()));
 
         setUserManager(m.isUserManager());
         setEveryPermission(m.isEveryPermission());

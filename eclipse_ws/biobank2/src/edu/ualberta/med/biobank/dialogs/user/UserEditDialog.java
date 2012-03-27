@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -228,10 +229,13 @@ public class UserEditDialog extends BgcBaseDialog {
                 Membership m = new Membership();
                 m.setPrincipal(user);
 
-                MembershipEditDialog dlg =
-                    new MembershipEditDialog(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell(), m,
-                        managerContext);
+                Shell shell = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell();
+
+                MembershipEditWizard wiz =
+                    new MembershipEditWizard(m, managerContext);
+                WizardDialog dlg = new WizardDialog(shell, wiz);
+
                 int res = dlg.open();
                 if (res == Status.OK) {
                     m.setPrincipal(user);

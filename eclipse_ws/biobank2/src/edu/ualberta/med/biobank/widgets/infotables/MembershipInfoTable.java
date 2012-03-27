@@ -1,26 +1,31 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.common.action.security.MembershipContext;
 import edu.ualberta.med.biobank.common.util.StringUtil;
-import edu.ualberta.med.biobank.dialogs.user.MembershipEditDialog;
+import edu.ualberta.med.biobank.dialogs.user.MembershipEditWizard;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 import edu.ualberta.med.biobank.gui.common.widgets.DefaultAbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.Study;
 
 public class MembershipInfoTable
     extends DefaultAbstractInfoTableWidget<Membership> {
@@ -64,9 +69,12 @@ public class MembershipInfoTable
     }
 
     protected void editMembership(Membership m) {
-        MembershipEditDialog dlg = new MembershipEditDialog(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            m, managerContext);
+        Shell shell = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell();
+
+        MembershipEditWizard wiz =
+            new MembershipEditWizard(m, managerContext);
+        WizardDialog dlg = new WizardDialog(shell, wiz);
 
         int res = dlg.open();
         if (res == Dialog.OK) {
@@ -76,7 +84,33 @@ public class MembershipInfoTable
         }
     }
 
-    public String getRolesAndPermissionsSummary(Membership m) {
+    private static String getCentersString(Membership m) {
+        if (m.getDomain().isAllCenters()) {
+            return "All Centers";
+        } else {
+            List<String> centerNames = new ArrayList<String>();
+            for (Center c : m.getDomain().getCenters()) {
+                centerNames.add(c.getNameShort());
+            }
+            Collections.sort(centerNames, String.CASE_INSENSITIVE_ORDER);
+            return StringUtil.join(centerNames, "\\r\\n");
+        }
+    }
+
+    private static String getStudiesString(Membership m) {
+        if (m.getDomain().isAllCenters()) {
+            return "All Studies";
+        } else {
+            List<String> studyNames = new ArrayList<String>();
+            for (Study s : m.getDomain().getStudies()) {
+                studyNames.add(s.getNameShort());
+            }
+            Collections.sort(studyNames, String.CASE_INSENSITIVE_ORDER);
+            return StringUtil.join(studyNames, "\\r\\n");
+        }
+    }
+
+    private static String getRolesAndPermissionsSummary(Membership m) {
         List<String> rolesAndPerms = new ArrayList<String>();
         for (Role role : m.getRoles()) {
             rolesAndPerms.add(role.getName());
@@ -97,11 +131,9 @@ public class MembershipInfoTable
                 Membership m = (Membership) element;
                 switch (columnIndex) {
                 case 0:
-                    return m.getCenter() != null
-                        ? m.getCenter().getNameShort() : "All Centers";
+                    return getCentersString(m);
                 case 1:
-                    return m.getStudy() != null
-                        ? m.getStudy().getNameShort() : "All Studies";
+                    return getStudiesString(m);
                 case 2:
                     return m.isUserManager() ? "Yes" : "No";
                 case 3:

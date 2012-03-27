@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.dialogs.user;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -157,11 +158,11 @@ public class GroupEditDialog extends BgcBaseDialog {
                 Membership m = new Membership();
                 m.setPrincipal(group);
 
-                Shell shell =
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell();
-                MembershipEditDialog dlg =
-                    new MembershipEditDialog(shell, m, context);
+                Shell shell = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell();
+                
+                MembershipEditWizard wiz = new MembershipEditWizard(m, context);
+                WizardDialog dlg = new WizardDialog(shell, wiz);
 
                 int res = dlg.open();
                 if (res == Status.OK) {
