@@ -45,6 +45,10 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                 this.isDeletable =
                     SessionManager.getAppService().isAllowed(
                         new CollectionEventUpdatePermission(cevent.getId()));
+            } else {
+                // not real deletes or edits
+                this.isEditable = true;
+                this.isDeletable = true;
             }
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(

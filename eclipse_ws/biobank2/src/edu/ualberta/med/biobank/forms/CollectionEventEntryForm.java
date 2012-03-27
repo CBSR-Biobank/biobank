@@ -371,12 +371,15 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private void updateControlForLabel(FormPvCustomInfo pvCustomInfo) {
         if ((EventAttrTypeEnum.NUMBER == pvCustomInfo.getType())
-            || (EventAttrTypeEnum.TEXT == pvCustomInfo.getType())
-            || (EventAttrTypeEnum.DATE_TIME == pvCustomInfo.getType())
-            || (EventAttrTypeEnum.SELECT_SINGLE == pvCustomInfo.getType())) {
+            || (EventAttrTypeEnum.TEXT == pvCustomInfo.getType()))
             ((BgcBaseText) pvCustomInfo.control).setText(pvCustomInfo
                 .getOrigValue());
-        } else if (EventAttrTypeEnum.SELECT_MULTIPLE == pvCustomInfo.getType()) {
+        else if (EventAttrTypeEnum.DATE_TIME == pvCustomInfo.getType())
+            ((DateTimeWidget) pvCustomInfo.control).setDate(DateFormatter
+                .parseToDateTime(pvCustomInfo.getOrigValue()));
+        else if (EventAttrTypeEnum.SELECT_SINGLE == pvCustomInfo.getType())
+            ((Combo) pvCustomInfo.control).setText(pvCustomInfo.getOrigValue());
+        else if (EventAttrTypeEnum.SELECT_MULTIPLE == pvCustomInfo.getType()) {
             ((SelectMultipleWidget) pvCustomInfo.control)
                 .setSelections(pvCustomInfo.getOrigValue().split(";")); //$NON-NLS-1$
         } else {
