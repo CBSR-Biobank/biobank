@@ -257,7 +257,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
                             .specimen
                                 .setSpecimenType(((SpecimenType) selectedObject));
                         }
-                        updateWidgetVisibilityAndValues();
+                        updateWidgetVisibilityAndValuesNoTimeReset();
                     }
                 }, new BiobankLabelProvider() {
                     @Override
@@ -310,6 +310,33 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         if (defaultTimeDrawn != null) {
             timeDrawnWidget.setDate(defaultTimeDrawn);
         }
+
+        quantityLabel.setVisible(enableVolume);
+        quantityText.setVisible(enableVolume);
+        quantityTextValidator.setAllowEmpty(!enableVolume || !isVolumeRequired);
+        String originalText = quantityText.getText();
+        quantityText.setText(originalText + "*"); //$NON-NLS-1$
+        quantityText.setText(originalText);
+        if (!enableVolume) {
+            internalSpecimen.specimen.setQuantity(null);
+        }
+    }
+
+    public void updateWidgetVisibilityAndValuesNoTimeReset() {
+        if (!dialogCreated) return;
+
+        SourceSpecimen ss = null;
+        SpecimenType type = internalSpecimen.specimen.getSpecimenType();
+        if (type != null) {
+            ss = mapStudySourceSpecimen.get(type.getName());
+        }
+        boolean enableVolume =
+            (type != null)
+                && (ss == null || Boolean.TRUE.equals(ss
+                    .getNeedOriginalVolume()));
+        boolean isVolumeRequired =
+            ss != null && Boolean.TRUE.equals(ss.getNeedOriginalVolume());
+
         quantityLabel.setVisible(enableVolume);
         quantityText.setVisible(enableVolume);
         quantityTextValidator.setAllowEmpty(!enableVolume || !isVolumeRequired);
