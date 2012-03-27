@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
+import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
@@ -86,7 +87,17 @@ public class GroupSaveAction implements Action<IdResult> {
             oldM.setUserManager(newM.isUserManager());
             oldM.setEveryPermission(newM.isEveryPermission());
 
-            oldM.setDomain(newM.getDomain());
+            // TODO: throw away old domain, copy into new? Shorter.
+            Domain newD = newM.getDomain();
+            Domain oldD = oldM.getDomain();
+
+            oldD.getCenters().clear();
+            oldD.getCenters().addAll(newD.getCenters());
+            oldD.setAllCenters(newD.isAllCenters());
+
+            oldD.getStudies().clear();
+            oldD.getStudies().addAll(newD.getStudies());
+            oldD.setAllStudies(newD.isAllStudies());
         }
 
         for (Membership m : group.getMemberships()) {

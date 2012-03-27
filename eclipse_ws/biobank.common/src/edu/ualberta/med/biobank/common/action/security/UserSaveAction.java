@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
+import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
@@ -166,6 +167,9 @@ public class UserSaveAction implements Action<IdResult> {
             if (!newPermissionScope.containsAll(oldPermissionScope)
                 || !newRoleScope.containsAll(oldRoleScope)) {
                 // TODO: better exception
+                // TODO: there is a bug here! got it when editting a Membership
+                // on
+                // testweirdkid
                 throw new ActionException("reduced scope");
             }
 
@@ -183,7 +187,18 @@ public class UserSaveAction implements Action<IdResult> {
             roles.retainAll(newM.getRoles());
             oldM.getRoles().addAll(roles);
 
-            oldM.setDomain(newM.getDomain());
+            // TODO: throw away old domain, copy into new? Shorter.
+            Domain newD = newM.getDomain();
+            Domain oldD = oldM.getDomain();
+
+            oldD.getCenters().clear();
+            oldD.getCenters().addAll(newD.getCenters());
+            oldD.setAllCenters(newD.isAllCenters());
+
+            oldD.getStudies().clear();
+            oldD.getStudies().addAll(newD.getStudies());
+            oldD.setAllStudies(newD.isAllStudies());
+
             oldM.setUserManager(newM.isUserManager());
             oldM.setEveryPermission(newM.isEveryPermission());
 
