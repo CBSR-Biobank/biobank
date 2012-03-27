@@ -12,7 +12,7 @@ public class MembershipEditWizard extends Wizard {
     private final ManagerContext context;
 
     private MembershipDomainPage domainPage;
-    private MembershipRolesPage rolesPage;
+    private MembershipPermissionsPage rolesPage;
 
     public MembershipEditWizard(Membership membership, ManagerContext context) {
         this.originalMembership = membership;
@@ -28,7 +28,7 @@ public class MembershipEditWizard extends Wizard {
     @Override
     public void addPages() {
         domainPage = new MembershipDomainPage(membership, context);
-        rolesPage = new MembershipRolesPage(membership, context);
+        rolesPage = new MembershipPermissionsPage(membership, context);
 
         addPage(domainPage);
         addPage(rolesPage);

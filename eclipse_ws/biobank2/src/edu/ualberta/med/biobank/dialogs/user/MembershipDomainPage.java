@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.dialogs.user;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -36,6 +37,11 @@ public class MembershipDomainPage extends BgcWizardPage {
     private MultiSelectWidget<Center> centersWidget;
     private MultiSelectWidget<Study> studiesWidget;
 
+    private final WritableValue validCenters = new WritableValue(Boolean.FALSE,
+        Boolean.class);
+    private final WritableValue validStudies = new WritableValue(Boolean.FALSE,
+        Boolean.class);
+
     MembershipDomainPage(Membership membership, ManagerContext context) {
         super("", "Centers and Studies", null);
 
@@ -63,15 +69,27 @@ public class MembershipDomainPage extends BgcWizardPage {
         Group centersGroup = createGroup(container, "Centers");
         createAllCentersButton(centersGroup);
         createCentersWidget(centersGroup);
+        createCentersValidation("Select at least one center");
 
         Group studiesGroup = createGroup(container, "Studies");
         createAllStudiesButton(studiesGroup);
         createStudiesWidget(studiesGroup);
+        createStudiesValidation("Select at least one study");
 
         centersWidget.addSelectionChangedListener(centersSelectionHandler);
         studiesWidget.addSelectionChangedListener(studiesSelectionHandler);
 
         setControl(container);
+    }
+
+    private void createCentersValidation(String message) {
+        WritableValue dummy = new WritableValue(Boolean.FALSE, Boolean.class);
+        getWidgetCreator().addBooleanBinding(dummy, validCenters, message);
+    }
+
+    private void createStudiesValidation(String message) {
+        WritableValue dummy = new WritableValue(Boolean.FALSE, Boolean.class);
+        getWidgetCreator().addBooleanBinding(dummy, validStudies, message);
     }
 
     private Group createGroup(Composite parent, String title) {
@@ -153,10 +171,15 @@ public class MembershipDomainPage extends BgcWizardPage {
     }
 
     private void updatePageComplete() {
-        boolean complete = true;
-        complete &= domain.isAllCenters() || !domain.getCenters().isEmpty();
-        complete &= domain.isAllStudies() || !domain.getStudies().isEmpty();
-        setPageComplete(complete);
+        boolean centersSelected =
+            domain.isAllCenters() || !domain.getCenters().isEmpty();
+        validCenters.setValue(centersSelected);
+
+        boolean studiesSelected =
+            domain.isAllStudies() || !domain.getStudies().isEmpty();
+        validStudies.setValue(studiesSelected);
+
+        setPageComplete(centersSelected && studiesSelected);
     }
 
     private void updateCenterSelections() {
