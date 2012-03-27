@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizardPage;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
-import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
@@ -256,10 +255,12 @@ public class MembershipPermissionsPage extends BgcWizardPage {
 
     private void updateEveryPermissionButton() {
         boolean canGrantEveryPermission = false;
-        for (Domain d : context.getManager().getManageableDomains()) {
-            if (d.isSuperset(membership.getDomain())) {
-                canGrantEveryPermission = true;
-                break;
+        for (Membership m : context.getManager().getAllMemberships()) {
+            if (m.isUserManager() && m.isEveryPermission()) {
+                if (m.getDomain().isSuperset(membership.getDomain())) {
+                    canGrantEveryPermission = true;
+                    break;
+                }
             }
         }
         if (!canGrantEveryPermission) {
