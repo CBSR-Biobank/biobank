@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.dialogs.user;
 import org.eclipse.jface.wizard.Wizard;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
+import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Membership;
 
 public class MembershipEditWizard extends Wizard {
@@ -35,7 +36,15 @@ public class MembershipEditWizard extends Wizard {
 
     @Override
     public boolean canFinish() {
-        return domainPage.isPageComplete() && rolesPage.isPageComplete();
+        boolean canFinish = true;
+
+        Domain domain = membership.getDomain();
+        canFinish &= domain.isAllCenters() || !domain.getCenters().isEmpty();
+        canFinish &= domain.isAllStudies() || !domain.getStudies().isEmpty();
+
+        canFinish &= !membership.getAllPermissions().isEmpty();
+
+        return canFinish;
     }
 
     @Override

@@ -74,7 +74,7 @@ public abstract class DefaultAbstractInfoTableWidget<T>
         // table.getColumn(i).pack();
         // }
 
-        System.out.println("2");
+        // System.out.println("2");
     }
 
     @Override
