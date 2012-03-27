@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.dialogs.user;
 import org.eclipse.jface.wizard.Wizard;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
-import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Membership;
 
 public class MembershipEditWizard extends Wizard {
@@ -52,7 +51,15 @@ public class MembershipEditWizard extends Wizard {
      * @param dst destination {@link Membership}
      */
     private void copyMembership(Membership src, Membership dst) {
-        dst.setDomain(new Domain(src.getDomain()));
+        dst.setId(src.getId()); // necessary for isNew()
+
+        dst.getDomain().setAllCenters(src.getDomain().isAllCenters());
+        dst.getDomain().getCenters().clear();
+        dst.getDomain().getCenters().addAll(src.getDomain().getCenters());
+
+        dst.getDomain().setAllStudies(src.getDomain().isAllStudies());
+        dst.getDomain().getStudies().clear();
+        dst.getDomain().getStudies().addAll(src.getDomain().getStudies());
 
         dst.setUserManager(src.isUserManager());
         dst.setEveryPermission(src.isEveryPermission());
@@ -67,9 +74,9 @@ public class MembershipEditWizard extends Wizard {
     private void updateWindowTitle() {
         String title = null;
         if (membership.isNew()) {
-            title = "Add a New Membership";
+            title = "Add Membership";
         } else {
-            title = "Editing a Membership";
+            title = "Edit Membership";
         }
         setWindowTitle(title);
     }

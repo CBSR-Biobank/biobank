@@ -141,7 +141,7 @@ public class MembershipDomainPage extends BgcWizardPage {
         allStudiesButton.setText("All Studies");
         allStudiesButton
             .setToolTipText("Allow access to all current and future studies");
-        allStudiesButton.setSelection(domain.isAllCenters());
+        allStudiesButton.setSelection(domain.isAllStudies());
 
         GridData gd = new GridData(SWT.FILL, SWT.TOP, true, true);
         allStudiesButton.setLayoutData(gd);

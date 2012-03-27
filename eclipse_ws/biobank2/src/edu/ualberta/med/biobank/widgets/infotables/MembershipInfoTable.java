@@ -6,8 +6,14 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
@@ -66,6 +72,13 @@ public class MembershipInfoTable
                 setList(getList());
             }
         });
+
+        MultilineHandler handler = new MultilineHandler();
+
+        Table table = getTableViewer().getTable();
+        table.addListener(SWT.MeasureItem, handler);
+        table.addListener(SWT.PaintItem, handler);
+        table.addListener(SWT.EraseItem, handler);
     }
 
     protected void editMembership(Membership m) {
@@ -93,12 +106,12 @@ public class MembershipInfoTable
                 centerNames.add(c.getNameShort());
             }
             Collections.sort(centerNames, String.CASE_INSENSITIVE_ORDER);
-            return StringUtil.join(centerNames, "\\r\\n");
+            return StringUtil.join(centerNames, "\n");
         }
     }
 
     private static String getStudiesString(Membership m) {
-        if (m.getDomain().isAllCenters()) {
+        if (m.getDomain().isAllStudies()) {
             return "All Studies";
         } else {
             List<String> studyNames = new ArrayList<String>();
@@ -106,7 +119,7 @@ public class MembershipInfoTable
                 studyNames.add(s.getNameShort());
             }
             Collections.sort(studyNames, String.CASE_INSENSITIVE_ORDER);
-            return StringUtil.join(studyNames, "\\r\\n");
+            return StringUtil.join(studyNames, "\n");
         }
     }
 
@@ -149,4 +162,46 @@ public class MembershipInfoTable
     protected BgcTableSorter getTableSorter() {
         return null;
     }
+
+    /**
+     * 
+     * @see http://www.java2s.com/Tutorial/Java/0280__SWT/MultilineTablecell.htm
+     */
+    public static class MultilineHandler implements Listener {
+        public MultilineHandler() {
+        }
+
+        @Override
+        public void handleEvent(Event event) {
+            switch (event.type) {
+            case SWT.MeasureItem: {
+                TableItem item = (TableItem) event.item;
+                String text = getText(item, event.index);
+                Point size = event.gc.textExtent(text);
+                event.width = size.x;
+                event.height = Math.max(event.height, size.y);
+                break;
+            }
+            case SWT.PaintItem: {
+                TableItem item = (TableItem) event.item;
+                String text = getText(item, event.index);
+                Point size = event.gc.textExtent(text);
+                int offset2 = event.index == 0
+                    ? Math.max(0, (event.height - size.y) / 2)
+                    : 0;
+                event.gc.drawText(text, event.x, event.y + offset2, true);
+                break;
+            }
+            case SWT.EraseItem: {
+                event.detail &= ~SWT.FOREGROUND;
+                break;
+            }
+            }
+        }
+
+        String getText(TableItem item, int column) {
+            String text = item.getText(column);
+            return text;
+        }
+    };
 }
