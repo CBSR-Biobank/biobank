@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -85,8 +84,8 @@ public class Domain extends AbstractBiobankModel {
 
     @Transient
     public boolean isSuperset(Domain that) {
-        boolean allCenters = containsAllCenters(that.getCenters());
-        boolean allStudies = containsAllStudies(that.getStudies());
+        boolean allCenters = containsAllCenters(that);
+        boolean allStudies = containsAllStudies(that);
         return allCenters && allStudies;
     }
 
@@ -95,9 +94,19 @@ public class Domain extends AbstractBiobankModel {
         return isAllCenters() || getCenters().contains(center);
     }
 
+    /**
+     * Done on a {@link Domain} instead of a set of {@link Center}-s because if
+     * the given {@link Domain} returns true for {@link #isAllCenters()} but has
+     * an empty set from {@link #getCenters()}, then that is very misleading.
+     * 
+     * @param domain
+     * @return
+     */
     @Transient
-    public boolean containsAllCenters(Collection<Center> centers) {
-        return isAllCenters() || getCenters().containsAll(centers);
+    public boolean containsAllCenters(Domain that) {
+        return isAllCenters()
+            || (!that.isAllCenters() && getCenters()
+                .containsAll(that.getCenters()));
     }
 
     @Transient
@@ -106,8 +115,10 @@ public class Domain extends AbstractBiobankModel {
     }
 
     @Transient
-    public boolean containsAllStudies(Collection<Study> studies) {
-        return isAllStudies() || getStudies().containsAll(studies);
+    public boolean containsAllStudies(Domain that) {
+        return isAllStudies()
+            || (!that.isAllStudies() && getStudies()
+                .containsAll(that.getStudies()));
     }
 
     @Transient

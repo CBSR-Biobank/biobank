@@ -199,7 +199,7 @@ public class MembershipDomainPage extends BgcWizardPage {
     private Set<Center> getCenterOptions() {
         Set<Center> options = new HashSet<Center>();
         for (Domain d : context.getManager().getManageableDomains()) {
-            if (d.containsAllStudies(domain.getStudies())) {
+            if (d.containsAllStudies(domain)) {
                 if (d.isAllCenters()) {
                     options.addAll(context.getCenters());
                     break;
@@ -214,7 +214,7 @@ public class MembershipDomainPage extends BgcWizardPage {
     private Set<Study> getStudyOptions() {
         Set<Study> options = new HashSet<Study>();
         for (Domain d : context.getManager().getManageableDomains()) {
-            if (d.containsAllCenters(domain.getCenters())) {
+            if (d.containsAllCenters(domain)) {
                 if (d.isAllStudies()) {
                     options.addAll(context.getStudies());
                     break;
