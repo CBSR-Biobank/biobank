@@ -87,7 +87,7 @@ public class MembershipPermissionsPage extends BgcWizardPage {
         createPermissionsTree(container);
         updatePermissionSelections();
 
-        createPermissionsValidation("Select at least one role or permission to grant");
+        createPermissionsValidation("Select at least one permission or role (with permissions) to grant");
 
         rolesWidget.addSelectionChangedListener(rolesSelectionHandler);
         permissionsTree.addCheckStateListener(permissionsCheckStateHandler);

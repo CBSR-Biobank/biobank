@@ -18,7 +18,7 @@ public class MembershipEditWizard extends Wizard {
         this.originalMembership = membership;
 
         this.membership = new Membership();
-        copyMembership(originalMembership, membership);
+        copyMembership(originalMembership, this.membership);
 
         this.context = context;
 
