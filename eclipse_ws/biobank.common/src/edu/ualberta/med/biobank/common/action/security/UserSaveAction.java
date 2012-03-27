@@ -179,6 +179,7 @@ public class UserSaveAction implements Action<IdResult> {
             roles.retainAll(newM.getRoles());
             oldM.getRoles().addAll(roles);
 
+            oldM.setDomain(newM.getDomain());
             oldM.setUserManager(newM.isUserManager());
             oldM.setEveryPermission(newM.isEveryPermission());
 
