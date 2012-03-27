@@ -117,6 +117,10 @@ public class UserSaveAction implements Action<IdResult> {
         for (Membership membership : diff.getRemovals()) {
             checkFullyManageable(context, membership);
 
+            // TODO: BUG! Note that this will attempt to remove
+            // "Global Administrator" memberships, etc. because the higher power
+            // memberships are not present in those re-submitted! ERROR!
+
             user.getMemberships().remove(membership);
             context.getSession().delete(membership);
         }
