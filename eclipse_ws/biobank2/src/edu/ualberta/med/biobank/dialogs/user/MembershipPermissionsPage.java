@@ -310,6 +310,8 @@ public class MembershipPermissionsPage extends BgcWizardPage {
                 explicitPerms.remove(perm);
                 membership.getPermissions().remove(perm);
             }
+
+            updatePageComplete();
         }
 
         private boolean isInRole(Object o) {
