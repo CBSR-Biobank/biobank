@@ -3,7 +3,9 @@ package edu.ualberta.med.biobank.dialogs;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.dialogs.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME =
+        "edu.ualberta.med.biobank.dialogs.messages"; //$NON-NLS-1$
+    public static String Comments_add;
     public static String ActivityStatusDialog_name_label;
     public static String ActivityStatusDialog_name_validator_msg;
     public static String ActivityStatusDialog_title_add;
@@ -27,7 +29,9 @@ public class Messages extends NLS {
     public static String CEventSourceSpecimenDialog_label_activity;
     public static String CEventSourceSpecimenDialog_validation_activity;
     public static String CEventSourceSpecimenDialog_label_comments;
+    public static String CEventSourceSpecimenDialog_no;
     public static String CEventSourceSpecimenDialog_reset_error_title;
+    public static String CEventSourceSpecimenDialog_yes;
 
     public static String ChangePasswordDialog_description;
     public static String ChangePasswordDialog_error_title;

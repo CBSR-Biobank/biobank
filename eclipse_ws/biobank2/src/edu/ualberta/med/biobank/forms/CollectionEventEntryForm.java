@@ -62,6 +62,7 @@ import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 import edu.ualberta.med.biobank.widgets.infotables.entry.CEventSpecimenEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.CommentedSpecimenInfo;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -133,8 +134,6 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             new StudyGetEventAttrInfoAction(ceventInfo.cevent
                 .getPatient().getStudy().getId())).getMap();
         copyCEvent();
-        // FIXME log edit action?
-        // SessionManager.logEdit(cevent);
         String tabName;
         if (adapter.getId() == null) {
             tabName = Messages.CollectionEventEntryForm_title_new;
@@ -164,7 +163,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             ceventCopy.setActivityStatus(ceventInfo.cevent.getActivityStatus());
             ceventCopy.setComments(ceventInfo.cevent.getComments());
             sourceSpecimens =
-                new ArrayList<SpecimenInfo>(ceventInfo.sourceSpecimenInfos);
+                new ArrayList<SpecimenInfo>(
+                );
+            for (SpecimenInfo info : ceventInfo.sourceSpecimenInfos)
+                sourceSpecimens.add(new CommentedSpecimenInfo(info));
         }
         cevent.setWrappedObject(ceventCopy);
         comment.setWrappedObject(new Comment());
@@ -196,7 +198,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add, null, comment, "message", null);
+            Messages.Comments_add, null, comment, "message", null); //$NON-NLS-1$
 
     }
 
@@ -376,7 +378,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 .getOrigValue());
         } else if (EventAttrTypeEnum.SELECT_MULTIPLE == pvCustomInfo.getType()) {
             ((SelectMultipleWidget) pvCustomInfo.control)
-                .setSelections(pvCustomInfo.getOrigValue().split(";"));
+                .setSelections(pvCustomInfo.getOrigValue().split(";")); //$NON-NLS-1$
         } else {
             Assert.isTrue(false,
                 "Invalid pvInfo type: " + pvCustomInfo.getType()); //$NON-NLS-1$
@@ -401,12 +403,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     protected void saveForm() throws Exception {
         List<SaveCEventSpecimenInfo> cevents =
             new ArrayList<CollectionEventSaveAction.SaveCEventSpecimenInfo>();
-        for (Object o : specimensTable.getList()) {
-            SpecimenInfo specInfo = (SpecimenInfo) o;
+        for (SpecimenInfo o : specimensTable.getList()) {
+            CommentedSpecimenInfo specInfo = (CommentedSpecimenInfo) o;
             SaveCEventSpecimenInfo ceSpecInfo = new SaveCEventSpecimenInfo();
-            // TODO: why is this even being sent to the server, unless comments
-            // were modified here and need to be saved?
-            // ceSpecInfo.comments = specInfo.specimen.getCommentCollection();
+            ceSpecInfo.comments = specInfo.comments;
             ceSpecInfo.id = specInfo.specimen.getId();
             ceSpecInfo.inventoryId = specInfo.specimen.getInventoryId();
             ceSpecInfo.quantity = specInfo.specimen.getQuantity();

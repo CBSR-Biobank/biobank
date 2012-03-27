@@ -18,8 +18,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeInfo;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
@@ -31,10 +33,11 @@ import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.InventoryIdValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.infotables.entry.CommentedSpecimenInfo;
 
 public class CEventSourceSpecimenDialog extends PagedDialog {
 
-    private Specimen editedSpecimen;
+    private CommentedSpecimenInfo editedSpecimen;
 
     private ComboViewer specimenTypeComboViewer;
 
@@ -56,11 +59,16 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
     private Date defaultTimeDrawn;
 
-    private Specimen internalSpecimen;
+    private CommentedSpecimenInfo internalSpecimen;
 
     private List<String> inventoryIdExcludeList;
 
-    public CEventSourceSpecimenDialog(Shell parent, Specimen spec,
+    private CommentWrapper commentWrapper = new CommentWrapper(
+        SessionManager.getAppService());
+
+    private BgcBaseText commentWidget;
+
+    public CEventSourceSpecimenDialog(Shell parent, CommentedSpecimenInfo spec,
         List<SourceSpecimen> studySourceSpecimen,
         List<SpecimenType> allSpecimenTypes,
         List<String> inventoryIdExcludeList, NewListener listener,
@@ -69,19 +77,26 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         this.defaultTimeDrawn = defaultTimeDrawn;
         this.inventoryIdExcludeList = inventoryIdExcludeList;
         Assert.isNotNull(studySourceSpecimen);
-        internalSpecimen = new Specimen();
+        internalSpecimen = new CommentedSpecimenInfo(new SpecimenInfo());
+        internalSpecimen.specimen = new Specimen();
         if (spec == null) {
             // FIXME ugly
-            internalSpecimen.setActivityStatus(ActivityStatus.ACTIVE);
-            internalSpecimen.setCreatedAt(defaultTimeDrawn);
+            internalSpecimen.specimen.setActivityStatus(ActivityStatus.ACTIVE);
+            internalSpecimen.specimen.setCreatedAt(defaultTimeDrawn);
         } else {
-            internalSpecimen.setId(spec.getId());
-            internalSpecimen.setSpecimenType(spec.getSpecimenType());
-            internalSpecimen.setInventoryId(spec.getInventoryId());
-            internalSpecimen.setQuantity(spec.getQuantity());
-            internalSpecimen.setCreatedAt(spec.getCreatedAt());
-            internalSpecimen.setComments(spec.getComments());
-            internalSpecimen.setActivityStatus(spec.getActivityStatus());
+            internalSpecimen.specimen.setId(spec.specimen.getId());
+            internalSpecimen.specimen.setSpecimenType(spec.specimen
+                .getSpecimenType());
+            internalSpecimen.specimen.setInventoryId(spec.specimen
+                .getInventoryId());
+            internalSpecimen.specimen.setQuantity(spec.specimen.getQuantity());
+            internalSpecimen.specimen
+                .setCreatedAt(spec.specimen.getCreatedAt());
+            internalSpecimen.specimen.setActivityStatus(spec.specimen
+                .getActivityStatus());
+            // comments is special
+            internalSpecimen.comments = spec.comments;
+
             editedSpecimen = spec;
         }
         mapStudySourceSpecimen = new HashMap<String, SourceSpecimen>();
@@ -127,12 +142,12 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
                 SWT.NONE,
                 Messages.CEventSourceSpecimenDialog_field_inventoryId_label,
                 null,
-                internalSpecimen,
+                internalSpecimen.specimen,
                 SpecimenPeer.INVENTORY_ID.getName(),
                 new InventoryIdValidator(
                     inventoryIdExcludeList,
                     Messages.CEventSourceSpecimenDialog_field_inventoryID_validator_msg,
-                    internalSpecimen));
+                    internalSpecimen.specimen));
         GridData gd = (GridData) inventoryIdWidget.getLayoutData();
         gd.horizontalSpan = 2;
 
@@ -147,8 +162,8 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             createDateTimeWidget(
                 contents,
                 timeDrawnLabel,
-                internalSpecimen.getCreatedAt(),
-                internalSpecimen,
+                internalSpecimen.specimen.getCreatedAt(),
+                internalSpecimen.specimen,
                 SpecimenPeer.CREATED_AT.getName(),
                 new NotNullValidator(
                     Messages.CEventSourceSpecimenDialog_field_time_validation_msg),
@@ -160,12 +175,12 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             widgetCreator.createComboViewer(contents,
                 Messages.CEventSourceSpecimenDialog_label_activity,
                 ActivityStatus.valuesList(),
-                internalSpecimen.getActivityStatus(),
+                internalSpecimen.specimen.getActivityStatus(),
                 Messages.CEventSourceSpecimenDialog_validation_activity,
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
-                        internalSpecimen
+                        internalSpecimen.specimen
                             .setActivityStatus((ActivityStatus) selectedObject);
                     }
                 }, new BiobankLabelProvider() {
@@ -177,15 +192,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         gd = (GridData) activityStatusComboViewer.getControl().getLayoutData();
         gd.horizontalSpan = 2;
 
-        BgcBaseText commentWidget =
-            (BgcBaseText) createBoundWidgetWithLabel(contents,
-                BgcBaseText.class, SWT.MULTI,
-                Messages.CEventSourceSpecimenDialog_label_comments, null,
-                internalSpecimen, SpecimenPeer.COMMENTS.getName(),
-                null);
-        gd = (GridData) commentWidget.getLayoutData();
-        gd.horizontalSpan = 2;
-        gd.widthHint = 400;
+        createCommentSection(contents);
 
         quantityLabel =
             widgetCreator.createLabel(contents,
@@ -197,7 +204,8 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
                 Messages.CEventSourceSpecimenDialog_field_quantity_validation_msg);
         quantityText =
             (BgcBaseText) createBoundWidget(contents, BgcBaseText.class,
-                SWT.BORDER, quantityLabel, new String[0], internalSpecimen,
+                SWT.BORDER, quantityLabel, new String[0],
+                internalSpecimen.specimen,
                 SpecimenPeer.QUANTITY.getName(), quantityTextValidator);
         gd = (GridData) quantityText.getLayoutData();
         gd.horizontalSpan = 2;
@@ -206,16 +214,29 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         updateWidgetVisibilityAndValues();
     }
 
+    private void createCommentSection(Composite contents) {
+        commentWidget =
+            (BgcBaseText) createBoundWidgetWithLabel(contents,
+                BgcBaseText.class, SWT.MULTI,
+                Messages.CEventSourceSpecimenDialog_label_comments, null,
+                commentWrapper, "message", //$NON-NLS-1$
+                null);
+        GridData gd = new GridData();
+        gd = (GridData) commentWidget.getLayoutData();
+        gd.horizontalSpan = 2;
+        gd.widthHint = 400;
+        commentWidget.setLayoutData(gd);
+    }
+
     private void addSpecimenTypeWidgets(Composite contents) {
         boolean useStudyOnlySourceSpecimens = true;
         SourceSpecimen ss = null;
-        SpecimenTypeInfo typeInfo = new SpecimenTypeInfo();
-        typeInfo.type = internalSpecimen.getSpecimenType();
-        if (typeInfo.type != null) {
-            ss = mapStudySourceSpecimen.get(typeInfo.type.getName());
+        SpecimenType type = internalSpecimen.specimen.getSpecimenType();
+        if (type != null) {
+            ss = mapStudySourceSpecimen.get(type.getName());
         }
-        if (ss == null && typeInfo.type != null
-            && allSpecimenTypes.contains(typeInfo)) {
+        if (ss == null && type != null
+            && allSpecimenTypes.contains(type)) {
             useStudyOnlySourceSpecimens = false;
         }
         specimenTypeComboViewer =
@@ -228,11 +249,13 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
                     public void doSelection(Object selectedObject) {
                         if (selectedObject instanceof SourceSpecimen) {
                             internalSpecimen
+                            .specimen
                                 .setSpecimenType(((SourceSpecimen) selectedObject)
                                     .getSpecimenType());
                         } else {
                             internalSpecimen
-                                .setSpecimenType(((SpecimenTypeInfo) selectedObject).type);
+                            .specimen
+                                .setSpecimenType(((SpecimenType) selectedObject));
                         }
                         updateWidgetVisibilityAndValues();
                     }
@@ -243,13 +266,13 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
                             return ((SourceSpecimen) element).getSpecimenType()
                                 .getNameShort();
                         }
-                        return ((SpecimenTypeInfo) element).type.getNameShort();
+                        return ((SpecimenType) element).getNameShort();
                     }
                 });
         if (!useStudyOnlySourceSpecimens) {
             specimenTypeComboViewer.setInput(allSpecimenTypes);
             specimenTypeComboViewer.setSelection(new StructuredSelection(
-                typeInfo));
+                type));
         }
 
         final Button allSpecimenTypesCheckBox = new Button(contents, SWT.CHECK);
@@ -273,7 +296,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         if (!dialogCreated) return;
 
         SourceSpecimen ss = null;
-        SpecimenType type = internalSpecimen.getSpecimenType();
+        SpecimenType type = internalSpecimen.specimen.getSpecimenType();
         if (type != null) {
             ss = mapStudySourceSpecimen.get(type.getName());
         }
@@ -294,7 +317,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         quantityText.setText(originalText + "*"); //$NON-NLS-1$
         quantityText.setText(originalText);
         if (!enableVolume) {
-            internalSpecimen.setQuantity(null);
+            internalSpecimen.specimen.setQuantity(null);
         }
     }
 
@@ -308,8 +331,8 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
     }
 
     @Override
-    protected Specimen getNew() {
-        return new Specimen();
+    protected CommentedSpecimenInfo getNew() {
+        return new CommentedSpecimenInfo(new SpecimenInfo());
     }
 
     @Override
@@ -321,18 +344,30 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         specimenTypeComboViewer.getCombo().deselectAll();
         activityStatusComboViewer.setSelection(
             new StructuredSelection(ActivityStatus.ACTIVE));
+        commentWidget.setText(""); //$NON-NLS-1$
         updateWidgetVisibilityAndValues();
     }
 
     @Override
     protected void copy(Object newModelObject) {
-        Specimen spec = (Specimen) newModelObject;
-        spec.setInventoryId(internalSpecimen.getInventoryId());
-        spec.setSpecimenType(internalSpecimen.getSpecimenType());
-        spec.setQuantity(internalSpecimen.getQuantity());
-        spec.setCreatedAt(internalSpecimen.getCreatedAt());
-        spec.setComments(internalSpecimen.getComments());
-        spec.setActivityStatus(internalSpecimen.getActivityStatus());
-        inventoryIdExcludeList.add(internalSpecimen.getInventoryId());
+        CommentedSpecimenInfo spec =
+            (CommentedSpecimenInfo) newModelObject;
+        spec.specimen
+            .setInventoryId(internalSpecimen.specimen.getInventoryId());
+        spec.specimen.setSpecimenType(internalSpecimen.specimen
+            .getSpecimenType());
+        spec.specimen.setQuantity(internalSpecimen.specimen.getQuantity());
+        spec.specimen.setCreatedAt(internalSpecimen.specimen.getCreatedAt());
+        if (commentWrapper.getMessage() != null
+            && !commentWrapper.getMessage().equals("")) { //$NON-NLS-1$
+            spec.comments.add(commentWrapper.getMessage());
+        }
+        if (spec.comments.size() > 0)
+            spec.comment = Messages.CEventSourceSpecimenDialog_yes;
+        else
+            spec.comment = Messages.CEventSourceSpecimenDialog_no;
+        spec.specimen.setActivityStatus(internalSpecimen.specimen
+            .getActivityStatus());
+        inventoryIdExcludeList.add(internalSpecimen.specimen.getInventoryId());
     }
 }

@@ -56,7 +56,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         public ActivityStatus activityStatus;
         public Integer specimenTypeId;
         public Integer centerId;
-        public String commentText;
+        public List<String> comments;
         public BigDecimal quantity;
     }
 
@@ -190,7 +190,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 specimen.setCollectionEvent(ceventToSave);
                 // cascade will save-update the specimens from this list:
                 specimen.setOriginalCollectionEvent(ceventToSave);
-                saveSpecimenComment(context, specimen, specInfo.commentText);
+                saveSpecimenComments(context, specimen, specInfo.comments);
                 specimen.setCreatedAt(specInfo.createdAt);
                 specimen.setInventoryId(specInfo.inventoryId);
                 specimen.setQuantity(specInfo.quantity);
@@ -321,10 +321,11 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         }
     }
 
-    private void saveSpecimenComment(ActionContext context,
-        Specimen specimenToSave, String commentText) {
-        Comment comment = CommentUtil.create(context.getUser(), commentText);
-        if (comment != null) {
+    private void saveSpecimenComments(ActionContext context,
+        Specimen specimenToSave, List<String> comments) {
+        List<Comment> completedComments =
+            CommentUtil.createCommentsFromList(context.getUser(), comments);
+        for (Comment comment : completedComments) {
             context.getSession().save(comment);
             specimenToSave.getComments().add(comment);
         }

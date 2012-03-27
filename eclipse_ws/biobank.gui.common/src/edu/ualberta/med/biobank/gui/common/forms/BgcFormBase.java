@@ -111,9 +111,9 @@ public abstract class BgcFormBase extends EditorPart implements
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (ActionException e) {
-            BgcPlugin.openAsyncError("Action Failed", e);
+            BgcPlugin.openAsyncError(Messages.BgcFormBase_action_error, e);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Exception in form initialization", e);
+            BgcPlugin.openAsyncError(Messages.BgcFormBase_generic_error, e);
             logger.error("BgcFormBase.createPartControl Error", e); //$NON-NLS-1$
         }
         getSite().setSelectionProvider(this);
@@ -481,7 +481,7 @@ public abstract class BgcFormBase extends EditorPart implements
             init();
             setValues();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error", "Unable to reload form.");
+            BgcPlugin.openAsyncError(Messages.BgcFormBase_reload_error, Messages.BgcFormBase_message);
             logger.error("Can't reload the form", e); //$NON-NLS-1$
         }
     }

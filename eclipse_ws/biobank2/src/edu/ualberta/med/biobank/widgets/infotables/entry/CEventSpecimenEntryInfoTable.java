@@ -23,7 +23,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -35,9 +34,9 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
     private boolean isDeletable;
 
     public CEventSpecimenEntryInfoTable(Composite parent,
-        List<SpecimenInfo> specs, CollectionEvent cevent,
+        List<SpecimenInfo> sourceSpecimens, CollectionEvent cevent,
         ColumnsShown columnsShowns) {
-        super(parent, specs, columnsShowns);
+        super(parent, sourceSpecimens, columnsShowns);
         try {
             if (cevent.getId() != null) {
                 this.isEditable =
@@ -48,7 +47,8 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                         new CollectionEventUpdatePermission(cevent.getId()));
             }
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.CEventSpecimenEntryInfoTable_error,
+            BgcPlugin.openAsyncError(
+                Messages.CEventSpecimenEntryInfoTable_error,
                 Messages.CEventSpecimenEntryInfoTable_message);
         }
     }
@@ -59,7 +59,7 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
         specimensAdded.setValue(currentSpecimens.size() > 0);
     }
 
-    public void addOrEditSpecimen(boolean add, SpecimenInfo si,
+    public void addOrEditSpecimen(boolean add, CommentedSpecimenInfo si,
         List<SourceSpecimen> studySourceTypes,
         List<SpecimenType> allSpecimenTypes, final CollectionEvent cEvent,
         final Date defaultTimeDrawn) {
@@ -72,14 +72,12 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
             newListener = new NewListener() {
                 @Override
                 public void newAdded(Object mw) {
-                    Specimen spec = (Specimen) mw;
-                    spec.setCollectionEvent(cEvent);
-                    spec.setOriginalCollectionEvent(cEvent);
-                    spec.setCurrentCenter(SessionManager.getUser()
+                    CommentedSpecimenInfo spec = (CommentedSpecimenInfo) mw;
+                    spec.specimen.setCollectionEvent(cEvent);
+                    spec.specimen.setOriginalCollectionEvent(cEvent);
+                    spec.specimen.setCurrentCenter(SessionManager.getUser()
                         .getCurrentWorkingCenter().getWrappedObject());
-                    SpecimenInfo info = new SpecimenInfo();
-                    info.specimen = spec;
-                    currentSpecimens.add(info);
+                    currentSpecimens.add(spec);
                     specimensAdded.setValue(true);
                     reloadCollection(currentSpecimens);
                     notifyListeners();
@@ -91,10 +89,12 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
         CEventSourceSpecimenDialog dlg =
             new CEventSourceSpecimenDialog(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(), si == null ? null
-                : si.specimen, studySourceTypes, allSpecimenTypes,
+                : si, studySourceTypes,
+                allSpecimenTypes,
                 inventoryIdExcludeList, newListener, defaultTimeDrawn);
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
+
             reloadCollection(currentSpecimens);
             notifyListeners();
         }
@@ -106,7 +106,8 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
             addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {
                 @Override
                 public void editItem(InfoTableEvent<SpecimenInfo> event) {
-                    SpecimenInfo si = getSelection();
+                    CommentedSpecimenInfo si =
+                        (CommentedSpecimenInfo) getSelection();
                     if (si != null)
                         addOrEditSpecimen(false, si, studySourceTypes,
                             allSpecimenTypes, null, null);

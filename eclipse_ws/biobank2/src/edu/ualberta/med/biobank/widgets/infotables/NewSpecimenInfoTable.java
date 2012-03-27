@@ -62,7 +62,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 case 9:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 10:
-                    return row.comments;
+                    return row.comment;
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -114,7 +114,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 case 8:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 9:
-                    return row.comments;
+                    return row.comment;
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -168,7 +168,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 case 8:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 9:
-                    return row.comments;
+                    return row.comment;
                 default:
                     return ""; //$NON-NLS-1$
                 }

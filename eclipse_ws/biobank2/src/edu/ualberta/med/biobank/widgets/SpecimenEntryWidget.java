@@ -168,7 +168,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                     bspecimen.getSpecimen().getSpecimenPosition() != null ?
                         bspecimen.getSpecimen().getSpecimenPosition()
                             .getPositionString() : null;
-                ispecimen.comments =
+                ispecimen.comment =
                     bspecimen.getSpecimen().getComments().size() == 0 ? Messages.SpecimenEntryWidget_no
                         : Messages.SpecimenEntryWidget_yes;
 

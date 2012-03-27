@@ -318,6 +318,8 @@ public class Messages extends NLS {
 
     public static String CollectionEventEntryForm_number_validation_msg;
 
+    public static String CollectionEventEntryForm_YES;
+
     public static String ProcessingEventViewForm_title;
     public static String ProcessingEventViewForm_specimens_title;
     public static String ProcessingEventEntryForm_title_new;

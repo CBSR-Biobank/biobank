@@ -32,8 +32,10 @@ public class NewSpecimenEntryInfoTable extends NewSpecimenInfoTable {
             @Override
             public int compare(Object e1, Object e2) {
                 try {
-                    SpecimenInfo i1 = (SpecimenInfo) getCollectionModelObject(e1);
-                    SpecimenInfo i2 = (SpecimenInfo) getCollectionModelObject(e2);
+                    SpecimenInfo i1 =
+                        (SpecimenInfo) getCollectionModelObject(e1);
+                    SpecimenInfo i2 =
+                        (SpecimenInfo) getCollectionModelObject(e2);
                     return super.compare(i1.specimen.getInventoryId(),
                         i2.specimen.getInventoryId());
                 } catch (Exception e) {

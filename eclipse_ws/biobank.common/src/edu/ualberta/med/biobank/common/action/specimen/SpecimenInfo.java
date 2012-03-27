@@ -16,7 +16,18 @@ public class SpecimenInfo implements ActionResult {
     public String parentLabel;
     public String positionString;
     public String topContainerTypeNameShort;
-    public String comments;
+    public String comment;
+
+    public SpecimenInfo(SpecimenInfo info) {
+        this.specimen = info.specimen;
+        this.parentLabel = info.parentLabel;
+        this.positionString = info.positionString;
+        this.comment = info.comment;
+    }
+
+    public SpecimenInfo() {
+        this.specimen = new Specimen();
+    }
 
     public String getPositionString(boolean fullString,
         boolean addTopParentShortName) {

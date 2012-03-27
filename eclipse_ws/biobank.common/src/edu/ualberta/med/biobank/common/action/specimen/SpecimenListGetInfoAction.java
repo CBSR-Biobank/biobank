@@ -19,6 +19,7 @@ public abstract class SpecimenListGetInfoAction implements
     Action<ListResult<SpecimenInfo>> {
     private static final long serialVersionUID = 1L;
 
+    // can't use distinct because we are not selecting an object
     @SuppressWarnings("nls")
     protected static final String SPEC_BASE_QRY =
         "SELECT spec,parent.label,pos.positionString,toptype.nameShort, count(comment)"
@@ -36,7 +37,8 @@ public abstract class SpecimenListGetInfoAction implements
             + " INNER JOIN FETCH patient.study study"
             + " LEFT JOIN spec.comments comment";
 
-    protected static final String SPEC_BASE_END = " GROUP BY spec.id";
+    // used in subclass
+    protected static final String SPEC_BASE_END = " GROUP BY spec.id"; //$NON-NLS-1$
 
     @Override
     public boolean isAllowed(ActionContext context) {
@@ -59,7 +61,7 @@ public abstract class SpecimenListGetInfoAction implements
             specInfo.parentLabel = (String) row[1];
             specInfo.positionString = (String) row[2];
             specInfo.topContainerTypeNameShort = (String) row[3];
-            specInfo.comments = ((Long) row[4]).equals(new Long(0)) ? "N" //$NON-NLS-1$
+            specInfo.comment = ((Long) row[4]).equals(new Long(0)) ? "N" //$NON-NLS-1$
                 : "Y"; //$NON-NLS-1$
             specs.add(specInfo);
         }
