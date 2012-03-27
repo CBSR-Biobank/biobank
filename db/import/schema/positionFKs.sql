@@ -15,13 +15,15 @@ ALTER TABLE `CONTAINER_POSITION` DROP KEY `FK_ContainerPosition_parentContainer`
 ALTER TABLE `CONTAINER_POSITION` ADD CONSTRAINT `FK_ContainerPosition_parentContainer`
   FOREIGN KEY `FK_ContainerPosition_parentContainer`
     (`PARENT_CONTAINER_ID`, `PARENT_CONTAINER_TYPE_ID`)
-  REFERENCES `CONTAINER` (`ID`, `CONTAINER_TYPE_ID`);
+  REFERENCES `CONTAINER` (`ID`, `CONTAINER_TYPE_ID`)
+  ON UPDATE CASCADE;
 
 -- add double-column Container FK, which stops the Container from changing
 -- its ContainerType if it has a ContainerPosition
 ALTER TABLE `CONTAINER_POSITION` ADD CONSTRAINT `FK_ContainerPosition_container`
   FOREIGN KEY `FK_ContainerPosition_Container` (`CONTAINER_ID`, `CONTAINER_TYPE_ID`)
-  REFERENCES `CONTAINER` (`ID`, `CONTAINER_TYPE_ID`);
+  REFERENCES `CONTAINER` (`ID`, `CONTAINER_TYPE_ID`)
+  ON UPDATE CASCADE;
 
 -- add a FK from the ContainerPosition to the `CONTAINER_TYPE_CONTAINER_TYPE`
 -- table so that only ContainerPosition-s with an explicitly defined
@@ -48,13 +50,15 @@ ALTER TABLE `SPECIMEN_POSITION` DROP KEY `FK_SpecimenPosition_container`;
 -- its ContainerType if it has a child Specimen
 ALTER TABLE `SPECIMEN_POSITION` ADD CONSTRAINT `FK_SpecimenPosition_container`
   FOREIGN KEY `FK_SpecimenPosition_container` (`CONTAINER_ID`, `CONTAINER_TYPE_ID`)
-  REFERENCES `CONTAINER` (`ID`, `CONTAINER_TYPE_ID`);
+  REFERENCES `CONTAINER` (`ID`, `CONTAINER_TYPE_ID`)
+  ON UPDATE CASCADE;
 
 -- add double-column Specimen FK, which stops the Specimen from changing
 -- its SpecimenType if it has a SpecimenPosition
 ALTER TABLE `SPECIMEN_POSITION` ADD CONSTRAINT `FK_SpecimenPosition_specimen`
   FOREIGN KEY `FK_SpecimenPosition_specimen` (`SPECIMEN_ID`, `SPECIMEN_TYPE_ID`)
-  REFERENCES `SPECIMEN` (`ID`, `SPECIMEN_TYPE_ID`);
+  REFERENCES `SPECIMEN` (`ID`, `SPECIMEN_TYPE_ID`)
+  ON UPDATE CASCADE;
 
 -- add a FK from the SpecimenPosition to the `CONTAINER_TYPE_SPECIMEN_TYPE`
 -- table so that only SpecimenPosition-s with an explicitly defined
