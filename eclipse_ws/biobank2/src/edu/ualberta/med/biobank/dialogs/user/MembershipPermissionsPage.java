@@ -117,6 +117,7 @@ public class MembershipPermissionsPage extends BgcWizardPage {
                 selected.addAll(role.getPermissions());
             }
 
+            permissionsTree.setInput(options);
             permissionsTree.setSelections(selected);
 
             membership.getPermissions().clear();
@@ -126,7 +127,6 @@ public class MembershipPermissionsPage extends BgcWizardPage {
         } finally {
             permissionsTree.addCheckStateListener(permissionsCheckStateHandler);
         }
-
     }
 
     private Set<PermissionEnum> getPermissionOptions() {
