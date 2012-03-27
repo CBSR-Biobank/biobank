@@ -48,8 +48,8 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                         new CollectionEventUpdatePermission(cevent.getId()));
             }
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
+            BgcPlugin.openAsyncError(Messages.CEventSpecimenEntryInfoTable_error,
+                Messages.CEventSpecimenEntryInfoTable_message);
         }
     }
 
