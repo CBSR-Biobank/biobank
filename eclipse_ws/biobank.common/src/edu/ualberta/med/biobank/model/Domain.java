@@ -65,6 +65,7 @@ public class Domain extends AbstractBiobankModel {
 
     public void setAllCenters(boolean allCenters) {
         this.allCenters = allCenters;
+        if (allCenters) getCenters().clear();
     }
 
     @Column(name = "ALL_STUDIES")
@@ -74,6 +75,7 @@ public class Domain extends AbstractBiobankModel {
 
     public void setAllStudies(boolean allStudies) {
         this.allStudies = allStudies;
+        if (allStudies) getStudies().clear();
     }
 
     @Transient

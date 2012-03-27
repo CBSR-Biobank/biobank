@@ -22,10 +22,16 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
 public class MembershipDomainPage extends BgcWizardPage {
+    private final StudiesSelectionHandler studiesSelectionHandler =
+        new StudiesSelectionHandler();
+    private final CentersSelectionHandler centersSelectionHandler =
+        new CentersSelectionHandler();
     private final Membership membership;
     private final Domain domain;
     private final ManagerContext context;
 
+    private Button allCentersButton;
+    private Button allStudiesButton;
     private MultiSelectWidget<Center> centersWidget;
     private MultiSelectWidget<Study> studiesWidget;
     private Button userManagerButton;
@@ -43,60 +49,89 @@ public class MembershipDomainPage extends BgcWizardPage {
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite container = new Composite(parent, SWT.NONE);
-        container.setLayout(new GridLayout(2, false));
+        container.setLayout(new GridLayout(1, false));
         container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        // TODO: radio buttons or check boxes for all centers and studies
+        createAllCentersButton(container);
+        createCentersWidget(container);
+        
+        createAllStudiesButton(container);
+        createStudiesWidget(container);
 
-        centersWidget = new MultiSelectWidget<Center>(container, SWT.NONE,
+        centersWidget.addSelectionChangedListener(centersSelectionHandler);
+        studiesWidget.addSelectionChangedListener(studiesSelectionHandler);
+
+        createUserManagerButton(container);
+        createEveryPermissionButton(container);
+
+        updatePageComplete();
+
+        setControl(container);
+    }
+
+    private void createAllCentersButton(Composite parent) {
+        allCentersButton = new Button(parent, SWT.CHECK);
+        allCentersButton.setText("All Centers");
+        allCentersButton.setSelection(domain.isAllCenters());
+        allCentersButton.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                boolean allCenters = allCentersButton.getSelection();
+                domain.setAllCenters(allCenters);
+                centersWidget.setEnabled(!allCenters);
+                updatePageComplete();
+            }
+        });
+    }
+
+    private void createCentersWidget(Composite parent) {
+        centersWidget = new MultiSelectWidget<Center>(parent, SWT.NONE,
             "Available Centers",
-            "Selected Centers", 120) {
+            "Selected Centers", 150) {
             @Override
             protected String getTextForObject(Center center) {
                 return center.getNameShort();
             }
         };
 
+        centersWidget.setEnabled(!domain.isAllCenters());
         updateCenterSelections();
+    }
 
-        studiesWidget = new MultiSelectWidget<Study>(container, SWT.NONE,
+    private void createAllStudiesButton(Composite parent) {
+        allStudiesButton = new Button(parent, SWT.CHECK);
+        allStudiesButton.setText("All Studies");
+        allStudiesButton.setSelection(domain.isAllCenters());
+        allStudiesButton.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                boolean allStudies = allStudiesButton.getSelection();
+                domain.setAllStudies(allStudies);
+                studiesWidget.setEnabled(!allStudies);
+                updatePageComplete();
+            }
+        });
+    }
+
+    private void createStudiesWidget(Composite parent) {
+        studiesWidget = new MultiSelectWidget<Study>(parent, SWT.NONE,
             "Available Studies",
-            "Selected Studies", 120) {
+            "Selected Studies", 150) {
             @Override
             protected String getTextForObject(Study study) {
                 return study.getNameShort();
             }
         };
 
+        studiesWidget.setEnabled(!domain.isAllStudies());
         updateStudySelections();
+    }
 
-        centersWidget.addSelectionChangedListener(
-            new BgcEntryFormWidgetListener() {
-                @Override
-                public void selectionChanged(MultiSelectEvent event) {
-                    Set<Center> domainCenters = domain.getCenters();
-                    domainCenters.clear();
-                    domainCenters.addAll(centersWidget.getSelected());
-                    updateStudySelections();
-                    updateEveryPermissionOption();
-                }
-            });
-
-        studiesWidget.addSelectionChangedListener(
-            new BgcEntryFormWidgetListener() {
-                @Override
-                public void selectionChanged(MultiSelectEvent event) {
-                    Set<Study> domainStudies = domain.getStudies();
-                    domainStudies.clear();
-                    domainStudies.addAll(studiesWidget.getSelected());
-                    updateCenterSelections();
-                    updateEveryPermissionOption();
-                }
-            });
-
-        userManagerButton = new Button(container, SWT.CHECK);
+    private void createUserManagerButton(Composite parent) {
+        userManagerButton = new Button(parent, SWT.CHECK);
         userManagerButton
             .setText("Can create other users with the granted roles and permissions");
+        userManagerButton.setSelection(membership.isUserManager());
         userManagerButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -104,10 +139,13 @@ public class MembershipDomainPage extends BgcWizardPage {
                 membership.setUserManager(userManager);
             }
         });
+    }
 
-        everyPermissionButton = new Button(container, SWT.CHECK);
+    private void createEveryPermissionButton(Composite parent) {
+        everyPermissionButton = new Button(parent, SWT.CHECK);
         everyPermissionButton
             .setText("Grant all current and future roles and permissions");
+        everyPermissionButton.setSelection(membership.isEveryPermission());
         everyPermissionButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -115,11 +153,16 @@ public class MembershipDomainPage extends BgcWizardPage {
                 membership.setEveryPermission(everyPermission);
             }
         });
-
-        setControl(container);
     }
 
-    private void updateEveryPermissionOption() {
+    private void updatePageComplete() {
+        boolean complete = true;
+        complete &= domain.isAllCenters() || !domain.getCenters().isEmpty();
+        complete &= domain.isAllStudies() || !domain.getStudies().isEmpty();
+        setPageComplete(complete);
+    }
+
+    private void updateEveryPermissionButton() {
         boolean canGrantEveryPermission = false;
         for (Domain d : context.getManager().getManageableDomains()) {
             if (d.isSuperset(domain)) {
@@ -175,8 +218,27 @@ public class MembershipDomainPage extends BgcWizardPage {
         return options;
     }
 
-    @Override
-    public boolean canFlipToNextPage() {
-        return !membership.isEveryPermission();
+    private class CentersSelectionHandler implements BgcEntryFormWidgetListener {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            Set<Center> domainCenters = domain.getCenters();
+            domainCenters.clear();
+            domainCenters.addAll(centersWidget.getSelected());
+            updateStudySelections();
+            updateEveryPermissionButton();
+            updatePageComplete();
+        }
+    }
+
+    private class StudiesSelectionHandler implements BgcEntryFormWidgetListener {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            Set<Study> domainStudies = domain.getStudies();
+            domainStudies.clear();
+            domainStudies.addAll(studiesWidget.getSelected());
+            updateCenterSelections();
+            updateEveryPermissionButton();
+            updatePageComplete();
+        }
     }
 }
