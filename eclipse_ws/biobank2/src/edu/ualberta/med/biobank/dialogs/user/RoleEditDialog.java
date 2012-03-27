@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget;
-import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget.PermissionTreeRes;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RoleEditDialog extends BgcBaseDialog {
@@ -97,8 +96,7 @@ public class RoleEditDialog extends BgcBaseDialog {
     @Override
     protected void okPressed() {
         try {
-            PermissionTreeRes res = tree.getAddedAndRemovedNodes();
-            role.getPermissions().addAll(res.addedPermissions);
+            role.getPermissions().addAll(tree.getCheckedElements());
 
             IdResult result = SessionManager.getAppService().doAction(
                 new RoleSaveAction(new RoleSaveInput(role)));

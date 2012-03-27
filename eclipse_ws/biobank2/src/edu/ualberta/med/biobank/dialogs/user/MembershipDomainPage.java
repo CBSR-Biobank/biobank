@@ -35,16 +35,23 @@ public class MembershipDomainPage extends BgcWizardPage {
     private Button allStudiesButton;
     private MultiSelectWidget<Center> centersWidget;
     private MultiSelectWidget<Study> studiesWidget;
-    private Button userManagerButton;
-    private Button everyPermissionButton;
 
     MembershipDomainPage(Membership membership, ManagerContext context) {
-        super("Domain", "Select centers and studies for this membership", null);
+        super("", "Centers and Studies", null);
+
+        setMessage("Where the user (or group) is allowed access");
 
         this.membership = membership;
         this.domain = membership.getDomain();
 
         this.context = context;
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+
+        updatePageComplete();
     }
 
     @Override
@@ -64,11 +71,6 @@ public class MembershipDomainPage extends BgcWizardPage {
         centersWidget.addSelectionChangedListener(centersSelectionHandler);
         studiesWidget.addSelectionChangedListener(studiesSelectionHandler);
 
-        createUserManagerButton(container);
-        createEveryPermissionButton(container);
-
-        updatePageComplete();
-
         setControl(container);
     }
 
@@ -83,7 +85,13 @@ public class MembershipDomainPage extends BgcWizardPage {
     private void createAllCentersButton(Composite parent) {
         allCentersButton = new Button(parent, SWT.CHECK);
         allCentersButton.setText("All Centers");
+        allCentersButton
+            .setToolTipText("Allow access to all current and future centers");
         allCentersButton.setSelection(domain.isAllCenters());
+
+        GridData gd = new GridData(SWT.FILL, SWT.TOP, true, true);
+        allCentersButton.setLayoutData(gd);
+
         allCentersButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -98,7 +106,7 @@ public class MembershipDomainPage extends BgcWizardPage {
     private void createCentersWidget(Composite parent) {
         centersWidget = new MultiSelectWidget<Center>(parent, SWT.NONE,
             "Available Centers",
-            "Selected Centers", 80) {
+            "Selected Centers", 100) {
             @Override
             protected String getTextForObject(Center center) {
                 return center.getNameShort();
@@ -112,7 +120,13 @@ public class MembershipDomainPage extends BgcWizardPage {
     private void createAllStudiesButton(Composite parent) {
         allStudiesButton = new Button(parent, SWT.CHECK);
         allStudiesButton.setText("All Studies");
+        allStudiesButton
+            .setToolTipText("Allow access to all current and future studies");
         allStudiesButton.setSelection(domain.isAllCenters());
+
+        GridData gd = new GridData(SWT.FILL, SWT.TOP, true, true);
+        allStudiesButton.setLayoutData(gd);
+
         allStudiesButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -127,7 +141,7 @@ public class MembershipDomainPage extends BgcWizardPage {
     private void createStudiesWidget(Composite parent) {
         studiesWidget = new MultiSelectWidget<Study>(parent, SWT.NONE,
             "Available Studies",
-            "Selected Studies", 80) {
+            "Selected Studies", 100) {
             @Override
             protected String getTextForObject(Study study) {
                 return study.getNameShort();
@@ -138,55 +152,11 @@ public class MembershipDomainPage extends BgcWizardPage {
         updateStudySelections();
     }
 
-    private void createUserManagerButton(Composite parent) {
-        userManagerButton = new Button(parent, SWT.CHECK);
-        userManagerButton.setText("User manager");
-        userManagerButton
-            .setToolTipText("Can create, edit, and delete users and groups.");
-        userManagerButton.setSelection(membership.isUserManager());
-        userManagerButton.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                boolean userManager = userManagerButton.getSelection();
-                membership.setUserManager(userManager);
-            }
-        });
-    }
-
-    private void createEveryPermissionButton(Composite parent) {
-        everyPermissionButton = new Button(parent, SWT.CHECK);
-        everyPermissionButton.setText("Grant all permissions and roles");
-        everyPermissionButton
-            .setToolTipText("Grant all current and future roles and permissions");
-        everyPermissionButton.setSelection(membership.isEveryPermission());
-        everyPermissionButton.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                boolean everyPermission = everyPermissionButton.getSelection();
-                membership.setEveryPermission(everyPermission);
-            }
-        });
-    }
-
     private void updatePageComplete() {
         boolean complete = true;
         complete &= domain.isAllCenters() || !domain.getCenters().isEmpty();
         complete &= domain.isAllStudies() || !domain.getStudies().isEmpty();
         setPageComplete(complete);
-    }
-
-    private void updateEveryPermissionButton() {
-        boolean canGrantEveryPermission = false;
-        for (Domain d : context.getManager().getManageableDomains()) {
-            if (d.isSuperset(domain)) {
-                canGrantEveryPermission = true;
-                break;
-            }
-        }
-        if (!canGrantEveryPermission) {
-            everyPermissionButton.setSelection(false);
-        }
-        everyPermissionButton.setEnabled(canGrantEveryPermission);
     }
 
     private void updateCenterSelections() {
@@ -238,7 +208,6 @@ public class MembershipDomainPage extends BgcWizardPage {
             domainCenters.clear();
             domainCenters.addAll(centersWidget.getSelected());
             updateStudySelections();
-            updateEveryPermissionButton();
             updatePageComplete();
         }
     }
@@ -250,7 +219,6 @@ public class MembershipDomainPage extends BgcWizardPage {
             domainStudies.clear();
             domainStudies.addAll(studiesWidget.getSelected());
             updateCenterSelections();
-            updateEveryPermissionButton();
             updatePageComplete();
         }
     }

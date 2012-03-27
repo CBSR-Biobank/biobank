@@ -31,8 +31,8 @@ public class MembershipInfoTable
     extends DefaultAbstractInfoTableWidget<Membership> {
     public static final int ROWS_PER_PAGE = 7;
     private static final String[] HEADINGS = new String[] {
-        Messages.MembershipInfoTable_center_label,
-        Messages.MembershipInfoTable_study_label,
+        "Centers",
+        "Studies",
         "Manager",
         "Roles and Permissions" };
 

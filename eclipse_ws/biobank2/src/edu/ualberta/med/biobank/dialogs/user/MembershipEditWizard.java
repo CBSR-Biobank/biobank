@@ -9,6 +9,9 @@ public class MembershipEditWizard extends Wizard {
     private final Membership membership;
     private final ManagerContext context;
 
+    private MembershipDomainPage domainPage;
+    private MembershipRolesPage rolesPage;
+
     public MembershipEditWizard(Membership membership, ManagerContext context) {
         this.membership = membership;
         this.context = context;
@@ -16,13 +19,16 @@ public class MembershipEditWizard extends Wizard {
 
     @Override
     public void addPages() {
-        addPage(new MembershipDomainPage(membership, context));
-        addPage(new MembershipRolesPage(membership, context));
+        domainPage = new MembershipDomainPage(membership, context);
+        rolesPage = new MembershipRolesPage(membership, context);
+
+        addPage(domainPage);
+        addPage(rolesPage);
     }
 
     @Override
     public boolean canFinish() {
-        return true;
+        return domainPage.isPageComplete() && rolesPage.isPageComplete();
     }
 
     @Override
