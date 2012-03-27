@@ -79,6 +79,9 @@ public class MembershipDomainPage extends BgcWizardPage {
         centersWidget.addSelectionChangedListener(centersSelectionHandler);
         studiesWidget.addSelectionChangedListener(studiesSelectionHandler);
 
+        updateAllCentersButton();
+        updateAllStudiesButton();
+
         setControl(container);
     }
 
@@ -117,6 +120,7 @@ public class MembershipDomainPage extends BgcWizardPage {
                 domain.setAllCenters(allCenters);
                 centersWidget.setEnabled(!allCenters);
                 updateCenterSelections();
+                updateAllStudiesButton();
                 updatePageComplete();
             }
         });
@@ -132,8 +136,8 @@ public class MembershipDomainPage extends BgcWizardPage {
             }
         };
 
+        // TODO: move to updateCenterSelections()?
         centersWidget.setEnabled(!domain.isAllCenters());
-        updateCenterSelections();
     }
 
     private void createAllStudiesButton(Composite parent) {
@@ -153,6 +157,7 @@ public class MembershipDomainPage extends BgcWizardPage {
                 domain.setAllStudies(allStudies);
                 studiesWidget.setEnabled(!allStudies);
                 updateStudySelections();
+                updateAllCentersButton();
                 updatePageComplete();
             }
         });
@@ -168,8 +173,48 @@ public class MembershipDomainPage extends BgcWizardPage {
             }
         };
 
+        // TODO: move to updateStudySelections()?
         studiesWidget.setEnabled(!domain.isAllStudies());
+    }
+
+    private void updateAllCentersButton() {
+        boolean allowed = isAllowedAllCentersButton();
+
+        if (!allowed) allCentersButton.setSelection(false);
+        allCentersButton.setEnabled(allowed);
+
+        updateCenterSelections();
+    }
+
+    private void updateAllStudiesButton() {
+        boolean allowed = isAllowedAllStudiesButton();
+
+        if (!allowed) allStudiesButton.setSelection(false);
+        allStudiesButton.setEnabled(allowed);
+
         updateStudySelections();
+    }
+
+    private boolean isAllowedAllCentersButton() {
+        for (Domain d : context.getManager().getManageableDomains()) {
+            if (d.containsAllStudies(domain)) {
+                if (d.isAllCenters()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isAllowedAllStudiesButton() {
+        for (Domain d : context.getManager().getManageableDomains()) {
+            if (d.containsAllCenters(domain)) {
+                if (d.isAllStudies()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void updatePageComplete() {
@@ -232,7 +277,7 @@ public class MembershipDomainPage extends BgcWizardPage {
             Set<Center> domainCenters = domain.getCenters();
             domainCenters.clear();
             domainCenters.addAll(centersWidget.getSelected());
-            updateStudySelections();
+            updateAllStudiesButton();
             updatePageComplete();
         }
     }
@@ -243,7 +288,7 @@ public class MembershipDomainPage extends BgcWizardPage {
             Set<Study> domainStudies = domain.getStudies();
             domainStudies.clear();
             domainStudies.addAll(studiesWidget.getSelected());
-            updateCenterSelections();
+            updateAllCentersButton();
             updatePageComplete();
         }
     }
