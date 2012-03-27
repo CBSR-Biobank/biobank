@@ -116,6 +116,7 @@ public class MembershipDomainPage extends BgcWizardPage {
                 boolean allCenters = allCentersButton.getSelection();
                 domain.setAllCenters(allCenters);
                 centersWidget.setEnabled(!allCenters);
+                updateCenterSelections();
                 updatePageComplete();
             }
         });
@@ -151,6 +152,7 @@ public class MembershipDomainPage extends BgcWizardPage {
                 boolean allStudies = allStudiesButton.getSelection();
                 domain.setAllStudies(allStudies);
                 studiesWidget.setEnabled(!allStudies);
+                updateStudySelections();
                 updatePageComplete();
             }
         });
