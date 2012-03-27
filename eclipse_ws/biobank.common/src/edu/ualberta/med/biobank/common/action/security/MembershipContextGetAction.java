@@ -7,6 +7,7 @@ import org.hibernate.Hibernate;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Role;
@@ -64,6 +65,11 @@ public class MembershipContextGetAction implements
     static void initMemberships(Set<Membership> memberships) {
         for (Membership membership : memberships) {
             Hibernate.initialize(membership.getDomain());
+
+            Domain domain = membership.getDomain();
+            Hibernate.initialize(domain.getCenters());
+            Hibernate.initialize(domain.getStudies());
+
             Hibernate.initialize(membership.getPermissions());
             Hibernate.initialize(membership.getRoles());
             for (Role role : membership.getRoles()) {
