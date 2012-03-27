@@ -101,6 +101,8 @@ public class MembershipPermissionsPage extends BgcWizardPage {
     }
 
     private void updatePermissionSelections() {
+        permissionsTree.setEnabled(!membership.isEveryPermission());
+
         Set<PermissionEnum> options = getPermissionOptions();
         Set<PermissionEnum> selected =
             new HashSet<PermissionEnum>(explicitPerms);
@@ -144,6 +146,8 @@ public class MembershipPermissionsPage extends BgcWizardPage {
     }
 
     private void updateRoleSelections() {
+        rolesWidget.setEnabled(!membership.isEveryPermission());
+
         Set<Role> options = getRoleOptions();
         Set<Role> selected = new HashSet<Role>(explicitRoles);
         selected.retainAll(options);
@@ -262,8 +266,6 @@ public class MembershipPermissionsPage extends BgcWizardPage {
             everyPermissionButton.setSelection(false);
         }
         everyPermissionButton.setEnabled(canGrantEveryPermission);
-
-        updatePageComplete();
     }
 
     private void updatePageComplete() {
