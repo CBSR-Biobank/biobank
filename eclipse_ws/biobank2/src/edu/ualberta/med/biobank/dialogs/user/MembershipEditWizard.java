@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.dialogs.user;
 import org.eclipse.jface.wizard.Wizard;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
-import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Membership;
 
 public class MembershipEditWizard extends Wizard {
@@ -12,7 +11,7 @@ public class MembershipEditWizard extends Wizard {
     private final ManagerContext context;
 
     private MembershipDomainPage domainPage;
-    private MembershipPermissionsPage rolesPage;
+    private MembershipPermissionsPage permsPage;
 
     public MembershipEditWizard(Membership membership, ManagerContext context) {
         this.originalMembership = membership;
@@ -28,23 +27,18 @@ public class MembershipEditWizard extends Wizard {
     @Override
     public void addPages() {
         domainPage = new MembershipDomainPage(membership, context);
-        rolesPage = new MembershipPermissionsPage(membership, context);
+        permsPage = new MembershipPermissionsPage(membership, context);
 
         addPage(domainPage);
-        addPage(rolesPage);
+        addPage(permsPage);
     }
 
     @Override
     public boolean canFinish() {
-        boolean canFinish = true;
-
-        Domain domain = membership.getDomain();
-        canFinish &= domain.isAllCenters() || !domain.getCenters().isEmpty();
-        canFinish &= domain.isAllStudies() || !domain.getStudies().isEmpty();
-
-        canFinish &= !membership.getAllPermissions().isEmpty();
-
-        return canFinish;
+        boolean onLastPage = getContainer() != null && permsPage != null
+            && permsPage.equals(getContainer().getCurrentPage());
+        boolean hasPerms = !membership.getAllPermissions().isEmpty();
+        return onLastPage && hasPerms;
     }
 
     @Override
