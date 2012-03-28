@@ -7,6 +7,7 @@ import java.util.List;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.common.util.ListChangeEvent;
 import edu.ualberta.med.biobank.common.util.ListChangeHandler;
@@ -34,7 +35,12 @@ public abstract class DefaultAbstractInfoTableWidget<T>
         paginationRequired = paginationWidget
             .setTableMaxRows(collection.size());
         if (paginationRequired) {
-            getTableViewer().refresh();
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    getTableViewer().refresh();
+                }
+            });
         }
     }
 
