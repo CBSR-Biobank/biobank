@@ -4,6 +4,8 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -45,6 +47,14 @@ public abstract class RoleInfoTable extends
             public void deleteItem(InfoTableEvent<Role> event) {
                 Role role = getSelection();
                 deleteRole(role);
+            }
+        });
+
+        addClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                Role r = getSelection();
+                if (r != null) editRole(r);
             }
         });
 

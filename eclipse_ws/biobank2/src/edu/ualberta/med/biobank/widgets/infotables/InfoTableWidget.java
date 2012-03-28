@@ -73,6 +73,9 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
         String[] headings, int rowsPerPage, Class<?> wrapperClass) {
         super(parent, collection, headings, null, rowsPerPage);
 
+        // TODO: this should be moved into abstractInfoTableWidget, since that
+        // class provides the contract to listen, but for some reason only this
+        // derived class makes the functionality work. See Jon
         addTableClickListener();
         useDefaultEditItem = false;
     }

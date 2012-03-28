@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -69,6 +71,14 @@ public class MembershipInfoTable
                 principal.getMemberships().remove(membership);
                 getList().remove(membership);
                 setList(getList());
+            }
+        });
+
+        addClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                Membership m = getSelection();
+                if (m != null) editMembership(m);
             }
         });
 

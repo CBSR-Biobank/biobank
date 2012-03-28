@@ -4,6 +4,8 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -66,6 +68,14 @@ public abstract class UserInfoTable extends
             public void deleteItem(InfoTableEvent<User> event) {
                 User user = ((User) getSelection());
                 deleteUser(user);
+            }
+        });
+
+        addClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                User u = getSelection();
+                if (u != null) editUser(u);
             }
         });
 

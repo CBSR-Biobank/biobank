@@ -4,6 +4,8 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -55,6 +57,14 @@ public abstract class GroupInfoTable extends
             @Override
             public void deleteItem(InfoTableEvent<Group> event) {
                 deleteGroup((Group) getSelection());
+            }
+        });
+
+        addClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                Group g = getSelection();
+                if (g != null) editGroup(g);
             }
         });
 

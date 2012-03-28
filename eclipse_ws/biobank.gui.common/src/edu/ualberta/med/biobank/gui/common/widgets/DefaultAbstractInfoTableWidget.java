@@ -21,6 +21,7 @@ public abstract class DefaultAbstractInfoTableWidget<T>
         super(parent, headings, null, rowsPerPage);
 
         addListChangeHandler(infoTableListChangeHandler);
+        addTableClickListener();
     }
 
     public void setSelection(T selection) {

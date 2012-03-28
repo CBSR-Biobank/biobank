@@ -141,6 +141,7 @@ public class ContainerTypeInfoTable extends
     @Override
     public void addClickListener(IDoubleClickListener listener) {
         doubleClickListeners.add(listener);
+        // TODO: this code makes no sense. See jon for why.
         MenuItem mi = new MenuItem(getMenu(), SWT.PUSH);
         mi.setText(Messages.ContainerTypeInfoTable_edit_label);
         mi.addSelectionListener(new SelectionAdapter() {
