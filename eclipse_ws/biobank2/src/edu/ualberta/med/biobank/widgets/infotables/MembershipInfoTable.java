@@ -185,10 +185,8 @@ public class MembershipInfoTable
                 TableItem item = (TableItem) event.item;
                 String text = getText(item, event.index);
                 Point size = event.gc.textExtent(text);
-                int offset2 = event.index == 0
-                    ? Math.max(0, (event.height - size.y) / 2)
-                    : 0;
-                event.gc.drawText(text, event.x, event.y + offset2, true);
+                int offset = Math.max(0, (event.height - size.y) / 2);
+                event.gc.drawText(text, event.x, event.y + offset, true);
                 break;
             }
             case SWT.EraseItem: {
