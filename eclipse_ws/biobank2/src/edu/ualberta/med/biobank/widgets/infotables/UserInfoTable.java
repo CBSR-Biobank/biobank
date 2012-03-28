@@ -143,6 +143,11 @@ public abstract class UserInfoTable extends
         int res = dlg.open();
         if (res == Dialog.OK) {
             reload();
+
+            getList().remove(user);
+            getList().add(output.getUser());
+            reload();
+
             setSelection(user);
 
             notifyListeners();

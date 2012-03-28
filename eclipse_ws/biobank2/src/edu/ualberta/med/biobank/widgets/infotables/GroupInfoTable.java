@@ -102,6 +102,11 @@ public abstract class GroupInfoTable extends
         int res = dlg.open();
         if (res == Dialog.OK) {
             reload();
+
+            getList().remove(group);
+            getList().add(output.getGroup());
+            reload();
+
             setSelection(group);
 
             notifyListeners();
