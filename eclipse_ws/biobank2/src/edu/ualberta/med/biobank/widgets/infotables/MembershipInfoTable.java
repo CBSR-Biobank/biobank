@@ -133,6 +133,8 @@ public class MembershipInfoTable
     }
 
     private static String getRolesAndPermissionsSummary(Membership m) {
+        if (m.isEveryPermission()) return "All";
+
         List<String> rolesAndPerms = new ArrayList<String>();
         for (Role role : m.getRoles()) {
             rolesAndPerms.add(role.getName());
