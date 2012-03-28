@@ -152,4 +152,23 @@ public class User extends Principal {
         }
         return domains;
     }
+
+    /**
+     * Get a {@link Set} of all the {@link Membership}-s the given {@link User}
+     * is able to partially manage (i.e. for which
+     * {@link Membership#isPartiallyManageable(User)} returns true).
+     * 
+     * @param u
+     * @return
+     */
+    @Transient
+    public Set<Membership> getManageableMemberships(User u) {
+        Set<Membership> manageable = new HashSet<Membership>();
+        for (Membership membership : getMemberships()) {
+            if (membership.isPartiallyManageable(u)) {
+                manageable.add(membership);
+            }
+        }
+        return manageable;
+    }
 }

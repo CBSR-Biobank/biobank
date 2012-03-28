@@ -156,6 +156,7 @@ public abstract class UserInfoTable extends
 
             getList().remove(user);
             getList().add(output.getUser());
+
             reload();
 
             setSelection(user);

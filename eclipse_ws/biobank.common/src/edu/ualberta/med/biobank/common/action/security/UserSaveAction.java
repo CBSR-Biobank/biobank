@@ -111,20 +111,27 @@ public class UserSaveAction implements Action<IdResult> {
         }
     }
 
-    private void setMemberships(ActionContext context, User user) {
-        SetDiff<Membership> diff = new SetDiff<Membership>(
-            user.getMemberships(), input.getMemberships());
+    private Set<Membership> getManageableMemberships(ActionContext context,
+        User user) {
+        User manager = input.getContext().getManager();
+        User executor = context.getUser();
+        Set<Membership> managerMembs = user.getManageableMemberships(manager);
+        Set<Membership> executorMembs = user.getManageableMemberships(executor);
 
-        for (Membership membership : diff.getRemovals()) {
-            checkFullyManageable(context, membership);
-
-            // TODO: BUG! Note that this will attempt to remove
-            // "Global Administrator" memberships, etc. because the higher power
-            // memberships are not present in those re-submitted! ERROR!
-
-            user.getMemberships().remove(membership);
-            context.getSession().delete(membership);
+        if (!managerMembs.containsAll(executorMembs)) {
+            throw new ActionException(
+                "No longer able to manage some submitted memberships. Please start over and try again.");
         }
+
+        return managerMembs;
+    }
+
+    private void setMemberships(ActionContext context, User user) {
+        Set<Membership> manageable = getManageableMemberships(context, user);
+        SetDiff<Membership> diff = new SetDiff<Membership>(
+            manageable, input.getMemberships());
+
+        handleMembershipRemovals(context, diff.getRemovals());
 
         for (Membership membership : diff.getAdditions()) {
             checkFullyManageable(context, membership);
@@ -133,14 +140,36 @@ public class UserSaveAction implements Action<IdResult> {
             membership.setPrincipal(user);
         }
 
-        mergeMemberships(context, diff.getIntersection());
+        mergeMembershipUpdates(context, diff.getIntersection());
 
         for (Membership m : user.getMemberships()) {
             m.reducePermissions();
         }
     }
 
-    private void mergeMemberships(ActionContext context,
+    private void handleMembershipRemovals(ActionContext context,
+        Set<Membership> removals) {
+        User executingUser = context.getUser();
+        for (Membership membership : removals) {
+            // can only remove these memberships if they're _still_ fully
+            // manageable, otherwise, the executing user can only clear out the
+            // portions they're allowed to edit
+            if (membership.isFullyManageable(executingUser)) {
+                membership.getPrincipal().getMemberships().remove(membership);
+                context.getSession().delete(membership);
+            } else {
+                Set<PermissionEnum> perms = membership
+                    .getManageablePermissions(executingUser);
+                membership.getPermissions().removeAll(perms);
+
+                Set<Role> roles = membership.getManageableRoles(executingUser,
+                    input.getContext().getRoles());
+                membership.getRoles().removeAll(roles);
+            }
+        }
+    }
+
+    private void mergeMembershipUpdates(ActionContext context,
         Set<Pair<Membership>> conflicts) {
         User executingUser = context.getUser();
         User manager = input.getContext().getManager();

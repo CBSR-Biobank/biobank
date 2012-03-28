@@ -64,24 +64,22 @@ public class UserGetAction implements Action<UserGetOutput> {
 
         Set<PermissionEnum> permsScope;
         Set<Role> rolesScope;
-        for (Membership m : src.getMemberships()) {
-            if (m.isPartiallyManageable(executingUser)) {
-                Membership copy = new Membership(m, dst);
-                copy.setId(m.getId());
+        for (Membership m : src.getManageableMemberships(executingUser)) {
+            Membership copy = new Membership(m, dst);
+            copy.setId(m.getId());
 
-                Hibernate.initialize(copy.getDomain());
+            Hibernate.initialize(copy.getDomain());
 
-                Domain domain = copy.getDomain();
-                Hibernate.initialize(domain.getCenters());
-                Hibernate.initialize(domain.getStudies());
+            Domain domain = copy.getDomain();
+            Hibernate.initialize(domain.getCenters());
+            Hibernate.initialize(domain.getStudies());
 
-                // limit permission and role scope to manageable ones
-                permsScope = m.getManageablePermissions(executingUser);
-                rolesScope = m.getManageableRoles(executingUser, allRoles);
+            // limit permission and role scope to manageable ones
+            permsScope = m.getManageablePermissions(executingUser);
+            rolesScope = m.getManageableRoles(executingUser, allRoles);
 
-                m.getPermissions().retainAll(permsScope);
-                m.getRoles().retainAll(rolesScope);
-            }
+            copy.getPermissions().retainAll(permsScope);
+            copy.getRoles().retainAll(rolesScope);
         }
     }
 
