@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.common.action.security.MembershipContext;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.dialogs.user.MembershipEditWizard;
+import edu.ualberta.med.biobank.dialogs.user.SecurityWizardDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 import edu.ualberta.med.biobank.gui.common.widgets.DefaultAbstractInfoTableWidget;
@@ -42,7 +43,6 @@ public class MembershipInfoTable
         "Manager",
         "Roles and Permissions" };
 
-    private final MembershipContext context;
     private final ManagerContext managerContext;
 
     public MembershipInfoTable(Composite parent,
@@ -52,7 +52,6 @@ public class MembershipInfoTable
 
         setCollection(principal.getMemberships());
 
-        this.context = context;
         this.managerContext = managerContext;
 
         addEditItemListener(new IInfoTableEditItemListener<Membership>() {
@@ -87,7 +86,7 @@ public class MembershipInfoTable
 
         MembershipEditWizard wiz =
             new MembershipEditWizard(m, managerContext);
-        WizardDialog dlg = new WizardDialog(shell, wiz);
+        WizardDialog dlg = new SecurityWizardDialog(shell, wiz);
 
         int res = dlg.open();
         if (res == Dialog.OK) {

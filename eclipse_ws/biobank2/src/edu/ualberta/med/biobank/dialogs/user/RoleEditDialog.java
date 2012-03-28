@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.action.security.RoleSaveAction;
 import edu.ualberta.med.biobank.common.action.security.RoleSaveInput;
 import edu.ualberta.med.biobank.common.peer.RolePeer;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
-import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.PermissionEnum;
@@ -21,7 +20,7 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class RoleEditDialog extends BgcBaseDialog {
+public class RoleEditDialog extends AbstractSecurityEditDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
 

@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.common.action.security.MembershipContext;
 import edu.ualberta.med.biobank.common.peer.GroupPeer;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.Group;
@@ -37,7 +36,7 @@ import edu.ualberta.med.biobank.widgets.infotables.MembershipInfoTable;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class GroupEditDialog extends BgcBaseDialog {
+public class GroupEditDialog extends AbstractSecurityEditDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
 
@@ -160,9 +159,9 @@ public class GroupEditDialog extends BgcBaseDialog {
 
                 Shell shell = PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getShell();
-                
+
                 MembershipEditWizard wiz = new MembershipEditWizard(m, context);
-                WizardDialog dlg = new WizardDialog(shell, wiz);
+                WizardDialog dlg = new SecurityWizardDialog(shell, wiz);
 
                 int res = dlg.open();
                 if (res == Status.OK) {

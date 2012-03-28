@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -36,7 +37,6 @@ import edu.ualberta.med.biobank.common.action.security.UserSaveInput;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.validators.EmailValidator;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -55,7 +55,7 @@ import edu.ualberta.med.biobank.widgets.infotables.MembershipInfoTable;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class UserEditDialog extends BgcBaseDialog {
+public class UserEditDialog extends AbstractSecurityEditDialog {
     public static final int CLOSE_PARENT_RETURN_CODE = 3;
     private static final int PASSWORD_LENGTH_MIN = 5;
 
@@ -87,6 +87,14 @@ public class UserEditDialog extends BgcBaseDialog {
         if (user.isNew()) {
             user.setNeedPwdChange(true);
         }
+    }
+
+    @Override
+    protected void createButtonsForButtonBar(Composite parent) {
+        super.createButtonsForButtonBar(parent);
+
+        Button okButton = getButton(IDialogConstants.OK_ID);
+        okButton.setText("Save");
     }
 
     @Override
@@ -234,7 +242,7 @@ public class UserEditDialog extends BgcBaseDialog {
 
                 MembershipEditWizard wiz =
                     new MembershipEditWizard(m, managerContext);
-                WizardDialog dlg = new WizardDialog(shell, wiz);
+                WizardDialog dlg = new SecurityWizardDialog(shell, wiz);
 
                 int res = dlg.open();
                 if (res == Status.OK) {
