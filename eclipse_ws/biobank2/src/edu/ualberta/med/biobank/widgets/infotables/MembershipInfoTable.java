@@ -142,6 +142,7 @@ public class MembershipInfoTable
         for (PermissionEnum permission : m.getPermissions()) {
             rolesAndPerms.add(permission.getName());
         }
+        Collections.sort(rolesAndPerms, String.CASE_INSENSITIVE_ORDER);
         String summary = StringUtil.join(rolesAndPerms, ", ");
         summary = StringUtil.truncate(summary, 50, "...");
         return summary;
