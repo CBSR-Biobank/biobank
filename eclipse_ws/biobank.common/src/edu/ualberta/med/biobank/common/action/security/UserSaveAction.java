@@ -13,16 +13,14 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
-import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.util.IdUtil;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
-import edu.ualberta.med.biobank.util.NullHelper;
 import edu.ualberta.med.biobank.util.SetDiff;
 import edu.ualberta.med.biobank.util.SetDiff.Pair;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -114,18 +112,21 @@ public class UserSaveAction implements Action<IdResult> {
     }
 
     private void setMemberships(ActionContext context, User user) {
-        SetDiff<MembershipDomain> diff = diffMemberships(user);
+        SetDiff<Membership> diff = new SetDiff<Membership>(
+            user.getMemberships(), input.getMemberships());
 
-        for (MembershipDomain domain : diff.getRemovals()) {
-            Membership membership = domain.getMembership();
+        for (Membership membership : diff.getRemovals()) {
             checkFullyManageable(context, membership);
+
+            // TODO: BUG! Note that this will attempt to remove
+            // "Global Administrator" memberships, etc. because the higher power
+            // memberships are not present in those re-submitted! ERROR!
 
             user.getMemberships().remove(membership);
             context.getSession().delete(membership);
         }
 
-        for (MembershipDomain domain : diff.getAdditions()) {
-            Membership membership = domain.getMembership();
+        for (Membership membership : diff.getAdditions()) {
             checkFullyManageable(context, membership);
 
             user.getMemberships().add(membership);
@@ -140,7 +141,7 @@ public class UserSaveAction implements Action<IdResult> {
     }
 
     private void mergeMemberships(ActionContext context,
-        Set<Pair<MembershipDomain>> conflicts) {
+        Set<Pair<Membership>> conflicts) {
         User executingUser = context.getUser();
         User manager = input.getContext().getManager();
 
@@ -149,9 +150,9 @@ public class UserSaveAction implements Action<IdResult> {
 
         Set<PermissionEnum> perms, oldPermissionScope, newPermissionScope;
         Set<Role> roles, oldRoleScope, newRoleScope;
-        for (Pair<MembershipDomain> conflict : conflicts) {
-            Membership oldM = conflict.getOld().getMembership();
-            Membership newM = conflict.getNew().getMembership();
+        for (Pair<Membership> conflict : conflicts) {
+            Membership oldM = conflict.getOld();
+            Membership newM = conflict.getNew();
 
             // the permissions and roles the user would have intended to modify
             oldPermissionScope = oldM.getManageablePermissions(manager);
@@ -166,6 +167,9 @@ public class UserSaveAction implements Action<IdResult> {
             if (!newPermissionScope.containsAll(oldPermissionScope)
                 || !newRoleScope.containsAll(oldRoleScope)) {
                 // TODO: better exception
+                // TODO: there is a bug here! got it when editting a Membership
+                // on
+                // testweirdkid
                 throw new ActionException("reduced scope");
             }
 
@@ -183,7 +187,20 @@ public class UserSaveAction implements Action<IdResult> {
             roles.retainAll(newM.getRoles());
             oldM.getRoles().addAll(roles);
 
-            oldM.setRank(newM.getRank());
+            // TODO: throw away old domain, copy into new? Shorter.
+            Domain newD = newM.getDomain();
+            Domain oldD = oldM.getDomain();
+
+            oldD.getCenters().clear();
+            oldD.getCenters().addAll(newD.getCenters());
+            oldD.setAllCenters(newD.isAllCenters());
+
+            oldD.getStudies().clear();
+            oldD.getStudies().addAll(newD.getStudies());
+            oldD.setAllStudies(newD.isAllStudies());
+
+            oldM.setUserManager(newM.isUserManager());
+            oldM.setEveryPermission(newM.isEveryPermission());
 
             checkFullyManageable(context, oldM);
         }
@@ -196,13 +213,6 @@ public class UserSaveAction implements Action<IdResult> {
             throw new ActionException(
                 "you do not have permissions to make this change on this user");
         }
-    }
-
-    private SetDiff<MembershipDomain> diffMemberships(User user) {
-        final Set<MembershipDomain> oldDomains, newDomains;
-        oldDomains = MembershipDomain.from(user.getMemberships());
-        newDomains = MembershipDomain.from(input.getMemberships());
-        return new SetDiff<MembershipDomain>(oldDomains, newDomains);
     }
 
     private void setGroups(ActionContext context, User user) {
@@ -282,72 +292,6 @@ public class UserSaveAction implements Action<IdResult> {
 
         @Override
         public void beforeCompletion() {
-        }
-    }
-
-    /**
-     * Helps merge {@link Membership}-s by comparing them by domain (their
-     * {@link Center} and {@link Study}).
-     * 
-     * @author Jonathan Ferland
-     */
-    public static class MembershipDomain {
-        private final Membership membership;
-        private final Integer centerId;
-        private final Integer studyId;
-
-        private MembershipDomain(Membership m) {
-            this.membership = m;
-            this.centerId = m.getCenter() != null ? m.getCenter().getId() : 0;
-            this.studyId = m.getStudy() != null ? m.getStudy().getId() : 0;
-        }
-
-        public Membership getMembership() {
-            return membership;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 1;
-            hash = 31 * hash + ((centerId == null) ? 0 : centerId.hashCode());
-            hash = 31 * hash + ((studyId == null) ? 0 : studyId.hashCode());
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null) return false;
-            if (getClass() != o.getClass()) return false;
-            MembershipDomain that = (MembershipDomain) o;
-            if (!NullHelper.safeEquals(centerId, that.centerId)) return false;
-            if (!NullHelper.safeEquals(studyId, that.studyId)) return false;
-            return true;
-        }
-
-        @Override
-        public String toString() {
-            return "MembershipDomain [membership=" + membership + ", centerId="
-                + centerId + ", studyId=" + studyId + "]";
-        }
-
-        /**
-         * 
-         * @param memberships
-         * @return
-         * @throws IllegalArgumentException if any two resulting
-         *             {@link MembershipDomain}-s are equal.
-         */
-        public static Set<MembershipDomain> from(Set<Membership> memberships)
-            throws IllegalArgumentException {
-            Set<MembershipDomain> domains = new HashSet<MembershipDomain>();
-            for (Membership m : memberships) {
-                MembershipDomain d = new MembershipDomain(m);
-                if (!domains.add(d)) {
-                    throw new IllegalArgumentException("duplicate domain " + d);
-                }
-            }
-            return domains;
         }
     }
 }

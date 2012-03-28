@@ -44,4 +44,11 @@ public class StringUtil {
         }
         return sb.toString();
     }
+
+    public static String truncate(String string, int n, String suffix) {
+        if (string.length() - suffix.length() > n) {
+            return string.substring(0, n) + suffix;
+        }
+        return string;
+    }
 }

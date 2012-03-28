@@ -1,10 +1,8 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -13,32 +11,50 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.security.GroupDeleteAction;
+import edu.ualberta.med.biobank.common.action.security.GroupDeleteInput;
+import edu.ualberta.med.biobank.common.action.security.GroupGetAction;
+import edu.ualberta.med.biobank.common.action.security.GroupGetInput;
+import edu.ualberta.med.biobank.common.action.security.GroupGetOutput;
+import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.dialogs.user.GroupEditDialog;
+import edu.ualberta.med.biobank.dialogs.user.TmpUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.DefaultAbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.model.Group;
 
-public abstract class GroupInfoTable extends InfoTableWidget<GroupWrapper> {
+public abstract class GroupInfoTable extends
+    DefaultAbstractInfoTableWidget<Group> {
     public static final int ROWS_PER_PAGE = 12;
-    private static final String[] HEADINGS = new String[] { Messages.GroupInfoTable_name_label };
+    private static final String[] HEADINGS =
+        new String[] { Messages.GroupInfoTable_name_label };
 
-    public GroupInfoTable(Composite parent, List<GroupWrapper> collection) {
-        super(parent, collection, HEADINGS, ROWS_PER_PAGE, GroupWrapper.class);
+    private final ManagerContext context;
 
-        addEditItemListener(new IInfoTableEditItemListener<GroupWrapper>() {
+    public GroupInfoTable(Composite parent, List<Group> collection,
+        ManagerContext context) {
+        super(parent, HEADINGS, ROWS_PER_PAGE);
+
+        setList(collection);
+
+        this.context = context;
+
+        addEditItemListener(new IInfoTableEditItemListener<Group>() {
             @Override
-            public void editItem(InfoTableEvent<GroupWrapper> event) {
-                editGroup((GroupWrapper) getSelection());
+            public void editItem(InfoTableEvent<Group> event) {
+                editGroup((Group) getSelection());
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener<GroupWrapper>() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<Group>() {
             @Override
-            public void deleteItem(InfoTableEvent<GroupWrapper> event) {
-                deleteGroup((GroupWrapper) getSelection());
+            public void deleteItem(InfoTableEvent<Group> event) {
+                deleteGroup((Group) getSelection());
             }
         });
 
@@ -47,53 +63,19 @@ public abstract class GroupInfoTable extends InfoTableWidget<GroupWrapper> {
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                duplicate((GroupWrapper) getSelection());
+                duplicate((Group) getSelection());
             }
         });
     }
 
-    protected abstract void duplicate(GroupWrapper origGroup);
-
-    @SuppressWarnings("serial")
-    @Override
-    protected BiobankTableSorter getComparator() {
-        return new BiobankTableSorter() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                if (o1 instanceof GroupWrapper
-                    && o2 instanceof GroupWrapper) {
-                    GroupWrapper g1 = (GroupWrapper) o1;
-                    GroupWrapper g2 = (GroupWrapper) o2;
-                    return g1.compareTo(g2);
-                }
-                return 0;
-            }
-        };
-    }
-
-    @Override
-    protected String getCollectionModelObjectToString(Object o) {
-        if (o == null) {
-            return null;
-        }
-
-        GroupWrapper group = (GroupWrapper) o;
-        return StringUtils.join(Arrays.asList(group.getName()), "\t"); //$NON-NLS-1$
-    }
+    protected abstract void duplicate(Group original);
 
     @Override
     protected BgcLabelProvider getLabelProvider() {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                GroupWrapper group = (GroupWrapper) ((BiobankCollectionModel) element).o;
-                if (group == null) {
-                    if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
-                    }
-                    return ""; //$NON-NLS-1$
-                }
-
+                Group group = (Group) element;
                 switch (columnIndex) {
                 case 0:
                     return group.getName();
@@ -104,17 +86,29 @@ public abstract class GroupInfoTable extends InfoTableWidget<GroupWrapper> {
         };
     }
 
-    protected void editGroup(GroupWrapper group) {
+    protected void editGroup(Group group) {
+        GroupGetOutput output = null;
+
+        try {
+            output = SessionManager.getAppService()
+                .doAction(new GroupGetAction(new GroupGetInput(group)));
+        } catch (Throwable t) {
+            TmpUtil.displayException(t);
+            return;
+        }
+
         GroupEditDialog dlg = new GroupEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), group);
+            .getActiveWorkbenchWindow().getShell(), output, context);
         int res = dlg.open();
         if (res == Dialog.OK) {
-            reloadCollection(getList(), group);
+            reload();
+            setSelection(group);
+
             notifyListeners();
         }
     }
 
-    protected boolean deleteGroup(GroupWrapper group) {
+    protected boolean deleteGroup(Group group) {
         try {
             String name = group.getName();
             String message = MessageFormat.format(
@@ -123,16 +117,20 @@ public abstract class GroupInfoTable extends InfoTableWidget<GroupWrapper> {
 
             if (BgcPlugin.openConfirm(
                 Messages.GroupInfoTable_delete_confirm_title, message)) {
-                group.delete();
+
+                SessionManager.getAppService().doAction(
+                    new GroupDeleteAction(new GroupDeleteInput(group)));
+
                 // remove the group from the collection
                 getList().remove(group);
-                reloadCollection(getList(), null);
+
+                reload();
+
                 notifyListeners();
                 return true;
             }
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.GroupInfoTable_delete_error_msg,
-                e);
+        } catch (Throwable t) {
+            TmpUtil.displayException(t);
         }
         return false;
     }

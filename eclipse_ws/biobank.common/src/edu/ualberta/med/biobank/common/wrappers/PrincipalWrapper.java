@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.wrappers.base.PrincipalBaseWrapper;
+import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Principal;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -23,30 +24,18 @@ public abstract class PrincipalWrapper<T extends Principal> extends
         super(appService);
     }
 
-    /**
-     * Duplicate a principal: create a new one that will have the exact same
-     * relations. This duplicated principal is not yet saved into the DB.
-     */
-    public PrincipalWrapper<T> duplicate() {
-        PrincipalWrapper<T> newPrincipal = createDuplicate();
-        List<MembershipWrapper> msList = new ArrayList<MembershipWrapper>();
-        for (MembershipWrapper ms : getMembershipCollection(false)) {
-            msList.add(ms.duplicate());
-        }
-        newPrincipal.addToMembershipCollection(msList);
-        return newPrincipal;
-    }
-
-    protected abstract PrincipalWrapper<T> createDuplicate();
-
     protected Set<CenterWrapper<?>> getAllCentersInvolved() throws Exception {
         Set<CenterWrapper<?>> centers = new HashSet<CenterWrapper<?>>();
         for (MembershipWrapper ms : getMembershipCollection(false)) {
-            CenterWrapper<?> center = ms.getCenter();
-            if (center == null)
+            Domain domain = ms.getWrappedObject().getDomain();
+            if (domain.isAllCenters())
                 centers.addAll(CenterWrapper.getCenters(appService));
-            else
-                centers.add(center);
+            else {
+                List<CenterWrapper<?>> wrappedCenters =
+                    ModelWrapper.wrapModelCollection(
+                        appService, domain.getCenters(), null);
+                centers.addAll(wrappedCenters);
+            }
         }
         return centers;
     }

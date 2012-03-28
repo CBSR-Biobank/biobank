@@ -1,12 +1,8 @@
 package edu.ualberta.med.biobank.common.action.security;
 
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.hibernate.Criteria;
 import org.hibernate.criterion.CriteriaSpecification;
-import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -14,21 +10,14 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.model.Group;
-import edu.ualberta.med.biobank.model.User;
 
-/**
- * Returns a list of {@link Group}-s that the executing user has
- * <em>complete</em> control over.
- * 
- * @author Jonathan Ferland
- */
-public class GroupGetAllAction implements Action<GroupGetAllOutput> {
+public class GroupGetAction implements Action<GroupGetOutput> {
     private static final long serialVersionUID = 1L;
     private static final Permission PERMISSION = new UserManagerPermission();
 
-    public GroupGetAllInput input;
+    private final GroupGetInput input;
 
-    public GroupGetAllAction(GroupGetAllInput input) {
+    public GroupGetAction(GroupGetInput input) {
         this.input = input;
     }
 
@@ -38,8 +27,7 @@ public class GroupGetAllAction implements Action<GroupGetAllOutput> {
     }
 
     @Override
-    public GroupGetAllOutput run(ActionContext context)
-        throws ActionException {
+    public GroupGetOutput run(ActionContext context) throws ActionException {
         Criteria c = context.getSession()
             .createCriteria(Group.class, "g")
             .createAlias("g.memberships", "m", Criteria.LEFT_JOIN)
@@ -49,19 +37,13 @@ public class GroupGetAllAction implements Action<GroupGetAllOutput> {
             .createAlias("d.studies", "s", Criteria.LEFT_JOIN)
             .createAlias("m.roles", "r", Criteria.LEFT_JOIN)
             .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
-            .addOrder(Order.asc("g.name"));
+            .add(Restrictions.idEq(input.getGroupId()));
 
-        User user = context.getUser();
-        SortedSet<Group> groups = new TreeSet<Group>(Group.NAME_COMPARATOR);
+        Group group = (Group) c.uniqueResult();
 
-        @SuppressWarnings("unchecked")
-        List<Group> results = c.list();
-        for (Group group : results) {
-            if (group.isFullyManageable(user)) {
-                groups.add(group);
-            }
-        }
+        MembershipContext managerContext = new MembershipContextGetAction(
+            new MembershipContextGetInput()).run(context).getContext();
 
-        return new GroupGetAllOutput(groups);
+        return new GroupGetOutput(group, managerContext);
     }
 }

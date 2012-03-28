@@ -141,4 +141,15 @@ public class User extends Principal {
 
         return memberships;
     }
+
+    @Transient
+    public Set<Domain> getManageableDomains() {
+        Set<Domain> domains = new HashSet<Domain>();
+        for (Membership membership : getAllMemberships()) {
+            if (membership.isUserManager()) {
+                domains.add(membership.getDomain());
+            }
+        }
+        return domains;
+    }
 }

@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.widgets.infotables;
 import java.text.MessageFormat;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -12,43 +11,39 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.security.RoleDeleteAction;
+import edu.ualberta.med.biobank.common.action.security.RoleDeleteInput;
 import edu.ualberta.med.biobank.dialogs.user.RoleEditDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.DefaultAbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.model.Role;
 
-public abstract class RoleInfoTable extends InfoTableWidget<RoleWrapper> {
+public abstract class RoleInfoTable extends
+    DefaultAbstractInfoTableWidget<Role> {
     public static final int ROWS_PER_PAGE = 12;
 
-    private static final String[] HEADINGS = new String[] { Messages.RoleInfoTable_name_label };
+    private static final String[] HEADINGS =
+        new String[] { Messages.RoleInfoTable_name_label };
 
-    protected static class TableRowData {
-        RoleWrapper role;
-        String name;
-
-        @Override
-        public String toString() {
-            return StringUtils.join(new String[] { name }, "\t"); //$NON-NLS-1$
-        }
-    }
-
-    public RoleInfoTable(Composite parent, List<RoleWrapper> collection) {
-        super(parent, collection, HEADINGS, ROWS_PER_PAGE, RoleWrapper.class);
-        addEditItemListener(new IInfoTableEditItemListener<RoleWrapper>() {
+    public RoleInfoTable(Composite parent, List<Role> collection) {
+        super(parent, HEADINGS, ROWS_PER_PAGE);
+        addEditItemListener(new IInfoTableEditItemListener<Role>() {
             @Override
-            public void editItem(InfoTableEvent<RoleWrapper> event) {
-                RoleWrapper role = ((TableRowData) getSelection()).role;
+            public void editItem(InfoTableEvent<Role> event) {
+                Role role = getSelection();
                 editRole(role);
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener<RoleWrapper>() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<Role>() {
             @Override
-            public void deleteItem(InfoTableEvent<RoleWrapper> event) {
-                RoleWrapper role = ((TableRowData) getSelection()).role;
+            public void deleteItem(InfoTableEvent<Role> event) {
+                Role role = getSelection();
                 deleteRole(role);
             }
         });
@@ -58,43 +53,23 @@ public abstract class RoleInfoTable extends InfoTableWidget<RoleWrapper> {
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                RoleWrapper role = ((TableRowData) getSelection()).role;
+                Role role = getSelection();
                 duplicate(role);
             }
         });
     }
 
-    protected abstract void duplicate(RoleWrapper origRole);
-
-    @SuppressWarnings("serial")
-    @Override
-    protected BiobankTableSorter getComparator() {
-        return new BiobankTableSorter() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                if (o1 instanceof RoleWrapper && o2 instanceof RoleWrapper) {
-                    return ((RoleWrapper) o1).compareTo((RoleWrapper) o2);
-                }
-                return 0;
-            }
-        };
-    }
+    protected abstract void duplicate(Role origRole);
 
     @Override
     protected BgcLabelProvider getLabelProvider() {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
-                if (info == null) {
-                    if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
-                    }
-                    return ""; //$NON-NLS-1$
-                }
+                Role role = (Role) element;
                 switch (columnIndex) {
                 case 0:
-                    return info.name;
+                    return role.getName();
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -102,17 +77,17 @@ public abstract class RoleInfoTable extends InfoTableWidget<RoleWrapper> {
         };
     }
 
-    protected void editRole(RoleWrapper role) {
+    protected void editRole(Role role) {
         RoleEditDialog dlg = new RoleEditDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), role);
         int res = dlg.open();
         if (res == Dialog.OK) {
-            reloadCollection(getList(), role);
+            reload();
             notifyListeners();
         }
     }
 
-    protected boolean deleteRole(RoleWrapper role) {
+    protected boolean deleteRole(Role role) {
         try {
             String name = role.getName();
             String message = MessageFormat.format(
@@ -121,10 +96,13 @@ public abstract class RoleInfoTable extends InfoTableWidget<RoleWrapper> {
 
             if (BgcPlugin.openConfirm(
                 Messages.RoleInfoTable_delete_confirm_title, message)) {
-                role.delete();
-                // remove the role from the collection
+
+                SessionManager.getAppService().doAction(
+                    new RoleDeleteAction(new RoleDeleteInput(role)));
+
                 getList().remove(role);
-                reloadCollection(getList(), null);
+                reload();
+
                 notifyListeners();
                 return true;
             }
@@ -133,21 +111,5 @@ public abstract class RoleInfoTable extends InfoTableWidget<RoleWrapper> {
                 .openAsyncError(Messages.RoleInfoTable_delete_error_msg, e);
         }
         return false;
-    }
-
-    @Override
-    public Object getCollectionModelObject(Object o) throws Exception {
-        TableRowData info = new TableRowData();
-        info.role = (RoleWrapper) o;
-        info.name = info.role.getName();
-        info.role.reload();
-        return info;
-    }
-
-    @Override
-    protected String getCollectionModelObjectToString(Object o) {
-        if (o == null)
-            return null;
-        return ((TableRowData) o).toString();
     }
 }

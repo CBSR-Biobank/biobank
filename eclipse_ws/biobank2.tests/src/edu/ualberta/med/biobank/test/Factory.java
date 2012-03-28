@@ -589,16 +589,19 @@ public class Factory {
         Membership membership = new Membership();
 
         if (domain == Domain.CENTER || domain == Domain.CENTER_STUDY) {
-            membership.setCenter(getDefaultCenter());
+            membership.getDomain().getCenters().add(getDefaultCenter());
         }
         if (domain == Domain.STUDY || domain == Domain.CENTER_STUDY) {
-            membership.setStudy(getDefaultStudy());
+            membership.getDomain().getStudies().add(getDefaultStudy());
         }
 
         Principal p = getDefaultPrincipal();
         p.getMemberships().add(membership);
         membership.setPrincipal(p);
-        membership.setRank(rank);
+
+        membership.setUserManager(rank.isGe(Rank.MANAGER) ? true : false);
+        membership.setEveryPermission(rank.isGe(Rank.ADMINISTRATOR) ? true
+            : false);
 
         if (Rank.MANAGER.equals(rank)) {
             // needs at least one permission or role to manage

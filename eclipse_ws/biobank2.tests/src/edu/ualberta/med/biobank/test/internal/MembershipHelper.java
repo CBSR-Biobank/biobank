@@ -16,8 +16,8 @@ public class MembershipHelper extends DbHelper {
         MembershipWrapper mw = new MembershipWrapper(appService);
         mw.setPrincipal(principal);
         principal.addToMembershipCollection(Arrays.asList(mw));
-        mw.setCenter(center);
-        mw.setStudy(study);
+        // mw.setCenter(center);
+        // mw.setStudy(study);
         return mw;
     }
 

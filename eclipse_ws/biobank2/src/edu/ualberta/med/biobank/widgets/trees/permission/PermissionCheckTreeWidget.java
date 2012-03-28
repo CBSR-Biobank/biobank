@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.trees.permission;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -26,17 +27,18 @@ import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 
 public class PermissionCheckTreeWidget extends Composite {
+    private final PermissionsCheckStateHandler permissionsCheckStateHandler =
+        new PermissionsCheckStateHandler();
+    private final Map<PermissionEnum, PermissionNode> nodes =
+        new HashMap<PermissionEnum, PermissionNode>();
+    private final Set<PermissionEnum> disabled = new HashSet<PermissionEnum>();
 
     private ContainerCheckedTreeViewer treeviewer;
-
     private PermissionRootNode rootNode;
-
-    private List<PermissionEnum> allPossiblePermissions;
 
     public PermissionCheckTreeWidget(Composite parent, boolean title,
         List<PermissionEnum> permissions) {
         super(parent, SWT.NONE);
-        this.allPossiblePermissions = permissions;
 
         GridLayout gl = new GridLayout(2, false);
         gl.marginWidth = 0;
@@ -74,7 +76,7 @@ public class PermissionCheckTreeWidget extends Composite {
 
         treeviewer = new ContainerCheckedTreeViewer(this);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        gd.heightHint = 300;
+        gd.heightHint = 160;
         gd.horizontalSpan = 2;
         treeviewer.getTree().setLayoutData(gd);
 
@@ -84,57 +86,48 @@ public class PermissionCheckTreeWidget extends Composite {
         treeviewer.setComparator(new ViewerComparator());
 
         treeviewer.setInput(buildContent(permissions));
-        treeviewer.expandToLevel(2);
+        treeviewer.expandToLevel(AbstractTreeViewer.ALL_LEVELS);
+
+        treeviewer.addCheckStateListener(permissionsCheckStateHandler);
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        treeviewer.getTree().setEnabled(enabled);
     }
 
     public void setInput(Collection<PermissionEnum> perms) {
-        treeviewer.setInput(buildContent(perms));
+        treeviewer.removeCheckStateListener(permissionsCheckStateHandler);
+        try {
+            treeviewer.setInput(buildContent(perms));
+        } finally {
+            treeviewer.addCheckStateListener(permissionsCheckStateHandler);
+        }
     }
 
-    private List<PermissionRootNode> buildContent(
+    private Collection<PermissionNode> buildContent(
         Collection<PermissionEnum> allPermissions) {
-        rootNode = new PermissionRootNode();
-        final Map<PermissionEnum, PermissionNode> nodes =
-            new HashMap<PermissionEnum, PermissionNode>();
-        for (PermissionEnum r : allPermissions) {
-            PermissionNode node = new PermissionNode(rootNode, r);
-            nodes.put(r, node);
+        nodes.clear();
+        for (PermissionEnum perm : allPermissions) {
+            PermissionNode node = new PermissionNode(rootNode, perm);
+            nodes.put(perm, node);
         }
-        rootNode.setChildren(nodes);
-        return Arrays.asList(rootNode);
+        return nodes.values();
     }
 
     public void setSelections(Collection<PermissionEnum> permissions) {
-        List<IPermissionCheckTreeNode> checkedNodes =
-            new ArrayList<IPermissionCheckTreeNode>();
-        for (PermissionEnum permission : permissions) {
-            PermissionNode rNode = rootNode.getNode(permission);
-            checkedNodes.add(rNode);
-        }
-        treeviewer.setCheckedElements(checkedNodes.toArray());
-    }
-
-    public PermissionTreeRes getAddedAndRemovedNodes() {
-        PermissionTreeRes res = new PermissionTreeRes();
-        res.buildRes();
-        return res;
-    }
-
-    public class PermissionTreeRes {
-        public List<PermissionEnum> addedPermissions =
-            new ArrayList<PermissionEnum>();
-        public List<PermissionEnum> removedPermissions =
-            new ArrayList<PermissionEnum>();
-
-        public void buildRes() {
-            removedPermissions.addAll(allPossiblePermissions);
-            for (Object checkedO : treeviewer.getCheckedElements()) {
-                if (checkedO instanceof PermissionNode) {
-                    PermissionNode node = (PermissionNode) checkedO;
-                    addedPermissions.add(node.getPermission());
-                    removedPermissions.remove(node.getPermission());
-                }
+        treeviewer.removeCheckStateListener(permissionsCheckStateHandler);
+        try {
+            List<IPermissionCheckTreeNode> checkedNodes =
+                new ArrayList<IPermissionCheckTreeNode>();
+            for (PermissionEnum permission : permissions) {
+                PermissionNode node = nodes.get(permission);
+                checkedNodes.add(node);
             }
+            treeviewer.setCheckedElements(checkedNodes.toArray());
+        } finally {
+            treeviewer.addCheckStateListener(permissionsCheckStateHandler);
         }
     }
 
@@ -149,12 +142,23 @@ public class PermissionCheckTreeWidget extends Composite {
         return checked;
     }
 
+    public void setDisabled(Set<PermissionEnum> perms) {
+        disabled.clear();
+        disabled.addAll(perms);
+
+        treeviewer.refresh();
+    }
+
     public boolean hasCheckedItems() {
         return treeviewer.getCheckedElements().length > 0;
     }
 
-    public void addCheckedListener(ICheckStateListener checkStateListener) {
+    public void addCheckStateListener(ICheckStateListener checkStateListener) {
         treeviewer.addCheckStateListener(checkStateListener);
+    }
+
+    public void removeCheckStateListener(ICheckStateListener checkStateListener) {
+        treeviewer.removeCheckStateListener(checkStateListener);
     }
 
     public class PermissionContentProvider implements ITreeContentProvider {
@@ -203,7 +207,6 @@ public class PermissionCheckTreeWidget extends Composite {
     }
 
     public class PermissionLabelProvider implements ILabelProvider {
-
         @Override
         public void addListener(ILabelProviderListener listener) {
         }
@@ -231,6 +234,23 @@ public class PermissionCheckTreeWidget extends Composite {
             if (element instanceof IPermissionCheckTreeNode)
                 return ((IPermissionCheckTreeNode) element).getText();
             return "Problem with display"; //$NON-NLS-1$
+        }
+    }
+
+    private class PermissionsCheckStateHandler implements ICheckStateListener {
+        @Override
+        public void checkStateChanged(CheckStateChangedEvent event) {
+
+            Object element = event.getElement();
+            if (!(element instanceof PermissionNode)) return;
+
+            PermissionNode node = (PermissionNode) event.getElement();
+            PermissionEnum perm = node.getPermission();
+
+        }
+
+        private void updateParent(PermissionRootNode parent) {
+
         }
     }
 }

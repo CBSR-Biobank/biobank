@@ -20,9 +20,9 @@ public class UserSaveInput implements ActionInput {
     private final boolean needPwdChange;
     private final Set<Membership> memberships;
     private final Set<Integer> groupIds;
-    private final ManagerContext context;
+    private final MembershipContext context;
 
-    public UserSaveInput(User user, ManagerContext context, String password) {
+    public UserSaveInput(User user, MembershipContext context, String password) {
         if (user == null)
             throw new IllegalArgumentException("null user");
         if (context == null)
@@ -44,7 +44,7 @@ public class UserSaveInput implements ActionInput {
         this.password = password;
     }
 
-    public UserSaveInput(User user, ManagerContext context) {
+    public UserSaveInput(User user, MembershipContext context) {
         this(user, context, null);
     }
 
@@ -84,7 +84,7 @@ public class UserSaveInput implements ActionInput {
         return groupIds;
     }
 
-    public ManagerContext getContext() {
+    public MembershipContext getContext() {
         return context;
     }
 }

@@ -151,6 +151,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.server.applicationservice.exceptions,
  edu.ualberta.med.biobank.server.query,
  edu.ualberta.med.biobank.server.reports,
+ edu.ualberta.med.biobank.util,
  edu.ualberta.med.biobank.validator.engine,
  gov.nih.nci.system.applicationservice;
   uses:="gov.nih.nci.system.query,

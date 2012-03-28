@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
+import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
@@ -36,8 +37,8 @@ public class UserGetAction implements Action<UserGetOutput> {
 
         User copy = new User();
 
-        ManagerContext managerContext = new ManagerContextGetAction(
-            new ManagerContextGetInput()).run(context).getContext();
+        MembershipContext managerContext = new MembershipContextGetAction(
+            new MembershipContextGetInput()).run(context).getContext();
 
         copyProperties(user, copy);
         copyMemberships(user, copy, context, managerContext.getRoles());
@@ -68,8 +69,11 @@ public class UserGetAction implements Action<UserGetOutput> {
                 Membership copy = new Membership(m, dst);
                 copy.setId(m.getId());
 
-                Hibernate.initialize(copy.getCenter());
-                Hibernate.initialize(copy.getStudy());
+                Hibernate.initialize(copy.getDomain());
+
+                Domain domain = copy.getDomain();
+                Hibernate.initialize(domain.getCenters());
+                Hibernate.initialize(domain.getStudies());
 
                 // limit permission and role scope to manageable ones
                 permsScope = m.getManageablePermissions(executingUser);

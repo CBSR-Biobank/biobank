@@ -9,12 +9,13 @@ import org.hibernate.criterion.Restrictions;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.security.ManagerContext;
-import edu.ualberta.med.biobank.common.action.security.ManagerContextGetAction;
-import edu.ualberta.med.biobank.common.action.security.ManagerContextGetInput;
+import edu.ualberta.med.biobank.common.action.security.MembershipContext;
+import edu.ualberta.med.biobank.common.action.security.MembershipContextGetAction;
+import edu.ualberta.med.biobank.common.action.security.MembershipContextGetInput;
 import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
 import edu.ualberta.med.biobank.common.action.security.UserSaveInput;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
@@ -34,8 +35,10 @@ public class TestUserSaveAction extends TestAction {
         tx.commit();
 
         Membership membership = new Membership();
-        membership.setCenter(center);
-        membership.setStudy(study);
+        Domain domain = membership.getDomain();
+        domain.getCenters().add(center);
+        domain.getStudies().add(study);
+
         membership.getRoles().add(role);
         membership.getPermissions().add(PermissionEnum.CLINIC_CREATE);
 
@@ -51,8 +54,8 @@ public class TestUserSaveAction extends TestAction {
 
         user.getGroups().add(group);
 
-        ManagerContext context = exec(new ManagerContextGetAction(
-            new ManagerContextGetInput())).getContext();
+        MembershipContext context = exec(new MembershipContextGetAction(
+            new MembershipContextGetInput())).getContext();
 
         IdResult result =
             exec(new UserSaveAction(new UserSaveInput(user, context)));
@@ -90,11 +93,8 @@ public class TestUserSaveAction extends TestAction {
         Assert.assertEquals("membership roles",
             membership.getRoles(), savedMembership.getRoles());
 
-        Assert.assertEquals("membership center",
-            membership.getCenter(), savedMembership.getCenter());
-
-        Assert.assertEquals("membership study",
-            membership.getStudy(), savedMembership.getStudy());
+        Assert.assertEquals("membership domain not inserted properly",
+            domain.isEquivalent(savedMembership.getDomain()));
 
         Set<Group> savedGroups = user.getGroups();
 

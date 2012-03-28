@@ -335,8 +335,9 @@ public class LoginDialog extends TitleAreaDialog {
             }
         }
 
-        boolean secureConnection = ((secureConnectionButton == null) || secureConnectionButton
-            .getSelection());
+        boolean secureConnection =
+            ((secureConnectionButton == null) || secureConnectionButton
+                .getSelection());
 
         SessionHelper sessionHelper = new SessionHelper(serverWidget.getText(),
             secureConnection, userNameWidget.getText(),
@@ -453,18 +454,31 @@ public class LoginDialog extends TitleAreaDialog {
             && !sessionHelper.getUser().isInSuperAdminMode())
             if (sessionHelper.getUser().isSuperAdmin()) {
                 // connect in admin mode
-                BgcPlugin.openInformation(
-                    Messages.LoginDialog_workingCenter_admin_title,
-                    Messages.LoginDialog_noWorkingCenter_admin_msg);
-                // open the administration perspective if another
-                // perspective is open
-                sessionHelper.getUser().setInSuperAdminMode(true);
-            } else {
-                // can't connect without a working center
-                BgcPlugin.openAsyncError(
-                    Messages.LoginDialog_workingCenterSelection_error_title,
-                    Messages.LoginDialog_workingCenterSelection_error_msg);
-            }
+            BgcPlugin.openInformation(
+                Messages.LoginDialog_workingCenter_admin_title,
+                Messages.LoginDialog_noWorkingCenter_admin_msg);
+            // open the administration perspective if another
+            // perspective is open
+            sessionHelper.getUser().setInSuperAdminMode(true);
+            IWorkbench workbench = PlatformUI.getWorkbench();
+            IWorkbenchWindow activeWindow = workbench
+                .getActiveWorkbenchWindow();
+            IWorkbenchPage page = activeWindow.getActivePage();
+            if (!page.getPerspective().getId().equals(MainPerspective.ID)) {
+                try {
+                    workbench.showPerspective(MainPerspective.ID,
+                        activeWindow);
+                } catch (WorkbenchException e) {
+                    BgcPlugin.openAsyncError(
+                        "Error while opening main perspective", e); //$NON-NLS-1$
+        }
+    }
+} else {
+    // can't connect without a working center
+    BgcPlugin.openAsyncError(
+        Messages.LoginDialog_workingCenterSelection_error_title,
+        Messages.LoginDialog_workingCenterSelection_error_msg);
+}
     }
 
     public static class Authentication {

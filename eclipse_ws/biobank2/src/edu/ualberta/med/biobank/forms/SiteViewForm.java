@@ -216,7 +216,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         setSiteSectionValues();
         setAddressValues(site);
 
-        studiesTable.setCollection(siteInfo.getStudyCountInfos());
+        studiesTable.setList(siteInfo.getStudyCountInfos());
         containerTypesTable.setList(siteInfo.getContainerTypeInfos());
         topContainersTable.setList(siteInfo.getTopContainers());
         // TODO: load comments?

@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.gui.common.widgets;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -30,7 +32,6 @@ import edu.ualberta.med.biobank.common.util.DelegatingList;
 import edu.ualberta.med.biobank.common.util.ListChangeHandler;
 import edu.ualberta.med.biobank.common.util.ListChangeSource;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * This abstract class is used to create most the tables used in the client. The
@@ -190,7 +191,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     protected abstract BgcTableSorter getTableSorter();
 
-    public abstract void reload() throws ApplicationException;
+    public abstract void reload();
 
     @Override
     public boolean setFocus() {
@@ -446,6 +447,10 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     public void setList(final List<T> list) {
         this.list.setDelegate(list);
+    }
+
+    public void setCollection(final Collection<T> list) {
+        this.list.setDelegate(new ArrayList<T>(list));
     }
 
     public List<T> getList() {

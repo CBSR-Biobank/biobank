@@ -47,22 +47,6 @@ public class GroupWrapper extends GroupBaseWrapper {
     }
 
     @Override
-    public GroupWrapper duplicate() {
-        return (GroupWrapper) super.duplicate();
-    }
-
-    /**
-     * Duplicate a group: create a new one that will have the exact same
-     * relations. This duplicated group is not yet saved into the DB.
-     */
-    @Override
-    public GroupWrapper createDuplicate() {
-        GroupWrapper newGroup = new GroupWrapper(appService);
-        newGroup.setName(getName());
-        return newGroup;
-    }
-
-    @Override
     public String toString() {
         return getName();
     }

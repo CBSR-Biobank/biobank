@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
-import org.eclipse.core.runtime.Assert;
+import java.util.ArrayList;
+
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -17,21 +19,20 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.client.util.BiobankProxyHelperImpl;
+import edu.ualberta.med.biobank.common.action.IdResult;
+import edu.ualberta.med.biobank.common.action.security.GroupGetOutput;
 import edu.ualberta.med.biobank.common.action.security.GroupSaveAction;
 import edu.ualberta.med.biobank.common.action.security.GroupSaveInput;
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
-import edu.ualberta.med.biobank.common.action.security.ManagerContextGetAction;
-import edu.ualberta.med.biobank.common.action.security.ManagerContextGetInput;
+import edu.ualberta.med.biobank.common.action.security.MembershipContext;
 import edu.ualberta.med.biobank.common.peer.GroupPeer;
-import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
-import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
-import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.Group;
+import edu.ualberta.med.biobank.model.Membership;
+import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.widgets.infotables.MembershipInfoTable;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -40,26 +41,22 @@ public class GroupEditDialog extends BgcBaseDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
 
-    private GroupWrapper group;
+    private final Group group;
+    private final MembershipContext membershipContext;
+    private final ManagerContext context;
+
     private MembershipInfoTable membershipInfoTable;
-    private MultiSelectWidget<UserWrapper> usersWidget;
-    private ManagerContext context;
+    private MultiSelectWidget<User> usersWidget;
 
-    public GroupEditDialog(Shell parent, GroupWrapper originalGroup) {
+    public GroupEditDialog(Shell parent, GroupGetOutput output,
+        ManagerContext context) {
         super(parent);
-        Assert.isNotNull(originalGroup);
-        this.group = originalGroup;
 
-        try {
-            // TODO: fix this!
-            // this is horrible, but ... running out of time.
-            context = SessionManager.getAppService()
-                .doAction(new ManagerContextGetAction(
-                    new ManagerContextGetInput())).getContext();
-        } catch (ApplicationException e) {
-        }
+        this.group = output.getGroup();
+        this.membershipContext = output.getContext();
+        this.context = context;
 
-        if (originalGroup.isNew()) {
+        if (group.isNew()) {
             currentTitle = Messages.GroupEditDialog_title_add;
             titleAreaMessage = Messages.GroupEditDialog_titlearea_add;
         } else {
@@ -126,25 +123,23 @@ public class GroupEditDialog extends BgcBaseDialog {
         gd.horizontalAlignment = SWT.RIGHT;
         addButton.setLayoutData(gd);
 
-        membershipInfoTable = new MembershipInfoTable(contents, group, context);
+        membershipInfoTable =
+            new MembershipInfoTable(contents, group, membershipContext, context);
     }
 
     private void createUsersSection(Composite contents)
         throws ApplicationException {
-        // FIXME something else than a double list selection might be better
-        usersWidget = new MultiSelectWidget<UserWrapper>(contents, SWT.NONE,
+        usersWidget = new MultiSelectWidget<User>(contents, SWT.NONE,
             Messages.GroupEditDialog_available_users_label,
             Messages.GroupEditDialog_selected_users_label, 200) {
             @Override
-            protected String getTextForObject(UserWrapper nodeObject) {
-                return nodeObject.getFullName() + " (" + nodeObject.getLogin() //$NON-NLS-1$
-                    + ")"; //$NON-NLS-1$
+            protected String getTextForObject(User node) {
+                return node.getFullName() + " (" + node.getLogin() + ")";
             }
         };
 
-        usersWidget.setSelections(
-            UserWrapper.getAllUsers(SessionManager.getAppService()),
-            group.getUserCollection(false));
+        usersWidget.setSelections(context.getUsers(),
+            new ArrayList<User>(group.getUsers()));
     }
 
     private Composite createTabItem(TabFolder tb, String title, int columns) {
@@ -160,18 +155,24 @@ public class GroupEditDialog extends BgcBaseDialog {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
-                MembershipWrapper ms = new MembershipWrapper(SessionManager
-                    .getAppService());
-                ms.setPrincipal(group);
+                Membership m = new Membership();
+                m.setPrincipal(group);
 
-                MembershipEditDialog dlg =
-                    new MembershipEditDialog(PlatformUI
-                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                        ms, context);
+                Shell shell = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell();
+                
+                MembershipEditWizard wiz = new MembershipEditWizard(m, context);
+                WizardDialog dlg = new WizardDialog(shell, wiz);
+
                 int res = dlg.open();
                 if (res == Status.OK) {
-                    membershipInfoTable.reloadCollection(
-                        group.getMembershipCollection(true), null);
+                    m.setPrincipal(group);
+                    group.getMemberships().add(m);
+
+                    membershipInfoTable.setCollection(group.getMemberships());
+                    membershipInfoTable.setSelection(m);
+                } else {
+                    m.setPrincipal(null);
                 }
             }
         });
@@ -182,31 +183,18 @@ public class GroupEditDialog extends BgcBaseDialog {
         // try saving or updating the group inside this dialog so that if there
         // is an error the entered information is not lost
         try {
-            group.addToUserCollection(usersWidget.getAddedToSelection());
-            Group groupModel = group.getWrappedObject();
+            group.getUsers().addAll(usersWidget.getAddedToSelection());
 
-            // for now it's faster to use the name as the description
-            groupModel.setDescription(groupModel.getName());
+            // FIXME: for now it's faster to use the name as the description
+            group.setDescription(group.getName());
 
-            Group unproxied =
-                (Group) new BiobankProxyHelperImpl()
-                    .convertToObject(groupModel);
+            IdResult result = SessionManager.getAppService().doAction(
+                new GroupSaveAction(new GroupSaveInput(group)));
+            group.setId(result.getId());
 
-            SessionManager.getAppService().doAction(
-                new GroupSaveAction(new GroupSaveInput(unproxied)));
             close();
         } catch (Throwable t) {
             TmpUtil.displayException(t);
         }
-    }
-
-    @Override
-    protected void cancelPressed() {
-        try {
-            group.reset();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        super.cancelPressed();
     }
 }

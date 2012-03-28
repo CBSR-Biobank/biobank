@@ -1,8 +1,5 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
-import java.util.HashSet;
-
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -10,7 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.client.util.BiobankProxyHelperImpl;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.security.RoleSaveAction;
 import edu.ualberta.med.biobank.common.action.security.RoleSaveInput;
 import edu.ualberta.med.biobank.common.peer.RolePeer;
@@ -20,21 +17,32 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget;
-import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget.PermissionTreeRes;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RoleEditDialog extends BgcBaseDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
 
-    private RoleWrapper role;
+    private final RoleWrapper roleWrapper;
+    private final Role role;
+    private final Role originalRole;
+
     private PermissionCheckTreeWidget tree;
 
-    public RoleEditDialog(Shell parent, RoleWrapper role) {
+    public RoleEditDialog(Shell parent, Role role) {
         super(parent);
-        Assert.isNotNull(role);
+
+        BiobankApplicationService service = SessionManager.getAppService();
+
         this.role = role;
+        this.originalRole = new Role();
+
+        copyRole(role, originalRole);
+
+        this.roleWrapper = new RoleWrapper(service, role);
+
         if (role.isNew()) {
             currentTitle = Messages.RoleEditDialog_title_add;
             titleAreaMessage = Messages.RoleEditDialog_titlearea_add;
@@ -42,6 +50,11 @@ public class RoleEditDialog extends BgcBaseDialog {
             currentTitle = Messages.RoleEditDialog_title_edit;
             titleAreaMessage = Messages.RoleEditDialog_titlearea_modify;
         }
+    }
+
+    private static final void copyRole(Role src, Role dst) {
+        dst.setName(dst.getName());
+        dst.getPermissions().addAll(src.getPermissions());
     }
 
     @Override
@@ -67,14 +80,13 @@ public class RoleEditDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Messages.RoleEditDialog_property_title_name, null, role,
+            Messages.RoleEditDialog_property_title_name, null, roleWrapper,
             RolePeer.NAME.getName(), new NonEmptyStringValidator(
                 Messages.RoleEditDialog_msg_name_required));
 
-        tree =
-            new PermissionCheckTreeWidget(contents, true,
-                PermissionEnum.valuesList());
-        tree.setSelections(role.getPermissionCollection());
+        tree = new PermissionCheckTreeWidget(contents, true,
+            PermissionEnum.valuesList());
+        tree.setSelections(role.getPermissions());
 
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.horizontalSpan = 2;
@@ -84,19 +96,12 @@ public class RoleEditDialog extends BgcBaseDialog {
     @Override
     protected void okPressed() {
         try {
+            role.getPermissions().addAll(tree.getCheckedElements());
 
-            Role roleModel = role.getWrappedObject();
+            IdResult result = SessionManager.getAppService().doAction(
+                new RoleSaveAction(new RoleSaveInput(role)));
 
-            Role unproxied =
-                (Role) new BiobankProxyHelperImpl()
-                    .convertToObject(roleModel);
-
-            PermissionTreeRes res = tree.getAddedAndRemovedNodes();
-            roleModel.setPermissions(new HashSet<PermissionEnum>(
-                res.addedPermissions));
-
-            SessionManager.getAppService().doAction(
-                new RoleSaveAction(new RoleSaveInput(unproxied)));
+            role.setId(result.getId());
 
             close();
         } catch (Throwable t) {
@@ -106,11 +111,7 @@ public class RoleEditDialog extends BgcBaseDialog {
 
     @Override
     protected void cancelPressed() {
-        try {
-            role.reload();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        copyRole(originalRole, role);
         super.cancelPressed();
     }
 }

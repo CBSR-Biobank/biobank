@@ -13,6 +13,8 @@ import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.observable.ChangeEvent;
+import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
@@ -23,6 +25,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -58,6 +61,7 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.util.NullHelper;
 
 public class BgcWidgetCreator {
 
@@ -588,6 +592,32 @@ public class BgcWidgetCreator {
             widget.addModifyListener(modifyListener);
         }
         return widget;
+    }
+
+    public Binding addBooleanBinding(Control control,
+        final WritableValue writableValue,
+        final IObservableValue observableValue, final String errorMsg) {
+
+        final ControlDecoration decoration = BgcBaseWidget
+            .createDecorator(control, errorMsg, SWT.LEFT | SWT.TOP);
+        Binding b = addBooleanBinding(writableValue, observableValue, errorMsg,
+            IStatus.ERROR);
+
+        b.getValidationStatus().addChangeListener(new IChangeListener() {
+            @Override
+            public void handleChange(ChangeEvent event) {
+                boolean equal = NullHelper.safeEquals(
+                    writableValue.getValue(), observableValue.getValue());
+
+                if (equal) {
+                    decoration.hide();
+                } else {
+                    decoration.show();
+                }
+            }
+        });
+
+        return b;
     }
 
     public Binding addBooleanBinding(WritableValue writableValue,

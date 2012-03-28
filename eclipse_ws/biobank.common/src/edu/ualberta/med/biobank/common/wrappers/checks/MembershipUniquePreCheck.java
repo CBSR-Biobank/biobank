@@ -7,10 +7,8 @@ import java.util.Collection;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.MembershipPeer;
 import edu.ualberta.med.biobank.common.peer.PrincipalPeer;
-import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
@@ -59,10 +57,11 @@ public class MembershipUniquePreCheck extends UncachedAction<Membership> {
 
     private void throwException() throws DuplicatePropertySetException {
         String modelClass = Format.modelClass(getModelClass());
-        Collection<Property<?, ? super Membership>> properties = new ArrayList<Property<?, ? super Membership>>();
+        Collection<Property<?, ? super Membership>> properties =
+            new ArrayList<Property<?, ? super Membership>>();
         properties.add(MembershipPeer.PRINCIPAL);
-        properties.add(MembershipPeer.CENTER);
-        properties.add(MembershipPeer.STUDY);
+        // properties.add(MembershipPeer.CENTER);
+        // properties.add(MembershipPeer.STUDY);
         String values = Format.propertyValues(getModel(), properties);
         String names = Format.propertyNames(properties);
 
@@ -77,9 +76,10 @@ public class MembershipUniquePreCheck extends UncachedAction<Membership> {
         appendValueTest(hql, session,
             MembershipPeer.PRINCIPAL.to(PrincipalPeer.ID));
         hql.append(" and "); //$NON-NLS-1$
-        appendValueTest(hql, session, MembershipPeer.CENTER.to(CenterPeer.ID));
+        // appendValueTest(hql, session,
+        // MembershipPeer.CENTER.to(CenterPeer.ID));
         hql.append(" and "); //$NON-NLS-1$
-        appendValueTest(hql, session, MembershipPeer.STUDY.to(StudyPeer.ID));
+        // appendValueTest(hql, session, MembershipPeer.STUDY.to(StudyPeer.ID));
 
         hql.append(getNotSelfCondition());
 

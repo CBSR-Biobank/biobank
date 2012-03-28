@@ -8,10 +8,10 @@ public class UserGetOutput implements ActionOutput {
     private static final long serialVersionUID = 1L;
 
     private final User user;
-    private final ManagerContext context;
+    private final MembershipContext context;
     private final boolean isFullyManageable;
 
-    public UserGetOutput(User user, ManagerContext context,
+    public UserGetOutput(User user, MembershipContext context,
         boolean isFullyManageable) {
         this.user = user;
         this.context = context;
@@ -22,13 +22,13 @@ public class UserGetOutput implements ActionOutput {
         return user;
     }
 
-    public ManagerContext getContext() {
+    public MembershipContext getContext() {
         return context;
     }
 
     /**
      * Because the {@link Membership}-s and {@link Group}-s of the returned user
-     * have been restricted to those this {@link ManagerContext} can see, he
+     * have been restricted to those this {@link MembershipContext} can see, he
      * will think he's able to fully manage the {@link User} (via
      * {@link User#isFullyManageable(User)}. This indicates whether he
      * <em>truely</em> can.
