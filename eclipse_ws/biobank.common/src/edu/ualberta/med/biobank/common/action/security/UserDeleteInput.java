@@ -1,8 +1,12 @@
 package edu.ualberta.med.biobank.common.action.security;
 
+import java.io.Serializable;
+
 import edu.ualberta.med.biobank.model.User;
 
-public class UserDeleteInput {
+public class UserDeleteInput implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final Integer userId;
 
     public UserDeleteInput(User user) {
