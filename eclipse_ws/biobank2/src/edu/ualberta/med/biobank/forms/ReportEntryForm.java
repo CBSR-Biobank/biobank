@@ -166,6 +166,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         String tabName;
         if (report.isNew()) {
             tabName = NLS.bind(Messages.ReportEntryForm_title_new, entityName);
+            report.setName(tabName);
         } else {
             String reportName = report.getName();
             if (reportName == null || reportName.isEmpty()) {
