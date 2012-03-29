@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -138,6 +139,14 @@ public class MembershipPermissionsPage extends BgcWizardPage {
                     break;
                 }
                 options.addAll(managerMemb.getAllPermissions());
+            }
+        }
+        // remove options that do not meet requirements
+        Iterator<PermissionEnum> it = options.iterator();
+        while (it.hasNext()) {
+            PermissionEnum permission = it.next();
+            if (!permission.isRequirementsMet(membership)) {
+                it.remove();
             }
         }
         return options;

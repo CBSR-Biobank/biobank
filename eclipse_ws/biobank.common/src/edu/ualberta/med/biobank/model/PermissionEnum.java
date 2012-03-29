@@ -62,7 +62,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     DISPATCH_UPDATE(32),
     DISPATCH_DELETE(33),
 
-    RESEARCH_GROUP_CREATE(34),
+    RESEARCH_GROUP_CREATE(34, Require.ALL_CENTERS),
     RESEARCH_GROUP_READ(35),
     RESEARCH_GROUP_UPDATE(36),
     RESEARCH_GROUP_DELETE(37),
@@ -79,7 +79,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
 
     REQUEST_PROCESS(46),
 
-    CLINIC_CREATE(47),
+    CLINIC_CREATE(47, Require.ALL_CENTERS),
     CLINIC_READ(48),
     CLINIC_UPDATE(49),
     CLINIC_DELETE(50),
@@ -209,6 +209,21 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     }
 
     /**
+     * Return true if special requirements (i.e. {@link Require}-s) are met on
+     * the given {@link Membership}, otherwise false.
+     * 
+     * @param m
+     * @return
+     */
+    public boolean isRequirementsMet(Membership m) {
+        boolean reqsMet = true;
+        Domain d = m.getDomain();
+        reqsMet &= !requires.contains(Require.ALL_CENTERS) || d.isAllCenters();
+        reqsMet &= !requires.contains(Require.ALL_STUDIES) || d.isAllStudies();
+        return reqsMet;
+    }
+
+    /**
      * This is a confusing check. If {@link Center} is null, it means we do not
      * care about its value, otherwise, {@link Domain#contains(Center)} must be
      * true. The same applies to {@link Study}.
@@ -219,21 +234,13 @@ public enum PermissionEnum implements NotAProxy, Serializable {
      * @return
      */
     private boolean isMembershipAllowed(Membership m, Center c, Study s) {
-        boolean requiresMet = areRequiresMet(m);
+        boolean requiresMet = isRequirementsMet(m);
         boolean hasCenter = c == null || m.getDomain().contains(c);
         boolean hasStudy = s == null || m.getDomain().contains(s);
         boolean hasPermission = m.getAllPermissions().contains(this);
 
         boolean allowed = requiresMet && hasCenter && hasStudy && hasPermission;
         return allowed;
-    }
-
-    private boolean areRequiresMet(Membership m) {
-        boolean reqsMet = true;
-        Domain d = m.getDomain();
-        reqsMet &= !requires.contains(Require.ALL_CENTERS) || d.isAllCenters();
-        reqsMet &= !requires.contains(Require.ALL_STUDIES) || d.isAllStudies();
-        return reqsMet;
     }
 
     /**
