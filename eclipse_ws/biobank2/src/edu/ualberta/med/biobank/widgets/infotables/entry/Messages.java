@@ -44,6 +44,10 @@ public class Messages extends NLS {
 
     public static String ActivityStatusEntryInfoTable_save_error_title;
 
+    public static String AliquotedSpecimenEntryInfoTable_0;
+
+    public static String AliquotedSpecimenEntryInfoTable_1;
+
     public static String AliquotedSpecimenEntryInfoTable_delete_title;
     public static String AliquotedSpecimenEntryInfoTable_delete_question;
 

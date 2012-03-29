@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
@@ -297,12 +298,12 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             final List<SpecimenType> allSpecimenTypes =
                 SessionManager.getAppService()
                     .doAction(new SpecimenTypeGetAllAction()).getList();
-            final List<SourceSpecimen> studySourceSpecimens =
+            final Set<SourceSpecimen> studySourceSpecimens =
                 SessionManager
                     .getAppService()
                     .doAction(
                         new StudyGetSourceSpecimensAction(ceventInfo.cevent
-                            .getPatient().getStudy().getId())).getList();
+                            .getPatient().getStudy().getId())).getSet();
 
             specimensTable.addEditSupport(studySourceSpecimens,
                 allSpecimenTypes);

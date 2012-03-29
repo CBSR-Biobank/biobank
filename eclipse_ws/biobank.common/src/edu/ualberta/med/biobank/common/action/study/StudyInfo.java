@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.common.action.study;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
@@ -17,23 +19,23 @@ public class StudyInfo implements ActionResult {
     Long patientCount;
     Long collectionEventCount;
     List<ClinicInfo> clinicInfos;
-    List<SourceSpecimen> sourceSpcs;
-    List<AliquotedSpecimen> aliquotedSpcs;
-    List<StudyEventAttr> studyEventAttrs;
+    Set<SourceSpecimen> sourceSpcs;
+    Set<AliquotedSpecimen> aliquotedSpcs;
+    Set<StudyEventAttr> studyEventAttrs;
 
     public StudyInfo() {
         this.study = null;
         this.clinicInfos = new ArrayList<ClinicInfo>();
-        this.sourceSpcs = new ArrayList<SourceSpecimen>();
-        this.aliquotedSpcs = new ArrayList<AliquotedSpecimen>();
-        this.studyEventAttrs = new ArrayList<StudyEventAttr>();
+        this.sourceSpcs = new HashSet<SourceSpecimen>();
+        this.aliquotedSpcs = new HashSet<AliquotedSpecimen>();
+        this.studyEventAttrs = new HashSet<StudyEventAttr>();
     }
 
     public StudyInfo(Study study, Long patientCount, Long ceventCount,
         List<ClinicInfo> clinicInfos,
-        List<SourceSpecimen> sourceSpcs,
-        List<AliquotedSpecimen> aliquotedSpcs,
-        List<StudyEventAttr> studyEventAttrs) {
+        Set<SourceSpecimen> sourceSpcs,
+        Set<AliquotedSpecimen> aliquotedSpcs,
+        Set<StudyEventAttr> studyEventAttrs) {
         this.study = study;
         this.patientCount = patientCount;
         this.collectionEventCount = ceventCount;
@@ -67,19 +69,19 @@ public class StudyInfo implements ActionResult {
         this.clinicInfos = clinicInfos;
     }
 
-    public List<SourceSpecimen> getSourceSpecimens() {
+    public Set<SourceSpecimen> getSourceSpecimens() {
         return sourceSpcs;
     }
 
-    public void setSourceSpcs(List<SourceSpecimen> sourceSpcs) {
+    public void setSourceSpcs(Set<SourceSpecimen> sourceSpcs) {
         this.sourceSpcs = sourceSpcs;
     }
 
-    public List<AliquotedSpecimen> getAliquotedSpcs() {
+    public Set<AliquotedSpecimen> getAliquotedSpcs() {
         return aliquotedSpcs;
     }
 
-    public List<StudyEventAttr> getStudyEventAttrs() {
+    public Set<StudyEventAttr> getStudyEventAttrs() {
         return studyEventAttrs;
     }
 }

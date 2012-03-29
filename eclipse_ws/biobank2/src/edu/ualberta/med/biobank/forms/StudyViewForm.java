@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
@@ -13,13 +14,18 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.treeview.patient.StudyWithPatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
@@ -58,6 +64,8 @@ public class StudyViewForm extends BiobankViewForm {
 
     private CommentsInfoTable commentTable;
 
+    private List<ClinicInfo> clinics;
+
     @Override
     public void init() throws Exception {
         Assert
@@ -73,10 +81,18 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void updateStudyInfo() throws Exception {
-        studyInfo = SessionManager.getAppService().doAction(
-            new StudyGetInfoAction(adapter.getId()));
-        Assert.isNotNull(studyInfo.getStudy());
-        study.setWrappedObject(studyInfo.getStudy());
+        studyInfo =
+            SessionManager.getAppService().doAction(
+                new StudyGetInfoAction(adapter.getId()));
+        Study s = studyInfo.getStudy();
+        clinics = studyInfo.getClinicInfos();
+        Set<AliquotedSpecimen> as = studyInfo.getAliquotedSpcs();
+        Set<SourceSpecimen> ss = studyInfo.getSourceSpecimens();
+        Set<StudyEventAttr> ea = studyInfo.getStudyEventAttrs();
+        s.setAliquotedSpecimens(as);
+        s.setSourceSpecimens(ss);
+        s.setStudyEventAttrs(ea);
+        study.setWrappedObject(s);
     }
 
     @Override

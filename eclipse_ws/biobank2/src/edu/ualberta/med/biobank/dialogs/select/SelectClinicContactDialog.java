@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.dialogs.select;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
@@ -19,26 +20,28 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.action.study.StudyGetFreeContactsAction;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyContactEntryInfoTable;
 
 public class SelectClinicContactDialog extends BgcBaseDialog {
 
     public static final int ADD_BTN_ID = 100;
 
-    private static final String TITLE = Messages.SelectClinicContactDialog_dialog_title;
+    private static final String TITLE =
+        Messages.SelectClinicContactDialog_dialog_title;
 
     private StudyContactEntryInfoTable contactInfoTable;
 
-    private ContactWrapper selectedContact;
+    private Contact selectedContact;
 
-    private List<ContactWrapper> contacts;
+    private List<Contact> contacts;
 
     private ComboViewer clinicCombo;
 
-    public SelectClinicContactDialog(Shell parent, List<ContactWrapper> contacts) {
+    public SelectClinicContactDialog(Shell parent, List<Contact> contacts) {
         super(parent);
         this.contacts = contacts;
     }
@@ -69,27 +72,31 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
         LabelProvider labelProvider = new LabelProvider() {
             @Override
             public String getText(Object o) {
-                return ((ClinicWrapper) o).getNameShort();
+                return ((Clinic) o).getNameShort();
             }
         };
 
-        List<ContactWrapper> allContacts = ContactWrapper
-            .getAllContacts(SessionManager.getAppService());
+        StudyGetFreeContactsAction action =
+            new StudyGetFreeContactsAction();
+
+        List<Contact> allContacts =
+            (List<Contact>) SessionManager.getAppService().doAction(action)
+                .getList();
         allContacts.removeAll(contacts);
 
-        HashSet<ClinicWrapper> clinics = new HashSet<ClinicWrapper>();
-        for (ContactWrapper contact : allContacts)
+        HashSet<Clinic> clinics = new HashSet<Clinic>();
+        for (Contact contact : allContacts)
             clinics.add(contact.getClinic());
 
         clinicCombo = widgetCreator.createComboViewer(contents,
             Messages.SelectClinicContactDialog_clinic_label,
-            new ArrayList<ClinicWrapper>(clinics), null, labelProvider);
+            new ArrayList<Clinic>(clinics), null, labelProvider);
         clinicCombo
             .addSelectionChangedListener(new ISelectionChangedListener() {
 
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
-                    filterContacts((ClinicWrapper) ((StructuredSelection) event
+                    filterContacts((Clinic) ((StructuredSelection) event
                         .getSelection()).getFirstElement());
                     getShell().setSize(
                         contents.getParent().getParent()
@@ -98,7 +105,7 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
             });
 
         contactInfoTable = new StudyContactEntryInfoTable(contents,
-            new ArrayList<ContactWrapper>());
+            new ArrayList<Contact>());
         contactInfoTable.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -114,11 +121,11 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
 
     }
 
-    protected void filterContacts(ClinicWrapper clinic) {
-        List<ContactWrapper> clinicContacts = clinic.getContactCollection(true);
-        for (ContactWrapper contact : contacts)
+    protected void filterContacts(Clinic clinic) {
+        Collection<Contact> clinicContacts = clinic.getContacts();
+        for (Contact contact : contacts)
             clinicContacts.remove(contact);
-        contactInfoTable.setList(clinicContacts);
+        contactInfoTable.setList(new ArrayList<Contact>(clinicContacts));
     }
 
     @Override
@@ -127,7 +134,7 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
         super.okPressed();
     }
 
-    public ContactWrapper getSelection() {
+    public Contact getSelection() {
         return selectedContact;
     }
 

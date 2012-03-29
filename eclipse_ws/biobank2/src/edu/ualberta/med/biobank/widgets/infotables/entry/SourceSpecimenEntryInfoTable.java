@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -40,6 +41,8 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
 
     private StudyWrapper study;
 
+    private StudySourceSpecimenDialog dlg;
+
     public SourceSpecimenEntryInfoTable(Composite parent,
         List<SourceSpecimenWrapper> collection) {
         super(parent, collection);
@@ -55,8 +58,10 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         List<SpecimenTypeWrapper> specimenTypes) {
         super(parent, null);
         this.study = study;
-        availableSpecimenTypes = specimenTypes;
         selectedSourceSpecimens = study.getSourceSpecimenCollection(true);
+        availableSpecimenTypes = specimenTypes;
+        for (SourceSpecimenWrapper ss : selectedSourceSpecimens)
+            availableSpecimenTypes.remove(ss.getSpecimenType());
         if (selectedSourceSpecimens == null) {
             selectedSourceSpecimens = new ArrayList<SourceSpecimenWrapper>();
         }
@@ -128,10 +133,13 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
 
     private void addOrEditStudySourceSpecimen(final boolean add,
         final SourceSpecimenWrapper sourceSpecimen) {
-        List<SpecimenTypeWrapper> dialogSpecimenTypes = availableSpecimenTypes;
+        List<SpecimenTypeWrapper> dialogSpecimenTypes;
         if (!add) {
-            dialogSpecimenTypes.add(sourceSpecimen.getSpecimenType());
-        }
+            dialogSpecimenTypes =
+                Arrays.asList(sourceSpecimen.getSpecimenType());
+        } else
+            dialogSpecimenTypes = availableSpecimenTypes;
+
         NewListener newListener = null;
         if (add) {
             // only add to the collection when adding and not editing
@@ -139,20 +147,21 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
                 @Override
                 public void newAdded(Object spec) {
                     SourceSpecimenWrapper ss = (SourceSpecimenWrapper) spec;
-                    availableSpecimenTypes.remove(sourceSpecimen
+                    availableSpecimenTypes.remove(ss
                         .getSpecimenType());
-                    selectedSourceSpecimens.add((SourceSpecimenWrapper) spec);
+                    dlg.setSpecimenTypes(availableSpecimenTypes);
+                    selectedSourceSpecimens.add(ss);
                     addedOrModifiedSourceSpecimens.add(ss);
                     reloadCollection(selectedSourceSpecimens);
                     notifyListeners();
                 }
             };
         }
-        StudySourceSpecimenDialog dlg =
-            new StudySourceSpecimenDialog(
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-                sourceSpecimen.getNeedOriginalVolume(), sourceSpecimen
-                    .getSpecimenType(), dialogSpecimenTypes, newListener);
+
+        dlg = new StudySourceSpecimenDialog(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+            sourceSpecimen.getNeedOriginalVolume(), sourceSpecimen
+                .getSpecimenType(), dialogSpecimenTypes, newListener);
 
         int res = dlg.open();
         if (res == Dialog.OK) {

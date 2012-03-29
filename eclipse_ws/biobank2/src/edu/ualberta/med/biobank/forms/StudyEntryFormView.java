@@ -178,8 +178,8 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
     private void createClinicSection() {
         Section section =
             baseForm.createSection(Messages.StudyEntryForm_contacts_title);
-        final ClinicAddInfoTable clinicsTable =
-            new ClinicAddInfoTable(section, studyWrapper);
+        final ClinicAddInfoTable clinicsTable = null;
+        // new ClinicAddInfoTable(section, studyWrapper);
         section.setClient(clinicsTable);
         if (isSuperAdmin) {
             BaseForm.addSectionToolbar(section,
@@ -190,7 +190,7 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
                     }
                 }, null);
         }
-        contactWrappers.setTable(clinicsTable);
+        // contactWrappers.setTable(clinicsTable);
     }
 
     private void createSourceSpecimensSection() {

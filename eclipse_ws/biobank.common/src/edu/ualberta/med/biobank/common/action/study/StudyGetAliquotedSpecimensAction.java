@@ -1,19 +1,20 @@
 package edu.ualberta.med.biobank.common.action.study;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.ListResult;
+import edu.ualberta.med.biobank.common.action.SetResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Study;
 
 public class StudyGetAliquotedSpecimensAction implements
-    Action<ListResult<AliquotedSpecimen>> {
+    Action<SetResult<AliquotedSpecimen>> {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
@@ -40,10 +41,10 @@ public class StudyGetAliquotedSpecimensAction implements
     }
 
     @Override
-    public ListResult<AliquotedSpecimen> run(ActionContext context)
+    public SetResult<AliquotedSpecimen> run(ActionContext context)
         throws ActionException {
-        ArrayList<AliquotedSpecimen> result =
-            new ArrayList<AliquotedSpecimen>();
+        Set<AliquotedSpecimen> result =
+            new HashSet<AliquotedSpecimen>();
 
         Query query =
             context.getSession().createQuery(SELECT_ALIQUOTED_SPCS_HQL);
@@ -55,7 +56,7 @@ public class StudyGetAliquotedSpecimensAction implements
             result.addAll(aliquotedSpecimens);
         }
 
-        return new ListResult<AliquotedSpecimen>(result);
+        return new SetResult<AliquotedSpecimen>(result);
     }
 
 }

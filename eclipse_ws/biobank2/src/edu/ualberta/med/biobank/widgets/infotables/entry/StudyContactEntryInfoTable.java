@@ -6,20 +6,21 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 import edu.ualberta.med.biobank.widgets.infotables.Messages;
 
-public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> {
+public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
 
     private static final int PAGE_SIZE_ROWS = 10;
 
     protected static class TableRowData {
-        ContactWrapper contact;
+        Contact contact;
         String clinicNameShort;
         String name;
         String title;
@@ -46,7 +47,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         Messages.StudyContactEntryInfoTable_office_label };
 
     public StudyContactEntryInfoTable(Composite parent,
-        List<ContactWrapper> contactCollection) {
+        List<Contact> contactCollection) {
         super(parent, contactCollection, HEADINGS, PAGE_SIZE_ROWS,
             ContactWrapper.class);
     }
@@ -56,7 +57,8 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -90,8 +92,8 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         if (o == null)
             return null;
         TableRowData info = new TableRowData();
-        info.contact = (ContactWrapper) o;
-        ClinicWrapper clinic = info.contact.getClinic();
+        info.contact = (Contact) o;
+        Clinic clinic = info.contact.getClinic();
         Assert.isNotNull(clinic, "contact's clinic is null"); //$NON-NLS-1$
         info.clinicNameShort = clinic.getNameShort();
         info.name = info.contact.getName();
@@ -114,7 +116,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
     }
 
     @Override
-    public ContactWrapper getSelection() {
+    public Contact getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;

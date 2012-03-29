@@ -15,16 +15,10 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
     private static final String STUDY_INFO_HQL =
         "SELECT DISTINCT study"
             + " FROM " + Study.class.getName() + " study"
-            + " LEFT JOIN FETCH study.sites"
-            + " LEFT JOIN FETCH study.contacts"
-            + " LEFT JOIN FETCH study.sourceSpecimens srcSpc"
-            + " LEFT JOIN FETCH srcSpc.specimenType"
-            + " LEFT JOIN FETCH study.aliquotedSpecimens aqSpc"
-            + " LEFT JOIN FETCH aqSpc.specimenType"
-            + " LEFT JOIN FETCH study.studyEventAttrs seattr"
-            + " LEFT JOIN FETCH seattr.globalEventAttr"
             + " LEFT JOIN FETCH study.comments comments"
             + " LEFT JOIN FETCH comments.user"
+            + " LEFT JOIN FETCH study.contacts c"
+            + " LEFT JOIN FETCH c.clinic"
             + " WHERE study.id = ?";
 
     @SuppressWarnings("nls")
@@ -79,11 +73,11 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
         studyInfo.patientCount = (Long) items[1];
         studyInfo.collectionEventCount = (Long) items[2];
         studyInfo.clinicInfos = getClinicInfo.run(context).getList();
-        studyInfo.sourceSpcs = getSourceSpecimens.run(context).getList();
+        studyInfo.sourceSpcs = getSourceSpecimens.run(context).getSet();
         studyInfo.aliquotedSpcs =
-            getAliquotedSpecimens.run(context).getList();
+            getAliquotedSpecimens.run(context).getSet();
         studyInfo.studyEventAttrs =
-            getStudyEventAttrs.run(context).getList();
+            getStudyEventAttrs.run(context).getSet();
 
         return studyInfo;
     }

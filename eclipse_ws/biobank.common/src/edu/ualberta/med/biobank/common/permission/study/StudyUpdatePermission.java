@@ -10,14 +10,18 @@ public class StudyUpdatePermission implements Permission {
     private static final long serialVersionUID = 1L;
     private Integer studyId;
 
-    public StudyUpdatePermission(Integer siteId) {
-        this.studyId = siteId;
+    public StudyUpdatePermission(Integer studyId) {
+        this.studyId = studyId;
+    }
+
+    public StudyUpdatePermission() {
+
     }
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        Study study = context.load(Study.class, studyId);
+        // get is intended, null value indicates any study
+        Study study = context.get(Study.class, studyId);
         return PermissionEnum.STUDY_UPDATE.isAllowed(context.getUser(), study);
     }
-
 }

@@ -74,6 +74,11 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         return currentTitle;
     }
 
+    public void setSpecimenTypes(List<SpecimenTypeWrapper> specimenTypes) {
+        this.specimenTypes = specimenTypes;
+        typeName.setInput(specimenTypes);
+    }
+
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite contents = new Composite(parent, SWT.NONE);
