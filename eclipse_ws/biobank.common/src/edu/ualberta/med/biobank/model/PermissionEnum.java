@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.model;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     SPECIMEN_LINK(6),
     SPECIMEN_ASSIGN(7),
 
-    SITE_CREATE(8),
+    SITE_CREATE(8, Require.ALL_CENTERS),
     SITE_READ(9),
     SITE_UPDATE(10),
     SITE_DELETE(11),
@@ -66,7 +67,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     RESEARCH_GROUP_UPDATE(36),
     RESEARCH_GROUP_DELETE(37),
 
-    STUDY_CREATE(38),
+    STUDY_CREATE(38, Require.ALL_STUDIES),
     STUDY_READ(39),
     STUDY_UPDATE(40),
     STUDY_DELETE(41),
@@ -93,10 +94,10 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     CONTAINER_UPDATE(58),
     CONTAINER_DELETE(59),
 
-    SPECIMEN_TYPE_CREATE(60),
+    SPECIMEN_TYPE_CREATE(60, Require.ALL_CENTERS, Require.ALL_STUDIES),
     SPECIMEN_TYPE_READ(61),
-    SPECIMEN_TYPE_UPDATE(62),
-    SPECIMEN_TYPE_DELETE(63),
+    SPECIMEN_TYPE_UPDATE(62, Require.ALL_CENTERS, Require.ALL_STUDIES),
+    SPECIMEN_TYPE_DELETE(63, Require.ALL_CENTERS, Require.ALL_STUDIES),
 
     LOGGING(64),
     REPORTS(65),
@@ -126,9 +127,11 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     }
 
     private final Integer id;
+    private final EnumSet<Require> requires;
 
-    private PermissionEnum(Integer permissionId) {
-        this.id = permissionId;
+    private PermissionEnum(Integer id, Require... requires) {
+        this.id = id;
+        this.requires = EnumSet.of(Require.DEFAULT, requires);
     }
 
     public static List<PermissionEnum> valuesList() {
@@ -141,6 +144,10 @@ public enum PermissionEnum implements NotAProxy, Serializable {
 
     public Integer getId() {
         return id;
+    }
+
+    public EnumSet<Require> getRequires() {
+        return EnumSet.copyOf(requires);
     }
 
     public String getName() {
@@ -206,20 +213,53 @@ public enum PermissionEnum implements NotAProxy, Serializable {
      * care about its value, otherwise, {@link Domain#contains(Center)} must be
      * true. The same applies to {@link Study}.
      * 
-     * @param membership
-     * @param center
-     * @param study
+     * @param m
+     * @param c
+     * @param s
      * @return
      */
-    private boolean isMembershipAllowed(Membership membership, Center center,
-        Study study) {
-        boolean hasCenter = center == null
-            || membership.getDomain().contains(center);
-        boolean hasStudy = study == null
-            || membership.getDomain().contains(study);
-        boolean hasPermission = membership.getAllPermissions().contains(this);
+    private boolean isMembershipAllowed(Membership m, Center c, Study s) {
+        boolean requiresMet = areRequiresMet(m);
+        boolean hasCenter = c == null || m.getDomain().contains(c);
+        boolean hasStudy = s == null || m.getDomain().contains(s);
+        boolean hasPermission = m.getAllPermissions().contains(this);
 
-        boolean isAllowed = hasCenter && hasStudy && hasPermission;
-        return isAllowed;
+        boolean allowed = requiresMet && hasCenter && hasStudy && hasPermission;
+        return allowed;
+    }
+
+    private boolean areRequiresMet(Membership m) {
+        boolean reqsMet = true;
+        Domain d = m.getDomain();
+        reqsMet &= !requires.contains(Require.ALL_CENTERS) || d.isAllCenters();
+        reqsMet &= !requires.contains(Require.ALL_STUDIES) || d.isAllStudies();
+        return reqsMet;
+    }
+
+    /**
+     * Defines special requirements for a {@link PermissionEnum}.
+     * 
+     * @author jferland
+     * 
+     */
+    public enum Require implements NotAProxy, Serializable {
+        /**
+         * Does nothing but make creating {@link EnumSet}-s easier.
+         */
+        DEFAULT,
+
+        /**
+         * If present, the {@link PermissionEnum} must exist in a
+         * {@link Membership} for which its {@link Domain#isAllCenters()}
+         * returns true.
+         */
+        ALL_CENTERS,
+
+        /**
+         * If present, the {@link PermissionEnum} must exist in a
+         * {@link Membership} for which its {@link Domain#isAllStudies()}
+         * returns true.
+         */
+        ALL_STUDIES;
     }
 }
