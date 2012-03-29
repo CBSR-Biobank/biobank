@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -30,6 +33,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.util.NullHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class UserInfoTable extends
@@ -151,14 +155,15 @@ public abstract class UserInfoTable extends
             .getActiveWorkbenchWindow().getShell(), output, managerContext);
         int res = dlg.open();
         if (res == Dialog.OK) {
-            reload();
+            User modifiedUser = output.getUser();
 
-            getList().remove(user);
-            getList().add(output.getUser());
+            List<User> tmp = new ArrayList<User>(getList());
+            tmp.remove(user);
+            tmp.add(modifiedUser);
+            Collections.sort(tmp, new UserComparator());
+            setList(tmp);
 
-            reload();
-
-            setSelection(user);
+            setSelection(modifiedUser);
 
             notifyListeners();
         }
@@ -199,5 +204,13 @@ public abstract class UserInfoTable extends
                 .openAsyncError(Messages.UserInfoTable_delete_error_msg, e);
         }
         return false;
+    }
+
+    public static class UserComparator implements Comparator<User> {
+        @Override
+        public int compare(User a, User b) {
+            return NullHelper.safeCompareTo(a.getLogin(), b.getLogin(),
+                String.CASE_INSENSITIVE_ORDER);
+        }
     }
 }

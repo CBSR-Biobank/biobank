@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Status;
@@ -116,7 +117,9 @@ public abstract class GroupsPage extends BgcDialogPage {
                     .format(Messages.UserManagementDialog_group_added_msg,
                         group.getName()));
 
-            getCurrentAllGroupsList().add(group);
+            List<Group> allCurrent = getCurrentAllGroupsList();
+            allCurrent.add(group);
+            Collections.sort(allCurrent, new GroupInfoTable.GroupComparator());
 
             groupInfoTable.reload();
             groupInfoTable.setSelection(group);

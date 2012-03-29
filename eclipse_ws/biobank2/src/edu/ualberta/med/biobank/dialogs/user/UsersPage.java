@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Status;
@@ -122,7 +123,10 @@ public abstract class UsersPage extends BgcDialogPage {
                             Messages.UserManagementDialog_user_added_msg,
                             user.getLogin()));
 
-                    getCurrentAllUsersList().add(user);
+                    List<User> allCurrent = getCurrentAllUsersList();
+                    allCurrent.add(user);
+                    Collections.sort(allCurrent,
+                        new UserInfoTable.UserComparator());
 
                     userInfoTable.setList(getCurrentAllUsersList());
                     userInfoTable.setSelection(user);

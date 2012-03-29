@@ -26,7 +26,7 @@ public abstract class DefaultAbstractInfoTableWidget<T>
 
     public void setSelection(T selection) {
         if (selection != null) {
-            tableViewer.setSelection(new StructuredSelection(selection));
+            tableViewer.setSelection(new StructuredSelection(selection), true);
         }
     }
 

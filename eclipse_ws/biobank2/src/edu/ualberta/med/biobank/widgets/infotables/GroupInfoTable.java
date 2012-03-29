@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -28,6 +31,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.Group;
+import edu.ualberta.med.biobank.util.NullHelper;
 
 public abstract class GroupInfoTable extends
     DefaultAbstractInfoTableWidget<Group> {
@@ -110,15 +114,15 @@ public abstract class GroupInfoTable extends
             .getActiveWorkbenchWindow().getShell(), output, context);
         int res = dlg.open();
         if (res == Dialog.OK) {
-            reload();
+            Group modifiedGroup = output.getGroup();
 
-            getList().remove(group);
-            getList().add(output.getGroup());
-            reload();
+            List<Group> tmp = new ArrayList<Group>(getList());
+            tmp.remove(group);
+            tmp.add(modifiedGroup);
+            Collections.sort(tmp, new GroupComparator());
+            setList(tmp);
 
-            setSelection(group);
-
-            notifyListeners();
+            setSelection(modifiedGroup);
         }
     }
 
@@ -147,5 +151,13 @@ public abstract class GroupInfoTable extends
             TmpUtil.displayException(t);
         }
         return false;
+    }
+
+    public static class GroupComparator implements Comparator<Group> {
+        @Override
+        public int compare(Group a, Group b) {
+            return NullHelper.safeCompareTo(a.getName(), b.getName(),
+                String.CASE_INSENSITIVE_ORDER);
+        }
     }
 }
