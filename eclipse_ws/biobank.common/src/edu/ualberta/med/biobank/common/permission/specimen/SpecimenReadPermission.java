@@ -33,11 +33,11 @@ public class SpecimenReadPermission implements Permission {
                 context
                     .getSession()
                     .createQuery(
-                        "from "
+                        "from " //$NON-NLS-1$
                             + Specimen.class.getName()
-                            + " spec inner join fetch spec.currentCenter inner join fetch "
-                            + "spec.collectionEvent ce inner join fetch"
-                            + " ce.patient p inner join fetch p.study where spec.inventoryId=?");
+                            + " spec inner join fetch spec.currentCenter inner join fetch " //$NON-NLS-1$
+                            + "spec.collectionEvent ce inner join fetch" //$NON-NLS-1$
+                            + " ce.patient p inner join fetch p.study where spec.inventoryId=?"); //$NON-NLS-1$
             q.setParameter(0, inventoryId);
             if (q.list().size() > 0)
                 specimen = (Specimen) q.list().get(0);

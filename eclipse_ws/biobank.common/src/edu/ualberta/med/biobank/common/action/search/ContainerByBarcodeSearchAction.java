@@ -8,7 +8,10 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.Site;
 
 public class ContainerByBarcodeSearchAction implements
     Action<ListResult<Object>> {
@@ -26,15 +29,15 @@ public class ContainerByBarcodeSearchAction implements
     private Integer currentCenter;
 
     public ContainerByBarcodeSearchAction(String barcode,
-        Integer currentCenter) {
+        SiteWrapper site) {
         this.barcode = barcode;
-        this.currentCenter = currentCenter;
+        this.currentCenter = site.getId();
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return true;
-        // FIXME: ??? what to do
+        return new ContainerReadPermission(context.load(Site.class,
+            currentCenter)).isAllowed(context);
     }
 
     @Override

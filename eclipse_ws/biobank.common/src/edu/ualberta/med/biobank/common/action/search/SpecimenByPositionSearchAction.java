@@ -8,6 +8,8 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenSiteReadPermission;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Specimen;
 
 public class SpecimenByPositionSearchAction implements
@@ -26,15 +28,14 @@ public class SpecimenByPositionSearchAction implements
     private Integer currentCenter;
 
     public SpecimenByPositionSearchAction(String positionString,
-        Integer currentCenter) {
+        SiteWrapper site) {
         this.positionString = positionString;
-        this.currentCenter = currentCenter;
+        this.currentCenter = site.getId();
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return true;
-        // FIXME: ??? what to do
+        return new SpecimenSiteReadPermission(currentCenter).isAllowed(context);
     }
 
     @SuppressWarnings("unchecked")

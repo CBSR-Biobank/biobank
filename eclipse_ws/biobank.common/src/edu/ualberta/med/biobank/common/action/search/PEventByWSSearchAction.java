@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 
 public class PEventByWSSearchAction implements
@@ -23,18 +24,17 @@ public class PEventByWSSearchAction implements
     private static final long serialVersionUID = 1L;
     private String worksheet;
 
-    private Integer currentCenter;
+    private Integer site;
 
     public PEventByWSSearchAction(String worksheet,
         Integer currentCenter) {
         this.worksheet = worksheet;
-        this.currentCenter = currentCenter;
+        this.site = currentCenter;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return true;
-        // FIXME: ??? what to do
+        return new ProcessingEventReadPermission(site).isAllowed(context);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class PEventByWSSearchAction implements
         Query q =
             context.getSession().createQuery(PEVENT_BASE_QRY);
         q.setParameter(0, worksheet);
-        q.setParameter(1, currentCenter);
+        q.setParameter(1, site);
         @SuppressWarnings("unchecked")
         List<Integer> rows = q.list();
         return new ListResult<Integer>(rows);

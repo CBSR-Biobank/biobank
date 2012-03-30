@@ -51,7 +51,7 @@ public enum SearchType {
             if (center instanceof SiteWrapper) {
                 SpecimenByPositionSearchAction action =
                     new SpecimenByPositionSearchAction(searchString,
-                        center.getId());
+                        (SiteWrapper) center);
                 return wrapIds(SessionManager.getAppService()
                     .doAction(action).getList(), SpecimenWrapper.class);
             }
@@ -66,14 +66,14 @@ public enum SearchType {
             if (center instanceof SiteWrapper) {
                 ContainerByLabelSearchAction action =
                     new ContainerByLabelSearchAction(searchString,
-                        center.getId());
+                        (SiteWrapper) center);
                 List<ModelWrapper<?>> list =
-                        new ArrayList<ModelWrapper<?>>(
-                            ModelWrapper.wrapModelCollection(SessionManager
-                                .getAppService(),
-                                SessionManager.getAppService().doAction(action)
-                                    .getList(),
-                                ContainerWrapper.class));
+                    new ArrayList<ModelWrapper<?>>(
+                        ModelWrapper.wrapModelCollection(SessionManager
+                            .getAppService(),
+                            SessionManager.getAppService().doAction(action)
+                                .getList(),
+                            ContainerWrapper.class));
                 return list;
             }
             return Collections.emptyList();
@@ -87,7 +87,7 @@ public enum SearchType {
             if (center instanceof SiteWrapper) {
                 ContainerByBarcodeSearchAction action =
                     new ContainerByBarcodeSearchAction(searchString,
-                        center.getId());
+                        (SiteWrapper) center);
                 List<ModelWrapper<?>> list =
                     new ArrayList<ModelWrapper<?>>(
                         ModelWrapper.wrapModelCollection(SessionManager

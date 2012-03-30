@@ -44,7 +44,7 @@ public class ProcessingEventAdapter extends AdapterBase {
             this.isReadable =
                 SessionManager.getAppService()
                     .isAllowed(
-                        new ProcessingEventReadPermission());
+                        new ProcessingEventReadPermission(null));
             this.isEditable =
                 SessionManager.getAppService().isAllowed(
                     new ProcessingEventUpdatePermission());
