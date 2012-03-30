@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -20,6 +21,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
@@ -32,7 +34,6 @@ import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.GlobalEventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -43,10 +44,14 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.EventAttrWidget;
@@ -107,6 +112,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private List<SpecimenTypeWrapper> specimenTypeWrappers;
 
+    private List<ClinicInfo> clinics;
+
     public StudyEntryForm() {
         super();
         pvCustomInfoList = new ArrayList<StudyEventAttrCustom>();
@@ -137,8 +144,15 @@ public class StudyEntryForm extends BiobankEntryForm {
             studyInfo =
                 SessionManager.getAppService().doAction(
                     new StudyGetInfoAction(id));
-            study.setWrappedObject(studyInfo.getStudy());
-            SessionManager.logLookup(studyInfo.getStudy());
+            Study s = studyInfo.getStudy();
+            clinics = studyInfo.getClinicInfos();
+            Set<AliquotedSpecimen> as = studyInfo.getAliquotedSpcs();
+            Set<SourceSpecimen> ss = studyInfo.getSourceSpecimens();
+            Set<StudyEventAttr> ea = studyInfo.getStudyEventAttrs();
+            s.setAliquotedSpecimens(as);
+            s.setSourceSpecimens(ss);
+            s.setStudyEventAttrs(ea);
+            study.setWrappedObject(s);
         } else {
             studyInfo = new StudyInfo();
             study.setWrappedObject(new Study());
@@ -201,7 +215,11 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private void createClinicSection() {
         Section section = createSection(Messages.StudyEntryForm_contacts_title);
-        contactEntryTable = new ClinicAddInfoTable(section, study);
+        List<Contact> contacts = new ArrayList<Contact>();
+        for (ClinicInfo clinicInfo : clinics)
+            contacts.addAll(clinicInfo.getContacts());
+        contactEntryTable =
+            new ClinicAddInfoTable(section, contacts);
         contactEntryTable.adaptToToolkit(toolkit, true);
         contactEntryTable.addSelectionChangedListener(listener);
 
@@ -246,6 +264,9 @@ public class StudyEntryForm extends BiobankEntryForm {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     sourceSpecimenEntryTable.addSourceSpecimen();
+                    aliquotedSpecimenEntryTable
+                        .setAvailableSpecimenTypes(sourceSpecimenEntryTable
+                            .getList());
                 }
             });
         section.setClient(sourceSpecimenEntryTable);
@@ -258,6 +279,10 @@ public class StudyEntryForm extends BiobankEntryForm {
             new AliquotedSpecimenEntryInfoTable(section, study);
         aliquotedSpecimenEntryTable.adaptToToolkit(toolkit, true);
         aliquotedSpecimenEntryTable.addSelectionChangedListener(listener);
+
+        aliquotedSpecimenEntryTable
+            .setAvailableSpecimenTypes(sourceSpecimenEntryTable
+                .getList());
 
         addSectionToolbar(section,
             Messages.StudyEntryForm_aliquoted_specimens_button_add,
@@ -332,12 +357,14 @@ public class StudyEntryForm extends BiobankEntryForm {
     protected void saveForm() throws Exception {
         // save of source specimen is made inside the entryinfotable
 
+        study.getWrappedObject().setContacts(
+            new HashSet<Contact>(contactEntryTable.getList()));
+
         final StudySaveAction saveAction = new StudySaveAction();
         saveAction.setId(study.getId());
         saveAction.setName(study.getName());
         saveAction.setNameShort(study.getNameShort());
         saveAction.setActivityStatus(study.getActivityStatus());
-        saveAction.setSiteIds(getSiteInfos());
         saveAction.setContactIds(getContactInfos());
         saveAction.setSourceSpecimenSaveInfo(getSourceSpecimenInfos());
         saveAction.setAliquotSpecimenSaveInfo(getAliquotedSpecimenInfos());
@@ -346,16 +373,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         Integer id =
             SessionManager.getAppService().doAction(saveAction).getId();
-        updateStudyInfo(id);
-    }
-
-    private HashSet<Integer> getSiteInfos() {
-        HashSet<Integer> siteIds = new HashSet<Integer>();
-
-        for (SiteWrapper wrapper : study.getSiteCollection(false)) {
-            siteIds.add(wrapper.getId());
-        }
-        return siteIds;
+        study.setId(id);
+        ((AdapterBase) adapter).setModelObject(study);
     }
 
     private HashSet<Integer> getContactInfos() {

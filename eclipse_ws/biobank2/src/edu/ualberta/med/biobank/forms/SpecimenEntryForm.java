@@ -102,7 +102,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private BgcBaseText sourceSpecimenField;
 
-    private List<AliquotedSpecimen> aliquotedSpecTypes;
+    private Set<AliquotedSpecimen> aliquotedSpecTypes;
 
     private Set<SpecimenType> containerSpecimenTypeList;
 
@@ -125,7 +125,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 SessionManager.getAppService().doAction(
                     new StudyGetAliquotedSpecimensAction(specimenInfo
                         .getSpecimen().getCollectionEvent().
-                        getPatient().getStudy().getId())).getList();
+                        getPatient().getStudy().getId())).getSet();
             if (specimenInfo
                 .getSpecimen().getSpecimenPosition() != null)
                 containerSpecimenTypeList =
@@ -143,7 +143,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             specimen.setWrappedObject(specimenInfo.getSpecimen());
         } else {
             specimenInfo = new SpecimenBriefInfo();
-            aliquotedSpecTypes = new ArrayList<AliquotedSpecimen>();
+            aliquotedSpecTypes = new HashSet<AliquotedSpecimen>();
             containerSpecimenTypeList = new HashSet<SpecimenType>();
             specimen.setWrappedObject((Specimen) specimenAdapter
                 .getModelObject().getWrappedObject());

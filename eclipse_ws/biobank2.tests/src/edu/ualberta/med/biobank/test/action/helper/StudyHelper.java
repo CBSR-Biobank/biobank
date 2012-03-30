@@ -23,7 +23,6 @@ public class StudyHelper extends Helper {
         saveAction.setName(name);
         saveAction.setNameShort(nameShort);
         saveAction.setActivityStatus(activityStatus);
-        saveAction.setSiteIds(new HashSet<Integer>());
         saveAction.setContactIds(new HashSet<Integer>());
         saveAction
             .setSourceSpecimenSaveInfo(new HashSet<SourceSpecimenSaveInfo>());
@@ -46,8 +45,6 @@ public class StudyHelper extends Helper {
         saveStudy.setName(studyInfo.getStudy().getName());
         saveStudy.setNameShort(studyInfo.getStudy().getNameShort());
         saveStudy.setActivityStatus(studyInfo.getStudy().getActivityStatus());
-
-        saveStudy.setSiteIds(new HashSet<Integer>());
 
         Set<Integer> ids = new HashSet<Integer>();
         for (ClinicInfo infos : studyInfo.getClinicInfos()) {

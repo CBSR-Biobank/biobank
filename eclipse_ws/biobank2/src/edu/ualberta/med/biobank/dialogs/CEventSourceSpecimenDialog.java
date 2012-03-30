@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -69,7 +70,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
     private BgcBaseText commentWidget;
 
     public CEventSourceSpecimenDialog(Shell parent, CommentedSpecimenInfo spec,
-        List<SourceSpecimen> studySourceSpecimen,
+        Set<SourceSpecimen> studySourceSpecimen,
         List<SpecimenType> allSpecimenTypes,
         List<String> inventoryIdExcludeList, NewListener listener,
         Date defaultTimeDrawn) {

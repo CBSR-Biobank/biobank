@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.widgets.infotables.entry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -64,7 +65,7 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
     }
 
     public void addOrEditSpecimen(boolean add, CommentedSpecimenInfo si,
-        List<SourceSpecimen> studySourceTypes,
+        Set<SourceSpecimen> studySourceTypes,
         List<SpecimenType> allSpecimenTypes, final CollectionEvent cEvent,
         final Date defaultTimeDrawn) {
         NewListener newListener = null;
@@ -104,7 +105,7 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
         }
     }
 
-    public void addEditSupport(final List<SourceSpecimen> studySourceTypes,
+    public void addEditSupport(final Set<SourceSpecimen> studySourceTypes,
         final List<SpecimenType> allSpecimenTypes) {
         if (isEditable) {
             addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {

@@ -1,19 +1,20 @@
 package edu.ualberta.med.biobank.common.action.study;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.ListResult;
+import edu.ualberta.med.biobank.common.action.SetResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 
 public class StudyGetStudyEventAttrsAction implements
-    Action<ListResult<StudyEventAttr>> {
+    Action<SetResult<StudyEventAttr>> {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
@@ -39,9 +40,9 @@ public class StudyGetStudyEventAttrsAction implements
     }
 
     @Override
-    public ListResult<StudyEventAttr> run(ActionContext context)
+    public SetResult<StudyEventAttr> run(ActionContext context)
         throws ActionException {
-        ArrayList<StudyEventAttr> result = new ArrayList<StudyEventAttr>();
+        Set<StudyEventAttr> result = new HashSet<StudyEventAttr>();
 
         Query query =
             context.getSession().createQuery(SELECT_STUDY_EVENT_ATTR_HQL);
@@ -53,7 +54,7 @@ public class StudyGetStudyEventAttrsAction implements
             result.addAll(attrs);
         }
 
-        return new ListResult<StudyEventAttr>(result);
+        return new SetResult<StudyEventAttr>(result);
     }
 
 }

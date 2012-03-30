@@ -99,9 +99,6 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         StudySaveAction saveStudy = new StudySaveAction();
         saveStudy.setId(studyId);
 
-        // TODO: set site ids?
-        saveStudy.setSiteIds(new HashSet<Integer>());
-
         saveStudy.setName(view.getName().getValue());
         saveStudy.setNameShort(view.getNameShort().getValue());
         saveStudy.setActivityStatus(getActivityStatus());
@@ -236,9 +233,9 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
 
             StudyInfo studyInfo =
                 new StudyInfo(new Study(), 0l, 0l, new ArrayList<ClinicInfo>(),
-                    new ArrayList<SourceSpecimen>(),
-                    new ArrayList<AliquotedSpecimen>(),
-                    new ArrayList<StudyEventAttr>());
+                    new HashSet<SourceSpecimen>(),
+                    new HashSet<AliquotedSpecimen>(),
+                    new HashSet<StudyEventAttr>());
 
             editStudy(studyInfo);
         }

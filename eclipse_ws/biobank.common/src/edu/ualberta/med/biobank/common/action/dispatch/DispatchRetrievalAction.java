@@ -25,25 +25,25 @@ public class DispatchRetrievalAction implements Action<ListResult<Dispatch>> {
     private Boolean noErrors;
 
     private static String DISPATCH_HQL_STATE_SELECT =
-        "SELECT DISTINCT d FROM " + Dispatch.class.getName() + " d"
-            + " LEFT JOIN FETCH d.dispatchSpecimens"
-            + " INNER JOIN FETCH d.senderCenter"
-            + " INNER JOIN FETCH d.receiverCenter"
-            + " LEFT JOIN FETCH d.shipmentInfo si"
-            + " LEFT JOIN FETCH si.shippingMethod"
-            + " WHERE d.state=? AND ";
+        "SELECT DISTINCT d FROM " + Dispatch.class.getName() + " d" //$NON-NLS-1$ //$NON-NLS-2$
+            + " LEFT JOIN FETCH d.dispatchSpecimens" //$NON-NLS-1$
+            + " INNER JOIN FETCH d.senderCenter" //$NON-NLS-1$
+            + " INNER JOIN FETCH d.receiverCenter" //$NON-NLS-1$
+            + " LEFT JOIN FETCH d.shipmentInfo si" //$NON-NLS-1$
+            + " LEFT JOIN FETCH si.shippingMethod" //$NON-NLS-1$
+            + " WHERE d.state=? AND "; //$NON-NLS-1$
 
-    private static String SENDER_HQL = "d.senderCenter.id=?";
-    private static String RECEIVER_HQL = "d.receiverCenter.id=?";
+    private static String SENDER_HQL = "d.senderCenter.id=?"; //$NON-NLS-1$
+    private static String RECEIVER_HQL = "d.receiverCenter.id=?"; //$NON-NLS-1$
 
-    private static String NOTEMPTY_HQL = " AND EXISTS ";
-    private static String EMPTY_HQL = " AND NOT EXISTS ";
+    private static String NOTEMPTY_HQL = " AND EXISTS "; //$NON-NLS-1$
+    private static String EMPTY_HQL = " AND NOT EXISTS "; //$NON-NLS-1$
 
-    private static String NO_ERRORS_HQL = "(FROM "
-        + DispatchSpecimen.class.getName() + " ds"
-        + " WHERE (ds.state=" + DispatchSpecimenState.MISSING.getId()
-        + " OR ds.state=" + DispatchSpecimenState.EXTRA.getId()
-        + ") AND ds.dispatch.id=d.id) ";
+    private static String NO_ERRORS_HQL = "(FROM " //$NON-NLS-1$
+        + DispatchSpecimen.class.getName() + " ds" //$NON-NLS-1$
+        + " WHERE (ds.state=" + DispatchSpecimenState.MISSING.getId() //$NON-NLS-1$
+        + " OR ds.state=" + DispatchSpecimenState.EXTRA.getId() //$NON-NLS-1$
+        + ") AND ds.dispatch.id=d.id) "; //$NON-NLS-1$
 
     public DispatchRetrievalAction(DispatchState state, Integer centerId,
         Boolean isSender, Boolean noErrors) {

@@ -107,16 +107,6 @@ public class TestStudy extends TestAction {
         }
 
         studySaveAction.setActivityStatus(ActivityStatus.ACTIVE);
-        studySaveAction.setSiteIds(null);
-        try {
-            exec(studySaveAction);
-            Assert
-                .fail("should not be allowed to add study with null site ids");
-        } catch (NullPointerException e) {
-            Assert.assertTrue(true);
-        }
-
-        studySaveAction.setSiteIds(new HashSet<Integer>());
         studySaveAction.setContactIds(null);
         try {
             exec(studySaveAction);
@@ -407,9 +397,9 @@ public class TestStudy extends TestAction {
     }
 
     private Set<Integer> getSourceSpecimenSpecimenTypes(
-        List<SourceSpecimen> sourceSpecimens) {
+        Set<SourceSpecimen> set) {
         Set<Integer> result = new HashSet<Integer>();
-        for (SourceSpecimen ss : sourceSpecimens) {
+        for (SourceSpecimen ss : set) {
             result.add(ss.getSpecimenType().getId());
         }
         return result;

@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
@@ -162,7 +161,6 @@ public class StudySaveAction implements Action<IdResult> {
     private String name;
     private String nameShort;
     private ActivityStatus activityStatus;
-    private Set<Integer> siteIds;
     private Set<Integer> contactIds;
     private Collection<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos;
     private Collection<AliquotedSpecimenSaveInfo> aliquotSpecimenSaveInfos;
@@ -184,10 +182,6 @@ public class StudySaveAction implements Action<IdResult> {
 
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
-    }
-
-    public void setSiteIds(Set<Integer> siteIds) {
-        this.siteIds = siteIds;
     }
 
     public void setContactIds(Set<Integer> contactIds) {
@@ -232,7 +226,6 @@ public class StudySaveAction implements Action<IdResult> {
         study.setNameShort(nameShort);
         study.setActivityStatus(activityStatus);
 
-        saveSites(context);
         saveContacts(context);
         saveSourceSpecimens(context);
         saveAliquotedSpecimens(context);
@@ -243,25 +236,6 @@ public class StudySaveAction implements Action<IdResult> {
         context.getSession().flush();
 
         return new IdResult(study.getId());
-    }
-
-    private void saveSites(ActionContext context) {
-        Set<Site> sites = context.load(Site.class, siteIds);
-
-        SetDifference<Site> sitesDiff =
-            new SetDifference<Site>(study.getSites(), sites);
-        study.setSites(sitesDiff.getNewSet());
-
-        // remove this study from sites in removed list
-        for (Site site : sitesDiff.getRemoveSet()) {
-            Set<Study> siteStudies = site.getStudies();
-            if (siteStudies.remove(study)) {
-                site.setStudies(siteStudies);
-            } else {
-                throw new ActionException(
-                    "study not found in removed site's collection");
-            }
-        }
     }
 
     private void saveContacts(ActionContext context) {
@@ -285,7 +259,7 @@ public class StudySaveAction implements Action<IdResult> {
                 contact.setStudies(contactStudies);
             } else {
                 throw new ActionException(
-                    "study not found in removed site's collection");
+                    "study not found in removed contact's collection");
             }
         }
     }

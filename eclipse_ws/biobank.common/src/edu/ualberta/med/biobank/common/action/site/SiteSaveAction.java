@@ -9,7 +9,6 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.site.SiteCreatePermission;
 import edu.ualberta.med.biobank.common.permission.site.SiteUpdatePermission;
-import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 
@@ -29,7 +28,6 @@ public class SiteSaveAction extends CenterSaveAction {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        // TODO
         Permission permission;
         if (centerId == null)
             permission = new SiteCreatePermission();
@@ -42,15 +40,9 @@ public class SiteSaveAction extends CenterSaveAction {
     public IdResult run(ActionContext context) throws ActionException {
         Site site = context.load(Site.class, centerId, new Site());
 
-        // TODO: check that the user has access to at least the studies they are
-        // removing or adding?
         Set<Study> studies = context.load(Study.class, studyIds);
-        SetDifference<Study> sitesDiff = new SetDifference<Study>(
-            site.getStudies(), studies);
-        site.setStudies(sitesDiff.getNewSet());
-        for (Study study : sitesDiff.getRemoveSet()) {
-            context.getSession().delete(study);
-        }
+        site.getStudies().clear();
+        site.getStudies().addAll(studies);
 
         return run(context, site);
     }

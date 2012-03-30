@@ -1,18 +1,19 @@
 package edu.ualberta.med.biobank.common.action.study;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.ListResult;
+import edu.ualberta.med.biobank.common.action.SetResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 
 public class StudyGetSourceSpecimensAction implements
-    Action<ListResult<SourceSpecimen>> {
+    Action<SetResult<SourceSpecimen>> {
 
     private static final long serialVersionUID = 1L;
 
@@ -35,9 +36,9 @@ public class StudyGetSourceSpecimensAction implements
     }
 
     @Override
-    public ListResult<SourceSpecimen> run(ActionContext context)
+    public SetResult<SourceSpecimen> run(ActionContext context)
         throws ActionException {
-        ArrayList<SourceSpecimen> result = new ArrayList<SourceSpecimen>();
+        Set<SourceSpecimen> result = new HashSet<SourceSpecimen>();
 
         Query query = context.getSession().createQuery(SELECT_SOURCE_SPCS_HQL);
         query.setParameter(0, studyId);
@@ -48,6 +49,6 @@ public class StudyGetSourceSpecimensAction implements
             result.addAll(srcspcs);
         }
 
-        return new ListResult<SourceSpecimen>(result);
+        return new SetResult<SourceSpecimen>(result);
     }
 }

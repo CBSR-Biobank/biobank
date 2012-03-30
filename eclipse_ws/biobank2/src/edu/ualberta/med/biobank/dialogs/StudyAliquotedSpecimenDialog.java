@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.dialogs;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -209,5 +210,11 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         quantity.setText(""); //$NON-NLS-1$
         volume.setText(""); //$NON-NLS-1$
         activityStatus.getCombo().deselectAll();
+    }
+
+    public void setSpecimenTypes(
+        Set<SpecimenTypeWrapper> availableSpecimenTypes) {
+        this.availableSpecimenTypes = availableSpecimenTypes;
+        this.specimenTypeComboViewer.setInput(availableSpecimenTypes);
     }
 }
