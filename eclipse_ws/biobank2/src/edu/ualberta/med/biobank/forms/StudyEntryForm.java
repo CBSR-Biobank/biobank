@@ -1,10 +1,10 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -44,11 +44,9 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
-import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -112,8 +110,6 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private List<SpecimenTypeWrapper> specimenTypeWrappers;
 
-    private List<ClinicInfo> clinics;
-
     public StudyEntryForm() {
         super();
         pvCustomInfoList = new ArrayList<StudyEventAttrCustom>();
@@ -144,15 +140,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             studyInfo =
                 SessionManager.getAppService().doAction(
                     new StudyGetInfoAction(id));
-            Study s = studyInfo.getStudy();
-            clinics = studyInfo.getClinicInfos();
-            Set<AliquotedSpecimen> as = studyInfo.getAliquotedSpcs();
-            Set<SourceSpecimen> ss = studyInfo.getSourceSpecimens();
-            Set<StudyEventAttr> ea = studyInfo.getStudyEventAttrs();
-            s.setAliquotedSpecimens(as);
-            s.setSourceSpecimens(ss);
-            s.setStudyEventAttrs(ea);
-            study.setWrappedObject(s);
+            study.setWrappedObject(studyInfo.getStudy());
         } else {
             studyInfo = new StudyInfo();
             study.setWrappedObject(new Study());
@@ -216,7 +204,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     private void createClinicSection() {
         Section section = createSection(Messages.StudyEntryForm_contacts_title);
         List<Contact> contacts = new ArrayList<Contact>();
-        for (ClinicInfo clinicInfo : clinics)
+        for (ClinicInfo clinicInfo : studyInfo.getClinicInfos())
             contacts.addAll(clinicInfo.getContacts());
         contactEntryTable =
             new ClinicAddInfoTable(section, contacts);
@@ -253,7 +241,11 @@ public class StudyEntryForm extends BiobankEntryForm {
         Section section =
             createSection(Messages.StudyEntryForm_source_specimens_title);
         sourceSpecimenEntryTable =
-            new SourceSpecimenEntryInfoTable(section, study,
+            new SourceSpecimenEntryInfoTable(
+                section,
+                ModelWrapper.wrapModelCollection(
+                    SessionManager.getAppService(),
+                    studyInfo.getSourceSpecimens(), SourceSpecimenWrapper.class),
                 specimenTypeWrappers);
         sourceSpecimenEntryTable.adaptToToolkit(toolkit, true);
         sourceSpecimenEntryTable.addSelectionChangedListener(listener);
@@ -275,8 +267,13 @@ public class StudyEntryForm extends BiobankEntryForm {
     private void createAliquotedSpecimensSection() {
         Section section =
             createSection(Messages.StudyEntryForm_aliquoted_specimens_title);
+
         aliquotedSpecimenEntryTable =
-            new AliquotedSpecimenEntryInfoTable(section, study);
+            new AliquotedSpecimenEntryInfoTable(section,
+                ModelWrapper.wrapModelCollection(
+                    SessionManager.getAppService(),
+                    studyInfo.getAliquotedSpcs(),
+                    AliquotedSpecimenWrapper.class), true, true);
         aliquotedSpecimenEntryTable.adaptToToolkit(toolkit, true);
         aliquotedSpecimenEntryTable.addSelectionChangedListener(listener);
 
@@ -306,8 +303,12 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         StudyEventAttrCustom studyEventAttrCustom;
 
-        List<String> studyEventInfoLabels =
-            Arrays.asList(study.getStudyEventAttrLabels());
+        Map<String, StudyEventAttr> studyEventAttrLabelMap =
+            new HashMap<String, StudyEventAttr>();
+        for (StudyEventAttr sea : studyInfo.getStudyEventAttrs()) {
+            studyEventAttrLabelMap.put(sea.getGlobalEventAttr().getLabel(),
+                sea);
+        }
 
         for (GlobalEventAttrWrapper geAttr : GlobalEventAttrWrapper
             .getAllGlobalEventAttrs(SessionManager.getAppService())) {
@@ -317,21 +318,23 @@ public class StudyEntryForm extends BiobankEntryForm {
             studyEventAttrCustom.setGlobalEventAttr(geAttr.getWrappedObject());
             studyEventAttrCustom.setLabel(label);
             studyEventAttrCustom.setType(geAttr.getTypeName());
-            if (studyEventInfoLabels.contains(label)) {
-                studyEventAttrCustom.setStudyEventAttrId(study
-                    .getStudyEventAttr(label).getId());
-                studyEventAttrCustom.setAllowedValues(study
-                    .getStudyEventAttrPermissible(label));
+            StudyEventAttr sea = studyEventAttrLabelMap.get(label);
+            if (sea != null) {
+                studyEventAttrCustom.setStudyEventAttrId(sea.getId());
+                String permissible = sea.getPermissible();
+                if ((permissible != null) && !permissible.isEmpty()) {
+                    studyEventAttrCustom.setAllowedValues(permissible
+                        .split(";"));
+                }
                 selected =
-                    study.getStudyEventAttrActivityStatus(label).equals(
-                        ActivityStatus.ACTIVE);
+                    sea.getActivityStatus().equals(ActivityStatus.ACTIVE);
             }
             studyEventAttrCustom.setIsDefault(false);
             studyEventAttrCustom.widget =
                 new EventAttrWidget(client, SWT.NONE, studyEventAttrCustom,
                     selected);
             studyEventAttrCustom.widget.addSelectionChangedListener(listener);
-            studyEventAttrCustom.inStudy = studyEventInfoLabels.contains(label);
+            studyEventAttrCustom.inStudy = (sea != null);
             pvCustomInfoList.add(studyEventAttrCustom);
         }
     }
@@ -482,21 +485,31 @@ public class StudyEntryForm extends BiobankEntryForm {
         GuiUtil.reset(activityStatusComboViewer, study.getActivityStatus());
         contactEntryTable.reload();
         aliquotedSpecimenEntryTable.reload();
-        sourceSpecimenEntryTable.reload();
+        sourceSpecimenEntryTable.reload(ModelWrapper.wrapModelCollection(
+            SessionManager.getAppService(),
+            studyInfo.getSourceSpecimens(), SourceSpecimenWrapper.class));
         commentEntryTable.setList(study.getCommentCollection(false));
         resetPvCustomInfo();
     }
 
     private void resetPvCustomInfo() throws Exception {
-        List<String> studyPvInfoLabels =
-            Arrays.asList(study.getStudyEventAttrLabels());
+        Map<String, StudyEventAttr> studyEventAttrLabelMap =
+            new HashMap<String, StudyEventAttr>();
+        for (StudyEventAttr sea : studyInfo.getStudyEventAttrs()) {
+            studyEventAttrLabelMap.put(sea.getGlobalEventAttr().getLabel(),
+                sea);
+        }
 
         for (StudyEventAttrCustom studyPvAttrCustom : pvCustomInfoList) {
             boolean selected = false;
-            String label = studyPvAttrCustom.getLabel();
-            if (studyPvInfoLabels.contains(studyPvAttrCustom.getLabel())) {
-                studyPvAttrCustom.setAllowedValues(study
-                    .getStudyEventAttrPermissible(label));
+            StudyEventAttr sea =
+                studyEventAttrLabelMap.get(studyPvAttrCustom.getLabel());
+            if (sea != null) {
+                String permissible = sea.getPermissible();
+                if ((permissible != null) && !permissible.isEmpty()) {
+                    studyPvAttrCustom.setAllowedValues(permissible
+                        .split(";"));
+                }
                 selected = true;
                 studyPvAttrCustom.inStudy = true;
             }

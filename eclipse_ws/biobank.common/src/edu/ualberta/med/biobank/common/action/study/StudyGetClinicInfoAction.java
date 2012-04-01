@@ -21,31 +21,27 @@ import edu.ualberta.med.biobank.model.Study;
 public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> {
     private static final long serialVersionUID = 1L;
 
-    // @formatter:off
     @SuppressWarnings("nls")
     private static final String STUDY_CONTACTS_HQL =
         "SELECT clinics,contacts "
-        + "FROM " + Study.class.getName() + " study"
-        + " INNER JOIN study.contacts contacts"
-        + " INNER JOIN contacts.clinic clinics"
-        + " WHERE study.id=?";
-    // @formatter:on
+            + "FROM " + Study.class.getName() + " study"
+            + " INNER JOIN study.contacts contacts"
+            + " INNER JOIN contacts.clinic clinics"
+            + " WHERE study.id=?";
 
-    // @formatter:off
     @SuppressWarnings("nls")
     private static final String STUDY_CLINIC_INFO_HQL =
-        "SELECT clinics,COUNT(DISTINCT patients)," 
-        + " COUNT(DISTINCT cevents)"
-        + " FROM " + Study.class.getName() + " study"
-        + " INNER JOIN study.contacts contacts"
-        + " INNER JOIN contacts.clinic clinics"
-        + " LEFT JOIN clinics.originInfos originInfo"
-        + " LEFT JOIN originInfo.specimens specimens"
-        + " LEFT JOIN specimens.collectionEvent cevents"
-        + " LEFT JOIN cevents.patient patients"
-        + " WHERE study.id = ?"
-        + " GROUP BY clinics";
-    // @formatter:on
+        "SELECT clinics,COUNT(DISTINCT patients),"
+            + " COUNT(DISTINCT cevents)"
+            + " FROM " + Study.class.getName() + " study"
+            + " INNER JOIN study.contacts contacts"
+            + " INNER JOIN contacts.clinic clinics"
+            + " LEFT JOIN clinics.originInfos originInfo"
+            + " LEFT JOIN originInfo.specimens specimens"
+            + " LEFT JOIN specimens.collectionEvent cevents"
+            + " LEFT JOIN cevents.patient patients"
+            + " WHERE study.id = ?"
+            + " GROUP BY clinics";
 
     private final Integer studyId;
 

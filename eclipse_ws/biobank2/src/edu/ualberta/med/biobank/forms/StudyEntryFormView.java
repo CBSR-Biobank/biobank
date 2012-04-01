@@ -25,9 +25,7 @@ import edu.ualberta.med.biobank.mvp.view.item.Adapter;
 import edu.ualberta.med.biobank.mvp.view.item.TableItem;
 import edu.ualberta.med.biobank.mvp.view.item.TextBox;
 import edu.ualberta.med.biobank.mvp.view.util.InputTable;
-import edu.ualberta.med.biobank.widgets.infotables.entry.AliquotedSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ClinicAddInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.entry.SourceSpecimenEntryInfoTable;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class StudyEntryFormView extends AbstractEntryFormView implements
@@ -194,40 +192,40 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
     }
 
     private void createSourceSpecimensSection() {
-        Section section =
-            baseForm
-                .createSection(Messages.StudyEntryForm_source_specimens_title);
-        final SourceSpecimenEntryInfoTable sourceSpecimenTable =
-            new SourceSpecimenEntryInfoTable(section, studyWrapper, null);
-        section.setClient(sourceSpecimenTable);
-        if (isSuperAdmin) {
-            BaseForm.addSectionToolbar(section,
-                Messages.SiteEntryForm_studies_add, new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
-                        sourceSpecimenTable.addSourceSpecimen();
-                    }
-                }, null);
-        }
-        srcSpcWrappers.setTable(sourceSpecimenTable);
+        // Section section =
+        // baseForm
+        // .createSection(Messages.StudyEntryForm_source_specimens_title);
+        // final SourceSpecimenEntryInfoTable sourceSpecimenTable =
+        // new SourceSpecimenEntryInfoTable(section, studyWrapper, null);
+        // section.setClient(sourceSpecimenTable);
+        // if (isSuperAdmin) {
+        // BaseForm.addSectionToolbar(section,
+        // Messages.SiteEntryForm_studies_add, new SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent e) {
+        // sourceSpecimenTable.addSourceSpecimen();
+        // }
+        // }, null);
+        // }
+        // srcSpcWrappers.setTable(sourceSpecimenTable);
     }
 
     private void createAliquotedSpecimensSection() {
-        Section section = baseForm.createSection(
-            Messages.StudyEntryForm_aliquoted_specimens_title);
-        final AliquotedSpecimenEntryInfoTable aliquotedSpecimenTable =
-            new AliquotedSpecimenEntryInfoTable(section, studyWrapper);
-        section.setClient(aliquotedSpecimenTable);
-        if (isSuperAdmin) {
-            BaseForm.addSectionToolbar(section,
-                Messages.SiteEntryForm_studies_add, new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
-                        aliquotedSpecimenTable.addAliquotedSpecimen();
-                    }
-                }, null);
-        }
-        aqSpcWrappers.setTable(aliquotedSpecimenTable);
+        // Section section = baseForm.createSection(
+        // Messages.StudyEntryForm_aliquoted_specimens_title);
+        // final AliquotedSpecimenEntryInfoTable aliquotedSpecimenTable =
+        // new AliquotedSpecimenEntryInfoTable(section, studyWrapper);
+        // section.setClient(aliquotedSpecimenTable);
+        // if (isSuperAdmin) {
+        // BaseForm.addSectionToolbar(section,
+        // Messages.SiteEntryForm_studies_add, new SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent e) {
+        // aliquotedSpecimenTable.addAliquotedSpecimen();
+        // }
+        // }, null);
+        // }
+        // aqSpcWrappers.setTable(aliquotedSpecimenTable);
     }
 
     private void createStudyEventAttrSection() {

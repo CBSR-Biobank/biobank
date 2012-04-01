@@ -14,7 +14,6 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.dialogs.StudySourceSpecimenDialog;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -39,8 +38,6 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
 
     private List<SourceSpecimenWrapper> deletedSourceSpecimen;
 
-    private StudyWrapper study;
-
     private StudySourceSpecimenDialog dlg;
 
     public SourceSpecimenEntryInfoTable(Composite parent,
@@ -54,11 +51,11 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
      *            instance (cannot be null)
      * @param study the study the source specimens belong to.
      */
-    public SourceSpecimenEntryInfoTable(Composite parent, StudyWrapper study,
+    public SourceSpecimenEntryInfoTable(Composite parent,
+        List<SourceSpecimenWrapper> sourceSpecimens,
         List<SpecimenTypeWrapper> specimenTypes) {
         super(parent, null);
-        this.study = study;
-        selectedSourceSpecimens = study.getSourceSpecimenCollection(true);
+        selectedSourceSpecimens = sourceSpecimens;
         availableSpecimenTypes = specimenTypes;
         for (SourceSpecimenWrapper ss : selectedSourceSpecimens)
             availableSpecimenTypes.remove(ss.getSpecimenType());
@@ -183,9 +180,8 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         return deletedSourceSpecimen;
     }
 
-    @Override
-    public void reload() {
-        selectedSourceSpecimens = study.getSourceSpecimenCollection(true);
+    public void reload(List<SourceSpecimenWrapper> sourceSpecimens) {
+        selectedSourceSpecimens = sourceSpecimens;
         if (selectedSourceSpecimens == null) {
             selectedSourceSpecimens = new ArrayList<SourceSpecimenWrapper>();
         }
