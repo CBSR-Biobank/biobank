@@ -138,6 +138,7 @@ public class PatientVisitSummaryTest extends AbstractReportTest {
 
         Collection<ProcessingEventWrapper> patientVisits = getPatientVisits();
 
+        @SuppressWarnings("unchecked")
         Collection<ProcessingEventWrapper> filteredPatientVisits =
             PredicateUtil.filter(patientVisits, PredicateUtil.andPredicate(
                 patientVisitProcessedBetween(after, before),

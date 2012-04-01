@@ -32,6 +32,7 @@ public abstract class RoleInfoTable extends
     private static final String[] HEADINGS =
         new String[] { Messages.RoleInfoTable_name_label };
 
+    @SuppressWarnings("unused")
     public RoleInfoTable(Composite parent, List<Role> collection) {
         super(parent, HEADINGS, ROWS_PER_PAGE);
         addEditItemListener(new IInfoTableEditItemListener<Role>() {

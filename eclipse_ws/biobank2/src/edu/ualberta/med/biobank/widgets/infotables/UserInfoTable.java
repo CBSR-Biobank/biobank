@@ -58,7 +58,7 @@ public abstract class UserInfoTable extends
         addEditItemListener(new IInfoTableEditItemListener<User>() {
             @Override
             public void editItem(InfoTableEvent<User> event) {
-                User user = ((User) getSelection());
+                User user = getSelection();
                 editUser(user);
             }
         });
@@ -66,7 +66,7 @@ public abstract class UserInfoTable extends
         addDeleteItemListener(new IInfoTableDeleteItemListener<User>() {
             @Override
             public void deleteItem(InfoTableEvent<User> event) {
-                User user = ((User) getSelection());
+                User user = getSelection();
                 deleteUser(user);
             }
         });
@@ -84,7 +84,7 @@ public abstract class UserInfoTable extends
         unlockMenuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                User user = ((User) getSelection());
+                User user = getSelection();
                 String userName = user.getLogin();
                 try {
                     SessionManager.getAppService().unlockUser(userName);
@@ -99,7 +99,7 @@ public abstract class UserInfoTable extends
         menu.addListener(SWT.Show, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                User user = ((User) getSelection());
+                User user = getSelection();
                 unlockMenuItem.setEnabled(isLockedOut(user));
             }
         });

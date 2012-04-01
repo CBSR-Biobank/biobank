@@ -8,8 +8,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 
 public class ProcessingAdministrationHandler extends AbstractHandler implements

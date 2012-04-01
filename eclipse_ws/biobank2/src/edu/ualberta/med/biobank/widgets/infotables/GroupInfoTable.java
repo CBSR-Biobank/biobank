@@ -49,14 +49,14 @@ public abstract class GroupInfoTable extends
         addEditItemListener(new IInfoTableEditItemListener<Group>() {
             @Override
             public void editItem(InfoTableEvent<Group> event) {
-                editGroup((Group) getSelection());
+                editGroup(getSelection());
             }
         });
 
         addDeleteItemListener(new IInfoTableDeleteItemListener<Group>() {
             @Override
             public void deleteItem(InfoTableEvent<Group> event) {
-                deleteGroup((Group) getSelection());
+                deleteGroup(getSelection());
             }
         });
 
@@ -73,7 +73,7 @@ public abstract class GroupInfoTable extends
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                duplicate((Group) getSelection());
+                duplicate(getSelection());
             }
         });
     }

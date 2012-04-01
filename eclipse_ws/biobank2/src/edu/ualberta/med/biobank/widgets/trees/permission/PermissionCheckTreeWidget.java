@@ -244,11 +244,12 @@ public class PermissionCheckTreeWidget extends Composite {
             Object element = event.getElement();
             if (!(element instanceof PermissionNode)) return;
 
-            PermissionNode node = (PermissionNode) event.getElement();
-            PermissionEnum perm = node.getPermission();
+            // PermissionNode node = (PermissionNode) event.getElement();
+            // PermissionEnum perm = node.getPermission();
 
         }
 
+        @SuppressWarnings("unused")
         private void updateParent(PermissionRootNode parent) {
 
         }

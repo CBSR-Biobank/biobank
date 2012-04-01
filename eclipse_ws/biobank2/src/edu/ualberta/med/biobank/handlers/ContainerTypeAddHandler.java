@@ -4,7 +4,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -33,16 +32,18 @@ public class ContainerTypeAddHandler extends LogoutSensitiveHandler {
     @Override
     public boolean isEnabled() {
         try {
-        	 if (allowed == null) {
-             	Integer centerId = SessionManager.getUser()
-                 .getCurrentWorkingCenter() !=null ? SessionManager.getUser()
-                         .getCurrentWorkingCenter().getId() : null;
-                 allowed =
-                     SessionManager.getAppService().isAllowed(
-                         new ContainerTypeCreatePermission(centerId));
-             }
-             return SessionManager.getInstance().getSession() != null &&
-                 allowed;
+            if (allowed == null) {
+                Integer centerId =
+                    SessionManager.getUser()
+                        .getCurrentWorkingCenter() != null ? SessionManager
+                        .getUser()
+                        .getCurrentWorkingCenter().getId() : null;
+                allowed =
+                    SessionManager.getAppService().isAllowed(
+                        new ContainerTypeCreatePermission(centerId));
+            }
+            return SessionManager.getInstance().getSession() != null &&
+                allowed;
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
                 Messages.HandlerPermission_message);

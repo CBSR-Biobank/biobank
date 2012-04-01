@@ -47,6 +47,7 @@ public class MembershipInfoTable
 
     private final ManagerContext managerContext;
 
+    @SuppressWarnings("unused")
     public MembershipInfoTable(Composite parent,
         final Principal principal, MembershipContext context,
         ManagerContext managerContext) {
@@ -59,7 +60,7 @@ public class MembershipInfoTable
         addEditItemListener(new IInfoTableEditItemListener<Membership>() {
             @Override
             public void editItem(InfoTableEvent<Membership> event) {
-                Membership membership = ((Membership) getSelection());
+                Membership membership = getSelection();
                 editMembership(membership);
             }
         });
@@ -67,7 +68,7 @@ public class MembershipInfoTable
         addDeleteItemListener(new IInfoTableDeleteItemListener<Membership>() {
             @Override
             public void deleteItem(InfoTableEvent<Membership> event) {
-                Membership membership = ((Membership) getSelection());
+                Membership membership = getSelection();
                 principal.getMemberships().remove(membership);
                 getList().remove(membership);
                 setList(getList());
@@ -109,27 +110,27 @@ public class MembershipInfoTable
     private static String getCentersString(Membership m) {
         if (m.getDomain().isAllCenters()) {
             return "All Centers";
-        } else {
-            List<String> centerNames = new ArrayList<String>();
-            for (Center c : m.getDomain().getCenters()) {
-                centerNames.add(c.getNameShort());
-            }
-            Collections.sort(centerNames, String.CASE_INSENSITIVE_ORDER);
-            return StringUtil.join(centerNames, "\n");
         }
+
+        List<String> centerNames = new ArrayList<String>();
+        for (Center c : m.getDomain().getCenters()) {
+            centerNames.add(c.getNameShort());
+        }
+        Collections.sort(centerNames, String.CASE_INSENSITIVE_ORDER);
+        return StringUtil.join(centerNames, "\n");
     }
 
     private static String getStudiesString(Membership m) {
         if (m.getDomain().isAllStudies()) {
             return "All Studies";
-        } else {
-            List<String> studyNames = new ArrayList<String>();
-            for (Study s : m.getDomain().getStudies()) {
-                studyNames.add(s.getNameShort());
-            }
-            Collections.sort(studyNames, String.CASE_INSENSITIVE_ORDER);
-            return StringUtil.join(studyNames, "\n");
         }
+
+        List<String> studyNames = new ArrayList<String>();
+        for (Study s : m.getDomain().getStudies()) {
+            studyNames.add(s.getNameShort());
+        }
+        Collections.sort(studyNames, String.CASE_INSENSITIVE_ORDER);
+        return StringUtil.join(studyNames, "\n");
     }
 
     private static String getRolesAndPermissionsSummary(Membership m) {

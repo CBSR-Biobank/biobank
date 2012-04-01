@@ -248,9 +248,8 @@ public class MembershipDomainPage extends BgcWizardPage {
                 if (d.isAllCenters()) {
                     options.addAll(context.getCenters());
                     break;
-                } else {
-                    options.addAll(d.getCenters());
                 }
+                options.addAll(d.getCenters());
             }
         }
         return options;
@@ -263,9 +262,8 @@ public class MembershipDomainPage extends BgcWizardPage {
                 if (d.isAllStudies()) {
                     options.addAll(context.getStudies());
                     break;
-                } else {
-                    options.addAll(d.getStudies());
                 }
+                options.addAll(d.getStudies());
             }
         }
         return options;

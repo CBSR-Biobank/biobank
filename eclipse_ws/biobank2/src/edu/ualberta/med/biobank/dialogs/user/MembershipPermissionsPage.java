@@ -136,9 +136,8 @@ public class MembershipPermissionsPage extends BgcWizardPage {
                 if (managerMemb.isEveryPermission()) {
                     options.addAll(PermissionEnum.valuesList());
                     break;
-                } else {
-                    options.addAll(managerMemb.getAllPermissions());
                 }
+                options.addAll(managerMemb.getAllPermissions());
             }
         }
         return options;
@@ -173,9 +172,8 @@ public class MembershipPermissionsPage extends BgcWizardPage {
                 if (managerMemb.isEveryPermission()) {
                     options.addAll(context.getRoles());
                     break;
-                } else {
-                    options.addAll(managerMemb.getRoles());
                 }
+                options.addAll(managerMemb.getRoles());
             }
         }
         return options;

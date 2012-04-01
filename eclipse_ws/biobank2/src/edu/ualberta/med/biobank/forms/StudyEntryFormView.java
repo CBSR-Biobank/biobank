@@ -1,16 +1,12 @@
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
@@ -25,8 +21,6 @@ import edu.ualberta.med.biobank.mvp.view.item.Adapter;
 import edu.ualberta.med.biobank.mvp.view.item.TableItem;
 import edu.ualberta.med.biobank.mvp.view.item.TextBox;
 import edu.ualberta.med.biobank.mvp.view.util.InputTable;
-import edu.ualberta.med.biobank.widgets.infotables.entry.ClinicAddInfoTable;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class StudyEntryFormView extends AbstractEntryFormView implements
     StudyEntryPresenter.View {
@@ -103,9 +97,11 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
     }
 
     private BaseForm baseForm;
-    private WritableApplicationService appService;
-    private StudyWrapper studyWrapper;
-    private boolean isSuperAdmin;
+
+    // private WritableApplicationService appService;
+
+    // private StudyWrapper studyWrapper;
+    // private boolean isSuperAdmin;
 
     @Override
     public void setActivityStatusComboView(IView view) {
@@ -157,9 +153,9 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
         table.addLabel("activityStatus");
         activityStatusComboView.create(table);
 
-        appService = SessionManager.getAppService();
-        studyWrapper = new StudyWrapper(appService);
-        isSuperAdmin = SessionManager.getUser().isSuperAdmin();
+        // appService = SessionManager.getAppService();
+        // studyWrapper = new StudyWrapper(appService);
+        // isSuperAdmin = SessionManager.getUser().isSuperAdmin();
 
         createCommentsSection();
         createClinicSection();
@@ -174,20 +170,20 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
     }
 
     private void createClinicSection() {
-        Section section =
-            baseForm.createSection(Messages.StudyEntryForm_contacts_title);
-        final ClinicAddInfoTable clinicsTable = null;
-        // new ClinicAddInfoTable(section, studyWrapper);
-        section.setClient(clinicsTable);
-        if (isSuperAdmin) {
-            BaseForm.addSectionToolbar(section,
-                Messages.SiteEntryForm_studies_add, new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
-                        clinicsTable.createClinicContact();
-                    }
-                }, null);
-        }
+        // Section section =
+        // baseForm.createSection(Messages.StudyEntryForm_contacts_title);
+        // final ClinicAddInfoTable clinicsTable = null;
+        // // new ClinicAddInfoTable(section, studyWrapper);
+        // section.setClient(clinicsTable);
+        // if (isSuperAdmin) {
+        // BaseForm.addSectionToolbar(section,
+        // Messages.SiteEntryForm_studies_add, new SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent e) {
+        // clinicsTable.createClinicContact();
+        // }
+        // }, null);
+        // }
         // contactWrappers.setTable(clinicsTable);
     }
 

@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
@@ -64,8 +63,6 @@ public class StudyViewForm extends BiobankViewForm {
 
     private CommentsInfoTable commentTable;
 
-    private List<ClinicInfo> clinics;
-
     @Override
     public void init() throws Exception {
         Assert
@@ -85,7 +82,6 @@ public class StudyViewForm extends BiobankViewForm {
             SessionManager.getAppService().doAction(
                 new StudyGetInfoAction(adapter.getId()));
         Study s = studyInfo.getStudy();
-        clinics = studyInfo.getClinicInfos();
         Set<AliquotedSpecimen> as = studyInfo.getAliquotedSpcs();
         Set<SourceSpecimen> ss = studyInfo.getSourceSpecimens();
         Set<StudyEventAttr> ea = studyInfo.getStudyEventAttrs();

@@ -61,8 +61,8 @@ public class TestGroupDeleteAction extends TestAction {
     public void asGlobalAdmin() {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
-        Membership userMembership =
-            factory.createMembership(Domain.GLOBAL, Rank.ADMINISTRATOR);
+        // Membership userMembership =
+        // factory.createMembership(Domain.GLOBAL, Rank.ADMINISTRATOR);
         tx.commit();
 
         Scenario.Builder b = new Scenario.Builder().user(user).allDomains();
@@ -75,8 +75,8 @@ public class TestGroupDeleteAction extends TestAction {
     public void asCenterAdmin() {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
-        Membership userMembership =
-            factory.createMembership(Domain.CENTER, Rank.ADMINISTRATOR);
+        // Membership userMembership =
+        // factory.createMembership(Domain.CENTER, Rank.ADMINISTRATOR);
         tx.commit();
 
         Scenario.Builder b = new Scenario.Builder().user(user)
@@ -91,8 +91,8 @@ public class TestGroupDeleteAction extends TestAction {
     public void asStudyAdmin() {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
-        Membership userMembership =
-            factory.createMembership(Domain.STUDY, Rank.ADMINISTRATOR);
+        // Membership userMembership =
+        // factory.createMembership(Domain.STUDY, Rank.ADMINISTRATOR);
         tx.commit();
 
         Scenario.Builder b = new Scenario.Builder().user(user)
@@ -107,6 +107,8 @@ public class TestGroupDeleteAction extends TestAction {
     public void asCenterStudyAdmin() {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
+
+        @SuppressWarnings("unused")
         Membership userMembership =
             factory.createMembership(Domain.CENTER_STUDY, Rank.ADMINISTRATOR);
         tx.commit();

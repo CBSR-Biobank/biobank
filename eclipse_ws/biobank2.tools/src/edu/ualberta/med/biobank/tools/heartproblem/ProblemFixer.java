@@ -4,7 +4,6 @@ import jargs.gnu.CmdLineParser;
 import jargs.gnu.CmdLineParser.Option;
 import jargs.gnu.CmdLineParser.OptionException;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -407,8 +406,7 @@ public class ProblemFixer {
     /*
      * Parses the command line arguments and returns them in an AppArgs object.
      */
-    private static AppArgs parseCommandLine(String argv[])
-        throws URISyntaxException {
+    private static AppArgs parseCommandLine(String argv[]) {
         AppArgs appArgs = new AppArgs();
 
         CmdLineParser parser = new CmdLineParser();

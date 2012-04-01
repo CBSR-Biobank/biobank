@@ -39,28 +39,28 @@ public class ManagerContextGetAction implements Action<ManagerContextGetOutput> 
         throws ActionException {
 
         @SuppressWarnings("unchecked")
-        List<Center> centers = (List<Center>) context.getSession()
+        List<Center> centers = context.getSession()
             .createCriteria(Center.class)
             .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
             .addOrder(Order.asc("name"))
             .list();
 
         @SuppressWarnings("unchecked")
-        List<Study> studies = (List<Study>) context.getSession()
+        List<Study> studies = context.getSession()
             .createCriteria(Study.class)
             .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
             .addOrder(Order.asc("name"))
             .list();
 
         @SuppressWarnings("unchecked")
-        List<Role> roles = (List<Role>) context.getSession()
+        List<Role> roles = context.getSession()
             .createCriteria(Role.class)
             .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
             .addOrder(Order.asc("name"))
             .list();
 
         @SuppressWarnings("unchecked")
-        List<User> users = (List<User>) context.getSession()
+        List<User> users = context.getSession()
             .createCriteria(User.class)
             .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
             .addOrder(Order.asc("login"))

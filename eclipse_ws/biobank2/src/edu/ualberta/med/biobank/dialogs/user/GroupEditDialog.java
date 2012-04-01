@@ -126,8 +126,7 @@ public class GroupEditDialog extends AbstractSecurityEditDialog {
             new MembershipInfoTable(contents, group, membershipContext, context);
     }
 
-    private void createUsersSection(Composite contents)
-        throws ApplicationException {
+    private void createUsersSection(Composite contents) {
         usersWidget = new MultiSelectWidget<User>(contents, SWT.NONE,
             Messages.GroupEditDialog_available_users_label,
             Messages.GroupEditDialog_selected_users_label, 200) {

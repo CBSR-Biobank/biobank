@@ -79,9 +79,8 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
         StudyGetFreeContactsAction action =
             new StudyGetFreeContactsAction();
 
-        List<Contact> allContacts =
-            (List<Contact>) SessionManager.getAppService().doAction(action)
-                .getList();
+        List<Contact> allContacts = SessionManager.getAppService().
+            doAction(action).getList();
         allContacts.removeAll(contacts);
 
         HashSet<Clinic> clinics = new HashSet<Clinic>();

@@ -14,10 +14,11 @@ import edu.ualberta.med.biobank.model.Contact;
 
 public class StudyGetFreeContactsAction implements Action<ListResult<Contact>> {
 
+    @SuppressWarnings("nls")
     private static final String ALL_CONTACTS =
-        "from " //$NON-NLS-1$
-            + Contact.class.getName()
-            + " contact inner join fetch contact.clinic cl inner join fetch cl.contacts"; //$NON-NLS-1$
+        "FROM " + Contact.class.getName() + " contact"
+            + " INNER JOIN FETCH contact.clinic cl"
+            + " INNER JOIN FETCH cl.contacts";
 
     private static final long serialVersionUID = 1L;
 
@@ -31,6 +32,7 @@ public class StudyGetFreeContactsAction implements Action<ListResult<Contact>> {
     public ListResult<Contact> run(ActionContext context)
         throws ActionException {
         Query q = context.getSession().createQuery(ALL_CONTACTS);
+        @SuppressWarnings("unchecked")
         List<Contact> list = q.list();
         return new ListResult<Contact>(list);
     }

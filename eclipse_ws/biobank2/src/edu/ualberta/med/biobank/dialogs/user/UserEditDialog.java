@@ -211,17 +211,15 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
                 managerContext);
     }
 
-    private void createGroupsSection(Composite contents)
-        throws ApplicationException {
-        groupsWidget =
-            new MultiSelectWidget<Group>(contents, SWT.NONE,
-                Messages.UserEditDialog_groups_available,
-                Messages.UserEditDialog_groups_selected, 200) {
-                @Override
-                protected String getTextForObject(Group node) {
-                    return node.getName();
-                }
-            };
+    private void createGroupsSection(Composite contents) {
+        groupsWidget = new MultiSelectWidget<Group>(contents, SWT.NONE,
+            Messages.UserEditDialog_groups_available,
+            Messages.UserEditDialog_groups_selected, 200) {
+            @Override
+            protected String getTextForObject(Group node) {
+                return node.getName();
+            }
+        };
 
         Set<Group> available = membershipContext.getGroups();
 
