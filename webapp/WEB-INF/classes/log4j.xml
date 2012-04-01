@@ -18,13 +18,17 @@
 
   <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
     <param name="Target" value="System.out" />
-    <param name="Threshold" value="error" />
+    <param name="Threshold" value="debug" />
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern"
         value="%d{ABSOLUTE} %-5p [%c{1}] %m%n" />
     </layout>
   </appender>
 
+  <category name="edu.ualberta.med.biobank.common.action.study">
+    <level value="debug" />
+    <appender-ref ref="CONSOLE" />
+  </category>
 
   <category name="Biobank.Activity">
     <level value="INFO" />

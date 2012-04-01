@@ -197,7 +197,11 @@ public abstract class BgcFormBase extends EditorPart implements
         if (title != null) {
             section.setText(title);
         }
-        section.setLayout(new GridLayout(1, false));
+        GridLayout layout = new GridLayout(1, false);
+        layout.verticalSpacing = 0;
+        layout.marginHeight = 0;
+        layout.marginWidth = 0;
+        section.setLayout(layout);
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         section.addExpansionListener(new ExpansionAdapter() {
             @Override
@@ -220,7 +224,11 @@ public abstract class BgcFormBase extends EditorPart implements
     protected Composite sectionAddClient(Section section) {
         Composite client = toolkit.createComposite(section);
         section.setClient(client);
-        client.setLayout(new GridLayout(2, false));
+        GridLayout layout = new GridLayout(2, false);
+        layout.verticalSpacing = 1;
+        layout.marginHeight = 1;
+        layout.marginWidth = 1;
+        client.setLayout(layout);
         toolkit.paintBordersFor(client);
         return client;
     }
@@ -481,7 +489,8 @@ public abstract class BgcFormBase extends EditorPart implements
             init();
             setValues();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.BgcFormBase_reload_error, Messages.BgcFormBase_message);
+            BgcPlugin.openAsyncError(Messages.BgcFormBase_reload_error,
+                Messages.BgcFormBase_message);
             logger.error("Can't reload the form", e); //$NON-NLS-1$
         }
     }

@@ -106,20 +106,16 @@ public class StudyViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        nameLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, Messages.label_name);
-        nameShortLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.label_nameShort);
-        activityStatusLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.label_activity);
-        patientTotal =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.StudyViewForm_field_label_total_patients);
-        visitTotal =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.StudyViewForm_field_label_total_cEvents);
+        nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.label_name);
+        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.label_nameShort);
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.label_activity);
+        patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.StudyViewForm_field_label_total_patients);
+        visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.StudyViewForm_field_label_total_cEvents);
 
         createCommentsSection();
         createClinicSection();

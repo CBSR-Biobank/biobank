@@ -29,13 +29,13 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
         Long ceventCount;
         String contactNames;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] { clinicNameShort,
-                (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
-                (ceventCount != null) ? ceventCount.toString() : "", //$NON-NLS-1$
-                contactNames }, "\t"); //$NON-NLS-1$
-
+                (patientCount != null) ? patientCount.toString() : "",
+                (ceventCount != null) ? ceventCount.toString() : "",
+                contactNames }, "\t");
         }
     }
 
@@ -43,7 +43,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
         Messages.StudyContactInfoTable_clinic_label,
         Messages.StudyContactInfoTable_patient_count_label,
         Messages.StudyContactInfoTable_cEvent_count_label,
-        Messages.StudyContactInfoTable_contact_name_label };
+        Messages.StudyContactInfoTable_contact_names_label };
 
     private StudyWrapper study;
 
@@ -54,12 +54,33 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
     }
 
     public static class ClinicContacts {
-        public ClinicWrapper clinic;
-        public String contacts;
+        private ClinicWrapper clinic;
+        private StringBuffer contactsBuf;
 
-        public ClinicContacts(ClinicWrapper clinic, String contacts) {
+        public ClinicContacts(ClinicWrapper clinic, ContactWrapper contact) {
             this.clinic = clinic;
-            this.contacts = contacts;
+            contactsBuf = new StringBuffer();
+            addContact(contact);
+        }
+
+        public void addContact(ContactWrapper contact) {
+            if (contactsBuf.length() > 0) {
+                contactsBuf.append("\n"); //$NON-NLS-1$
+            }
+            String name = contact.getName();
+            if ((name != null) && !name.isEmpty()) {
+                contactsBuf.append(contact.getName());
+            }
+            String title = contact.getTitle();
+            if ((title != null) && !title.isEmpty()) {
+                contactsBuf.append(" ("); //$NON-NLS-1$
+                contactsBuf.append(title);
+                contactsBuf.append(")"); //$NON-NLS-1$
+            }
+        }
+
+        public String getFormattedContacts() {
+            return contactsBuf.toString();
         }
     }
 
@@ -70,23 +91,17 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
 
     private Collection<ClinicContacts> processClinics(
         List<ContactWrapper> contactCollection) {
-        HashMap<ClinicWrapper, ClinicContacts> tableData = new HashMap<ClinicWrapper, ClinicContacts>();
+        HashMap<ClinicWrapper, ClinicContacts> tableData =
+            new HashMap<ClinicWrapper, ClinicContacts>();
         for (ContactWrapper contact : contactCollection) {
             ClinicWrapper clinic = contact.getClinic();
             if (tableData.containsKey(clinic)) {
                 ClinicContacts prevEntry = tableData.get(clinic);
-                ClinicContacts newEntry = new ClinicContacts(
-                    clinic,
-                    prevEntry.contacts + ";" //$NON-NLS-1$
-                        + (contact.getName() == null ? "" : contact.getName()) //$NON-NLS-1$
-                        + (contact.getTitle() == null ? "" : "(" + contact.getTitle() + ")")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                tableData.put(clinic, newEntry);
-            } else
-                tableData.put(clinic,
-                    new ClinicContacts(clinic, (contact.getName() == null ? "" //$NON-NLS-1$
-                        : contact.getName())
-                        + (contact.getTitle() == null ? "" : "(" //$NON-NLS-1$ //$NON-NLS-2$
-                            + contact.getTitle() + ")"))); //$NON-NLS-1$
+                prevEntry.addContact(contact);
+                tableData.put(clinic, prevEntry);
+            } else {
+                tableData.put(clinic, new ClinicContacts(clinic, contact));
+            }
         }
         return tableData.values();
     }
@@ -106,7 +121,8 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -123,7 +139,8 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
                 case 3:
                     return item.contactNames;
                 default:
-                    return ""; //$NON-NLS-1$
+                    throw new IllegalArgumentException(
+                        "column index is invalid " + columnIndex);
                 }
             }
         };
@@ -137,7 +154,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
         info.clinicNameShort = info.clinic.getNameShort();
         info.patientCount = info.clinic.getPatientCountForStudy(study);
         info.ceventCount = info.clinic.getCollectionEventCountForStudy(study);
-        info.contactNames = cc.contacts;
+        info.contactNames = cc.getFormattedContacts();
         return info;
     }
 

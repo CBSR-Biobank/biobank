@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -44,9 +45,11 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -234,7 +237,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add, null, comment, "message", null);
+            Messages.Comments_add, null, comment, "message", null); //$NON-NLS-1$
     }
 
     private void createSourceSpecimensSection() {
@@ -265,11 +268,16 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createAliquotedSpecimensSection() {
-        Section section =
-            createSection(Messages.StudyEntryForm_aliquoted_specimens_title);
+        Composite client =
+            createSectionWithClient(Messages.StudyEntryForm_aliquoted_specimens_title);
+        GridLayout layout = (GridLayout) client.getLayout();
+        layout.numColumns = 1;
+        layout.verticalSpacing = 0;
+
+        toolkit.createLabel(client, Messages.StudyEntryForm_1, SWT.LEFT);
 
         aliquotedSpecimenEntryTable =
-            new AliquotedSpecimenEntryInfoTable(section,
+            new AliquotedSpecimenEntryInfoTable(client,
                 ModelWrapper.wrapModelCollection(
                     SessionManager.getAppService(),
                     studyInfo.getAliquotedSpcs(),
@@ -281,7 +289,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             .setAvailableSpecimenTypes(sourceSpecimenEntryTable
                 .getList());
 
-        addSectionToolbar(section,
+        addSectionToolbar((Section) client.getParent(),
             Messages.StudyEntryForm_aliquoted_specimens_button_add,
             new SelectionAdapter() {
                 @Override
@@ -289,7 +297,6 @@ public class StudyEntryForm extends BiobankEntryForm {
                     aliquotedSpecimenEntryTable.addAliquotedSpecimen();
                 }
             }, AliquotedSpecimenWrapper.class);
-        section.setClient(aliquotedSpecimenEntryTable);
     }
 
     private void createEventAttrSection() throws Exception {
@@ -298,7 +305,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         GridLayout gl = (GridLayout) client.getLayout();
         gl.numColumns = 1;
 
-        toolkit.createLabel(client, "Date Processed is collected by default.",
+        toolkit.createLabel(client, Messages.StudyEntryForm_2,
             SWT.LEFT);
 
         StudyEventAttrCustom studyEventAttrCustom;
@@ -324,7 +331,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 String permissible = sea.getPermissible();
                 if ((permissible != null) && !permissible.isEmpty()) {
                     studyEventAttrCustom.setAllowedValues(permissible
-                        .split(";"));
+                        .split(";")); //$NON-NLS-1$
                 }
                 selected =
                     sea.getActivityStatus().equals(ActivityStatus.ACTIVE);
@@ -390,40 +397,64 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private HashSet<SourceSpecimenSaveInfo> getSourceSpecimenInfos() {
-        study.addToSourceSpecimenCollection(sourceSpecimenEntryTable
-            .getAddedOrModifiedSourceSpecimens());
-        study.removeFromSourceSpecimenCollection(sourceSpecimenEntryTable
-            .getDeletedSourceSpecimens());
-
         HashSet<SourceSpecimenSaveInfo> sourceSpecimenSaveInfos =
             new HashSet<SourceSpecimenSaveInfo>();
 
-        for (SourceSpecimenWrapper wrapper : study
-            .getSourceSpecimenCollection(false)) {
-            SourceSpecimenSaveInfo sourceSpecimenSaveInfo =
-                new SourceSpecimenSaveInfo(wrapper.getWrappedObject());
-            LOGGER.debug(sourceSpecimenSaveInfo.toString());
-            sourceSpecimenSaveInfos.add(sourceSpecimenSaveInfo);
+        Set<SourceSpecimen> newSourceSpcs =
+            new HashSet<SourceSpecimen>(studyInfo.getSourceSpecimens());
+
+        // remove the ones deleted
+        for (SourceSpecimenWrapper wrapper : sourceSpecimenEntryTable
+            .getDeletedSourceSpecimens()) {
+            newSourceSpcs.remove(wrapper.getWrappedObject());
+        }
+
+        // add the ones not modified
+        for (SourceSpecimen ss : newSourceSpcs) {
+            if (!sourceSpecimenEntryTable
+                .getAddedOrModifiedSourceSpecimens().contains(ss)) {
+                sourceSpecimenSaveInfos.add(new SourceSpecimenSaveInfo(ss));
+            }
+        }
+
+        // add the modified ones
+        for (SourceSpecimenWrapper wrapper : sourceSpecimenEntryTable
+            .getAddedOrModifiedSourceSpecimens()) {
+            sourceSpecimenSaveInfos.add(new SourceSpecimenSaveInfo(
+                wrapper.getWrappedObject()));
         }
         return sourceSpecimenSaveInfos;
     }
 
     private HashSet<AliquotedSpecimenSaveInfo> getAliquotedSpecimenInfos() {
-        study.addToAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
-            .getAddedOrModifiedAliquotedSpecimens());
-        study.removeFromAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
-            .getDeletedAliquotedSpecimens());
-
         HashSet<AliquotedSpecimenSaveInfo> aliquotedSpecimenSaveInfos =
             new HashSet<AliquotedSpecimenSaveInfo>();
 
-        for (AliquotedSpecimenWrapper wrapper : study
-            .getAliquotedSpecimenCollection(false)) {
-            AliquotedSpecimenSaveInfo aliquotedSpecimenSaveInfo =
-                new AliquotedSpecimenSaveInfo(wrapper.getWrappedObject());
-            LOGGER.debug(aliquotedSpecimenSaveInfo.toString());
-            aliquotedSpecimenSaveInfos.add(aliquotedSpecimenSaveInfo);
+        Set<AliquotedSpecimen> newAliquotedSpcs =
+            new HashSet<AliquotedSpecimen>(studyInfo.getAliquotedSpcs());
+
+        // remove the ones deleted
+        for (AliquotedSpecimenWrapper wrapper : aliquotedSpecimenEntryTable
+            .getDeletedAliquotedSpecimens()) {
+            newAliquotedSpcs.remove(wrapper.getWrappedObject());
         }
+
+        // add the ones not modified
+        for (AliquotedSpecimen as : newAliquotedSpcs) {
+            if (!aliquotedSpecimenEntryTable
+                .getAddedOrModifiedAliquotedSpecimens().contains(as)) {
+                aliquotedSpecimenSaveInfos
+                    .add(new AliquotedSpecimenSaveInfo(as));
+            }
+        }
+
+        // add the modified ones
+        for (AliquotedSpecimenWrapper wrapper : aliquotedSpecimenEntryTable
+            .getAddedOrModifiedAliquotedSpecimens()) {
+            aliquotedSpecimenSaveInfos.add(new AliquotedSpecimenSaveInfo(
+                wrapper.getWrappedObject()));
+        }
+
         return aliquotedSpecimenSaveInfos;
     }
 
@@ -508,7 +539,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 String permissible = sea.getPermissible();
                 if ((permissible != null) && !permissible.isEmpty()) {
                     studyPvAttrCustom.setAllowedValues(permissible
-                        .split(";"));
+                        .split(";")); //$NON-NLS-1$
                 }
                 selected = true;
                 studyPvAttrCustom.inStudy = true;

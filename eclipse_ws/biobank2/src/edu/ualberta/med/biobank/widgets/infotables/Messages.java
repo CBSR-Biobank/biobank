@@ -149,7 +149,7 @@ public class Messages extends NLS {
 
     public static String StudyContactInfoTable_clinic_label;
 
-    public static String StudyContactInfoTable_contact_name_label;
+    public static String StudyContactInfoTable_contact_names_label;
 
     public static String StudyContactInfoTable_patient_count_label;
 

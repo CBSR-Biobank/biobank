@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.study.StudyGetFreeContactsAction;
+import edu.ualberta.med.biobank.common.action.clinic.ContactsGetAllAction;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
@@ -37,13 +37,13 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
 
     private Contact selectedContact;
 
-    private List<Contact> contacts;
+    private List<Contact> excludedContacts;
 
     private ComboViewer clinicCombo;
 
     public SelectClinicContactDialog(Shell parent, List<Contact> contacts) {
         super(parent);
-        this.contacts = contacts;
+        this.excludedContacts = contacts;
     }
 
     @Override
@@ -76,16 +76,14 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
             }
         };
 
-        StudyGetFreeContactsAction action =
-            new StudyGetFreeContactsAction();
-
         List<Contact> allContacts = SessionManager.getAppService().
-            doAction(action).getList();
-        allContacts.removeAll(contacts);
+            doAction(new ContactsGetAllAction()).getList();
+        allContacts.removeAll(excludedContacts);
 
         HashSet<Clinic> clinics = new HashSet<Clinic>();
-        for (Contact contact : allContacts)
+        for (Contact contact : allContacts) {
             clinics.add(contact.getClinic());
+        }
 
         clinicCombo = widgetCreator.createComboViewer(contents,
             Messages.SelectClinicContactDialog_clinic_label,
@@ -122,7 +120,7 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
 
     protected void filterContacts(Clinic clinic) {
         Collection<Contact> clinicContacts = clinic.getContacts();
-        for (Contact contact : contacts)
+        for (Contact contact : excludedContacts)
             clinicContacts.remove(contact);
         contactInfoTable.setList(new ArrayList<Contact>(clinicContacts));
     }

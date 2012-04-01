@@ -99,6 +99,10 @@ public class Messages extends NLS {
     public static String StudyViewForm_aliquoted_specimen_title;
     public static String StudyViewForm_visit_info_attributes_title;
     public static String StudyViewForm_visit_info_msg;
+    public static String StudyEntryForm_1;
+
+    public static String StudyEntryForm_2;
+
     public static String StudyEntryForm_creation_msg;
     public static String StudyEntryForm_edition_msg;
     public static String StudyEntryForm_title_new;

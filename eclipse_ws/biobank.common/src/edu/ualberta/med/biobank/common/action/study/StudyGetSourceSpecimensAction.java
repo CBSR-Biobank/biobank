@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.action.study;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Query;
@@ -35,6 +34,7 @@ public class StudyGetSourceSpecimensAction implements
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public SetResult<SourceSpecimen> run(ActionContext context)
         throws ActionException {
@@ -43,12 +43,7 @@ public class StudyGetSourceSpecimensAction implements
         Query query = context.getSession().createQuery(SELECT_SOURCE_SPCS_HQL);
         query.setParameter(0, studyId);
 
-        @SuppressWarnings("unchecked")
-        List<SourceSpecimen> srcspcs = query.list();
-        if (srcspcs != null) {
-            result.addAll(srcspcs);
-        }
-
+        result.addAll(query.list());
         return new SetResult<SourceSpecimen>(result);
     }
 }
