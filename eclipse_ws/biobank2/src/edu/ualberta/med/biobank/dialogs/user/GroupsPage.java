@@ -79,18 +79,7 @@ public abstract class GroupsPage extends BgcDialogPage {
                     newGroup.setDescription(src.getDescription());
 
                     for (Membership srcMemb : src.getMemberships()) {
-                        Membership newMemb = new Membership();
-                        newMemb.setDomain(srcMemb.getDomain());
-
-                        newMemb.setEveryPermission(srcMemb.isEveryPermission());
-                        newMemb.setUserManager(srcMemb.isUserManager());
-
-                        newMemb.getRoles().addAll(srcMemb.getRoles());
-                        newMemb.getPermissions().addAll(
-                            srcMemb.getPermissions());
-
-                        newMemb.setPrincipal(newGroup);
-                        newGroup.getMemberships().add(newMemb);
+                        new Membership(srcMemb, newGroup);
                     }
 
                     newGroup.setName("CopyOf" + newGroup.getName()); //$NON-NLS-1$
