@@ -53,8 +53,8 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
     }
 
     public static class ClinicContacts {
-        private ClinicWrapper clinic;
-        private StringBuffer contactsBuf;
+        public ClinicWrapper clinic;
+        public StringBuffer contactsBuf;
 
         public ClinicContacts(ClinicWrapper clinic, ContactWrapper contact) {
             this.clinic = clinic;
