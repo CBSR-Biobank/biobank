@@ -82,7 +82,6 @@ public abstract class GroupsPage extends BgcDialogPage {
                         new Membership(srcMemb, newGroup);
                     }
 
-                    newGroup.setName("CopyOf" + newGroup.getName()); //$NON-NLS-1$
                     addGroup(newGroup);
                 }
             };
