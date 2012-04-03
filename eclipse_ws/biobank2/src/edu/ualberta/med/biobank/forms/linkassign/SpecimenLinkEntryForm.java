@@ -454,8 +454,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                     filteredSpecs.add(spec);
             availableSourceSpecimens = filteredSpecs;
         }
-
         // for single
+        singleTypesWidget.resetValues(true, false);
         singleTypesWidget.setSourceSpecimens(availableSourceSpecimens);
         singleTypesWidget.setResultTypes(studiesAliquotedTypes);
         if (!isSingleMode())
