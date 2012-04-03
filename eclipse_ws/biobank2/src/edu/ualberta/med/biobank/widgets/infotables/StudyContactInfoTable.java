@@ -53,11 +53,11 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
     }
 
     public static class ClinicContacts {
-        public ClinicWrapper clinic;
-        public StringBuffer contactsBuf;
+        private ClinicWrapper clinic;
+        private StringBuffer contactsBuf;
 
         public ClinicContacts(ClinicWrapper clinic, ContactWrapper contact) {
-            this.clinic = clinic;
+            this.setClinic(clinic);
             contactsBuf = new StringBuffer();
             addContact(contact);
         }
@@ -80,6 +80,14 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
 
         public String getFormattedContacts() {
             return contactsBuf.toString();
+        }
+
+        public ClinicWrapper getClinic() {
+            return clinic;
+        }
+
+        public void setClinic(ClinicWrapper clinic) {
+            this.clinic = clinic;
         }
     }
 
@@ -148,10 +156,10 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
         TableRowData info = new TableRowData();
         ClinicContacts cc = (ClinicContacts) o;
         info.clinic = cc;
-        info.clinicNameShort = info.clinic.clinic.getNameShort();
-        info.patientCount = info.clinic.clinic.getPatientCountForStudy(study);
+        info.clinicNameShort = info.clinic.getClinic().getNameShort();
+        info.patientCount = info.clinic.getClinic().getPatientCountForStudy(study);
         info.ceventCount =
-            info.clinic.clinic.getCollectionEventCountForStudy(study);
+            info.clinic.getClinic().getCollectionEventCountForStudy(study);
         info.contactNames = cc.getFormattedContacts();
         return info;
     }

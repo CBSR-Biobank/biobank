@@ -156,7 +156,7 @@ public class StudyViewForm extends BiobankViewForm {
                 public void doubleClick(InfoTableEvent<ClinicContacts> event) {
                     ClinicWrapper c =
                         ((ClinicContacts) ((InfoTableSelection) event
-                            .getSelection()).getObject()).clinic;
+                            .getSelection()).getObject()).getClinic();
                     AdapterBase.openForm(
                         new FormInput(
                             new ClinicAdapter(null,
@@ -170,7 +170,7 @@ public class StudyViewForm extends BiobankViewForm {
                 public void editItem(InfoTableEvent<ClinicContacts> event) {
                     ClinicWrapper c =
                         ((ClinicContacts) ((InfoTableSelection) event
-                            .getSelection()).getObject()).clinic;
+                            .getSelection()).getObject()).getClinic();
                     AdapterBase.openForm(
                         new FormInput(
                             new ClinicAdapter(null,
