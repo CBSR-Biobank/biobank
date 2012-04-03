@@ -124,6 +124,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     @Override
     protected void init() throws Exception {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         Assert.isTrue(adapter instanceof ShipmentAdapter,
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());

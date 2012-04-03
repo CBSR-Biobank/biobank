@@ -64,6 +64,7 @@ public class RequestEntryForm extends BiobankViewForm {
 
     @Override
     protected void init() throws Exception {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         Assert.isNotNull(adapter, "Adapter should be no null"); //$NON-NLS-1$
         Assert.isTrue((adapter instanceof RequestAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$

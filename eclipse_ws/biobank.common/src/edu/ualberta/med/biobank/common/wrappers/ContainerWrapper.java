@@ -849,13 +849,12 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @throws BiobankException
      */
     public static List<ContainerWrapper> getPossibleContainersFromPosition(
-        BiobankApplicationService appService, UserWrapper user,
-        String positionText, boolean isContainerPosition,
-        ContainerTypeWrapper contType) throws ApplicationException,
-        BiobankException {
+        BiobankApplicationService appService, String positionText,
+        boolean isContainerPosition, ContainerTypeWrapper contType)
+        throws ApplicationException, BiobankException {
         List<ContainerWrapper> foundContainers;
         List<ContainerWrapper> possibles = getPossibleParents(appService,
-            positionText, user.getCurrentWorkingSite(), contType);
+            positionText, contType.getSite(), contType);
         if (isContainerPosition)
             foundContainers = possibles;
         else {

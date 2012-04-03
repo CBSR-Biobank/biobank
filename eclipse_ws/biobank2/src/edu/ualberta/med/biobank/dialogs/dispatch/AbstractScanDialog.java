@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -163,6 +164,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
     protected void processScanResult(IProgressMonitor monitor,
         CenterWrapper<?> currentCenter) throws Exception {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+
         if (checkBeforeProcessing(currentCenter)) {
             Map<RowColPos, PalletCell> cells = getCells();
             // conversion for server side call
@@ -468,6 +471,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         CellProcessResult res = (CellProcessResult) SessionManager
             .getAppService().doAction(
                 getCellProcessAction(SessionManager.getUser()

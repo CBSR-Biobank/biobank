@@ -18,11 +18,6 @@ public class ContainerTypeAddHandler extends LogoutSensitiveHandler {
     public Object execute(ExecutionEvent event) throws ExecutionException {
         ContainerTypeAdapter containerTypeAdapter = new ContainerTypeAdapter(
             null, new ContainerTypeWrapper(SessionManager.getAppService()));
-        try {
-            SessionManager.getUser().getCurrentWorkingSite().reload();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         ((ContainerTypeWrapper) containerTypeAdapter.getModelObject())
             .setSite(SessionManager.getUser().getCurrentWorkingSite());
         containerTypeAdapter.openEntryForm(false);

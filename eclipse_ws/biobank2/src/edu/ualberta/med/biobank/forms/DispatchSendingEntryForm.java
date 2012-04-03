@@ -72,6 +72,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         super.init();
 
         if (dispatch.isNew()) {
+            Assert
+                .isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
             dispatch.getWrappedObject().setSenderCenter(
                 SessionManager.getUser()
                     .getCurrentWorkingCenter().getWrappedObject());
@@ -161,6 +163,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             setTextValue(receiverLabel, dispatch.getReceiverCenter()
                 .getNameShort());
         } else {
+            Assert
+                .isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
             try {
                 destSiteComboViewer = createComboViewer(client,
                     Messages.DispatchSendingEntryForm_receiver_label,
@@ -251,6 +255,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     @Override
     protected void openScanDialog() {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             dispatch, SessionManager.getUser().getCurrentWorkingCenter());
@@ -262,6 +267,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     @Override
     protected void doSpecimenTextAction(String inventoryId) {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         try {
             CellProcessResult res =
                 (CellProcessResult) SessionManager

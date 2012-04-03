@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -97,6 +98,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     @Override
     protected void init() throws Exception {
         super.init();
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         currentPlateToScan = plateToScanSessionString;
         addScannerPreferencesPropertyListener();
         palletScanManagement = new PalletScanManagement() {

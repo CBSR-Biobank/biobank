@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -139,6 +140,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
      */
     protected void doSpecimenTextAction(String inventoryId, boolean showMessages)
         throws Exception {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         try {
             CellProcessResult res = (CellProcessResult) SessionManager
                 .getAppService().doAction(

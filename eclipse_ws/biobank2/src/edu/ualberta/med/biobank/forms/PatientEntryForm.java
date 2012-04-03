@@ -116,6 +116,7 @@ public class PatientEntryForm extends BiobankEntryForm {
     }
 
     private void createPatientSection() throws Exception {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;

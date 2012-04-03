@@ -405,6 +405,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         List<SaveCEventSpecimenInfo> cevents =
             new ArrayList<CollectionEventSaveAction.SaveCEventSpecimenInfo>();
         for (SpecimenInfo o : specimensTable.getList()) {

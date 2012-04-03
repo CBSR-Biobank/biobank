@@ -617,10 +617,10 @@ public abstract class AbstractLinkAssignEntryForm extends
         parentContainers = null;
         try {
             parentContainers = null;
-            List<ContainerWrapper> foundContainers = ContainerWrapper
-                .getPossibleContainersFromPosition(
-                    SessionManager.getAppService(), SessionManager.getUser(),
-                    positionText.getText(), isContainerPosition, type);
+            List<ContainerWrapper> foundContainers =
+                ContainerWrapper.getPossibleContainersFromPosition(
+                    SessionManager.getAppService(), positionText.getText(),
+                    isContainerPosition, type);
             if (foundContainers.size() == 1) {
                 initParentContainers(foundContainers.get(0));
             } else if (foundContainers.size() > 1) {

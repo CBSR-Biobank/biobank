@@ -149,10 +149,11 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
             .getContainerType().getSpecimenTypeCollection();
         List<ContainerWrapper> conts = new ArrayList<ContainerWrapper>();
         try {
-            conts = ContainerWrapper.getEmptyContainersHoldingSpecimenType(
-                SessionManager.getAppService(), SessionManager.getUser()
-                    .getCurrentWorkingSite(), typesFromOlContainer,
-                oldContainer.getRowCapacity(), oldContainer.getColCapacity());
+            conts =
+                ContainerWrapper.getEmptyContainersHoldingSpecimenType(
+                    SessionManager.getAppService(), oldContainer.getSite(),
+                    typesFromOlContainer, oldContainer.getRowCapacity(),
+                    oldContainer.getColCapacity());
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
                 Messages.MoveSpecimensToDialog_getEmptyContainers_error_title,

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.osgi.util.NLS;
@@ -65,6 +66,8 @@ public class DispatchCreateScanDialog extends
      */
     @Override
     protected void createCustomDialogPreContents(final Composite parent) {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+
         // only sites have containers
         if (SessionManager.getUser().getCurrentWorkingCenter() instanceof SiteWrapper) {
             Button palletWithoutPositionRadio = new Button(parent, SWT.RADIO);

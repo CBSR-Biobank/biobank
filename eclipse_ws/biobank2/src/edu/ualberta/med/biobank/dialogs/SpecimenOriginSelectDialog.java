@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.dialogs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -51,6 +52,8 @@ public class SpecimenOriginSelectDialog extends BgcBaseDialog {
 
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+
         Composite contents = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(2, false);
         contents.setLayout(layout);

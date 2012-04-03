@@ -128,6 +128,7 @@ public class DispatchViewForm extends BiobankViewForm {
 
         DispatchChangeStatePermission perm =
             new DispatchChangeStatePermission(dispatch.getId());
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         if (SessionManager.getAppService().isAllowed(perm)) {
             if (dispatch.isInCreationState()
                 && SessionManager.getUser().getCurrentWorkingCenter()

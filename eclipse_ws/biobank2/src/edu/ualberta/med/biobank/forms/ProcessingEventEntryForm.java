@@ -212,6 +212,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     }
 
     private void createSpecimensSection() {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+
         Composite client =
             createSectionWithClient(Messages.ProcessingEventEntryForm_specimens_title);
         GridLayout layout = new GridLayout(1, false);
@@ -274,10 +276,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                         else if (specimen.getParentContainer() != null)
                             throw new VetoException(
                                 Messages.ProcessingEventEntryForm_stored_spec_error_msg);
-                        else if (!SessionManager
-                            .getUser()
-                            .getCurrentWorkingCenter()
-                            .getStudyCollection()
+                        else if (!SessionManager.getUser()
+                            .getCurrentWorkingCenter().getStudyCollection()
                             .contains(
                                 specimen.getCollectionEvent().getPatient()
                                     .getStudy()))
