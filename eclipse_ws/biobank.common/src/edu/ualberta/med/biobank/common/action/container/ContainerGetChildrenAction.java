@@ -39,7 +39,7 @@ public class ContainerGetChildrenAction implements
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         Container c = context.load(Container.class, parentContainerId);
-        return new ContainerReadPermission(c.getSite())
+        return new ContainerReadPermission(c.getSite().getId())
             .isAllowed(context);
     }
 

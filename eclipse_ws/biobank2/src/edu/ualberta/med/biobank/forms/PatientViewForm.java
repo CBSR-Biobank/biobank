@@ -21,8 +21,10 @@ import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
@@ -133,14 +135,14 @@ public class PatientViewForm extends BiobankViewForm {
             new NewCollectionEventInfoTable(section, patientInfo.ceventInfos);
         section.setClient(collectionEventTable);
         collectionEventTable.adaptToToolkit(toolkit, true);
-        collectionEventTable.addClickListener(collectionDoubleClickListener);
         collectionEventTable
-            .addEditItemListener(new IInfoTableEditItemListener<PatientCEventInfo>() {
+            .addClickListener(new IInfoTableDoubleClickItemListener<PatientCEventInfo>() {
 
                 @Override
-                public void editItem(InfoTableEvent<PatientCEventInfo> event) {
+                public void doubleClick(InfoTableEvent<PatientCEventInfo> event) {
                     CollectionEvent ce =
-                        (CollectionEvent) event.getInfoTable().getSelection();
+                        ((PatientCEventInfo) ((InfoTableSelection) event
+                            .getSelection()).getObject()).cevent;
                     if (ce != null) {
                         try {
                             Map<Integer, SimpleCEventInfo> map =
@@ -158,8 +160,41 @@ public class PatientViewForm extends BiobankViewForm {
                                         .getId()));
                             adapter.openEntryForm();
                         } catch (ApplicationException e) {
-                            BgcPlugin.openAsyncError("Unable to open form",
-                                "Error loading collection event.");
+                            BgcPlugin.openAsyncError(
+                                Messages.PatientViewForm_0,
+                                Messages.PatientViewForm_1);
+                        }
+                    }
+                    return;
+                }
+            });
+        collectionEventTable
+            .addEditItemListener(new IInfoTableEditItemListener<PatientCEventInfo>() {
+
+                @Override
+                public void editItem(InfoTableEvent<PatientCEventInfo> event) {
+                    CollectionEvent ce =
+                        (CollectionEvent) event.getInfoTable().getSelection().cevent;
+                    if (ce != null) {
+                        try {
+                            Map<Integer, SimpleCEventInfo> map =
+                                SessionManager
+                                    .getAppService()
+                                    .doAction(
+                                        new PatientGetSimpleCollectionEventInfosAction(
+                                            ce
+                                                .getPatient().getId()))
+                                    .getMap();
+
+                            CollectionEventAdapter adapter =
+                                new CollectionEventAdapter(
+                                    PatientViewForm.this.adapter, map.get(ce
+                                        .getId()));
+                            adapter.openEntryForm();
+                        } catch (ApplicationException e) {
+                            BgcPlugin.openAsyncError(
+                                Messages.PatientViewForm_0,
+                                Messages.PatientViewForm_1);
                         }
                     }
                     return;

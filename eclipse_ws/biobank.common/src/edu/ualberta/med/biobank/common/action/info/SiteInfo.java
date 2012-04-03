@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.action.info;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.action.ActionResult;
@@ -30,15 +29,15 @@ public class SiteInfo implements ActionResult {
     }
 
     public List<SiteContainerTypeInfo> getContainerTypeInfos() {
-        return Collections.unmodifiableList(containerTypeInfos);
+        return containerTypeInfos;
     }
 
     public List<StudyCountInfo> getStudyCountInfos() {
-        return Collections.unmodifiableList(studyCountInfo);
+        return studyCountInfo;
     }
 
     public List<Container> getTopContainers() {
-        return Collections.unmodifiableList(topContainers);
+        return topContainers;
     }
 
     public Long getContainerTypeCount() {

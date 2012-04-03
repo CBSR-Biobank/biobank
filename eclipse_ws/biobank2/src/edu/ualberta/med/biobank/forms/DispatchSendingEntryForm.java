@@ -7,8 +7,6 @@ import java.util.Locale;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -34,9 +32,13 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
@@ -233,23 +235,44 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             }
         };
         specimensNonProcessedTable.adaptToToolkit(toolkit, true);
-        specimensNonProcessedTable.addClickListener(new IDoubleClickListener() {
-            @Override
-            public void doubleClick(DoubleClickEvent event) {
-                Object selection = event.getSelection();
-                if (selection instanceof InfoTableSelection) {
-                    InfoTableSelection tableSelection =
-                        (InfoTableSelection) selection;
-                    DispatchSpecimenWrapper dsa =
-                        (DispatchSpecimenWrapper) tableSelection
-                            .getObject();
-                    if (dsa != null) {
-                        SessionManager.openViewForm(dsa.getSpecimen());
+        specimensNonProcessedTable
+            .addClickListener(new IInfoTableDoubleClickItemListener<DispatchSpecimenWrapper>() {
+                @Override
+                public void doubleClick(
+                    InfoTableEvent<DispatchSpecimenWrapper> event) {
+                    Object selection = event.getSelection();
+                    if (selection instanceof InfoTableSelection) {
+                        InfoTableSelection tableSelection =
+                            (InfoTableSelection) selection;
+                        DispatchSpecimenWrapper dsa =
+                            (DispatchSpecimenWrapper) tableSelection
+                                .getObject();
+                        if (dsa != null) {
+                            SessionManager.openViewForm(dsa.getSpecimen());
+                        }
                     }
                 }
-            }
-        });
-        specimensNonProcessedTable.createDefaultEditItem();
+            });
+        specimensNonProcessedTable
+            .addEditItemListener(new IInfoTableEditItemListener<DispatchSpecimenWrapper>() {
+
+                @Override
+                public void editItem(
+                    InfoTableEvent<DispatchSpecimenWrapper> event) {
+                    Object selection = event.getSelection();
+                    if (selection instanceof InfoTableSelection) {
+                        InfoTableSelection tableSelection =
+                            (InfoTableSelection) selection;
+                        DispatchSpecimenWrapper dsa =
+                            (DispatchSpecimenWrapper) tableSelection
+                                .getObject();
+                        if (dsa != null) {
+                            new SpecimenAdapter(null, dsa.getSpecimen())
+                                .openEntryForm();
+                        }
+                    }
+                }
+            });
         specimensNonProcessedTable.addSelectionChangedListener(biobankListener);
     }
 

@@ -66,7 +66,7 @@ public enum SearchType {
             if (center instanceof SiteWrapper) {
                 ContainerByLabelSearchAction action =
                     new ContainerByLabelSearchAction(searchString,
-                        (SiteWrapper) center);
+                        center.getId());
                 List<ModelWrapper<?>> list =
                     new ArrayList<ModelWrapper<?>>(
                         ModelWrapper.wrapModelCollection(SessionManager

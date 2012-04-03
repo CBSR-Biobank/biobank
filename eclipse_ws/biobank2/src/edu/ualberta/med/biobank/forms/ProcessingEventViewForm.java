@@ -16,9 +16,18 @@ import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGet
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
@@ -140,8 +149,37 @@ public class ProcessingEventViewForm extends BiobankViewForm {
             new NewSpecimenInfoTable(client, specimens,
                 ColumnsShown.PEVENT_SOURCE_SPECIMENS, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
-        sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
-        sourceSpecimenTable.createDefaultEditItem();
+        sourceSpecimenTable
+            .addClickListener(new IInfoTableDoubleClickItemListener<SpecimenInfo>() {
+
+                @Override
+                public void doubleClick(InfoTableEvent<SpecimenInfo> event) {
+                    Specimen s =
+                        ((SpecimenInfo) ((InfoTableSelection) event
+                            .getSelection()).getObject()).specimen;
+                    AdapterBase.openForm(
+                        new FormInput(
+                            new SpecimenAdapter(null,
+                                new SpecimenWrapper(SessionManager
+                                    .getAppService(), s))),
+                        SpecimenViewForm.ID);
+                }
+            });
+        sourceSpecimenTable
+            .addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {
+                @Override
+                public void editItem(InfoTableEvent<SpecimenInfo> event) {
+                    Specimen s =
+                        ((SpecimenInfo) ((InfoTableSelection) event
+                            .getSelection()).getObject()).specimen;
+                    AdapterBase.openForm(
+                        new FormInput(
+                            new SpecimenAdapter(null,
+                                new SpecimenWrapper(SessionManager
+                                    .getAppService(), s))),
+                        SpecimenEntryForm.ID);
+                }
+            });
     }
 
 }

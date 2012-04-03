@@ -221,8 +221,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         childContainerTypesViewer.getList().setLayoutData(gd);
         childContainerTypesViewer
             .setContentProvider(new ArrayContentProvider());
-        childContainerTypesViewer
-            .addDoubleClickListener(collectionDoubleClickListener);
         setChildContainerTypesValues();
     }
 

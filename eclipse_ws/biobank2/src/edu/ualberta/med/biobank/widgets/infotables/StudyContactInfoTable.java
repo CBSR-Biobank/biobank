@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
@@ -23,7 +22,7 @@ import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable.ClinicC
 public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
 
     protected static class TableRowData {
-        ClinicWrapper clinic;
+        ClinicContacts clinic;
         String clinicNameShort;
         Long patientCount;
         Long ceventCount;
@@ -107,13 +106,11 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
     }
 
     @Override
-    public ClinicWrapper getSelection() {
+    public ClinicContacts getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
-        TableRowData row = (TableRowData) item.o;
-        Assert.isNotNull(row);
-        return row.clinic;
+        return ((TableRowData) item.o).clinic;
     }
 
     @Override
@@ -150,10 +147,11 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
     public TableRowData getCollectionModelObject(Object o) throws Exception {
         TableRowData info = new TableRowData();
         ClinicContacts cc = (ClinicContacts) o;
-        info.clinic = cc.clinic;
-        info.clinicNameShort = info.clinic.getNameShort();
-        info.patientCount = info.clinic.getPatientCountForStudy(study);
-        info.ceventCount = info.clinic.getCollectionEventCountForStudy(study);
+        info.clinic = cc;
+        info.clinicNameShort = info.clinic.clinic.getNameShort();
+        info.patientCount = info.clinic.clinic.getPatientCountForStudy(study);
+        info.ceventCount =
+            info.clinic.clinic.getCollectionEventCountForStudy(study);
         info.contactNames = cc.getFormattedContacts();
         return info;
     }

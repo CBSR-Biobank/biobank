@@ -232,6 +232,10 @@ public class Messages extends NLS {
     public static String ContainerTypeEntryForm_contents_subcontainer_selected;
     public static String ContainerTypeEntryForm_contents_subcontainer_available;
 
+    public static String PatientViewForm_0;
+
+    public static String PatientViewForm_1;
+
     public static String PatientViewForm_title;
     public static String patient_field_label_study;
     public static String PatientViewForm_label_createdAt;

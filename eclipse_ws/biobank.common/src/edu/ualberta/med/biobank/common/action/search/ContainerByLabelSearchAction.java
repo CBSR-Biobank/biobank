@@ -9,7 +9,6 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Container;
 
 public class ContainerByLabelSearchAction implements
@@ -25,17 +24,17 @@ public class ContainerByLabelSearchAction implements
     private static final long serialVersionUID = 1L;
     private String label;
 
-    private SiteWrapper site;
+    private Integer siteId;
 
     public ContainerByLabelSearchAction(String label,
-        SiteWrapper site) {
+        Integer siteId) {
         this.label = label;
-        this.site = site;
+        this.siteId = siteId;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ContainerReadPermission(site.getWrappedObject())
+        return new ContainerReadPermission(siteId)
             .isAllowed(context);
     }
 
@@ -45,7 +44,7 @@ public class ContainerByLabelSearchAction implements
         Query q =
             context.getSession().createQuery(CONTAINER_BASE_QRY);
         q.setParameter(0, label);
-        q.setParameter(1, site.getId());
+        q.setParameter(1, siteId);
         @SuppressWarnings("unchecked")
         List<Container> rows = q.list();
         return new ListResult<Container>(rows);

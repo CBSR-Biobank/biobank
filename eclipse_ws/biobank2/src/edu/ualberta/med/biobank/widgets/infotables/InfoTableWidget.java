@@ -12,12 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
-import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
-import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
-import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
 /**
  * Used to display tabular information for a class in the object model or
@@ -66,43 +61,15 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
 
     protected List<BiobankCollectionModel> model;
 
-    protected boolean useDefaultEditItem;
-
     @SuppressWarnings("unused")
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int rowsPerPage, Class<?> wrapperClass) {
         super(parent, collection, headings, null, rowsPerPage);
-
-        // TODO: this should be moved into abstractInfoTableWidget, since that
-        // class provides the contract to listen, but for some reason only this
-        // derived class makes the functionality work. See Jon
-        addTableClickListener();
-        useDefaultEditItem = false;
     }
 
     public InfoTableWidget(Composite parent, List<T> list,
         String[] headings, Class<?> wrapperClass) {
         this(parent, list, headings, 5, wrapperClass);
-    }
-
-    public void createDefaultEditItem() {
-        useDefaultEditItem = true;
-        // IMPORTANT! call our super classes addEditItemListener() here
-        //
-        // if not, then the default edit item behaviour will not work
-        super.addEditItemListener(new IInfoTableEditItemListener<T>() {
-            @Override
-            public void editItem(InfoTableEvent<T> event) {
-                // do nothing
-            }
-        });
-    }
-
-    @Override
-    public void addEditItemListener(IInfoTableEditItemListener<T> listener) {
-        // turn off the default edit item behaviour
-        useDefaultEditItem = false;
-        super.addEditItemListener(listener);
     }
 
     @Override
@@ -260,34 +227,6 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
 
     public Object getCollectionModelObject(Object item) throws Exception {
         return item;
-    }
-
-    @Override
-    public Object getSelection() {
-        BiobankCollectionModel item = getSelectionInternal();
-        if (item == null)
-            return null;
-        Object object = item.o;
-        Assert.isNotNull(object);
-        return object;
-    }
-
-    @Override
-    public void editItem() {
-        if (useDefaultEditItem) {
-            // default edit item which opens the entry form for the selected
-            // model object
-            ModelWrapper<?> selection = (ModelWrapper<?>) InfoTableWidget.this
-                .getSelection();
-            if (selection != null) {
-                AbstractAdapterBase adapter = AdapterFactory
-                    .getAdapter(selection);
-                adapter.openEntryForm();
-            }
-            return;
-        }
-
-        super.editItem();
     }
 
 }

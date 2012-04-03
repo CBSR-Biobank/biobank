@@ -27,17 +27,23 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
@@ -76,10 +82,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     private CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
-
-    // FIXME: this action should be logged in the user actions log
-    // private ProcessingEventLogProvider logProvider =
-    // new ProcessingEventLogProvider();
 
     private List<SpecimenInfo> specimens;
 
@@ -231,7 +233,21 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                 }
             });
         specimenEntryWidget
-            .addDoubleClickListener(collectionDoubleClickListener);
+            .addDoubleClickListener(new IInfoTableDoubleClickItemListener<SpecimenInfo>() {
+
+                @Override
+                public void doubleClick(InfoTableEvent<SpecimenInfo> event) {
+                    Specimen s =
+                        ((SpecimenInfo) ((InfoTableSelection) event
+                            .getSelection()).getObject()).specimen;
+                    AdapterBase.openForm(
+                        new FormInput(
+                            new SpecimenAdapter(null,
+                                new SpecimenWrapper(SessionManager
+                                    .getAppService(), s))),
+                        SpecimenViewForm.ID);
+                }
+            });
 
         VetoListener<ItemAction, SpecimenWrapper> vetoListener =
             new VetoListener<ItemAction, SpecimenWrapper>() {

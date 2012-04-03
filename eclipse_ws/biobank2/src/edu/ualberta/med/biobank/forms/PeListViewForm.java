@@ -12,6 +12,12 @@ import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventBri
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetBriefInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PeListInfoTable;
 
@@ -51,8 +57,40 @@ public class PeListViewForm extends BiobankViewForm {
 
         processingEvents = new PeListInfoTable(page, peInfos);
         processingEvents.adaptToToolkit(toolkit, true);
-        processingEvents.addClickListener(collectionDoubleClickListener);
-        processingEvents.createDefaultEditItem();
+        processingEvents
+            .addClickListener(new IInfoTableDoubleClickItemListener<ProcessingEventBriefInfo>() {
+
+                @Override
+                public void doubleClick(
+                    InfoTableEvent<ProcessingEventBriefInfo> event) {
+                    ProcessingEvent pe =
+                        ((ProcessingEventBriefInfo) ((InfoTableSelection) event
+                            .getSelection()).getObject()).e;
+                    AdapterBase.openForm(
+                        new FormInput(
+                            new ProcessingEventAdapter(null,
+                                new ProcessingEventWrapper(SessionManager
+                                    .getAppService(), pe))),
+                        ProcessingEventViewForm.ID);
+                }
+            });
+        processingEvents
+            .addEditItemListener(new IInfoTableEditItemListener<ProcessingEventBriefInfo>() {
+
+                @Override
+                public void editItem(
+                    InfoTableEvent<ProcessingEventBriefInfo> event) {
+                    ProcessingEvent pe =
+                        ((ProcessingEventBriefInfo) ((InfoTableSelection) event
+                            .getSelection()).getObject()).e;
+                    AdapterBase.openForm(
+                        new FormInput(
+                            new ProcessingEventAdapter(null,
+                                new ProcessingEventWrapper(SessionManager
+                                    .getAppService(), pe))),
+                        ProcessingEventEntryForm.ID);
+                }
+            });
     }
 
     @Override

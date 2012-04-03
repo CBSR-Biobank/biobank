@@ -3,8 +3,6 @@ package edu.ualberta.med.biobank.widgets.infotables;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -13,19 +11,18 @@ import org.eclipse.swt.widgets.MenuItem;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
-import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
 public class ContainerInfoTable extends InfoTableWidget<Container> {
 
     private static class TableRowData {
-        ContainerWrapper container;
+        Container container;
         String label;
         String typeNameShort;
         String status;
@@ -60,7 +57,8 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -91,10 +89,10 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
 
         Container container = (Container) obj;
 
-        info.container = new ContainerWrapper(SessionManager.getAppService(),
-            container);
+        info.container =
+            container;
         info.label = info.container.getLabel();
-        ContainerTypeWrapper type = info.container.getContainerType();
+        ContainerType type = info.container.getContainerType();
         if (type != null) {
             info.typeNameShort = type.getNameShort();
         }
@@ -112,13 +110,11 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
     }
 
     @Override
-    public ContainerWrapper getSelection() {
+    public Container getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
-        TableRowData row = (TableRowData) item.o;
-        Assert.isNotNull(row);
-        return row.container;
+        return ((TableRowData) item.o).container;
     }
 
     @Override
@@ -127,20 +123,20 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
     }
 
     @Override
-    public void addClickListener(IDoubleClickListener listener) {
+    public void addClickListener(
+        IInfoTableDoubleClickItemListener<Container> listener) {
         doubleClickListeners.add(listener);
         MenuItem mi = new MenuItem(getMenu(), SWT.PUSH);
         mi.setText(Messages.ContainerInfoTable_edit_label);
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                ModelWrapper<?> selection = ContainerInfoTable.this
+                Container selection = ContainerInfoTable.this
                     .getSelection();
                 if (selection != null) {
-                    AbstractAdapterBase adapter = AdapterFactory
-                        .getAdapter(selection);
-                    adapter.setParent(siteAdapter.getContainersGroupNode());
-                    adapter.openEntryForm();
+                    new ContainerAdapter(siteAdapter.getContainersGroupNode(),
+                        new ContainerWrapper(SessionManager.getAppService(),
+                            selection)).openEntryForm();
                 }
             }
         });

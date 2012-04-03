@@ -150,4 +150,10 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
             }
         };
     }
+
+    @Override
+    public CommentWrapper getSelection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

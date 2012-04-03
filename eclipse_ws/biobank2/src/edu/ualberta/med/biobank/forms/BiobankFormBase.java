@@ -12,7 +12,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.events.SelectionListener;
@@ -27,7 +26,6 @@ import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
@@ -37,7 +35,6 @@ import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.forms.BgcFormBase;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
@@ -129,26 +126,6 @@ public abstract class BiobankFormBase extends BgcFormBase {
             return o;
         }
         return null;
-    }
-
-    @Override
-    protected void performDoubleClick(DoubleClickEvent event) {
-        Object selection = event.getSelection();
-        if (selection instanceof StructuredSelection) {
-            Object element = ((StructuredSelection) selection)
-                .getFirstElement();
-            if (element instanceof AbstractAdapterBase) {
-                ((AbstractAdapterBase) element).performDoubleClick();
-            } else if (element instanceof ModelWrapper<?>) {
-                SessionManager.openViewForm((ModelWrapper<?>) element);
-            }
-        } else if (selection instanceof InfoTableSelection) {
-            InfoTableSelection tableSelection = (InfoTableSelection) selection;
-            if (tableSelection.getObject() instanceof ModelWrapper<?>) {
-                SessionManager.openViewForm((ModelWrapper<?>) tableSelection
-                    .getObject());
-            }
-        }
     }
 
     @Override

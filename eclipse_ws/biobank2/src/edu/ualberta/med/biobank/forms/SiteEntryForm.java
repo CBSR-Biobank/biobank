@@ -26,6 +26,10 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -33,6 +37,7 @@ import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
@@ -186,10 +191,29 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         }
         studiesTable = new StudyAddInfoTable(section, site, superAdmin);
         studiesTable.adaptToToolkit(toolkit, true);
-        studiesTable.addClickListener(collectionDoubleClickListener);
-        // TODO: the new style info table needs to support editing of items
-        // via the context menu
-        // studiesTable.createDefaultEditItem();
+        studiesTable
+            .addClickListener(new IInfoTableDoubleClickItemListener<StudyWrapper>() {
+
+                @Override
+                public void doubleClick(InfoTableEvent<StudyWrapper> event) {
+                    StudyWrapper s =
+                        ((StudyWrapper) ((InfoTableSelection) event
+                            .getSelection()).getObject());
+                    new StudyAdapter(null, s).openViewForm();
+
+                }
+            });
+        studiesTable
+            .addEditItemListener(new IInfoTableEditItemListener<StudyWrapper>() {
+                @Override
+                public void editItem(InfoTableEvent<StudyWrapper> event) {
+                    StudyWrapper s =
+                        ((StudyWrapper) ((InfoTableSelection) event
+                            .getSelection()).getObject());
+                    new StudyAdapter(null,
+                        s).openEntryForm();
+                }
+            });
         studiesTable.addSelectionChangedListener(listener);
         section.setClient(studiesTable);
     }

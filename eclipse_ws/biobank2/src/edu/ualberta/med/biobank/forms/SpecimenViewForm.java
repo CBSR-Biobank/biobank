@@ -17,12 +17,18 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetDispatchesActi
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
@@ -126,7 +132,18 @@ public class SpecimenViewForm extends BiobankViewForm {
         dispatchInfoTable =
             new DispatchInfoTable(client,
                 specimenDispatchesInfo.getDispatches());
-        dispatchInfoTable.addClickListener(collectionDoubleClickListener);
+        dispatchInfoTable
+            .addEditItemListener(new IInfoTableEditItemListener<DispatchWrapper>() {
+
+                @Override
+                public void editItem(InfoTableEvent<DispatchWrapper> event) {
+                    Dispatch d =
+                        ((Dispatch) ((InfoTableSelection) event
+                            .getSelection()).getObject());
+                    new DispatchAdapter(null, new DispatchWrapper(
+                        SessionManager.getAppService(), d)).openEntryForm();
+                }
+            });
     }
 
     private void createInformationSection() {

@@ -41,9 +41,14 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.RequestReceiveScanDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.infotables.RequestDispatchInfoTable;
@@ -203,8 +208,29 @@ public class RequestEntryForm extends BiobankViewForm {
 
         dispatchTable = new RequestDispatchInfoTable(dispatchCreation,
             request.getDispatchCollection(false));
-        dispatchTable.addClickListener(collectionDoubleClickListener);
-        dispatchTable.createDefaultEditItem();
+        dispatchTable
+            .addClickListener(new IInfoTableDoubleClickItemListener<DispatchWrapper>() {
+
+                @Override
+                public void doubleClick(InfoTableEvent<DispatchWrapper> event) {
+                    DispatchWrapper d =
+                        ((DispatchWrapper) ((InfoTableSelection) event
+                            .getSelection()).getObject());
+                    new DispatchAdapter(null, d).openViewForm();
+                }
+
+            });
+        dispatchTable
+            .addEditItemListener(new IInfoTableEditItemListener<DispatchWrapper>() {
+
+                @Override
+                public void editItem(InfoTableEvent<DispatchWrapper> event) {
+                    DispatchWrapper d =
+                        ((DispatchWrapper) ((InfoTableSelection) event
+                            .getSelection()).getObject());
+                    new DispatchAdapter(null, d).openEntryForm();
+                }
+            });
         dispatchTable.addSelectionListener(new SelectionListener() {
 
             @Override

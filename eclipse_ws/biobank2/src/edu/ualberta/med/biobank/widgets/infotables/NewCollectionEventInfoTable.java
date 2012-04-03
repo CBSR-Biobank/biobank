@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
@@ -62,12 +61,10 @@ public class NewCollectionEventInfoTable extends
     }
 
     @Override
-    public CollectionEvent getSelection() {
+    public PatientCEventInfo getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null) return null;
-        PatientCEventInfo row = (PatientCEventInfo) item.o;
-        Assert.isNotNull(row);
-        return row.cevent;
+        return (PatientCEventInfo) item.o;
     }
 
     @Override

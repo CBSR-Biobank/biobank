@@ -26,7 +26,8 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                SpecimenTypeWrapper item = (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;
+                SpecimenTypeWrapper item =
+                    (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -56,6 +57,13 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    public SpecimenTypeWrapper getSelection() {
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null) return null;
+        return (SpecimenTypeWrapper) item.o;
     }
 
 }

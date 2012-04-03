@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.gui.common.forms;
 
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -32,12 +31,6 @@ public abstract class BgcEntryForm extends BgcFormBase implements IBgcEntryForm 
 
     @Override
     protected void init() throws Exception {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void performDoubleClick(DoubleClickEvent event) {
         // TODO Auto-generated method stub
 
     }

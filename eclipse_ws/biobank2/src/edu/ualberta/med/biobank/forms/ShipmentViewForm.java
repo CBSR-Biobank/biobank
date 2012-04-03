@@ -18,9 +18,17 @@ import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -104,7 +112,21 @@ public class ShipmentViewForm extends BiobankViewForm {
         specimenWidget =
             new SpecimenEntryWidget(client, SWT.NONE, toolkit, false);
         specimenWidget.setSpecimens(specimens);
-        specimenWidget.addDoubleClickListener(collectionDoubleClickListener);
+        specimenWidget
+            .addDoubleClickListener(new IInfoTableDoubleClickItemListener<SpecimenInfo>() {
+                @Override
+                public void doubleClick(InfoTableEvent<SpecimenInfo> event) {
+                    Specimen s =
+                        ((SpecimenInfo) ((InfoTableSelection) event
+                            .getSelection()).getObject()).specimen;
+                    AdapterBase.openForm(
+                        new FormInput(
+                            new SpecimenAdapter(null,
+                                new SpecimenWrapper(SessionManager
+                                    .getAppService(), s))),
+                        SpecimenViewForm.ID);
+                }
+            });
     }
 
     private void createMainSection() {

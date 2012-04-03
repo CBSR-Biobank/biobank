@@ -18,8 +18,17 @@ import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
+import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
@@ -157,8 +166,37 @@ public class ClinicViewForm extends AddressViewFormCommon {
         studiesTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studiesTable);
 
-        studiesTable.addClickListener(collectionDoubleClickListener);
-        studiesTable.createDefaultEditItem();
+        studiesTable
+            .addClickListener(new IInfoTableDoubleClickItemListener<StudyCountInfo>() {
+
+                @Override
+                public void doubleClick(InfoTableEvent<StudyCountInfo> event) {
+                    Study s =
+                        ((StudyCountInfo) ((InfoTableSelection) event
+                            .getSelection()).getObject()).getStudy();
+                    AdapterBase.openForm(
+                        new FormInput(
+                            new StudyAdapter(null,
+                                new StudyWrapper(SessionManager
+                                    .getAppService(), s))),
+                        StudyViewForm.ID);
+                }
+            });
+        studiesTable
+            .addEditItemListener(new IInfoTableEditItemListener<StudyCountInfo>() {
+                @Override
+                public void editItem(InfoTableEvent<StudyCountInfo> event) {
+                    Study s =
+                        ((StudyCountInfo) ((InfoTableSelection) event
+                            .getSelection()).getObject()).getStudy();
+                    AdapterBase.openForm(
+                        new FormInput(
+                            new StudyAdapter(null,
+                                new StudyWrapper(SessionManager
+                                    .getAppService(), s))),
+                        StudyEntryForm.ID);
+                }
+            });
     }
 
     @Override

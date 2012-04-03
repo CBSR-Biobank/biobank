@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.Site;
 
 public class ContainerByBarcodeSearchAction implements
     Action<ListResult<Object>> {
@@ -36,8 +35,7 @@ public class ContainerByBarcodeSearchAction implements
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ContainerReadPermission(context.load(Site.class,
-            currentCenter)).isAllowed(context);
+        return new ContainerReadPermission(currentCenter).isAllowed(context);
     }
 
     @Override

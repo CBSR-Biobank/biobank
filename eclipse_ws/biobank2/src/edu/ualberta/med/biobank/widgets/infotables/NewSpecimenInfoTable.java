@@ -6,18 +6,14 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
-import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
 public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
 
@@ -246,19 +242,6 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
         return r.toString();
     }
 
-    // FIXME do we need this method?
-    // public void setSelection(SpecimenWrapper selectedSample) {
-    // if (selectedSample == null)
-    // return;
-    // for (BiobankCollectionModel item : model) {
-    // TableRowData info = (TableRowData) item.o;
-    // if (info.specimen == selectedSample) {
-    // getTableViewer().setSelection(new StructuredSelection(item),
-    // true);
-    // }
-    // }
-    // }
-
     @Override
     public SpecimenInfo getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
@@ -266,30 +249,6 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
         SpecimenInfo row = (SpecimenInfo) item.o;
         Assert.isNotNull(row);
         return row;
-    }
-
-    @Override
-    public void editItem() {
-        if (useDefaultEditItem) {
-            // default edit item which opens the entry form for the selected
-            // model object
-            SpecimenInfo specimenInfo = getSelection();
-            if (specimenInfo != null) {
-                SpecimenWrapper specimen =
-                    new SpecimenWrapper(SessionManager.getAppService(),
-                        specimenInfo.specimen);
-                try {
-                    // specimen.reload();
-                } catch (Exception e) {
-                }
-                AbstractAdapterBase adapter =
-                    AdapterFactory.getAdapter(specimen);
-                adapter.openEntryForm();
-            }
-            return;
-        }
-
-        super.editItem();
     }
 
     @Override

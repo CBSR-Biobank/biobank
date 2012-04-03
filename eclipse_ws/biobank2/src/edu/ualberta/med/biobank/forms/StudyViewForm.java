@@ -16,21 +16,30 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyInfo;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.treeview.patient.StudyWithPatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SourceSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable.ClinicContacts;
 
 public class StudyViewForm extends BiobankViewForm {
 
@@ -140,8 +149,35 @@ public class StudyViewForm extends BiobankViewForm {
             createSectionWithClient(Messages.StudyViewForm_clinic_title);
 
         contactsTable = new StudyContactInfoTable(client, study);
-        contactsTable.addClickListener(collectionDoubleClickListener);
-        contactsTable.createDefaultEditItem();
+        contactsTable
+            .addClickListener(new IInfoTableDoubleClickItemListener<ClinicContacts>() {
+
+                @Override
+                public void doubleClick(InfoTableEvent<ClinicContacts> event) {
+                    ClinicWrapper c =
+                        ((ClinicContacts) ((InfoTableSelection) event
+                            .getSelection()).getObject()).clinic;
+                    AdapterBase.openForm(
+                        new FormInput(
+                            new ClinicAdapter(null,
+                                c)),
+                        ClinicViewForm.ID);
+                }
+            });
+        contactsTable
+            .addEditItemListener(new IInfoTableEditItemListener<ClinicContacts>() {
+                @Override
+                public void editItem(InfoTableEvent<ClinicContacts> event) {
+                    ClinicWrapper c =
+                        ((ClinicContacts) ((InfoTableSelection) event
+                            .getSelection()).getObject()).clinic;
+                    AdapterBase.openForm(
+                        new FormInput(
+                            new ClinicAdapter(null,
+                                c)),
+                        ClinicEntryForm.ID);
+                }
+            });
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
     }

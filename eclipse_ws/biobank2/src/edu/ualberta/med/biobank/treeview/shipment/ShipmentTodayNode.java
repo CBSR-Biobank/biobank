@@ -38,7 +38,7 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
                     new OriginInfoUpdatePermission(SessionManager.getUser()
                         .getCurrentWorkingCenter().getId()));
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            BgcPlugin.openAsyncError(Messages.ShipmentTodayNode_0, Messages.ShipmentTodayNode_1);
         }
     }
 

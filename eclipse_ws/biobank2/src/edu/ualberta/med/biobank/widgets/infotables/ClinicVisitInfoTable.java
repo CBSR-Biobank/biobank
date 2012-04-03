@@ -97,4 +97,12 @@ public class ClinicVisitInfoTable extends
         return ((TableRowData) o).toString();
     }
 
+    @Override
+    public PatientCEventInfo getSelection() {
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        return ((TableRowData) item.o).cevent;
+    }
+
 }

@@ -53,7 +53,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
  * </ul>
  */
 public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
-    implements IInfoTablePagination, IDoubleClickListener, ListChangeSource<T> {
+    implements IInfoTablePagination, ListChangeSource<T> {
 
     public static class RowItem {
         int itemNumber;
@@ -113,6 +113,13 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         table.setLayoutData(gd);
 
         tableViewer.setSorter(tableSorter);
+        tableViewer.addDoubleClickListener(new IDoubleClickListener() {
+
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                AbstractInfoTableWidget.this.doubleClick();
+            }
+        });
 
         setHeadings(headings, columnWidths);
         tableViewer.setUseHashlookup(true);
@@ -137,6 +144,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
         BgcClipboard.addClipboardCopySupport(tableViewer, menu, labelProvider,
             headings.length);
+
     }
 
     public void setHeadings(String[] headings) {
@@ -197,10 +205,6 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     public boolean setFocus() {
         tableViewer.getControl().setFocus();
         return true;
-    }
-
-    public void addSelectionListener(SelectionListener listener) {
-        tableViewer.getTable().addSelectionListener(listener);
     }
 
     protected TableViewer getTableViewer() {
@@ -301,11 +305,11 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         paginationWidget.enableWidgets(enable);
     }
 
-    protected void addTableClickListener() {
-        tableViewer.addDoubleClickListener(this);
+    public void addSelectionListener(SelectionListener listener) {
+        tableViewer.getTable().addSelectionListener(listener);
     }
 
-    public void addClickListener(IDoubleClickListener listener) {
+    public void addClickListener(IInfoTableDoubleClickItemListener<T> listener) {
         doubleClickListeners.add(listener);
     }
 
@@ -352,24 +356,23 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     }
 
     /**
-     * Derived classes should override this method
+     * IMPORTANT: Remember that your primary class in TableRowData must be of
+     * type T.. can't enforce this from superclass
      * 
      * @return
      */
-    public Object getSelection() {
-        return null;
-    }
+    public abstract T getSelection();
 
-    @Override
-    public void doubleClick(DoubleClickEvent dcevent) {
+    public void doubleClick() {
         // get selection as derived class object
         Object selection = getSelection();
 
-        final DoubleClickEvent event = new DoubleClickEvent(tableViewer,
+        final InfoTableEvent<T> event = new InfoTableEvent<T>(this,
             new InfoTableSelection(selection));
         Object[] listeners = doubleClickListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
-            final IDoubleClickListener l = (IDoubleClickListener) listeners[i];
+            final IInfoTableDoubleClickItemListener<T> l =
+                (IInfoTableDoubleClickItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {

@@ -11,13 +11,26 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
+import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
@@ -148,10 +161,32 @@ public class SiteViewForm extends AddressViewFormCommon {
         studiesTable =
             new NewStudyInfoTable(section, siteInfo.getStudyCountInfos());
         studiesTable.adaptToToolkit(toolkit, true);
-        studiesTable.addClickListener(collectionDoubleClickListener);
+        studiesTable
+            .addClickListener(new IInfoTableDoubleClickItemListener<StudyCountInfo>() {
 
-        // TODO: provide way to edit study with this table
-        // studiesTable.createDefaultEditItem();
+                @Override
+                public void doubleClick(InfoTableEvent<StudyCountInfo> event) {
+                    Study s =
+                        ((StudyCountInfo) ((InfoTableSelection) event
+                            .getSelection()).getObject()).getStudy();
+                    new StudyAdapter(null,
+                        new StudyWrapper(SessionManager
+                            .getAppService(), s)).openViewForm();
+
+                }
+            });
+        studiesTable
+            .addEditItemListener(new IInfoTableEditItemListener<StudyCountInfo>() {
+                @Override
+                public void editItem(InfoTableEvent<StudyCountInfo> event) {
+                    Study s =
+                        ((StudyCountInfo) ((InfoTableSelection) event
+                            .getSelection()).getObject()).getStudy();
+                    new StudyAdapter(null,
+                        new StudyWrapper(SessionManager
+                            .getAppService(), s)).openEntryForm();
+                }
+            });
 
         section.setClient(studiesTable);
     }
@@ -181,7 +216,19 @@ public class SiteViewForm extends AddressViewFormCommon {
                 siteInfo.getContainerTypeInfos());
         containerTypesTable.adaptToToolkit(toolkit, true);
 
-        containerTypesTable.addClickListener(collectionDoubleClickListener);
+        containerTypesTable
+            .addClickListener(new IInfoTableDoubleClickItemListener<SiteContainerTypeInfo>() {
+
+                @Override
+                public void doubleClick(
+                    InfoTableEvent<SiteContainerTypeInfo> event) {
+                    ContainerType ct =
+                        ((SiteContainerTypeInfo) ((InfoTableSelection) event
+                            .getSelection()).getObject()).getContainerType();
+                    new ContainerTypeAdapter(null, new ContainerTypeWrapper(
+                        SessionManager.getAppService(), ct)).openViewForm();
+                }
+            });
         section.setClient(containerTypesTable);
     }
 
@@ -203,7 +250,17 @@ public class SiteViewForm extends AddressViewFormCommon {
         topContainersTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(topContainersTable);
 
-        topContainersTable.addClickListener(collectionDoubleClickListener);
+        topContainersTable
+            .addClickListener(new IInfoTableDoubleClickItemListener<Container>() {
+
+                @Override
+                public void doubleClick(InfoTableEvent<Container> event) {
+                    ContainerWrapper ct =
+                        (ContainerWrapper) ((InfoTableSelection) event
+                            .getSelection()).getObject();
+                    new ContainerAdapter(null, ct).openViewForm();
+                }
+            });
         section.setClient(topContainersTable);
     }
 

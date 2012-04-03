@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -38,6 +37,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -298,7 +298,8 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         hasSpecimens.setValue(specimens != null && specimens.size() > 0);
     }
 
-    public void addDoubleClickListener(IDoubleClickListener listener) {
+    public void addDoubleClickListener(
+        IInfoTableDoubleClickItemListener<SpecimenInfo> listener) {
         specTable.addClickListener(listener);
     }
 

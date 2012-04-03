@@ -22,6 +22,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
         + " INNER JOIN FETCH dispatch.receiverCenter"
         + " INNER JOIN FETCH dispatch.senderCenter"
         + " LEFT JOIN fetch dispatch.comments comments"
+        + " LEFT JOIN fetch comments.user"
         + " WHERE dispatch.id=?";
 
     private Integer id;

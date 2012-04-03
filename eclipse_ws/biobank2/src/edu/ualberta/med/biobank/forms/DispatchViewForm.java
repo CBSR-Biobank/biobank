@@ -8,8 +8,6 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -32,9 +30,13 @@ import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -167,9 +169,10 @@ public class DispatchViewForm extends BiobankViewForm {
                 };
             specimensNonProcessedTable.adaptToToolkit(toolkit, true);
             specimensNonProcessedTable
-                .addClickListener(new IDoubleClickListener() {
+                .addClickListener(new IInfoTableDoubleClickItemListener<DispatchSpecimenWrapper>() {
                     @Override
-                    public void doubleClick(DoubleClickEvent event) {
+                    public void doubleClick(
+                        InfoTableEvent<DispatchSpecimenWrapper> event) {
                         Object selection = event.getSelection();
                         if (selection instanceof InfoTableSelection) {
                             InfoTableSelection tableSelection =
@@ -190,7 +193,26 @@ public class DispatchViewForm extends BiobankViewForm {
                         specimensNonProcessedTable.reloadCollection();
                     }
                 });
-            specimensNonProcessedTable.createDefaultEditItem();
+            specimensNonProcessedTable
+                .addEditItemListener(new IInfoTableEditItemListener<DispatchSpecimenWrapper>() {
+
+                    @Override
+                    public void editItem(
+                        InfoTableEvent<DispatchSpecimenWrapper> event) {
+                        Object selection = event.getSelection();
+                        if (selection instanceof InfoTableSelection) {
+                            InfoTableSelection tableSelection =
+                                (InfoTableSelection) selection;
+                            DispatchSpecimenWrapper dsa =
+                                (DispatchSpecimenWrapper) tableSelection
+                                    .getObject();
+                            if (dsa != null) {
+                                new SpecimenAdapter(null, dsa.getSpecimen())
+                                    .openEntryForm();
+                            }
+                        }
+                    }
+                });
         } else {
             specimensTree =
                 new DispatchSpecimensTreeTable(page, dispatch,

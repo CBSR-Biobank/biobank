@@ -4,8 +4,6 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -28,6 +26,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.DefaultAbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.User;
@@ -71,9 +70,9 @@ public abstract class UserInfoTable extends
             }
         });
 
-        addClickListener(new IDoubleClickListener() {
+        addClickListener(new IInfoTableDoubleClickItemListener<User>() {
             @Override
-            public void doubleClick(DoubleClickEvent event) {
+            public void doubleClick(InfoTableEvent<User> event) {
                 User u = getSelection();
                 if (u != null) editUser(u);
             }

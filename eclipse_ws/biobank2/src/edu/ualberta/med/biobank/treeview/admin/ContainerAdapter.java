@@ -70,8 +70,7 @@ public class ContainerAdapter extends AdapterBase {
                     new ContainerDeletePermission(id));
             this.isReadable =
                 SessionManager.getAppService().isAllowed(
-                    new ContainerReadPermission(container.getSite()
-                        .getWrappedObject()));
+                    new ContainerReadPermission(container.getSite().getId()));
             this.isEditable =
                 SessionManager.getAppService().isAllowed(
                     new ContainerUpdatePermission(id));

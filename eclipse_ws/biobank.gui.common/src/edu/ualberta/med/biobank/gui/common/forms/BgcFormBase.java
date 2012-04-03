@@ -10,8 +10,6 @@ import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -72,14 +70,6 @@ public abstract class BgcFormBase extends EditorPart implements
 
     protected boolean isEditable;
 
-    protected IDoubleClickListener collectionDoubleClickListener =
-        new IDoubleClickListener() {
-            @Override
-            public void doubleClick(DoubleClickEvent event) {
-                performDoubleClick(event);
-            }
-        };
-
     public BgcFormBase() {
         widgets = new HashMap<String, Control>();
         widgetCreator = createWidgetCreator();
@@ -126,8 +116,6 @@ public abstract class BgcFormBase extends EditorPart implements
      *            view.
      */
     protected abstract void init() throws Exception;
-
-    protected abstract void performDoubleClick(DoubleClickEvent event);
 
     @Override
     public boolean isDirty() {
