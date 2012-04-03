@@ -98,9 +98,6 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
         int style = SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL;
 
-        if (!isEditMode())
-            style = style | SWT.MULTI;
-
         tableViewer = new TableViewer(this, style);
         tableSorter = getTableSorter();
         labelProvider = getLabelProvider();
