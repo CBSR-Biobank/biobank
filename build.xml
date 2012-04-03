@@ -63,12 +63,19 @@ End:
             casesensitive="true"
             trim="true" />
   </condition>
+  <condition property="isHostBiobankAict">
+    <equals arg1="${host.name}"
+            arg2="biobank.cbsr.ualberta.ca"
+            casesensitive="true"
+            trim="true" />
+  </condition>
   <condition property="isHostLocal">
     <and>
       <isfalse value="${isHostAicmlMed}" />
       <isfalse value="${isHostAicml5}" />
       <isfalse value="${isHostCbsr}" />
       <isfalse value="${isHostCbsrTraining}" />
+      <isfalse value="${isHostBiobankAict}" />
     </and>
   </condition>
 
@@ -288,6 +295,11 @@ End:
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
   </target>
+  <target name="hostBiobankAict" if="isHostBiobankAict">
+    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
+          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
+          overwrite="true" />
+  </target>
   <target name="hostLocal" if="isHostLocal">
     <copy file="${secu-log.dir}/jboss/localhost.keystore"
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
@@ -317,7 +329,7 @@ End:
   </target>
 
   <target name="deploy-jboss"
-          depends="jboss.home.env,package-webapp,check-jboss-uptodate,hostAicmlMed,hostAicml5,hostCbsr,hostCbsrTraining,hostLocal"
+          depends="jboss.home.env,package-webapp,check-jboss-uptodate,hostAicmlMed,hostAicml5,hostCbsr,hostCbsrTraining,hostBiobankAict,hostLocal"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
