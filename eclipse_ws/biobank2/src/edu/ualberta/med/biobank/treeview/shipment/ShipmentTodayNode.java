@@ -33,10 +33,14 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
         super(parent, id);
         setLabel(Messages.ShipmentTodayNode_today_label);
         try {
-            this.createAllowed =
-                SessionManager.getAppService().isAllowed(
-                    new OriginInfoUpdatePermission(SessionManager.getUser()
-                        .getCurrentWorkingCenter().getId()));
+            this.createAllowed = false;
+
+            if (SessionManager.getUser().getCurrentWorkingCenter() != null) {
+                this.createAllowed =
+                    SessionManager.getAppService().isAllowed(
+                        new OriginInfoUpdatePermission(SessionManager.getUser()
+                            .getCurrentWorkingCenter().getId()));
+            }
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(Messages.ShipmentTodayNode_0, Messages.ShipmentTodayNode_1);
         }
