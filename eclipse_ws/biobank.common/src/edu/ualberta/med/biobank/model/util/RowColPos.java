@@ -17,8 +17,12 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
     public RowColPos(Integer row, Integer col) {
         if (row == null)
             throw new IllegalArgumentException("row is null");
+        if (row < 0)
+            throw new IllegalArgumentException("row is negative");
         if (col == null)
             throw new IllegalArgumentException("column is null");
+        if (col < 0)
+            throw new IllegalArgumentException("column is negative");
 
         this.row = row;
         this.col = col;

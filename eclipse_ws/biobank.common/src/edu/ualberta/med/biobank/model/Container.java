@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.model;
 
-import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -271,6 +270,7 @@ public class Container extends AbstractBiobankModel {
      * 
      * @throws Exception
      */
+    @SuppressWarnings("nls")
     @Transient
     public RowColPos getPositionFromLabelingScheme(String position)
         throws Exception {
@@ -283,40 +283,15 @@ public class Container extends AbstractBiobankModel {
         if (rcp != null) {
             if (rcp.getRow() >= containerType.getRowCapacity()
                 || rcp.getCol() >= containerType.getColCapacity()) {
-                throw new IllegalArgumentException(
-                    MessageFormat
-                        .format(
-                            "Can''t use position {0} in container {1}. Reason: capacity = {2}*{3}",
-                            position, getFullInfoLabel(),
-                            containerType.getRowCapacity(),
-                            containerType.getColCapacity()));
-            }
-            if (rcp.getRow() < 0 || rcp.getCol() < 0) {
-                throw new Exception(
-                    MessageFormat.format(
-                        "Position ''{0}'' is invalid for this container {1}",
-                        position, getFullInfoLabel()));
+                throw new IllegalArgumentException("position " + position
+                    + " (" + rcp + ") is out of bounds of "
+                    + containerType.getCapacity());
             }
         }
         return rcp;
     }
 
-    /**
-     * @return a string with the label of this container + the short name of its
-     *         type
-     * 
-     */
-    @Transient
-    public String getFullInfoLabel() {
-        ContainerType containerType = getContainerType();
-        if ((containerType == null) || (containerType.getNameShort() == null)) {
-            return getLabel();
-        }
-        return getLabel() + " (" + containerType.getNameShort() + ")";
-    }
-
     public boolean hasSpecimens() {
         return (getSpecimenPositions().size() > 0);
     }
-
 }

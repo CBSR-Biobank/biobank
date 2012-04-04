@@ -50,6 +50,7 @@ public class Capacity implements Serializable {
     }
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
         return "Capacity [rowCapacity=" + rowCapacity + ", colCapacity="
             + colCapacity + "]";
