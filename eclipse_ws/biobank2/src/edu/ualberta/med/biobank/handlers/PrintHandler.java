@@ -17,8 +17,8 @@ public class PrintHandler extends AbstractHandler implements IHandler {
         AbstractSpecimenAdminForm form = (AbstractSpecimenAdminForm) HandlerUtil
             .getActiveEditor(event);
         boolean doPrint = MessageDialog.openQuestion(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), Messages.PrintHandler_print_dialog_title,
-            Messages.PrintHandler_print_dialog_question);
+            .getActiveWorkbenchWindow().getShell(), "Print",
+            "Do you want to print information ?");
         if (doPrint) {
             form.print();
         }

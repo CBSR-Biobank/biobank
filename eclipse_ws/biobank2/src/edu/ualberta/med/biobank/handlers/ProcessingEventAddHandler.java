@@ -37,8 +37,8 @@ public class ProcessingEventAddHandler extends LogoutSensitiveHandler {
                     SessionManager.getAppService().isAllowed(
                         new ProcessingEventCreatePermission());
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
-                Messages.HandlerPermission_message);
+            BgcPlugin.openAsyncError("",
+                "");
         }
         return allowed;
     }

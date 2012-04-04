@@ -18,12 +18,12 @@ public class DecodePlateHandler extends AbstractHandler implements IHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        FormInput input = new FormInput(null, Messages.DecodePlateHandler_decode_label);
+        FormInput input = new FormInput(null, "");
         try {
             return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, DecodePlateForm.ID, false);
         } catch (PartInitException e) {
-            logger.error("Can't open form with id " + DecodePlateForm.ID, e); //$NON-NLS-1$
+            logger.error("Can't open form with id " + DecodePlateForm.ID, e); 
             return null;
         }
     }

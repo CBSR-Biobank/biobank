@@ -43,7 +43,7 @@ public abstract class LinkAssignCommonHandler extends LogoutSensitiveHandler
             }
         } catch (WorkbenchException e) {
             throw new ExecutionException(
-                Messages.LinkAssignCommonHandler_link_assign_open_error_msg, e);
+                "Error while opening link-assign management perspective", e);
         }
         return null;
     }

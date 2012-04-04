@@ -15,7 +15,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class EditSpecimenTypesHandler extends LogoutSensitiveHandler {
     public static final String ID =
-        "edu.ualberta.med.biobank.commands.editSpecimenTypes"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.commands.editSpecimenTypes"; 
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -31,7 +31,7 @@ public class EditSpecimenTypesHandler extends LogoutSensitiveHandler {
                     SpecimenTypesViewForm.ID, false, 0);
         } catch (Exception e) {
             throw new ExecutionException(
-                Messages.EditSpecimenTypesHandler_handler_error_msg, e);
+                "Could not execute handler.", e);
         }
 
         return null;

@@ -23,7 +23,7 @@ public class ProcessingAdministrationHandler extends AbstractHandler implements
                     workbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
             throw new ExecutionException(
-                Messages.ProcessingAdministrationHandler_perspective_error, e);
+                "Error while opening Processing perpective", e);
         }
         return null;
     }

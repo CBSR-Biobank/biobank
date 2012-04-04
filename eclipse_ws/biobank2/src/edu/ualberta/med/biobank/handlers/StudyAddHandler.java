@@ -12,7 +12,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyAddHandler extends LogoutSensitiveHandler {
     public static final String ID =
-        "edu.ualberta.med.biobank.commands.addStudy"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.commands.addStudy"; 
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -34,8 +34,8 @@ public class StudyAddHandler extends LogoutSensitiveHandler {
                 && allowed
                 && SessionManager.getInstance().getSession() != null;
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
-                Messages.HandlerPermission_message);
+            BgcPlugin.openAsyncError("",
+                "");
             return false;
         }
     }

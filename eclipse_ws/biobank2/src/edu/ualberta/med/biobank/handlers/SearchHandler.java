@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.views.SearchView;
 
 public class SearchHandler extends AbstractHandler {
 
-    public static final String SEARCH_COMMAND_ID = "edu.ualberta.med.biobank.commands.search"; //$NON-NLS-1$
+    public static final String SEARCH_COMMAND_ID = "edu.ualberta.med.biobank.commands.search"; 
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -22,7 +22,7 @@ public class SearchHandler extends AbstractHandler {
         try {
             page.showView(SearchView.ID);
         } catch (PartInitException e) {
-            throw new ExecutionException(Messages.SearchHandler_view_open_error, e);
+            throw new ExecutionException("View cannot be opened", e);
         }
         return null;
     }

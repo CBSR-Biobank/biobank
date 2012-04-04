@@ -22,14 +22,14 @@ public class SpecimenLinkHandler extends LinkAssignCommonHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         if (!checkActivityLogSavePathValid()) {
-            BgcPlugin.openAsyncError(Messages.SpecimenLinkHandler_log_location,
-                Messages.SpecimenLinkHandler_error_message);
+            BgcPlugin.openAsyncError("Activity Log Location",
+                "Invalid path selected. Cannot proceed with link assign.");
             return null;
         }
 
         openLinkAssignPerspective(SpecimenLinkEntryForm.ID,
             new SpecimenLinkAdapter(null, 0,
-                Messages.SpecimenLinkHandler_specimen_link_label, false));
+                "Specimen Link", false));
         return null;
     }
 

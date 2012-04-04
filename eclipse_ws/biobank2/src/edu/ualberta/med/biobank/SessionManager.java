@@ -42,10 +42,10 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class SessionManager {
 
     public static final String BIOBANK2_CONTEXT_LOGGED_OUT =
-        "biobank.context.loggedOut"; //$NON-NLS-1$
+        "biobank.context.loggedOut"; 
 
     public static final String BIOBANK2_CONTEXT_LOGGED_IN =
-        "biobank.context.loggedIn"; //$NON-NLS-1$
+        "biobank.context.loggedIn"; 
 
     private static BgcLogger logger = BgcLogger.getLogger(SessionManager.class
         .getName());
@@ -87,7 +87,7 @@ public class SessionManager {
 
     public void addSession(final BiobankApplicationService appService,
         String serverName, UserWrapper user) {
-        logger.debug("addSession: " + serverName + ", user/" + user.getLogin()); //$NON-NLS-1$ //$NON-NLS-2$
+        logger.debug("addSession: " + serverName + ", user/" + user.getLogin());  
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, user);
         rootNode.addChild(sessionAdapter);
@@ -114,7 +114,7 @@ public class SessionManager {
     }
 
     public void updateSession() {
-        Assert.isNotNull(sessionAdapter, "session adapter is null"); //$NON-NLS-1$
+        Assert.isNotNull(sessionAdapter, "session adapter is null"); 
         sessionAdapter.performExpand();
     }
 
@@ -154,7 +154,7 @@ public class SessionManager {
 
     public SessionAdapter getSession() {
         Assert.isNotNull(sessionAdapter,
-            Messages.SessionManager_noconnection_error_msg);
+            "No connection available. Please log in to continue.");
         return sessionAdapter;
     }
 
@@ -258,20 +258,20 @@ public class SessionManager {
             Class<?> clazz = object.getClass();
             StringBuilder loggerName =
                 new StringBuilder(clazz.getSimpleName());
-            loggerName.append("LogProvider"); //$NON-NLS-1$
+            loggerName.append("LogProvider"); 
             loggerName.insert(0,
-                "edu.ualberta.med.biobank.common.wrappers.loggers."); //$NON-NLS-1$
+                "edu.ualberta.med.biobank.common.wrappers.loggers."); 
             WrapperLogProvider<?> provider =
                 (WrapperLogProvider<?>) Class
                     .forName(
                         loggerName.toString())
                     .getConstructor().newInstance();
             Log log = provider.getObjectLog(object);
-            log.setAction("select"); //$NON-NLS-1$
+            log.setAction("select"); 
             log.setType(clazz.getSimpleName());
             getAppService().logActivity(log);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.SessionManager_error_message, e);
+            BgcPlugin.openAsyncError("Logging failed", e);
         }
     }
 
@@ -308,13 +308,13 @@ public class SessionManager {
                                             ((AdapterBase) ab).resetObject();
                                     }
                                 } catch (Exception ex) {
-                                    logger.error("Problem reseting object", ex); //$NON-NLS-1$
+                                    logger.error("Problem reseting object", ex); 
                                 }
                             view.getTreeViewer().update(ab, null);
                         }
                     }
                 } catch (Exception ex) {
-                    logger.error("Error updating tree nodes", ex); //$NON-NLS-1$
+                    logger.error("Error updating tree nodes", ex); 
                 }
             }
         });
@@ -347,7 +347,7 @@ public class SessionManager {
                     }
                 } catch (PartInitException e) {
                     BgcPlugin.openAsyncError(
-                        Messages.SessionManager_actions_error_title, e);
+                        "Error displaying available actions", e);
                 }
                 // don't want to switch if was activated by an handler after
                 // login
@@ -359,7 +359,7 @@ public class SessionManager {
                             .showPerspective(MainPerspective.ID,
                                 page.getWorkbenchWindow());
                     } catch (WorkbenchException e) {
-                        logger.error("Error opening main perspective", e); //$NON-NLS-1$
+                        logger.error("Error opening main perspective", e); 
                 }
             }
         });

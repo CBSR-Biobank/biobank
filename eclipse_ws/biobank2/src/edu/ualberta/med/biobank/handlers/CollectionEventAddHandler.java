@@ -31,7 +31,7 @@ public class CollectionEventAddHandler extends AbstractHandler {
                 cevent);
             adapter.openEntryForm();
         } catch (Exception exp) {
-            logger.error("Error while opening the collection event entry form", //$NON-NLS-1$
+            logger.error("Error while opening the collection event entry form", 
                 exp);
         }
         return null;
@@ -48,8 +48,8 @@ public class CollectionEventAddHandler extends AbstractHandler {
             return SessionManager.getInstance().getSession() != null &&
                 allowed;
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
-                Messages.HandlerPermission_message);
+            BgcPlugin.openAsyncError("",
+                "");
             return false;
         }
     }

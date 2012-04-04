@@ -24,8 +24,8 @@ public class ReloadHandler extends AbstractHandler implements IHandler {
                         .getActiveEditor()).reload();
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        Messages.ReloadViewFormHandler_reload_error_title,
-                        Messages.ReloadViewFormHandler_reload_error_msg);
+                        "Reload error",
+                        "An error occurred while reloading the form.");
                 }
             }
         });

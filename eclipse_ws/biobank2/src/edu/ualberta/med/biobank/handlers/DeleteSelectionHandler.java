@@ -15,11 +15,11 @@ public class DeleteSelectionHandler extends AbstractHandler implements IHandler 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         AbstractAdapterBase adapter = SessionManager.getSelectedNode();
-        Assert.isNotNull(adapter, "adapter is null"); //$NON-NLS-1$
+        Assert.isNotNull(adapter, "adapter is null"); 
         if (!adapter.isDeletable()) {
             BgcPlugin.openError(
-                Messages.DeleteSelectionHandler_delete_error_title,
-                Messages.DeleteSelectionHandler_delete_error_msg);
+                "Delete Error",
+                "This item cannot be deleted");
             return null;
         }
         adapter.deleteWithConfirm();

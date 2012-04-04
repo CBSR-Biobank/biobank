@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class CbsrHelp extends AbstractHandler {
 
-    public static final String CBSR_HELP_URL = "http://biosample.ca/index.php/help"; //$NON-NLS-1$
+    public static final String CBSR_HELP_URL = "http://biosample.ca/index.php/help"; 
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -24,9 +24,9 @@ public class CbsrHelp extends AbstractHandler {
                 .createBrowser(null);
             browser.openURL(new URL(CBSR_HELP_URL));
         } catch (PartInitException e) {
-            BgcPlugin.openAsyncError(Messages.CbsrHelp_browser_error_msg, e);
+            BgcPlugin.openAsyncError("Could not open web browser", e);
         } catch (MalformedURLException e) {
-            BgcPlugin.openAsyncError(Messages.CbsrHelp_url_error_msg, e);
+            BgcPlugin.openAsyncError("Could not open web browser URL", e);
         }
         return null;
     }

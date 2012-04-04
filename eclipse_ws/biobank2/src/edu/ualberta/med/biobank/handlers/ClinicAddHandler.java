@@ -12,7 +12,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicAddHandler extends LogoutSensitiveHandler {
     public static final String ID =
-        "edu.ualberta.med.biobank.commands.addClinic"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.commands.addClinic"; 
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -33,8 +33,8 @@ public class ClinicAddHandler extends LogoutSensitiveHandler {
                 && SessionManager.getInstance().getSession() != null &&
                 allowed;
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
-                Messages.HandlerPermission_message);
+            BgcPlugin.openAsyncError("Error",
+                "Unable to retrieve permissions");
             return false;
         }
     }

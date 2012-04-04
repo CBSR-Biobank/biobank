@@ -15,7 +15,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShippingMethodsEditHandler extends LogoutSensitiveHandler {
     public static final String ID =
-        "edu.ualberta.med.biobank.commands.editShipmentMethods"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.commands.editShipmentMethods"; 
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -31,7 +31,7 @@ public class ShippingMethodsEditHandler extends LogoutSensitiveHandler {
                     ShippingMethodViewForm.ID, false, 0);
         } catch (Exception e) {
             throw new ExecutionException(
-                Messages.EditShippingMethodsHandler_handler_error_msg, e);
+                "Could not execute handler.", e);
         }
 
         return null;

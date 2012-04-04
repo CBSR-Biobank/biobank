@@ -19,7 +19,7 @@ public class ReportsHandler extends LogoutSensitiveHandler {
                 workbench.showPerspective(ReportsPerspective.ID,
                     workbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
-            throw new ExecutionException(Messages.ReportsHandler_init_error, e);
+            throw new ExecutionException("Perspective could not be initialized", e);
         }
         return null;
 
