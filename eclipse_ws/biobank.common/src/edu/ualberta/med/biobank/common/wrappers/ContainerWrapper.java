@@ -27,10 +27,6 @@ import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.actions.UpdateContainerChildrenAction;
 import edu.ualberta.med.biobank.common.wrappers.actions.UpdateContainerPathAction;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.ContainerPersistChecks;
-import edu.ualberta.med.biobank.common.wrappers.checks.NotNullPreCheck;
-import edu.ualberta.med.biobank.common.wrappers.checks.UniqueCheck;
-import edu.ualberta.med.biobank.common.wrappers.checks.UniquePreCheck;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
@@ -52,10 +48,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         .getString("ContainerWrapper.child.position.conflict.msg"); //$NON-NLS-1$
     private static final String OUT_OF_BOUNDS_POSITION_MSG = Messages
         .getString("ContainerWrapper.out.of.bounds.position.msg"); //$NON-NLS-1$
-    private static final String HAS_SPECIMENS_MSG = Messages
-        .getString("ContainerWrapper.has.specimens.msg"); //$NON-NLS-1$
-    private static final String HAS_CHILD_CONTAINERS_MSG = Messages
-        .getString("ContainerWrapper.has.child.containers.msg"); //$NON-NLS-1$
     private static final String CANNOT_HOLD_SPECIMEN_TYPE_MSG = Messages
         .getString("ContainerWrapper.cannot.hold.specimen.type.msg"); //$NON-NLS-1$
     private static final String SAMPLE_EXISTS_AT_POSITION_MSG = Messages
@@ -848,6 +840,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      *            used
      * @throws BiobankException
      */
+    @SuppressWarnings({ "null", "unused" })
     public static List<ContainerWrapper> getPossibleContainersFromPosition(
         BiobankApplicationService appService, String positionText,
         boolean isContainerPosition, ContainerTypeWrapper contType)
@@ -951,14 +944,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(new NotNullPreCheck<Container>(this, ContainerPeer.LABEL));
-        tasks.add(new NotNullPreCheck<Container>(this, ContainerPeer.SITE));
-        tasks.add(new NotNullPreCheck<Container>(this,
-            ContainerPeer.CONTAINER_TYPE));
-
-        tasks.add(new UniquePreCheck<Container>(this, UNIQUE_LABEL_PROPS));
-        tasks.add(new UniquePreCheck<Container>(this, UNIQUE_BARCODE_PROPS));
-
         // TODO: is this next line necessary? Causes error w/ hibernate, so
         // allow cascade via hibernate?
         // tasks.deleteRemovedUnchecked(this, ContainerPeer.POSITION);
@@ -976,26 +961,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         tasks.persistAdded(this, ContainerPeer.CHILD_POSITIONS);
 
         addTasksToUpdateChildren(tasks);
-
-        tasks.add(new UniqueCheck<Container>(this, UNIQUE_LABEL_PROPS));
-        tasks.add(new UniqueCheck<Container>(this, UNIQUE_BARCODE_PROPS));
-
-        tasks.add(new ContainerPersistChecks(this));
     }
 
     @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
-        String hasSpecimensMsg = MessageFormat.format(HAS_SPECIMENS_MSG,
-            getLabel());
-        tasks.add(check().empty(ContainerPeer.SPECIMEN_POSITIONS,
-            hasSpecimensMsg));
-
-        String hasChildrenMsg = MessageFormat.format(HAS_CHILD_CONTAINERS_MSG,
-            getLabel());
-        tasks.add(check().empty(ContainerPeer.CHILD_POSITIONS,
-            hasChildrenMsg));
-
         // Count on Hibernate to delete-cascade this object. We can't because
         // there's a two-way foreign key constraint. So we could, but it's
         // really confusing.

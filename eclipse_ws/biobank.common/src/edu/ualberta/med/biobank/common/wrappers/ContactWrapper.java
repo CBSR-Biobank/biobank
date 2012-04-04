@@ -1,11 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.peer.ContactPeer;
-import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ContactBaseWrapper;
 import edu.ualberta.med.biobank.model.Contact;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -17,9 +14,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * contact
  */
 public class ContactWrapper extends ContactBaseWrapper {
-    private static final String HAS_STUDIES_MSG = Messages
-        .getString("ContactWrapper.delete.error.msg"); //$NON-NLS-1$
-
     public ContactWrapper(WritableApplicationService appService,
         Contact wrappedObject) {
         super(appService, wrappedObject);
@@ -67,16 +61,6 @@ public class ContactWrapper extends ContactBaseWrapper {
             wrappers.add(new ContactWrapper(appService, contact));
         }
         return wrappers;
-    }
-
-    @Deprecated
-    @Override
-    protected void addDeleteTasks(TaskList tasks) {
-        String hasStudiesMsg = MessageFormat.format(HAS_STUDIES_MSG, getName());
-
-        tasks.add(check().empty(ContactPeer.STUDIES, hasStudiesMsg));
-
-        super.addDeleteTasks(tasks);
     }
 
     // /**

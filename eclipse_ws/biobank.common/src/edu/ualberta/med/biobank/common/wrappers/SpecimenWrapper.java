@@ -11,36 +11,24 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
-import edu.ualberta.med.biobank.common.peer.ContainerPeer;
-import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.IfAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.actions.UpdateChildrensTopSpecimenAction;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.SpecimenPostPersistChecks;
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.loggers.SpecimenLogProvider;
 import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
-import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage;
-import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage.LazyArg;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenWrapper extends SpecimenBaseWrapper {
-    private static final String BAD_SAMPLE_TYPE_MSG = Messages
-        .getString("SpecimenWrapper.bad.specimen.type.msg"); //$NON-NLS-1$
     private static final String DISPATCHS_CACHE_KEY = "dispatchs"; //$NON-NLS-1$
     private static final SpecimenLogProvider LOG_PROVIDER =
         new SpecimenLogProvider();
@@ -409,32 +397,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return super.getTopSpecimen();
     }
 
-    private void addTasksToPostCheckLegalSampleType(TaskList tasks) {
-        LazyArg containerLabel = LazyMessage.newArg(this,
-            SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.CONTAINER
-                .to(ContainerPeer.LABEL)));
-
-        LazyArg specimenType = LazyMessage.newArg(this,
-            SpecimenPeer.SPECIMEN_TYPE.to(SpecimenTypePeer.NAME_SHORT));
-
-        LazyMessage badSampleTypeMsg = new LazyMessage(BAD_SAMPLE_TYPE_MSG,
-            containerLabel, specimenType);
-
-        Property<Collection<SpecimenType>, Specimen> pathToLegalSpecimenTypeOptions =
-            SpecimenPeer.SPECIMEN_POSITION
-                .to(SpecimenPositionPeer.CONTAINER
-                    .to(ContainerPeer.CONTAINER_TYPE
-                        .to(ContainerTypePeer.SPECIMEN_TYPES)));
-
-        BiobankSessionAction checkLegalSampleType = check().legalOption(
-            pathToLegalSpecimenTypeOptions, SpecimenPeer.SPECIMEN_TYPE,
-            badSampleTypeMsg);
-
-        tasks.add(check().ifProperty(
-            SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.ID),
-            Is.NOT_NULL, checkLegalSampleType));
-    }
-
     private void addTasksToUpdateChildren(TaskList tasks) {
         if (topSpecimenChanged) {
             SpecimenWrapper topSpecimen = getTopSpecimen();
@@ -466,29 +428,18 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().notNull(SpecimenPeer.SPECIMEN_TYPE));
-        tasks.add(check().notNull(SpecimenPeer.INVENTORY_ID));
-
-        tasks.add(check().unique(SpecimenPeer.INVENTORY_ID));
-
         tasks.deleteRemovedValue(this, SpecimenPeer.SPECIMEN_POSITION);
 
         super.addPersistTasks(tasks);
 
         tasks.persist(this, SpecimenPeer.SPECIMEN_POSITION);
 
-        addTasksToPostCheckLegalSampleType(tasks);
-
         addTasksToUpdateChildren(tasks);
-
-        tasks.add(new SpecimenPostPersistChecks(this));
     }
 
     @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
-        tasks.add(check().empty(SpecimenPeer.CHILD_SPECIMENS));
-
         // Either Hibernate must delete this object (via the defined cascade) or
         // do it here, but not both. If both are done, then a
         // StaleStateException is thrown because an attempt is made to delete an

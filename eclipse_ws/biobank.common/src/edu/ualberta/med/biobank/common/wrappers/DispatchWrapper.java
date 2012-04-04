@@ -22,13 +22,8 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.IfAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.IfAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchSpecimenBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.NotNullPreCheck;
-import edu.ualberta.med.biobank.common.wrappers.checks.UniqueCheck;
 import edu.ualberta.med.biobank.common.wrappers.loggers.DispatchLogProvider;
 import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
 import edu.ualberta.med.biobank.model.Dispatch;
@@ -494,12 +489,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().notNull(DispatchPeer.SENDER_CENTER));
-        tasks.add(check().notNull(DispatchPeer.RECEIVER_CENTER));
-
-        tasks.add(new NotNullPreCheck<Dispatch>(this,
-            DispatchPeer.SENDER_CENTER));
-
         tasks.deleteRemoved(this, DispatchPeer.DISPATCH_SPECIMENS);
 
         removeSpecimensFromParents(tasks);
@@ -508,12 +497,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         super.addPersistTasks(tasks);
 
         tasks.persistAdded(this, DispatchPeer.DISPATCH_SPECIMENS);
-
-        BiobankSessionAction checkWaybill = new UniqueCheck<Dispatch>(this,
-            UNIQUE_WAYBILL_PER_SENDER_PROPERTIES);
-
-        tasks.add(new IfAction<Dispatch>(this, WAYBILL_PROPERTY, Is.NOT_NULL,
-            checkWaybill));
 
         tasks.add(new ResetInternalStateQueryTask(this));
     }

@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ClinicBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.ClinicPreDeleteChecks;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
@@ -220,13 +219,5 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         tasks.deleteRemoved(this, ClinicPeer.CONTACTS);
 
         super.addPersistTasks(tasks);
-    }
-
-    @Deprecated
-    @Override
-    protected void addDeleteTasks(TaskList tasks) {
-        tasks.add(new ClinicPreDeleteChecks(this));
-
-        super.addDeleteTasks(tasks);
     }
 }

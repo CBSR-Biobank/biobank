@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,9 +9,6 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
-import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
-import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
@@ -25,13 +21,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
-    private static final String HAS_SPECIMENS_MSG = Messages
-        .getString("SpecimenTypeWrapper.has.specimens.msg"); //$NON-NLS-1$
-    private static final String HAS_SOURCE_SPECIMENS_MSG = Messages
-        .getString("SpecimenTypeWrapper.has.source.specimens.msg"); //$NON-NLS-1$
-    private static final String HAS_ALIQUOTED_SPECIMENS_MSG = Messages
-        .getString("SpecimenTypeWrapper.has.aliquoted.specimens.msg"); //$NON-NLS-1$
-
     private static final String UNKNOWN_IMPORT_NAME = Messages
         .getString("SpecimenTypeWrapper.unknow.import.label"); //$NON-NLS-1$
 
@@ -156,41 +145,13 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
     @Deprecated
     @Override
-    protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().notNull(SpecimenTypePeer.NAME));
-        tasks.add(check().notNull(SpecimenTypePeer.NAME_SHORT));
-
-        tasks.add(check().unique(SpecimenTypePeer.NAME));
-        tasks.add(check().unique(SpecimenTypePeer.NAME_SHORT));
-
-        super.addPersistTasks(tasks);
-    }
-
-    @Deprecated
-    @Override
     protected void addDeleteTasks(TaskList tasks) {
-        String isUsedBySpecimensMsg = MessageFormat.format(HAS_SPECIMENS_MSG,
-            getName());
-        tasks.add(check().notUsedBy(Specimen.class, SpecimenPeer.SPECIMEN_TYPE,
-            isUsedBySpecimensMsg));
-
-        String isUsedBySourceSpecimensMsg = MessageFormat.format(
-            HAS_SOURCE_SPECIMENS_MSG, getName());
-        tasks.add(check().notUsedBy(SourceSpecimen.class,
-            SourceSpecimenPeer.SPECIMEN_TYPE, isUsedBySourceSpecimensMsg));
-
-        String isUsedByAliquotedSpecimensMsg = MessageFormat.format(
-            HAS_ALIQUOTED_SPECIMENS_MSG, getName());
-        tasks
-            .add(check().notUsedBy(AliquotedSpecimen.class,
-                AliquotedSpecimenPeer.SPECIMEN_TYPE,
-                isUsedByAliquotedSpecimensMsg));
-
         removeThisTypeFromParents(tasks);
 
         super.addDeleteTasks(tasks);
     }
 
+    @SuppressWarnings("deprecation")
     public void removeThisTypeFromParents(TaskList tasks) {
         for (SpecimenTypeWrapper parent : getParentSpecimenTypeCollection(false)) {
             parent.removeFromChildSpecimenTypeCollection(Arrays.asList(this));

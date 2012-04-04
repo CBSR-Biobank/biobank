@@ -19,15 +19,11 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.PatientBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.CollectionIsEmptyCheck;
-import edu.ualberta.med.biobank.common.wrappers.checks.NotUsedCheck;
 import edu.ualberta.med.biobank.common.wrappers.loggers.PatientLogProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -36,10 +32,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class PatientWrapper extends PatientBaseWrapper {
     private static final PatientLogProvider LOG_PROVIDER =
         new PatientLogProvider();
-    private static final String HAS_SPECIMENS_MSG = Messages
-        .getString("PatientWrapper.has.specimens.msg"); //$NON-NLS-1$
-    private static final String HAS_COLLECTION_EVENTS_MSG = Messages
-        .getString("PatientWrapper.has.collection.event.msg"); //$NON-NLS-1$
 
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
         super(appService, patient);
@@ -306,30 +298,6 @@ public class PatientWrapper extends PatientBaseWrapper {
     public Long getCollectionEventCount(boolean fast)
         throws BiobankQueryResultSizeException, ApplicationException {
         return getPropertyCount(PatientPeer.COLLECTION_EVENTS, fast);
-    }
-
-    @Deprecated
-    @Override
-    protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().notNull(PatientPeer.PNUMBER));
-        tasks.add(check().unique(PatientPeer.PNUMBER));
-
-        super.addPersistTasks(tasks);
-    }
-
-    @Deprecated
-    @Override
-    protected void addDeleteTasks(TaskList tasks) {
-        String hasCollectionEventsMsg = HAS_COLLECTION_EVENTS_MSG;
-        tasks.add(new CollectionIsEmptyCheck<Patient>(this,
-            PatientPeer.COLLECTION_EVENTS, hasCollectionEventsMsg));
-
-        String hasSpecimensMsg = MessageFormat.format(HAS_SPECIMENS_MSG,
-            getPnumber());
-        tasks.add(new NotUsedCheck<Patient>(this, SpecimenPeer.COLLECTION_EVENT
-            .to(CollectionEventPeer.PATIENT), Specimen.class, hasSpecimensMsg));
-
-        super.addDeleteTasks(tasks);
     }
 
     public static Integer getNextVisitNumber(

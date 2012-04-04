@@ -59,7 +59,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         new ElementTracker<E>(this);
     private final ElementQueue<E> elementQueue = new ElementQueue<E>(this);
     private final WrapperCascader<E> cascader = new WrapperCascader<E>(this);
-    private final WrapperChecker<E> preChecker = new WrapperChecker<E>(this);
     WrapperSession session;
 
     public ModelWrapper(WritableApplicationService appService, E wrappedObject) {
@@ -194,7 +193,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     @Deprecated
     protected void addPersistTasks(TaskList tasks) {
         tasks.add(new PersistModelWrapperQueryTask<E>(this));
-        tasks.add(check().stringLengths());
     }
 
     /**
@@ -944,10 +942,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected WrapperCascader<E> cascade() {
         return cascader;
-    }
-
-    protected WrapperChecker<E> check() {
-        return preChecker;
     }
 
     /**
