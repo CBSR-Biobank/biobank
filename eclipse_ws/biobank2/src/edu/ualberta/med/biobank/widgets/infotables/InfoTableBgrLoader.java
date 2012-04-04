@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.util.ListChangeHandler;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
-import edu.ualberta.med.biobank.gui.common.widgets.Messages;
 
 public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
     @SuppressWarnings("unused")
