@@ -14,7 +14,6 @@ public class ClientVersionInvalidException extends BiobankServerException {
 
     @Override
     public String getMessage() {
-        return Messages
-            .getString("ClientVersionInvalidException.compatibility.error.msg"); //$NON-NLS-1$
+        return "Client authentication failed. The Java Client version is not compatible with the server and must be upgraded."; 
     }
 }

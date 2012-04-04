@@ -13,6 +13,6 @@ public class ModificationConcurrencyException extends BiobankServerException {
 
     @Override
     public String getMessage() {
-        return Messages.getString("ModificationConcurrency.message"); //$NON-NLS-1$
+        return "An object has already been modified by another user"; 
     }
 }

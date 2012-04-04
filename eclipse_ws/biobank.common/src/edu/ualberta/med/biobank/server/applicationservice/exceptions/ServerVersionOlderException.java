@@ -22,8 +22,7 @@ public class ServerVersionOlderException extends BiobankServerException {
     public String getMessage() {
         return MessageFormat
             .format(
-                Messages
-                    .getString("ServerVersionOlderException.too.new.error.msg"), client, server); //$NON-NLS-1$
+                "Client authentication failed. The ''{0}'' Java Client version is too new to connect to a ''{1}'' server.", client, server); 
     }
 
 }

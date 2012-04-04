@@ -14,8 +14,7 @@ public class VersionFormatInvalidException extends BiobankServerException {
 
     @Override
     public String getMessage() {
-        return Messages
-            .getString("VersionFormatInvalidException.version.format.error.msg"); //$NON-NLS-1$
+        return "The version string is formatted incorrectly."; 
     }
 
 }

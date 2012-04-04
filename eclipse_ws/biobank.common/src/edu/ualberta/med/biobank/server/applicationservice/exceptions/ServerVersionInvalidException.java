@@ -14,7 +14,6 @@ public class ServerVersionInvalidException extends BiobankServerException {
 
     @Override
     public String getMessage() {
-        return Messages
-            .getString("ServerVersionInvalidException.server.version.error.msg"); //$NON-NLS-1$
+        return "The server version could not be determined."; 
     }
 }

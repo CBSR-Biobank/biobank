@@ -18,11 +18,11 @@ public class BiobankCSMSecurityUtil {
     private static Logger log = Logger.getLogger(BiobankCSMSecurityUtil.class
         .getName());
 
-    public static final String APPLICATION_CONTEXT_NAME = "biobank"; //$NON-NLS-1$
+    public static final String APPLICATION_CONTEXT_NAME = "biobank"; 
 
-    public static final String GLOBAL_FEATURE_START_NAME = "Global Feature: "; //$NON-NLS-1$
+    public static final String GLOBAL_FEATURE_START_NAME = "Global Feature: "; 
 
-    public static final String CENTER_FEATURE_START_NAME = "Center Feature: "; //$NON-NLS-1$
+    public static final String CENTER_FEATURE_START_NAME = "Center Feature: "; 
 
     public static void modifyPassword(Long csmUserId, String oldPassword,
         String newPassword) throws ApplicationException {
@@ -37,25 +37,23 @@ public class BiobankCSMSecurityUtil {
             User user = upm.getUser(userLogin);
             if (!user.getUserId().equals(csmUserId))
                 throw new ApplicationException(
-                    Messages
-                        .getString("BiobankCSMSecurityUtil.pwd.modify.itself.error")); //$NON-NLS-1$
+                    "Only the user itself can modify its password through this method"); 
             if (!oldPassword.equals(authentication.getCredentials())) {
                 throw new ApplicationException(
-                    Messages
-                        .getString("BiobankSecurityUtil.pwd.verif.error.msg")); //$NON-NLS-1$
+                    "Cannot modify password: verification password is incorrect."); 
             }
             if (oldPassword.equals(newPassword)) {
                 throw new ApplicationException(
-                    Messages.getString("BiobankSecurityUtil.pwd.new.error.msg")); //$NON-NLS-1$
+                    "New password needs to be different from the old one."); 
             }
             user.setPassword(newPassword);
             user.setStartDate(null);
             upm.modifyUser(user);
         } catch (ApplicationException ae) {
-            log.error("Error modifying password", ae); //$NON-NLS-1$
+            log.error("Error modifying password", ae); 
             throw ae;
         } catch (Exception ex) {
-            log.error("Error modifying password", ex); //$NON-NLS-1$
+            log.error("Error modifying password", ex); 
             throw new ApplicationException(ex);
         }
     }
@@ -74,8 +72,7 @@ public class BiobankCSMSecurityUtil {
                     .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
             if (user.getLogin() == null)
                 throw new ApplicationException(
-                    Messages
-                        .getString("BiobankSecurityUtil.login.set.error.msg")); //$NON-NLS-1$
+                    "Login should be set"); 
             boolean newUser = (user.getId() == null);
             User serverUser;
             if (newUser) {
@@ -85,14 +82,12 @@ public class BiobankCSMSecurityUtil {
                 } else
                     throw new ApplicationException(
                         MessageFormat.format(
-                            Messages
-                                .getString("BiobankCSMSecurityUtil.login.exists.error"), user.getLogin())); //$NON-NLS-1$
+                            "Login {0} already exists.", user.getLogin())); 
             } else {
                 if (user.getCsmUserId() == null)
                     throw new ApplicationException(
                         MessageFormat.format(
-                            Messages
-                                .getString("BiobankCSMSecurityUtil.user.csm.missing.error"), //$NON-NLS-1$
+                            "User with id {0} is missing a csmUserId", 
                             user.getId()));
                 serverUser = null;
                 try {
@@ -101,8 +96,7 @@ public class BiobankCSMSecurityUtil {
                 } catch (CSObjectNotFoundException confe) {
                     throw new ApplicationException(
                         MessageFormat.format(
-                            Messages
-                                .getString("BiobankCSMSecurityUtil.csm.user.not.found.error"), //$NON-NLS-1$
+                            "CSM Security user with id {0} not found.", 
                             user.getCsmUserId()), confe);
                 }
             }
@@ -127,10 +121,10 @@ public class BiobankCSMSecurityUtil {
 
             return serverUser.getUserId();
         } catch (ApplicationException ae) {
-            log.error("Error persisting csm security user", ae); //$NON-NLS-1$
+            log.error("Error persisting csm security user", ae); 
             throw ae;
         } catch (Exception ex) {
-            log.error("Error persisting csm security user", ex); //$NON-NLS-1$
+            log.error("Error persisting csm security user", ex); 
             throw new ApplicationException(ex.getMessage(), ex);
         }
     }
@@ -145,28 +139,25 @@ public class BiobankCSMSecurityUtil {
                 .getAuthentication().getName();
             if (currentLogin.equals(user.getLogin())) {
                 throw new ApplicationException(
-                    Messages
-                        .getString("BiobankSecurityUtil.delete.self.error.msg")); //$NON-NLS-1$
+                    "User cannot delete himself"); 
             }
             if (user.getCsmUserId() == null)
                 throw new ApplicationException(
                     MessageFormat.format(
-                        Messages
-                            .getString("BiobankCSMSecurityUtil.user.csm.missing.error"), user.getId())); //$NON-NLS-1$
+                        "User with id {0} is missing a csmUserId", user.getId())); 
             User serverUser = upm.getUserById(user.getCsmUserId().toString());
             if (serverUser == null) {
                 throw new ApplicationException(
                     MessageFormat.format(
-                        Messages
-                            .getString("BiobankCSMSecurityUtil.csm.user.not.found.error"), //$NON-NLS-1$
+                        "CSM Security user with id {0} not found.", 
                         user.getCsmUserId()));
             }
             upm.removeUser(serverUser.getUserId().toString());
         } catch (ApplicationException ae) {
-            log.error("Error deleting security user", ae); //$NON-NLS-1$
+            log.error("Error deleting security user", ae); 
             throw ae;
         } catch (Exception ex) {
-            log.error("Error deleting security user", ex); //$NON-NLS-1$
+            log.error("Error deleting security user", ex); 
             throw new ApplicationException(ex.getMessage(), ex);
         }
     }
@@ -181,16 +172,15 @@ public class BiobankCSMSecurityUtil {
             if (serverUser == null) {
                 throw new ApplicationException(
                     MessageFormat.format(
-                        Messages
-                            .getString("BiobankCSMSecurityUtil.user.notfound.error"), login)); //$NON-NLS-1$
+                        "User {0} not found", login)); 
             }
             // FIXME how safe is this?
             return serverUser.getPassword();
         } catch (ApplicationException ae) {
-            log.error("Error retrieving csm security user password", ae); //$NON-NLS-1$
+            log.error("Error retrieving csm security user password", ae); 
             throw ae;
         } catch (Exception ex) {
-            log.error("Error retrieving csm security user password", ex); //$NON-NLS-1$
+            log.error("Error retrieving csm security user password", ex); 
             throw new ApplicationException(ex.getMessage(), ex);
         }
     }
@@ -208,15 +198,14 @@ public class BiobankCSMSecurityUtil {
             } catch (CSObjectNotFoundException onfe) {
                 throw new ApplicationException(
                     MessageFormat.format(
-                        Messages
-                            .getString("BiobankCSMSecurityUtil.csm.user.not.found.error"), //$NON-NLS-1$
+                        "CSM Security user with id {0} not found.", 
                         csmUserId), onfe);
             }
         } catch (ApplicationException ae) {
-            log.error("Error retrieving csm security user password", ae); //$NON-NLS-1$
+            log.error("Error retrieving csm security user password", ae); 
             throw ae;
         } catch (Exception ex) {
-            log.error("Error retrieving csm security user password", ex); //$NON-NLS-1$
+            log.error("Error retrieving csm security user password", ex); 
             throw new ApplicationException(ex.getMessage(), ex);
         }
     }
