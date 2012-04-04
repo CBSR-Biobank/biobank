@@ -142,10 +142,10 @@ public abstract class AbstractAdapterBase implements
     protected String getTooltipText(String string) {
         String label = getLabel();
         if (label == null) {
-            return new StringBuilder(Messages.AdapterBase_new_label).append(
+            return new StringBuilder("New ").append(
                 string).toString();
         }
-        return new StringBuilder(string).append(" ").append(label).toString(); //$NON-NLS-1$
+        return new StringBuilder(string).append(" ").append(label).toString(); 
     }
 
     public List<AbstractAdapterBase> getChildren() {
@@ -187,7 +187,7 @@ public abstract class AbstractAdapterBase implements
         AbstractAdapterBase newNode) {
         int pos = children.indexOf(existingNode);
         Assert.isTrue(pos >= 0,
-            "existing node not found: " + existingNode.getLabel()); //$NON-NLS-1$
+            "existing node not found: " + existingNode.getLabel()); 
         newNode.setParent(this);
         children.add(pos + 1, newNode);
         newNode.addListener(deltaListener);
@@ -282,7 +282,7 @@ public abstract class AbstractAdapterBase implements
     protected void addEditMenu(Menu menu, String objectName) {
         if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.AdapterBase_edit_label + objectName);
+            mi.setText("Edit " + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -295,7 +295,7 @@ public abstract class AbstractAdapterBase implements
     protected void addViewMenu(Menu menu, String objectName) {
         if (isReadable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.AdapterBase_view_label + objectName);
+            mi.setText("View " + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -308,7 +308,7 @@ public abstract class AbstractAdapterBase implements
     protected void addDeleteMenu(Menu menu, String objectName) {
         if (isDeletable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.AdapterBase_delete_label + objectName);
+            mi.setText("Delete " + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -321,12 +321,12 @@ public abstract class AbstractAdapterBase implements
     public void deleteWithConfirm() {
         String msg = getConfirmDeleteMessage();
         if (msg == null) {
-            throw new RuntimeException("adapter has no confirm delete msg: " //$NON-NLS-1$
+            throw new RuntimeException("adapter has no confirm delete msg: " 
                 + getClass().getName());
         }
         boolean doDelete = true;
         doDelete = BgcPlugin.openConfirm(
-            Messages.AdapterBase_confirm_delete_title, msg);
+            "Confirm Delete", msg);
         if (doDelete) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
@@ -349,17 +349,17 @@ public abstract class AbstractAdapterBase implements
                                 .getConstraintViolationsMsgs(
                                 (ConstraintViolationException) e.getCause());
                             BgcPlugin.openAsyncError(
-                                Messages.AdapterBase_delete_error_title,
-                                StringUtils.join(msgs, "\n")); //$NON-NLS-1$
+                                "Delete failed",
+                                StringUtils.join(msgs, "\n")); 
 
                         } else {
                             BgcPlugin.openAsyncError(
-                                Messages.AdapterBase_delete_error_title,
+                                "Delete failed",
                                 e.getLocalizedMessage());
                         }
                     } catch (Exception e) {
                         BgcPlugin.openAsyncError(
-                            Messages.AdapterBase_delete_error_title, e);
+                            "Delete failed", e);
                         getParent().addChild(AbstractAdapterBase.this);
                         return;
                     }
@@ -428,7 +428,7 @@ public abstract class AbstractAdapterBase implements
                 .openEditor(input, id, focusOnEditor);
             return part;
         } catch (PartInitException e) {
-            LOGGER.error("Can't open form with id " + id, e); //$NON-NLS-1$
+            LOGGER.error("Can't open form with id " + id, e); 
             return null;
         }
 

@@ -59,15 +59,15 @@ public class PatientAdapter extends AbstractNewAdapterBase {
                 SessionManager.getAppService().isAllowed(
                     new PatientUpdatePermission(patient.getId()));
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.PatientAdapter_error,
-                Messages.PatientAdapter_message);
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
         }
     }
 
     @Override
     protected String getLabelInternal() {
         if (patient == null)
-            return "no patient - should not see this"; //$NON-NLS-1$
+            return "no patient - should not see this"; 
         return patient.getPnumber();
     }
 
@@ -75,8 +75,8 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     public String getTooltipTextInternal() {
         if (patient != null && study != null)
             return study.getName()
-                + " - " + getTooltipText(Messages.PatientAdapter_patient_label); //$NON-NLS-1$
-        return getTooltipText(Messages.PatientAdapter_patient_label);
+                + " - " + getTooltipText("Patient"); 
+        return getTooltipText("Patient");
     }
 
     @Override
@@ -87,13 +87,13 @@ public class PatientAdapter extends AbstractNewAdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, Messages.PatientAdapter_patient_label);
-        addViewMenu(menu, Messages.PatientAdapter_patient_label);
-        addDeleteMenu(menu, Messages.PatientAdapter_patient_label);
+        addEditMenu(menu, "Patient");
+        addViewMenu(menu, "Patient");
+        addDeleteMenu(menu, "Patient");
 
         if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.PatientAdapter_add_cevent_label);
+            mi.setText("Add Collection Event");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -146,7 +146,7 @@ public class PatientAdapter extends AbstractNewAdapterBase {
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.PatientAdapter_delete_confirm_msg;
+        return "Are you sure you want to delete this patient?";
     }
 
     public Patient getPatient() {

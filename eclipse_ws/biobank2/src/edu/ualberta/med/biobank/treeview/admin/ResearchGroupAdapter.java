@@ -67,19 +67,19 @@ public class ResearchGroupAdapter extends AbstractNewAdapterBase {
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText(Messages.ResearchGroupAdapter_tooltip);
+        return getTooltipText("Research Group");
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, Messages.ResearchGroupAdapter_menu_label);
-        addViewMenu(menu, Messages.ResearchGroupAdapter_menu_label);
-        addDeleteMenu(menu, Messages.ResearchGroupAdapter_menu_label);
+        addEditMenu(menu, "Research Group");
+        addViewMenu(menu, "Research Group");
+        addDeleteMenu(menu, "Research Group");
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.ResearchGroupAdapter_delete_confirm_msg;
+        return "Are you sure you want to delete this research group?";
     }
 
     @Override

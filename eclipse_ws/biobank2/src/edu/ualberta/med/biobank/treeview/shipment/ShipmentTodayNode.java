@@ -31,7 +31,7 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
 
     public ShipmentTodayNode(AdapterBase parent, int id) {
         super(parent, id);
-        setLabel(Messages.ShipmentTodayNode_today_label);
+        setLabel("Today's shipments");
         try {
             this.createAllowed = false;
 
@@ -42,7 +42,7 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
                             .getCurrentWorkingCenter().getId()));
             }
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.ShipmentTodayNode_0, Messages.ShipmentTodayNode_1);
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
         }
     }
 
@@ -91,7 +91,7 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.ShipmentTodayNode_add_label);
+            mi.setText("Add Shipment");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

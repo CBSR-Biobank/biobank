@@ -22,24 +22,24 @@ public class NewStudyAdapter extends AbstractNewAdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        return study == null ? "" : study.getNameShort(); //$NON-NLS-1$
+        return study == null ? "" : study.getNameShort(); 
     }
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText(Messages.StudyAdapter_study_label);
+        return getTooltipText("Study");
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, Messages.StudyAdapter_study_label);
-        addViewMenu(menu, Messages.StudyAdapter_study_label);
-        addDeleteMenu(menu, Messages.StudyAdapter_study_label);
+        addEditMenu(menu, "Study");
+        addViewMenu(menu, "Study");
+        addDeleteMenu(menu, "Study");
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.StudyAdapter_delete_confirm_msg;
+        return "Are you sure you want to delete this study?";
     }
 
     @Override

@@ -19,7 +19,7 @@ public class IncomingNode extends AdapterBase {
     private ReceivingRequestGroup requestNode;
 
     public IncomingNode(AdapterBase parent, int id) {
-        super(parent, id, Messages.IncomingNode_incoming_node_label, true);
+        super(parent, id, "Incoming", true);
         receivedTransitNode = new ReceivingInTransitDispatchGroup(this, 0);
         receivedTransitNode.setParent(this);
         addChild(receivedTransitNode);

@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public class ReceivingRequestGroup extends AbstractRequestGroup {
 
     public ReceivingRequestGroup(AdapterBase parent, int id) {
-        super(parent, id, Messages.ReceivingRequestGroup_node_label);
+        super(parent, id, "Pending Requests");
     }
 
     @Override

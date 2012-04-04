@@ -23,7 +23,7 @@ public abstract class AbstractRequestGroup extends AdapterBase {
 
     @Override
     public void openViewForm() {
-        Assert.isTrue(false, "should not be called"); //$NON-NLS-1$
+        Assert.isTrue(false, "should not be called"); 
     }
 
     @Override

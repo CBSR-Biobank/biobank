@@ -28,7 +28,7 @@ public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
 
     public ResearchGroupMasterGroup(SessionAdapter sessionAdapter, int id) {
         super(sessionAdapter, id,
-            Messages.ResearchGroupMasterGroup_all_rgroups_label, null, false);
+            "All Research Groups", null, false);
         try {
             rgs = ResearchGroupWrapper.getAllResearchGroups(SessionManager
                 .getAppService());
@@ -52,7 +52,7 @@ public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.ResearchGroupMasterGroup_add_rgroup_menu);
+            mi.setText("Add Research Group");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

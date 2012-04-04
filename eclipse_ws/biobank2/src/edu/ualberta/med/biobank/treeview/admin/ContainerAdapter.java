@@ -75,8 +75,8 @@ public class ContainerAdapter extends AdapterBase {
                 SessionManager.getAppService().isAllowed(
                     new ContainerUpdatePermission(id));
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.ContainerAdapter_error,
-                Messages.ContainerAdapter_message);
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
         }
     }
 
@@ -104,8 +104,8 @@ public class ContainerAdapter extends AdapterBase {
         if (container.getContainerType() == null) {
             return container.getLabel();
         }
-        return container.getLabel() + " (" //$NON-NLS-1$
-            + container.getContainerType().getNameShort() + ")"; //$NON-NLS-1$
+        return container.getLabel() + " ("
+            + container.getContainerType().getNameShort() + ")";
     }
 
     @Override
@@ -114,17 +114,17 @@ public class ContainerAdapter extends AdapterBase {
         if (container != null) {
             SiteWrapper site = container.getSite();
             if (site != null) {
-                return site.getNameShort() + " - " //$NON-NLS-1$
-                    + getTooltipText(Messages.ContainerAdapter_container_label);
+                return site.getNameShort() + " - "
+                    + getTooltipText("Container");
             }
         }
-        return getTooltipText(Messages.ContainerAdapter_container_label);
+        return getTooltipText("Container");
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, Messages.ContainerAdapter_container_label);
-        addViewMenu(menu, Messages.ContainerAdapter_container_label);
+        addEditMenu(menu, "Container");
+        addViewMenu(menu, "Container");
 
         // FIXME: issue 1557
         //
@@ -144,7 +144,7 @@ public class ContainerAdapter extends AdapterBase {
 
         if (isEditable() && getContainer().hasSpecimens()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.ContainerAdapter_move_specs_label);
+            mi.setText("Move all specimens to");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -153,7 +153,7 @@ public class ContainerAdapter extends AdapterBase {
             });
         }
 
-        addDeleteMenu(menu, Messages.ContainerAdapter_container_label);
+        addDeleteMenu(menu, "Container");
     }
 
     public void moveSpecimens() {
@@ -171,7 +171,7 @@ public class ContainerAdapter extends AdapterBase {
                     @Override
                     public void run(final IProgressMonitor monitor) {
                         monitor.beginTask(NLS.bind(
-                            Messages.ContainerAdapter_moving_specs,
+                            "Moving specimens from container {0} to {1}",
                             getContainer().getFullInfoLabel(),
                             newContainer.getFullInfoLabel()),
                             IProgressMonitor.UNKNOWN);
@@ -182,15 +182,15 @@ public class ContainerAdapter extends AdapterBase {
                             monitor.done();
                             BgcPlugin
                                 .openAsyncInformation(
-                                    Messages.ContainerAdapter_spec_moved_info_title,
+                                    "Specimens moved",
                                     NLS.bind(
-                                        Messages.ContainerAdapter_spec_moved_info_msg,
+                                        "{0} specimens are now in {1}.",
                                         newContainer.getSpecimens().size(),
                                         newContainer.getFullInfoLabel()));
                         } catch (Exception e) {
                             monitor.setCanceled(true);
                             BgcPlugin.openAsyncError(
-                                Messages.ContainerAdapter_move_erro_title, e);
+                                "Move problem", e);
                         }
                     }
                 });
@@ -206,14 +206,14 @@ public class ContainerAdapter extends AdapterBase {
                 SessionManager.openViewForm(getContainer());
             } catch (Exception e) {
                 BgcPlugin.openError(
-                    Messages.ContainerAdapter_move_specs_error_title, e);
+                    "Problem while moving specimens", e);
             }
         }
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.ContainerAdapter_delete_confirm_msg;
+        return "Are you sure you want to delete this container?";
     }
 
     public void moveContainer(ContainerWrapper destParentContainer) {
@@ -243,7 +243,7 @@ public class ContainerAdapter extends AdapterBase {
                 }
             } catch (Exception e) {
                 BgcPlugin.openError(
-                    Messages.ContainerAdapter_move_cont_error_title, e);
+                    "Problem while moving container", e);
             }
         }
     }
@@ -259,8 +259,9 @@ public class ContainerAdapter extends AdapterBase {
         List<ContainerWrapper> newParentContainers = container
             .getPossibleParents(newLabel);
         if (newParentContainers.size() == 0) {
-            BgcPlugin.openError(Messages.ContainerAdapter_move_error_title,
-                NLS.bind(Messages.ContainerAdapter_move_parent_error_msg,
+            BgcPlugin.openError("Move Error",
+                NLS.bind(
+                    "A parent container with child \"{0}\" does not exist.",
                     newLabel));
             return false;
         }
@@ -283,9 +284,12 @@ public class ContainerAdapter extends AdapterBase {
         ContainerWrapper currentChild = newParent.getChildByLabel(newLabel);
         if (currentChild != null) {
             BgcPlugin
-                .openError(Messages.ContainerAdapter_move_error_title, NLS
-                    .bind(Messages.ContainerAdapter_move_empty_error_msg,
-                        newLabel));
+                .openError(
+                    "Move Error",
+                    NLS
+                        .bind(
+                            "Container position \"{0}\" is not empty. Please choose a different location.",
+                            newLabel));
             return false;
         }
 
@@ -298,7 +302,7 @@ public class ContainerAdapter extends AdapterBase {
             @Override
             public void run(final IProgressMonitor monitor) {
                 monitor.beginTask(NLS.bind(
-                    Messages.ContainerAdapter_moving_cont, oldLabel, newLabel),
+                    "Moving container {0} to {1}", oldLabel, newLabel),
                     IProgressMonitor.UNKNOWN);
                 // try {
                 // container.persist();
@@ -308,8 +312,8 @@ public class ContainerAdapter extends AdapterBase {
                 // }
                 monitor.done();
                 BgcPlugin.openAsyncInformation(
-                    Messages.ContainerAdapter_cont_moved_info_title, NLS.bind(
-                        Messages.ContainerAdapter_moved_info_msg, oldLabel,
+                    "Container moved", NLS.bind(
+                        "The container {0} has been moved to {1}", oldLabel,
                         container.getLabel()));
             }
         });

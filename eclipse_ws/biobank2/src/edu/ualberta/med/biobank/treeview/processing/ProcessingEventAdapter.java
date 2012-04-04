@@ -64,18 +64,18 @@ public class ProcessingEventAdapter extends AdapterBase {
     protected String getLabelInternal() {
         ProcessingEventWrapper pevent =
             (ProcessingEventWrapper) getModelObject();
-        Assert.isNotNull(pevent, "processing event is null"); //$NON-NLS-1$
+        Assert.isNotNull(pevent, "processing event is null"); 
         String worksheet = pevent.getWorksheet();
         String name = pevent.getFormattedCreatedAt()
-            + (worksheet == null ? "" : " - #" + pevent.getWorksheet()); //$NON-NLS-1$ //$NON-NLS-2$
+            + (worksheet == null ? "" : " - #" + pevent.getWorksheet());  
 
         long count = -1;
         try {
             count = pevent.getSpecimenCount(true);
         } catch (Exception e) {
-            logger.error("Problem counting specimens", e); //$NON-NLS-1$
+            logger.error("Problem counting specimens", e); 
         }
-        return name + " [" + NumberFormatter.format(count) + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+        return name + " [" + NumberFormatter.format(count) + "]";  
     }
 
     @Override
@@ -83,21 +83,21 @@ public class ProcessingEventAdapter extends AdapterBase {
         ProcessingEventWrapper pevent =
             (ProcessingEventWrapper) getModelObject();
         if (pevent == null)
-            return Messages.ProvessingEventAdapter_tooltiptext;
-        return NLS.bind(Messages.ProvessingEventAdapter_tooltiptext_withdate,
+            return "Processing event";
+        return NLS.bind("Processing event on date {0}",
             pevent.getFormattedCreatedAt());
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, Messages.ProcessingEventAdapter_pevent_label);
-        addViewMenu(menu, Messages.ProcessingEventAdapter_pevent_label);
-        addDeleteMenu(menu, Messages.ProcessingEventAdapter_pevent_label);
+        addEditMenu(menu, "Processing Event");
+        addViewMenu(menu, "Processing Event");
+        addDeleteMenu(menu, "Processing Event");
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.ProcessingEventAdapter_deleteMsg;
+        return "Are you sure you want to delete this processing event?";
     }
 
     @Override

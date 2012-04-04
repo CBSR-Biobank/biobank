@@ -59,19 +59,19 @@ public class StudyAdapter extends AdapterBase {
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText(Messages.StudyAdapter_study_label);
+        return getTooltipText("");
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, Messages.StudyAdapter_study_label);
-        addViewMenu(menu, Messages.StudyAdapter_study_label);
-        addDeleteMenu(menu, Messages.StudyAdapter_study_label);
+        addEditMenu(menu, "");
+        addViewMenu(menu, "");
+        addDeleteMenu(menu, "");
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.StudyAdapter_delete_confirm_msg;
+        return "";
     }
 
     @Override

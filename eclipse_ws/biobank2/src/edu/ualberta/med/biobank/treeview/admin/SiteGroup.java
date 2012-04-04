@@ -27,7 +27,7 @@ public class SiteGroup extends AdapterBase {
     private Boolean createAllowed;
 
     public SiteGroup(SessionAdapter parent, int id) {
-        super(parent, id, Messages.SiteGroup_sites_node_label, true);
+        super(parent, id, "All Sites", true);
         try {
             this.createAllowed = SessionManager.getAppService().isAllowed(
                 new SiteCreatePermission());
@@ -38,7 +38,7 @@ public class SiteGroup extends AdapterBase {
 
     @Override
     public void openViewForm() {
-        Assert.isTrue(false, "should not be called"); //$NON-NLS-1$
+        Assert.isTrue(false, "should not be called"); 
     }
 
     @Override
@@ -55,7 +55,7 @@ public class SiteGroup extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.SiteGroup_add_label);
+            mi.setText("Add Site");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

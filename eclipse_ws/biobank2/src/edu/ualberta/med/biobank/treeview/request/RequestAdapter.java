@@ -29,10 +29,10 @@ public class RequestAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         RequestWrapper shipment = (RequestWrapper) getModelObject();
-        Assert.isNotNull(shipment, "Request is null"); //$NON-NLS-1$
+        Assert.isNotNull(shipment, "Request is null"); 
         ResearchGroupWrapper study = shipment.getResearchGroup();
-        String label = shipment.getId() + " - "; //$NON-NLS-1$
-        label += study.getNameShort() + " - "; //$NON-NLS-1$
+        String label = shipment.getId() + " - "; 
+        label += study.getNameShort() + " - "; 
         label += DateFormatter.formatAsDate(shipment.getCreated());
         return label;
 
@@ -40,7 +40,7 @@ public class RequestAdapter extends AdapterBase {
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText(Messages.RequestAdapter_tooltip);
+        return getTooltipText("Request");
     }
 
     @Override
@@ -50,7 +50,7 @@ public class RequestAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addViewMenu(menu, Messages.RequestAdapter_add_text);
+        addViewMenu(menu, "Request");
     }
 
     @Override

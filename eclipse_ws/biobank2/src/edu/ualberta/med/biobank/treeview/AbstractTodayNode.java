@@ -21,7 +21,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     private List<E> currentTodayElements;
 
     public AbstractTodayNode(AdapterBase parent, int id) {
-        super(parent, id, Messages.AbstractTodayNode_today, true);
+        super(parent, id, "Today", true);
     }
 
     @Override
@@ -98,7 +98,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
         } catch (final RemoteAccessException exp) {
             BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
-            logger.error("Error while getting " + getLabel(), e); //$NON-NLS-1$
+            logger.error("Error while getting " + getLabel(), e); 
         }
     }
 

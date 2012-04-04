@@ -28,7 +28,7 @@ public class ReportAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        String label = ""; //$NON-NLS-1$
+        String label = ""; 
 
         ReportWrapper report = (ReportWrapper) getModelObject();
         if (report != null && report.getName() != null) {
@@ -40,13 +40,13 @@ public class ReportAdapter extends AdapterBase {
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText(Messages.ReportAdapter_report_label);
+        return getTooltipText("Report");
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText(Messages.ReportAdapter_copy_label);
+        mi.setText("Copy");
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -55,13 +55,13 @@ public class ReportAdapter extends AdapterBase {
         });
 
         mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText(Messages.ReportAdapter_delete_label);
+        mi.setText("Delete");
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 boolean delete = BgcPlugin.openConfirm(
-                    Messages.ReportAdapter_delete_confirm_title, NLS.bind(
-                        Messages.ReportAdapter_delete_confirm_msg,
+                    "Delete Report", NLS.bind(
+                        "Are you sure you want to delete the report named ''{0}''? This action cannot be undone.",
                         ((ReportWrapper) getModelObject()).getName()));
                 if (delete) {
                     try {
@@ -83,7 +83,7 @@ public class ReportAdapter extends AdapterBase {
             ReportWrapper report = new ReportWrapper(
                 (ReportWrapper) getModelObject());
             report.setName(report.getName()
-                + " " + Messages.ReportAdapter_copy_naming); //$NON-NLS-1$
+                + " " + "Copy"); 
 
             int userId = SessionManager.getUser().getId().intValue();
             report.setUserId(userId);

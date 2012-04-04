@@ -34,7 +34,7 @@ public class ProcessingEventGroup extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (SessionManager.getInstance().isConnected()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.ProcessingEventGroup_pevent_add_label);
+            mi.setText("Add processing event");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

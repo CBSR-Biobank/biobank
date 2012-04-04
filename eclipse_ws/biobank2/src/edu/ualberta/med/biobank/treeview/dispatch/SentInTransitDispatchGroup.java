@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public class SentInTransitDispatchGroup extends AbstractDispatchGroup {
 
     public SentInTransitDispatchGroup(AdapterBase parent, int id) {
-        super(parent, id, Messages.SentInTransitDispatchGroup_sent_node_label);
+        super(parent, id, "In transit");
     }
 
     @Override

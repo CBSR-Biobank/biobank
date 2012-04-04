@@ -14,13 +14,13 @@ import org.eclipse.swt.widgets.Tree;
 public abstract class NewAbstractSearchedNode extends AbstractNewAdapterBase {
 
     public NewAbstractSearchedNode(AbstractAdapterBase parent, int id) {
-        super(parent, id, Messages.AbstractSearchedNode_searched, null, false);
+        super(parent, id, "", null, false);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText(Messages.AbstractSearchedNode_clear);
+        mi.setText("");
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {

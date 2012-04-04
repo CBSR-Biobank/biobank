@@ -33,7 +33,7 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
     private boolean createAllowed;
 
     public ClinicMasterGroup(SessionAdapter sessionAdapter, int id) {
-        super(sessionAdapter, id, Messages.ClinicMasterGroup_clinics_node_label);
+        super(sessionAdapter, id, "All Clinics");
         try {
             this.createAllowed =
                 SessionManager.getAppService().isAllowed(
@@ -47,7 +47,7 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.ClinicMasterGroup_add_label);
+            mi.setText("Add Clinic");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

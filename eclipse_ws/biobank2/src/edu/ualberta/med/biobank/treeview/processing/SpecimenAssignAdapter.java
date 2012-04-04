@@ -24,7 +24,7 @@ public class SpecimenAssignAdapter extends AdapterBase {
 
     @Override
     public String getTooltipTextInternal() {
-        return Messages.SpecimenAssignAdapter_assign_label;
+        return "Specimen Assign";
     }
 
     @Override

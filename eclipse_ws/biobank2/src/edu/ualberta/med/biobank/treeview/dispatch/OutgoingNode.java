@@ -25,7 +25,7 @@ public class OutgoingNode extends AdapterBase {
     private Boolean createAllowed;
 
     public OutgoingNode(AdapterBase parent, int id) {
-        super(parent, id, Messages.OutgoingNode_outgoing_node_label, true);
+        super(parent, id, "Outgoing", true);
         creationNode = new InCreationDispatchGroup(this, 0);
         creationNode.setParent(this);
         addChild(creationNode);
@@ -58,7 +58,7 @@ public class OutgoingNode extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.OutgoingNode_add_label);
+            mi.setText("Add Dispatch");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

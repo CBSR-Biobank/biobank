@@ -26,7 +26,7 @@ public class InCreationDispatchGroup extends AbstractDispatchGroup {
     private Boolean createAllowed;
 
     public InCreationDispatchGroup(AdapterBase parent, int id) {
-        super(parent, id, Messages.InCreationDispatchGroup_creation_node_label);
+        super(parent, id, "Creation");
         try {
             this.createAllowed =
                 SessionManager.getAppService().isAllowed(
@@ -51,7 +51,7 @@ public class InCreationDispatchGroup extends AbstractDispatchGroup {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.InCreationDispatchGroup_add_label);
+            mi.setText("Add Dispatch");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

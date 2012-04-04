@@ -70,27 +70,27 @@ public class SiteAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         SiteWrapper site = (SiteWrapper) getModelObject();
-        Assert.isNotNull(site, "site is null"); //$NON-NLS-1$
+        Assert.isNotNull(site, "site is null"); 
         return site.getNameShort();
     }
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText(Messages.SiteAdapter_tooltip_label);
+        return getTooltipText("Repository Site");
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, Messages.SiteAdapter_site_label);
-        addViewMenu(menu, Messages.SiteAdapter_site_label);
+        addEditMenu(menu, "Site");
+        addViewMenu(menu, "Site");
         if (!getModelObject().equals(
             SessionManager.getUser().getCurrentWorkingCenter()))
-            addDeleteMenu(menu, Messages.SiteAdapter_site_label);
+            addDeleteMenu(menu, "Site");
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.SiteAdapter_delete_confirm_msg;
+        return "Are you sure you want to delete this repository site?";
     }
 
     @Override

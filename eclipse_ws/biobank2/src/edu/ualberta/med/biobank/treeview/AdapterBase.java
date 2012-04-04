@@ -34,7 +34,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         .getName());
 
     protected static final String BGR_LOADING_LABEL =
-        Messages.AdapterBase_loading;
+        "loading...";
 
     private Object modelObject;
 
@@ -192,7 +192,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
                         text = getModelObject().toString();
                     }
                     logger.error(
-                        "Error while loading children of node " + text, e); //$NON-NLS-1$
+                        "Error while loading children of node " + text, e); 
                 }
             }
         });
@@ -241,7 +241,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
                 .openEditor(input, id, focusOnEditor);
             return part;
         } catch (PartInitException e) {
-            logger.error("Can't open form with id " + id, e); //$NON-NLS-1$
+            logger.error("Can't open form with id " + id, e); 
             return null;
         }
 

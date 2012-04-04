@@ -33,14 +33,14 @@ public abstract class AbstractSearchedNode extends AdapterBase {
 
     public AbstractSearchedNode(AdapterBase parent, int id,
         boolean keepDirectLeafChild) {
-        super(parent, id, Messages.AbstractSearchedNode_searched, true);
+        super(parent, id, "Searched", true);
         this.keepDirectLeafChild = keepDirectLeafChild;
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText(Messages.AbstractSearchedNode_clear);
+        mi.setText("Clear");
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -124,7 +124,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         } catch (final RemoteAccessException exp) {
             BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
-            logger.error("Error while refreshing searched elements", e); //$NON-NLS-1$
+            logger.error("Error while refreshing searched elements", e); 
         }
     }
 

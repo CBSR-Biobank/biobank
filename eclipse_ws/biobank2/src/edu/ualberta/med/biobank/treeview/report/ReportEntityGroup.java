@@ -36,7 +36,7 @@ public class ReportEntityGroup extends AdapterBase {
 
     @Override
     public void openViewForm() {
-        Assert.isTrue(false, "should not be called"); //$NON-NLS-1$
+        Assert.isTrue(false, "should not be called"); 
     }
 
     @Override
@@ -53,7 +53,7 @@ public class ReportEntityGroup extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (parent.isModifiable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(NLS.bind(Messages.ReportEntityGroup_new_label,
+            mi.setText(NLS.bind("New {0} Report",
                 entity.getName()));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override

@@ -22,7 +22,7 @@ public class NodeLabelProvider implements ILabelProvider {
         if (element instanceof AbstractAdapterBase) {
             return ((AbstractAdapterBase) element).getLabel();
         }
-        return "error in getText"; //$NON-NLS-1$
+        return "error in getText"; 
     }
 
     @Override

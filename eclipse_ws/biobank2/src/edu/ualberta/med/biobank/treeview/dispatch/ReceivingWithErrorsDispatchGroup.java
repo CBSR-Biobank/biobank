@@ -13,7 +13,7 @@ public class ReceivingWithErrorsDispatchGroup extends AbstractDispatchGroup {
 
     public ReceivingWithErrorsDispatchGroup(AdapterBase parent, int id) {
         super(parent, id,
-            Messages.ReceivingWithErrorsDispatchGroup_error_node_label);
+            "Errors - Not Closed");
     }
 
     @Override

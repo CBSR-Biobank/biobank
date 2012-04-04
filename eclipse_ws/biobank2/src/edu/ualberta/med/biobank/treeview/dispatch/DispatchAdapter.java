@@ -85,38 +85,38 @@ public class DispatchAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         DispatchWrapper dispatch = getDispatchWrapper();
-        Assert.isNotNull(dispatch, "Dispatch is null"); //$NON-NLS-1$
-        String label = ""; //$NON-NLS-1$
+        Assert.isNotNull(dispatch, "Dispatch is null"); 
+        String label = ""; 
         if (dispatch.getSenderCenter() != null
             && dispatch.getReceiverCenter() != null)
-            label += dispatch.getSenderCenter().getNameShort() + " -> " //$NON-NLS-1$
+            label += dispatch.getSenderCenter().getNameShort() + " -> " 
                 + dispatch.getReceiverCenter().getNameShort();
 
         ShipmentInfoWrapper shipInfo = dispatch.getShipmentInfo();
         if ((shipInfo != null) && (shipInfo.getPackedAt() != null))
-            label += " [" + dispatch.getFormattedPackedAt() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+            label += " [" + dispatch.getFormattedPackedAt() + "]";  
         return label;
     }
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText(Messages.DispatchAdapter_dispatch_label);
+        return getTooltipText("Dispatch");
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         CenterWrapper<?> siteParent = SessionManager.getUser()
             .getCurrentWorkingCenter();
-        addViewMenu(menu, Messages.DispatchAdapter_dispatch_label);
+        addViewMenu(menu, "Dispatch");
         try {
             if (isDeletable()) {
-                addDeleteMenu(menu, Messages.DispatchAdapter_dispatch_label);
+                addDeleteMenu(menu, "Dispatch");
             }
             if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
                 && isEditable
                 && getDispatchWrapper().hasErrors()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText(Messages.DispatchAdapter_close_label);
+                mi.setText("Close");
                 mi.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent event) {
@@ -128,7 +128,7 @@ public class DispatchAdapter extends AdapterBase {
                 && isEditable
                 && getDispatchWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText(Messages.DispatchAdapter_move_creation_label);
+                mi.setText("Move to Creation");
                 mi.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent event) {
@@ -139,7 +139,7 @@ public class DispatchAdapter extends AdapterBase {
             if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
                 && getDispatchWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText(Messages.DispatchAdapter_receive_label);
+                mi.setText("Receive");
                 mi.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent event) {
@@ -147,7 +147,7 @@ public class DispatchAdapter extends AdapterBase {
                     }
                 });
                 mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText(Messages.DispatchAdapter_receive_process_label);
+                mi.setText("Receive and Process");
                 mi.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent event) {
@@ -155,7 +155,7 @@ public class DispatchAdapter extends AdapterBase {
                     }
                 });
                 mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText(Messages.DispatchAdapter_lost_label);
+                mi.setText("Mark as Lost");
                 mi.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent event) {
@@ -163,9 +163,9 @@ public class DispatchAdapter extends AdapterBase {
                     }
                 });
             }
-            addEditMenu(menu, Messages.DispatchAdapter_dispatch_label);
+            addEditMenu(menu, "Dispatch");
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.DispatchAdapter_check_error_msg,
+            BgcPlugin.openAsyncError("Error checking permissions",
                 e);
         }
     }
@@ -179,7 +179,7 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.DispatchAdapter_delete_confirm_msg;
+        return "Are you sure you want to delete this dispatch?";
     }
 
     public void doReceive() {
@@ -225,7 +225,7 @@ public class DispatchAdapter extends AdapterBase {
             // to be sure has last database data.
             getDispatchWrapper().reload();
         } catch (Exception ex) {
-            BgcPlugin.openAsyncError(Messages.DispatchAdapter_reload_error, ex);
+            BgcPlugin.openAsyncError("Error reloading", ex);
         }
         getDispatchWrapper().setState(DispatchState.LOST);
         persistDispatch();

@@ -39,7 +39,7 @@ public class ContainerGroup extends AdapterBase {
     private boolean createAllowed;
 
     public ContainerGroup(SiteAdapter parent, int id) {
-        super(parent, id, Messages.ContainerGroup_containers_node_label, true);
+        super(parent, id, "Containers", true);
         try {
             this.createAllowed =
                 SessionManager.getAppService().isAllowed(
@@ -75,7 +75,7 @@ public class ContainerGroup extends AdapterBase {
                     ContainerGroup.super.performExpand();
                 } catch (ApplicationException e) {
                     // TODO: open an error dialog here?
-                    LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
+                    LOGGER.error("BioBankFormBase.createPartControl Error", e);             
                 }
             }
         });
@@ -85,7 +85,7 @@ public class ContainerGroup extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.ContainerGroup_add_label);
+            mi.setText("Add a Container");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -141,8 +141,8 @@ public class ContainerGroup extends AdapterBase {
                 .getTopContainerTypesInSite(SessionManager.getAppService(),
                     site);
             if (top.size() == 0) {
-                BgcPlugin.openError(Messages.ContainerGroup_create_error_title,
-                    Messages.ContainerGroup_create_error_msg);
+                BgcPlugin.openError("Unable to create container",
+                    "You must define a top-level container type before initializing storage.");
             } else {
                 ContainerWrapper c = new ContainerWrapper(
                     SessionManager.getAppService());
@@ -154,7 +154,7 @@ public class ContainerGroup extends AdapterBase {
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (Exception e) {
-            LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$
+            LOGGER.error("BioBankFormBase.createPartControl Error", e); 
         }
     }
 

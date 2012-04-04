@@ -36,14 +36,14 @@ public class ContainerTypeGroup extends AdapterBase {
     private Boolean createAllowed;
 
     public ContainerTypeGroup(SiteAdapter parent, int id) {
-        super(parent, id, Messages.ContainerTypeGroup_types_node_label, true);
+        super(parent, id, "Container Types", true);
         try {
             this.createAllowed =
                 SessionManager.getAppService().isAllowed(
                     new ContainerTypeCreatePermission(parent.getId()));
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.ContainerTypeGroup_error,
-                Messages.ContainerTypeGroup_message);
+            BgcPlugin.openAsyncError("Error",
+                "Unable to retrieve permissions");
         }
     }
 
@@ -61,7 +61,7 @@ public class ContainerTypeGroup extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.ContainerTypeGroup_add_label);
+            mi.setText("Add Container Type");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

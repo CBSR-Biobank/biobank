@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 public class SiteClinicGroup extends AbstractClinicGroup {
 
     public SiteClinicGroup(SiteAdapter parent, int id) {
-        super(parent, id, Messages.SiteClinicGroup_clinics_node_label);
+        super(parent, id, "Clinics");
     }
 
     @Override

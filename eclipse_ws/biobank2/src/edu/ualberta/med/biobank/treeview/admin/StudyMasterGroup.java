@@ -32,7 +32,7 @@ public class StudyMasterGroup extends AbstractStudyGroup {
     private Boolean createAllowed;
 
     public StudyMasterGroup(SessionAdapter parent, int id) {
-        super(parent, id, Messages.StudyMasterGroup_studies_node_label);
+        super(parent, id, "All Studies");
         try {
             this.createAllowed = SessionManager.getAppService().isAllowed(
                 new StudyCreatePermission());
@@ -45,7 +45,7 @@ public class StudyMasterGroup extends AbstractStudyGroup {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.StudyMasterGroup_add_label);
+            mi.setText("Add Study");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

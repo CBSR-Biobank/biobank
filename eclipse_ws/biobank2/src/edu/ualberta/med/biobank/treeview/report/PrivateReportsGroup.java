@@ -13,9 +13,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PrivateReportsGroup extends AbstractReportGroup {
-    private static final String NODE_NAME = Messages.PrivateReportsGroup_myreport_node_label;
-    private static final String HQL_REPORT_OF_USER = "from " //$NON-NLS-1$
-        + Report.class.getName() + " where userId = ?"; //$NON-NLS-1$
+    private static final String NODE_NAME = "My Reports";
+    private static final String HQL_REPORT_OF_USER = "from " 
+        + Report.class.getName() + " where userId = ?"; 
 
     public PrivateReportsGroup(AdapterBase parent, int id) {
         super(parent, id, NODE_NAME);

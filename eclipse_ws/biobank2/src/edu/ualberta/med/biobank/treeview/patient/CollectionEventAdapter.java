@@ -60,16 +60,16 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        Assert.isNotNull(ceventInfo, "collection event is null"); //$NON-NLS-1$
-        return new StringBuilder("#") //$NON-NLS-1$ 
+        Assert.isNotNull(ceventInfo, "collection event is null"); 
+        return new StringBuilder("#")  
             .append(ceventInfo.cevent.getVisitNumber())
-            .append(" - ")//$NON-NLS-1$
+            .append(" - ")
             .append(
-                ceventInfo.minSourceSpecimenDate == null ? Messages.CollectionEventAdapter_nospecimens_label
+                ceventInfo.minSourceSpecimenDate == null ? "No Specimens"
                     : DateFormatter
                         .formatAsDateTime(ceventInfo.minSourceSpecimenDate))
-            .append(" [").append(ceventInfo.sourceSpecimenCount) //$NON-NLS-1$ 
-            .append("]").toString(); //$NON-NLS-1$ 
+            .append(" [").append(ceventInfo.sourceSpecimenCount)  
+            .append("]").toString();  
     }
 
     @Override
@@ -77,7 +77,7 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
         String tabName = null;
         if (ceventInfo != null)
             if (ceventInfo.cevent.getId() == null) {
-                tabName = Messages.CollectionEventEntryForm_title_new;
+                tabName = "New collection event";
                 // FIXME this should not be done in a getter!
                 // try {
                 // cEvent
@@ -91,7 +91,7 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
                 // }
         } else {
             tabName = NLS.bind(
-                Messages.CollectionEventEntryForm_title_edit,
+                "Collection Event - #{0}",
                 ceventInfo.cevent.getVisitNumber());
         }
         return tabName;
@@ -99,14 +99,14 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, Messages.CollectionEventAdapter_cevent_label);
-        addViewMenu(menu, Messages.CollectionEventAdapter_cevent_label);
-        addDeleteMenu(menu, Messages.CollectionEventAdapter_cevent_label);
+        addEditMenu(menu, "Collection Event");
+        addViewMenu(menu, "Collection Event");
+        addDeleteMenu(menu, "Collection Event");
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.CollectionEventAdapter_delete_confirm_msg;
+        return "Are you sure you want to delete this collection event?";
     }
 
     @Override

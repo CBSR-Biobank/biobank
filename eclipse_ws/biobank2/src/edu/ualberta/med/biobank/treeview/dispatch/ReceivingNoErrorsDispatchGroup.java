@@ -13,7 +13,7 @@ public class ReceivingNoErrorsDispatchGroup extends AbstractDispatchGroup {
 
     public ReceivingNoErrorsDispatchGroup(AdapterBase parent, int id) {
         super(parent, id,
-            Messages.ReceivingNoErrorsDispatchGroup_receiving_node_label);
+            "Receiving");
     }
 
     @Override

@@ -39,8 +39,8 @@ public class ContainerDragDropListener implements DropTargetListener,
             if (ts.size() != 1)
                 BgcPlugin
                     .openError(
-                        Messages.ContainerDragDropListener_move_multiple_error_title,
-                        Messages.ContainerDragDropListener_move_multiple_error_msg);
+                        "Cannot move multiple container",
+                        "You cannot move multiple containers, please drag them one at a time.");
 
             srcContainerAdapter = (ContainerAdapter) ts.getFirstElement();
             if (srcContainerAdapter != null)
@@ -85,7 +85,7 @@ public class ContainerDragDropListener implements DropTargetListener,
                 } catch (Exception ex) {
                     BgcPlugin
                         .openAsyncError(
-                            Messages.ContainerDragDropListener_drag_error_title,
+                            "Error in drag",
                             ex);
                 }
             }
@@ -130,20 +130,20 @@ public class ContainerDragDropListener implements DropTargetListener,
                     && !dstContainer.isContainerFull()) {
 
                     // TODO implement the moving of containers here.
-                    System.out.println("Valid Drag Detected:"); //$NON-NLS-1$
-                    System.out.println(srcContainer + " --> " //$NON-NLS-1$
+                    System.out.println("Valid Drag Detected:"); 
+                    System.out.println(srcContainer + " --> " 
                         + dstContainer);
                     srcContainerAdapter.moveContainer(dstContainer);
                     return;
                 }
                 BgcPlugin
                     .openError(
-                        Messages.ContainerDragDropListener_state_error_title,
-                        Messages.ContainerDragDropListener_state_error_msg);
+                        "Invalid state",
+                        "ERROR: an unexpected state occured in TreeDragDropListener. Please report this.");
             } catch (Exception ex) {
                 BgcPlugin
                     .openAsyncError(
-                        Messages.ContainerDragDropListener_drop_error_title,
+                        "Drop error",
                         ex);
             }
         }
