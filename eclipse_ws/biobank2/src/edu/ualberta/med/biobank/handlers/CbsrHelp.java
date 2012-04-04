@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class CbsrHelp extends AbstractHandler {
 
-    public static final String CBSR_HELP_URL = "http://biosample.ca/index.php/help"; 
+    public static final String CBSR_HELP_URL = "http://biosample.ca/index.php/help";
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
