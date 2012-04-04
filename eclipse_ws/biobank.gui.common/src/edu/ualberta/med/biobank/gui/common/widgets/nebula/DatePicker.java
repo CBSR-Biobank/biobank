@@ -699,8 +699,10 @@ class DatePicker extends VPanel {
 
         monthButtons = new VButton[12];
         for (int month = 0; month < monthButtons.length; month++) {
-            monthButtons[month] = new VButton(monthPanel,
-                (cdt.field.length > 1) ? (SWT.PUSH | SWT.NO_FOCUS) : SWT.TOGGLE);
+            monthButtons[month] =
+                new VButton(monthPanel,
+                    (cdt.field.length > 1) ? (SWT.PUSH | SWT.NO_FOCUS)
+                        : SWT.TOGGLE);
             monthButtons[month].setSquare(true);
             monthButtons[month].setData("month", month); //$NON-NLS-1$
             monthButtons[month].setData(CDT.PickerPart,
@@ -767,8 +769,10 @@ class DatePicker extends VPanel {
 
         yearButtons = new VButton[15];
         for (int year = 0; year < yearButtons.length; year++) {
-            yearButtons[year] = new VButton(yearPanel,
-                (cdt.field.length > 1) ? (SWT.PUSH | SWT.NO_FOCUS) : SWT.TOGGLE);
+            yearButtons[year] =
+                new VButton(yearPanel,
+                    (cdt.field.length > 1) ? (SWT.PUSH | SWT.NO_FOCUS)
+                        : SWT.TOGGLE);
             yearButtons[year].setSquare(true);
             yearButtons[year]
                 .setData(CDT.PickerPart, PickerPart.DayOfWeekLabel);
@@ -1001,9 +1005,10 @@ class DatePicker extends VPanel {
                 first.set(Calendar.MINUTE, 0);
                 first.set(Calendar.HOUR_OF_DAY, 0);
 
-                Calendar last = cdt
-                    .getCalendarInstance((Date) dayButtons[dayButtons.length - 1]
-                        .getData(CDT.Key.Date));
+                Calendar last =
+                    cdt
+                        .getCalendarInstance((Date) dayButtons[dayButtons.length - 1]
+                            .getData(CDT.Key.Date));
                 last.set(Calendar.MILLISECOND, 0);
                 last.set(Calendar.SECOND, 0);
                 last.set(Calendar.MINUTE, 0);
@@ -1181,9 +1186,10 @@ class DatePicker extends VPanel {
                 first.set(Calendar.MINUTE, 0);
                 first.set(Calendar.HOUR_OF_DAY, 0);
 
-                Calendar last = cdt
-                    .getCalendarInstance((Date) dayButtons[dayButtons.length - 1]
-                        .getData(CDT.Key.Date));
+                Calendar last =
+                    cdt
+                        .getCalendarInstance((Date) dayButtons[dayButtons.length - 1]
+                            .getData(CDT.Key.Date));
                 last.set(Calendar.MILLISECOND, 0);
                 last.set(Calendar.SECOND, 0);
                 last.set(Calendar.MINUTE, 0);
@@ -1262,22 +1268,29 @@ class DatePicker extends VPanel {
                         .currentTimeMillis());
                     Object[] margs = {
                         cal.getTime(),
-                        Resources.getString(
-                            "date_ordinal_" + cal.get(Calendar.DATE), locale) //$NON-NLS-1$
+                        DATE_ORDINALS[cal.get(Calendar.DATE) - 1]
                     };
-                    MessageFormat formatter = new MessageFormat(
-                        Resources.getString("today_verbose.text", locale), locale); //$NON-NLS-1$
+                    MessageFormat formatter =
+                        new MessageFormat("Today is {0,date,EEEE}, the {1}",
+                            locale);
                     today.setText(formatter.format(margs));
                 } else {
-                    today.setText(Resources.getString("today.text", locale)); //$NON-NLS-1$
+                    today.setText("Today");
                 }
             }
             if (clear != null) {
-                clear.setText(Resources.getString("clear.text", locale)); //$NON-NLS-1$
+                clear.setText("Clear");
             }
             footer.layout();
         }
     }
+
+    private static final String[] DATE_ORDINALS = new String[] {
+        "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th",
+        "11th", "12th", "13th", "14th", "15th", "16th", "17th", "18th", "19th",
+        "20th", "21st", "22nd", "23rd", "24th", "25th", "26th", "27th", "28th",
+        "29th", "30th", "31st"
+    };
 
     /**
      * set / update the text of the header - <code>monthLabel</code>,
@@ -1360,29 +1373,21 @@ class DatePicker extends VPanel {
     private void updateLocale() {
         Locale locale = cdt.getLocale();
         if (monthPrev != null)
-            monthPrev.setToolTipText(Resources.getString(
-                "nav_prev_month", locale)); //$NON-NLS-1$
+            monthPrev.setToolTipText("Previous Month");
         if (monthNext != null)
-            monthNext.setToolTipText(Resources.getString(
-                "nav_next_month", locale)); //$NON-NLS-1$
+            monthNext.setToolTipText("Next Month");
         if (dateNow != null)
-            dateNow.setToolTipText(Resources.getString(
-                "nav_current_day", locale)); //$NON-NLS-1$
+            dateNow.setToolTipText("Go To Today");
         if (yearPrev != null)
-            yearPrev.setToolTipText(Resources
-                .getString("nav_prev_year", locale)); //$NON-NLS-1$
+            yearPrev.setToolTipText("Previous Year");
         if (yearNext != null)
-            yearNext.setToolTipText(Resources
-                .getString("nav_next_year", locale)); //$NON-NLS-1$
+            yearNext.setToolTipText("Next Year");
         if (today != null)
-            today
-                .setToolTipText(Resources.getString("nav_current_day", locale)); //$NON-NLS-1$
+            today.setToolTipText("Go To Today");
         if (todayMenuItem != null)
-            todayMenuItem.setText(Resources
-                .getString("nav_current_day", locale)); //$NON-NLS-1$
+            todayMenuItem.setText("Go To Today");
         if (showSelMenuItem != null)
-            showSelMenuItem.setText(Resources.getString(
-                "show_selection", locale)); //$NON-NLS-1$
+            showSelMenuItem.setText("Show Selection");
     }
 
     private void updateMonths() {

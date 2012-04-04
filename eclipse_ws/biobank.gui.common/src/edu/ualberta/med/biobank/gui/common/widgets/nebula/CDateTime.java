@@ -424,7 +424,7 @@ public class CDateTime extends BaseCombo {
 
         VButton b = new VButton(tb, SWT.OK | SWT.NO_FOCUS);
         b.setData(CDT.PickerPart, PickerPart.OkButton);
-        b.setToolTipText(Resources.getString("accept.text", locale)); //$NON-NLS-1$
+        b.setToolTipText("Accept");
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
             @Override
@@ -435,7 +435,7 @@ public class CDateTime extends BaseCombo {
 
         b = new VButton(tb, SWT.CANCEL | SWT.NO_FOCUS);
         b.setData(CDT.PickerPart, PickerPart.CancelButton);
-        b.setToolTipText(Resources.getString("cancel.text", locale)); //$NON-NLS-1$
+        b.setToolTipText("Cancel");
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
             @Override
@@ -447,8 +447,8 @@ public class CDateTime extends BaseCombo {
 
         b = new VButton(tb, SWT.NO_FOCUS);
         b.setData(CDT.PickerPart, PickerPart.ClearButton);
-        b.setText(Resources.getString("clear.text", locale)); //$NON-NLS-1$
-        b.setToolTipText(Resources.getString("clear.text", locale)); //$NON-NLS-1$
+        b.setText("Clear");
+        b.setToolTipText("Clear");
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
             @Override
@@ -854,9 +854,9 @@ public class CDateTime extends BaseCombo {
     public String getNullText() {
         if (nullText == null) {
             if (isDate) {
-                return Resources.getString("null_text.date", locale); //$NON-NLS-1$
+                return "<choose date>";
             }
-            return Resources.getString("null_text.time", locale); //$NON-NLS-1$
+            return "<choose time>";
         }
         return nullText;
     }
@@ -1597,9 +1597,9 @@ public class CDateTime extends BaseCombo {
     private void updateNullText() {
         if (defaultNullText) {
             if (isDate) {
-                nullText = Resources.getString("null_text.date", locale); //$NON-NLS-1$
+                nullText = "<choose date>"; //$NON-NLS-1$
             } else {
-                nullText = Resources.getString("null_text.time", locale); //$NON-NLS-1$
+                nullText = "<choose time>"; //$NON-NLS-1$
             }
             if (!hasSelection()) {
                 updateText();
