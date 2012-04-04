@@ -40,5 +40,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-validator-4.2.0.Final.jar" sourcepath="/Users/jferland/Source/Java/hibernate-distribution-3.6.9.Final/project/hibernate-core"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/validation-api-1.0.0.GA.jar" sourcepath="/home/jferland/.m2/repository/javax/validation/validation-api/1.0.0.GA/validation-api-1.0.0.GA-sources.jar"/>
 	<classpathentry kind="lib" path="lib/client/ognl-2.6.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/gettext-commons-0.9.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

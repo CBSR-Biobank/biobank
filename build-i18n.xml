@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="i18n" basedir=".">
+  <property file="build.properties" />
+ 
+  <property name="gettexttasks.jar" value="${req.jars.dir}/gettext-ant-tasks-0.9.7.jar"/>
+
+  <target name="init.gettext" description="Loads the Ant gettext tasks">
+    <taskdef name="gettext-extract"
+             classname="org.xnap.commons.ant.gettext.GettextExtractKeysTask"
+             classpath="${gettexttasks.jar}"/>
+    <taskdef name="gettext-merge"
+             classname="org.xnap.commons.ant.gettext.GettextMergeKeysTask"
+             classpath="${gettexttasks.jar}"/>
+    <taskdef name="gettext-generate-default"
+             classname="org.xnap.commons.ant.gettext.GenerateDefaultBundleTask"
+             classpath="${gettexttasks.jar}"/>
+    <taskdef name="gettext-dist"
+             classname="org.xnap.commons.ant.gettext.GettextDistTask"
+             classpath="${gettexttasks.jar}"/>
+  </target>
+
+  <target name="extract-messages" description="Extracts message keys from the source code" depends="init.gettext">
+    <gettext-extract keysFile="messages.pot" poDirectory="po">
+      <fileset dir="src/main/java" includes="**/*.java"/>
+      <fileset dir="src2/main/java" includes="**/*.java"/>
+    </gettext-extract>
+  </target>
+
+  <target name="merge-messages" description="Merges newly extracted messages into existing po files" depends="init.gettext">
+    <gettext-merge keysFile="messages.pot" poDirectory="po"/>
+  </target>
+
+  <target name="generate-default-bundle" description="Generates a default bundle" depends="init.gettext">
+    <gettext-generate-default targetBundle="org.mynamespace.i18n.Messages" outputDirectory="po" potfile="po/messages.pot"/>
+  </target>
+
+  <target name="generate-bundles-jar" description="Generates Java ResourceBundles and jars them up" depends="init.gettext">
+    <gettext-dist targetBundle="org.mynamespace.i18n.Messages" poDirectory="po" outputDirectory="po" percentage="65"/>
+      <jar destfile="lib/messages.jar" basedir="po"
+           includes="org/**"/>
+  </target>
+</project>
