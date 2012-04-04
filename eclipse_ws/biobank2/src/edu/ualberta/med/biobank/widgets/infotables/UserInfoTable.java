@@ -209,7 +209,7 @@ public abstract class UserInfoTable extends
     public static class UserComparator implements Comparator<User> {
         @Override
         public int compare(User a, User b) {
-            return NullHelper.safeCompareTo(a.getLogin(), b.getLogin(),
+            return NullHelper.cmp(a.getLogin(), b.getLogin(),
                 String.CASE_INSENSITIVE_ORDER);
         }
     }

@@ -21,7 +21,7 @@ public class SourceSpecimenWrapper extends SourceSpecimenBaseWrapper {
         if (other instanceof SourceSpecimenWrapper) {
             ModelWrapper<SpecimenType> otherSpecimenType = ((SourceSpecimenWrapper) other)
                 .getSpecimenType();
-            return NullHelper.safeCompareTo(getSpecimenType(), otherSpecimenType);
+            return NullHelper.cmp(getSpecimenType(), otherSpecimenType);
         }
         return 0;
     }

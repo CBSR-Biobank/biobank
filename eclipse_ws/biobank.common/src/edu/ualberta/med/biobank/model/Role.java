@@ -62,7 +62,7 @@ public class Role extends AbstractBiobankModel {
         public int compare(Role a, Role b) {
             if (a == null && b == null) return 0;
             if (a == null ^ b == null) return (a == null) ? -1 : 1;
-            return NullHelper.safeCompareTo(a.getName(), b.getName());
+            return NullHelper.cmp(a.getName(), b.getName());
         }
     }
 }

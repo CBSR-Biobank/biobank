@@ -606,7 +606,7 @@ public class BgcWidgetCreator {
         b.getValidationStatus().addChangeListener(new IChangeListener() {
             @Override
             public void handleChange(ChangeEvent event) {
-                boolean equal = NullHelper.safeEquals(
+                boolean equal = NullHelper.eq(
                     writableValue.getValue(), observableValue.getValue());
 
                 if (equal) {

@@ -72,7 +72,7 @@ public class Group extends Principal {
         public int compare(Group a, Group b) {
             if (a == null && b == null) return 0;
             if (a == null ^ b == null) return (a == null) ? -1 : 1;
-            return NullHelper.safeCompareTo(a.getName(), b.getName());
+            return NullHelper.cmp(a.getName(), b.getName());
         }
     }
 }

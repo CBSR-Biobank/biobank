@@ -156,7 +156,7 @@ public abstract class GroupInfoTable extends
     public static class GroupComparator implements Comparator<Group> {
         @Override
         public int compare(Group a, Group b) {
-            return NullHelper.safeCompareTo(a.getName(), b.getName(),
+            return NullHelper.cmp(a.getName(), b.getName(),
                 String.CASE_INSENSITIVE_ORDER);
         }
     }

@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.util;
 import java.util.Comparator;
 
 public class NullHelper {
-    public static boolean safeEquals(Object a, Object b) {
+    public static boolean eq(Object a, Object b) {
         return (a == null) ? (b == null) : a.equals(b);
     }
 
@@ -19,8 +19,7 @@ public class NullHelper {
      * @param two
      * @return
      */
-    public static <T extends Comparable<T>> int safeCompareTo(
-        final T one, final T two) {
+    public static <T extends Comparable<T>> int cmp(final T one, final T two) {
         if (one == null ^ two == null) {
             return (one == null) ? -1 : 1;
         }
@@ -40,8 +39,7 @@ public class NullHelper {
      * @param comparator
      * @return
      */
-    public static <T> int safeCompareTo(final T one, final T two,
-        Comparator<T> comparator) {
+    public static <T> int cmp(final T one, final T two, Comparator<T> comparator) {
         if (one == null ^ two == null) {
             return (one == null) ? -1 : 1;
         }

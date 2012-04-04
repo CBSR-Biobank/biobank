@@ -133,9 +133,9 @@ public class ValidContainerTypeValidator
         // rows, but not columns if more than one row is filled (assuming
         // labeling is done row by row)
 
-        isValid &= NullHelper.safeEquals(ct.getCapacity(), oldCt.getCapacity());
-        isValid &= NullHelper.safeEquals(ct.getTopLevel(), oldCt.getTopLevel());
-        isValid &= NullHelper.safeEquals(ct.getChildLabelingScheme(),
+        isValid &= NullHelper.eq(ct.getCapacity(), oldCt.getCapacity());
+        isValid &= NullHelper.eq(ct.getTopLevel(), oldCt.getTopLevel());
+        isValid &= NullHelper.eq(ct.getChildLabelingScheme(),
             oldCt.getChildLabelingScheme());
 
         if (!isValid) {

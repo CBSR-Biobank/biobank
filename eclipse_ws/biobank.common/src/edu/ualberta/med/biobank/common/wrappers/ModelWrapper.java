@@ -607,7 +607,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     @Override
     public int compareTo(ModelWrapper<E> other) {
-        return NullHelper.safeCompareTo(getId(), other.getId());
+        return NullHelper.cmp(getId(), other.getId());
     }
 
     public static <W extends ModelWrapper<? extends R>, R, M> List<W> wrapModelCollection(
