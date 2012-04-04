@@ -26,8 +26,8 @@ public class ShippingMethodDialog extends BgcBaseDialog {
         this.tmpShippingMethod = new ShippingMethodWrapper(null);
         copyTo(origShippingMethod, tmpShippingMethod);
         this.message = message;
-        currentTitle = (shippingMethod.getName() == null ? Messages.ShippingMethodDialog_title_add
-            : Messages.ShippingMethodDialog_title_edit);
+        currentTitle = (shippingMethod.getName() == null ? "Add Shipping Method"
+            : "Edit Shipping Method");
     }
 
     private void copyTo(ShippingMethodWrapper src, ShippingMethodWrapper dest) {
@@ -57,9 +57,9 @@ public class ShippingMethodDialog extends BgcBaseDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            Messages.ShippingMethodDialog_name_label, null, tmpShippingMethod,
+            "Name", null, tmpShippingMethod,
             ShippingMethodPeer.NAME.getName(), new NonEmptyStringValidator(
-                Messages.ShippingMethodDialog_name_validation_msg));
+                "Shipping method must have a name."));
     }
 
     @Override

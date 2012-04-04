@@ -26,7 +26,7 @@ public abstract class RolesPage extends BgcDialogPage {
 
     @Override
     public String getTitle() {
-        return Messages.RolesPage_title;
+        return "Roles";
     }
 
     @Override
@@ -84,8 +84,8 @@ public abstract class RolesPage extends BgcDialogPage {
         int res = dlg.open();
         if (res == Status.OK) {
             BgcPlugin.openAsyncInformation(
-                Messages.RolesPage_role_added_title,
-                MessageFormat.format(Messages.RolesPage_role_added_msg,
+                "Role added",
+                MessageFormat.format("Successfully added new role {0}",
                     role.getName()));
 
             getCurrentAllRolesList().add(role);

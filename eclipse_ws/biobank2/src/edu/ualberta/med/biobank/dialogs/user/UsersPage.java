@@ -39,7 +39,7 @@ public abstract class UsersPage extends BgcDialogPage {
 
     @Override
     public String getTitle() {
-        return Messages.UsersPage_page_title;
+        return "Users";
     }
 
     @Override
@@ -118,9 +118,9 @@ public abstract class UsersPage extends BgcDialogPage {
                 int res = dlg.open();
                 if (res == Status.OK) {
                     BgcPlugin.openAsyncInformation(
-                        Messages.UserManagementDialog_user_added_title,
+                        "User Added",
                         MessageFormat.format(
-                            Messages.UserManagementDialog_user_added_msg,
+                            "Successfully added new user {0}.",
                             user.getLogin()));
 
                     List<User> allCurrent = getCurrentAllUsersList();

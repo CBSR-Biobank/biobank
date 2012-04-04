@@ -58,7 +58,7 @@ public class DispatchCreateScanDialog extends
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.DispatchCreateScanDialog_description;
+        return "Scan specimens to dispatch. If a pallet with previous position is scan, the specimens scanned\nwill be compared to those that are supposed to be in the pallet.";
     }
 
     /**
@@ -72,11 +72,11 @@ public class DispatchCreateScanDialog extends
         if (SessionManager.getUser().getCurrentWorkingCenter() instanceof SiteWrapper) {
             Button palletWithoutPositionRadio = new Button(parent, SWT.RADIO);
             palletWithoutPositionRadio
-                .setText(Messages.DispatchCreateScanDialog_without_position_radio_text);
+                .setText("Pallet without previous position");
             final Button palletWithPositionRadio =
                 new Button(parent, SWT.RADIO);
             palletWithPositionRadio
-                .setText(Messages.DispatchCreateScanDialog_with_position_radio_text);
+                .setText("Pallet with previous position");
 
             palletWithPositionRadio
                 .addSelectionListener(new SelectionAdapter() {
@@ -90,14 +90,14 @@ public class DispatchCreateScanDialog extends
                 });
 
             productBarcodeValidator = new NonEmptyStringValidator(
-                Messages.DispatchCreateScanDialog_productBarcode_validationMsg);
+                "Enter product barcode");
             Label palletproductBarcodeLabel = widgetCreator.createLabel(parent,
-                Messages.DispatchCreateScanDialog_productBarcode_label);
+                "Pallet product barcode");
             palletproductBarcodeText =
                 (BgcBaseText) createBoundWidget(parent,
                     BgcBaseText.class, SWT.NONE, palletproductBarcodeLabel,
                     new String[0], this,
-                    "currentProductBarcode", productBarcodeValidator); //$NON-NLS-1$
+                    "currentProductBarcode", productBarcodeValidator); 
             palletproductBarcodeText
                 .addKeyListener(new EnterKeyToNextFieldListener());
             showProductBarcodeField(false);
@@ -109,10 +109,10 @@ public class DispatchCreateScanDialog extends
         resetScan();
         palletproductBarcodeText.setEnabled(show);
         if (show) {
-            palletproductBarcodeText.setText(""); //$NON-NLS-1$
+            palletproductBarcodeText.setText(""); 
         } else {
             palletproductBarcodeText
-                .setText(Messages.DispatchCreateScanDialog_noposision_text);
+                .setText("No previous position");
         }
     }
 
@@ -144,9 +144,9 @@ public class DispatchCreateScanDialog extends
             if (currentPallet == null) {
                 BgcPlugin
                     .openAsyncError(
-                        Messages.DispatchCreateScanDialog_pallet_search_error_title,
+                        "Pallet error",
                         NLS.bind(
-                            Messages.DispatchCreateScanDialog_pallet_search_error_msg,
+                            "Can''t find pallet with barcode ''{0}''",
                             currentProductBarcode));
                 return false;
             }
@@ -179,7 +179,7 @@ public class DispatchCreateScanDialog extends
 
     @Override
     protected String getProceedButtonlabel() {
-        return Messages.DispatchCreateScanDialog_proceed_button_label;
+        return "Add specimens";
     }
 
     @Override

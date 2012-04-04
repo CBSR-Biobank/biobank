@@ -38,7 +38,7 @@ public abstract class GroupsPage extends BgcDialogPage {
 
     @Override
     public String getTitle() {
-        return Messages.GroupsPage_page_title;
+        return "Groups";
     }
 
     @Override
@@ -113,8 +113,8 @@ public abstract class GroupsPage extends BgcDialogPage {
         int res = dlg.open();
         if (res == Status.OK) {
             BgcPlugin.openAsyncInformation(
-                Messages.UserManagementDialog_group_added_title, MessageFormat
-                    .format(Messages.UserManagementDialog_group_added_msg,
+                "Group Added", MessageFormat
+                    .format("Successfully added new group {0}.",
                         group.getName()));
 
             List<Group> allCurrent = getCurrentAllGroupsList();

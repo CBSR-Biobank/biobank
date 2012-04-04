@@ -40,6 +40,6 @@ public class TmpUtil {
         }
 
         BgcPlugin.openAsyncError(
-            Messages.UserEditDialog_save_error_title, message);
+            "Unable to Save User", message);
     }
 }

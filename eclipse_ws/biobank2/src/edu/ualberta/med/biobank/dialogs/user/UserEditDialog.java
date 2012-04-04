@@ -60,7 +60,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
     private static final int PASSWORD_LENGTH_MIN = 5;
 
     private static final String MSG_PASSWORD_REQUIRED = NLS.bind(
-        Messages.UserEditDialog_passwords_length_msg, PASSWORD_LENGTH_MIN);
+        "Passwords must be at least {0} characters long.", PASSWORD_LENGTH_MIN);
 
     private final UserWrapper userWrapper;
     private final User user;
@@ -100,17 +100,17 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
     @Override
     protected String getDialogShellTitle() {
         if (user.isNew()) {
-            return Messages.UserEditDialog_title_add;
+            return "Add User";
         }
-        return Messages.UserEditDialog_title_edit;
+        return "Edit User";
     }
 
     @Override
     protected String getTitleAreaMessage() {
         if (user.isNew()) {
-            return Messages.UserEditDialog_description_add;
+            return "Add a new user";
         }
-        return Messages.UserEditDialog_description_edit;
+        return "Modify an existing user's information";
     }
 
     @Override
@@ -129,13 +129,13 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
         tb.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createUserFields(createTabItem(tb,
-            Messages.UserEditDialog_general_title, 2));
+            "General", 2));
 
         createMembershipsSection(createTabItem(tb,
-            Messages.UserEditDialog_roles_permissions_title, 1));
+            "Roles and Permissions", 1));
 
         createGroupsSection(createTabItem(tb,
-            Messages.UserEditDialog_group_title, 1));
+            "Groups", 1));
     }
 
     private Composite createTabItem(TabFolder tb, String title, int columns) {
@@ -158,25 +158,25 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
 
         controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER | readOnly,
-            Messages.UserEditDialog_login_label, null, userWrapper,
+            "Login", null, userWrapper,
             UserPeer.LOGIN.getName(), new NonEmptyStringValidator(
-                Messages.UserEditDialog_loginName_validation_msg)));
+                "A valid login name is required.")));
 
         controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER | readOnly,
-            Messages.UserEditDialog_firstName_label, null, userWrapper,
+            "Full Name", null, userWrapper,
             UserPeer.FULL_NAME.getName(), new NonEmptyStringValidator(
-                Messages.UserEditDialog_fullName_validator_msg)));
+                "Full name of this user is required")));
 
         controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER | readOnly,
-            Messages.UserEditDialog_Email_label, null, userWrapper,
+            "Email", null, userWrapper,
             UserPeer.EMAIL.getName(), new EmailValidator(
-                Messages.UserEditDialog_email_validator_msg)));
+                "A valid email is required")));
 
         Control checkbox = createBoundWidgetWithLabel(contents, Button.class,
             SWT.CHECK | readOnly,
-            Messages.UserEditDialog_bulkemail_label, null, userWrapper,
+            "Receive bulk emails", null, userWrapper,
             UserPeer.RECV_BULK_EMAILS.getName(), null);
         controls.add(checkbox);
 
@@ -213,8 +213,8 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
 
     private void createGroupsSection(Composite contents) {
         groupsWidget = new MultiSelectWidget<Group>(contents, SWT.NONE,
-            Messages.UserEditDialog_groups_available,
-            Messages.UserEditDialog_groups_selected, 200) {
+            "Available groups",
+            "Selected groups", 200) {
             @Override
             protected String getTextForObject(Group node) {
                 return node.getName();
@@ -278,8 +278,8 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
             if (SessionManager.getUser().equals(user)) {
                 // if the User is making changes to himself, logout
                 BgcPlugin.openInformation(
-                    Messages.UserEditDialog_user_persist_title,
-                    Messages.UserEditDialog_user_persist_msg);
+                    "User Information Saved",
+                    "Your information has been successfully updated. You will be logged out and have to reconnect.");
 
                 LogoutHandler lh = new LogoutHandler();
                 try {
@@ -304,15 +304,15 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
         if (!user.isNew()) {
             // existing users can have their password field left blank
             passwordValidator = new OrValidator(Arrays.asList(
-                new EmptyStringValidator(""), passwordValidator), //$NON-NLS-1$
+                new EmptyStringValidator(""), passwordValidator), 
                 MSG_PASSWORD_REQUIRED);
         }
 
         password = (BgcBaseText) createBoundWidgetWithLabel(parent,
             BgcBaseText.class, SWT.BORDER | SWT.PASSWORD,
-            (user.isNew() ? Messages.UserEditDialog_password_new_label
-                : Messages.UserEditDialog_password_label), new String[0],
-            userWrapper, "password", passwordValidator); //$NON-NLS-1$
+            (user.isNew() ? "New Password"
+                : "Password"), new String[0],
+            userWrapper, "password", passwordValidator); 
 
         password.addModifyListener(new ModifyListener() {
             @Override
@@ -326,12 +326,12 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
                 parent,
                 BgcBaseText.class,
                 SWT.BORDER | SWT.PASSWORD,
-                (user.isNew() ? Messages.UserEditDialog_password_retype_new_label
-                    : Messages.UserEditDialog_password_retype_label),
+                (user.isNew() ? "Re-Type New Password"
+                    : "Re-Type Password"),
                 new String[0],
                 userWrapper,
-                "password", new MatchingTextValidator( //$NON-NLS-1$
-                    Messages.UserEditDialog_passwords_match_error_msg, password));
+                "password", new MatchingTextValidator( 
+                    "The passwords entered do not match.", password));
 
         MatchingTextValidator.addListener(password, passwordRetyped);
     }

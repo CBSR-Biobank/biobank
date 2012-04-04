@@ -31,7 +31,7 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
     public static final int ADD_BTN_ID = 100;
 
     private static final String TITLE =
-        Messages.SelectClinicContactDialog_dialog_title;
+        "Clinic Contacts";
 
     private StudyContactEntryInfoTable contactInfoTable;
 
@@ -53,12 +53,12 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.SelectClinicContactDialog_description;
+        return "Select a contact to add to this study";
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.SelectClinicContactDialog_main_title;
+        return "Add a clinic contact to study";
     }
 
     @Override
@@ -86,7 +86,7 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
         }
 
         clinicCombo = widgetCreator.createComboViewer(contents,
-            Messages.SelectClinicContactDialog_clinic_label,
+            "Clinic",
             new ArrayList<Clinic>(clinics), null, labelProvider);
         clinicCombo
             .addSelectionChangedListener(new ISelectionChangedListener() {

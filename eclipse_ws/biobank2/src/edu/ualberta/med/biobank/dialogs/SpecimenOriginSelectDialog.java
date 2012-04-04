@@ -31,7 +31,7 @@ public class SpecimenOriginSelectDialog extends BgcBaseDialog {
         super(parentShell);
         this.specimen = specimen;
         this.centers = centers;
-        description = NLS.bind(Messages.SpecimenOriginSelectDialog_description,
+        description = NLS.bind("Select the center where specimen ''{0}'' was created.",
             specimen.getInventoryId());
     }
 
@@ -42,12 +42,12 @@ public class SpecimenOriginSelectDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.SpecimenOriginSelectDialog_title;
+        return "Specimen original center";
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.SpecimenOriginSelectDialog_title;
+        return "Specimen original center";
     }
 
     @Override
@@ -63,13 +63,13 @@ public class SpecimenOriginSelectDialog extends BgcBaseDialog {
         GridData gd = new GridData(GridData.FILL, SWT.TOP, true, true, 2, 1);
         gd.widthHint = 400;
         l.setLayoutData(gd);
-        l.setText(Messages.SpecimenOriginSelectDialog_details);
+        l.setText("Source specimens require an origin center. By removing this specimen from this shipment the origin center has to be re-assigned. Please select this specimen's origin center. If this specimen is to be deleted then select your center from the list.");
 
         selectedCenter = SessionManager.getUser().getCurrentWorkingCenter();
 
         List<Object> objectList = new ArrayList<Object>(centers);
         widgetCreator.createComboViewer(contents,
-            Messages.SpecimenOriginSelectDialog_centers_label, objectList,
+            "Creation center", objectList,
             selectedCenter, null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {

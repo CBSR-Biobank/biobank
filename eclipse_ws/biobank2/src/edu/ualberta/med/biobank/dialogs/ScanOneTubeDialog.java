@@ -39,24 +39,24 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
         area.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         widgetCreator.createLabel(area,
-            Messages.ScanOneTubeDialog_barcode_label);
+            "Barcode");
         valueText = widgetCreator.createText(area, SWT.NONE, null, null);
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return NLS.bind(Messages.ScanOneTubeDialog_description,
+        return NLS.bind("Scan the missing tube for position {0}",
             ContainerLabelingSchemeWrapper.rowColToSbs(position));
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.ScanOneTubeDialog_title;
+        return "Pallet tube scan";
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.ScanOneTubeDialog_title;
+        return "Pallet tube scan";
     }
 
     @Override
@@ -66,8 +66,8 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
             if (otherCell.getValue() != null
                 && otherCell.getValue().equals(scannedValue)) {
                 BgcPlugin.openAsyncError(
-                    Messages.ScanOneTubeDialog_error_title, NLS.bind(
-                        Messages.ScanOneTubeDialog_error_msg,
+                    "Tube Scan Error", NLS.bind(
+                        "The value entered already exists in position {0}",
                         ContainerLabelingSchemeWrapper
                             .rowColToSbs(new RowColPos(otherCell.getRow(),
                                 otherCell.getCol()))));
