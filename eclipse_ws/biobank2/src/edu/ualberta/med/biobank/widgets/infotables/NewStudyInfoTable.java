@@ -12,11 +12,11 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 
 public class NewStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
     private static final String[] HEADINGS = new String[] {
-        Messages.StudyInfoTable_name_label,
-        Messages.StudyInfoTable_nameshort_label,
-        Messages.StudyInfoTable_status_label,
-        Messages.StudyInfoTable_patients_label,
-        Messages.StudyInfoTable_visits_label };
+        "Name",
+        "Short Name",
+        "Status",
+        "Patients",
+        "Patient Visits" };
 
     public NewStudyInfoTable(Composite parent, List<StudyCountInfo> studies) {
         super(parent, studies, HEADINGS, 10,
@@ -38,14 +38,14 @@ public class NewStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
                     return info.getStudy().getNameShort();
                 case 2:
                     return (info.getStudy().getActivityStatus() != null) ? info
-                        .getStudy().getActivityStatus().getName() : ""; //$NON-NLS-1$
+                        .getStudy().getActivityStatus().getName() : ""; 
                 case 3:
                     return NumberFormatter.format(info.getPatientCount());
                 case 4:
                     return NumberFormatter.format(info
                         .getCollectionEventCount());
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };

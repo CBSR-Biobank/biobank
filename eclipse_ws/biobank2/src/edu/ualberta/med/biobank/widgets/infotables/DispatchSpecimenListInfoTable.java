@@ -34,16 +34,16 @@ public abstract class DispatchSpecimenListInfoTable extends
         @Override
         public String toString() {
             return StringUtils.join(new String[] { inventoryId, type, pnumber,
-                status, comment }, "\t"); //$NON-NLS-1$
+                status, comment }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.DispatchSpecimenListInfoTable_inventoryid_label,
-        Messages.DispatchSpecimenListInfoTable_type_label,
-        Messages.DispatchSpecimenListInfoTable_pnumber_label,
-        Messages.DispatchSpecimenListInfoTable_status_label,
-        Messages.DispatchSpecimenListInfoTable_comment_label };
+        "Inventory ID",
+        "Type",
+        "Patient Number",
+        "Activity Status",
+        "Comment" };
 
     private boolean editMode = false;
 
@@ -64,18 +64,18 @@ public abstract class DispatchSpecimenListInfoTable extends
                             if (dsaList.size() == 1
                                 && !BgcPlugin
                                     .openConfirm(
-                                        Messages.DispatchSpecimenListInfoTable_remove_confirm_title,
+                                        "Remove Specimen",
                                         NLS.bind(
-                                            Messages.DispatchSpecimenListInfoTable_remove_one_confirm_msg,
+                                            "Are you sure you want to remove specimen \"{0}\" from this shipment ?",
                                             dsaList.get(0).getSpecimen()
                                                 .getInventoryId())))
                                 return;
                             if (dsaList.size() > 1
                                 && !BgcPlugin
                                     .openConfirm(
-                                        Messages.DispatchSpecimenListInfoTable_remove_confirm_title,
+                                        "Remove Specimen",
                                         NLS.bind(
-                                            Messages.DispatchSpecimenListInfoTable_remove_multiple_confirm_msg,
+                                            "Are you sure you want to remove these {0} specimens from this shipment ?",
                                             dsaList.size())))
                                 return;
                             try {
@@ -85,7 +85,7 @@ public abstract class DispatchSpecimenListInfoTable extends
                             } catch (Exception e) {
                                 BgcPlugin
                                     .openAsyncError(
-                                        Messages.DispatchSpecimenListInfoTable_delete_error_title,
+                                        "Delete failed",
                                         e);
                             }
                         }
@@ -113,7 +113,7 @@ public abstract class DispatchSpecimenListInfoTable extends
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return Messages.DispatchSpecimenListInfoTable_14;
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:
@@ -127,7 +127,7 @@ public abstract class DispatchSpecimenListInfoTable extends
                 case 4:
                     return info.comment;
                 default:
-                    return Messages.DispatchSpecimenListInfoTable_15;
+                    return "";
                 }
             }
         };
@@ -141,7 +141,7 @@ public abstract class DispatchSpecimenListInfoTable extends
         info.pnumber = info.dsa.getSpecimen().getCollectionEvent().getPatient()
             .getPnumber();
         SpecimenTypeWrapper type = info.dsa.getSpecimen().getSpecimenType();
-        Assert.isNotNull(type, Messages.DispatchSpecimenListInfoTable_16);
+        Assert.isNotNull(type, "specimen with null type");
         info.type = type.getName();
         info.status = info.dsa.getSpecimen().getActivityStatus().toString();
         info.comment =
@@ -182,7 +182,7 @@ public abstract class DispatchSpecimenListInfoTable extends
 
     public List<DispatchSpecimenWrapper> getSelectedItems() {
         Assert.isTrue(!tableViewer.getTable().isDisposed(),
-            Messages.DispatchSpecimenListInfoTable_17);
+            "widget is disposed");
         IStructuredSelection stSelection = (IStructuredSelection) tableViewer
             .getSelection();
         List<DispatchSpecimenWrapper> dsaList =

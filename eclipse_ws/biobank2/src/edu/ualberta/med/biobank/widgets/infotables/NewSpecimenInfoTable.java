@@ -19,17 +19,17 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
 
     public static enum ColumnsShown {
         PEVENT_SOURCE_SPECIMENS(new String[] {
-            Messages.SpecimenInfoTable_inventoryid_label,
-            Messages.SpecimenInfoTable_type_label,
-            Messages.SpecimenInfoTable_position_label,
-            Messages.SpecimenInfoTable_time_drawn_label,
-            Messages.SpecimenInfoTable_quantity_ml_label,
-            Messages.SpecimenInfoTable_status_label,
-            Messages.SpecimenInfoTable_study_label,
-            Messages.SpecimenInfoTable_pnumber_label,
-            Messages.SpecimenInfoTable_origin_center_label,
-            Messages.SpecimenInfoTable_current_center_label,
-            Messages.SpecimenInfoTable_comments_label }) {
+            "Inventory ID",
+            "Type",
+            "Position",
+            "Time drawn",
+            "Quantity (ml)",
+            "Activity status",
+            "Study",
+            "Patient #",
+            "Origin Center",
+            "Current Center",
+            "Comments" }) {
             @Override
             public String getColumnValue(SpecimenInfo row, int columnIndex) {
                 switch (columnIndex) {
@@ -54,13 +54,13 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                         .getPnumber();
                 case 8:
                     OriginInfo oi = row.specimen.getOriginInfo();
-                    return oi == null ? "" : oi.getCenter().getNameShort(); //$NON-NLS-1$
+                    return oi == null ? "" : oi.getCenter().getNameShort(); 
                 case 9:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 10:
                     return row.comment;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
 
@@ -75,16 +75,16 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
             }
         },
         CEVENT_SOURCE_SPECIMENS(new String[] {
-            Messages.SpecimenInfoTable_inventoryid_label,
-            Messages.SpecimenInfoTable_type_label,
-            Messages.SpecimenInfoTable_position_label,
-            Messages.SpecimenInfoTable_time_drawn_label,
-            Messages.NewSpecimenInfoTable_quantity_label,
-            Messages.SpecimenInfoTable_status_label,
-            Messages.SpecimenInfoTable_worksheet_label,
-            Messages.SpecimenInfoTable_origin_center_label,
-            Messages.SpecimenInfoTable_current_center_label,
-            Messages.SpecimenInfoTable_comments_label }) {
+            "Inventory ID",
+            "Type",
+            "Position",
+            "Time drawn",
+            "Quantity",
+            "Activity status",
+            "Worksheet",
+            "Origin Center",
+            "Current Center",
+            "Comments" }) {
             @Override
             public String getColumnValue(SpecimenInfo row, int columnIndex) {
                 switch (columnIndex) {
@@ -103,16 +103,16 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                     return row.specimen.getActivityStatus().getName();
                 case 6:
                     ProcessingEvent pe = row.specimen.getProcessingEvent();
-                    return pe == null ? "" : pe.getWorksheet(); //$NON-NLS-1$
+                    return pe == null ? "" : pe.getWorksheet(); 
                 case 7:
                     OriginInfo oi = row.specimen.getOriginInfo();
-                    return oi == null ? "" : oi.getCenter().getNameShort(); //$NON-NLS-1$
+                    return oi == null ? "" : oi.getCenter().getNameShort(); 
                 case 8:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 9:
                     return row.comment;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
 
@@ -129,16 +129,16 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
         },
 
         CEVENT_ALIQUOTED_SPECIMENS(new String[] {
-            Messages.SpecimenInfoTable_inventoryid_label,
-            Messages.SpecimenInfoTable_type_label,
-            Messages.SpecimenInfoTable_position_label,
-            Messages.NewSpecimenInfoTable_source_worksheet_label,
-            Messages.SpecimenInfoTable_created_label,
-            Messages.SpecimenInfoTable_quantity_ml_label,
-            Messages.SpecimenInfoTable_status_label,
-            Messages.SpecimenInfoTable_origin_center_label,
-            Messages.SpecimenInfoTable_current_center_label,
-            Messages.SpecimenInfoTable_comments_label }) {
+            "Inventory ID",
+            "Type",
+            "Position",
+            "Source worksheet",
+            "Time created",
+            "Quantity (ml)",
+            "Activity status",
+            "Origin Center",
+            "Current Center",
+            "Comments" }) {
             @Override
             public String getColumnValue(SpecimenInfo row, int columnIndex) {
                 switch (columnIndex) {
@@ -166,7 +166,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 case 9:
                     return row.comment;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
 
@@ -228,7 +228,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 return currentColumnsShowns.getColumnValue(info, columnIndex);
             }

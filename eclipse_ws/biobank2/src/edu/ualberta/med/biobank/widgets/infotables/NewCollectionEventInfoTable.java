@@ -13,10 +13,10 @@ public class NewCollectionEventInfoTable extends
     InfoTableWidget<PatientCEventInfo> {
 
     private static final String[] HEADINGS = new String[] {
-        Messages.CollectionEventInfoTable_header_visitNumber,
-        Messages.CollectionEventInfoTable_header_numSourceSpecimens,
-        Messages.CollectionEventInfoTable_header_numAliquotedSpecimens,
-        Messages.CollectionEventInfoTable_header_comment };
+        "",
+        "",
+        "",
+        "" };
 
     public NewCollectionEventInfoTable(Composite parent,
         List<PatientCEventInfo> collection) {
@@ -34,7 +34,7 @@ public class NewCollectionEventInfoTable extends
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -44,11 +44,11 @@ public class NewCollectionEventInfoTable extends
                 case 2:
                     return NumberFormatter.format(info.aliquotedSpecimenCount);
                 case 3:
-                    return info.cevent.getComments().size() == 0 ? Messages.SpecimenInfoTable_no_first_letter
-                        : Messages.SpecimenInfoTable_yes_first_letter;
+                    return info.cevent.getComments().size() == 0 ? ""
+                        : "";
 
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };

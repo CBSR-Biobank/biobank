@@ -29,7 +29,7 @@ public abstract class RoleInfoTable extends
     public static final int ROWS_PER_PAGE = 12;
 
     private static final String[] HEADINGS =
-        new String[] { Messages.RoleInfoTable_name_label };
+        new String[] { "Name" };
 
     @SuppressWarnings("unused")
     public RoleInfoTable(Composite parent, List<Role> collection) {
@@ -59,7 +59,7 @@ public abstract class RoleInfoTable extends
         });
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.RoleInfoTable_duplicate_label);
+        item.setText("Duplicate");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -81,7 +81,7 @@ public abstract class RoleInfoTable extends
                 case 0:
                     return role.getName();
                 default:
-                    return ""; //$NON-NLS-1$
+                    return "";
                 }
             }
         };
@@ -101,11 +101,11 @@ public abstract class RoleInfoTable extends
         try {
             String name = role.getName();
             String message = MessageFormat.format(
-                Messages.RoleInfoTable_delete_confirm_msg,
+                "Are you certain you want to delete \"{0}\"?",
                 new Object[] { name });
 
             if (BgcPlugin.openConfirm(
-                Messages.RoleInfoTable_delete_confirm_title, message)) {
+                "Confirm Deletion", message)) {
 
                 SessionManager.getAppService().doAction(
                     new RoleDeleteAction(new RoleDeleteInput(role)));
@@ -118,7 +118,7 @@ public abstract class RoleInfoTable extends
             }
         } catch (Exception e) {
             BgcPlugin
-                .openAsyncError(Messages.RoleInfoTable_delete_error_msg, e);
+                .openAsyncError("Unable to delete role.", e);
         }
         return false;
     }

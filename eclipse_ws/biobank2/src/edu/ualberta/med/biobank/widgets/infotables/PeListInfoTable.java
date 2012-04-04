@@ -24,15 +24,15 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { startDate, studyNameShort,
-                numSVs.toString(), numAliquots.toString() }, "\t"); //$NON-NLS-1$
+                numSVs.toString(), numAliquots.toString() }, "\t"); 
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.PeListInfoTable_start_label,
-        Messages.PeListInfoTable_study_label,
-        Messages.PeListInfoTable_sources_label,
-        Messages.PeListInfoTable_aliquoteds_label };
+        "Start date",
+        "Study",
+        "Source Specimens",
+        "Aliquoted Specimens" };
 
     public PeListInfoTable(Composite parent, List<ProcessingEventBriefInfo> pvs) {
         super(parent, pvs, HEADINGS, PAGE_SIZE_ROWS,
@@ -50,7 +50,7 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -62,7 +62,7 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
                 case 3:
                     return NumberFormatter.format(item.numAliquots);
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };

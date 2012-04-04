@@ -37,7 +37,7 @@ public abstract class GroupInfoTable extends
     DefaultAbstractInfoTableWidget<Group> {
     public static final int ROWS_PER_PAGE = 12;
     private static final String[] HEADINGS =
-        new String[] { Messages.GroupInfoTable_name_label };
+        new String[] { "Name" };
 
     private final ManagerContext context;
 
@@ -72,7 +72,7 @@ public abstract class GroupInfoTable extends
         });
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.GroupInfoTable_duplicate);
+        item.setText("Duplicate");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -93,7 +93,7 @@ public abstract class GroupInfoTable extends
                 case 0:
                     return group.getName();
                 default:
-                    return ""; //$NON-NLS-1$
+                    return "";
                 }
             }
         };
@@ -130,11 +130,11 @@ public abstract class GroupInfoTable extends
         try {
             String name = group.getName();
             String message = MessageFormat.format(
-                Messages.GroupInfoTable_delete_confirm_msg,
+                "Are you certain you want to delete \"{0}\"?",
                 new Object[] { name });
 
             if (BgcPlugin.openConfirm(
-                Messages.GroupInfoTable_delete_confirm_title, message)) {
+                "Confirm Deletion", message)) {
 
                 SessionManager.getAppService().doAction(
                     new GroupDeleteAction(new GroupDeleteInput(group)));

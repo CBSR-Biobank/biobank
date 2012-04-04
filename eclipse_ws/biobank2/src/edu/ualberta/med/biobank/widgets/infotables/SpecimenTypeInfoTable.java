@@ -12,8 +12,8 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
     private static final int PAGE_SIZE_ROWS = 10;
 
     private static final String[] HEADINGS = new String[] {
-        Messages.SpecimenTypeInfoTable_type_label,
-        Messages.SpecimenTypeInfoTable_shortname_label };
+        "Specimen Type",
+        "Short Name" };
 
     public SpecimenTypeInfoTable(Composite parent,
         List<SpecimenTypeWrapper> sampleTypeCollection) {
@@ -32,7 +32,7 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -40,7 +40,7 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
                 case 1:
                     return item.getNameShort();
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };
@@ -51,7 +51,7 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
         if (o == null)
             return null;
         SpecimenTypeWrapper type = (SpecimenTypeWrapper) o;
-        return type.getName() + "\t" + type.getNameShort(); //$NON-NLS-1$
+        return type.getName() + "\t" + type.getNameShort(); 
     }
 
     @Override

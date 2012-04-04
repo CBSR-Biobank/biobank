@@ -39,10 +39,10 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.StudyContactInfoTable_clinic_label,
-        Messages.StudyContactInfoTable_patient_count_label,
-        Messages.StudyContactInfoTable_cEvent_count_label,
-        Messages.StudyContactInfoTable_contact_names_label };
+        "Clinic",
+        "#Patients",
+        "#Collection Events",
+        "Contact(s)" };
 
     private StudyWrapper study;
 
@@ -64,7 +64,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
 
         public void addContact(ContactWrapper contact) {
             if (contactsBuf.length() > 0) {
-                contactsBuf.append("\n"); //$NON-NLS-1$
+                contactsBuf.append("\n"); 
             }
             String name = contact.getName();
             if ((name != null) && !name.isEmpty()) {
@@ -72,9 +72,9 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
             }
             String title = contact.getTitle();
             if ((title != null) && !title.isEmpty()) {
-                contactsBuf.append(" ("); //$NON-NLS-1$
+                contactsBuf.append(" ("); 
                 contactsBuf.append(title);
-                contactsBuf.append(")"); //$NON-NLS-1$
+                contactsBuf.append(")"); 
             }
         }
 
@@ -132,7 +132,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:

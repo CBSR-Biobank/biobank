@@ -33,16 +33,16 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
         public String toString() {
             return StringUtils.join(new String[] { label, typeNameShort,
                 status, barcode,
-                (temperature != null) ? temperature.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+                (temperature != null) ? temperature.toString() : "" }, "\t");  
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.ContainerInfoTable_name_label,
-        Messages.ContainerInfoTable_type_label,
-        Messages.ContainerInfoTable_status_label,
-        Messages.ContainerInfoTable_barcode_label,
-        Messages.ContainerInfoTable_temperature_label };
+        "Name",
+        "Container Type",
+        "Status",
+        "Product Barcode",
+        "Temperature" };
 
     private SiteAdapter siteAdapter;
 
@@ -63,7 +63,7 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -77,7 +77,7 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
                 case 4:
                     NumberFormatter.format(item.temperature);
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };
@@ -127,7 +127,7 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
         IInfoTableDoubleClickItemListener<Container> listener) {
         doubleClickListeners.add(listener);
         MenuItem mi = new MenuItem(getMenu(), SWT.PUSH);
-        mi.setText(Messages.ContainerInfoTable_edit_label);
+        mi.setText("Edit");
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

@@ -25,15 +25,15 @@ public class CollectionEventInfoTable extends
             return StringUtils.join(
                 new String[] { visitNumber.toString(),
                     String.valueOf(sourceSpecimenCount),
-                    String.valueOf(aliquotedSpecimenCount), comment }, "\t"); //$NON-NLS-1$
+                    String.valueOf(aliquotedSpecimenCount), comment }, "\t"); 
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.CollectionEventInfoTable_header_visitNumber,
-        Messages.CollectionEventInfoTable_header_numSourceSpecimens,
-        Messages.CollectionEventInfoTable_header_numAliquotedSpecimens,
-        Messages.CollectionEventInfoTable_header_comment };
+        "Visit#",
+        "Num source specimens",
+        "Num aliquoted specimens",
+        "Comment" };
 
     public CollectionEventInfoTable(Composite parent,
         List<CollectionEventWrapper> collection) {
@@ -51,7 +51,7 @@ public class CollectionEventInfoTable extends
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -64,7 +64,7 @@ public class CollectionEventInfoTable extends
                     return info.comment;
 
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };
@@ -80,8 +80,8 @@ public class CollectionEventInfoTable extends
         info.aliquotedSpecimenCount = info.collectionEvent
             .getAliquotedSpecimensCount(true);
         info.comment =
-            info.collectionEvent.getCommentCollection(false).size() == 0 ? Messages.SpecimenInfoTable_no_first_letter
-                : Messages.SpecimenInfoTable_yes_first_letter;
+            info.collectionEvent.getCommentCollection(false).size() == 0 ? "N"
+                : "Y";
         return info;
     }
 

@@ -12,12 +12,12 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
     private static final String[] HEADINGS = new String[] {
-        Messages.RequestDispatchInfoTable_sender_label,
-        Messages.RequestDispatchInfoTable_receiver_label,
-        Messages.RequestDispatchInfoTable_total_specs_label,
-        Messages.RequestDispatchInfoTable_packed_label,
-        Messages.RequestDispatchInfoTable_received_label,
-        Messages.RequestDispatchInfoTable_state_label };
+        "Sender",
+        "Receiver",
+        "Total Specimens",
+        "Date Packed",
+        "Date Received",
+        "State" };
 
     public RequestDispatchInfoTable(Composite parent,
         List<DispatchWrapper> dispatchCollection) {
@@ -35,7 +35,7 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -52,7 +52,7 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                 case 5:
                     return item.getStateDescription();
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };

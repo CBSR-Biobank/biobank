@@ -35,17 +35,17 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                     new String[] { sender,
                         DateFormatter.formatAsDate(dispatchTime), receiver,
                         DateFormatter.formatAsDate(dateReceived), waybill,
-                        dstatus }, "\t"); //$NON-NLS-1$
+                        dstatus }, "\t"); 
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.DispatchInfoTable_sender_label,
-        Messages.DispatchInfoTable_time_label,
-        Messages.DispatchInfoTable_receiver_label,
-        Messages.DispatchInfoTable_received_label,
-        Messages.DispatchInfoTable_waybill_label,
-        Messages.DispatchInfoTable_state_label };
+        "Sender",
+        "Dispatch Time",
+        "Receiver",
+        "Date Received",
+        "Waybill",
+        "Dispatch State" };
 
     private boolean editMode = false;
 
@@ -76,7 +76,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -92,7 +92,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                 case 5:
                     return info.dstatus;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };

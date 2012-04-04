@@ -29,19 +29,19 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         public String toString() {
             return StringUtils.join(new String[] { name, title, studies,
                 emailAddress, mobileNumber, pagerNumber, officeNumber,
-                faxNumber }, "\t"); //$NON-NLS-1$
+                faxNumber }, "\t"); 
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.ContactInfoTable_name_label,
-        Messages.ContactInfoTable_title_label,
-        Messages.ContactInfoTable_studies_label,
-        Messages.ContactInfoTable_email_label,
-        Messages.ContactInfoTable_mobile_label,
-        Messages.ContactInfoTable_pager_label,
-        Messages.ContactInfoTable_office_label,
-        Messages.ContactInfoTable_fax_label };
+        "Contact Name",
+        "Title",
+        "Studies",
+        "Email",
+        "Mobile #",
+        "Pager #",
+        "Office #",
+        "Fax #" };
 
     public ContactInfoTable(Composite parent, List<ContactWrapper> contacts) {
         super(parent, contacts, HEADINGS, PAGE_SIZE_ROWS, ContactWrapper.class);
@@ -58,7 +58,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -78,7 +78,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
                 case 7:
                     return item.faxNumber;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };
@@ -98,7 +98,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
             int count = 0;
             for (StudyWrapper study : studies) {
                 if (count > 0) {
-                    sb.append(", "); //$NON-NLS-1$
+                    sb.append(", "); 
                 }
                 sb.append(study.getNameShort());
                 ++count;

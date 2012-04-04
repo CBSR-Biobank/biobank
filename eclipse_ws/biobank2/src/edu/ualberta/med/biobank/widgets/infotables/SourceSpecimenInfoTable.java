@@ -27,13 +27,13 @@ public class SourceSpecimenInfoTable extends
             return StringUtils.join(new String[] {
                 name,
                 (needOriginalVolume != null) ? needOriginalVolume.toString()
-                    : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+                    : "" }, "\t");  
         }
     }
 
     private final static String[] HEADINGS = new String[] {
-        Messages.SourceSpecimen_field_type_label,
-        Messages.SourceSpecimen_field_originalVolume_label };
+        "Specimen type",
+        "Need Original Volume" };
 
     public SourceSpecimenInfoTable(Composite parent,
         List<SourceSpecimenWrapper> collection) {
@@ -52,7 +52,7 @@ public class SourceSpecimenInfoTable extends
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -60,7 +60,7 @@ public class SourceSpecimenInfoTable extends
                 case 1:
                     return info.needOriginalVolume;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };
@@ -72,14 +72,14 @@ public class SourceSpecimenInfoTable extends
         TableRowData info = new TableRowData();
         info.studySourceVessel = (SourceSpecimenWrapper) studySourceVessel;
         Assert.isNotNull(info.studySourceVessel.getSpecimenType(),
-            "study specimen type is null"); //$NON-NLS-1$
+            "study specimen type is null"); 
         info.name = info.studySourceVessel.getSpecimenType().getName();
         info.needOriginalVolume =
             (info.studySourceVessel
                 .getNeedOriginalVolume() != null) ? (info.studySourceVessel
-                .getNeedOriginalVolume() ? Messages.SourceSpecimenInfoTable_yes_label
-                : Messages.SourceSpecimenInfoTable_no_label)
-                : Messages.SourceSpecimenInfoTable_no_label;
+                .getNeedOriginalVolume() ? "Yes"
+                : "No")
+                : "No";
         return info;
     }
 

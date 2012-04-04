@@ -23,17 +23,17 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { name, nameShort, status,
-                (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
-                (visitCount != null) ? visitCount.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+                (patientCount != null) ? patientCount.toString() : "", 
+                (visitCount != null) ? visitCount.toString() : "" }, "\t");  
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.StudyInfoTable_name_label,
-        Messages.StudyInfoTable_nameshort_label,
-        Messages.StudyInfoTable_status_label,
-        Messages.StudyInfoTable_patients_label,
-        Messages.StudyInfoTable_visits_label };
+        "",
+        "",
+        "",
+        "",
+        "" };
 
     public StudyInfoTable(Composite parent, List<StudyWrapper> collection) {
         super(parent, collection, HEADINGS, 10, StudyWrapper.class);
@@ -50,7 +50,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -58,13 +58,13 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
                 case 1:
                     return info.nameShort;
                 case 2:
-                    return (info.status != null) ? info.status : ""; //$NON-NLS-1$
+                    return (info.status != null) ? info.status : ""; 
                 case 3:
                     return NumberFormatter.format(info.patientCount);
                 case 4:
                     return NumberFormatter.format(info.visitCount);
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };
@@ -78,7 +78,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         info.nameShort = info.study.getNameShort();
         info.status = info.study.getActivityStatus().getName();
         if (info.status == null) {
-            info.status = ""; //$NON-NLS-1$
+            info.status = ""; 
         }
         info.patientCount = info.study.getPatientCount(true);
         info.visitCount = info.study.getCollectionEventCount();

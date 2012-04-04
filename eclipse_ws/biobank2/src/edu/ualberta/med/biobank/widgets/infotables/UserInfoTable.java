@@ -42,9 +42,9 @@ public abstract class UserInfoTable extends
     public static final int ROWS_PER_PAGE = 12;
 
     private static final String[] HEADINGS = new String[] {
-        Messages.UserInfoTable_login_label,
-        Messages.UserInfoTable_fullname_label,
-        Messages.UserInfoTable_email_label };
+        "Login",
+        "Full Name",
+        "Email" };
 
     private final ManagerContext managerContext;
     private MenuItem unlockMenuItem;
@@ -83,7 +83,7 @@ public abstract class UserInfoTable extends
         });
 
         unlockMenuItem = new MenuItem(menu, SWT.PUSH);
-        unlockMenuItem.setText(Messages.UserInfoTable_unlock_label);
+        unlockMenuItem.setText("Unlock User");
         unlockMenuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -93,7 +93,7 @@ public abstract class UserInfoTable extends
                     SessionManager.getAppService().unlockUser(userName);
                 } catch (ApplicationException e) {
                     BgcPlugin.openAsyncError(MessageFormat.format(
-                        Messages.UserInfoTable_unlock_error_msg,
+                        "Cannot unlock user {0}.",
                         new Object[] { userName }), e);
                 }
             }
@@ -132,7 +132,7 @@ public abstract class UserInfoTable extends
                 case 2:
                     return user.getEmail();
                 default:
-                    return ""; //$NON-NLS-1$
+                    return "";
                 }
             }
         };
@@ -177,16 +177,16 @@ public abstract class UserInfoTable extends
 
             if (SessionManager.getUser().equals(user)) {
                 BgcPlugin.openAsyncError(
-                    Messages.UserInfoTable_delete_error_msg,
-                    Messages.UserInfoTable_confirm_delete_suicide_msg);
+                    "Unable to delete user.",
+                    "You may not delete yourself as a user");
                 return false;
             }
             message = MessageFormat.format(
-                Messages.UserInfoTable_confirm_delete_msg,
+                "Are you certain you want to delete \"{0}\"?",
                 new Object[] { loginName });
 
             if (BgcPlugin.openConfirm(
-                Messages.UserInfoTable_confirm_delete_title, message)) {
+                "Confirm Deletion", message)) {
 
                 SessionManager.getAppService().doAction(
                     new UserDeleteAction(new UserDeleteInput(user)));
@@ -201,7 +201,7 @@ public abstract class UserInfoTable extends
             }
         } catch (Exception e) {
             BgcPlugin
-                .openAsyncError(Messages.UserInfoTable_delete_error_msg, e);
+                .openAsyncError("Unable to delete user.", e);
         }
         return false;
     }

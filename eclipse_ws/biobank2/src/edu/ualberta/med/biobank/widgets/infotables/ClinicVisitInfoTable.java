@@ -26,9 +26,9 @@ public class ClinicVisitInfoTable extends
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.ClinicVisitInfoTable_nber_label,
-        Messages.ClinicVisitInfoTable_source_specs_label,
-        Messages.ClinicVisitInfoTable_aliquoted_spec_label };
+        "Visit #",
+        "Source Specimens",
+        "Aliquoted Specimens" };
 
     public ClinicVisitInfoTable(Composite parent,
         List<PatientCEventInfo> collection) {
@@ -46,7 +46,7 @@ public class ClinicVisitInfoTable extends
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -58,7 +58,7 @@ public class ClinicVisitInfoTable extends
                     return NumberFormatter
                         .format(item.cevent.aliquotedSpecimenCount);
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };

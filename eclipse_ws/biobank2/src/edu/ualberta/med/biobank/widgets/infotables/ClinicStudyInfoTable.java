@@ -21,15 +21,15 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { studyShortName,
-                (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
-                (visitCount != null) ? visitCount.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+                (patientCount != null) ? patientCount.toString() : "", 
+                (visitCount != null) ? visitCount.toString() : "" }, "\t");  
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.ClinicStudyInfoTable_study_label,
-        Messages.ClinicStudyInfoTable_patient_count_label,
-        Messages.ClinicStudyInfoTable_cvent_count_label };
+        "Study",
+        "#Patients",
+        "#Collection Events" };
 
     public ClinicStudyInfoTable(Composite parent,
         List<StudyCountInfo> studyCountInfo) {
@@ -48,7 +48,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
 
                 switch (columnIndex) {
@@ -59,7 +59,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
                 case 2:
                     return NumberFormatter.format(item.visitCount);
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };

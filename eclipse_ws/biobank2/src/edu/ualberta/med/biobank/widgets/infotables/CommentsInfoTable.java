@@ -41,9 +41,9 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.CommentCollectionInfoTable_0,
-        Messages.CommentCollectionInfoTable_1,
-        Messages.CommentCollectionInfoTable_2 };
+        "User",
+        "Date",
+        "Message" };
 
     public CommentsInfoTable(Composite parent,
         List<CommentWrapper> collection) {
@@ -100,7 +100,7 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -111,7 +111,7 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
                 case 2:
                     return StringUtils.join(wrapText(item.message, 80), "\n");
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };

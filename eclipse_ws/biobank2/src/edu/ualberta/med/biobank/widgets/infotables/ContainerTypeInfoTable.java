@@ -33,19 +33,19 @@ public class ContainerTypeInfoTable extends
         @Override
         public String toString() {
             return StringUtils.join(new String[] { name, nameShort,
-                (capacity != null) ? capacity.toString() : "", status, //$NON-NLS-1$
-                (inUseCount != null) ? inUseCount.toString() : "", //$NON-NLS-1$
-                (temperature != null) ? temperature.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+                (capacity != null) ? capacity.toString() : "", status, 
+                (inUseCount != null) ? inUseCount.toString() : "", 
+                (temperature != null) ? temperature.toString() : "" }, "\t");  
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.ContainerTypeInfoTable_name_label,
-        Messages.ContainerTypeInfoTable_nameshort_label,
-        Messages.ContainerTypeInfoTable_capacity_label,
-        Messages.ContainerTypeInfoTable_status_label,
-        Messages.ContainerTypeInfoTable_use_label,
-        Messages.ContainerTypeInfoTable_temperature_label };
+        "Name",
+        "Short Name",
+        "Capacity",
+        "Status",
+        "In Use",
+        "Temperature" };
 
     private SiteAdapter siteAdapter;
 
@@ -67,7 +67,7 @@ public class ContainerTypeInfoTable extends
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -83,7 +83,7 @@ public class ContainerTypeInfoTable extends
                 case 5:
                     return NumberFormatter.format(item.temperature);
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };
@@ -141,7 +141,7 @@ public class ContainerTypeInfoTable extends
         doubleClickListeners.add(listener);
         // TODO: this code makes no sense. See jon for why.
         MenuItem mi = new MenuItem(getMenu(), SWT.PUSH);
-        mi.setText(Messages.ContainerTypeInfoTable_edit_label);
+        mi.setText("Edit");
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

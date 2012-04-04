@@ -28,15 +28,15 @@ public class AliquotedSpecimenInfoTable extends
         @Override
         public String toString() {
             return StringUtils.join(new String[] { typeName,
-                (volume != null) ? volume.toString() : "", //$NON-NLS-1$
-                (quantity != null) ? quantity.toString() : "", status }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+                (volume != null) ? volume.toString() : "", 
+                (quantity != null) ? quantity.toString() : "", status }, "\t");  
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.AliquotedSpecimen_field_type_label,
-        Messages.AliquotedSpecimen_field_volume_label,
-        Messages.AliquotedSpecimen_field_quantity_label,
+        "Specimen type",
+        "Volume (ml)",
+        "Quantity",
         "Activity status" };
 
     public AliquotedSpecimenInfoTable(Composite parent,
@@ -50,12 +50,12 @@ public class AliquotedSpecimenInfoTable extends
         TableRowData info = new TableRowData();
         info.sampleStorage = (AliquotedSpecimenWrapper) obj;
         SpecimenTypeWrapper type = info.sampleStorage.getSpecimenType();
-        Assert.isNotNull(type, "sample storage - sample type is null"); //$NON-NLS-1$
+        Assert.isNotNull(type, "sample storage - sample type is null"); 
         info.typeName = type.getName();
         info.volume = info.sampleStorage.getVolume();
         info.quantity = info.sampleStorage.getQuantity();
         ActivityStatus status = info.sampleStorage.getActivityStatus();
-        Assert.isNotNull(status, "sample storage - activity status is null"); //$NON-NLS-1$
+        Assert.isNotNull(status, "sample storage - activity status is null"); 
         info.status = status.getName();
         return info;
     }
@@ -71,7 +71,7 @@ public class AliquotedSpecimenInfoTable extends
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -83,7 +83,7 @@ public class AliquotedSpecimenInfoTable extends
                 case 3:
                     return item.status;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };

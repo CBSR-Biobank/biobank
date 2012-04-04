@@ -12,7 +12,7 @@ public class ShippingMethodInfoTable extends
     InfoTableWidget<ShippingMethodWrapper> {
 
     private static final String[] HEADINGS =
-        new String[] { Messages.ShippingMethodInfoTable_ship_label };
+        new String[] { "Shipping method" };
 
     public ShippingMethodInfoTable(Composite parent,
         List<ShippingMethodWrapper> sampleStorageCollection) {
@@ -31,13 +31,13 @@ public class ShippingMethodInfoTable extends
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
                 switch (columnIndex) {
                 case 0:
                     return item.getName();
                 default:
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 }
             }
         };
