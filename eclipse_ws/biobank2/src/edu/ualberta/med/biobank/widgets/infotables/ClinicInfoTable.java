@@ -32,12 +32,12 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.ClinicInfoTable_name_label,
-        Messages.ClinicInfoTable_nameshort_label,
-        Messages.ClinicInfoTable_study_count_label,
-        Messages.ClinicInfoTable_status_label,
-        Messages.ClinicInfoTable_patients_label,
-        Messages.ClinicInfoTable_visits_label };
+        "Name",
+        "Short Name",
+        "Patients",
+        "Status",
+        "Study Count",
+        "Patient Visits" };
 
     public ClinicInfoTable(Composite parent, List<ClinicWrapper> collection) {
         super(parent, collection, HEADINGS, 10, ClinicWrapper.class);
@@ -48,10 +48,11 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return "loading...";
                     }
                     return ""; //$NON-NLS-1$
                 }
