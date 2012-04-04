@@ -63,27 +63,27 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
         tree.setLinesVisible(true);
 
         TreeColumn tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.RequestSpecimensTreeTable_location_label);
+        tc.setText("Location");
         tc.setWidth(300);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.RequestSpecimensTreeTable_id_label);
+        tc.setText("Inventory Id");
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.RequestSpecimensTreeTable_type_label);
+        tc.setText("Type");
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.RequestSpecimensTreeTable_patient_label);
+        tc.setText("Patient");
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.RequestSpecimensTreeTable_claimed_label);
+        tc.setText("Claimed By");
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.RequestSpecimensTreeTable_state_label);
+        tc.setText("State");
         tc.setWidth(100);
 
         ITreeContentProvider contentProvider = new ITreeContentProvider() {
@@ -129,12 +129,12 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                 if (element instanceof RequestTableGroup) {
                     if (columnIndex == 0)
                         return ((RequestTableGroup) element).getTitle();
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 } else if (element instanceof RequestContainerAdapter) {
                     if (columnIndex == 0)
                         return ((RequestContainerAdapter) element)
                             .getLabelInternal();
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 } else if (element instanceof Node) {
                     if (columnIndex == 0) {
                         return ((RequestContainerAdapter) ((TreeItemAdapter) element)
@@ -155,9 +155,9 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                                 ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
                                     .getSpecimen()).getState()).getLabel();
                     } else
-                        return ""; //$NON-NLS-1$
+                        return ""; 
                 }
-                return ""; //$NON-NLS-1$
+                return ""; 
             }
         };
         tv.setLabelProvider(labelProvider);
@@ -204,7 +204,7 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
     protected void addClaimMenu(Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.RequestSpecimensTreeTable_claim_menu);
+        item.setText("Claim");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -224,14 +224,14 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
             SessionManager.getAppService().doAction(new RequestClaimAction(rs));
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.RequestSpecimensTreeTable_claim_error_title, e);
+                "Failed to claim", e);
         }
     }
 
     private void addSetUnavailableMenu(final Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.RequestSpecimensTreeTable_flag_unavailable_menu);
+        item.setText("Flag as unavailable");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -248,7 +248,7 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                     } catch (Exception e) {
                         BgcPlugin
                             .openAsyncError(
-                                Messages.RequestSpecimensTreeTable_save_error_title,
+                                "Save Error",
                                 e);
                     }
                 }

@@ -97,7 +97,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                     }
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        Messages.SpecimenTypeEntryInfoTree_save_error_title, e);
+                        "Save Failed", e);
                 }
                 reloadCollection(selectedSpecimenTypes);
             } else {
@@ -105,7 +105,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                     specimenType.reload();
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        Messages.SpecimenTypeEntryInfoTree_refresh_error_title,
+                        "Refresh Failed",
                         e);
                 }
                 reloadCollection(selectedSpecimenTypes);
@@ -141,9 +141,9 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                     if (!specType.isNew() && specType.isUsed()) {
                         BgcPlugin
                             .openError(
-                                Messages.SpecimenTypeEntryInfoTree_delete_error_title,
+                                "Specimen Type Delete Error",
                                 NLS.bind(
-                                    Messages.SpecimenTypeEntryInfoTree_delete_error_msg,
+                                    "Cannot delete specimen type \"{0}\" since specimens or studies are using it.",
                                     specType.getName()));
                         return;
                     }
@@ -152,9 +152,9 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                         .openConfirm(
                             PlatformUI.getWorkbench()
                                 .getActiveWorkbenchWindow().getShell(),
-                            Messages.SpecimenTypeEntryInfoTree_delete_question_title,
+                            "Delete Specimen Type",
                             NLS.bind(
-                                Messages.SpecimenTypeEntryInfoTree_delete_question_msg,
+                                "Are you sure you want to delete specimen type \"{0}\"?",
                                 specType.getName()))) {
                         return;
                     }
@@ -175,13 +175,13 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                             (ConstraintViolationException) e.getCause());
                         BgcPlugin
                             .openAsyncError(
-                                Messages.SpecimenTypeEntryInfoTree_delete_type_error_msg,
+                                "Error deleting specimen type",
                                 StringUtils.join(msgs, "\n"));
 
                     } else {
                         BgcPlugin
                             .openAsyncError(
-                                Messages.SpecimenTypeEntryInfoTree_delete_type_error_msg,
+                                "Error deleting specimen type",
                                 e.getLocalizedMessage());
                     }
                 } catch (final RemoteConnectFailureException exp) {
@@ -189,7 +189,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                 } catch (Exception e) {
                     BgcPlugin
                         .openAsyncError(
-                            Messages.SpecimenTypeEntryInfoTree_delete_type_error_msg,
+                            "Error deleting specimen type",
                             e);
                 }
             }
@@ -203,20 +203,20 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                     if (sv.getName().equals(type.getName())) {
                         throw new BiobankCheckException(
                             NLS.bind(
-                                Messages.SpecimenTypeEntryInfoTree_name_already_added_error_msg,
+                                "A specimen type with name \"{0}\" already exists.",
                                 type.getName()));
                     }
                     else if (sv.getNameShort().equals(type.getNameShort())) {
                         throw new BiobankCheckException(
                             NLS.bind(
-                                Messages.SpecimenTypeEntryInfoTree_name_short_already_added_error_msg,
+                                "A specimen type with short name \"{0}\" already exists.",
                                 type.getNameShort()));
                     }
                 }
 
         } catch (BiobankException bce) {
             BgcPlugin.openAsyncError(
-                Messages.SpecimenTypeEntryInfoTree_check_error_title, bce);
+                "Check error", bce);
             return false;
         }
         return true;
@@ -238,7 +238,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                 globalSpecimenTypes, SpecimenTypeWrapper.class));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
-                Messages.SpecimenTypeEntryInfoTree_unaivalable_error_title, e);
+                "AppService unavailable", e);
         }
     }
 

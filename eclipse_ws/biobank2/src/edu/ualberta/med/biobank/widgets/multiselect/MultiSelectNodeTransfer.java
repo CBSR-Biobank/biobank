@@ -28,8 +28,8 @@ public class MultiSelectNodeTransfer extends ByteArrayTransfer {
         super();
     }
 
-    private static final String TYPE_NAME = "favorites-transfer-format:" //$NON-NLS-1$ 
-        + System.currentTimeMillis() + ":" + INSTANCE.hashCode(); //$NON-NLS-1$
+    private static final String TYPE_NAME = "favorites-transfer-format:"  
+        + System.currentTimeMillis() + ":" + INSTANCE.hashCode(); 
 
     private static final int TYPEID = registerType(TYPE_NAME);
 
@@ -118,7 +118,7 @@ public class MultiSelectNodeTransfer extends ByteArrayTransfer {
         }
         if (clazz != null) {
             Method setIdMethod = clazz
-                .getDeclaredMethod("setId", Integer.class); //$NON-NLS-1$
+                .getDeclaredMethod("setId", Integer.class); 
             setIdMethod.setAccessible(true);
             setIdMethod.invoke(wrapper, id);
             wrapper.reload();

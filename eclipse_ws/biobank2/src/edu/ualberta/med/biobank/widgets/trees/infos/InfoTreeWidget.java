@@ -166,7 +166,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
     }
 
     protected BiobankCollectionModel getSelectionInternal() {
-        Assert.isTrue(!treeViewer.getTree().isDisposed(), "widget is disposed"); //$NON-NLS-1$
+        Assert.isTrue(!treeViewer.getTree().isDisposed(), "widget is disposed"); 
         IStructuredSelection stSelection = (IStructuredSelection) treeViewer
             .getSelection();
 
@@ -285,7 +285,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
                 }
             });
         } catch (Exception e) {
-            logger.error("setCollection error", e); //$NON-NLS-1$
+            logger.error("setCollection error", e); 
         }
     }
 
@@ -305,7 +305,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
     public void addClickListener(IDoubleClickListener listener) {
         doubleClickListeners.add(listener);
         editItem = new MenuItem(getMenu(), SWT.PUSH);
-        editItem.setText(Messages.InfoTreeWidget_edit_label);
+        editItem.setText("Edit");
         editItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -344,7 +344,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.InfoTreeWidget_add_label);
+        item.setText("Add");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -358,7 +358,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.InfoTreeWidget_edit_label);
+        item.setText("Edit");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -372,7 +372,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.InfoTreeWidget_delete_label);
+        item.setText("Delete");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -507,7 +507,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
 
     @Override
     protected void setPageLabelText() {
-        pageLabel.setText(NLS.bind(Messages.InfoTreeWidget_pages_text,
+        pageLabel.setText(NLS.bind("Page: {0} of {1}",
             (pageInfo.page + 1), +pageInfo.pageTotal));
     }
 

@@ -46,7 +46,7 @@ public class PermissionNode implements IPermissionCheckTreeNode {
 
     @Override
     public String toString() {
-        return "Permission=" //$NON-NLS-1$
+        return "Permission=" 
             + permission.toString();
     }
 

@@ -16,7 +16,7 @@ public class MultiSelectNodeContentProvider<T> implements ITreeContentProvider,
     @Override
     public Object[] getChildren(Object parentElement) {
         Assert.isTrue(parentElement instanceof MultiSelectNode,
-            "Invalid object"); //$NON-NLS-1$
+            "Invalid object"); 
         return ((MultiSelectNode<T>) parentElement).getChildren().toArray();
     }
 
@@ -28,7 +28,7 @@ public class MultiSelectNodeContentProvider<T> implements ITreeContentProvider,
     @SuppressWarnings("unchecked")
     @Override
     public boolean hasChildren(Object element) {
-        Assert.isTrue(element instanceof MultiSelectNode, "Invalid object"); //$NON-NLS-1$
+        Assert.isTrue(element instanceof MultiSelectNode, "Invalid object"); 
         return (((MultiSelectNode<T>) element).getChildCount() > 0);
     }
 

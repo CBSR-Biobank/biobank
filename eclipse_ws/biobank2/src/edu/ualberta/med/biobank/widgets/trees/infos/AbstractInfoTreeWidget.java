@@ -296,7 +296,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
             backgroundThread.start();
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.AbstractInfoTreeWidget_load_error_title, e);
+                "Cannot Load Tree Data", e);
         }
 
         layout(true, true);
@@ -391,7 +391,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         firstButton = new Button(paginationWidget, SWT.NONE);
         firstButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_FIRST));
-        firstButton.setToolTipText(Messages.AbstractInfoTreeWidget_first_label);
+        firstButton.setToolTipText("First page");
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -403,7 +403,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         prevButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_PREV));
         prevButton
-            .setToolTipText(Messages.AbstractInfoTreeWidget_previous_label);
+            .setToolTipText("Previous page");
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -416,7 +416,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         nextButton = new Button(paginationWidget, SWT.NONE);
         nextButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_NEXT));
-        nextButton.setToolTipText(Messages.AbstractInfoTreeWidget_next_label);
+        nextButton.setToolTipText("Next page");
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -427,7 +427,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         lastButton = new Button(paginationWidget, SWT.NONE);
         lastButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_LAST));
-        lastButton.setToolTipText(Messages.AbstractInfoTreeWidget_last_label);
+        lastButton.setToolTipText("Last page");
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

@@ -72,23 +72,23 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         tree.setLinesVisible(true);
 
         TreeColumn tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.DispatchSpecimensTreeTable_inventoryid_label);
+        tc.setText("Inventory Id");
         tc.setWidth(200);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.DispatchSpecimensTreeTable_type_label);
+        tc.setText("Type");
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.DispatchSpecimensTreeTable_pnumber_label);
+        tc.setText("Patient Number");
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.DispatchSpecimensTreeTable_status_label);
+        tc.setText("Activity Status");
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.DispatchSpecimensTreeTable_comment_label);
+        tc.setText("Dispatch comment");
         tc.setWidth(100);
 
         menu = new Menu(parent);
@@ -138,12 +138,12 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                 if (element instanceof TableGroup) {
                     if (columnIndex == 0)
                         return ((TableGroup<?>) element).getTitle();
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 } else if (element instanceof RequestContainerAdapter) {
                     if (columnIndex == 0)
                         return ((RequestContainerAdapter) element)
                             .getLabelInternal();
-                    return ""; //$NON-NLS-1$
+                    return ""; 
                 } else if (element instanceof TreeItemAdapter) {
                     if (columnIndex == 4)
                         return CommentWrapper
@@ -152,7 +152,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                     return ((TreeItemAdapter) element)
                         .getColumnText(columnIndex);
                 }
-                return ""; //$NON-NLS-1$
+                return ""; 
             }
 
             @Override
@@ -161,7 +161,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
             }
         };
         tv.setLabelProvider(labelProvider);
-        tv.setInput("root"); //$NON-NLS-1$
+        tv.setInput("root"); 
         menu.addListener(SWT.Show, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -202,7 +202,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     protected void addModifyCommentMenu(Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.DispatchSpecimensTreeTable_modidy_comment_label);
+        item.setText("Modify comment");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -215,7 +215,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     private void addSetMissingMenu(final Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.DispatchSpecimensTreeTable_set_missing_label);
+        item.setText("Set as missing");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -228,7 +228,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     private void addSetNonprocessedMenu(final Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.DispatchSpecimensTreeTable_set_nonprocessed_label);
+        item.setText("Set as non-processed");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -277,7 +277,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     }
 
     public void refresh() {
-        tv.setInput("refresh"); //$NON-NLS-1$
+        tv.setInput("refresh"); 
     }
 
     public void addClickListener() {
@@ -291,7 +291,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
             }
         });
         editItem = new MenuItem(getMenu(), SWT.PUSH);
-        editItem.setText(Messages.DispatchSpecimensTreeTable_edit_label);
+        editItem.setText("Edit");
         editItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

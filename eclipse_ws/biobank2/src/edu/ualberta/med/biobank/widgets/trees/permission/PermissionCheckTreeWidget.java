@@ -50,7 +50,7 @@ public class PermissionCheckTreeWidget extends Composite {
 
         if (title) {
             Label label = new Label(this, SWT.NONE);
-            label.setText(Messages.PermissionCheckTree_title);
+            label.setText("Permissions:");
             GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
             gd.horizontalSpan = 2;
             label.setLayoutData(gd);
@@ -233,7 +233,7 @@ public class PermissionCheckTreeWidget extends Composite {
         public String getText(Object element) {
             if (element instanceof IPermissionCheckTreeNode)
                 return ((IPermissionCheckTreeNode) element).getText();
-            return "Problem with display"; //$NON-NLS-1$
+            return "Problem with display"; 
         }
     }
 

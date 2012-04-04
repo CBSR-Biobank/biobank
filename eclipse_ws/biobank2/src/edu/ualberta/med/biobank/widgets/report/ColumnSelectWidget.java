@@ -46,7 +46,7 @@ public class ColumnSelectWidget extends Composite {
     private static final LabelProvider DISPLAYED_COLUMNS_LABEL_PROVIDER = new DisplayedColumnsLabelProvider();
     private static final LabelProvider AVAILABLE_COLUMNS_LABEL_PROVIDER = new AvailableColumnsLabelProvider();
     private static final ITreeContentProvider AVAILABLE_COLUMNS_TREE_CONTENT_PROVIDER = new AvailableColumnsTreeContentProvider();
-    private static final Object AVAILABLE_COLUMNS_ROOT_OBJECT = "root"; //$NON-NLS-1$
+    private static final Object AVAILABLE_COLUMNS_ROOT_OBJECT = "root"; 
     private static final Comparator<ReportColumnWrapper> REPORT_COLUMN_WRAPER_COMPARTOR = new Comparator<ReportColumnWrapper>() {
         @Override
         public int compare(ReportColumnWrapper rcw1, ReportColumnWrapper rcw2) {
@@ -159,7 +159,7 @@ public class ColumnSelectWidget extends Composite {
         subContainer
             .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createLabel(subContainer, Messages.ColumnSelectWidget_available_label);
+        createLabel(subContainer, "Available Columns");
 
         available = new TreeViewer(subContainer, SWT.MULTI | SWT.READ_ONLY
             | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -184,7 +184,7 @@ public class ColumnSelectWidget extends Composite {
         subContainer
             .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createLabel(subContainer, Messages.ColumnSelectWidget_displayed_label);
+        createLabel(subContainer, "Displayed Columns");
 
         displayed = new TableViewer(subContainer, SWT.MULTI | SWT.READ_ONLY
             | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -211,7 +211,7 @@ public class ColumnSelectWidget extends Composite {
         subContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
             false, true));
 
-        createLabel(subContainer, ""); //$NON-NLS-1$
+        createLabel(subContainer, ""); 
 
         rightButton = createButton(subContainer, BgcPlugin.IMG_ARROW_RIGHT);
         leftButton = createButton(subContainer, BgcPlugin.IMG_ARROW_LEFT);
@@ -237,7 +237,7 @@ public class ColumnSelectWidget extends Composite {
         subContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
             false, true));
 
-        createLabel(subContainer, ""); //$NON-NLS-1$
+        createLabel(subContainer, ""); 
 
         upButton = createButton(subContainer, BgcPlugin.IMG_UP);
         downButton = createButton(subContainer, BgcPlugin.IMG_DOWN);
@@ -350,7 +350,7 @@ public class ColumnSelectWidget extends Composite {
         Label label = new Label(parent, SWT.NONE);
         label.setText(labelText);
         label.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
-        label.setFont(new Font(null, "sans-serif", 8, SWT.BOLD)); //$NON-NLS-1$
+        label.setFont(new Font(null, "sans-serif", 8, SWT.BOLD)); 
         return label;
     }
 
@@ -638,7 +638,7 @@ public class ColumnSelectWidget extends Composite {
                 return ((PropertyModifierWrapper) element)
                     .getPropertyModifier().getName();
             }
-            return ""; //$NON-NLS-1$
+            return ""; 
         }
     }
 
@@ -712,7 +712,7 @@ public class ColumnSelectWidget extends Composite {
     public static String getColumnName(ReportColumn reportColumn) {
         String text = reportColumn.getEntityColumn().getName();
         if (reportColumn.getPropertyModifier() != null) {
-            text += " (" + reportColumn.getPropertyModifier().getName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+            text += " (" + reportColumn.getPropertyModifier().getName() + ")";  
         }
         return text;
     }

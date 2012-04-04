@@ -136,15 +136,15 @@ public class ReportTreeWidget extends Composite {
                 final ReportTreeNode node = (ReportTreeNode) element;
                 if (node != null
                     && node.getParent().getLabel()
-                        .compareTo(Messages.ReportTreeWidget_custom_label) == 0) {
+                        .compareTo("Custom") == 0) {
                     MenuItem mi = new MenuItem(menu, SWT.NONE);
-                    mi.setText(Messages.ReportTreeWidget_delete_label);
+                    mi.setText("Delete");
                     mi.addSelectionListener(new SelectionAdapter() {
                         @Override
                         public void widgetSelected(SelectionEvent event) {
                             File file = new File(Platform.getInstanceLocation()
                                 .getURL().getPath()
-                                + "/saved_reports/" + node.getLabel() + ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+                                + "/saved_reports/" + node.getLabel() + ".xml");  
                             file.delete();
                             node.getParent().removeChild(node);
                             treeViewer.refresh();
@@ -164,7 +164,7 @@ public class ReportTreeWidget extends Composite {
         // lengthy tooltip faking code here
         final Tree tree = treeViewer.getTree();
         // Disable native tooltip
-        tree.setToolTipText(""); //$NON-NLS-1$
+        tree.setToolTipText(""); 
         final Display display = tree.getDisplay();
         final Shell shell = new Shell(display);
         shell.setLayout(new FillLayout());
@@ -177,7 +177,7 @@ public class ReportTreeWidget extends Composite {
                 switch (event.type) {
                 case SWT.MouseDown:
                     Event e = new Event();
-                    e.item = (TreeItem) label.getData("_TREEITEM"); //$NON-NLS-1$
+                    e.item = (TreeItem) label.getData("_TREEITEM"); 
                     // Assuming table is single select, set the selection as if
                     // the mouse down event went through to the table
                     tree.setSelection(new TreeItem[] { (TreeItem) e.item });
@@ -226,10 +226,10 @@ public class ReportTreeWidget extends Composite {
                             .getSystemColor(SWT.COLOR_INFO_FOREGROUND));
                         label.setBackground(display
                             .getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-                        label.setData("_TREEITEM", item); //$NON-NLS-1$
+                        label.setData("_TREEITEM", item); 
                         String text = ((AbstractReportTreeNode) item.getData())
                             .getToolTipText();
-                        if (text == null || text.equalsIgnoreCase("")) //$NON-NLS-1$
+                        if (text == null || text.equalsIgnoreCase("")) 
                             return;
                         label.setText(text);
                         label.addListener(SWT.MouseExit, labelListener);
@@ -263,8 +263,8 @@ public class ReportTreeWidget extends Composite {
                     .openEditor(new ReportInput(node),
                         ((ReportTreeNode) node).getReport().getEditorId());
         } catch (Exception ex) {
-            BgcPlugin.openAsyncError(Messages.ReportTreeWidget_error_title, ex,
-                Messages.ReportTreeWidget_error_msg);
+            BgcPlugin.openAsyncError("Error", ex,
+                "There was an error while building page.");
         }
     }
 

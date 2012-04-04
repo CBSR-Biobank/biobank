@@ -84,12 +84,12 @@ public abstract class MultiSelectWidget<T> extends BgcBaseWidget {
         moveRightButton = new Button(moveComposite, SWT.PUSH);
         moveRightButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ARROW_RIGHT));
-        moveRightButton.setToolTipText(Messages.MultiSelectWidget_move_tooltip);
+        moveRightButton.setToolTipText("Move to selected");
         moveLeftButton = new Button(moveComposite, SWT.PUSH);
         moveLeftButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ARROW_LEFT));
         moveLeftButton
-            .setToolTipText(Messages.MultiSelectWidget_remove_tooltip);
+            .setToolTipText("Remove from selected");
 
         selTree = createLabelledTree(this, rightLabel);
         selTree.setInput(selTreeRootNode);
@@ -183,7 +183,7 @@ public abstract class MultiSelectWidget<T> extends BgcBaseWidget {
 
         Label l = new Label(selComposite, SWT.NONE);
         l.setText(label);
-        l.setFont(new Font(null, "sans-serif", 8, SWT.BOLD)); //$NON-NLS-1$
+        l.setFont(new Font(null, "sans-serif", 8, SWT.BOLD)); 
         gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.CENTER;

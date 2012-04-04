@@ -17,7 +17,7 @@ public class TextFilterValueWidget implements FilterValueWidget {
 
     public TextFilterValueWidget(Composite parent) {
         text = new Text(parent, SWT.BORDER);
-        text.setToolTipText(Messages.TextFilterValueWidget_wildcard_info);
+        text.setToolTipText("For string values, use '%' as a wildcard character");
     }
 
     @Override
@@ -38,7 +38,7 @@ public class TextFilterValueWidget implements FilterValueWidget {
     @Override
     public void setValues(Collection<ReportFilterValue> values) {
         if (!text.isDisposed()) {
-            text.setText(""); //$NON-NLS-1$
+            text.setText(""); 
             for (ReportFilterValue value : values) {
                 if (value != null && value.getValue() != null) {
                     text.setText(value.getValue());

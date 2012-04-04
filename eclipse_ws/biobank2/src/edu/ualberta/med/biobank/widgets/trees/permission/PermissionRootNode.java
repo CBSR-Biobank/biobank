@@ -12,7 +12,7 @@ public class PermissionRootNode implements IPermissionCheckTreeNode {
 
     @Override
     public String getText() {
-        return Messages.PermissionRootNode_text;
+        return "All permissions";
     }
 
     @Override
