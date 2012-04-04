@@ -19,19 +19,19 @@ public class IssueTrackerPreferencePage extends FieldEditorPreferencePage
     @Override
     protected void createFieldEditors() {
         addField(new StringFieldEditor(PreferenceConstants.ISSUE_TRACKER_EMAIL,
-            Messages.IssueTrackerPreferencePage_email_label, getFieldEditorParent()));
+            "Tracker email:", getFieldEditorParent()));
         addField(new StringFieldEditor(
-            PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER, Messages.IssueTrackerPreferencePage_server_label,
+            PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER, "SMTP server:",
             getFieldEditorParent()));
         addField(new IntegerFieldEditor(
             PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PORT,
-            Messages.IssueTrackerPreferencePage_port_label, getFieldEditorParent()));
+            "SMTP server port:", getFieldEditorParent()));
         addField(new StringFieldEditor(
             PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_USER,
-            Messages.IssueTrackerPreferencePage_username_label, getFieldEditorParent()));
+            "SMTP server username:", getFieldEditorParent()));
         StringFieldEditor field = new StringFieldEditor(
             PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PASSWORD,
-            Messages.IssueTrackerPreferencePage_password_label, getFieldEditorParent());
+            "SMTP server password:", getFieldEditorParent());
         field.getTextControl(getFieldEditorParent()).setEchoChar('*');
         addField(field);
     }

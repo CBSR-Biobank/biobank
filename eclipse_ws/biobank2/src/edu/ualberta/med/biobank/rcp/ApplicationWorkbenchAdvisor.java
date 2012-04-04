@@ -53,8 +53,8 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
                 && page.getPerspective().getId()
                     .equals(LinkAssignPerspective.ID)) {
                 BgcPlugin.openInformation(
-                    Messages.ApplicationWorkbenchAdvisor_close_error_title,
-                    Messages.ApplicationWorkbenchAdvisor_close_error_msg);
+                    "Can't close",
+                    "Please end specimen management session before closing");
                 return false;
             }
         }
@@ -72,6 +72,6 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     public void postStartup() {
         PreferenceManager pm = PlatformUI.getWorkbench().getPreferenceManager();
         // remove the default 'General' preference page of the workbench
-        pm.remove("org.eclipse.ui.preferencePages.Workbench"); //$NON-NLS-1$
+        pm.remove("org.eclipse.ui.preferencePages.Workbench"); 
     }
 }

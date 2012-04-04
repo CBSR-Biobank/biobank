@@ -59,7 +59,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         String windowTitle = product.getName();
 
         if (BiobankPlugin.getDefault().windowTitleShowVersionEnabled()) {
-            windowTitle += " " + product.getDefiningBundle().getVersion(); //$NON-NLS-1$
+            windowTitle += " " + product.getDefiningBundle().getVersion(); 
         }
         return windowTitle;
     }
@@ -88,7 +88,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         IStatusLineManager statusline = getWindowConfigurer()
             .getActionBarConfigurer().getStatusLineManager();
         statusline.setMessage(null,
-            Messages.ApplicationWorkbenchWindowAdvisor_ready_msg);
+            "Application ready");
 
         IWorkbench workbench = PlatformUI.getWorkbench();
         IWorkbenchWindow activeWindow = workbench.getActiveWorkbenchWindow();
@@ -99,7 +99,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                 workbench.showPerspective(ProcessingPerspective.ID,
                     activeWindow);
             } catch (WorkbenchException e) {
-                logger.error("Error while opening patients perpective", e); //$NON-NLS-1$
+                logger.error("Error while opening patients perpective", e); 
             }
         }
         page.addPartListener(new BiobankPartListener());
@@ -136,7 +136,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                             mainWindowUpdateTitle(SessionManager.getUser());
                             serverItem.setText(new StringBuffer(
                                 SessionManager.getUser().getLogin())
-                                .append("@") //$NON-NLS-1$
+                                .append("@") 
                                 .append(SessionManager.getServer())
                                 .toString());
                             superAdminItem.setVisible(SessionManager
@@ -144,7 +144,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                         } else if (sourceValue
                             .equals(LoginSessionState.LOGGED_OUT)) {
                             mainWindowResetTitle();
-                            serverItem.setText(""); //$NON-NLS-1$
+                            serverItem.setText(""); 
                             superAdminItem.setVisible(false);
                         }
                     }
@@ -164,7 +164,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     private void activateIfNotInPerspective(String currentPerspectiveId,
         String notId) {
         if (!currentPerspectiveId.equals(notId))
-            BindingContextHelper.activateContextInWorkbench("not." + notId); //$NON-NLS-1$
+            BindingContextHelper.activateContextInWorkbench("not." + notId); 
     }
 
     private void mainWindowResetTitle() {
@@ -188,9 +188,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         StringBuffer newTitle = new StringBuffer(getWindowTitle());
 
         if (currentCenterText != null) {
-            newTitle.append(" - ").append( //$NON-NLS-1$
+            newTitle.append(" - ").append( 
                 NLS.bind(
-                    Messages.ApplicationWorkbenchWindowAdvisor_center_text,
+                    "Center {0}",
                     currentCenterText));
         }
 

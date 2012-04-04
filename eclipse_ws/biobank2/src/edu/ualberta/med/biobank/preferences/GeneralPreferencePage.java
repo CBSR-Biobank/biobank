@@ -6,7 +6,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.WorkbenchMessages;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 
@@ -32,17 +31,17 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     protected void createFieldEditors() {
         showVersionFieldEditor = new BooleanFieldEditor(
             PreferenceConstants.GENERAL_SHOW_VERSION,
-            Messages.GeneralPreferencePage_version_label,
+            "Show software version in main window title",
             getFieldEditorParent());
         addField(showVersionFieldEditor);
 
         showHeapFieldEditor = new BooleanFieldEditor(
             IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR,
-            WorkbenchMessages.WorkbenchPreference_HeapStatusButton,
+            "",
             getFieldEditorParent());
         showHeapFieldEditor.getDescriptionControl(getFieldEditorParent())
             .setToolTipText(
-                WorkbenchMessages.WorkbenchPreference_HeapStatusButtonToolTip);
+                "");
         addField(showHeapFieldEditor);
     }
 

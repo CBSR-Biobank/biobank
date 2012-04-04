@@ -41,7 +41,7 @@ public class DefaultTopPreferencePage extends PreferencePage implements
     protected Control createContents(Composite parent) {
         Composite composite = createScrolledComposite(parent);
 
-        String description = Messages.DefaultTopPreferencePage_description;
+        String description = "Expand the tree to edit preferences for a specific feature.";
         Text text = new Text(composite, 8);
 
         text.setBackground(composite.getBackground());
