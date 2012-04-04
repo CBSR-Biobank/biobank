@@ -40,16 +40,16 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class PatientEntryForm extends BiobankEntryForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.PatientEntryForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.PatientEntryForm";
 
     private static final String CREATED_AT_BINDING =
-        "patient-created-at-binding"; //$NON-NLS-1$
+        "patient-created-at-binding";
 
     public static final String MSG_NEW_PATIENT_OK =
-        Messages.PatientEntryForm_creation_msg;
+        "Creating a new patient record.";
 
     public static final String MSG_PATIENT_OK =
-        Messages.PatientEntryForm_edition_msg;
+        "Editing an existing patient record.";
 
     private ComboViewer studiesViewer;
 
@@ -59,7 +59,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private NonEmptyStringValidator pnumberNonEmptyValidator =
         new NonEmptyStringValidator(
-            Messages.PatientEntryForm_patientNumber_validation_msg);
+            "Patient must have a patient number");
 
     private PatientInfo patientInfo;
 
@@ -74,16 +74,16 @@ public class PatientEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof PatientAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         updatePatientInfo();
 
         String tabName;
         if (patientInfo == null) {
-            tabName = Messages.PatientEntryForm_new_title;
+            tabName = "New Patient";
         } else {
             tabName =
-                NLS.bind(Messages.PatientEntryForm_edit_title,
+                NLS.bind("Patient {0}",
                     patientInfo.patient.getPnumber());
         }
         setPartName(tabName);
@@ -104,7 +104,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.PatientEntryForm_main_title);
+        form.setText("Patient Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
 
@@ -140,9 +140,9 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         studiesViewer =
             createComboViewer(client,
-                Messages.PatientEntryForm_field_study_label, studies,
+                "Study", studies,
                 selectedStudy,
-                Messages.PatientEntryForm_field_study_validation_msg,
+                "A study should be selected",
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -160,15 +160,15 @@ public class PatientEntryForm extends BiobankEntryForm {
         setFirstControl(studiesViewer.getControl());
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.PatientEntryForm_field_pNumber_label, null, patient,
+            "Patient Number", null, patient,
             PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
 
         createdAtLabel = widgetCreator.createLabel(client,
-            Messages.PatientEntryForm_created_label);
+            "Created At");
         createdAtLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         createdAtValidator = new NotNullValidator(
-            Messages.PatientEntryForm_created_validation_msg);
+            "Created At should be set");
 
         createDateTimeWidget(client, createdAtLabel, patient.getCreatedAt(),
             patient, PatientPeer.CREATED_AT.getName(), createdAtValidator,
@@ -178,7 +178,7 @@ public class PatientEntryForm extends BiobankEntryForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient(Messages.Comments_title);
+        Composite client = createSectionWithClient("Comments");
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -190,7 +190,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add, null, comment, "message", null);
+            "Add a comment", null, comment, "message", null);
     }
 
     @Override

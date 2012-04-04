@@ -36,7 +36,7 @@ import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsS
 public class ProcessingEventViewForm extends BiobankViewForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ProcessingEventViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.ProcessingEventViewForm";
 
     private BgcBaseText centerLabel;
 
@@ -58,11 +58,11 @@ public class ProcessingEventViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ProcessingEventAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         setPEventInfo(adapter.getId());
 
-        setPartName(NLS.bind(Messages.ProcessingEventViewForm_title,
+        setPartName(NLS.bind("Processing event for date {0}",
             DateFormatter.formatAsDateTime(pevent.getCreatedAt())));
     }
 
@@ -84,7 +84,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind(Messages.ProcessingEventViewForm_title,
+        form.setText(NLS.bind("Processing event for date {0}",
             DateFormatter.formatAsDateTime(pevent.getCreatedAt())));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -102,23 +102,20 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         centerLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.ProcessingEvent_field_center_label);
+            createReadOnlyLabelledField(client, SWT.NONE, "Center");
         worksheetLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.ProcessingEvent_field_worksheet_label);
+            createReadOnlyLabelledField(client, SWT.NONE, "Worksheet");
         dateCreationLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.ProcessingEvent_field_date_label);
+            createReadOnlyLabelledField(client, SWT.NONE, "Start time");
         activityLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.label_activity);
+                "Activity status");
 
         createCommentsSection();
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient(Messages.label_comments);
+        Composite client = createSectionWithClient("Comments");
         commentTable = new CommentsInfoTable(client,
             pevent.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
@@ -127,9 +124,9 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     @Override
     public void setValues() throws Exception {
-        setPartName(NLS.bind(Messages.ProcessingEventViewForm_title,
+        setPartName(NLS.bind("Processing event for date {0}",
             DateFormatter.formatAsDateTime(pevent.getCreatedAt())));
-        form.setText(NLS.bind(Messages.ProcessingEventViewForm_title,
+        form.setText(NLS.bind("Processing event for date {0}",
             DateFormatter.formatAsDateTime(pevent.getCreatedAt())));
         sourceSpecimenTable.setList(specimens);
         commentTable.setList(pevent.getCommentCollection(false));
@@ -144,7 +141,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     private void createSourceSpecimensSection() {
         Composite client =
-            createSectionWithClient(Messages.ProcessingEventViewForm_specimens_title);
+            createSectionWithClient("Source specimens");
         sourceSpecimenTable =
             new NewSpecimenInfoTable(client, specimens,
                 ColumnsShown.PEVENT_SOURCE_SPECIMENS, 10);

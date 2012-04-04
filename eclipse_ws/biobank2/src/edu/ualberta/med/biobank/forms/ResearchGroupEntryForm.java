@@ -37,19 +37,19 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 @SuppressWarnings("unused")
 public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.ResearchGroupEntryForm";
 
     private static final String MSG_NEW_RG_OK =
-        Messages.ResearchGroupEntryForm_creation_msg;
+        "New Research Group information.";
 
     private static final String MSG_RG_OK =
-        Messages.ResearchGroupEntryForm_msg_ok;
+        "Research Group information.";
 
     private static final String MSG_NO_RG_NAME =
-        Messages.ResearchGroupEntryForm_msg_noResearchGroupName;
+        "Research Group must have a name";
 
     private static final String MSG_NO_RG_NAME_SHORT =
-        Messages.ResearchGroupEntryForm_msg_noResearchGroupNameShort;
+        "Research Group must have a short name";
 
     private ResearchGroupAdapter researchGroupAdapter;
 
@@ -77,7 +77,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ResearchGroupAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         researchGroupAdapter = (ResearchGroupAdapter) adapter;
 
@@ -85,9 +85,9 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
         String tabName;
         if (researchGroup.isNew()) {
-            tabName = Messages.ResearchGroupEntryForm_title_new;
+            tabName = "New Research Group";
         } else
-            tabName = NLS.bind(Messages.ResearchGroupEntryForm_title_edit,
+            tabName = NLS.bind("Research Group {0}",
                 researchGroup.getNameShort());
         setPartName(tabName);
     }
@@ -115,10 +115,10 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void createFormContent() throws ApplicationException {
-        form.setText(Messages.ResearchGroupEntryForm_main_title);
+        form.setText("Research Group Information");
         page.setLayout(new GridLayout(1, false));
         toolkit.createLabel(page,
-            Messages.ResearchGroupEntryForm_main_description, SWT.LEFT);
+            "Research Groups can be associated with studies after submitting this initial information.", SWT.LEFT);
         createResearchGroupInfoSection();
         createAddressArea(researchGroup);
         createButtonsSection();
@@ -134,12 +134,12 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, Messages.label_name, null, researchGroup,
+            SWT.NONE, "Name", null, researchGroup,
             ResearchGroupPeer.NAME.getName(), new NonEmptyStringValidator(
                 MSG_NO_RG_NAME)));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.label_nameShort, null, researchGroup,
+            "Name Short", null, researchGroup,
             ResearchGroupPeer.NAME_SHORT.getName(),
             new NonEmptyStringValidator(MSG_NO_RG_NAME_SHORT));
 
@@ -151,9 +151,9 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             availableStudies.add(researchGroup.getStudy());
 
         studyComboViewer = createComboViewer(client,
-            Messages.ResearchGroupEntryForm_study_label, availableStudies,
+            "Study", availableStudies,
             researchGroup.getStudy(),
-            Messages.ResearchGroupEntryForm_study_validator_msg,
+            "Select the associated study",
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -164,9 +164,9 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             SessionManager.getUser().isSuperAdmin());
 
         activityStatusComboViewer = createComboViewer(client,
-            Messages.label_activity,
+            "Activity status",
             ActivityStatus.valuesList(), researchGroup.getActivityStatus(),
-            Messages.ResearchGroupEntryForm_activity_validator_msg,
+            "Research Group must have an activity status",
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -180,7 +180,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient(Messages.Comments_title);
+        Composite client = createSectionWithClient("Comments");
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -194,7 +194,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         commentWidget =
             (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
                 SWT.MULTI,
-                Messages.Comments_add, null, comment, "message", null);
+                "Add a comment", null, comment, "message", null);
 
     }
 

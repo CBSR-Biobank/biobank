@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms.linkassign;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -81,14 +82,14 @@ public class LinkFormPatientManagement {
 
     protected void createPatientNumberText(Composite parent) {
         patientLabel = widgetCreator.createLabel(parent,
-            Messages.LinkFormPatientManagement_patientNumber_label);
+            "Patient number");
         patientLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         patientValidator = new NonEmptyStringValidator(
-            Messages.LinkFormPatientManagement_patientNumber_validationMsg);
+            "Enter a patient number");
         patientNumberText = (BgcBaseText) widgetCreator.createBoundWidget(
             parent, BgcBaseText.class, SWT.NONE, patientLabel, new String[0],
-            new WritableValue("", String.class), patientValidator); //$NON-NLS-1$
+            new WritableValue("", String.class), patientValidator);
         GridData gd = (GridData) patientNumberText.getLayoutData();
         gd.horizontalSpan = 2;
         patientNumberText.addFocusListener(new FocusAdapter() {
@@ -127,10 +128,10 @@ public class LinkFormPatientManagement {
 
     private void createProcessingEventWidgets(Composite compositeFields) {
         pEventComboLabel = widgetCreator.createLabel(compositeFields,
-            Messages.LinkFormPatientManagement_pEvent_date);
+            "Processing event");
         viewerProcessingEvents = widgetCreator.createComboViewer(
             compositeFields, pEventComboLabel, null, null,
-            Messages.LinkFormPatientManagement_pEvent_validationMsg, false,
+            "A processing event should be selected", false,
             null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -167,7 +168,7 @@ public class LinkFormPatientManagement {
                     if (pe != null) {
                         specimenAdminForm.appendLog(NLS
                             .bind(
-                                Messages.LinkFormPatientManagement_activitylog_pEvent_selection,
+                                "Processing event {0} / {1} selected",
                                 pe.getWorksheet(), pe.getFormattedCreatedAt()));
                     }
                 }
@@ -175,7 +176,7 @@ public class LinkFormPatientManagement {
         });
         pEventListCheck = specimenAdminForm.getToolkit().createButton(
             compositeFields,
-            Messages.LinkFormPatientManagement_last7days_label, SWT.CHECK);
+            "Last 7 days", SWT.CHECK);
         pEventListCheck.setSelection(pEventListCheckSelection);
         pEventListCheck.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -187,11 +188,11 @@ public class LinkFormPatientManagement {
         // Will replace the combo in some specific situations (like cabinet
         // form):
         pEventTextLabel = widgetCreator.createLabel(compositeFields,
-            Messages.LinkFormPatientManagement_pEvent_date);
+            "Processing event");
         pEventTextLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         pEventText = (BgcBaseText) widgetCreator.createWidget(compositeFields,
-            BgcBaseText.class, SWT.NONE, ""); //$NON-NLS-1$
+            BgcBaseText.class, SWT.NONE, "");
         pEventText.setEnabled(false);
         GridData gd = (GridData) pEventText.getLayoutData();
         gd.horizontalSpan = 2;
@@ -201,10 +202,10 @@ public class LinkFormPatientManagement {
 
     private void createCollectionEventWidgets(Composite compositeFields) {
         cEventComboLabel = widgetCreator.createLabel(compositeFields,
-            Messages.LinkFormPatientManagement_visit_number);
+            "Collection visit#");
         viewerCollectionEvents = widgetCreator.createComboViewer(
             compositeFields, cEventComboLabel, null, null,
-            Messages.LinkFormPatientManagement_visit_validationMsg, false,
+            "A collection event should be selected", false,
             null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -233,7 +234,7 @@ public class LinkFormPatientManagement {
                     if (ce != null) {
                         specimenAdminForm.appendLog(NLS
                             .bind(
-                                Messages.LinkFormPatientManagement_activitylog_visit_selection,
+                                "Visit number {0} selected",
                                 ce.getVisitNumber()));
                     }
                 }
@@ -255,26 +256,26 @@ public class LinkFormPatientManagement {
                     .getStudyCollection().contains(currentPatient.getStudy())) {
                     BgcPlugin
                         .openError(
-                            Messages.LinkFormPatientManagement_patient_search_error_title,
-                            Messages
+                            "Patient search error",
+                            MessageFormat
                                 .format(
-                                    Messages.LinkFormPatientManagement_notworking_with_study_error_msg,
-                                    currentPatient.getPnumber(), currentPatient
-                                        .getStudy().getNameShort(),
+                                    "Patient {0} has been found but it is linked to the study {1}. The center {2} is not working with this study.",
+                                    currentPatient.getPnumber(),
+                                    currentPatient.getStudy().getNameShort(),
                                     SessionManager.getUser()
                                         .getCurrentWorkingCenter()
                                         .getNameShort()));
                     currentPatient = null;
                 } else {
-                    specimenAdminForm.appendLog("--------"); //$NON-NLS-1$
+                    specimenAdminForm.appendLog("--------");
                     specimenAdminForm.appendLog(NLS.bind(
-                        Messages.LinkFormPatientManagement_activitylog_patient,
+                        "Found patient with number {0}",
                         currentPatient.getPnumber()));
                 }
             }
         } catch (ApplicationException e) {
             BgcPlugin.openError(
-                Messages.LinkFormPatientManagement_patient_search_error_title,
+                "Patient search error",
                 e);
         }
         setProcessingEventListFromPatient();
@@ -289,7 +290,7 @@ public class LinkFormPatientManagement {
 
         currentPatient = null;
         if (resetAll)
-            patientNumberText.setText(""); //$NON-NLS-1$
+            patientNumberText.setText("");
     }
 
     public PatientWrapper getCurrentPatient() {
@@ -305,7 +306,7 @@ public class LinkFormPatientManagement {
         viewerProcessingEvents.setInput(Arrays.asList(pEvent));
         viewerProcessingEvents.setSelection(new StructuredSelection(pEvent));
         if (pEventText != null) {
-            pEventText.setText(pEvent.getFormattedCreatedAt() + " - " //$NON-NLS-1$
+            pEventText.setText(pEvent.getFormattedCreatedAt() + " - "
                 + pEvent.getWorksheet());
         }
         viewerCollectionEvents.setInput(Arrays.asList(cEvent));
@@ -336,14 +337,14 @@ public class LinkFormPatientManagement {
 
     public void enableValidators(boolean enabled) {
         if (enabled) {
-            patientNumberText.setText(""); //$NON-NLS-1$
+            patientNumberText.setText("");
             viewerProcessingEvents.getCombo().deselectAll();
             viewerCollectionEvents.getCombo().deselectAll();
         } else {
-            patientNumberText.setText("?"); //$NON-NLS-1$
-            viewerProcessingEvents.setInput(new String[] { "?" }); //$NON-NLS-1$
+            patientNumberText.setText("?");
+            viewerProcessingEvents.setInput(new String[] { "?" });
             viewerProcessingEvents.getCombo().select(0);
-            viewerCollectionEvents.setInput(new String[] { "?" }); //$NON-NLS-1$
+            viewerCollectionEvents.setInput(new String[] { "?" });
             viewerCollectionEvents.getCombo().select(0);
         }
     }
@@ -377,7 +378,7 @@ public class LinkFormPatientManagement {
                     } catch (ApplicationException e) {
                         BgcPlugin
                             .openAsyncError(
-                                Messages.LinkFormPatientManagement_pEvent_retrieve_error_msg,
+                                "Problem retrieving processing events",
                                 e);
                     }
                 else
@@ -399,7 +400,7 @@ public class LinkFormPatientManagement {
                 viewerProcessingEvents.setInput(null);
             }
             if (pEventText != null) {
-                pEventText.setText(""); //$NON-NLS-1$
+                pEventText.setText("");
             }
         }
         viewerProcessingEvents.getCombo().setFocus();
@@ -418,7 +419,7 @@ public class LinkFormPatientManagement {
                 } catch (ApplicationException e) {
                     BgcPlugin
                         .openAsyncError(
-                            Messages.LinkFormPatientManagement_cEvent_retrieve_error_msg,
+                            "Problem retrieving collection events",
                             e);
                 }
                 viewerCollectionEvents.setInput(collection);
@@ -452,13 +453,13 @@ public class LinkFormPatientManagement {
             if (specs.size() == 0) {
                 BgcPlugin
                     .openAsyncError(
-                        Messages.LinkFormPatientManagement_sourceSpecimenInProcess_error_title,
-                        Messages.LinkFormPatientManagement_sourceSpecimenInProcess_error_msg);
+                        "Source specimens error",
+                        "No source specimen of this collection event has been declared in a processing event.");
             }
         } catch (ApplicationException e) {
             specs = new ArrayList<SpecimenWrapper>();
             BgcPlugin.openAsyncError(
-                Messages.LinkFormPatientManagement_sourceSpecs_retrieve_error,
+                "Problem retrieveing source specimens",
                 e);
         }
         return specs;
@@ -480,7 +481,7 @@ public class LinkFormPatientManagement {
             study.reload();
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.LinkFormPatientManagement_study_reload_error_msg, e);
+                "Problem reloading study", e);
         }
 
         List<SpecimenTypeWrapper> studiesAliquotedTypes;
@@ -490,20 +491,20 @@ public class LinkFormPatientManagement {
                     .getAuthorizedActiveAliquotedTypes(authorizedSpecimenTypesInContainer);
             if (studiesAliquotedTypes.size() == 0) {
                 String studyNameShort =
-                    Messages.LinkFormPatientManagement_study_unknown_label;
+                    "unknown";
                 if (getCurrentPatient() != null)
                     studyNameShort = study.getNameShort();
                 BgcPlugin
                     .openAsyncError(
-                        Messages.LinkFormPatientManagement_aliquotedSpecimenTypes_error_title,
+                        "No specimen types",
                         NLS.bind(
-                            Messages.LinkFormPatientManagement_aliquotedSpecimenTypes_error_msg,
+                            "There are no specimen types that are defined in study {0} and that are authorized inside available containers.",
                             studyNameShort));
             }
         } catch (ApplicationException e) {
             studiesAliquotedTypes = new ArrayList<SpecimenTypeWrapper>();
             BgcPlugin.openAsyncError(
-                Messages.LinkFormPatientManagement_types_retrieve_error, e);
+                "Error retrieving available types", e);
         }
         return studiesAliquotedTypes;
     }

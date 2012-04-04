@@ -128,7 +128,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient(Messages.Comments_title);
+        Composite client = createSectionWithClient("Comments");
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -140,7 +140,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add, null, comment, "message", null);
+            "Add a comment", null, comment, "message", null);
     }
 
     private void createSiteSection() {
@@ -155,17 +155,17 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, Messages.label_name, null, site, SitePeer.NAME.getName(),
+            SWT.NONE, "Name", null, site, SitePeer.NAME.getName(),
             new NonEmptyStringValidator(
                 Messages.SiteEntryForm_field_name_validation_msg)));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.label_nameShort, null, site,
+            "Name Short", null, site,
             SitePeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 Messages.SiteEntryForm_field_nameShort_validation_msg));
 
         activityStatusComboViewer =
-            createComboViewer(client, Messages.label_activity,
+            createComboViewer(client, "Activity status",
                 ActivityStatus.valuesList(), site.getActivityStatus(),
                 Messages.SiteEntryForm_field_activity_validation_msg,
                 new ComboSelectionUpdate() {

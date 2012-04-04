@@ -57,13 +57,13 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ProcessingEventEntryForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.ProcessingEventEntryForm";
 
     private static final String MSG_NEW_PEVENT_OK =
-        Messages.ProcessingEventEntryForm_creation_msg;
+        "Creating a new processing event";
 
     private static final String MSG_PEVENT_OK =
-        Messages.ProcessingEventEntryForm_edition_msg;
+        "Editing a processing event";
 
     private ProcessingEventAdapter pEventAdapter;
 
@@ -88,24 +88,24 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ProcessingEventAdapter,
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         pEventAdapter = (ProcessingEventAdapter) adapter;
         setPEventInfo(adapter.getId());
         String tabName;
         if (pEventAdapter.getId() == null) {
-            tabName = Messages.ProcessingEventEntryForm_title_new;
+            tabName = "New processing event";
         } else {
             if (pevent.getWorksheet() == null)
                 tabName =
                     NLS.bind(
-                        Messages.ProcessingEventEntryForm_title_edit_worksheet,
+                        "Processing event {0} on {1}",
                         pevent.getWorksheet(), pevent.getFormattedCreatedAt());
             else
                 tabName =
                     NLS.bind(
-                        Messages.ProcessingEventEntryForm_title_edit_noworksheet,
+                        "Processing event date {0}",
                         DateFormatter.formatAsDateTime(pevent.getCreatedAt()));
         }
 
@@ -133,7 +133,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.ProcessingEventEntryForm_main_title);
+        form.setText("Processing event information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         createMainSection();
@@ -149,34 +149,34 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.ProcessingEvent_field_center_label, pevent.getCenter()
+            "Center", pevent.getCenter()
                 .getName());
 
         dateWidget =
             createDateTimeWidget(
                 client,
-                Messages.ProcessingEvent_field_date_label,
+                "Start time",
                 pevent.getCreatedAt(),
                 pevent,
                 ProcessingEventPeer.CREATED_AT.getName(),
                 new NotNullValidator(
-                    Messages.ProcessingEventEntryForm_field_date_validation_msg));
+                    "A creation date/time should be selected"));
         setFirstControl(dateWidget);
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.ProcessingEvent_field_worksheet_label, null, pevent,
+            "Worksheet", null, pevent,
             ProcessingEventPeer.WORKSHEET.getName(),
             (!pevent.isNew() && pevent.getWorksheet() == null) ? null
                 : new NonEmptyStringValidator(
-                    Messages.ProcessingEventEntryForm_worksheet_validation_msg));
+                    "Worksheet cannot be null"));
 
         activityStatusComboViewer =
             createComboViewer(
                 client,
-                Messages.label_activity,
+                "Activity status",
                 ActivityStatus.valuesList(),
                 pevent.getActivityStatus(),
-                Messages.ProcessingEventEntryForm_field_activity_validation_msg,
+                "Processing event must have an activity status ",
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -196,7 +196,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient(Messages.Comments_title);
+        Composite client = createSectionWithClient("Comments");
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -209,7 +209,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add);
+            "Add a comment");
 
     }
 
@@ -217,7 +217,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
 
         Composite client =
-            createSectionWithClient(Messages.ProcessingEventEntryForm_specimens_title);
+            createSectionWithClient("Source specimens");
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
@@ -260,23 +260,23 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     case PRE_ADD:
                         if (specimen == null)
                             throw new VetoException(
-                                Messages.ProcessingEventEntryForm_notfound_spec_error_msg);
+                                "No specimen found for that inventory id.");
                         else if (!SessionManager.getUser()
                             .getCurrentWorkingCenter()
                             .equals(specimen.getCurrentCenter())) {
                             String centerName =
-                                Messages.ProcessingEventEntryForm_none_text;
+                                "'none'";
                             if (specimen.getCurrentCenter() != null)
                                 centerName =
                                     specimen.getCurrentCenter().getNameShort();
                             throw new VetoException(
                                 NLS.bind(
-                                    Messages.ProcessingEventEntryForm_center_spec_error_msg,
+                                    "Specimen is currently in center {0}. You can''t process it.",
                                     centerName));
                         } else if (specimen.getProcessingEvent() != null) {
                             throw new VetoException(
                                 NLS.bind(
-                                    Messages.ProcessingEventEntryForm_other_pEvent_error_msg,
+                                    "This specimen is already in processing event ''{0}'' ({1}). Remove it from the other processing event first.",
                                     specimen.getProcessingEvent()
                                         .getWorksheet(), specimen
                                         .getProcessingEvent()
@@ -284,14 +284,14 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                         } else if (!specimen.isActive())
                             throw new VetoException(
                                 NLS.bind(
-                                    Messages.ProcessingEventEntryForm_spec_active_only_error_msg,
+                                    "This specimen has status ''{0}''. Only ''Active'' specimens can be added to a processing event.",
                                     specimen.getActivityStatus().getName()));
                         else if (specimen.isUsedInDispatch())
                             throw new VetoException(
-                                Messages.ProcessingEventEntryForm_spec_dispatch_error_msg);
+                                "Specimen is currently listed in a dispatch.");
                         else if (specimen.getParentContainer() != null)
                             throw new VetoException(
-                                Messages.ProcessingEventEntryForm_stored_spec_error_msg);
+                                "Specimen is currently listed as stored in a container.");
                         else if (!SessionManager.getUser()
                             .getCurrentWorkingCenter().getStudyCollection()
                             .contains(
@@ -299,7 +299,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                     .getStudy()))
                             throw new VetoException(
                                 NLS.bind(
-                                    Messages.ProcessingEventEntryForm_spec_study_allowed_only_error_msg,
+                                    "This specimen is from study ''{0}''. This study is not linked to your current working center. Processing is not allowed.",
                                     specimen.getCollectionEvent().getPatient()
                                         .getStudy().getNameShort()));
                         else if (specimens.size() > 0) {
@@ -316,11 +316,11 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                     specimen.getCollectionEvent().getPatient()
                                         .getStudy()))
                                     throw new VetoException(
-                                        Messages.ProcessingEventEntryForm_study_spec_error_msg);
+                                        "All specimens must be part of the same study.");
                             } catch (Exception e) {
                                 BgcPlugin
                                     .openAsyncError(
-                                        Messages.ProcessingEventEntryForm_error,
+                                        "Error loading specimen",
                                         e);
                             }
                             break;
@@ -334,7 +334,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             };
 
         specimenEntryWidget.addBinding(widgetCreator,
-            Messages.ProcessingEventEntryForm_specimens_validation_msg);
+            "Specimens should be added to a processing event");
 
         specimenEntryWidget.addVetoListener(ItemAction.PRE_ADD, vetoListener);
         specimenEntryWidget.addVetoListener(ItemAction.POST_ADD, vetoListener);

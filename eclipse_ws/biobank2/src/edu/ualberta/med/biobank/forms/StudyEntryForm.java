@@ -175,17 +175,17 @@ public class StudyEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, Messages.label_name, null, study,
+            SWT.NONE, "Name", null, study,
             StudyPeer.NAME.getName(), new NonEmptyStringValidator(
                 Messages.StudyEntryForm_name_validator_msg)));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.label_nameShort, null, study,
+            "Name Short", null, study,
             StudyPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 Messages.StudyEntryForm_nameShort_validator_msg));
 
         activityStatusComboViewer =
-            createComboViewer(client, Messages.label_activity,
+            createComboViewer(client, "Activity status",
                 ActivityStatus.valuesList(), study.getActivityStatus(),
                 Messages.StudyEntryForm_activity_validator_msg,
                 new ComboSelectionUpdate() {
@@ -225,7 +225,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient(Messages.Comments_title);
+        Composite client = createSectionWithClient("Comments");
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -237,7 +237,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add, null, comment, "message", null); //$NON-NLS-1$
+            "Add a comment", null, comment, "message", null); //$NON-NLS-1$
     }
 
     private void createSourceSpecimensSection() {

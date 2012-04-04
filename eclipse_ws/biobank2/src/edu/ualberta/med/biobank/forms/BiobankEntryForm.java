@@ -71,7 +71,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     IBgcEntryForm {
 
     private static final String CONTEXT_ENTRY_FORM =
-        "biobank.context.entryForm"; //$NON-NLS-1$
+        "biobank.context.entryForm";
 
     protected String sessionName;
 
@@ -134,8 +134,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
             monitor.setCanceled(true);
             setDirty(true);
             BgcPlugin.openAsyncError(
-                Messages.BiobankEntryForm_state_error_title,
-                Messages.BiobankEntryForm_state_error_msg);
+                "Form state",
+                "Form in invalid state, save failed.");
             return;
         }
         doSaveInternal(monitor);
@@ -153,7 +153,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                     throws InvocationTargetException, InterruptedException {
 
                     try {
-                        monitor.beginTask(Messages.BiobankEntryForm_saving,
+                        monitor.beginTask("Saving...",
                             IProgressMonitor.UNKNOWN);
                         saveForm();
                         // this needs to be done there if we want the new node
@@ -234,7 +234,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     @Override
     public void setFocus() {
         super.setFocus();
-        Assert.isNotNull(firstControl, "first control widget is not set"); //$NON-NLS-1$
+        Assert.isNotNull(firstControl, "first control widget is not set");
         if (!firstControl.isDisposed()) {
             firstControl.setFocus();
         }
@@ -424,7 +424,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                 closeEntryOpenView(true, openViewAfterSaving());
             }
         } catch (Exception e) {
-            LOGGER.error("Can't save the form", e); //$NON-NLS-1$
+            LOGGER.error("Can't save the form", e);
         }
     }
 
@@ -460,7 +460,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                 openView &= !((AdapterBase) adapter).getModelObject().isNew();
             closeEntryOpenView(true, openView);
         } catch (Exception e) {
-            LOGGER.error("Can't cancel the form", e); //$NON-NLS-1$
+            LOGGER.error("Can't cancel the form", e);
         }
     }
 

@@ -37,7 +37,7 @@ public class AliquotedSpecimenInfoTable extends
         Messages.AliquotedSpecimen_field_type_label,
         Messages.AliquotedSpecimen_field_volume_label,
         Messages.AliquotedSpecimen_field_quantity_label,
-        Messages.label_activity };
+        "Activity status" };
 
     public AliquotedSpecimenInfoTable(Composite parent,
         List<AliquotedSpecimenWrapper> sampleStorageCollection) {

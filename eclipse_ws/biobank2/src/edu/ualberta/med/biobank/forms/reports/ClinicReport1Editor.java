@@ -14,10 +14,10 @@ public class ClinicReport1Editor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { Messages.FvLPatientVisitsEditor_study_label,
-            Messages.FvLPatientVisitsEditor_center_label,
-            Messages.FvLPatientVisitsEditor_first_spec_time_label,
-            Messages.FvLPatientVisitsEditor_last_spec_time_label };
+        return new String[] { "Study",
+            "Center",
+            "First Specimen Time Drawn",
+            "Last Specimen Time Drawn" };
     }
 
     @Override

@@ -116,11 +116,11 @@ public class StudyViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_name);
+            "Name");
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_nameShort);
+            "Name Short");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_activity);
+            "Activity status");
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.StudyViewForm_field_label_total_patients);
         visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
@@ -136,7 +136,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient(Messages.label_comments);
+        Composite client = createSectionWithClient("Comments");
         commentTable =
             new CommentsInfoTable(client,
                 study.getCommentCollection(false));

@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 
 public class SpecimenTypeReport2Editor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.SampleTypeSUsageEditor"; //$NON-NLS-1$
+    public static String ID = "edu.ualberta.med.biobank.editors.SampleTypeSUsageEditor";
 
     @Override
     protected void createOptionSection(Composite parent) {
@@ -19,7 +19,7 @@ public class SpecimenTypeReport2Editor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { Messages.SpecimenTypeSUsageEditor_specType_label, Messages.SpecimenTypeSUsageEditor_study_label };
+        return new String[] { "Specimen Type", "Study" };
     }
 
     @Override

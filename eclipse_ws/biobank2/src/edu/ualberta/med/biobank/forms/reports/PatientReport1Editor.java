@@ -14,15 +14,15 @@ public class PatientReport1Editor extends ReportsEditor {
     protected DateTimeWidget end;
 
     public static String ID =
-        "edu.ualberta.med.biobank.editors.PatientVisitSummaryEditor"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.editors.PatientVisitSummaryEditor";
 
     @Override
     protected void createOptionSection(Composite parent) {
         start = widgetCreator.createDateTimeWidget(parent,
-            Messages.PatientVisitSummaryEditor_start_label, null, null, null,
+            "Start Date (Time Drawn)", null, null, null,
             SWT.DATE);
         end = widgetCreator.createDateTimeWidget(parent,
-            Messages.PatientVisitSummaryEditor_end_label, null, null, null,
+            "End Date (Time Drawn)", null, null, null,
             SWT.DATE);
     }
 
@@ -36,22 +36,22 @@ public class PatientReport1Editor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { Messages.PatientVisitSummaryEditor_study_label,
-            Messages.PatientVisitSummaryEditor_clinic_label,
-            Messages.PatientVisitSummaryEditor_1visit_label,
-            Messages.PatientVisitSummaryEditor_2visits_label,
-            Messages.PatientVisitSummaryEditor_3visits_label,
-            Messages.PatientVisitSummaryEditor_4visits_label,
-            Messages.PatientVisitSummaryEditor_5visits_label,
-            Messages.PatientVisitSummaryEditor_visits_total_label,
-            Messages.PatientVisitSummaryEditor_patient_total_label };
+        return new String[] { "Study",
+            "Clinic",
+            "1 Visit",
+            "2 Visits",
+            "3 Visits",
+            "4 Visits",
+            "5+ Visits",
+            "Total Visits",
+            "Total Patients" };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> param = new ArrayList<String>();
-        param.add(Messages.PatientVisitSummaryEditor_start_label);
-        param.add(Messages.PatientVisitSummaryEditor_end_label);
+        param.add("Start Date (Time Drawn)");
+        param.add("End Date (Time Drawn)");
         return param;
     }
 

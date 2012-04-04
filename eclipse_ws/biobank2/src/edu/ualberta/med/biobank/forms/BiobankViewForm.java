@@ -35,12 +35,12 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 public abstract class BiobankViewForm extends BiobankFormBase {
 
     private static final String RELOAD_COMMAND_ID =
-        "edu.ualberta.med.biobank.commands.reload"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.commands.reload";
 
     private static final String EDIT_COMMAND_ID =
-        "edu.ualberta.med.biobank.commands.edit"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.commands.edit";
 
-    private static final String CONTEXT_VIEW_FORM = "biobank.context.viewForm"; //$NON-NLS-1$
+    private static final String CONTEXT_VIEW_FORM = "biobank.context.viewForm";
 
     private static BgcLogger logger = BgcLogger.getLogger(BiobankViewForm.class
         .getName());
@@ -61,7 +61,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                     try {
                         reload();
                     } catch (Exception e) {
-                        logger.error("Error sending event", e); //$NON-NLS-1$
+                        logger.error("Error sending event", e);
                     }
                 }
             };
@@ -129,12 +129,12 @@ public abstract class BiobankViewForm extends BiobankFormBase {
             CommandContributionItem edit = new CommandContributionItem(
                 new CommandContributionItemParameter(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow(),
-                    Messages.BiobankViewForm_edit_label, EDIT_COMMAND_ID, null,
+                    "Edit", EDIT_COMMAND_ID, null,
                     BiobankPlugin.getImageDescriptor(BgcPlugin.IMG_EDIT_FORM),
-                    null, null, Messages.BiobankViewForm_edit_label,
-                    Messages.BiobankViewForm_edit_label,
-                    Messages.BiobankViewForm_edit_label, SWT.NONE,
-                    Messages.BiobankViewForm_edit_label, true));
+                    null, null, "Edit",
+                    "Edit",
+                    "Edit", SWT.NONE,
+                    "Edit", true));
             form.getToolBarManager().add(edit);
         }
     }
@@ -143,12 +143,12 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         CommandContributionItem reload = new CommandContributionItem(
             new CommandContributionItemParameter(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow(),
-                Messages.BiobankViewForm_reload_label, RELOAD_COMMAND_ID, null,
+                "Reload", RELOAD_COMMAND_ID, null,
                 BiobankPlugin.getImageDescriptor(BgcPlugin.IMG_RELOAD_FORM),
-                null, null, Messages.BiobankViewForm_reload_label,
-                Messages.BiobankViewForm_reload_label,
-                Messages.BiobankViewForm_reload_label, SWT.NONE,
-                Messages.BiobankViewForm_reload_label, true));
+                null, null, "Reload",
+                "Reload",
+                "Reload", SWT.NONE,
+                "Reload", true));
         form.getToolBarManager().add(reload);
     }
 

@@ -112,10 +112,10 @@ public class SiteViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(client);
 
         nameLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, Messages.label_name);
+            createReadOnlyLabelledField(client, SWT.NONE, "Name");
         nameShortLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.label_nameShort);
+                "Name Short");
         studyCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
                 Messages.SiteViewForm_field_studyCount_label);
@@ -136,7 +136,7 @@ public class SiteViewForm extends AddressViewFormCommon {
                 Messages.SiteViewForm_field_totalSpecimen);
         activityStatusLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.label_activity);
+                "Activity status");
         setSiteSectionValues();
     }
 
@@ -192,7 +192,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient(Messages.label_comments);
+        Composite client = createSectionWithClient("Comments");
         commentTable =
             new CommentsInfoTable(client,
                 site.getCommentCollection(false));
