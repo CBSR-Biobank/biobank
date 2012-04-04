@@ -29,7 +29,7 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenWrapper extends SpecimenBaseWrapper {
-    private static final String DISPATCHS_CACHE_KEY = "dispatchs"; //$NON-NLS-1$
+    private static final String DISPATCHS_CACHE_KEY = "dispatchs"; 
     private static final SpecimenLogProvider LOG_PROVIDER =
         new SpecimenLogProvider();
 
@@ -57,7 +57,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         ApplicationException {
         checkNoDuplicates(Specimen.class, SpecimenPeer.INVENTORY_ID.getName(),
             getInventoryId(),
-            Messages.getString("SpecimenWrapper.spec.with.id.text")); //$NON-NLS-1$
+            "A specimen with inventoryId"); 
     }
 
     public String getFormattedCreatedAt() {
@@ -115,7 +115,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         }
         // TODO should never see that ? should never retrieve a Specimen which
         // site cannot be displayed ?
-        return "CANNOT DISPLAY INFORMATION"; //$NON-NLS-1$
+        return "CANNOT DISPLAY INFORMATION"; 
     }
 
     @Override
@@ -130,14 +130,13 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         ContainerWrapper parentContainer) throws Exception {
         RowColPos rcp = parentContainer.getContainerType()
             .getRowColFromPositionString(
-                positionString.replaceFirst(parentContainer.getLabel(), "")); //$NON-NLS-1$
+                positionString.replaceFirst(parentContainer.getLabel(), "")); 
         if ((rcp.getRow() > -1) && (rcp.getCol() > -1)) {
             setParent(parentContainer, rcp);
         } else {
             throw new Exception(
                 MessageFormat.format(
-                    Messages
-                        .getString("SpecimenWrapper.position.not.valid.msg"), positionString)); //$NON-NLS-1$
+                    "Position {0} not valid.", positionString)); 
         }
     }
 
@@ -157,8 +156,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             .getNameShort();
         if (addTopParentShortName && nameShort != null)
             return directParent.getLabel()
-                + getPositionStringInParent(position, directParent) + " (" //$NON-NLS-1$
-                + nameShort + ")"; //$NON-NLS-1$
+                + getPositionStringInParent(position, directParent) + " (" 
+                + nameShort + ")"; 
         return directParent.getLabel()
             + getPositionStringInParent(position, directParent);
     }
@@ -187,9 +186,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         }
     }
 
-    private static final String Specimen_QRY = "from " //$NON-NLS-1$
-        + Specimen.class.getName() + " where " //$NON-NLS-1$
-        + SpecimenPeer.INVENTORY_ID.getName() + " = ?"; //$NON-NLS-1$
+    private static final String Specimen_QRY = "from " 
+        + Specimen.class.getName() + " where " 
+        + SpecimenPeer.INVENTORY_ID.getName() + " = ?"; 
 
     /**
      * search in all Specimens list. No matter which site added it.
@@ -204,15 +203,15 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             return null;
         if (specimens.size() == 1)
             return new SpecimenWrapper(appService, specimens.get(0));
-        throw new BiobankCheckException("Error retrieving specimens: found " //$NON-NLS-1$
-            + specimens.size() + " results."); //$NON-NLS-1$
+        throw new BiobankCheckException("Error retrieving specimens: found " 
+            + specimens.size() + " results."); 
     }
 
-    private static final String SPECIMENS_NON_ACTIVE_QRY = "from " //$NON-NLS-1$
+    private static final String SPECIMENS_NON_ACTIVE_QRY = "from " 
         + Specimen.class.getName()
-        + " spec where spec." //$NON-NLS-1$
+        + " spec where spec." 
         + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
-        + " = ? and activityStatus != ?"; //$NON-NLS-1$
+        + " = ? and activityStatus != ?"; 
 
     public static List<SpecimenWrapper> getSpecimensNonActiveInCenter(
         WritableApplicationService appService, CenterWrapper<?> center)
@@ -239,7 +238,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             RowColPos rcp = null;
             try {
                 rcp = container.getContainerType().getRowColFromPositionString(
-                    positionString.replaceFirst(container.getLabel(), "")); //$NON-NLS-1$
+                    positionString.replaceFirst(container.getLabel(), "")); 
             } catch (Exception e) {
                 // Should never happen: it has been already tested in
                 // getPossibleParentsMethod
@@ -354,7 +353,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     @Deprecated
     public void setTopSpecimen(SpecimenBaseWrapper specimen) {
         throw new UnsupportedOperationException(
-            "Not allowed to directly set the top Specimen. Set the parent Specimen instead."); //$NON-NLS-1$
+            "Not allowed to directly set the top Specimen. Set the parent Specimen instead."); 
     }
 
     protected void setTopSpecimenInternal(SpecimenWrapper specimen,
@@ -472,9 +471,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
      */
     public String getCollectionInfo() {
         return getTopSpecimen().getFormattedCreatedAt()
-            + " in " //$NON-NLS-1$
+            + " in " 
             + getTopSpecimen().getOriginInfo().getCenter().getNameShort()
-            + " (visit #" + getCollectionEvent().getVisitNumber() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+            + " (visit #" + getCollectionEvent().getVisitNumber() + ")";  
     }
 
     public boolean hasUnknownImportType() {

@@ -21,8 +21,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
-    private static final String UNKNOWN_IMPORT_NAME = Messages
-        .getString("SpecimenTypeWrapper.unknow.import.label"); //$NON-NLS-1$
+    private static final String UNKNOWN_IMPORT_NAME = "Unknown / import"; 
 
     public SpecimenTypeWrapper(WritableApplicationService appService,
         SpecimenType wrappedObject) {
@@ -68,7 +67,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return new ArrayList<SpecimenTypeWrapper>(SpecimenTypes);
     }
 
-    public static final String ALL_SAMPLE_TYPES_QRY = "from " //$NON-NLS-1$
+    public static final String ALL_SAMPLE_TYPES_QRY = "from " 
         + SpecimenType.class.getName();
 
     public static List<SpecimenTypeWrapper> getAllSpecimenTypes(
@@ -86,10 +85,10 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return list;
     }
 
-    public static final String ALL_SOURCE_ONLY_SPECIMEN_TYPES_QRY = "from " //$NON-NLS-1$
-        + SpecimenType.class.getName() + " where " //$NON-NLS-1$
+    public static final String ALL_SOURCE_ONLY_SPECIMEN_TYPES_QRY = "from " 
+        + SpecimenType.class.getName() + " where " 
         + SpecimenTypePeer.PARENT_SPECIMEN_TYPES.getName()
-        + ".size = 0"; //$NON-NLS-1$
+        + ".size = 0"; 
 
     public static List<SpecimenTypeWrapper> getAllSourceOnlySpecimenTypes(
         WritableApplicationService appService, boolean sort)
@@ -123,9 +122,9 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return getName();
     }
 
-    private static final String IS_USED_QRY_START = "select count(x) from "; //$NON-NLS-1$
+    private static final String IS_USED_QRY_START = "select count(x) from "; 
     private static final String IS_USED_QRY_END =
-        " as x where x.specimenType.id=?"; //$NON-NLS-1$
+        " as x where x.specimenType.id=?"; 
     private static final Class<?>[] isUsedCheckClasses = new Class[] {
         Specimen.class, SourceSpecimen.class, AliquotedSpecimen.class };
 
@@ -163,11 +162,10 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         BiobankException {
         checkNoDuplicates(SpecimenType.class, SpecimenTypePeer.NAME.getName(),
             getName(),
-            Messages.getString("SpecimenTypeWrapper.specimen.with.name.text")); //$NON-NLS-1$
+            "A specimen type with name"); 
         checkNoDuplicates(SpecimenType.class,
             SpecimenTypePeer.NAME_SHORT.getName(), getNameShort(),
-            Messages
-                .getString("SpecimenTypeWrapper.specimen.with.name.short.text")); //$NON-NLS-1$
+            "A specimen type with name short"); 
     }
 
     public boolean isUnknownImport() {

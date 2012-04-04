@@ -79,7 +79,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         DispatchState state = DispatchState
             .getState(getProperty(DispatchPeer.STATE));
         if (state == null)
-            return ""; //$NON-NLS-1$
+            return ""; 
         return state.getLabel();
     }
 
@@ -194,8 +194,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             } else
                 throw new BiobankCheckException(
                     MessageFormat.format(
-                        Messages
-                            .getString("DispatchWrapper.specimen.add.sender.error.msg"), //$NON-NLS-1$
+                        "Specimen {0} does not belong to this sender.", 
                         specimen.getInventoryId()));
         }
         addToDispatchSpecimenCollection(newDispatchSpecimens);
@@ -301,11 +300,11 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(getSenderCenter() == null ? "" : getSenderCenter() //$NON-NLS-1$
-            .getNameShort() + "/"); //$NON-NLS-1$
-        sb.append(getReceiverCenter() == null ? "" : getReceiverCenter() //$NON-NLS-1$
-            .getNameShort() + "/"); //$NON-NLS-1$
-        sb.append(getShipmentInfo() == null ? "" : getShipmentInfo() //$NON-NLS-1$
+        sb.append(getSenderCenter() == null ? "" : getSenderCenter() 
+            .getNameShort() + "/"); 
+        sb.append(getReceiverCenter() == null ? "" : getReceiverCenter() 
+            .getNameShort() + "/"); 
+        sb.append(getShipmentInfo() == null ? "" : getShipmentInfo() 
             .getFormattedDateReceived());
         return sb.toString();
     }
@@ -352,21 +351,21 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     @SuppressWarnings("unused")
-    private static final String FAST_DISPATCH_SPECIMEN_QRY = "select ra from " //$NON-NLS-1$
+    private static final String FAST_DISPATCH_SPECIMEN_QRY = "select ra from " 
         + DispatchSpecimen.class.getName()
-        + " ra inner join fetch ra." //$NON-NLS-1$
+        + " ra inner join fetch ra." 
         + DispatchSpecimenPeer.SPECIMEN.getName()
-        + " as spec inner join fetch spec." //$NON-NLS-1$
+        + " as spec inner join fetch spec." 
         + SpecimenPeer.SPECIMEN_TYPE.getName()
-        + " inner join fetch spec." //$NON-NLS-1$
+        + " inner join fetch spec." 
         + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevent inner join fetch cevent." //$NON-NLS-1$
+        + " as cevent inner join fetch cevent." 
         + CollectionEventPeer.PATIENT.getName()
-        + " inner join fetch spec." //$NON-NLS-1$
+        + " inner join fetch spec." 
         + SpecimenPeer.ACTIVITY_STATUS.getName()
-        + " where ra." //$NON-NLS-1$
+        + " where ra." 
         + Property.concatNames(DispatchSpecimenPeer.DISPATCH, DispatchPeer.ID)
-        + " = ?"; //$NON-NLS-1$
+        + " = ?"; 
 
     public boolean canBeClosedBy(UserWrapper user) {
         return isInReceivedState()
@@ -390,9 +389,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return LOG_PROVIDER;
     }
 
-    private static final String DISPATCH_HQL_STRING = "from " //$NON-NLS-1$
-        + Dispatch.class.getName() + " as d inner join fetch d." //$NON-NLS-1$
-        + DispatchPeer.SHIPMENT_INFO.getName() + " as s "; //$NON-NLS-1$
+    private static final String DISPATCH_HQL_STRING = "from " 
+        + Dispatch.class.getName() + " as d inner join fetch d." 
+        + DispatchPeer.SHIPMENT_INFO.getName() + " as s "; 
 
     /**
      * Search for shipments in the site with the given waybill
@@ -400,8 +399,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     public static List<DispatchWrapper> getDispatchesByWaybill(
         WritableApplicationService appService, String waybill)
         throws ApplicationException {
-        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING + " where s." //$NON-NLS-1$
-            + ShipmentInfoPeer.WAYBILL.getName() + " = ?"); //$NON-NLS-1$
+        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING + " where s." 
+            + ShipmentInfoPeer.WAYBILL.getName() + " = ?"); 
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             Arrays.asList(new Object[] { waybill }));
 
@@ -414,15 +413,15 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private static final String DISPATCHES_BY_DATE_RECEIVED_QRY =
         DISPATCH_HQL_STRING
-            + " where s." //$NON-NLS-1$
+            + " where s." 
             + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + " >=? and s." //$NON-NLS-1$
+            + " >=? and s." 
             + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + " <? and (d." //$NON-NLS-1$
+            + " <? and (d." 
             + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
-            + "= ? or d." //$NON-NLS-1$
+            + "= ? or d." 
             + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-            + " = ?)"; //$NON-NLS-1$
+            + " = ?)"; 
 
     /**
      * Search for shipments in the site with the given date received. Don't use
@@ -447,15 +446,15 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private static final String DISPATCHED_BY_DATE_SENT_QRY =
         DISPATCH_HQL_STRING
-            + " where s." //$NON-NLS-1$
+            + " where s." 
             + ShipmentInfoPeer.PACKED_AT.getName()
-            + " >= ? and s." //$NON-NLS-1$
+            + " >= ? and s." 
             + ShipmentInfoPeer.PACKED_AT.getName()
-            + " < ? and (d." //$NON-NLS-1$
+            + " < ? and (d." 
             + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
-            + "= ? or d." //$NON-NLS-1$
+            + "= ? or d." 
             + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-            + " = ?)"; //$NON-NLS-1$
+            + " = ?)"; 
 
     public static List<DispatchWrapper> getDispatchesByDateSent(
         WritableApplicationService appService, Date dateSent,
