@@ -44,6 +44,8 @@ public class Messages extends NLS {
     public static String SessionAdapter_current_session_label;
     public static String SessionAdapter_load_error_title;
     public static String SessionAdapter_logout_label;
+    public static String SiteAdapter_0;
+    public static String SiteAdapter_1;
     public static String SiteAdapter_delete_confirm_msg;
     public static String SiteAdapter_site_label;
     public static String SiteAdapter_tooltip_label;

@@ -112,7 +112,6 @@ public abstract class AbstractViewWithAdapterTree extends
 
     @Override
     public void createPartControl(Composite parent) {
-        getSite().setSelectionProvider(getTreeViewer());
         getSite().getWorkbenchWindow().getSelectionService()
             .addSelectionListener(new ISelectionListener() {
                 @Override

@@ -110,6 +110,7 @@ public class CollectionView extends AbstractAdministrationView {
         }
         if (nodeRes.size() > 0) {
             if (doubleClick) {
+                setSelectedNode(nodeRes.get(0));
                 nodeRes.get(0).performDoubleClick();
             }
         }
