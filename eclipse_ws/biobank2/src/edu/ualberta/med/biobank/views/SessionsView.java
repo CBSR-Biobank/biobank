@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
  */
 public class SessionsView extends AbstractViewWithAdapterTree {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.SessionsView"; //$NON-NLS-1$
+    public static final String ID = "edu.ualberta.med.biobank.views.SessionsView"; 
 
     public SessionsView() {
         SessionManager.getInstance().setSessionsView(this);
@@ -43,9 +43,9 @@ public class SessionsView extends AbstractViewWithAdapterTree {
             session.rebuild();
         }
         if (SessionManager.isSuperAdminMode())
-            setPartName(Messages.SessionsView_admin_title);
+            setPartName("Administration");
         else
-            setPartName(Messages.SessionsView_center_admin_title);
+            setPartName("Center Administration");
     }
 
     @Override

@@ -31,7 +31,7 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public enum SearchType {
-    INVENTORY_ID(Messages.SearchType_inventoryid_label) {
+    INVENTORY_ID("Inventory ID") {
         @Override
         public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -44,7 +44,7 @@ public enum SearchType {
 
     },
 
-    SPECIMEN_POSITION(Messages.SearchType_position_spec_label) {
+    SPECIMEN_POSITION("Specimen position") {
         @Override
         public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -59,7 +59,7 @@ public enum SearchType {
         }
     },
 
-    CONTAINER_LABEL(Messages.SearchType_label_cont_label) {
+    CONTAINER_LABEL("Container label") {
         @Override
         public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -80,7 +80,7 @@ public enum SearchType {
         }
     },
 
-    CONTAINER_PRODUCT_BARCODE(Messages.SearchType_barcode_cont_label) {
+    CONTAINER_PRODUCT_BARCODE("Container product barcode") {
         @Override
         public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -101,7 +101,7 @@ public enum SearchType {
         }
     },
 
-    WORKSHEET(Messages.SearchType_worksheet_label) {
+    WORKSHEET("Worksheet") {
         @Override
         public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -116,7 +116,7 @@ public enum SearchType {
         public void processResults(List<ModelWrapper<?>> res) {
             Assert.isNotNull(res);
             FormInput input = new FormInput(res,
-                Messages.SearchType_pEvent_list_title);
+                "Processing Events List");
             try {
                 PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                     .getActivePage()
@@ -130,7 +130,7 @@ public enum SearchType {
     };
 
     private static final String CAN_T_OPEN_FORM_WITH_ID_MSG =
-        "Can''t open form with id {0}"; //$NON-NLS-1$
+        "Can''t open form with id {0}"; 
 
     private static BgcLogger logger = BgcLogger.getLogger(SearchType.class
         .getName());
@@ -157,8 +157,8 @@ public enum SearchType {
         } else {
             boolean open = MessageDialog.openQuestion(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(),
-                Messages.SearchType_question_title,
-                NLS.bind(Messages.SearchType_question_msg, size));
+                "Search Result",
+                NLS.bind("Found {0} results. Do you want to open all of them?", size));
             if (open) {
                 for (ModelWrapper<?> wrapper : res) {
                     openResult(wrapper);

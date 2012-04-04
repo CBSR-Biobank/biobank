@@ -53,7 +53,7 @@ public abstract class AbstractTodaySearchAdministrationView extends
         } catch (Exception e) {
             BgcPlugin
                 .openAsyncError(
-                    Messages.AbstractTodaySearchAdministrationView_search_error_title,
+                    "Search error",
                     e);
         }
     }

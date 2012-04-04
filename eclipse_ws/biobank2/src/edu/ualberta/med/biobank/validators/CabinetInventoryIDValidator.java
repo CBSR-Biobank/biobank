@@ -10,21 +10,21 @@ import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 
 public class CabinetInventoryIDValidator extends AbstractValidator {
 
-    private static final Pattern PATTERN = Pattern.compile("^[a-zA-Z]{6}$"); //$NON-NLS-1$
+    private static final Pattern PATTERN = Pattern.compile("^[a-zA-Z]{6}$"); 
 
-    private static final Pattern PATTERN2 = Pattern.compile("^C[a-zA-Z]{4}$"); //$NON-NLS-1$
+    private static final Pattern PATTERN2 = Pattern.compile("^C[a-zA-Z]{4}$"); 
 
     private boolean manageOldInventoryIDs = false;
 
     public CabinetInventoryIDValidator() {
-        super(Messages.CabinetInventoryIDValidator_error_msg);
+        super("Enter Inventory ID (6 letters for new samples, 4 allowed for old samples)");
     }
 
     @Override
     public IStatus validate(Object value) {
         if (!(value instanceof String)) {
             throw new RuntimeException(
-                Messages.CabinetInventoryIDValidator_nonstring_error_msg);
+                "Not supposed to be called for non-strings.");
         }
 
         String v = (String) value;

@@ -98,7 +98,7 @@ public abstract class AbstractViewWithAdapterTree extends
                 } catch (PartInitException pie) {
                     logger
                         .error(
-                            Messages.AbstractViewWithAdapterTree_view_activate_error_title,
+                            "Error activating the view",
                             pie);
                 }
             }

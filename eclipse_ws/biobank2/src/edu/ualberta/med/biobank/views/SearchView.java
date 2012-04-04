@@ -29,7 +29,7 @@ import edu.ualberta.med.biobank.utils.SearchType;
 
 public class SearchView extends ViewPart {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.SearchView"; //$NON-NLS-1$
+    public static final String ID = "edu.ualberta.med.biobank.views.SearchView"; 
 
     private BgcBaseText searchText;
     private ComboViewer searchTypeCombo;
@@ -99,7 +99,7 @@ public class SearchView extends ViewPart {
         });
 
         searchButton = new Button(parent, SWT.PUSH);
-        searchButton.setText(Messages.SearchView_search_label);
+        searchButton.setText("Search");
         searchButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -144,12 +144,12 @@ public class SearchView extends ViewPart {
                         type.processResults(res);
                     } else {
                         BgcPlugin.openInformation(
-                            Messages.SearchView_noresult_dialog_title,
-                            Messages.SearchView_noresult__dialog_msg);
+                            "Search Result",
+                            "no result");
                     }
                 } catch (Exception ex) {
                     BgcPlugin.openAsyncError(
-                        Messages.SearchView_search_error_title, ex);
+                        "Search error", ex);
                 }
             }
         });

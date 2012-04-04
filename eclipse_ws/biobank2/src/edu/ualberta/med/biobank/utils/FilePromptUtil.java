@@ -19,8 +19,8 @@ public class FilePromptUtil {
     public static boolean isWritableDir(File dir) {
         if (!dir.exists()) {
             boolean createPath = BgcPlugin.openConfirm(
-                Messages.FilePromptUtil_create_path_title, MessageFormat
-                    .format(Messages.FilePromptUtil_create_path_msg, dir));
+                "Create Path", MessageFormat
+                    .format("Path {0} does not exist. Would you like to create it?", dir));
 
             if (!createPath) {
                 return false;
@@ -28,25 +28,25 @@ public class FilePromptUtil {
 
             if (!dir.mkdirs()) {
                 BgcPlugin.openAsyncError(
-                    Messages.FilePromptUtil_create_path_error_title,
+                    "Error Creating Path",
                     MessageFormat.format(
-                        Messages.FilePromptUtil_create_pathe_error_msg, dir));
+                        "An error occurred. Could not create path {0}.", dir));
                 return false;
             }
         }
 
         if (!dir.isDirectory()) {
             BgcPlugin.openAsyncError(
-                Messages.FilePromptUtil_create_path_error_title, MessageFormat
-                    .format(Messages.FilePromptUtil_path_directory_error_msg,
+                "Error Creating Path", MessageFormat
+                    .format("An error occurred. The path {0} is not a directory.",
                         dir));
             return false;
         }
 
         if (!dir.canWrite()) {
-            BgcPlugin.openAsyncError(Messages.FilePromptUtil_path_error_title,
+            BgcPlugin.openAsyncError("Path Error",
                 MessageFormat.format(
-                    Messages.FilePromptUtil_path_write_error_msg, dir));
+                    "An error occurred. Unable to write to path {0}.", dir));
             return false;
         }
 

@@ -24,7 +24,7 @@ public class ReportsView extends ViewPart {
         .getName());
 
     public static final String ID =
-        "edu.ualberta.med.biobank.views.ReportsView"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.views.ReportsView"; 
 
     public static ReportsView currentInstance;
 
@@ -70,60 +70,60 @@ public class ReportsView extends ViewPart {
 
         // Specimens
         specimenTab = new CTabItem(top, SWT.NONE);
-        specimenTab.setText(Messages.ReportsView_specimens_tab_label);
+        specimenTab.setText("Specimens");
         Composite specimenBody = new Composite(top, SWT.NONE);
         specimenBody.setLayout(treeLayout);
         specimenBody.setLayoutData(treeGd);
         specimenTab.setControl(specimenBody);
         specimenTree = new ReportTreeWidget(specimenBody);
-        AbstractReportTreeNode specimenRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        AbstractReportTreeNode specimenRoot = new AbstractReportTreeNode(""); 
         specimenTree.setLayoutData(treeGd);
 
         top.setSelection(specimenTab);
 
         // Clinics
         clinicTab = new CTabItem(top, SWT.NONE);
-        clinicTab.setText(Messages.ReportsView_clinics_tab_label);
+        clinicTab.setText("Clinics");
         Composite clinicBody = new Composite(top, SWT.NONE);
         clinicBody.setLayout(treeLayout);
         clinicBody.setLayoutData(treeGd);
         clinicTab.setControl(clinicBody);
         clinicTree = new ReportTreeWidget(clinicBody);
-        AbstractReportTreeNode clinicRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        AbstractReportTreeNode clinicRoot = new AbstractReportTreeNode(""); 
         clinicTree.setLayoutData(treeGd);
 
         // Patients
         patientTab = new CTabItem(top, SWT.NONE);
-        patientTab.setText(Messages.ReportsView_patients_tab_label);
+        patientTab.setText("Patients");
         Composite patientBody = new Composite(top, SWT.NONE);
         patientBody.setLayout(treeLayout);
         patientBody.setLayoutData(treeGd);
         patientTab.setControl(patientBody);
         patientTree = new ReportTreeWidget(patientBody);
-        AbstractReportTreeNode patientRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        AbstractReportTreeNode patientRoot = new AbstractReportTreeNode(""); 
         patientTree.setLayoutData(treeGd);
 
         // Specimen Types
         specimenTypeTab = new CTabItem(top, SWT.NONE);
-        specimenTypeTab.setText(Messages.ReportsView_specTypes_tab_label);
+        specimenTypeTab.setText("Specimen Types");
         Composite specimenTypeBody = new Composite(top, SWT.NONE);
         specimenTypeBody.setLayout(treeLayout);
         specimenTypeBody.setLayoutData(treeGd);
         specimenTypeTab.setControl(specimenTypeBody);
         specimenTypeTree = new ReportTreeWidget(specimenTypeBody);
         AbstractReportTreeNode specimenTypeRoot =
-            new AbstractReportTreeNode(""); //$NON-NLS-1$
+            new AbstractReportTreeNode(""); 
         specimenTypeTree.setLayoutData(treeGd);
 
         // Containers
         containerTab = new CTabItem(top, SWT.NONE);
-        containerTab.setText(Messages.ReportsView_containers_tab_label);
+        containerTab.setText("Containers");
         Composite containerBody = new Composite(top, SWT.NONE);
         containerBody.setLayout(treeLayout);
         containerBody.setLayoutData(treeGd);
         containerTab.setControl(containerBody);
         containerTree = new ReportTreeWidget(containerBody);
-        AbstractReportTreeNode containerRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        AbstractReportTreeNode containerRoot = new AbstractReportTreeNode(""); 
         containerTree.setLayoutData(treeGd);
 
         initializeNewReports(specimenRoot, clinicRoot, patientRoot,
@@ -187,7 +187,7 @@ public class ReportsView extends ViewPart {
             child.setParent(containers);
             break;
         default:
-            throw new Exception(NLS.bind("Unable to place report node: {0}", //$NON-NLS-1$
+            throw new Exception(NLS.bind("Unable to place report node: {0}", 
                 child.getLabel()));
         }
     }
