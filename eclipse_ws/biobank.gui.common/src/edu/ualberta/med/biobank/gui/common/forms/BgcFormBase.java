@@ -101,10 +101,10 @@ public abstract class BgcFormBase extends EditorPart implements
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (ActionException e) {
-            BgcPlugin.openAsyncError(Messages.BgcFormBase_action_error, e);
+            BgcPlugin.openAsyncError("Action Failed", e);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.BgcFormBase_generic_error, e);
-            logger.error("BgcFormBase.createPartControl Error", e); //$NON-NLS-1$
+            BgcPlugin.openAsyncError("Exception in form initialization", e);
+            logger.error("BgcFormBase.createPartControl Error", e); 
         }
         getSite().setSelectionProvider(this);
     }
@@ -151,8 +151,8 @@ public abstract class BgcFormBase extends EditorPart implements
         book.setLayout(new GridLayout());
         book.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
             true));
-        page = book.createPage("page"); //$NON-NLS-1$
-        book.showPage("page"); //$NON-NLS-1$
+        page = book.createPage("page"); 
+        book.showPage("page"); 
 
         // start a new runnable so that database objects are populated in a
         // separate thread.
@@ -167,7 +167,7 @@ public abstract class BgcFormBase extends EditorPart implements
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
                     BgcPlugin.openError(
-                        "BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$
+                        "BioBankFormBase.createPartControl Error", e); 
                 }
             }
         });
@@ -279,7 +279,7 @@ public abstract class BgcFormBase extends EditorPart implements
     public static void setTextValue(BgcBaseText label, String value) {
         if ((label != null) && !label.isDisposed()) {
             if (value == null)
-                value = ""; //$NON-NLS-1$
+                value = ""; 
             label.setText(value);
         }
     }
@@ -477,9 +477,9 @@ public abstract class BgcFormBase extends EditorPart implements
             init();
             setValues();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.BgcFormBase_reload_error,
-                Messages.BgcFormBase_message);
-            logger.error("Can't reload the form", e); //$NON-NLS-1$
+            BgcPlugin.openAsyncError("Error",
+                "Unable to reload form.");
+            logger.error("Can't reload the form", e); 
         }
     }
 

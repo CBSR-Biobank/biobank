@@ -33,7 +33,7 @@ public class BgcBaseText extends BgcBaseWidget {
         if (toolkit == null) {
             this.text = new Text(this, style | SWT.BORDER);
         } else {
-            this.text = toolkit.createText(this, "", style | SWT.BORDER); //$NON-NLS-1$
+            this.text = toolkit.createText(this, "", style | SWT.BORDER); 
         }
         this.text.addFocusListener(getFocusListener());
         this.text.addMouseListener(getMouseListener());

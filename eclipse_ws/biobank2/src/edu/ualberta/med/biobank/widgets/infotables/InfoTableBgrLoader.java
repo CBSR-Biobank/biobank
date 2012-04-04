@@ -116,7 +116,7 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
                 });
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
-                    Messages.AbstractInfoTableWidget_load_error_title, e);
+                    "Cannot Load Table Data", e);
             }
         }
     }

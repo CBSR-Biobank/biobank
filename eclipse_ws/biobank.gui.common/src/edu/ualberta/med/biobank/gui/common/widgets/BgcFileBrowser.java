@@ -33,20 +33,20 @@ public class BgcFileBrowser extends BgcBaseWidget {
         setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
         setLayout(new GridLayout(3, false));
         Label l = new Label(this, SWT.NONE);
-        l.setText(label + ":"); //$NON-NLS-1$
+        l.setText(label + ":"); 
         textfield = new BgcBaseText(this, SWT.NONE);
         textfield.setEditable(false);
         textfield.setLayoutData(new GridData(GridData.FILL, GridData.FILL,
             true, false));
 
         browse = new Button(this, style);
-        browse.setText(Messages.BgcFileBrowser_browse);
+        browse.setText("Browse");
         browse.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 fileDialog = new FileDialog(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getShell(), SWT.OPEN);
-                fileDialog.setText(Messages.BgcFileBrowser_open);
+                fileDialog.setText("Open");
                 fileDialog.setFilterExtensions(filterExtensions);
                 final String path = fileDialog.open();
                 if (path != null) {
@@ -71,7 +71,7 @@ public class BgcFileBrowser extends BgcBaseWidget {
     }
 
     public void reset() {
-        textfield.setText(""); //$NON-NLS-1$
+        textfield.setText(""); 
     }
 
     public FileDialog getFileDialog() {

@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.Status;
  */
 public class EmailValidator extends AbstractValidator {
 
-    public static final String EMAIL_PATTERN = ".+@.+\\..+"; //$NON-NLS-1$
+    public static final String EMAIL_PATTERN = ".+@.+\\..+"; 
 
     public EmailValidator(String message) {
         super(message);
@@ -23,7 +23,7 @@ public class EmailValidator extends AbstractValidator {
     public IStatus validate(Object value) {
         if ((value != null) && !(value instanceof String))
             throw new RuntimeException(
-                Messages.NonEmptyStringValidator_non_string_error);
+                "Not supposed to be called for non-strings.");
         String email = (String) value;
         if ((value == null) || (email.length() == 0)
             || Pattern.matches(EMAIL_PATTERN, email)) {

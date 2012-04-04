@@ -55,7 +55,7 @@ public class PaginationWidget extends Composite {
         firstButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_FIRST));
         firstButton
-            .setToolTipText(Messages.AbstractInfoTableWidget_first_label);
+            .setToolTipText("First Page");
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -67,7 +67,7 @@ public class PaginationWidget extends Composite {
         prevButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_PREV));
         prevButton
-            .setToolTipText(Messages.AbstractInfoTableWidget_previous_label);
+            .setToolTipText("Previous Page");
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -80,7 +80,7 @@ public class PaginationWidget extends Composite {
         nextButton = new Button(this, SWT.NONE);
         nextButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_NEXT));
-        nextButton.setToolTipText(Messages.AbstractInfoTableWidget_next_label);
+        nextButton.setToolTipText("Next page");
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -91,7 +91,7 @@ public class PaginationWidget extends Composite {
         lastButton = new Button(this, SWT.NONE);
         lastButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_LAST));
-        lastButton.setToolTipText(Messages.AbstractInfoTableWidget_last_label);
+        lastButton.setToolTipText("Last Page");
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -215,10 +215,10 @@ public class PaginationWidget extends Composite {
     public void setPageLabelText() {
         if (pageInfo.pageTotal == TOTAL_PAGES_UNKNOWN) {
             pageLabel.setText(NLS.bind(
-                Messages.PaginationWidget_page_counter_unknown_total,
+                "Page: {0} of ?",
                 pageInfo.page + 1));
         } else {
-            pageLabel.setText(NLS.bind(Messages.PaginationWidget_page_counter,
+            pageLabel.setText(NLS.bind("Page: {0} of {1}",
                 pageInfo.page + 1, +pageInfo.pageTotal));
         }
     }

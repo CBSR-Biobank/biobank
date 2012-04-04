@@ -17,7 +17,7 @@ public abstract class TableFilter<T> {
 
     public TableFilter(Composite parent) {
         Label label = new Label(parent, SWT.NONE);
-        label.setText(Messages.TableFilter_filterText_label);
+        label.setText("Enter text to filter the list:");
         filterText = new Text(parent, SWT.BORDER);
         GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
         filterText.setLayoutData(gd);

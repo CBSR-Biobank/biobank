@@ -202,7 +202,7 @@ public abstract class BgcDialogWithPages extends BgcBaseDialog {
             public String getText(Object element) {
                 if ((element != null) && (element instanceof BgcDialogPage))
                     return ((BgcDialogPage) element).getTitle();
-                return ""; //$NON-NLS-1$
+                return ""; 
             }
         });
         listViewer.setInput(getPages());

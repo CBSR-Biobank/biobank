@@ -26,7 +26,7 @@ public class BgcClipboard {
         Menu menu, final BgcLabelProvider labelProvider, final int numCols) {
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.BgcClipboard_copy);
+        item.setText("Copy");
         item.addSelectionListener(new SelectionAdapter() {
             @SuppressWarnings("unchecked")
             @Override
@@ -43,7 +43,7 @@ public class BgcClipboard {
                         if (text != null) {
                             row.add(text);
                         } else {
-                            row.add(""); //$NON-NLS-1$
+                            row.add(""); 
                         }
                     }
                     selectedRows.add(StringUtils.join(row, '\t'));
@@ -52,7 +52,7 @@ public class BgcClipboard {
                     StringBuilder sb = new StringBuilder();
                     for (Object row : selectedRows) {
                         if (sb.length() != 0) {
-                            sb.append(System.getProperty("line.separator")); //$NON-NLS-1$
+                            sb.append(System.getProperty("line.separator")); 
                         }
                         sb.append(row.toString());
                     }

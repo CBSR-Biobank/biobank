@@ -65,7 +65,7 @@ public class BgcEntryFormActions {
         confirmAction.setActionDefinitionId(commandId);
         confirmAction.setImageDescriptor(confirmActionImage);
         confirmAction
-            .setToolTipText(Messages.BgcEntryFormActions_confirm_tooltip);
+            .setToolTipText("Confirm");
         entryForm.getScrolledForm().getToolBarManager().add(confirmAction);
     }
 
@@ -77,12 +77,12 @@ public class BgcEntryFormActions {
             new CommandContributionItem(
                 new CommandContributionItemParameter(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow(),
-                    Messages.BgcEntryFormActions_reset_label, commandId, null,
+                    "Reset", commandId, null,
                     reloadActionImage, null, null,
-                    Messages.BgcEntryFormActions_reset_label,
-                    Messages.BgcEntryFormActions_reset_label,
-                    Messages.BgcEntryFormActions_reset_label,
-                    SWT.NONE, Messages.BgcEntryFormActions_reset_label, true));
+                    "Reset",
+                    "Reset",
+                    "Reset",
+                    SWT.NONE, "Reset", true));
         entryForm.getScrolledForm().getToolBarManager().add(reset);
     }
 
@@ -94,12 +94,12 @@ public class BgcEntryFormActions {
             new CommandContributionItem(
                 new CommandContributionItemParameter(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow(),
-                    Messages.BgcEntryFormActions_cancel_label, commandId, null,
+                    "Cancel", commandId, null,
                     cancelActionImage, null, null,
-                    Messages.BgcEntryFormActions_cancel_label,
-                    Messages.BgcEntryFormActions_cancel_label,
-                    Messages.BgcEntryFormActions_cancel_label,
-                    SWT.NONE, Messages.BgcEntryFormActions_cancel_label, true));
+                    "Cancel",
+                    "Cancel",
+                    "Cancel",
+                    SWT.NONE, "Cancel", true));
         entryForm.getScrolledForm().getToolBarManager().add(cancel);
     }
 
@@ -107,7 +107,7 @@ public class BgcEntryFormActions {
         if (printAction != null)
             return;
 
-        Action action = new Action(Messages.BgcEntryFormActions_print_label) {
+        Action action = new Action("Print") {
             @Override
             public void run() {
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
@@ -117,7 +117,7 @@ public class BgcEntryFormActions {
                             entryForm.print();
                         } catch (Exception ex) {
                             BgcPlugin.openAsyncError(
-                                Messages.BgcEntryFormActions_print_error_msg,
+                                "Error printing.",
                                 ex);
                         }
                     }
