@@ -133,27 +133,23 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
         String value = scanCell.getValue();
         if (value == null) { // no specimen scanned
             scanCell.setStatus(CellInfoStatus.MISSING);
-            scanCell.setInformation(MessageFormat.format(Messages.getString(
-                "ScanAssign.scanStatus.specimen.missing", locale), //$NON-NLS-1$
+            scanCell.setInformation(MessageFormat.format("Specimen {0} missing", 
                 expectedSpecimen.getInventoryId()));
-            scanCell.setTitle("?"); //$NON-NLS-1$
+            scanCell.setTitle("?"); 
         } else {
             Specimen foundSpecimen = searchSpecimen(session, value);
             if (foundSpecimen == null) {
                 // not in database
                 scanCell.setStatus(CellInfoStatus.ERROR);
-                scanCell.setInformation(Messages.getString(
-                    "DispatchProcess.scanStatus.specimen.notfound", locale)); //$NON-NLS-1$
+                scanCell.setInformation("Specimen does not exist."); 
             } else {
                 if (expectedSpecimen != null
                     && !foundSpecimen.equals(expectedSpecimen)) {
                     // Position taken
                     scanCell.setStatus(CellInfoStatus.ERROR);
                     scanCell
-                        .setInformation(Messages
-                            .getString(
-                                "ScanAssign.scanStatus.specimen.positionTakenError", locale)); //$NON-NLS-1$
-                    scanCell.setTitle("!"); //$NON-NLS-1$
+                        .setInformation("Specimen different from the one registered at this position"); 
+                    scanCell.setTitle("!"); 
                 } else {
                     scanCell.setSpecimenId(foundSpecimen.getId());
                     if (expectedSpecimen != null
@@ -166,9 +162,7 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
                         scanCell.setTitle(foundSpecimen.getCollectionEvent()
                             .getPatient().getPnumber());
                         scanCell
-                            .setInformation(Messages
-                                .getString(
-                                    "DispatchProcess.create.specimen.anotherPallet", locale)); //$NON-NLS-1$
+                            .setInformation("This specimen should be on another pallet"); 
                     }
                 }
             }
@@ -189,16 +183,14 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
         Center sender, boolean checkAlreadyAdded) {
         if (specimen.getId() == null) {
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(""); //$NON-NLS-1$
+            cell.setInformation(""); 
         } else if (specimen.getActivityStatus() != ActivityStatus.ACTIVE) {
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(MessageFormat.format(Messages.getString(
-                "DispatchProcess.create.specimen.status", locale), //$NON-NLS-1$
+            cell.setInformation(MessageFormat.format("Activity status of {0} is not ''Active''. Check comments on this specimen for more information.", 
                 specimen.getInventoryId()));
         } else if (!specimen.getCurrentCenter().equals(sender)) {
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(MessageFormat.format(Messages.getString(
-                "DispatchProcess.create.specimen.currentCenter", locale), //$NON-NLS-1$
+            cell.setInformation(MessageFormat.format("Specimen {0} is currently assigned to center {1}. It should first be sent to center {2}.", 
                 specimen.getInventoryId(), specimen.getCurrentCenter()
                     .getNameShort(), sender.getNameShort()));
         } else {
@@ -208,16 +200,13 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
                 && currentSpecimenIds.get(specimen.getId()) != null;
             if (checkAlreadyAdded && alreadyInShipment) {
                 cell.setStatus(CellInfoStatus.ERROR);
-                cell.setInformation(MessageFormat.format(Messages.getString(
-                    "DispatchProcess.create.specimen.alreadyAdded", locale), //$NON-NLS-1$
+                cell.setInformation(MessageFormat.format("{0} is already in this dispatch.", 
                     specimen.getInventoryId()));
             } else if (new SpecimenIsUsedInDispatchAction(specimen.getId())
                 .run(actionContext).isTrue()) {
                 cell.setStatus(CellInfoStatus.ERROR);
                 cell.setInformation(MessageFormat.format(
-                    Messages
-                        .getString(
-                            "DispatchProcess.create.specimen.inNotClosedDispatch", locale), //$NON-NLS-1$
+                    "{0} is already in a not closed dispatch.", 
                     specimen.getInventoryId()));
             } else {
                 if (alreadyInShipment)

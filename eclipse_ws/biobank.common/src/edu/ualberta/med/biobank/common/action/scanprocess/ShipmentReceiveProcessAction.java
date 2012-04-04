@@ -106,10 +106,9 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
         if (foundSpecimen == null) {
             // not in db
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(MessageFormat.format(Messages.getString(
-                "DispatchReceiveScanDialog.cell.notInDb.msg", locale), cell //$NON-NLS-1$
+            cell.setInformation(MessageFormat.format("Specimen {0} not found in database", cell 
                 .getValue()));
-            cell.setTitle("!"); //$NON-NLS-1$
+            cell.setTitle("!"); 
         } else {
             ItemState state = data
                 .getCurrentDispatchSpecimenIds().get(foundSpecimen.getId());
@@ -117,8 +116,7 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
                 // not in the shipment
                 updateCellWithSpecimen(cell, foundSpecimen);
                 cell.setStatus(CellInfoStatus.EXTRA);
-                cell.setInformation(Messages.getString(
-                    "DispatchReceiveScanDialog.cell.notInShipment.msg", locale)); //$NON-NLS-1$
+                cell.setInformation("Specimen should not be in shipment"); 
             } else {
                 if (DispatchSpecimenState.RECEIVED == state) {
                     updateCellWithSpecimen(cell, foundSpecimen);
