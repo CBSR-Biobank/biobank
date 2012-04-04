@@ -2,8 +2,6 @@ package edu.ualberta.med.biobank.mvp.view;
 
 import org.eclipse.swt.widgets.Composite;
 
-
-import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.item.TextBox;
@@ -65,28 +63,22 @@ public class AddressEntryView extends AbstractView implements
     protected void onCreate(Composite parent) {
         table = new InputTable(parent);
 
-        street1.setValidationControl(
-            table.addLabel(Messages.AddressEntryFormCommon_street1_label));
+        street1.setValidationControl(table.addLabel("Street 1"));
         street1.setText(table.addText());
 
-        street2.setValidationControl(
-            table.addLabel(Messages.AddressEntryFormCommon_street2_label));
+        street2.setValidationControl(table.addLabel("Street 1"));
         street2.setText(table.addText());
 
-        city.setValidationControl(table
-            .addLabel(Messages.AddressEntryFormCommon_city_label));
+        city.setValidationControl(table.addLabel("City"));
         city.setText(table.addText());
 
-        province.setValidationControl(table
-            .addLabel(Messages.AddressEntryFormCommon_province_label));
+        province.setValidationControl(table.addLabel("Province"));
         province.setText(table.addText());
 
-        postalCode.setValidationControl(table
-            .addLabel(Messages.AddressEntryFormCommon_postalCode_label));
+        postalCode.setValidationControl(table.addLabel("Postal Code"));
         postalCode.setText(table.addText());
 
-        country.setValidationControl(table
-            .addLabel(Messages.AddressEntryFormCommon_country_label));
+        country.setValidationControl(table.addLabel("Country"));
         country.setText(table.addText());
     }
 }

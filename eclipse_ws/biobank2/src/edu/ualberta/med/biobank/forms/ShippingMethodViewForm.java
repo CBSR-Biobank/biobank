@@ -18,17 +18,17 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ShippingMethodViewForm extends BiobankFormBase {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ShippingMethodViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.ShippingMethodViewForm"; 
 
     public static final String OK_MESSAGE =
-        Messages.ShippingMethodViewForm_ok_msg;
+        "Add or edit a shipping method";
 
     private ShippingMethodEntryInfoTable statusWidget;
     private List<ShippingMethodWrapper> globalShippingMethods;
 
     @Override
     public void init() throws Exception {
-        setPartName(Messages.ShippingMethodViewForm_title);
+        setPartName("Shipping Method");
         setShippingMethodInfo();
     }
 
@@ -43,24 +43,24 @@ public class ShippingMethodViewForm extends BiobankFormBase {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.ShippingMethodViewForm_title);
+        form.setText("Shipping Method");
         page.setLayout(new GridLayout(1, false));
         createGlobalShippingMethodSection();
     }
 
     private void createGlobalShippingMethodSection() throws Exception {
-        Section section = createSection(Messages.ShippingMethodViewForm_title);
+        Section section = createSection("Shipping Method");
         if (globalShippingMethods == null) {
             globalShippingMethods = new ArrayList<ShippingMethodWrapper>();
         }
         statusWidget = new ShippingMethodEntryInfoTable(section,
-            globalShippingMethods, Messages.ShippingMethodViewForm_add_msg,
-            Messages.ShippingMethodViewForm_edit_msg);
+            globalShippingMethods, "Add a new global shipping method",
+            "Edit the global shipping method");
         statusWidget.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(statusWidget);
 
         addSectionToolbar(section,
-            Messages.ShippingMethodViewForm_add_button_label,
+            "Add a shipping method",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {

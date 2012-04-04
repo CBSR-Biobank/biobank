@@ -4,7 +4,6 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 
-import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SpecimenLinkPresenter;
@@ -61,7 +60,7 @@ public class SpecimenLinkView extends AbstractEntryFormView implements
     public void onCreate(BaseForm baseForm) {
         super.onCreate(baseForm);
 
-        baseForm.setTitle(Messages.SiteEntryForm_main_title);
+        baseForm.setTitle("Specimen Link");
 
         InputTable table = new InputTable(baseForm.getPage());
 

@@ -46,12 +46,12 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class SiteEntryForm extends AddressEntryFormCommon {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.SiteEntryForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.SiteEntryForm"; 
 
     private static final String MSG_NEW_SITE_OK =
-        Messages.SiteEntryForm_creation_msg;
+        "Create a new Biobank site.";
     private static final String MSG_SITE_OK =
-        Messages.SiteEntryForm_edition_msg;
+        "Edit a Biobank site.";
 
     private SiteAdapter siteAdapter;
 
@@ -81,7 +81,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof SiteAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
@@ -89,11 +89,11 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
         String tabName;
         if (site.isNew()) {
-            tabName = Messages.SiteEntryForm_title_new;
+            tabName = "New repository site";
             site.setActivityStatus(ActivityStatus.ACTIVE);
         } else {
             tabName =
-                NLS.bind(Messages.SiteEntryForm_title_edit, site.getNameShort());
+                NLS.bind("Repository site {0}", site.getNameShort());
         }
         setPartName(tabName);
     }
@@ -115,7 +115,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void createFormContent() throws ApplicationException {
-        form.setText(Messages.SiteEntryForm_main_title);
+        form.setText("Repository site information");
         page.setLayout(new GridLayout(1, false));
         createSiteSection();
         createCommentSection();
@@ -144,7 +144,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     private void createSiteSection() {
-        toolkit.createLabel(page, Messages.SiteEntryForm_main_description,
+        toolkit.createLabel(page, "Studies, clinics, containers and container types can be added after submitting this information.",
             SWT.LEFT);
 
         Composite client = toolkit.createComposite(page);
@@ -157,17 +157,17 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
             SWT.NONE, "Name", null, site, SitePeer.NAME.getName(),
             new NonEmptyStringValidator(
-                Messages.SiteEntryForm_field_name_validation_msg)));
+                "Site must have a name")));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
             "Name Short", null, site,
             SitePeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
-                Messages.SiteEntryForm_field_nameShort_validation_msg));
+                "Site short name cannot be blank"));
 
         activityStatusComboViewer =
             createComboViewer(client, "Activity status",
                 ActivityStatus.valuesList(), site.getActivityStatus(),
-                Messages.SiteEntryForm_field_activity_validation_msg,
+                "Site must have an activity status",
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -178,10 +178,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     private void createStudySection() {
-        Section section = createSection(Messages.SiteEntryForm_studies_title);
+        Section section = createSection("Studies");
         boolean superAdmin = SessionManager.getUser().isSuperAdmin();
         if (superAdmin) {
-            addSectionToolbar(section, Messages.SiteEntryForm_studies_add,
+            addSectionToolbar(section, "Add Study ",
                 new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {

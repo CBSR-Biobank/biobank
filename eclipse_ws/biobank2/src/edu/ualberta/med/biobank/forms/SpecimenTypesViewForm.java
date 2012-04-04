@@ -22,10 +22,10 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class SpecimenTypesViewForm extends BiobankFormBase {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.SpecimenTypesViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.SpecimenTypesViewForm"; 
 
     public static final String OK_MESSAGE =
-        Messages.SpecimenTypesViewForm_ok_msg;
+        "Add or edit a specimen type";
 
     private SpecimenTypeEntryInfoTree specimenWidget;
 
@@ -38,7 +38,7 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
 
     @Override
     public void init() throws Exception {
-        setPartName(Messages.SpecimenTypesViewForm_title);
+        setPartName("Specimen Types");
         try {
             this.createAllowed = SessionManager.getAppService().isAllowed(
                 new SpecimenTypeCreatePermission());
@@ -49,7 +49,7 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.SpecimenTypesViewForm_title);
+        form.setText("Specimen Types");
         page.setLayout(new GridLayout(1, false));
 
         updateSpecimenTypeInfo();
@@ -66,17 +66,17 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
     }
 
     private void createGlobalSpecimenTypeSection() {
-        Section section = createSection(Messages.SpecimenTypesViewForm_title);
+        Section section = createSection("Specimen Types");
         specimenWidget =
             new SpecimenTypeEntryInfoTree(section,
                 globalSpecimenTypeWrappers,
-                Messages.SpecimenTypesViewForm_add_type_label,
-                Messages.SpecimenTypesViewForm_edit_type_label);
+                "Add a new global specimen type",
+                "Edit the global specimen type");
         specimenWidget.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(specimenWidget);
 
         addSectionToolbar(section,
-            Messages.SpecimenTypesViewForm_add_specimen_button,
+            "Add a specimen type",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -90,7 +90,7 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
         if (!createAllowed) {
             BgcPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
-                Messages.SpecimenTypesViewForm_access_denied_error_msg);
+                "Cannot access Specimen Type editor. Access Denied.");
         }
     }
 
