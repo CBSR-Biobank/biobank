@@ -27,7 +27,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ContainerReport2Editor extends ReportsEditor {
 
     public static String ID =
-        "edu.ualberta.med.biobank.editors.ContainerEmptyLocationsEditor"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.editors.ContainerEmptyLocationsEditor"; 
 
     private BgcBaseText containerLabel;
     private TopContainerListWidget topContainers;
@@ -46,12 +46,12 @@ public class ContainerReport2Editor extends ReportsEditor {
     @Override
     protected void createOptionSection(Composite parameterSection) {
         containerLabel = createCustomText(
-            Messages.ContainerEmptyLocationsEditor_container_label_label,
+            "Container Label",
             parameterSection);
         topContainers = new TopContainerListWidget(parameterSection, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), listStatus,
-            Messages.ContainerEmptyLocationsEditor_top_cont_validation_msg);
+            "Top Container List Empty");
         topContainers.addSelectionChangedListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -63,7 +63,7 @@ public class ContainerReport2Editor extends ReportsEditor {
     protected BgcBaseText createCustomText(String labelText, Composite parent) {
         final BgcBaseText widget = (BgcBaseText) widgetCreator
             .createLabelledWidget(parent, BgcBaseText.class, SWT.NONE,
-                labelText, ""); //$NON-NLS-1$
+                labelText, ""); 
         widget.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -92,7 +92,7 @@ public class ContainerReport2Editor extends ReportsEditor {
 
     protected void validate(String label) {
         try {
-            if (label.equals("") //$NON-NLS-1$
+            if (label.equals("") 
                 || ContainerWrapper.getContainersByLabel(
                     SessionManager.getAppService(), label).size() > 0)
                 filterList(label);
@@ -101,9 +101,9 @@ public class ContainerReport2Editor extends ReportsEditor {
             }
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
-                Messages.ContainerEmptyLocationsEditor_label_error_title, NLS
+                "Invalid label", NLS
                     .bind(
-                        Messages.ContainerEmptyLocationsEditor_label_error_msg,
+                        "No container labelled {0}.",
                         label));
         }
 
@@ -117,16 +117,16 @@ public class ContainerReport2Editor extends ReportsEditor {
     @Override
     protected String[] getColumnNames() {
         return new String[] {
-            Messages.ContainerEmptyLocationsEditor_location_label,
-            Messages.ContainerEmptyLocationsEditor_type_label };
+            "Location",
+            "Pallet Type" };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> paramNames = new ArrayList<String>();
         paramNames
-            .add(Messages.ContainerEmptyLocationsEditor_container_label_label);
-        paramNames.add(Messages.ContainerEmptyLocationsEditor_top_label);
+            .add("Container Label");
+        paramNames.add("Top Containers");
         return paramNames;
     }
 
@@ -140,9 +140,9 @@ public class ContainerReport2Editor extends ReportsEditor {
 
     @Override
     public void setValues() throws Exception {
-        containerLabel.setText(""); //$NON-NLS-1$
+        containerLabel.setText(""); 
         topContainers.reset();
-        validate(""); //$NON-NLS-1$
+        validate(""); 
         super.setValues();
     }
 }

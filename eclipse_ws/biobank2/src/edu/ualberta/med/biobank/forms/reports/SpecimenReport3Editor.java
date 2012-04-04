@@ -26,7 +26,7 @@ public class SpecimenReport3Editor extends ReportsEditor implements
     IBgcFileBrowserListener {
 
     public static String ID =
-        "edu.ualberta.med.biobank.editors.AliquotRequestEditor"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.editors.AliquotRequestEditor"; 
 
     private BgcFileBrowser csvSelector;
 
@@ -36,8 +36,8 @@ public class SpecimenReport3Editor extends ReportsEditor implements
         parent.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
             false));
         csvSelector = new BgcFileBrowser(parent,
-            Messages.SpecimenRequestEditor_browse_label, SWT.NONE,
-            new String[] { "*.csv" }); //$NON-NLS-1$
+            "CSV File", SWT.NONE,
+            new String[] { "*.csv" }); 
         csvSelector.addFileSelectedListener(this);
         csvSelector.adaptToToolkit(toolkit, true);
         generateButton.setEnabled(false);
@@ -64,22 +64,22 @@ public class SpecimenReport3Editor extends ReportsEditor implements
             csvSelector.getFilePath()), CsvPreference.EXCEL_PREFERENCE);
 
         final CellProcessor[] processors = new CellProcessor[] {
-            new StrNotNullOrEmpty(), new ParseDate("yyyy-MM-dd"), //$NON-NLS-1$
+            new StrNotNullOrEmpty(), new ParseDate("yyyy-MM-dd"), 
             new StrNotNullOrEmpty(), new LMinMax(1, Long.MAX_VALUE) };
 
         List<Object> requests = new ArrayList<Object>();
 
         try {
-            String[] header = new String[] { "pnumber", "dateDrawn", //$NON-NLS-1$ //$NON-NLS-2$
-                "specimenTypeNameShort", "maxAliquots" }; //$NON-NLS-1$ //$NON-NLS-2$
+            String[] header = new String[] { "pnumber", "dateDrawn",  
+                "specimenTypeNameShort", "maxAliquots" };  
             RequestData request;
             while ((request = reader.read(RequestData.class, header,
                 processors)) != null) {
                 requests.add(request);
             }
         } catch (SuperCSVException e) {
-            throw new Exception("Parse error at line " + reader.getLineNumber() //$NON-NLS-1$
-                + "\n" + e.getCsvContext()); //$NON-NLS-1$
+            throw new Exception("Parse error at line " + reader.getLineNumber() 
+                + "\n" + e.getCsvContext()); 
         } finally {
             reader.close();
         }
@@ -88,18 +88,18 @@ public class SpecimenReport3Editor extends ReportsEditor implements
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { Messages.SpecimenRequestEditor_patient_label,
-            Messages.SpecimenRequestEditor_inventory_id_label,
-            Messages.SpecimenRequestEditor_drawn_label,
-            Messages.SpecimenRequestEditor_type_label,
-            Messages.SpecimenRequestEditor_location_label,
-            Messages.SpecimenRequestEditor_status_label };
+        return new String[] { "Patient",
+            "Inventory ID",
+            "Date Drawn",
+            "Type",
+            "Location",
+            "Activity Status" };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> paramName = new ArrayList<String>();
-        paramName.add(Messages.SpecimenRequestEditor_browse_label);
+        paramName.add("CSV File");
         return paramName;
     }
 

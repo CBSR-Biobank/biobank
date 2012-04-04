@@ -47,7 +47,7 @@ public class PalletScanManagement {
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) {
-                monitor.beginTask(Messages.PalletScanManagement_scan_progress,
+                monitor.beginTask("Scan and process...",
                     IProgressMonitor.UNKNOWN);
                 try {
                     launchScan(monitor, plateToScan, profile, isRescanMode);
@@ -59,13 +59,13 @@ public class PalletScanManagement {
                 } catch (Exception e) {
                     BgcPlugin
                         .openAsyncError(
-                            Messages.PalletScanManagement_dialog_scanError_title,
+                            "Scan result error",
                             e);
                     String msg = e.getMessage();
                     if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
                         msg = e.getCause().getMessage();
                     }
-                    scanAndProcessError(Messages.PalletScanManagement_error_title
+                    scanAndProcessError("ERROR: "
                         + msg);
                 }
                 monitor.done();
@@ -82,7 +82,7 @@ public class PalletScanManagement {
 
     private void launchScan(IProgressMonitor monitor, String plateToScan,
         String profile, boolean rescanMode) throws Exception {
-        monitor.subTask(Messages.PalletScanManagement_launching);
+        monitor.subTask("Launching scan");
         beforeScan();
         Map<RowColPos, PalletCell> oldCells = cells;
         if (BiobankPlugin.isRealScanEnabled()) {
@@ -92,9 +92,9 @@ public class PalletScanManagement {
                 plateError();
                 BgcPlugin
                     .openAsyncError(
-                        Messages.PalletScanManagement_scan_error_title,
+                        "Scan error",
                         NLS.bind(
-                            Messages.PalletScanManagement_scan_error_msg_notenabled,
+                            "Plate with barcode {0} is not enabled",
                             plateToScan));
                 return;
             }
@@ -105,8 +105,8 @@ public class PalletScanManagement {
                 cells = PalletCell.convertArray(scanCells);
             } catch (Exception ex) {
                 BgcPlugin.openAsyncError(
-                    Messages.PalletScanManagement_scan_error_title, ex,
-                    Messages.PalletScanManagement_scan_error_msg_2dScanner);
+                    "Scan error", ex,
+                    "Barcodes can still be scanned with the handheld 2D scanner.");
                 return;
             } finally {
                 scansCount++;
@@ -136,8 +136,8 @@ public class PalletScanManagement {
                         oldScannedCell
                             .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
                                 .getInformation()
-                                : "") //$NON-NLS-1$
-                                + " " + Messages.PalletScanManagement_rescan_differnt_msg); //$NON-NLS-1$
+                                : "") 
+                                + " " + "Rescanned value is different"); 
                         oldScannedCell.setStatus(CellInfoStatus.ERROR);
                         rescanDifferent = true;
 
@@ -158,7 +158,7 @@ public class PalletScanManagement {
             }
             if (rescanDifferent)
                 throw new Exception(
-                    Messages.PalletScanManagement_scan_error_previous_different_msg);
+                    "Scan error: Previously scanned specimens has been replaced. Please cancel and start again.");
         }
         afterSuccessfulScan();
     }
@@ -183,7 +183,7 @@ public class PalletScanManagement {
                             postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {
                             BgcPlugin.openAsyncError(
-                                Messages.PalletScanManagement_tube_error_title,
+                                "Scan tube error",
                                 ex);
                         }
                     }

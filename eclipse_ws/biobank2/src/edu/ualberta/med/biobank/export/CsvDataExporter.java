@@ -11,10 +11,10 @@ import org.supercsv.prefs.CsvPreference;
 import edu.ualberta.med.biobank.SessionManager;
 
 public class CsvDataExporter extends GuiDataExporter {
-    private static final String[] VALID_EXTS = { "*.csv" }; //$NON-NLS-1$
+    private static final String[] VALID_EXTS = { "*.csv" }; 
 
     public CsvDataExporter() {
-        super(Messages.CsvDataExporter_name);
+        super("Export CSV");
     }
 
     @Override
@@ -51,7 +51,7 @@ public class CsvDataExporter extends GuiDataExporter {
             }
 
             writer.close();
-            SessionManager.log(Messages.CsvDataExporter_log_export,
+            SessionManager.log("exportCSV",
                 data.getTitle(), LOG_TYPE);
         } catch (IOException e) {
             throw new DataExportException(e.getMessage());

@@ -56,13 +56,13 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         .getLogger(ContainerTypeEntryForm.class.getName());
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm"; 
 
     private static final String MSG_NEW_STORAGE_TYPE_OK =
-        Messages.ContainerTypeEntryForm_creation_msg;
+        "Creating a new storage type.";
 
     private static final String MSG_STORAGE_TYPE_OK =
-        Messages.ContainerTypeEntryForm_edition_msg;
+        "Editing an existing storage type.";
 
     private ContainerTypeAdapter containerTypeAdapter;
 
@@ -111,7 +111,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ContainerTypeAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
@@ -119,11 +119,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         String tabName;
         if (containerType.isNew()) {
-            tabName = Messages.ContainerTypeEntryForm_new_title;
+            tabName = "New Container Type";
             containerType.setActivityStatus(ActivityStatus.ACTIVE);
         } else {
             tabName =
-                NLS.bind(Messages.ContainerTypeEntryForm_edit_title,
+                NLS.bind("Container Type {0} ",
                     containerType.getName());
         }
         setPartName(tabName);
@@ -149,7 +149,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.ContainerTypeEntryForm_main_title);
+        form.setText("Container Type Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
 
@@ -159,7 +159,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient(Messages.Comments_title);
+        Composite client = createSectionWithClient("Comments");
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -172,7 +172,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add, null, comment, "message", null);
+            "Add a comment", null, comment, "message", null);
 
     }
 
@@ -199,41 +199,41 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         BgcBaseText name =
             (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
-                SWT.NONE, Messages.label_name, null, containerType,
+                SWT.NONE, "Name", null, containerType,
                 ContainerTypePeer.NAME.getName(), new NonEmptyStringValidator(
-                    Messages.ContainerTypeEntryForm_name_validation_msg));
+                    "Container type must have a name"));
 
         setFirstControl(name);
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.label_nameShort, null, containerType,
+            "Name Short", null, containerType,
             ContainerTypePeer.NAME_SHORT.getName(),
             new NonEmptyStringValidator(
-                Messages.ContainerTypeEntryForm_nameShort_validation_msg));
+                "Container type must have a short name"));
 
         if (containerType.getTopLevel() == null) {
             containerType.setTopLevel(false);
         }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            Messages.containerType_field_label_topLevel, null, containerType,
+            "Top Level Container", null, containerType,
             ContainerTypePeer.TOP_LEVEL.getName(), null);
         toolkit.paintBordersFor(client);
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.containerType_field_label_rows, null, containerType,
+            "Rows", null, containerType,
             CapacityPeer.ROW_CAPACITY.getName(), new IntegerNumberValidator(
-                Messages.ContainerTypeEntryForm_rows_validation_msg, false));
+                "Row capacity is not a valid number", false));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.containerType_field_label_cols, null, containerType,
+            "Columns", null, containerType,
             CapacityPeer.COL_CAPACITY.getName(), new IntegerNumberValidator(
-                Messages.ContainerTypeEntryForm_cols_validation_msg, false));
+                "Column capacity is not a valid number", false));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.containerType_field_label_temperature, null,
+            "Default Temperature\n(Celcius)", null,
             containerType, ContainerTypePeer.DEFAULT_TEMPERATURE.getName(),
             new DoubleNumberValidator(
-                Messages.ContainerTypeEntryForm_temperature_validation_msg));
+                "Default temperature is not a valid number"));
 
         String currentScheme = containerType.getChildLabelingSchemeName();
         labelingSchemeMap = new HashMap<Integer, String>();
@@ -243,9 +243,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         }
         labelingSchemeComboViewer =
             createComboViewer(client,
-                Messages.containerType_field_label_scheme,
+                "Child Labeling Scheme",
                 labelingSchemeMap.values(), currentScheme,
-                Messages.ContainerTypeEntryForm_scheme_validation_msg,
+                "Select a child labeling scheme",
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -255,16 +255,16 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                         } catch (Exception e) {
                             BgcPlugin
                                 .openAsyncError(
-                                    Messages.ContainerTypeEntryForm_scheme_error_msg,
+                                    "Error setting the labeling scheme",
                                     e);
                         }
                     }
                 });
 
         activityStatusComboViewer =
-            createComboViewer(client, Messages.label_activity,
+            createComboViewer(client, "Activity status",
                 ActivityStatus.valuesList(), containerType.getActivityStatus(),
-                Messages.ContainerTypeEntryForm_activity_validation_msg,
+                "Container type must have an activity status",
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -277,14 +277,14 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private void createContainsSection() throws Exception {
         Composite client =
-            createSectionWithClient(Messages.ContainerTypeEntryForm_contents_title);
+            createSectionWithClient("Contents");
         hasContainersRadio =
             toolkit.createButton(client,
-                Messages.ContainerTypeEntryForm_contents_button_container,
+                "Contains Containers",
                 SWT.RADIO);
         hasSpecimensRadio =
             toolkit.createButton(client,
-                Messages.ContainerTypeEntryForm_contents_button_specimen,
+                "Contains specimens",
                 SWT.RADIO);
         hasContainersRadio.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -328,8 +328,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         specimensMultiSelect =
             new MultiSelectWidget<SpecimenTypeWrapper>(parent, SWT.NONE,
-                Messages.ContainerTypeEntryForm_contents_specimen_available,
-                Messages.ContainerTypeEntryForm_contents_specimen_selected, 100) {
+                "Available specimen types",
+                "Selected specimen types", 100) {
                 @Override
                 protected String getTextForObject(SpecimenTypeWrapper nodeObject) {
                     return nodeObject.getName();
@@ -353,8 +353,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             new MultiSelectWidget<ContainerTypeWrapper>(
                 parent,
                 SWT.NONE,
-                Messages.ContainerTypeEntryForm_contents_subcontainer_available,
-                Messages.ContainerTypeEntryForm_contents_subcontainer_selected,
+                "Available Sub-Container Types",
+                "Selected Sub-Container types",
                 100) {
                 @Override
                 protected String getTextForObject(

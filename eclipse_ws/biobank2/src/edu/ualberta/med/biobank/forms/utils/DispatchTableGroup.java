@@ -27,10 +27,10 @@ public class DispatchTableGroup extends TableGroup<DispatchWrapper> {
         List<DispatchTableGroup> groups = new ArrayList<DispatchTableGroup>();
         if (ship.isInCreationState()) {
             groups.add(new DispatchTableGroup(DispatchSpecimenState.NONE,
-                Messages.DispatchTableGroup_added_label, ship));
+                "Added", ship));
         } else {
             groups.add(new DispatchTableGroup(DispatchSpecimenState.NONE,
-                Messages.DispatchTableGroup_nonprocessed_label, ship));
+                "Non processed", ship));
         }
         if (ship.hasBeenReceived()) {
             groups.add(new DispatchTableGroup(DispatchSpecimenState.RECEIVED,

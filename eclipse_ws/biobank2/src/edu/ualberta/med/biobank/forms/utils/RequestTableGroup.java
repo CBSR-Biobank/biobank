@@ -39,7 +39,7 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
         ArrayList<RequestTableGroup> groups =
             new ArrayList<RequestTableGroup>();
         groups.add(new RequestTableGroup(null,
-            Messages.RequestTableGroup_all_node_label, ship));
+            "All", ship));
         groups.add(new RequestTableGroup(RequestSpecimenState.PULLED_STATE,
             ship));
         return groups;
@@ -56,8 +56,8 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
             results =
                 SessionManager.getAppService().doAction(specAction).getList();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.RequestTableGroup_error_title,
-                Messages.RequestTableGroup_data_error_msg, e);
+            BgcPlugin.openAsyncError("Error",
+                "Unable to retrieve data from server", e);
         }
 
         HashSet<Integer> containers = new HashSet<Integer>();

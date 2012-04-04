@@ -39,7 +39,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ResearchGroupViewForm extends AddressViewFormCommon implements
     IBgcFileBrowserListener {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ResearchGroupViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.ResearchGroupViewForm"; 
 
     private ResearchGroupWrapper researchGroup = new ResearchGroupWrapper(
         SessionManager.getAppService());
@@ -61,11 +61,11 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ResearchGroupAdapter,
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         setRgInfo(adapter.getId());
-        setPartName(NLS.bind(Messages.ResearchGroupViewForm_title,
+        setPartName(NLS.bind("Research Group {0}",
             researchGroup.getNameShort()));
     }
 
@@ -84,7 +84,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind(Messages.ResearchGroupViewForm_title,
+        form.setText(NLS.bind("Research Group {0}",
             researchGroup.getName()));
 
         GridLayout layout = new GridLayout(1, false);
@@ -97,20 +97,20 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
     private void createUploadSection() {
         Composite client =
-            createSectionWithClient(Messages.ResearchGroupViewForm_request_upload_title);
+            createSectionWithClient("Request Upload");
         client.setLayout(new GridLayout(3, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
         toolkit.createLabel(client,
-            Messages.ResearchGroupViewForm_submit_request_rg_label);
+            "Submit a request on behalf of this research group:");
         csvSelector =
             new BgcFileBrowser(client,
-                Messages.ResearchGroupViewForm_csv_file_label, SWT.NONE,
-                new String[] { "*.csv" }); //$NON-NLS-1$
+                "CSV File", SWT.NONE,
+                new String[] { "*.csv" }); 
         csvSelector.addFileSelectedListener(this);
         csvSelector.adaptToToolkit(toolkit, true);
         uploadButton = new Button(client, SWT.PUSH);
-        uploadButton.setText(Messages.ResearchGroupViewForm_upload_button);
+        uploadButton.setText("Upload Request");
         uploadButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -118,7 +118,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
                     saveRequest();
                 } catch (Exception e1) {
                     BgcPlugin.openAsyncError(
-                        Messages.ResearchGroupViewForm_error_title,
+                        "Error Uploading",
                         "There was an error creating the request.");
                 }
             }
@@ -147,15 +147,15 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
         final CellProcessor[] processors =
             new CellProcessor[] { null, null,
-                new ParseDate("yyyy-MM-dd"), null, null, null }; //$NON-NLS-1$
+                new ParseDate("yyyy-MM-dd"), null, null, null }; 
 
         List<RequestInput> requests = new ArrayList<RequestInput>();
 
         try {
             // Peer class not used because this refers to RequestInput fields
-            String[] header = new String[] { "pnumber", "inventoryID", //$NON-NLS-1$ //$NON-NLS-2$
-                "dateDrawn", "specimenTypeNameShort", "location", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                "activityStatus" }; //$NON-NLS-1$
+            String[] header = new String[] { "pnumber", "inventoryID",  
+                "dateDrawn", "specimenTypeNameShort", "location",   
+                "activityStatus" }; 
             RequestInput srequest;
             while ((srequest =
                 reader.read(RequestInput.class, header, processors)) != null) {
@@ -164,9 +164,9 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             }
         } catch (SuperCSVException e) {
             throw new Exception(NLS.bind(
-                Messages.ResearchGroupViewForm_parse_error_msg,
+                "Parse error at line {0}",
                 reader.getLineNumber())
-                + "\n" + e.getCsvContext()); //$NON-NLS-1$
+                + "\n" + e.getCsvContext()); 
         } finally {
             reader.close();
         }
@@ -180,8 +180,8 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             new RequestSubmitAction(researchGroup.getId(), specs);
         SessionManager.getAppService().doAction(action);
 
-        BgcPlugin.openMessage(Messages.ResearchGroupViewForm_success_title,
-            Messages.ResearchGroupViewForm_success_msg);
+        BgcPlugin.openMessage("Success",
+            "Request successfully uploaded");
         SpecimenTransitView.reloadCurrent();
     }
 
@@ -192,21 +192,21 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         toolkit.paintBordersFor(client);
 
         nameLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, Messages.label_name);
+            createReadOnlyLabelledField(client, SWT.NONE, "Name");
         nameShortLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.label_nameShort);
-        studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study"); //$NON-NLS-1$
+                "Name Short");
+        studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study"); 
         activityStatusLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.label_activity);
+                "Activity status");
 
         createCommentsSection();
         setResearchGroupValues();
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient(Messages.label_comments);
+        Composite client = createSectionWithClient("Comments");
         commentTable =
             new CommentsInfoTable(client,
                 researchGroup.getCommentCollection(false));
@@ -223,9 +223,9 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
     @Override
     public void setValues() throws Exception {
-        setPartName(NLS.bind(Messages.ResearchGroupViewForm_title,
+        setPartName(NLS.bind("Research Group {0}",
             researchGroup.getName()));
-        form.setText(NLS.bind(Messages.ResearchGroupViewForm_title,
+        form.setText(NLS.bind("Research Group {0}",
             researchGroup.getName()));
         setResearchGroupValues();
         setAddressValues(researchGroup);

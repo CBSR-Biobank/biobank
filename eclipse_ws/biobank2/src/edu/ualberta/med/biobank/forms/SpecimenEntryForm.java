@@ -416,7 +416,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient(Messages.Comments_title);
+        Composite client = createSectionWithClient("Comments");
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -431,7 +431,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         commentText =
             (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
                 SWT.MULTI,
-                Messages.Comments_add, null, comment, "message", null);
+                "Add a comment", null, comment, "message", null);
 
     }
 

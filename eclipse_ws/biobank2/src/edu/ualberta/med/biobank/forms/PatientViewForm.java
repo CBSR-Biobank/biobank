@@ -34,7 +34,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.PatientViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.PatientViewForm"; 
 
     private BgcBaseText studyLabel;
 
@@ -57,11 +57,11 @@ public class PatientViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof PatientAdapter,
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         updatePatientInfo();
-        setPartName(NLS.bind(Messages.PatientViewForm_title,
+        setPartName(NLS.bind("Patient {0}",
             patientInfo.patient.getPnumber()));
     }
 
@@ -73,7 +73,7 @@ public class PatientViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind(Messages.PatientViewForm_title,
+        form.setText(NLS.bind("Patient {0}",
             patientInfo.patient.getPnumber()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -85,7 +85,7 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient(Messages.Comments_title);
+        Composite client = createSectionWithClient("Comments");
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -113,23 +113,23 @@ public class PatientViewForm extends BiobankViewForm {
 
         studyLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.patient_field_label_study);
+                "Study");
         createdAtLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.PatientViewForm_label_createdAt);
+                "Created At");
         visitCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.PatientViewForm_label_totalVisits);
+                "Total Visits");
         sourceSpecimenCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.PatientViewForm_label_totalSourceSpecimens);
+                "Total source specimens");
         aliquotedSpecimenCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.PatientViewForm_label_totalAliquotedSpecimens);
+                "Total aliquoted specimens");
     }
 
     private void createCollectionEventSection() {
-        Section section = createSection(Messages.PatientViewForm_visits_title);
+        Section section = createSection("Collection Events");
 
         collectionEventTable =
             new NewCollectionEventInfoTable(section, patientInfo.ceventInfos);
@@ -161,8 +161,8 @@ public class PatientViewForm extends BiobankViewForm {
                             adapter.openEntryForm();
                         } catch (ApplicationException e) {
                             BgcPlugin.openAsyncError(
-                                Messages.PatientViewForm_0,
-                                Messages.PatientViewForm_1);
+                                "Unable to open form",
+                                "Error loading collection event.");
                         }
                     }
                     return;
@@ -193,8 +193,8 @@ public class PatientViewForm extends BiobankViewForm {
                             adapter.openEntryForm();
                         } catch (ApplicationException e) {
                             BgcPlugin.openAsyncError(
-                                Messages.PatientViewForm_0,
-                                Messages.PatientViewForm_1);
+                                "Unable to open form",
+                                "Error loading collection event.");
                         }
                     }
                     return;
@@ -205,9 +205,9 @@ public class PatientViewForm extends BiobankViewForm {
 
     @Override
     public void setValues() throws Exception {
-        setPartName(NLS.bind(Messages.PatientViewForm_title,
+        setPartName(NLS.bind("Patient {0}",
             patientInfo.patient.getPnumber()));
-        form.setText(NLS.bind(Messages.PatientViewForm_title,
+        form.setText(NLS.bind("Patient {0}",
             patientInfo.patient.getPnumber()));
         collectionEventTable.setList(patientInfo.ceventInfos);
         setTextValue(studyLabel, patientInfo.patient.getStudy().getName());

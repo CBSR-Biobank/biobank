@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 public class ContainerReport1Editor extends ReportsEditor {
 
     public static String ID =
-        "edu.ualberta.med.biobank.editors.ContainerCapacityEditor"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.editors.ContainerCapacityEditor"; 
 
     @Override
     protected void createOptionSection(Composite parent) {
@@ -17,10 +17,10 @@ public class ContainerReport1Editor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { Messages.ContainerCapacityEditor_container_label,
-            Messages.ContainerCapacityEditor_capacity_label,
-            Messages.ContainerCapacityEditor_nberInUse_label,
-            Messages.ContainerCapacityEditor_perCentInUse_label };
+        return new String[] { "Container",
+            "Capacity",
+            "# In Use",
+            "% In Use" };
     }
 
     @Override

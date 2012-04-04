@@ -51,10 +51,10 @@ public class SiteViewFormView extends AbstractViewFormView
 
         InputTable table = new InputTable(baseForm.getPage());
 
-        table.addLabel(Messages.label_name);
+        table.addLabel("Name");
         name.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.label_nameShort);
+        table.addLabel("Name"Short);
         nameShort.setText(table.addReadOnlyText());
 
         table.addLabel(Messages.SiteViewForm_field_studyCount_label);
@@ -75,7 +75,7 @@ public class SiteViewFormView extends AbstractViewFormView
         table.addLabel(Messages.SiteViewForm_field_totalSpecimen);
         aliquotedSpecimenCount.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.label_activity);
+        table.addLabel("Activity status");
         activityStatus.setText(table.addReadOnlyText());
     }
 

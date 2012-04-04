@@ -96,13 +96,13 @@ public abstract class BiobankFormBase extends BgcFormBase {
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
         if (!(input instanceof FormInput))
-            throw new PartInitException("Invalid editor input"); //$NON-NLS-1$
+            throw new PartInitException("Invalid editor input"); 
         FormInput formInput = (FormInput) input;
 
         adapter = (AbstractAdapterBase) formInput
             .getAdapter(AbstractAdapterBase.class);
         if (adapter != null) {
-            Assert.isNotNull(adapter, "Bad editor input (null value)"); //$NON-NLS-1$
+            Assert.isNotNull(adapter, "Bad editor input (null value)"); 
             if (!formInput.hasPreviousForm()) {
                 currentLinkedForms = new ArrayList<BgcFormBase>();
             }
@@ -208,19 +208,19 @@ public abstract class BiobankFormBase extends BgcFormBase {
             BgcPlugin.openAccessDeniedErrorMessage(ex);
             cancelSave(monitor);
         } else if (ex instanceof BiobankException) {
-            BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
+            BgcPlugin.openAsyncError("Save error",
                 ex);
             cancelSave(monitor);
         } else if (ex instanceof BiobankServerException) {
-            BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
+            BgcPlugin.openAsyncError("Save error",
                 ex);
             cancelSave(monitor);
         } else if (ex instanceof BiobankSessionException) {
-            BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
+            BgcPlugin.openAsyncError("Save error",
                 ex);
             cancelSave(monitor);
         } else if (ex instanceof ActionException) {
-            BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
+            BgcPlugin.openAsyncError("Save error",
                 ex);
             cancelSave(monitor);
         } else if (ex instanceof ApplicationException) {
@@ -229,12 +229,12 @@ public abstract class BiobankFormBase extends BgcFormBase {
                     getConstraintViolationsMsgs((ConstraintViolationException) ex
                         .getCause());
                 BgcPlugin.openAsyncError(
-                    Messages.BiobankFormBase_save_error_title,
+                    "Save error",
                     StringUtils.join(msgs, "\n"));
 
             } else {
                 BgcPlugin.openAsyncError(
-                    Messages.BiobankFormBase_save_error_title,
+                    "Save error",
                     ex.getLocalizedMessage());
             }
             cancelSave(monitor);
@@ -244,7 +244,7 @@ public abstract class BiobankFormBase extends BgcFormBase {
             if (lastThrowException) {
                 BgcPlugin
                     .openAsyncError(
-                        Messages.BiobankFormBase_save_error_title,
+                        "Save error",
                         "An unknown error occurred. Report this issue to your administrator");
             }
         }

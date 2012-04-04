@@ -41,7 +41,7 @@ import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsS
 public class CollectionEventViewForm extends BiobankViewForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.CollectionEventViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.CollectionEventViewForm"; 
 
     private BgcBaseText studyLabel;
 
@@ -68,12 +68,12 @@ public class CollectionEventViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof CollectionEventAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         updateCEventInfo();
 
-        setPartName(NLS.bind(Messages.CollectionEventViewForm_title,
+        setPartName(NLS.bind("CE {0}",
             ceventInfo.cevent.getVisitNumber()));
     }
 
@@ -86,7 +86,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
+        form.setText(NLS.bind("Collection Event for visit {0}",
             ceventInfo.cevent.getVisitNumber()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -105,16 +105,16 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
         studyLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.CollectionEventViewForm_study_label);
+                "Study");
         patientLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.CollectionEventViewForm_patient_label);
+                "Patient");
         visitNumberLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.CollectionEventViewForm_visitNber_label);
+                "Visit#");
         activityStatusLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.label_activity);
+                "Activity status");
 
         createPvDataSection(client);
         createCommentsSection();
@@ -123,7 +123,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient(Messages.label_comments);
+        Composite client = createSectionWithClient("Comments");
         commentTable =
             new CommentsInfoTable(client,
                 ModelWrapper.wrapModelCollection(
@@ -189,7 +189,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private void createSourceSpecimensSection() {
         Composite client =
-            createSectionWithClient(Messages.CollectionEventViewForm_sourcespecimens_title);
+            createSectionWithClient("Source specimens");
         sourceSpecimenTable =
             new NewSpecimenInfoTable(client, ceventInfo.sourceSpecimenInfos,
                 ColumnsShown.CEVENT_SOURCE_SPECIMENS, 10);
@@ -229,7 +229,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     private void createAliquotedSpecimensSection() {
         // FIXME should we show that to clinics ?
         Composite client =
-            createSectionWithClient(Messages.CollectionEventViewForm_aliquotedspecimens_title);
+            createSectionWithClient("Aliquoted specimens");
         aliquotedSpcTable =
             new NewSpecimenInfoTable(client, ceventInfo.aliquotedSpecimenInfos,
                 ColumnsShown.CEVENT_ALIQUOTED_SPECIMENS, 10);
@@ -268,9 +268,9 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     @Override
     public void setValues() throws Exception {
-        setPartName(NLS.bind(Messages.CollectionEventViewForm_title,
+        setPartName(NLS.bind("CE {0}",
             ceventInfo.cevent.getVisitNumber()));
-        form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
+        form.setText(NLS.bind("Collection Event for visit {0}",
             +ceventInfo.cevent.getVisitNumber()));
         setCollectionEventValues();
         sourceSpecimenTable.setList(ceventInfo.sourceSpecimenInfos);

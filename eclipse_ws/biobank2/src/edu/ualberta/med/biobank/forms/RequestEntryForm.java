@@ -58,7 +58,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class RequestEntryForm extends BiobankViewForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.RequestEntryFormBase"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.RequestEntryFormBase"; 
     private RequestWrapper request = new RequestWrapper(
         SessionManager.getAppService());
     private RequestSpecimensTreeTable specimensTree;
@@ -70,14 +70,14 @@ public class RequestEntryForm extends BiobankViewForm {
     @Override
     protected void init() throws Exception {
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
-        Assert.isNotNull(adapter, "Adapter should be no null"); //$NON-NLS-1$
+        Assert.isNotNull(adapter, "Adapter should be no null"); 
         Assert.isTrue((adapter instanceof RequestAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         setRequestInfo(adapter.getId());
 
-        setPartName(Messages.RequestEntryForm_title
+        setPartName("Request "
             + request.getId().toString());
     }
 
@@ -96,7 +96,7 @@ public class RequestEntryForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText(NLS.bind(
-            Messages.RequestEntryForm_requestedOn_date_rgName, DateFormatter
+            "Requested on {0} {1}", DateFormatter
                 .formatAsDateTime(request.getSubmitted()),
             request.getResearchGroup()
                 .getNameShort()));
@@ -114,21 +114,21 @@ public class RequestEntryForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         BgcBaseText orderNumberLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, Messages.RequestEntryForm_number_label);
+            SWT.NONE, "Request Number");
         setTextValue(orderNumberLabel, request.getId());
 
         BgcBaseText researchGroupLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, Messages.RequestEntryForm_rgroup_Label);
+            SWT.NONE, "Research Group");
 
         setTextValue(researchGroupLabel, request.getResearchGroup()
             .getNameShort());
 
         BgcBaseText submittedLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, Messages.RequestEntryForm_submitted_label);
+            SWT.NONE, "Date Submitted");
         setTextValue(submittedLabel,
             DateFormatter.formatAsDateTime(request.getSubmitted()));
 
-        Section s = createSection(Messages.RequestEntryForm_specimens_section);
+        Section s = createSection("Specimens");
         Composite c = toolkit.createComposite(s);
         s.setClient(c);
         c.setLayout(new GridLayout());
@@ -145,10 +145,10 @@ public class RequestEntryForm extends BiobankViewForm {
         });
 
         Section s2 =
-            createSection(Messages.RequestEntryForm_dispatches_section);
+            createSection("Dispatches");
         Composite dispatchCreation = toolkit.createComposite(s2);
         s2.setClient(dispatchCreation);
-        addSectionToolbar(s2, Messages.RequestEntryForm_dispatch_add_title,
+        addSectionToolbar(s2, "New dispatch",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -157,9 +157,9 @@ public class RequestEntryForm extends BiobankViewForm {
             });
         dispatchCreation.setLayout(new GridLayout(5, false));
         toolkit.createLabel(dispatchCreation,
-            Messages.RequestEntryForm_scan_id_label);
+            "Enter/Scan inventory ID to add:");
         newSpecimenText = new BgcBaseText(dispatchCreation, SWT.NONE, toolkit);
-        addButton = toolkit.createButton(dispatchCreation, "", SWT.PUSH); //$NON-NLS-1$
+        addButton = toolkit.createButton(dispatchCreation, "", SWT.PUSH); 
         addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -172,7 +172,7 @@ public class RequestEntryForm extends BiobankViewForm {
                         .search(newSpecimenText.getText());
                     if (specNode == null)
                         throw new Exception(
-                            Messages.RequestEntryForm_not_found_error_msg);
+                            "Specimen not found");
                     specimen = (RequestSpecimenWrapper) specNode.getSpecimen();
                     if (specimen != null) {
                         addToDispatch(getDispatchSelection(),
@@ -181,9 +181,9 @@ public class RequestEntryForm extends BiobankViewForm {
                     }
                 } catch (Exception e1) {
                     BgcPlugin.openAsyncError(
-                        Messages.RequestEntryForm_error_title, e1.getMessage());
+                        "Error", e1.getMessage());
                 }
-                newSpecimenText.setText(""); //$NON-NLS-1$
+                newSpecimenText.setText(""); 
                 dispatchTable.reloadCollection(
                     request.getDispatchCollection(false),
                     getDispatchSelection());
@@ -191,8 +191,8 @@ public class RequestEntryForm extends BiobankViewForm {
         });
 
         toolkit.createLabel(dispatchCreation,
-            Messages.RequestEntryForm_pallet_add_label);
-        openScanButton = toolkit.createButton(dispatchCreation, "", SWT.PUSH); //$NON-NLS-1$
+            "Add Pallet:");
+        openScanButton = toolkit.createButton(dispatchCreation, "", SWT.PUSH); 
         openScanButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
@@ -272,10 +272,10 @@ public class RequestEntryForm extends BiobankViewForm {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
         toolkit.createLabel(addComposite,
-            Messages.RequestEntryForm_id_add_label);
+            "Enter inventory ID to add:");
         final BgcBaseText newSpecimenText = new BgcBaseText(addComposite,
             SWT.NONE, toolkit);
-        Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH); //$NON-NLS-1$
+        Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH); 
         addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -286,7 +286,7 @@ public class RequestEntryForm extends BiobankViewForm {
                         .getText());
                     if (updateNode == null)
                         throw new Exception(NLS.bind(
-                            Messages.RequestEntryForm_search_valid_error_msg,
+                            "Specimen {0} is not a valid choice.",
                             newSpecimenText.getText()));
                     else if (((TreeItemAdapter) updateNode).getSpecimen()
                         .getSpecimenState()
@@ -300,7 +300,7 @@ public class RequestEntryForm extends BiobankViewForm {
                                 || !spec.getClaimedBy().equals(
                                     SessionManager.getUser().getLogin()))
                                 throw new Exception(
-                                    Messages.RequestEntryForm_claim_error_msg);
+                                    "You must claim this specimen before pulling is permitted.");
                             SessionManager.getAppService().doAction(
                                 new RequestClaimAction(Arrays.asList(spec
                                     .getId())));
@@ -308,14 +308,14 @@ public class RequestEntryForm extends BiobankViewForm {
                         }
                     } else
                         throw new Exception(
-                            Messages.RequestEntryForm_processed_error_msg);
+                            "This specimen is not available for processing.");
 
                 } catch (Exception e1) {
                     BgcPlugin.openAsyncError(
-                        Messages.RequestEntryForm_error_title, e1.getMessage());
+                        "Error", e1.getMessage());
                 }
                 newSpecimenText.setFocus();
-                newSpecimenText.setText(""); //$NON-NLS-1$
+                newSpecimenText.setText(""); 
             }
         });
     }
@@ -375,7 +375,7 @@ public class RequestEntryForm extends BiobankViewForm {
                 dsInfos.add(new DispatchSpecimenInfo(null, rs.getSpecimen()
                     .getId(), DispatchSpecimenState.NONE.getId()));
             } else
-                throw new Exception(Messages.RequestEntryForm_add_error_msg);
+                throw new Exception("Error Adding: Specimen has not been pulled.");
         DispatchSaveInfo dInfo =
             new DispatchSaveInfo(dispatch.getId(), request.getResearchGroup()
                 .getId(),

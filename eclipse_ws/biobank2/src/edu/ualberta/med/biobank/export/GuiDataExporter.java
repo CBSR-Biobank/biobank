@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 public abstract class GuiDataExporter implements DataExporter {
     private final String name;
 
-    public static final String LOG_TYPE = "data"; //$NON-NLS-1$
+    public static final String LOG_TYPE = "data"; 
 
     public GuiDataExporter(String name) {
         this.name = name;
@@ -34,7 +34,7 @@ public abstract class GuiDataExporter implements DataExporter {
     @Override
     public void canExport(Data data) throws DataExportException {
         if (data.getRows() == null || data.getRows().isEmpty()) {
-            throw new DataExportException(Messages.GuiDataExporter_noresult_msg);
+            throw new DataExportException("no results to export");
         }
     }
 
@@ -47,13 +47,13 @@ public abstract class GuiDataExporter implements DataExporter {
             context.run(true, true, new IRunnableWithProgress() {
                 @Override
                 public void run(final IProgressMonitor monitor) {
-                    monitor.beginTask(Messages.GuiDataExporter_exporting,
+                    monitor.beginTask("Exporting data...",
                         IProgressMonitor.UNKNOWN);
                     try {
                         export(data, labelProvider, monitor);
                     } catch (Exception e) {
                         BgcPlugin.openAsyncError(
-                            Messages.GuiDataExporter_exporting_error_msg, e);
+                            "Error Exporting Data", e);
                         return;
                     }
                 }
@@ -80,16 +80,16 @@ public abstract class GuiDataExporter implements DataExporter {
         final Holder<String> path = new Holder<String>(null);
 
         if (exts != null) {
-            final Holder<String> defaultFilename = new Holder<String>("output"); //$NON-NLS-1$
+            final Holder<String> defaultFilename = new Holder<String>("output"); 
 
             if (data.getTitle() != null) {
-                defaultFilename.setValue(data.getTitle().replaceAll("[^\\w]", //$NON-NLS-1$
-                    "_")); //$NON-NLS-1$
+                defaultFilename.setValue(data.getTitle().replaceAll("[^\\w]", 
+                    "_")); 
             }
 
-            defaultFilename.setValue(defaultFilename.getValue() + "_" //$NON-NLS-1$
-                + DateFormatter.formatAsDate(new Date()).replaceAll("_{2,}", //$NON-NLS-1$
-                    "_")); //$NON-NLS-1$
+            defaultFilename.setValue(defaultFilename.getValue() + "_" 
+                + DateFormatter.formatAsDate(new Date()).replaceAll("_{2,}", 
+                    "_")); 
 
             Display display = Display.getDefault();
             display.syncExec(new Runnable() {
@@ -99,7 +99,7 @@ public abstract class GuiDataExporter implements DataExporter {
                     if (shell != null) {
                         FileDialog fd = new FileDialog(shell, SWT.SAVE);
                         fd.setOverwrite(true);
-                        fd.setText(Messages.GuiDataExporter_exportAs);
+                        fd.setText("Export as");
                         fd.setFilterExtensions(exts);
                         fd.setFileName(defaultFilename.getValue());
 

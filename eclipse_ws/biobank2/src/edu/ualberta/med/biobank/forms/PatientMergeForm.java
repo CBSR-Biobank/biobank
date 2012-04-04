@@ -39,10 +39,10 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class PatientMergeForm extends BiobankEntryForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.PatientMergeForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.PatientMergeForm"; 
 
     public static final String MSG_PATIENT_NOT_VALID =
-        Messages.PatientMergeForm_notValid_msg;
+        "Select a second patient";
 
     private PatientWrapper patient1 = new PatientWrapper(
         SessionManager.getAppService());
@@ -71,7 +71,7 @@ public class PatientMergeForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof PatientAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         p = SessionManager
@@ -81,7 +81,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             new PatientWrapper(SessionManager.getAppService());
         patient1.setWrappedObject(p.patient);
 
-        String tabName = NLS.bind(Messages.PatientMergeForm_title,
+        String tabName = NLS.bind("Merging Patient {0}",
             patient1.getPnumber());
         setPartName(tabName);
         patientNotNullValue = new WritableValue(Boolean.FALSE, Boolean.class);
@@ -91,7 +91,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind(Messages.PatientMergeForm_form_title,
+        form.setText(NLS.bind("Merging into Patient {0}",
             patient1.getPnumber()));
         page.setLayout(new GridLayout(1, false));
         form.setImage(BgcPlugin.getDefault().getImageRegistry()
@@ -99,7 +99,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
         toolkit.createLabel(
             page,
-            NLS.bind(Messages.PatientMergeForm_description,
+            NLS.bind("Select Patient Number to merge into Patient {0} and press Enter",
                 patient1.getPnumber()), SWT.LEFT);
 
         createPatientSection();
@@ -121,7 +121,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         patient1Data.verticalAlignment = SWT.FILL;
         patientArea1.setLayoutData(patient1Data);
 
-        Label arrow = toolkit.createLabel(client, "Arrow", SWT.IMAGE_BMP); //$NON-NLS-1$
+        Label arrow = toolkit.createLabel(client, "Arrow", SWT.IMAGE_BMP); 
         arrow.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ARROW_LEFT2));
 
@@ -137,12 +137,12 @@ public class PatientMergeForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         pnumber1Text = createReadOnlyLabelledField(patientArea1, SWT.NONE,
-            Messages.PatientMergeForm_pnumber_label);
+            "Patient Number");
         pnumber1Text.setText(patient1.getPnumber());
 
         pnumber2Text = (BgcBaseText) createLabelledWidget(patientArea2,
             BgcBaseText.class, SWT.NONE,
-            Messages.PatientMergeForm_pnumber_label);
+            "Patient Number");
         pnumber2Text.addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -168,11 +168,11 @@ public class PatientMergeForm extends BiobankEntryForm {
 
         StudyWrapper selectedStudy = patient1.getStudy();
         study1Text = createReadOnlyLabelledField(patientArea1, SWT.NONE,
-            Messages.PatientMergeForm_study_label);
+            "Study");
         study1Text.setText(selectedStudy.getNameShort());
 
         study2Text = createReadOnlyLabelledField(patientArea2, SWT.NONE,
-            Messages.PatientMergeForm_study_label);
+            "Study");
 
         patient1VisitsTable = new ClinicVisitInfoTable(patientArea1,
             p.ceventInfos);
@@ -203,7 +203,7 @@ public class PatientMergeForm extends BiobankEntryForm {
                     new PatientSearchAction(pnumber));
             if (pinfo == null)
                 throw new ApplicationException(
-                    Messages.PatientMergeForm_notfound);
+                    "Patient not found");
             p2 = SessionManager
                 .getAppService().doAction(
                     new PatientGetInfoAction(pinfo.patient.getId()));
@@ -212,24 +212,24 @@ public class PatientMergeForm extends BiobankEntryForm {
             patient2.setWrappedObject(p2.patient);
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
-                Messages.PatientMergeForm_retrieve_error_title, e);
+                "Error retrieving patient", e);
             patient2VisitsTable.setList(newContents);
-            study2Text.setText(""); //$NON-NLS-1$
+            study2Text.setText(""); 
             return;
         }
         if (patient2 == null) {
             BgcPlugin.openAsyncError(
-                Messages.PatientMergeForm_pnber_invalid_error_title,
-                Messages.PatientMergeForm_pnber_invalid_error_msg);
+                "Invalid Patient Number",
+                "Cannot find a patient with that pnumber");
             patient2VisitsTable.setList(newContents);
-            study2Text.setText(""); //$NON-NLS-1$
+            study2Text.setText(""); 
             return;
         }
 
         if (patient2.equals(patient1)) {
             BgcPlugin.openAsyncError(
-                Messages.PatientMergeForm_duplicate_error_title,
-                Messages.PatientMergeForm_duplicate_error_msg);
+                "Duplicate Patient Number",
+                "Cannot merge a patient with himself");
             patient2VisitsTable.setList(newContents);
             return;
         }
@@ -239,8 +239,8 @@ public class PatientMergeForm extends BiobankEntryForm {
         if (!patient2.getStudy().equals(patient1.getStudy())) {
             patient2VisitsTable.setList(newContents);
             BgcPlugin.openAsyncError(
-                Messages.PatientMergeForm_pnber_invalid_error_title,
-                Messages.PatientMergeForm_studies_error_msg);
+                "Invalid Patient Number",
+                "Patients from different studies cannot be merged");
         } else {
             patient2VisitsTable.setList(p2.ceventInfos);
             patientNotNullValue.setValue(Boolean.TRUE);
@@ -252,8 +252,8 @@ public class PatientMergeForm extends BiobankEntryForm {
         canMerge = false;
         if (patient2 != null) {
             if (BgcPlugin.openConfirm(
-                Messages.PatientMergeForm_confirm_dialog_title,
-                NLS.bind(Messages.PatientMergeForm_confirm_dialog_msg,
+                "Confirm Merge",
+                NLS.bind("Are you sure you want to merge patient {0} into patient {1}? All collection events, source specimens, and aliquoted specimens will be transferred.",
                     patient2.getPnumber(), patient1.getPnumber()))) {
                 canMerge = true;
             }
@@ -273,7 +273,7 @@ public class PatientMergeForm extends BiobankEntryForm {
                                 .getId())).isTrue();
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
-                    Messages.PatientMergeForm_merge_error_title, e);
+                    "Merge failed.", e);
                 return;
             }
 
@@ -296,10 +296,10 @@ public class PatientMergeForm extends BiobankEntryForm {
                     closeEntryOpenView(false, true);
                 }
             });
-            SessionManager.log(Messages.PatientMergeForm_merge,
-                patient2.getPnumber() + " " + Messages.PatientMergeForm_arrow //$NON-NLS-1$
-                    + " " + patient1.getPnumber(), //$NON-NLS-1$
-                Messages.PatientMergeForm_patient);
+            SessionManager.log("merge",
+                patient2.getPnumber() + " " + "-->" 
+                    + " " + patient1.getPnumber(), 
+                "Patient");
         }
     }
 
@@ -308,8 +308,8 @@ public class PatientMergeForm extends BiobankEntryForm {
         pnumber1Text.setText(patient1.getPnumber());
         study1Text.setText(patient1.getStudy().getNameShort());
         patient1VisitsTable.setList(p.ceventInfos);
-        pnumber2Text.setText(""); //$NON-NLS-1$
-        study2Text.setText(""); //$NON-NLS-1$
+        pnumber2Text.setText(""); 
+        study2Text.setText(""); 
         patient2VisitsTable
             .setList(new ArrayList<PatientCEventInfo>());
         patient2 = null;
@@ -317,7 +317,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        return NLS.bind(Messages.PatientMergeForm_ok_msg,
+        return NLS.bind("Patient {0} will be merged into patient {1}",
             patient2.getPnumber(), patient1.getPnumber());
     }
 

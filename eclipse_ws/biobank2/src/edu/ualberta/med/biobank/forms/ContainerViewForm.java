@@ -78,7 +78,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ContainerViewForm extends BiobankViewForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ContainerViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.ContainerViewForm"; 
 
     private static BgcLogger logger = BgcLogger
         .getLogger(ContainerViewForm.class.getName());
@@ -124,13 +124,13 @@ public class ContainerViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof ContainerAdapter,
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         containerAdapter = (ContainerAdapter) adapter;
         updateContainerInfo();
 
-        setPartName(NLS.bind(Messages.ContainerViewForm_title,
+        setPartName(NLS.bind("Container {0} ({1})",
             containerInfo.container.getLabel(), containerInfo.container
                 .getContainerType().getNameShort()));
         initCells();
@@ -156,7 +156,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind(Messages.ContainerViewForm_title,
+        form.setText(NLS.bind("Container {0} ({1})",
             containerInfo.container.getLabel(), containerInfo.container
                 .getContainerType().getNameShort()));
         page.setLayout(new GridLayout(1, false));
@@ -182,22 +182,22 @@ public class ContainerViewForm extends BiobankViewForm {
 
         siteLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.container_field_label_site);
+                "Repository Site");
         containerLabelLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.container_field_label_label);
+                "Label");
         productBarcodeLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.container_field_label_barcode);
+                "Product Bar Code");
         activityStatusLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.label_activity);
+                "Activity status");
         containerTypeLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.container_field_label_type);
+                "Container Type");
         temperatureLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.container_field_label_temperature);
+                "Temperature");
 
         createCommentsSection();
 
@@ -210,7 +210,7 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient(Messages.label_comments);
+        Composite client = createSectionWithClient("Comments");
         commentTable =
             new CommentsInfoTable(client,
                 ModelWrapper.wrapModelCollection(
@@ -232,8 +232,8 @@ public class ContainerViewForm extends BiobankViewForm {
             Integer colCap =
                 containerInfo.container.getContainerType().getCapacity()
                     .getColCapacity();
-            Assert.isNotNull(rowCap, "row capacity is null"); //$NON-NLS-1$
-            Assert.isNotNull(colCap, "column capacity is null"); //$NON-NLS-1$
+            Assert.isNotNull(rowCap, "row capacity is null"); 
+            Assert.isNotNull(colCap, "column capacity is null"); 
             if (rowCap == 0) rowCap = 1;
             if (colCap == 0) colCap = 1;
 
@@ -264,8 +264,8 @@ public class ContainerViewForm extends BiobankViewForm {
             }
         } catch (Exception ex) {
             BgcPlugin.openAsyncError(
-                Messages.ContainerViewForm_initCell_error_title,
-                Messages.ContainerViewForm_initCell_error_msg);
+                "Positions errors",
+                "Some child container has wrong position number");
             childrenOk = false;
         }
     }
@@ -280,7 +280,7 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     protected void createVisualizeContainer() {
-        Section s = createSection(Messages.ContainerViewForm_visual_title);
+        Section s = createSection("Container Visual");
         s.setLayout(new GridLayout(1, false));
         Composite containerSection = new Composite(s, SWT.NONE);
         containerSection.setLayout(new FillLayout(SWT.VERTICAL));
@@ -298,7 +298,7 @@ public class ContainerViewForm extends BiobankViewForm {
         if (!childrenOk) {
             Label label =
                 toolkit.createLabel(client,
-                    Messages.ContainerViewForm_visualization_error_msg);
+                    "Error in container children : can't display those initialized");
             label.setForeground(Display.getCurrent().getSystemColor(
                 SWT.COLOR_RED));
         }
@@ -357,7 +357,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 initSelectionCv =
                     createComboViewer(
                         childrenActionSection,
-                        Messages.ContainerViewForm_visualization_init_selection_label,
+                        "Initialize selection to",
                         containerTypes, containerTypes.get(0));
                 initSelectionCv.getCombo()
                     .setLayoutData(new GridData(SWT.LEFT));
@@ -365,7 +365,7 @@ public class ContainerViewForm extends BiobankViewForm {
                     toolkit
                         .createButton(
                             childrenActionSection,
-                            Messages.ContainerViewForm_visualization_init_button_text,
+                            "Initialize",
                             SWT.PUSH);
                 initializeSelectionButton
                     .addSelectionListener(new SelectionAdapter() {
@@ -384,20 +384,20 @@ public class ContainerViewForm extends BiobankViewForm {
                 // Delete action for selection
                 List<Object> deleteComboList = new ArrayList<Object>();
                 deleteComboList
-                    .add(Messages.ContainerViewForm_visualization_all_label);
+                    .add("All");
                 deleteComboList.addAll(containerTypes);
                 deleteCv =
                     createComboViewer(
                         childrenActionSection,
-                        Messages.ContainerViewForm_visualization_delete_select_label,
+                        "Delete selected containers of type",
                         deleteComboList,
-                        Messages.ContainerViewForm_visualization_all_label);
+                        "All");
                 deleteCv.getCombo().setLayoutData(new GridData(SWT.LEFT));
                 Button deleteButton =
                     toolkit
                         .createButton(
                             childrenActionSection,
-                            Messages.ContainerViewForm_visualization_delete_button_text,
+                            "Delete",
                             SWT.PUSH);
                 deleteButton.setLayoutData(new GridData(SWT.LEFT));
                 deleteButton.addSelectionListener(new SelectionAdapter() {
@@ -408,8 +408,8 @@ public class ContainerViewForm extends BiobankViewForm {
                                 .openConfirm(
                                     PlatformUI.getWorkbench()
                                         .getActiveWorkbenchWindow().getShell(),
-                                    Messages.ContainerViewForm_vizualisation_delete_confirm_title,
-                                    Messages.ContainerViewForm_vizualisation_delete_confirm_msg);
+                                    "Confirm Delete",
+                                    "Are you sure you want to delete these containers?");
                         if (confirm) {
                             Object selection =
                                 ((IStructuredSelection) deleteCv.getSelection())
@@ -444,7 +444,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 public void run(final IProgressMonitor monitor) {
                     monitor
                         .beginTask(
-                            Messages.ContainerViewForm_vizualisation_init_monitor_msg,
+                            "Initializing...",
                             IProgressMonitor.UNKNOWN);
                     boolean initDone = true;
                     try {
@@ -456,7 +456,7 @@ public class ContainerViewForm extends BiobankViewForm {
                         initDone = false;
                         BgcPlugin
                             .openAsyncError(
-                                Messages.ContainerViewForm_visualization_init_error_msg,
+                                "Error while creating children",
                                 e);
                     }
                     refresh(initDone, false);
@@ -473,7 +473,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.ContainerViewForm_visualization_init_error_msg, e);
+                "Error while creating children", e);
             refresh(false, false);
         }
     }
@@ -501,7 +501,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 public void run(final IProgressMonitor monitor) {
                     monitor
                         .beginTask(
-                            Messages.ContainerViewForm_visualization_delete_monitor_msg,
+                            "Deleting...",
                             IProgressMonitor.UNKNOWN);
                     boolean deleteDones = false;
                     try {
@@ -514,7 +514,7 @@ public class ContainerViewForm extends BiobankViewForm {
                     } catch (Exception ex) {
                         BgcPlugin
                             .openAsyncError(
-                                Messages.ContainerViewForm_visualization_delete_error_msg,
+                                "Can't Delete Containers",
                                 ex);
                     }
                     refresh(deleteDones, true);
@@ -530,7 +530,7 @@ public class ContainerViewForm extends BiobankViewForm {
             });
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.ContainerViewForm_visualization_delete_error_msg, e);
+                "Can't Delete Containers", e);
             refresh(false, false);
         }
     }
@@ -560,7 +560,7 @@ public class ContainerViewForm extends BiobankViewForm {
                         reload();
                     } catch (Exception e) {
                         logger.error(
-                            Messages.ContainerViewForm_refresh_error_msg, e);
+                            "Error loading", e);
                     }
                     if (rebuild) {
                         containerAdapter.rebuild();
@@ -622,7 +622,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createSpecimensSection() {
         Composite parent =
-            createSectionWithClient(Messages.ContainerViewForm_specimens_title);
+            createSectionWithClient("Specimens");
         specimensWidget =
             new NewSpecimenInfoTable(parent, specInfo,
                 ColumnsShown.CEVENT_SOURCE_SPECIMENS, 20);
@@ -664,7 +664,7 @@ public class ContainerViewForm extends BiobankViewForm {
     public void setValues() throws Exception {
         if (form.isDisposed()) return;
 
-        form.setText(NLS.bind(Messages.ContainerViewForm_title,
+        form.setText(NLS.bind("Container {0} ({1})",
             containerInfo.container
                 .getLabel(), containerInfo.container.getContainerType()
                 .getNameShort()));
@@ -675,7 +675,7 @@ public class ContainerViewForm extends BiobankViewForm {
         List<ContainerTypeWrapper> containerTypes = getChildContainerTypes();
         List<Object> deleteComboList = new ArrayList<Object>();
         deleteComboList
-            .add(Messages.ContainerViewForm_visualization_all_label);
+            .add("All");
         deleteComboList.addAll(containerTypes);
 
         if (initSelectionCv != null) {

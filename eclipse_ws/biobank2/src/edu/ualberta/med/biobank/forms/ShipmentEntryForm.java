@@ -449,7 +449,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient(Messages.Comments_title);
+        Composite client = createSectionWithClient("Comments");
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -462,7 +462,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.MULTI, Messages.Comments_add, null, comment, "message", null);
+            SWT.MULTI, "Add a comment", null, comment, "message", null);
 
     }
 

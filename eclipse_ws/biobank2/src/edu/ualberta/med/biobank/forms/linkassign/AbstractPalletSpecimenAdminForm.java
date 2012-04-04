@@ -61,14 +61,14 @@ import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManage
 public abstract class AbstractPalletSpecimenAdminForm extends
     AbstractSpecimenAdminForm {
 
-    private static final String PLATE_VALIDATOR = "plate-validator"; //$NON-NLS-1$
+    private static final String PLATE_VALIDATOR = "plate-validator"; 
     private BgcBaseText plateToScanText;
     protected Button scanButton;
     private String scanButtonTitle;
 
     protected CancelConfirmWidget cancelConfirmWidget;
 
-    private static String plateToScanSessionString = ""; //$NON-NLS-1$
+    private static String plateToScanSessionString = ""; 
 
     private IObservableValue plateToScanValue = new WritableValue(
         plateToScanSessionString, String.class);
@@ -118,10 +118,10 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             protected void beforeScan() {
                 setScanHasBeenLaunched(false, true);
                 String msg =
-                    Messages.AbstractPalletSpecimenAdminForm_activitylog_scanning;
+                    "----SCAN on plate {0}----";
                 if (isRescanMode()) {
                     msg =
-                        Messages.AbstractPalletSpecimenAdminForm_activitylog_rescanning;
+                        "----RESCAN on plate {0}----";
                 }
                 appendLog(NLS.bind(msg, currentPlateToScan));
 
@@ -148,7 +148,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             protected void afterSuccessfulScan() {
                 appendLog(NLS
                     .bind(
-                        Messages.AbstractPalletSpecimenAdminForm_activitylog_scanRes_total,
+                        "Scan completed - {0} specimens found",
                         cells.keySet().size()));
             }
 
@@ -191,7 +191,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             public void propertyChange(PropertyChangeEvent event) {
                 // force a check on available plates
                 String plateText = plateToScanText.getText();
-                plateToScanText.setText(""); //$NON-NLS-1$
+                plateToScanText.setText(""); 
                 plateToScanText.setText(plateText);
             }
         };
@@ -221,7 +221,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         synchronized (plateToScanSessionString) {
             plateToScanSessionString = (String) plateToScanValue.getValue();
             if (finished || BiobankPlugin.getPlatesEnabledCount() != 1) {
-                plateToScanSessionString = ""; //$NON-NLS-1$
+                plateToScanSessionString = ""; 
             }
         }
         return super.onClose();
@@ -230,7 +230,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected void setRescanMode() {
         if (palletScanManagement.getScansCount() > 0) {
             scanButton
-                .setText(Messages.AbstractPalletSpecimenAdminForm_retryScan_label);
+                .setText("Retry scan");
             rescanMode = true;
             enableFields(false);
         }
@@ -240,10 +240,10 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void createScanButton(Composite parent) {
         scanButtonTitle =
-            Messages.AbstractPalletSpecimenAdminForm_scanButton_text;
+            "Launch scan";
         if (!BiobankPlugin.isRealScanEnabled()) {
             createFakeOptions(parent);
-            scanButtonTitle = "Fake scan"; //$NON-NLS-1$
+            scanButtonTitle = "Fake scan"; 
         }
         scanButton = toolkit.createButton(parent, scanButtonTitle, SWT.PUSH);
         GridData gd = new GridData();
@@ -259,14 +259,14 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
             canLaunchScanValue,
-            Messages.AbstractPalletSpecimenAdminForm_canLaunchScanValidationMsg);
+            "Errors have been previously detected. Cannot launch scan.");
         addBooleanBinding(
             new WritableValue(Boolean.FALSE, Boolean.class),
             scanHasBeenLaunchedValue,
-            Messages.AbstractPalletSpecimenAdminForm_scanHasBeenLaunchedValidationMsg);
+            "Scanner should be launched");
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
             scanValidValue,
-            Messages.AbstractPalletSpecimenAdminForm_scanValidValidationMsg);
+            "Errors in scanning result");
     }
 
     protected void launchScanAndProcessResult() {
@@ -288,7 +288,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void createProfileComboBox(Composite fieldsComposite) {
         Label lbl = widgetCreator.createLabel(fieldsComposite,
-            Messages.AbstractPalletSpecimenAdminForm_profile_label);
+            "Profile");
         profilesCombo =
             widgetCreator
                 .createComboViewer(
@@ -296,7 +296,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                     lbl,
                     null,
                     null,
-                    "Invalid profile selected", false, null, null, new BiobankLabelProvider()); //$NON-NLS-1$
+                    "Invalid profile selected", false, null, null, new BiobankLabelProvider()); 
 
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
@@ -323,7 +323,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void createPlateToScanField(Composite fieldsComposite) {
         plateToScanLabel = widgetCreator.createLabel(fieldsComposite,
-            Messages.AbstractPalletSpecimenAdminForm_plateToScan_label);
+            "Plate to scan");
         plateToScanText =
             (BgcBaseText) widgetCreator
                 .createBoundWidget(
@@ -334,7 +334,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                     new String[0],
                     plateToScanValue,
                     new ScannerBarcodeValidator(
-                        Messages.AbstractPalletSpecimenAdminForm_plateToScan_validationMsg),
+                        "Enter a valid plate barcode"),
                     PLATE_VALIDATOR);
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
@@ -353,13 +353,13 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
         });
         String tooltip =
-            Messages.AbstractPalletSpecimenAdminForm_nobarcodes_msg;
+            "No barcodes availables. See the preferences to complete the configuration.";
         List<String> barcodes = BiobankPlugin.getDefault()
             .getPossibleBarcodes();
         if (barcodes.size() > 0)
             tooltip =
-                Messages.AbstractPalletSpecimenAdminForm_barcodes_tooltip_msg
-                    + StringUtil.join(barcodes, ", ");//$NON-NLS-1$
+                "Available barcodes are: "
+                    + StringUtil.join(barcodes, ", ");
         plateToScanText.setToolTipText(tooltip);
         GridData gd = (GridData) plateToScanText.getLayoutData();
         gd.horizontalAlignment = SWT.FILL;
@@ -481,7 +481,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected void postprocessScanTubeAlone(PalletCell palletCell)
         throws Exception {
         appendLog(NLS.bind(
-            Messages.AbstractPalletSpecimenAdminForm_activitylog_scanTubeAlone,
+            "Tube {0} scanned and set to position {1}",
             palletCell.getValue(), ContainerLabelingSchemeWrapper
                 .rowColToSbs(palletCell.getRowColPos())));
         beforeScanTubeAlone();
@@ -524,7 +524,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void createScanTubeAloneButton(Composite parent) {
-        scanTubeAloneSwitch = toolkit.createLabel(parent, "", SWT.NONE); //$NON-NLS-1$
+        scanTubeAloneSwitch = toolkit.createLabel(parent, "", SWT.NONE); 
         GridData gd = new GridData();
         gd.verticalAlignment = SWT.TOP;
         scanTubeAloneSwitch.setLayoutData(gd);
@@ -612,7 +612,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                 monitor
                     .subTask(NLS
                         .bind(
-                            Messages.AbstractPalletSpecimenAdminForm_scan_monitor_position,
+                            "Processing position {0}",
                             ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
                 PalletCell palletCell = cells.get(entry.getKey());
                 CellInfo servercell = entry.getValue();

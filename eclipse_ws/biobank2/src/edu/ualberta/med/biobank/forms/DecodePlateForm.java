@@ -26,7 +26,7 @@ import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManage
 
 public class DecodePlateForm extends PlateForm {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.DecodePlateForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.DecodePlateForm"; 
 
     private ScanPalletWidget spw;
 
@@ -36,7 +36,7 @@ public class DecodePlateForm extends PlateForm {
 
     @Override
     protected void init() throws Exception {
-        setPartName(Messages.DecodePlate_tabTitle);
+        setPartName("Decode Plate");
     }
 
     @Override
@@ -47,7 +47,7 @@ public class DecodePlateForm extends PlateForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.DecodePlate_tabTitle);
+        form.setText("Decode Plate");
         GridLayout layout = new GridLayout(2, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
@@ -60,7 +60,7 @@ public class DecodePlateForm extends PlateForm {
         plateSelectionWidget.setLayoutData(gd);
 
         scanButton = toolkit.createButton(page,
-            Messages.DecodePlateForm_button_scan_decode_label, SWT.PUSH);
+            "Scan && Decode Plate", SWT.PUSH);
         scanButton
             .setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
         scanButton.addSelectionListener(new SelectionAdapter() {
@@ -88,15 +88,15 @@ public class DecodePlateForm extends PlateForm {
         plateToScan = plateSelectionWidget.getSelectedPlate();
 
         if (plateToScan == null) {
-            BgcPlugin.openAsyncError(Messages.DecodePlateForm_error_title,
-                Messages.DecodePlateForm_noplate_error_msg);
+            BgcPlugin.openAsyncError("Decode Plate Error",
+                "No plate selected");
             return;
         }
 
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) {
-                monitor.beginTask(Messages.DecodePlateForm_scanning_decoding,
+                monitor.beginTask("Scanning and decoding...",
                     IProgressMonitor.UNKNOWN);
                 try {
                     scanAndProcessResult(monitor);
@@ -104,7 +104,7 @@ public class DecodePlateForm extends PlateForm {
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        Messages.DecodePlate_dialog_scanError_title, e);
+                        "Scan && Decode Error", e);
                 }
                 monitor.done();
             }
@@ -120,7 +120,7 @@ public class DecodePlateForm extends PlateForm {
     protected void scanAndProcessResult(IProgressMonitor monitor)
         throws Exception {
         launchScan(monitor);
-        monitor.subTask(Messages.DecodePlateForm_decoding);
+        monitor.subTask("Decoding...");
 
         Display.getDefault().asyncExec(new Runnable() {
             @Override
@@ -132,7 +132,7 @@ public class DecodePlateForm extends PlateForm {
     }
 
     protected void launchScan(IProgressMonitor monitor) throws Exception {
-        monitor.subTask(Messages.DecodePlateForm_launching);
+        monitor.subTask("Launching scan");
 
         List<ScanCell> decodedCells = ScannerConfigPlugin.decodePlate(
             plateToScan, ProfileManager.ALL_PROFILE_NAME);

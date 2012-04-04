@@ -46,7 +46,7 @@ import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 public class DispatchViewForm extends BiobankViewForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.DispatchViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.DispatchViewForm"; 
 
     private DispatchAdapter dispatchAdapter;
 
@@ -74,14 +74,14 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof DispatchAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         dispatchAdapter = (DispatchAdapter) adapter;
 
         setDispatchInfo(adapter.getId());
 
-        setPartName(Messages.DispatchViewForm_title);
+        setPartName("Dispatch");
     }
 
     private void setDispatchInfo(Integer id) throws Exception {
@@ -114,10 +114,10 @@ public class DispatchViewForm extends BiobankViewForm {
         }
         if (dateString == null)
             form.setText(NLS.bind(
-                Messages.DispatchViewForm_preparation_title, dateString,
+                "Dispatch created for {1}", dateString,
                 dispatch.getSenderCenter().getNameShort()));
         else
-            form.setText(NLS.bind(Messages.DispatchViewForm_sent_title,
+            form.setText(NLS.bind("Dispatch sent on {0} from {1}",
                 dateString, dispatch.getSenderCenter().getNameShort()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -158,7 +158,7 @@ public class DispatchViewForm extends BiobankViewForm {
     private void createTreeTableSection() {
         if (dispatch.isInCreationState()) {
             Composite parent =
-                createSectionWithClient(Messages.DispatchViewForm_specimen_section_label);
+                createSectionWithClient("Specimens added");
             specimensNonProcessedTable =
                 new DispatchSpecimenListInfoTable(parent, dispatch, false) {
                     @Override
@@ -226,7 +226,7 @@ public class DispatchViewForm extends BiobankViewForm {
         composite.setLayout(new GridLayout(3, false));
         Button sendButton =
             toolkit.createButton(composite,
-                Messages.DispatchViewForm_receive_button_label, SWT.PUSH);
+                "Receive", SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -236,7 +236,7 @@ public class DispatchViewForm extends BiobankViewForm {
 
         Button sendProcessButton =
             toolkit.createButton(composite,
-                Messages.DispatchViewForm_receive_process_button_label,
+                "Receive and Process",
                 SWT.PUSH);
         sendProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -247,7 +247,7 @@ public class DispatchViewForm extends BiobankViewForm {
 
         Button lostProcessButton =
             toolkit.createButton(composite,
-                Messages.DispatchViewForm_lost_button_label, SWT.PUSH);
+                "Lost", SWT.PUSH);
         lostProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -261,7 +261,7 @@ public class DispatchViewForm extends BiobankViewForm {
         composite.setLayout(new GridLayout(2, false));
         Button sendButton =
             toolkit.createButton(composite,
-                Messages.DispatchViewForm_done_button_label, SWT.PUSH);
+                "Done", SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -273,7 +273,7 @@ public class DispatchViewForm extends BiobankViewForm {
     private void createSendButton() {
         final Button sendButton =
             toolkit.createButton(page,
-                Messages.DispatchViewForm_send_button_label, SWT.PUSH);
+                "Send", SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -287,7 +287,7 @@ public class DispatchViewForm extends BiobankViewForm {
                             @Override
                             public void run(final IProgressMonitor monitor) {
                                 monitor.beginTask(
-                                    Messages.DispatchViewForm_saving_text,
+                                    "Saving...",
                                     IProgressMonitor.UNKNOWN);
                                 try {
                                     dispatchAdapter.setModelObject(dispatch);
@@ -301,7 +301,7 @@ public class DispatchViewForm extends BiobankViewForm {
                         });
                     } catch (Exception e1) {
                         BgcPlugin.openAsyncError(
-                            Messages.DispatchViewForm_save_error_title, e1);
+                            "Save error", e1);
                     }
                     SpecimenTransitView.getCurrent().reload();
                     dispatchAdapter.openViewForm();
@@ -320,9 +320,9 @@ public class DispatchViewForm extends BiobankViewForm {
 
         String stateMessage = null;
         if (dispatch.isInLostState())
-            stateMessage = Messages.DispatchViewForm_lost_msg;
+            stateMessage = " Dispatch Lost ";
         else if (dispatch.isInClosedState())
-            stateMessage = Messages.DispatchViewForm_complete_msg;
+            stateMessage = " Dispatch Complete ";
         if (stateMessage != null) {
             Label label =
                 widgetCreator.createLabel(client, stateMessage, SWT.CENTER,
@@ -340,31 +340,31 @@ public class DispatchViewForm extends BiobankViewForm {
 
         senderLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.DispatchViewForm_sender_label);
+                "Sender");
         receiverLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.DispatchViewForm_receiver_label);
+                "Receiver");
         if (!dispatch.isInCreationState()) {
             departedLabel =
                 createReadOnlyLabelledField(client, SWT.NONE,
-                    Messages.DispatchViewForm_packedAt_label);
+                    "Packed at");
             shippingMethodLabel =
                 createReadOnlyLabelledField(client, SWT.NONE,
-                    Messages.DispatchViewForm_shippingMethod_label);
+                    "Shipping Method");
             waybillLabel =
                 createReadOnlyLabelledField(client, SWT.NONE,
-                    Messages.DispatchViewForm_waybill_label);
+                    "Waybill");
         }
         if (dispatch.hasBeenReceived()) {
             dateReceivedLabel =
                 createReadOnlyLabelledField(client, SWT.NONE,
-                    Messages.DispatchViewForm_received_label);
+                    "Date received");
         }
         createCommentsSection();
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient(Messages.label_comments);
+        Composite client = createSectionWithClient("Comments");
         commentTable =
             new CommentsInfoTable(client,
                 dispatch.getCommentCollection(false));
@@ -387,7 +387,7 @@ public class DispatchViewForm extends BiobankViewForm {
         if (shipInfo != null) {
             if (shippingMethodLabel != null)
                 setTextValue(shippingMethodLabel,
-                    shipInfo.getShippingMethod() == null ? "" : shipInfo //$NON-NLS-1$
+                    shipInfo.getShippingMethod() == null ? "" : shipInfo 
                         .getShippingMethod().getName());
             if (waybillLabel != null)
                 setTextValue(waybillLabel, shipInfo.getWaybill());

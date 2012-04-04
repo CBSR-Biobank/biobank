@@ -43,15 +43,15 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicEntryForm extends AddressEntryFormCommon {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ClinicEntryForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.ClinicEntryForm"; 
 
     private static final String MSG_NEW_CLINIC_OK =
-        Messages.ClinicEntryForm_creation_msg;
+        "New clinic information.";
 
-    private static final String MSG_CLINIC_OK = Messages.ClinicEntryForm_msg_ok;
+    private static final String MSG_CLINIC_OK = "Clinic information.";
 
     private static final String MSG_NO_CLINIC_NAME =
-        Messages.ClinicEntryForm_msg_noClinicName;
+        "Clinic must have a name";
 
     private ClinicWrapper clinic = new ClinicWrapper(
         SessionManager.getAppService());
@@ -80,16 +80,16 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ClinicAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
         updateClinicInfo(adapter.getId());
         String tabName;
         if (clinic.isNew()) {
-            tabName = Messages.ClinicEntryForm_title_new;
+            tabName = "New Clinic";
             clinic.setActivityStatus(ActivityStatus.ACTIVE);
         } else
             tabName =
-                NLS.bind(Messages.ClinicEntryForm_title_edit,
+                NLS.bind("Clinic {0}",
                     clinic.getNameShort());
         setPartName(tabName);
     }
@@ -118,9 +118,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void createFormContent() throws ApplicationException {
-        form.setText(Messages.ClinicEntryForm_main_title);
+        form.setText("Clinic Information");
         page.setLayout(new GridLayout(1, false));
-        toolkit.createLabel(page, Messages.ClinicEntryForm_main_description,
+        toolkit.createLabel(page, "Clinics can be associated with studies after submitting this initial information.",
             SWT.LEFT);
         createClinicInfoSection();
         createAddressArea(clinic);
@@ -138,24 +138,24 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, Messages.label_name, null, clinic,
+            SWT.NONE, "Name", null, clinic,
             ClinicPeer.NAME.getName(), new NonEmptyStringValidator(
                 MSG_NO_CLINIC_NAME)));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.label_nameShort, null, clinic,
+            "Short name", null, clinic,
             ClinicPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 MSG_NO_CLINIC_NAME));
 
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            Messages.clinic_field_label_sendsShipments, null, clinic,
+            "Sends Shipments", null, clinic,
             ClinicPeer.SENDS_SHIPMENTS.getName(), null);
         toolkit.paintBordersFor(client);
 
         activityStatusComboViewer =
-            createComboViewer(client, Messages.label_activity,
+            createComboViewer(client, "Activity status",
                 ActivityStatus.valuesList(), clinic.getActivityStatus(),
-                Messages.ClinicEntryForm_activity_validator_msg,
+                "Clinic must have an activity status",
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -169,7 +169,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient(Messages.Comments_title);
+        Composite client = createSectionWithClient("Comments");
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -183,11 +183,11 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         comment = new CommentWrapper(SessionManager.getAppService());
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.Comments_add, null, comment, "message", null);
+            "Add a Comment", null, comment, "message", null);
     }
 
     private void createContactSection() {
-        Section section = createSection(Messages.clinic_contact_title);
+        Section section = createSection("Contacts");
 
         List<ContactWrapper> contacts =
             ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
@@ -197,7 +197,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         contactEntryWidget.adaptToToolkit(toolkit, true);
         contactEntryWidget.addSelectionChangedListener(listener);
 
-        addSectionToolbar(section, Messages.ClinicEntryForm_contact_button_add,
+        addSectionToolbar(section, "Add contact",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
