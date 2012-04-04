@@ -13,11 +13,11 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 public class EnterCommentPage extends BgcWizardPage {
     public static final String PAGE_NAME = EnterCommentPage.class
         .getCanonicalName();
-    private static final String COMMENT_REQUIRED = Messages.EnterCommentPage_required_msg;
+    private static final String COMMENT_REQUIRED = "Please enter a comment.";
     private String comment;
 
     public EnterCommentPage() {
-        super(PAGE_NAME, Messages.EnterCommentPage_description, null);
+        super(PAGE_NAME, "Enter a comment to explain the modification", null);
     }
 
     public String getComment() {
@@ -36,8 +36,8 @@ public class EnterCommentPage extends BgcWizardPage {
 
         getWidgetCreator().createBoundWidgetWithLabel(content,
             BgcBaseText.class, SWT.BORDER | SWT.MULTI,
-            Messages.EnterCommentPage_comment_label, null,
-            PojoObservables.observeValue(this, "comment"), //$NON-NLS-1$
+            "Comment", null,
+            PojoObservables.observeValue(this, "comment"), 
             new NonEmptyStringValidator(COMMENT_REQUIRED));
 
         setControl(content);

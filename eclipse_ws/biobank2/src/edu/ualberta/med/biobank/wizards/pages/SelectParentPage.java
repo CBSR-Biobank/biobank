@@ -26,12 +26,12 @@ public class SelectParentPage extends BgcWizardPage {
     public static final String PAGE_NAME = SelectParentPage.class
         .getCanonicalName();
     private static final String PARENT_REQUIRED =
-        Messages.SelectParentPage_required_msg;
+        "Please select its correct parent.";
     private Button isSourceSpecimen;
     private NewSpecimenInfoTable specTable;
 
     public SelectParentPage() {
-        super(PAGE_NAME, Messages.SelectParentPage_description, null);
+        super(PAGE_NAME, "Select a parent specimen", null);
     }
 
     public void setParentSpecimenList(List<SpecimenInfo> specs) {

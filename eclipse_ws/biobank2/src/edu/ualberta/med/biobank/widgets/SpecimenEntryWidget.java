@@ -85,7 +85,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
     public SpecimenEntryWidget(Composite parent, int style,
         FormToolkit toolkit, boolean editable) {
         super(parent, style);
-        Assert.isNotNull(toolkit, "toolkit is null"); //$NON-NLS-1$
+        Assert.isNotNull(toolkit, "toolkit is null"); 
         this.editable = editable;
 
         setLayout(new GridLayout(2, false));
@@ -94,7 +94,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
 
         if (editable) {
             Label label = toolkit.createLabel(this,
-                Messages.SpecimenEntryWidget_inventoryid_label);
+                "Enter specimen inventory ID to add:");
             GridData gd = new GridData();
             gd.horizontalSpan = 2;
             label.setLayoutData(gd);
@@ -105,10 +105,10 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                     public void handleEvent(Event e) {
                         addSpecimen();
                         newSpecimenInventoryId.setFocus();
-                        newSpecimenInventoryId.setText(""); //$NON-NLS-1$
+                        newSpecimenInventoryId.setText(""); 
                     }
                 });
-            addButton = toolkit.createButton(this, "", SWT.PUSH); //$NON-NLS-1$
+            addButton = toolkit.createButton(this, "", SWT.PUSH); 
             addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_ADD));
             addButton.addSelectionListener(new SelectionAdapter() {
@@ -163,34 +163,34 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                 ispecimen.specimen = bspecimen.getSpecimen();
                 ispecimen.parentLabel =
                     bspecimen.getParents().size() > 0 ? bspecimen.getParents()
-                        .pop().getLabel() : ""; //$NON-NLS-1$
+                        .pop().getLabel() : ""; 
                 ispecimen.positionString =
                     bspecimen.getSpecimen().getSpecimenPosition() != null ?
                         bspecimen.getSpecimen().getSpecimenPosition()
                             .getPositionString() : null;
                 ispecimen.comment =
-                    bspecimen.getSpecimen().getComments().size() == 0 ? Messages.SpecimenEntryWidget_no
-                        : Messages.SpecimenEntryWidget_yes;
+                    bspecimen.getSpecimen().getComments().size() == 0 ? "N"
+                        : "Y";
 
                 try {
                     addSpecimen(ispecimen);
                 } catch (VetoException e) {
                     BgcPlugin.openAsyncError(
-                        Messages.SpecimenEntryWidget_error_title,
+                        "Error",
                         e.getMessage());
                 }
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
-                    Messages.SpecimenEntryWidget_retrieve_error_title,
-                    Messages.SpecimenEntryWidget_notfound);
+                    "Error while looking up specimen",
+                    "Specimen not found.");
             }
         }
     }
 
     public void addSpecimen(SpecimenInfo specimen) throws VetoException {
         if (specimen != null && specimens.contains(specimen)) {
-            BgcPlugin.openAsyncError(Messages.SpecimenEntryWidget_error_title,
-                NLS.bind(Messages.SpecimenEntryWidget_already_added_error_msg,
+            BgcPlugin.openAsyncError("Error",
+                NLS.bind("Specimen {0} has already been added to this list",
                     specimen.specimen.getInventoryId()));
             return;
         }
@@ -234,9 +234,9 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                         if (!MessageDialog.openConfirm(
                             PlatformUI.getWorkbench()
                                 .getActiveWorkbenchWindow().getShell(),
-                            Messages.SpecimenEntryWidget_delete_question_title,
+                            "Delete Specimen",
                             NLS.bind(
-                                Messages.SpecimenEntryWidget_delete_question_msg,
+                                "Are you sure you want to remove specimen {0}?",
                                 specimen.specimen.getInventoryId()))) {
                             return;
                         }
@@ -245,7 +245,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                             removeSpecimen(specimen);
                         } catch (VetoException e) {
                             BgcPlugin.openAsyncError(
-                                Messages.SpecimenEntryWidget_error_title,
+                                "Error",
                                 e.getMessage());
                         }
                     }

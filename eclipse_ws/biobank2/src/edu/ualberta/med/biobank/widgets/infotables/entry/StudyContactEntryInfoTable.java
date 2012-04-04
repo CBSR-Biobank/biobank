@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
-import edu.ualberta.med.biobank.widgets.infotables.Messages;
 
 public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
 
@@ -33,18 +32,18 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
         public String toString() {
             return StringUtils.join(new String[] { clinicNameShort, name,
                 title, emailAddress, mobileNumber, pagerNumber, officeNumber },
-                "\t"); //$NON-NLS-1$
+                "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.StudyContactEntryInfoTable_clinic_label,
-        Messages.StudyContactEntryInfoTable_name_label,
-        Messages.StudyContactEntryInfoTable_title_label,
-        Messages.StudyContactEntryInfoTable_email_label,
-        Messages.StudyContactEntryInfoTable_mobile_label,
-        Messages.StudyContactEntryInfoTable_pager_label,
-        Messages.StudyContactEntryInfoTable_office_label };
+        "Clinic",
+        "Contact Name",
+        "Title",
+        "Email",
+        "Mobile #",
+        "Pager #",
+        "Office #" };
 
     public StudyContactEntryInfoTable(Composite parent,
         List<Contact> contactCollection) {
@@ -61,9 +60,9 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return "loading...";
                     }
-                    return ""; //$NON-NLS-1$
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:
@@ -81,7 +80,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
                 case 6:
                     return item.officeNumber;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return "";
                 }
             }
         };
@@ -94,12 +93,12 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
         TableRowData info = new TableRowData();
         info.contact = (Contact) o;
         Clinic clinic = info.contact.getClinic();
-        Assert.isNotNull(clinic, "contact's clinic is null"); //$NON-NLS-1$
+        Assert.isNotNull(clinic, "contact's clinic is null");
         info.clinicNameShort = clinic.getNameShort();
         info.name = info.contact.getName();
         info.title = info.contact.getTitle();
         if (info.title == null) {
-            info.title = ""; //$NON-NLS-1$
+            info.title = "";
         }
         info.emailAddress = info.contact.getEmailAddress();
         info.mobileNumber = info.contact.getMobileNumber();

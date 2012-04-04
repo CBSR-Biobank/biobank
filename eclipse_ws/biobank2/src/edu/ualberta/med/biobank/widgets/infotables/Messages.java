@@ -82,7 +82,6 @@ public class Messages extends NLS {
 
     public static String ContainerTypeInfoTable_use_label;
 
-    public static String infotable_loading_msg;
     public static String label_activity;
 
     public static String ShippingMethodInfoTable_ship_label;
@@ -130,20 +129,6 @@ public class Messages extends NLS {
     public static String SpecimenTypeInfoTable_shortname_label;
 
     public static String SpecimenTypeInfoTable_type_label;
-
-    public static String StudyContactEntryInfoTable_clinic_label;
-
-    public static String StudyContactEntryInfoTable_email_label;
-
-    public static String StudyContactEntryInfoTable_mobile_label;
-
-    public static String StudyContactEntryInfoTable_name_label;
-
-    public static String StudyContactEntryInfoTable_office_label;
-
-    public static String StudyContactEntryInfoTable_pager_label;
-
-    public static String StudyContactEntryInfoTable_title_label;
 
     public static String StudyContactInfoTable_cEvent_count_label;
 

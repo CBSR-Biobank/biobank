@@ -51,7 +51,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
             }
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.ClinicAddInfoTable_retrieve_error_title, e);
+                "Unable to retrieve available contacts", e);
         }
     }
 
@@ -68,11 +68,13 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
             public void deleteItem(InfoTableEvent<Contact> event) {
                 Contact contact = getSelection();
                 if (contact != null) {
-                    if (!BgcPlugin.openConfirm(
-                        Messages.ClinicAddInfoTable_delete_confirm_title, NLS
-                            .bind(
-                                Messages.ClinicAddInfoTable_delete_confirm_msg,
-                                contact.getName()))) {
+                    if (!BgcPlugin
+                        .openConfirm(
+                            "Delete Contact",
+                            NLS
+                                .bind(
+                                    "Are you sure you want to delete contact \"{0}\"?",
+                                    contact.getName()))) {
                         return;
                     }
                     getList().remove(contact);

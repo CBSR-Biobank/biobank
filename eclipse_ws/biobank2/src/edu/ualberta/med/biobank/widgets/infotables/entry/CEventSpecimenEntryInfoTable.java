@@ -53,8 +53,8 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
             }
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
-                Messages.CEventSpecimenEntryInfoTable_error,
-                Messages.CEventSpecimenEntryInfoTable_message);
+                "Permission Error",
+                "Unable to retrieve user permissions");
         }
     }
 
@@ -129,9 +129,9 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                             .openConfirm(
                                 PlatformUI.getWorkbench()
                                     .getActiveWorkbenchWindow().getShell(),
-                                Messages.SpecimenEntryInfoTable_delete_title,
+                                "Delete specimen",
                                 NLS.bind(
-                                    Messages.SpecimenEntryInfoTable_delete_question,
+                                    "Are you sure you want to delete specimen \"{0}\"?",
                                     si.specimen.getInventoryId()))) {
                             return;
                         }

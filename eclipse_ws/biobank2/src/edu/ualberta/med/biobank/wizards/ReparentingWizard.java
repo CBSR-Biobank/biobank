@@ -85,7 +85,7 @@ public class ReparentingWizard extends BgcWizard {
                     .getCollectionEventCollection(true));
             } else {
                 pnumberPage
-                    .setErrorMessage(Messages.SelectCollectionEventWizard_notexists_error_msg);
+                    .setErrorMessage("Patient does not exist.");
                 return false;
             }
         }

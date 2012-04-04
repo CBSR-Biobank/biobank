@@ -29,10 +29,11 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                DispatchWrapper item = (DispatchWrapper) ((BiobankCollectionModel) element).o;
+                DispatchWrapper item =
+                    (DispatchWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return "loading...";
                     }
                     return ""; //$NON-NLS-1$
                 }

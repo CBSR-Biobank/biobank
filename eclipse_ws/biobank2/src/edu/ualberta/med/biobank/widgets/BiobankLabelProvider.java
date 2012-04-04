@@ -64,7 +64,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                     return String.valueOf(study.getPatientCount(true));
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        Messages.BiobankLabelProvider_count_error_title, e);
+                        "Error in count", e);
                 }
             }
         } else if (element instanceof SpecimenWrapper) {
@@ -73,20 +73,20 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 0:
                 return specimen.getInventoryId();
             case 1:
-                return specimen.getSpecimenType() == null ? "" : specimen //$NON-NLS-1$
+                return specimen.getSpecimenType() == null ? "" : specimen 
                     .getSpecimenType().getName();
             case 2:
                 String position = specimen.getPositionString();
                 return (position != null) ? position
-                    : Messages.BiobankLabelProvider_none_string;
+                    : "none";
             case 3:
-                return specimen.getCreatedAt() == null ? "" : DateFormatter //$NON-NLS-1$
+                return specimen.getCreatedAt() == null ? "" : DateFormatter 
                     .formatAsDateTime(specimen.getCreatedAt());
             case 4:
-                return specimen.getQuantity() == null ? "" : specimen //$NON-NLS-1$
+                return specimen.getQuantity() == null ? "" : specimen 
                     .getQuantity().toString();
             case 6:
-                return specimen.getCommentCollection(false) == null ? "" : CommentWrapper.commentListToString(specimen.getCommentCollection(false)); //$NON-NLS-1$
+                return specimen.getCommentCollection(false) == null ? "" : CommentWrapper.commentListToString(specimen.getCommentCollection(false)); 
             }
         } else if (element instanceof SpecimenTypeWrapper) {
             final SpecimenTypeWrapper st = (SpecimenTypeWrapper) element;
@@ -103,14 +103,14 @@ public class BiobankLabelProvider extends LabelProvider implements
             if (m.o != null) {
                 return getColumnText(m.o, columnIndex);
             } else if (columnIndex == 0) {
-                return Messages.BiobankLabelProvider_loading;
+                return "loading ...";
             }
         } else if (element instanceof StudyContactInfo) {
             StudyContactInfo info = (StudyContactInfo) element;
             if (columnIndex == 0) {
                 if (info.contact != null)
                     return info.contact.getClinic().getName();
-                return ""; //$NON-NLS-1$
+                return ""; 
             }
             return getContactWrapperColumnIndex(info.contact, columnIndex);
         } else if (element instanceof DispatchSpecimenWrapper) {
@@ -140,9 +140,9 @@ public class BiobankLabelProvider extends LabelProvider implements
         } else if (element instanceof AbstractAdapterBase)
             return ((AbstractAdapterBase) element).getLabel();
         else {
-            Assert.isTrue(false, "invalid object type: " + element.getClass()); //$NON-NLS-1$
+            Assert.isTrue(false, "invalid object type: " + element.getClass()); 
         }
-        return ""; //$NON-NLS-1$
+        return ""; 
     }
 
     @Override
@@ -151,7 +151,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((ContainerTypeWrapper) element).getName();
         } else if (element instanceof StudyWrapper) {
             StudyWrapper study = (StudyWrapper) element;
-            return study.getNameShort() + " - " + study.getName(); //$NON-NLS-1$
+            return study.getNameShort() + " - " + study.getName(); 
         } else if (element instanceof ClinicWrapper) {
             return ((ClinicWrapper) element).getName();
         } else if (element instanceof SiteWrapper) {
@@ -166,7 +166,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             StringBuffer res = new StringBuffer(pevent.getFormattedCreatedAt());
             if (pevent.getWorksheet() != null
                 && !pevent.getWorksheet().isEmpty())
-                res.append(" - ").append(pevent.getWorksheet()); //$NON-NLS-1$
+                res.append(" - ").append(pevent.getWorksheet()); 
             return res.toString();
         } else if (element instanceof SpecimenTypeWrapper) {
             return ((SpecimenTypeWrapper) element).getName();
@@ -220,7 +220,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return contact.getFaxNumber();
             break;
         }
-        return ""; //$NON-NLS-1$
+        return ""; 
     }
 
 }

@@ -46,10 +46,11 @@ public class SourceSpecimenInfoTable extends
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return "loading...";
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -73,11 +74,12 @@ public class SourceSpecimenInfoTable extends
         Assert.isNotNull(info.studySourceVessel.getSpecimenType(),
             "study specimen type is null"); //$NON-NLS-1$
         info.name = info.studySourceVessel.getSpecimenType().getName();
-        info.needOriginalVolume = (info.studySourceVessel
-            .getNeedOriginalVolume() != null) ? (info.studySourceVessel
-            .getNeedOriginalVolume() ? Messages.SourceSpecimenInfoTable_yes_label
-            : Messages.SourceSpecimenInfoTable_no_label)
-            : Messages.SourceSpecimenInfoTable_no_label;
+        info.needOriginalVolume =
+            (info.studySourceVessel
+                .getNeedOriginalVolume() != null) ? (info.studySourceVessel
+                .getNeedOriginalVolume() ? Messages.SourceSpecimenInfoTable_yes_label
+                : Messages.SourceSpecimenInfoTable_no_label)
+                : Messages.SourceSpecimenInfoTable_no_label;
         return info;
     }
 

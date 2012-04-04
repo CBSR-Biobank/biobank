@@ -168,9 +168,9 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                             .openConfirm(
                                 PlatformUI.getWorkbench()
                                     .getActiveWorkbenchWindow().getShell(),
-                                Messages.AliquotedSpecimenEntryInfoTable_delete_title,
+                                "Delete aliquoted specimen",
                                 NLS.bind(
-                                    Messages.AliquotedSpecimenEntryInfoTable_delete_question,
+                                    "Are you sure you want to delete aliquoted specimen \"{0}\"?",
                                     aliquotedSpecimen.getSpecimenType()
                                         .getName()))) {
                             return;

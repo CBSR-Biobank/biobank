@@ -99,8 +99,8 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
                         .openConfirm(
                             PlatformUI.getWorkbench()
                                 .getActiveWorkbenchWindow().getShell(),
-                            Messages.SourceSpecimenEntryInfoTable_delete_title,
-                            Messages.SourceSpecimenEntryInfoTable_delete_question)) {
+                            "Delete source specimen",
+                            "Are you sure you want to delete this source specimen?")) {
                         return;
                     }
 

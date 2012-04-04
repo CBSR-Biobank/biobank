@@ -62,14 +62,14 @@ public class PlateSelectionWidget extends BgcBaseWidget {
         setLayoutData(gd);
 
         Label label = new Label(this, SWT.NONE);
-        label.setText(Messages.PlateSelectionWidget_select_label);
+        label.setText("Select plate:");
         plateButtons = new HashMap<Integer, Button>();
 
         List<Integer> enabledPlates = new ArrayList<Integer>();
 
         for (int i = 1, n = ScannerConfigPlugin.getPlatesMax(); i <= n; ++i) {
             Button b = new Button(this, SWT.RADIO);
-            b.setText(Messages.PlateSelectionWidget_plate_label + i);
+            b.setText("PLATE " + i);
             boolean visible =
                 ScannerConfigPlugin.getDefault().getPlateEnabled(i);
             b.setVisible(visible);

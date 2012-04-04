@@ -65,7 +65,7 @@ public class ContainerTypeInfoTable extends
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return "loading...";
                     }
                     return ""; //$NON-NLS-1$
                 }

@@ -57,7 +57,8 @@ public class StudyAddInfoTable extends StudyInfoTable {
                 notifyListeners();
                 StudyWrapper study = dlg.getSelection();
                 if (study != null) {
-                    List<StudyWrapper> dummyList = new ArrayList<StudyWrapper>();
+                    List<StudyWrapper> dummyList =
+                        new ArrayList<StudyWrapper>();
                     dummyList.add(study);
                     site.addToStudyCollection(dummyList);
                     setList(site.getStudyCollection(true));
@@ -65,7 +66,7 @@ public class StudyAddInfoTable extends StudyInfoTable {
             }
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.StudyAddInfoTable_retrieve_error_title, e);
+                "Unable to retrieve available studies", e);
         }
     }
 
@@ -85,8 +86,8 @@ public class StudyAddInfoTable extends StudyInfoTable {
                     return;
 
                 if (!BgcPlugin.openConfirm(
-                    Messages.StudyAddInfoTable_remove_confirm_title, NLS.bind(
-                        Messages.StudyAddInfoTable_remove_confirm_msg,
+                    "Remove Study", NLS.bind(
+                        "Are you sure you want to remove study \"{0}\"?",
                         study.getName()))) {
                     return;
                 }
@@ -98,7 +99,7 @@ public class StudyAddInfoTable extends StudyInfoTable {
                     notifyListeners();
                 } catch (BiobankCheckException e) {
                     BgcPlugin.openAsyncError(
-                        Messages.StudyAddInfoTable_delete_error_title, e);
+                        "Delete failed", e);
                 }
             }
         });

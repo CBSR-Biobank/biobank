@@ -11,7 +11,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 public class ShippingMethodInfoTable extends
     InfoTableWidget<ShippingMethodWrapper> {
 
-    private static final String[] HEADINGS = new String[] { Messages.ShippingMethodInfoTable_ship_label };
+    private static final String[] HEADINGS =
+        new String[] { Messages.ShippingMethodInfoTable_ship_label };
 
     public ShippingMethodInfoTable(Composite parent,
         List<ShippingMethodWrapper> sampleStorageCollection) {
@@ -24,10 +25,11 @@ public class ShippingMethodInfoTable extends
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                ShippingMethodWrapper item = (ShippingMethodWrapper) ((BiobankCollectionModel) element).o;
+                ShippingMethodWrapper item =
+                    (ShippingMethodWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return "loading...";
                     }
                     return ""; //$NON-NLS-1$
                 }

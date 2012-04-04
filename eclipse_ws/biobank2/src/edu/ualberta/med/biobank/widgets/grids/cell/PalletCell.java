@@ -21,7 +21,7 @@ public class PalletCell extends AbstractUICell {
 
     private String information;
 
-    private String title = ""; //$NON-NLS-1$
+    private String title = ""; 
 
     private SpecimenWrapper sourceSpecimen;
 
@@ -162,7 +162,7 @@ public class PalletCell extends AbstractUICell {
             }
             return type.getName();
         }
-        return ""; //$NON-NLS-1$
+        return ""; 
     }
 
     public SpecimenTypeWrapper getType() {

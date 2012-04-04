@@ -89,12 +89,12 @@ public class AliquotedSpecimenSelectionWidget {
                 widgetCreator
                     .createLabel(
                         parent,
-                        Messages.AliquotedSpecimenSelectionWidget_sources_spec_title);
+                        "Source specimen");
             sourceControlDecoration =
                 BgcBaseWidget
                     .createDecorator(
                         sourceLabel,
-                        Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
+                        "A source specimen type and an aliquoted specimen type should be selected");
         }
         cvSource = widgetCreator.createComboViewerWithoutLabel(parent, null,
             null, new BiobankLabelProvider());
@@ -103,8 +103,8 @@ public class AliquotedSpecimenSelectionWidget {
             @Override
             public String getText(Object element) {
                 SpecimenWrapper spc = (SpecimenWrapper) element;
-                return spc.getSpecimenType().getNameShort() + "(" //$NON-NLS-1$
-                    + spc.getInventoryId() + ")"; //$NON-NLS-1$
+                return spc.getSpecimenType().getNameShort() + "(" 
+                    + spc.getInventoryId() + ")"; 
             }
         });
         cvSource.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -124,12 +124,12 @@ public class AliquotedSpecimenSelectionWidget {
 
         if (!oneRow) {
             resultLabel = widgetCreator.createLabel(parent,
-                Messages.AliquotedSpecimenSelectionWidget_aliquoted_spec_title);
+                "Aliquoted specimen type");
             resultControlDecoration =
                 BgcBaseWidget
                     .createDecorator(
                         resultLabel,
-                        Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
+                        "A source specimen type and an aliquoted specimen type should be selected");
         }
         cvResult = widgetCreator.createComboViewerWithoutLabel(parent, null,
             null, new BiobankLabelProvider());
@@ -150,7 +150,7 @@ public class AliquotedSpecimenSelectionWidget {
             }
         });
         if (oneRow) {
-            textNumber = widgetCreator.getToolkit().createLabel(parent, "", //$NON-NLS-1$
+            textNumber = widgetCreator.getToolkit().createLabel(parent, "", 
                 SWT.BORDER);
             GridData gd = new GridData();
             gd.widthHint = 20;
@@ -160,7 +160,7 @@ public class AliquotedSpecimenSelectionWidget {
                 BgcBaseWidget
                     .createDecorator(
                         textNumber,
-                        Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
+                        "A source specimen type and an aliquoted specimen type should be selected");
         }
     }
 
@@ -226,7 +226,7 @@ public class AliquotedSpecimenSelectionWidget {
     public void setNumber(Integer number) {
         if (textNumber != null) {
             this.number = number;
-            String text = ""; //$NON-NLS-1$
+            String text = ""; 
             if (number != null) {
                 text = number.toString();
             }
@@ -325,7 +325,7 @@ public class AliquotedSpecimenSelectionWidget {
                 if (value instanceof Boolean && !(Boolean) value) {
                     decoration.show();
                     return ValidationStatus
-                        .error(Messages.AliquotedSpecimenSelectionWidget_selections_status_msg);
+                        .error("Type should be selected");
                 }
                 decoration.hide();
                 return Status.OK_STATUS;

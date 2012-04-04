@@ -66,18 +66,18 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                     if (!contact.deleteAllowed()) {
                         BgcPlugin
                             .openError(
-                                Messages.ContactEntryInfoTable_delete_error_title,
+                                "Contact Delete Error",
                                 NLS.bind(
-                                    Messages.ContactEntryInfoTable_delete_error_msg,
+                                    "Cannot delete contact \"{0}\" since it is associated with one or more studies",
                                     contact.getName()));
                         return;
                     }
 
                     if (!BgcPlugin
                         .openConfirm(
-                            Messages.ContactEntryInfoTable_delete_confirm_title,
+                            "Delete Contact",
                             NLS.bind(
-                                Messages.ContactEntryInfoTable_delete_confirm_msg,
+                                "Are you sure you want to delete contact \"{0}\"?",
                                 contact.getName()))) {
                         return;
                     }
@@ -114,7 +114,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                 contactWrapper.reload();
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
-                    Messages.ContactEntryInfoTable_cancel_error_title, e);
+                    "Cancel error", e);
             }
             reloadCollection(selectedContacts, null);
         }

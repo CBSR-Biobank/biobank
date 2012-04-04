@@ -90,7 +90,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                             shippingMethod.getName()));
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        Messages.ShippingMethodEntryInfoTable_save_error_title,
+                        "Save Failed",
                         e);
                 }
                 reloadCollection(selectedShippingMethod);
@@ -101,7 +101,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
             } catch (Exception e) {
                 BgcPlugin
                     .openAsyncError(
-                        Messages.ShippingMethodEntryInfoTable_refresh_error_title,
+                        "Refresh Failed",
                         e);
             }
             reloadCollection(selectedShippingMethod);
@@ -135,9 +135,9 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                         if (!type.isNew() && type.isUsed()) {
                             BgcPlugin
                                 .openError(
-                                    Messages.ShippingMethodEntryInfoTable_delete_error_title,
+                                    "Delete Error",
                                     NLS.bind(
-                                        Messages.ShippingMethodEntryInfoTable_delete_error_msg,
+                                        "Cannot delete shipping method \"{0}\" since shipments are using it.",
                                         type.getName()));
                             return;
                         }
@@ -146,9 +146,9 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                             .openConfirm(
                                 PlatformUI.getWorkbench()
                                     .getActiveWorkbenchWindow().getShell(),
-                                Messages.ShippingMethodEntryInfoTable_delete_confirm_title,
+                                "Delete shipping method",
                                 NLS.bind(
-                                    Messages.ShippingMethodEntryInfoTable_delete_confirm_msg,
+                                    "Are you sure you want to delete shipping method \"{0}\"?",
                                     type.getName()))) {
                             return;
                         }
@@ -163,7 +163,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                     } catch (final RemoteConnectFailureException exp) {
                         BgcPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
-                        logger.error("BioBankFormBase.createPartControl Error", //$NON-NLS-1$
+                        logger.error("BioBankFormBase.createPartControl Error",
                             e);
                     }
                 }
@@ -177,10 +177,10 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                 if (!sv.getId().equals(type.getId())
                     && sv.getName().equals(type.getName()))
                     throw new BiobankCheckException(
-                        Messages.ShippingMethodEntryInfoTable_already_added_error_msg);
+                        "That shipping method has already been added.");
         } catch (BiobankException bce) {
             BgcPlugin.openAsyncError(
-                Messages.ShippingMethodEntryInfoTable_check_error_title, bce);
+                "Check error", bce);
             return false;
         }
         return true;
@@ -198,7 +198,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                 .getAppService()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
-                Messages.ShippingMethodEntryInfoTable_unavailable_error_title,
+                "AppService unavailable",
                 e);
         }
     }

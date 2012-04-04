@@ -130,7 +130,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return "loading...";
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -157,7 +157,8 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
         ClinicContacts cc = (ClinicContacts) o;
         info.clinic = cc;
         info.clinicNameShort = info.clinic.getClinic().getNameShort();
-        info.patientCount = info.clinic.getClinic().getPatientCountForStudy(study);
+        info.patientCount =
+            info.clinic.getClinic().getPatientCountForStudy(study);
         info.ceventCount =
             info.clinic.getClinic().getCollectionEventCountForStudy(study);
         info.contactNames = cc.getFormattedContacts();
