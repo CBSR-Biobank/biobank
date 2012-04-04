@@ -15,10 +15,10 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResu
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenIsUsedInDispatchAction;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenAssignPermission;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class SpecimenAssignProcessAction extends ServerProcessAction {
 

@@ -1,13 +1,13 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenPositionBaseWrapper;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {

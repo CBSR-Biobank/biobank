@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.peer.AbstractPositionPeer;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.base.AbstractPositionBaseWrapper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractPositionWrapper<E extends AbstractPosition>

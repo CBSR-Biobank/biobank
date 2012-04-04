@@ -5,7 +5,7 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
-import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class ScanProcessResult extends ProcessResult implements Serializable {
 

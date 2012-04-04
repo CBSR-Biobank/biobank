@@ -8,8 +8,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 
 // TODO: should be an enum? Maybe make types that require java code, but put parameters and names into the database?
 @Entity
