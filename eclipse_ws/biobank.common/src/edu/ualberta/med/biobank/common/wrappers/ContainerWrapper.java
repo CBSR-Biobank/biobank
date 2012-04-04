@@ -42,13 +42,18 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends ContainerBaseWrapper {
-    public static final String PATH_DELIMITER = "/"; 
+    public static final String PATH_DELIMITER = "/";
 
-    private static final String CHILD_POSITION_CONFLICT_MSG = "Position {0} of container {1} already contains container {2} when trying to add container {3}."; 
-    private static final String OUT_OF_BOUNDS_POSITION_MSG = "Position {0} is invalid. Row should be between 0 and {1} (exclusive) and column should be between 0 and {2} (exclusive)."; 
-    private static final String CANNOT_HOLD_SPECIMEN_TYPE_MSG = "Container {0} does not allow inserts of type {1}."; 
-    private static final String SAMPLE_EXISTS_AT_POSITION_MSG = "Container {0} is already holding an specimen at position {1} {2}"; 
-    private static final String CONTAINER_AT_POSITION_MSG = "Container {0} is already holding a container {1} at position {2}."; 
+    private static final String CHILD_POSITION_CONFLICT_MSG =
+        "Position {0} of container {1} already contains container {2} when trying to add container {3}.";
+    private static final String OUT_OF_BOUNDS_POSITION_MSG =
+        "Position {0} is invalid. Row should be between 0 and {1} (exclusive) and column should be between 0 and {2} (exclusive).";
+    private static final String CANNOT_HOLD_SPECIMEN_TYPE_MSG =
+        "Container {0} does not allow inserts of type {1}.";
+    private static final String SAMPLE_EXISTS_AT_POSITION_MSG =
+        "Container {0} is already holding an specimen at position {1} {2}";
+    private static final String CONTAINER_AT_POSITION_MSG =
+        "Container {0} is already holding a container {1} at position {2}.";
 
     private static final Collection<Property<?, ? super Container>> UNIQUE_LABEL_PROPS,
         UNIQUE_BARCODE_PROPS;
@@ -117,10 +122,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public String getPath() {
         if (isNew()) {
             throw new BiobankRuntimeException(
-                "container is not in database yet: no ID"); 
+                "container is not in database yet: no ID");
         }
 
-        String parentPath = ""; 
+        String parentPath = "";
 
         if (isPropertyCached(ContainerPeer.POSITION) && getPosition() != null) {
             if (getPosition().isPropertyCached(
@@ -133,7 +138,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             // method returns the parent path plus its id.
             parentPath = super.getPath();
             if (parentPath == null) {
-                parentPath = ""; 
+                parentPath = "";
             }
         }
 
@@ -197,7 +202,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     @Override
     @Deprecated
     public void setPath(String dummy) {
-        throw new BiobankRuntimeException("cannot set path on container"); 
+        throw new BiobankRuntimeException("cannot set path on container");
     }
 
     /**
@@ -232,7 +237,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     @Deprecated
     public void setTopContainer(ContainerBaseWrapper container) {
         throw new UnsupportedOperationException(
-            "Not allowed to directly set the top Container. Set the parent Container instead."); 
+            "Not allowed to directly set the top Container. Set the parent Container instead.");
     }
 
     public void setTopContainerInternal(ContainerWrapper container,
@@ -285,14 +290,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 throw new Exception(
                     MessageFormat
                         .format(
-                            "Can''t use position {0} in container {1}. Reason: capacity = {2}*{3}", 
+                            "Can''t use position {0} in container {1}. Reason: capacity = {2}*{3}",
                             position, getFullInfoLabel(),
                             type.getRowCapacity(), type.getColCapacity()));
             }
             if (rcp.getRow() < 0 || rcp.getCol() < 0) {
                 throw new Exception(
                     MessageFormat.format(
-                        "Position ''{0}'' is invalid for this container {1}", 
+                        "Position ''{0}'' is invalid for this container {1}",
                         position, getFullInfoLabel()));
             }
         }
@@ -308,7 +313,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 getSpecimenPositionCollection(false);
             for (SpecimenPositionWrapper position : positions) {
                 SpecimenWrapper specimen = position.getSpecimen();
-                RowColPos rowColPos = new RowColPos(position);
+                RowColPos rowColPos = getRowColPos(position);
                 specimens.put(rowColPos, specimen);
             }
 
@@ -366,7 +371,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             || getContainerType().getNameShort() == null) {
             return getLabel();
         }
-        return getLabel() + " (" + getContainerType().getNameShort() + ")";  
+        return getLabel() + " (" + getContainerType().getNameShort() + ")";
     }
 
     public long getChildCount(boolean fast) throws BiobankException,
@@ -395,7 +400,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                     ContainerPositionPeer.PARENT_CONTAINER, this);
 
                 ContainerWrapper container = position.getContainer();
-                RowColPos rowColPos = new RowColPos(position);
+                RowColPos rowColPos = getRowColPos(position);
 
                 ContainerWrapper previous = children.put(rowColPos, container);
                 if (previous != null && !previous.equals(container)) {
@@ -411,6 +416,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         }
 
         return children;
+    }
+
+    private static RowColPos getRowColPos(AbstractPositionWrapper<?> pos) {
+        return new RowColPos(pos.getRow(), pos.getCol());
     }
 
     public boolean hasChildren() {
@@ -435,7 +444,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public ContainerWrapper getChildByLabel(String label) throws Exception {
         ContainerTypeWrapper containerType = getContainerType();
         if (containerType == null) {
-            throw new Exception("container type is null"); 
+            throw new Exception("container type is null");
         }
         if (label.startsWith(getLabel())) {
             label = label.substring(getLabel().length());
@@ -486,7 +495,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         throws Exception {
         SpecimenTypeWrapper type = specimen.getSpecimenType();
         if (type == null) {
-            throw new BiobankCheckException("specimen type is null"); 
+            throw new BiobankCheckException("specimen type is null");
         }
         return getContainerType().getSpecimenTypeCollection(false).contains(
             type);
@@ -515,14 +524,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     private static final String POSSIBLE_PARENTS_BASE_QRY =
-        "select distinct(c) from " 
+        "select distinct(c) from "
             + Container.class.getName()
-            + " as c left join c." 
+            + " as c left join c."
             + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
                 ContainerTypePeer.CHILD_CONTAINER_TYPES)
-            + " as ct where c." 
-            + ContainerPeer.SITE.getName() + "=? and c." 
-            + ContainerPeer.LABEL.getName() + " in ("; 
+            + " as ct where c."
+            + ContainerPeer.SITE.getName() + "=? and c."
+            + ContainerPeer.LABEL.getName() + " in (";
 
     /**
      * Get containers with a given label that can have a child (container or
@@ -544,10 +553,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         for (Integer crop : validLengths)
             if (crop < childLabel.length())
                 validParents
-                    .add(new StringBuilder("'") 
+                    .add(new StringBuilder("'")
                         .append(
                             childLabel.substring(0, childLabel.length() - crop))
-                        .append("'").toString()); 
+                        .append("'").toString());
 
         List<ContainerWrapper> filteredWrappers =
             new ArrayList<ContainerWrapper>();
@@ -556,9 +565,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             params.add(site.getWrappedObject());
             StringBuilder parentQuery = new StringBuilder(
                 POSSIBLE_PARENTS_BASE_QRY).append(
-                StringUtil.join(validParents, ",")).append(")");  
+                StringUtil.join(validParents, ",")).append(")");
             if (type != null) {
-                parentQuery.append(" and ct.id=?"); 
+                parentQuery.append(" and ct.id=?");
                 params.add(type.getId());
             }
             HQLCriteria criteria = new HQLCriteria(parentQuery.toString(),
@@ -588,9 +597,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             + Container.class.getName()
             + " where "
             + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
-            + "=? and " 
+            + "=? and "
             + ContainerPeer.SPECIMEN_POSITIONS.getName()
-            + ".size = 0 and " 
+            + ".size = 0 and "
             + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
                 ContainerTypePeer.CAPACITY, CapacityPeer.ROW_CAPACITY)
             + " >= ? and "
@@ -603,10 +612,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             + ContainerTypePeer.ID.getName()
             + " from "
             + ContainerType.class.getName()
-            + " as ct left join ct." 
+            + " as ct left join ct."
             + ContainerTypePeer.SPECIMEN_TYPES.getName()
-            + " as sampleType where sampleType." 
-            + SpecimenTypePeer.ID.getName() + " in ("; 
+            + " as sampleType where sampleType."
+            + SpecimenTypePeer.ID.getName() + " in (";
 
     /**
      * Retrieve a list of empty containers in a specific site. These containers
@@ -632,7 +641,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         }
         String qry = new StringBuilder(
             EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY)
-            .append(StringUtil.join(typeIds, ",")).append("))").toString();  
+            .append(StringUtil.join(typeIds, ",")).append("))").toString();
         HQLCriteria criteria = new HQLCriteria(qry, Arrays.asList(new Object[] {
             siteWrapper.getId(), minRowCapacity, minColCapacity }));
         List<Container> containers = appService.query(criteria);
@@ -640,10 +649,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper.class);
     }
 
-    private static final String CONTAINERS_IN_SITE_QRY = "from " 
-        + Container.class.getName() + " where " 
-        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and " 
-        + ContainerPeer.LABEL.getName() + "=?"; 
+    private static final String CONTAINERS_IN_SITE_QRY = "from "
+        + Container.class.getName() + " where "
+        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and "
+        + ContainerPeer.LABEL.getName() + "=?";
 
     /**
      * Get all containers form a given site with a given label
@@ -658,9 +667,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper.class);
     }
 
-    private static final String CONTAINERS_BY_LABEL = "from " 
-        + Container.class.getName() + " where " + ContainerPeer.LABEL.getName() 
-        + "=?"; 
+    private static final String CONTAINERS_BY_LABEL = "from "
+        + Container.class.getName() + " where " + ContainerPeer.LABEL.getName()
+        + "=?";
 
     /**
      * Get all containers with a given label
@@ -676,10 +685,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     private static final String CONTAINER_WITH_PRODUCT_BARCODE_IN_SITE_QRY =
-        "from " 
-            + Container.class.getName() + " where " 
-            + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and " 
-            + ContainerPeer.PRODUCT_BARCODE.getName() + "=?"; 
+        "from "
+            + Container.class.getName() + " where "
+            + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and "
+            + ContainerPeer.PRODUCT_BARCODE.getName() + "=?";
 
     /**
      * Get the container with the given productBarcode in a site
@@ -697,9 +706,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             return null;
         } else if (containers.size() > 1) {
             throw new Exception(
-                MessageFormat.format(
-                    "Multiples containers registered with product barcode {0}.", 
-                    productBarcode));
+                MessageFormat
+                    .format(
+                        "Multiples containers registered with product barcode {0}.",
+                        productBarcode));
         }
         return new ContainerWrapper(appService, containers.get(0));
     }
@@ -737,7 +747,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         throws Exception {
         if (type == null) {
             throw new Exception(
-                "Error initializing container. That is not a valid container type."); 
+                "Error initializing container. That is not a valid container type.");
         }
         Boolean filled = (getChild(i, j) != null);
         if (!filled) {
@@ -862,7 +872,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             for (int i = 0; i < validLengths.size(); i++) {
                 Integer crop = validLengths.get(i);
                 if (res.length() != 0)
-                    res.append(", "); 
+                    res.append(", ");
 
                 if (crop < positionText.length())
                     res.append(positionText.substring(0, positionText.length()
@@ -874,13 +884,13 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                     errorMsg =
                         MessageFormat
                             .format(
-                                "Can''t find container that will match these possible labels: {0}", 
+                                "Can''t find container that will match these possible labels: {0}",
                                 res.toString());
                 else
                     errorMsg =
                         MessageFormat
                             .format(
-                                "Can''t find container that can hold specimens and that will match these possible labels: {0}", 
+                                "Can''t find container that can hold specimens and that will match these possible labels: {0}",
                                 res.toString());
             else
                 errorMsg =
@@ -898,15 +908,15 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return getContainerType().isPallet96();
     }
 
-    private static final String POSITION_FREE_QRY = "from " 
+    private static final String POSITION_FREE_QRY = "from "
         + Specimen.class.getName()
-        + " where " 
+        + " where "
         + SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.ROW).getName()
-        + "=? and " 
+        + "=? and "
         + SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.COL).getName()
-        + "=? and " 
+        + "=? and "
         + SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.CONTAINER)
-            .getName() + "=?"; 
+            .getName() + "=?";
 
     /**
      * Method used to check if the current position of this Specimen is

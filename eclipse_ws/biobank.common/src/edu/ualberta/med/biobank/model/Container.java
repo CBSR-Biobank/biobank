@@ -22,11 +22,8 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.model.ActivityStatus.Loader;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.constraint.model.ValidContainer;
@@ -59,7 +56,6 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @ValidContainer(groups = PrePersist.class)
 public class Container extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
-    private static final I18n i18n = I18nFactory.getI18n(Loader.class);
 
     private String productBarcode;
     private String label;
@@ -242,11 +238,7 @@ public class Container extends AbstractBiobankModel {
 
     @Transient
     public Container getChild(RowColPos requestedPosition) throws Exception {
-        if (getChildPositions().size() == 0) {
-            throw new Exception("container does not have children");
-        }
-
-        for (ContainerPosition pos : childPositions) {
+        for (ContainerPosition pos : getChildPositions()) {
             RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
             if (requestedPosition.equals(rcp)) {
                 return pos.getContainer();
@@ -264,11 +256,6 @@ public class Container extends AbstractBiobankModel {
      */
     @Transient
     public Container getChildByLabel(String childLabel) throws Exception {
-        ContainerType containerType = getContainerType();
-        if (containerType == null) {
-            throw new Exception("container type is null");
-        }
-
         // remove parent label from child label
         if (childLabel.startsWith(getLabel())) {
             childLabel = childLabel.substring(getLabel().length());
@@ -288,11 +275,15 @@ public class Container extends AbstractBiobankModel {
     public RowColPos getPositionFromLabelingScheme(String position)
         throws Exception {
         ContainerType containerType = getContainerType();
+
+        if (containerType == null)
+            throw new IllegalStateException("container type cannot be null");
+
         RowColPos rcp = containerType.getRowColFromPositionString(position);
         if (rcp != null) {
             if (rcp.getRow() >= containerType.getRowCapacity()
                 || rcp.getCol() >= containerType.getColCapacity()) {
-                throw new Exception(
+                throw new IllegalArgumentException(
                     MessageFormat
                         .format(
                             "Can''t use position {0} in container {1}. Reason: capacity = {2}*{3}",

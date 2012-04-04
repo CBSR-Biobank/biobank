@@ -2,33 +2,26 @@ package edu.ualberta.med.biobank.common.util;
 
 import java.io.Serializable;
 
-import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
+import edu.ualberta.med.biobank.util.NullHelper;
 
 public class RowColPos implements Comparable<RowColPos>, Serializable {
-
     private static final long serialVersionUID = 1L;
 
     public static Integer PALLET_96_ROW_MAX = 8;
-
     public static Integer PALLET_96_COL_MAX = 12;
 
     private final Integer row;
     private final Integer col;
 
+    @SuppressWarnings("nls")
     public RowColPos(Integer row, Integer col) {
+        if (row == null)
+            throw new IllegalArgumentException("row is null");
+        if (col == null)
+            throw new IllegalArgumentException("column is null");
+
         this.row = row;
         this.col = col;
-
-        if (row == null || col == null) {
-            throw new IllegalArgumentException(
-                "Neither the row nor column of a position can be null"); //$NON-NLS-1$
-        }
-    }
-
-    // TODO: this should be a convenience method outside of this class.
-    // RowColPos shouldn't know about AbstractPositionWrapper -JMF
-    public RowColPos(AbstractPositionWrapper<?> pos) {
-        this(pos.getRow(), pos.getCol());
     }
 
     public Integer getRow() {
@@ -44,38 +37,38 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o instanceof RowColPos) {
-            RowColPos pos = (RowColPos) o;
-            if (row != null && col != null) {
-                return row.equals(pos.row) && col.equals(pos.col);
-            }
-        }
-        return false;
+    @SuppressWarnings("nls")
+    public String toString() {
+        return "RowColPos [row=" + row + ", col=" + col + "]";
+    }
+
+    @Override
+    public int compareTo(RowColPos that) {
+        int cmp = NullHelper.cmp(row, that.row);
+        return cmp != 0 ? cmp : NullHelper.cmp(col, that.col);
     }
 
     @Override
     public int hashCode() {
-        String hash = ""; //$NON-NLS-1$
-        if (row != null) {
-            hash += row.toString();
-        }
-        if (col != null) {
-            hash += col.toString();
-        }
-        return hash.hashCode();
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((col == null) ? 0 : col.hashCode());
+        result = prime * result + ((row == null) ? 0 : row.hashCode());
+        return result;
     }
 
     @Override
-    public String toString() {
-        return "(" + row + "," + col + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    }
-
-    @Override
-    public int compareTo(RowColPos pos) {
-        if (row.equals(pos.row)) {
-            return col - pos.col;
-        }
-        return row - pos.row;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        RowColPos other = (RowColPos) obj;
+        if (col == null) {
+            if (other.col != null) return false;
+        } else if (!col.equals(other.col)) return false;
+        if (row == null) {
+            if (other.row != null) return false;
+        } else if (!row.equals(other.row)) return false;
+        return true;
     }
 }
