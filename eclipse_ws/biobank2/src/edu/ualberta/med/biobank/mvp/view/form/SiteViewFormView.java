@@ -54,7 +54,7 @@ public class SiteViewFormView extends AbstractViewFormView
         table.addLabel("Name");
         name.setText(table.addReadOnlyText());
 
-        table.addLabel("Name"Short);
+        table.addLabel("Name Short");
         nameShort.setText(table.addReadOnlyText());
 
         table.addLabel(Messages.SiteViewForm_field_studyCount_label);
