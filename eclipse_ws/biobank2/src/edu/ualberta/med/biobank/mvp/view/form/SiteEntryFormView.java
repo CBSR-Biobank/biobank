@@ -9,7 +9,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.ListField;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
@@ -85,7 +84,7 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
     public void onCreate(BaseForm baseForm) {
         super.onCreate(baseForm);
 
-        baseForm.setTitle(Messages.SiteEntryForm_main_title);
+        baseForm.setTitle("New repository site");
 
         InputTable table = new InputTable(baseForm.getPage());
 
@@ -112,7 +111,7 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
         studySection.setClient(studiesTable);
         if (superAdmin) {
             BaseForm.addSectionToolbar(studySection,
-                Messages.SiteEntryForm_studies_add, new SelectionAdapter() {
+                "Add study", new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
                         studiesTable.createStudyDlg();

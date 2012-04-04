@@ -38,7 +38,7 @@ import edu.ualberta.med.biobank.widgets.infotables.NewStudyInfoTable;
 
 public class SiteViewForm extends AddressViewFormCommon {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.SiteViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.SiteViewForm"; 
 
     private SiteAdapter siteAdapter;
 
@@ -73,12 +73,12 @@ public class SiteViewForm extends AddressViewFormCommon {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof SiteAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
         updateSiteInfo();
-        setPartName(NLS.bind(Messages.SiteViewForm_title,
+        setPartName(NLS.bind("Repository site {0}",
             siteInfo.getSite().getNameShort()));
     }
 
@@ -92,7 +92,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind(Messages.SiteViewForm_title, site.getName()));
+        form.setText(NLS.bind("Repository site {0}", site.getName()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -118,22 +118,22 @@ public class SiteViewForm extends AddressViewFormCommon {
                 "Name Short");
         studyCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.SiteViewForm_field_studyCount_label);
+                "Total studies");
         containerTypeCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.site_field_type_label);
+                "Container types");
         topContainerCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.SiteViewForm_field_topLevelCount_label);
+                "Top level containers");
         patientCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.SiteViewForm_field_patientCount_label);
+                "Total patients");
         processingEventCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.SiteViewForm_field_peventCount_label);
+                "Total processing events");
         specimenCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.SiteViewForm_field_totalSpecimen);
+                "Total specimens");
         activityStatusLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
                 "Activity status");
@@ -157,7 +157,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createStudySection() {
-        Section section = createSection(Messages.SiteViewForm_studies_title);
+        Section section = createSection("Studies");
         studiesTable =
             new NewStudyInfoTable(section, siteInfo.getStudyCountInfos());
         studiesTable.adaptToToolkit(toolkit, true);
@@ -201,8 +201,8 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createContainerTypesSection() {
-        Section section = createSection(Messages.SiteViewForm_types_title);
-        addSectionToolbar(section, Messages.SiteViewForm_type_add,
+        Section section = createSection("Container types");
+        addSectionToolbar(section, "Add container type",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -234,8 +234,8 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private void createContainerSection() {
         Section section =
-            createSection(Messages.SiteViewForm_topContainers_title);
-        addSectionToolbar(section, Messages.SiteViewForm_topContainers_add,
+            createSection("Top level containers");
+        addSectionToolbar(section, "Add container",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -266,9 +266,9 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     @Override
     public void setValues() throws Exception {
-        setPartName(NLS.bind(Messages.SiteViewForm_title,
+        setPartName(NLS.bind("Repository site {0}",
             siteInfo.getSite().getNameShort()));
-        form.setText(NLS.bind(Messages.SiteViewForm_title,
+        form.setText(NLS.bind("Repository site {0}",
             siteInfo.getSite().getName()));
         setSiteSectionValues();
         setAddressValues(site);

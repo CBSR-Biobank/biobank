@@ -44,10 +44,10 @@ import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable.ClinicC
 public class StudyViewForm extends BiobankViewForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.StudyViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.StudyViewForm"; 
 
     private static final String DATE_PROCESSED_INFO_FIELD_NAME =
-        Messages.study_visit_info_dateProcessed;
+        ":Date Processed";
 
     private StudyWrapper study =
         new StudyWrapper(SessionManager.getAppService());
@@ -77,12 +77,12 @@ public class StudyViewForm extends BiobankViewForm {
         Assert
             .isTrue(
                 (adapter instanceof StudyAdapter || adapter instanceof StudyWithPatientAdapter),
-                "Invalid editor input: object of type " //$NON-NLS-1$
+                "Invalid editor input: object of type " 
                     + adapter.getClass().getName());
 
         updateStudyInfo();
         setPartName(NLS
-            .bind(Messages.StudyViewForm_title, study.getNameShort()));
+            .bind("Study {0}", study.getNameShort()));
         pvCustomInfoList = new ArrayList<StudyEventAttrCustomInfo>();
     }
 
@@ -103,7 +103,7 @@ public class StudyViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         if (study.getName() != null) {
-            form.setText(NLS.bind(Messages.StudyViewForm_title, study.getName()));
+            form.setText(NLS.bind("Study {0}", study.getName()));
         }
 
         GridLayout layout = new GridLayout(1, false);
@@ -122,9 +122,9 @@ public class StudyViewForm extends BiobankViewForm {
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity status");
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.StudyViewForm_field_label_total_patients);
+            "Total patients");
         visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.StudyViewForm_field_label_total_cEvents);
+            "Total collection events");
 
         createCommentsSection();
         createClinicSection();
@@ -146,7 +146,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void createClinicSection() {
         Composite client =
-            createSectionWithClient(Messages.StudyViewForm_clinic_title);
+            createSectionWithClient("Clinic Information");
 
         contactsTable = new StudyContactInfoTable(client, study);
         contactsTable
@@ -192,7 +192,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void createAliquotedSpecimenSection() {
         Section section =
-            createSection(Messages.StudyViewForm_aliquoted_specimen_title);
+            createSection("Aliquoted specimen types");
 
         aliquotedSpecimenTable =
             new AliquotedSpecimenInfoTable(section,
@@ -204,7 +204,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void createSourceSpecimenSection() {
         Section section =
-            createSection(Messages.StudyViewForm_source_specimen_title);
+            createSection("Source specimen types");
 
         sourceSpecimenTable =
             new SourceSpecimenInfoTable(section,
@@ -216,7 +216,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void createStudyEventAttrSection() throws Exception {
         Composite client =
-            createSectionWithClient(Messages.StudyViewForm_visit_info_attributes_title);
+            createSectionWithClient("Patient Visit Information Collected");
         client.setLayout(new GridLayout(1, false));
 
         StudyEventAttrCustomInfo combinedStudyEventAttrInfo;
@@ -241,7 +241,7 @@ public class StudyViewForm extends BiobankViewForm {
         }
 
         if (pvCustomInfoList.size() == 0) {
-            toolkit.createLabel(client, Messages.StudyViewForm_visit_info_msg);
+            toolkit.createLabel(client, "Study does not collect additional patient visit information");
             return;
         }
 
@@ -271,15 +271,15 @@ public class StudyViewForm extends BiobankViewForm {
                 continue;
             }
             setTextValue(pvCustomInfo.widget, StringUtils.join(
-                study.getStudyEventAttrPermissible(label), ";")); //$NON-NLS-1$
+                study.getStudyEventAttrPermissible(label), ";")); 
         }
     }
 
     @Override
     public void setValues() throws Exception {
         setPartName(NLS
-            .bind(Messages.StudyViewForm_title, study.getNameShort()));
-        form.setText(NLS.bind(Messages.StudyViewForm_title, study.getName()));
+            .bind("Study {0}", study.getNameShort()));
+        form.setText(NLS.bind("Study {0}", study.getName()));
         setStudySectionValues();
         setStudyEventAttrValues();
         aliquotedSpecimenTable.setList(study

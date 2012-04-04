@@ -64,16 +64,16 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class StudyEntryForm extends BiobankEntryForm {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.StudyEntryForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.StudyEntryForm"; 
 
     private static final String MSG_NEW_STUDY_OK =
-        Messages.StudyEntryForm_creation_msg;
+        "Creating a new study.";
 
     private static final String MSG_STUDY_OK =
-        Messages.StudyEntryForm_edition_msg;
+        "Editing an existing study.";
 
     private static final String DATE_PROCESSED_INFO_FIELD_NAME =
-        Messages.study_visit_info_dateProcessed;
+        "Date Processed";
 
     protected static BgcLogger LOGGER = BgcLogger
         .getLogger(StudyEntryForm.class.getName());
@@ -121,18 +121,18 @@ public class StudyEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof StudyAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         updateStudyInfo(adapter.getId());
 
         String tabName;
         if (study.isNew()) {
-            tabName = Messages.StudyEntryForm_title_new;
+            tabName = "New study";
             study.setActivityStatus(ActivityStatus.ACTIVE);
         } else {
             tabName =
-                NLS.bind(Messages.StudyEntryForm_title_edit,
+                NLS.bind("Study {0}",
                     study.getNameShort());
         }
         setPartName(tabName);
@@ -163,7 +163,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.StudyEntryForm_main_title);
+        form.setText("Study Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
 
@@ -177,17 +177,17 @@ public class StudyEntryForm extends BiobankEntryForm {
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
             SWT.NONE, "Name", null, study,
             StudyPeer.NAME.getName(), new NonEmptyStringValidator(
-                Messages.StudyEntryForm_name_validator_msg)));
+                "Study name cannot be blank")));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
             "Name Short", null, study,
             StudyPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
-                Messages.StudyEntryForm_nameShort_validator_msg));
+                "Study short name cannot be blank"));
 
         activityStatusComboViewer =
             createComboViewer(client, "Activity status",
                 ActivityStatus.valuesList(), study.getActivityStatus(),
-                Messages.StudyEntryForm_activity_validator_msg,
+                "Study must have an activity status",
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -205,7 +205,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createClinicSection() {
-        Section section = createSection(Messages.StudyEntryForm_contacts_title);
+        Section section = createSection("Clinics / Contacts");
         List<Contact> contacts = new ArrayList<Contact>();
         for (ClinicInfo clinicInfo : studyInfo.getClinicInfos())
             contacts.addAll(clinicInfo.getContacts());
@@ -214,7 +214,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         contactEntryTable.adaptToToolkit(toolkit, true);
         contactEntryTable.addSelectionChangedListener(listener);
 
-        addSectionToolbar(section, Messages.StudyEntryForm_contacts_button_add,
+        addSectionToolbar(section, "Add Clinic Contact",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -237,12 +237,12 @@ public class StudyEntryForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            "Add a comment", null, comment, "message", null); //$NON-NLS-1$
+            "Add a comment", null, comment, "message", null); 
     }
 
     private void createSourceSpecimensSection() {
         Section section =
-            createSection(Messages.StudyEntryForm_source_specimens_title);
+            createSection("Source specimen types");
         sourceSpecimenEntryTable =
             new SourceSpecimenEntryInfoTable(
                 section,
@@ -254,7 +254,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         sourceSpecimenEntryTable.addSelectionChangedListener(listener);
 
         addSectionToolbar(section,
-            Messages.StudyEntryForm_source_specimens_button_add,
+            "Add source specimen types",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -269,12 +269,12 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private void createAliquotedSpecimensSection() {
         Composite client =
-            createSectionWithClient(Messages.StudyEntryForm_aliquoted_specimens_title);
+            createSectionWithClient("Aliquoted specimen types");
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 1;
         layout.verticalSpacing = 0;
 
-        toolkit.createLabel(client, Messages.StudyEntryForm_1, SWT.LEFT);
+        toolkit.createLabel(client, "Source Specimen types must be added before any aliquoted specimen types can be added.", SWT.LEFT);
 
         aliquotedSpecimenEntryTable =
             new AliquotedSpecimenEntryInfoTable(client,
@@ -290,7 +290,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 .getList());
 
         addSectionToolbar((Section) client.getParent(),
-            Messages.StudyEntryForm_aliquoted_specimens_button_add,
+            "Add aliquoted Specimen type",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -301,11 +301,11 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private void createEventAttrSection() throws Exception {
         Composite client =
-            createSectionWithClient(Messages.StudyEntryForm_visit_info_title);
+            createSectionWithClient("Patient Visit Information Collected");
         GridLayout gl = (GridLayout) client.getLayout();
         gl.numColumns = 1;
 
-        toolkit.createLabel(client, Messages.StudyEntryForm_2,
+        toolkit.createLabel(client, "Date Processed is collected by default.",
             SWT.LEFT);
 
         StudyEventAttrCustom studyEventAttrCustom;
@@ -331,7 +331,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 String permissible = sea.getPermissible();
                 if ((permissible != null) && !permissible.isEmpty()) {
                     studyEventAttrCustom.setAllowedValues(permissible
-                        .split(";")); //$NON-NLS-1$
+                        .split(";")); 
                 }
                 selected =
                     sea.getActivityStatus().equals(ActivityStatus.ACTIVE);
@@ -539,7 +539,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 String permissible = sea.getPermissible();
                 if ((permissible != null) && !permissible.isEmpty()) {
                     studyPvAttrCustom.setAllowedValues(permissible
-                        .split(";")); //$NON-NLS-1$
+                        .split(";")); 
                 }
                 selected = true;
                 studyPvAttrCustom.inStudy = true;

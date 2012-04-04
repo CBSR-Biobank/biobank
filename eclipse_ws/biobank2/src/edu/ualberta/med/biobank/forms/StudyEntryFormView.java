@@ -137,9 +137,8 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
     public void onCreate(BaseForm baseForm) {
         super.onCreate(baseForm);
         this.baseForm = baseForm;
-        baseForm.setTitle(Messages.StudyEntryForm_main_title);
-        editor.setPartName(NLS.bind(Messages.StudyEntryForm_title_edit,
-            nameShort.getValue()));
+        baseForm.setTitle("Study information");
+        editor.setPartName(NLS.bind("Study {0}", nameShort.getValue()));
 
         InputTable table = new InputTable(baseForm.getPage());
 
@@ -226,7 +225,7 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
 
     private void createStudyEventAttrSection() {
         Composite client = baseForm.createSectionWithClient(
-            Messages.StudyEntryForm_visit_info_title);
+            "Patient Visit Information Collected");
         baseForm.getToolkit().createLabel(client,
             "Select the information that is collected from a patient during a "
                 + "collection event.");

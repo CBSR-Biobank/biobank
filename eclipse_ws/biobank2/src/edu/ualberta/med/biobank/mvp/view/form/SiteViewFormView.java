@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
-import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Comment;
@@ -57,22 +56,22 @@ public class SiteViewFormView extends AbstractViewFormView
         table.addLabel("Name Short");
         nameShort.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.SiteViewForm_field_studyCount_label);
+        table.addLabel("Total studies");
         studyCount.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.site_field_type_label);
+        table.addLabel("Container types");
         containerTypeCount.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.SiteViewForm_field_topLevelCount_label);
+        table.addLabel("Top level containers");
         topContainerCount.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.SiteViewForm_field_patientCount_label);
+        table.addLabel("Total patients");
         patientCount.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.SiteViewForm_field_peventCount_label);
+        table.addLabel("Total collection events");
         collectionEventCount.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.SiteViewForm_field_totalSpecimen);
+        table.addLabel("Total specimens");
         aliquotedSpecimenCount.setText(table.addReadOnlyText());
 
         table.addLabel("Activity status");
