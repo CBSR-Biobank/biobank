@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="i18n" basedir=".">
   <property file="build.properties" />
- 
+
+  <property name="bundle" value="edu.ualberta.med.biobank.i18n.Messages" />
+  <property name="po.dir" value="po" />
   <property name="gettexttasks.jar" value="${req.jars.dir}/gettext-ant-tasks-0.9.7.jar"/>
+
+  <target name="init.dir">
+    <mkdir dir="${po.dir}" />
+  </target>
 
   <target name="init.gettext" description="Loads the Ant gettext tasks">
     <taskdef name="gettext-extract"
@@ -19,24 +25,40 @@
              classpath="${gettexttasks.jar}"/>
   </target>
 
-  <target name="extract-messages" description="Extracts message keys from the source code" depends="init.gettext">
-    <gettext-extract keysFile="messages.pot" poDirectory="po">
-      <fileset dir="src/main/java" includes="**/*.java"/>
-      <fileset dir="src2/main/java" includes="**/*.java"/>
+  <target name="messages-extract"
+          description="Extracts message keys from the source code"
+          depends="init.dir,init.gettext">
+    <echo message="${po.dir}" />
+    <gettext-extract keysFile="messages.pot" poDirectory="${po.dir}">
+      <!-- TODO: all projects? what about sub-projects (e.g. scannerConfig) -->
+      <fileset dir="eclipse_ws/biobank.common/src" includes="**/*.java"/>
     </gettext-extract>
   </target>
 
-  <target name="merge-messages" description="Merges newly extracted messages into existing po files" depends="init.gettext">
-    <gettext-merge keysFile="messages.pot" poDirectory="po"/>
+  <target name="messages-merge"
+          description="Merges newly extracted messages into existing po files"
+          depends="init.dir,init.gettext">
+    <gettext-merge keysFile="messages.pot"
+                   poDirectory="${po.dir}" />
   </target>
 
-  <target name="generate-default-bundle" description="Generates a default bundle" depends="init.gettext">
-    <gettext-generate-default targetBundle="org.mynamespace.i18n.Messages" outputDirectory="po" potfile="po/messages.pot"/>
+  <target name="messages-bundle"
+          description="Generates a default bundle"
+          depends="init.dir,init.gettext">
+    <gettext-generate-default targetBundle="${bundle}"
+                              outputDirectory="${po.dir}"
+                              potfile="${po.dir}/messages.pot"/>
   </target>
 
-  <target name="generate-bundles-jar" description="Generates Java ResourceBundles and jars them up" depends="init.gettext">
-    <gettext-dist targetBundle="org.mynamespace.i18n.Messages" poDirectory="po" outputDirectory="po" percentage="65"/>
-      <jar destfile="lib/messages.jar" basedir="po"
+  <target name="messages-jar"
+          description="Generates Java ResourceBundles and jars them up"
+          depends="init.dir,init.gettext">
+    <gettext-dist targetBundle="${bundle}"
+                  poDirectory="${po.dir}"
+                  outputDirectory="${po.dir}"
+                  percentage="65"/>
+      <jar destfile="lib/messages.jar"
+           basedir="${po.dir}"
            includes="org/**"/>
   </target>
 </project>

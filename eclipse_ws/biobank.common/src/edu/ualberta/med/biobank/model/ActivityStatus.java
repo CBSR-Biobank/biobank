@@ -10,11 +10,11 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 
+/**
+ * 
+ * @author Jonathan Ferland
+ */
 public enum ActivityStatus implements NotAProxy, Serializable {
-
-    // TODO: a key for translation? Even if comes from server is enum, so will
-    // use local translation.
-    // TODO: comment on NOT CHANGING THE ID!!!
     ACTIVE(1, Loader.i18n.tr("Active")),
     CLOSED(2, Loader.i18n.tr("Closed")),
     // TODO: why can't there be a closed and flagged item or an active but

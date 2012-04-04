@@ -30,6 +30,7 @@ End:
   <property name="buildDirectory" value="${product.dir}/buildDirectory" />
 
   <import file="build-db.xml"/>
+  <import file="build-i18n.xml"/>
 
   <condition property="perl" value="perl" else="/usr/bin/perl">
     <os family="windows" />
