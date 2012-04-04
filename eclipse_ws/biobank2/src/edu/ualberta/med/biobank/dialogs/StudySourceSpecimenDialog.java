@@ -50,11 +50,11 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         userSourceSpecimen.setSpecimenType(defaultSpecimenType);
 
         if (defaultSpecimenType == null) {
-            currentTitle = Messages.StudySourceSpecimenDialog_Dialog_add_title;
-            message = Messages.StudySourceSpecimenDialog_Dialog_add_msg;
+            currentTitle = "Add source specimen types";
+            message = "Add a source specimen type to this study";
         } else {
-            currentTitle = Messages.StudySourceSpecimenDialog_Dialog_edit_title;
-            message = Messages.StudySourceSpecimenDialog_Dialog_edit_msg;
+            currentTitle = "Edit source specimen types";
+            message = "Edit a source specimen type of this study";
         }
         this.specimenTypes = specimenTypes;
     }
@@ -86,9 +86,9 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         typeName = getWidgetCreator().createComboViewer(contents,
-            Messages.StudySourceSpecimenDialog_field_type_label,
+            "Specimen type",
             specimenTypes, userSourceSpecimen.getSpecimenType(),
-            Messages.StudySourceSpecimenDialog_field_type_validation_msg,
+            "A specimen type should be selected",
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -99,7 +99,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
 
         volume = (Button) createBoundWidgetWithLabel(contents, Button.class,
             SWT.BORDER,
-            Messages.StudySourceSpecimenDialog_field_originalVolume_label,
+            "Need Original Volume",
             new String[0], userSourceSpecimen,
             SourceSpecimenPeer.NEED_ORIGINAL_VOLUME.getName(), null);
 

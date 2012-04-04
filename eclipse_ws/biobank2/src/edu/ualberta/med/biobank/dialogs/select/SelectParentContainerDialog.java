@@ -36,17 +36,17 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.SelectParentContainerDialog_dialog_title;
+        return "Select parent container";
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.SelectParentContainerDialog_description;
+        return "Select the appropriate parent container";
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.SelectParentContainerDialog_main_title;
+        return "Multiple parent containers are possible";
     }
 
     @Override
@@ -56,9 +56,9 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         comboViewer = getWidgetCreator().createComboViewer(contents,
-            Messages.SelectParentContainerDialog_select_label, containers,
+            "Select parent", containers,
             null,
-            Messages.SelectParentContainerDialog_select_validation_error_msg,
+            "A container should be selected",
             null, new BiobankLabelProvider());
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
@@ -69,18 +69,18 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
                 ContainerWrapper parent = container.getParentContainer();
                 boolean hasParents = parent != null;
                 if (hasParents)
-                    text.append(" (") //$NON-NLS-1$  
+                    text.append(" (")
                         .append(
-                            Messages.SelectParentContainerDialog_parents_list_label)
-                        .append(": "); //$NON-NLS-1$  
+                            "Parents")
+                        .append(": ");
                 while (parent != null) {
                     text.append(parent.getFullInfoLabel());
                     parent = parent.getParentContainer();
                     if (parent != null)
-                        text.append("; "); //$NON-NLS-1$
+                        text.append("; ");
                 }
                 if (hasParents)
-                    text.append(")"); //$NON-NLS-1$
+                    text.append(")");
                 return text.toString();
             }
         });

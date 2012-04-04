@@ -22,14 +22,14 @@ public class MoveContainerDialog extends BgcBaseDialog {
 
     private String title;
 
-    private String newLabel = ""; //$NON-NLS-1$
+    private String newLabel = "";
 
     public MoveContainerDialog(Shell parent, ContainerWrapper srcContainer,
         ContainerWrapper dstContainer) {
         super(parent);
         Assert.isNotNull(srcContainer);
         this.dstContainer = dstContainer;
-        title = NLS.bind(Messages.MoveContainerDialog_title,
+        title = NLS.bind("Move Container {0}",
             srcContainer.getLabel());
     }
 
@@ -40,7 +40,7 @@ public class MoveContainerDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.MoveContainerDialog_description;
+        return "Select the destination for this container.";
     }
 
     @Override
@@ -56,9 +56,9 @@ public class MoveContainerDialog extends BgcBaseDialog {
 
         BgcBaseText bbt = (BgcBaseText) createBoundWidgetWithLabel(contents,
             BgcBaseText.class, SWT.FILL,
-            Messages.MoveContainerDialog_destination_label, null, this,
-            "newLabel", new StringLengthValidator(2, //$NON-NLS-1$
-                Messages.MoveContainerDialog_destination_validation_msg));
+            "Destination Address", null, this,
+            "newLabel", new StringLengthValidator(2,
+                "Destination label must be another container (4 characters minimum)."));
         if (this.dstContainer != null)
             bbt.setText(this.dstContainer.getLabel());
     }

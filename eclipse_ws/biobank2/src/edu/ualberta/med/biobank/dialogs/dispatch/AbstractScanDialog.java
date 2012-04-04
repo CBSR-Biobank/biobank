@@ -53,7 +53,7 @@ import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManage
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     BgcBaseDialog {
 
-    private static final String TITLE = Messages.AbstractScanDialog_title;
+    private static final String TITLE = "Scanning specimens";
 
     private BgcBaseText plateToScanText;
 
@@ -139,12 +139,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
     protected void setRescanMode(boolean isOn) {
         if (isOn) {
-            scanButton.setText(Messages.AbstractScanDialog_retryScan_label);
+            scanButton.setText("Retry scan");
         } else {
             String scanButtonText =
-                Messages.AbstractScanDialog_launchScan_label;
+                "Launch Scan";
             if (!BiobankPlugin.isRealScanEnabled()) {
-                scanButtonText = Messages.AbstractScanDialog_fakeScan_label;
+                scanButtonText = "Fake scan";
             }
             scanButton.setText(scanButtonText);
         }
@@ -193,7 +193,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                     .getCells().entrySet()) {
                     RowColPos rcp = entry.getKey();
                     monitor.subTask(NLS.bind(
-                        Messages.AbstractScanDialog_processCell_task_position,
+                        "Processing position {0} ",
                         ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
                     PalletCell palletCell = cells.get(entry.getKey());
                     CellInfo servercell = entry.getValue();
@@ -236,9 +236,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         plateToScanText =
             (BgcBaseText) createBoundWidgetWithLabel(contents,
                 BgcBaseText.class, SWT.NONE,
-                Messages.AbstractScanDialog_plateToScan_label, new String[0],
-                this, "plateToScan", new ScannerBarcodeValidator( //$NON-NLS-1$
-                    Messages.AbstractScanDialog_plateToScan_validationMsg));
+                "Plate to scan", new String[0],
+                this, "plateToScan", new ScannerBarcodeValidator(
+                    "Enter a valid plate barcode"));
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
@@ -248,9 +248,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             }
         });
 
-        String scanButtonText = Messages.AbstractScanDialog_launchScan_label;
+        String scanButtonText = "Launch Scan";
         if (!BiobankPlugin.isRealScanEnabled()) {
-            scanButtonText = Messages.AbstractScanDialog_fakeScan_label;
+            scanButtonText = "Fake scan";
         }
         scanButton = new Button(contents, SWT.PUSH);
         scanButton.setText(scanButtonText);
@@ -279,12 +279,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), scanOkValue,
-            Messages.AbstractScanDialog_scanResults_errors_msg, IStatus.ERROR);
+            "Error in scan result. Please keep only specimens with no errors.", IStatus.ERROR);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), scanHasBeenLaunchedValue,
-            Messages.AbstractScanDialog_scan_validation_msg, IStatus.ERROR);
+            "Scan should be launched", IStatus.ERROR);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), hasValues, Messages.AbstractScanDialog_no_values,
+            Boolean.class), hasValues, "No values scanned",
             IStatus.ERROR);
 
     }
@@ -350,11 +350,11 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.CANCEL_ID,
-            Messages.AbstractScanDialog_cancelPallet_label, false);
+            "Cancel current pallet", false);
         createButton(parent, IDialogConstants.PROCEED_ID,
             getProceedButtonlabel(), false);
         createButton(parent, IDialogConstants.NEXT_ID,
-            Messages.AbstractScanDialog_startPallet_label, false);
+            "Start next Pallet", false);
         createButton(parent, IDialogConstants.FINISH_ID,
             IDialogConstants.FINISH_LABEL, false);
     }
@@ -416,7 +416,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                 doProceed();
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
-                    Messages.AbstractScanDialog_proceedError_title, e);
+                    "Error", e);
             }
         } else if (IDialogConstants.FINISH_ID == buttonId) {
             setReturnCode(OK);
@@ -443,7 +443,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.RIGHT;
         scanTubeAloneSwitch.setLayoutData(gd);
-        scanTubeAloneSwitch.setText(""); //$NON-NLS-1$
+        scanTubeAloneSwitch.setText("");
         scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_SCAN_EDIT));
         scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {

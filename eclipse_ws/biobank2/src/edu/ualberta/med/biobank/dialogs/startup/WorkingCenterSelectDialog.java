@@ -30,17 +30,17 @@ public class WorkingCenterSelectDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.WorkingCenterSelectDialog_description;
+        return "Choose the center you will work with.";
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.WorkingCenterSelectDialog_title;
+        return "Working center selection";
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.WorkingCenterSelectDialog_title;
+        return "Working center selection";
     }
 
     @Override
@@ -50,13 +50,13 @@ public class WorkingCenterSelectDialog extends BgcBaseDialog {
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         List<Object> objectList = new ArrayList<Object>(availableCenters);
-        String noCenterString = "-- " //$NON-NLS-1$ 
-            + Messages.WorkingCenterSelectDialog_no_center_selection_text
-            + " --"; //$NON-NLS-1$ 
+        String noCenterString = "-- "
+            + "no center selection"
+            + " --";
         if (user.isInSuperAdminMode())
             objectList.add(noCenterString);
         widgetCreator.createComboViewer(contents,
-            Messages.WorkingCenterSelectDialog_available_centers_label,
+            "Available centers",
             objectList, noCenterString, null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {

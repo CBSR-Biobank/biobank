@@ -27,8 +27,8 @@ public class ContactAddDialog extends BgcBaseDialog {
         super(parent);
         Assert.isNotNull(contactWrapper);
         this.contactWrapper = contactWrapper;
-        currentTitle = contactWrapper.getName() == null ? Messages.ContactAddDialog_title_add
-            : Messages.ContactAddDialog_title_edit;
+        currentTitle = contactWrapper.getName() == null ? "Add Contact"
+            : "Edit Contact";
     }
 
     @Override
@@ -39,9 +39,9 @@ public class ContactAddDialog extends BgcBaseDialog {
     @Override
     protected String getTitleAreaMessage() {
         if (contactWrapper.getName() == null) {
-            return Messages.ContactAddDialog_description_add;
+            return "Add a contact person to this clinic";
         }
-        return Messages.ContactAddDialog_description_edit;
+        return "Edit contact person for this clinic";
     }
 
     @Override
@@ -56,34 +56,34 @@ public class ContactAddDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         Control c = createBoundWidgetWithLabel(contents, BgcBaseText.class,
-            SWT.BORDER, Messages.ContactAddDialog_name_label, new String[0],
+            SWT.BORDER, "Name", new String[0],
             contactWrapper, ContactPeer.NAME.getName(), null);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 250;
         c.setLayoutData(gd);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Messages.ContactAddDialog_title_label, new String[0],
+            "Title", new String[0],
             contactWrapper, ContactPeer.TITLE.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Messages.ContactAddDialog_email_label, new String[0],
+            "Email", new String[0],
             contactWrapper, ContactPeer.EMAIL_ADDRESS.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Messages.ContactAddDialog_mobile_label, new String[0],
+            "Mobile #", new String[0],
             contactWrapper, ContactPeer.MOBILE_NUMBER.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Messages.ContactAddDialog_pager_label, new String[0],
+            "Pager #", new String[0],
             contactWrapper, ContactPeer.PAGER_NUMBER.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Messages.ContactAddDialog_office_label, new String[0],
+            "Office #", new String[0],
             contactWrapper, ContactPeer.OFFICE_NUMBER.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Messages.ContactAddDialog_fax_label, new String[0], contactWrapper,
+            "Fax #", new String[0], contactWrapper,
             ContactPeer.FAX_NUMBER.getName(), null);
     }
 

@@ -33,21 +33,21 @@ import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 
 public class ExportErrorsLogsDialog extends BgcBaseDialog {
 
-    public static final String TITLE = Messages.ExportErrorsLogsDialog_title;
+    public static final String TITLE = "Errors logs export options";
 
-    public static final String DEFAULT_FILE_NAME = "log_export.zip"; //$NON-NLS-1$
+    public static final String DEFAULT_FILE_NAME = "log_export.zip";
 
-    public static final String ZIP_EXTENSION = ".zip"; //$NON-NLS-1$
+    public static final String ZIP_EXTENSION = ".zip";
 
-    public static final String LOG_EXTENSION = ".log"; //$NON-NLS-1$
+    public static final String LOG_EXTENSION = ".log";
 
-    public static final String EXPORT_ERRORS_LOGS_PROPERTIES_FILE = "ExportErrorsLogs.properties"; //$NON-NLS-1$
+    public static final String EXPORT_ERRORS_LOGS_PROPERTIES_FILE = "ExportErrorsLogs.properties";
 
-    public static final String SCANNER_FILES_KEY = "scanner_files"; //$NON-NLS-1$
+    public static final String SCANNER_FILES_KEY = "scanner_files";
 
-    public static final String OTHERS_KEY = "others_working_directory_files"; //$NON-NLS-1$
+    public static final String OTHERS_KEY = "others_working_directory_files";
 
-    public static final String SEPARATOR_KEY = "separator"; //$NON-NLS-1$
+    public static final String SEPARATOR_KEY = "separator";
 
     private Button scannerExportCheck;
 
@@ -63,7 +63,7 @@ public class ExportErrorsLogsDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.ExportErrorsLogsDialog_description;
+        return "Select the options that fits your needs";
     }
 
     @Override
@@ -83,10 +83,10 @@ public class ExportErrorsLogsDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         linkAssignLogsCheck = new Button(contents, SWT.CHECK);
         linkAssignLogsCheck
-            .setText(Messages.ExportErrorsLogsDialog_activityLogs_label);
+            .setText("Export activity logs from Scan Link or Scan Assign or Cabinet Link Assign");
         scannerExportCheck = new Button(contents, SWT.CHECK);
         scannerExportCheck
-            .setText(Messages.ExportErrorsLogsDialog_scanner_label);
+            .setText("Export scanner informations");
     }
 
     @Override
@@ -104,8 +104,8 @@ public class ExportErrorsLogsDialog extends BgcBaseDialog {
                 createZip(selected);
             else {
                 BgcPlugin.openAsyncError(
-                    Messages.ExportErrorsLogsDialog_path_error_title, NLS.bind(
-                        Messages.ExportErrorsLogsDialog_path_error_msg,
+                    "Path problem", NLS.bind(
+                        "Cannot write in ''{0}''",
                         parentFolder.getAbsolutePath()));
                 openFileSelection();
             }
@@ -152,7 +152,7 @@ public class ExportErrorsLogsDialog extends BgcBaseDialog {
                     } catch (IOException e) {
                         BgcPlugin
                             .openAsyncError(
-                                Messages.ExportErrorsLogsDialog_fileClose_error_title,
+                                "Error closing files",
                                 e);
                     }
                 }
@@ -201,7 +201,7 @@ public class ExportErrorsLogsDialog extends BgcBaseDialog {
                 .getResourceAsStream(EXPORT_ERRORS_LOGS_PROPERTIES_FILE));
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.ExportErrorsLogsDialog_propertiesLoad_error_title, e);
+                "Error retrieving log file list", e);
         }
         if (needExportScannerInfos)
             files
@@ -228,21 +228,21 @@ public class ExportErrorsLogsDialog extends BgcBaseDialog {
 
     protected void exportComplete(String zipFile) {
         BgcPlugin.openInformation(
-            Messages.ExportErrorsLogsDialog_export_ok_title,
-            Messages.ExportErrorsLogsDialog_export_ok_msg + zipFile);
+            "Export complete",
+            "Log informations have been successfully exported in file " + zipFile);
 
     }
 
     protected void openError(Exception e) {
         BgcPlugin.openAsyncError(
-            Messages.ExportErrorsLogsDialog_export_error_title, e);
+            "Problem while exporting", e);
     }
 
     private String openFileSelection() {
         FileDialog fd = new FileDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), SWT.SAVE);
-        fd.setText(Messages.ExportErrorsLogsDialog_select_zip_msg);
-        fd.setFilterExtensions(new String[] { "*" + ZIP_EXTENSION }); //$NON-NLS-1$
+        fd.setText("Select destination zip file");
+        fd.setFilterExtensions(new String[] { "*" + ZIP_EXTENSION });
         fd.setFileName(DEFAULT_FILE_NAME);
         String selected = fd.open();
         return selected;

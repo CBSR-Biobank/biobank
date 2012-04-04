@@ -43,11 +43,11 @@ public class RoleEditDialog extends AbstractSecurityEditDialog {
         this.roleWrapper = new RoleWrapper(service, role);
 
         if (role.isNew()) {
-            currentTitle = Messages.RoleEditDialog_title_add;
-            titleAreaMessage = Messages.RoleEditDialog_titlearea_add;
+            currentTitle = "Add Role";
+            titleAreaMessage = "Add a new role";
         } else {
-            currentTitle = Messages.RoleEditDialog_title_edit;
-            titleAreaMessage = Messages.RoleEditDialog_titlearea_modify;
+            currentTitle = "Edit Role";
+            titleAreaMessage = "Modify an existing role's information";
         }
     }
 
@@ -79,9 +79,9 @@ public class RoleEditDialog extends AbstractSecurityEditDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Messages.RoleEditDialog_property_title_name, null, roleWrapper,
+            "Name", null, roleWrapper,
             RolePeer.NAME.getName(), new NonEmptyStringValidator(
-                Messages.RoleEditDialog_msg_name_required));
+                "A valid name is required."));
 
         tree = new PermissionCheckTreeWidget(contents, true,
             PermissionEnum.valuesList());

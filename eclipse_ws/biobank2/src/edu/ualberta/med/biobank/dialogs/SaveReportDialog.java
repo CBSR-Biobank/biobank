@@ -22,17 +22,17 @@ public class SaveReportDialog extends BgcBaseDialog {
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.SaveReportDialog_title;
+        return "Save";
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.SaveReportDialog_description;
+        return "Please enter a name for this report.";
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.SaveReportDialog_titleArea;
+        return "Enter Name";
     }
 
     @Override
@@ -41,7 +41,7 @@ public class SaveReportDialog extends BgcBaseDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.FILL,
-            Messages.SaveReportDialog_name_label, null, this, "fileName", null); //$NON-NLS-1$
+            "Name", null, this, "fileName", null);
     }
 
     public String getFileName() {

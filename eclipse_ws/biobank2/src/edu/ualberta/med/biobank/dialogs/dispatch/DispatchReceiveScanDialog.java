@@ -54,14 +54,14 @@ public class DispatchReceiveScanDialog extends
     protected void addExtraCells() {
         if (extras != null && extras.size() > 0) {
             BgcPlugin.openAsyncInformation(
-                Messages.DispatchReceiveScanDialog_notInDispatch_error_title,
-                Messages.DispatchReceiveScanDialog_notInDispatch_error_msg);
+                "Specimens not in dispatch",
+                "Some of the specimens in this pallet were not supposed  to be in this shipment. They will be added to the extra-pending list.");
             try {
                 currentShipment.addSpecimens(extras,
                     DispatchSpecimenState.EXTRA);
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
-                    Messages.DispatchReceiveScanDialog_flagging_error_title, e);
+                    "Error flagging specimens", e);
             }
         }
     }
@@ -96,7 +96,7 @@ public class DispatchReceiveScanDialog extends
                     .size());
 
             palletScanned.put(new RowColPos(6, 6), new PalletCell(new ScanCell(
-                6, 6, "aaah"))); //$NON-NLS-1$
+                6, 6, "aaah")));
         }
         return palletScanned;
     }

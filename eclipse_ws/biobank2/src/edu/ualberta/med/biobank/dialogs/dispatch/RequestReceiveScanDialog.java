@@ -42,8 +42,8 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
                 @Override
                 public void run() {
                     BgcPlugin.openInformation(
-                        Messages.RequestReceiveScanDialog_extra_title,
-                        Messages.RequestReceiveScanDialog_extra_msg);
+                        "Extra specimens",
+                        "Some of the specimens in this pallet were not supposed to be in this shipment.");
                 }
             });
         }
@@ -55,7 +55,7 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
             dispatchSpecimens.addAll(specimens);
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.RequestReceiveScanDialog_receiveError_title, e);
+                "Error receiving request", e);
         }
     }
 

@@ -61,7 +61,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         this.newAliquotedSpecimen.setActivityStatus(origAliquotedSpecimen
             .getActivityStatus());
         if (origAliquotedSpecimen.getSpecimenType() == null) {
-            currentTitle = Messages.StudyAliquotedSpecimenDialog_add_title;
+            currentTitle = "Add aliquoted specimen";
 
             try {
                 this.newAliquotedSpecimen
@@ -69,11 +69,11 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
             } catch (Exception e) {
                 BgcPlugin
                     .openAsyncError(
-                        Messages.StudyAliquotedSpecimenDialog_activityStatus_retrieve_error_title,
-                        Messages.StudyAliquotedSpecimenDialog_activityStatus_retrieve_error_msg);
+                        "Database Error",
+                        "Error while retrieving activity status");
             }
         } else {
-            currentTitle = Messages.StudyAliquotedSpecimenDialog_edit_title;
+            currentTitle = "Edit aliquoted specimen";
         }
     }
 
@@ -85,8 +85,8 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
     @Override
     protected String getTitleAreaMessage() {
         if (availableSpecimenTypes.size() > 0)
-            return Messages.StudyAliquotedSpecimenDialog_msg;
-        return Messages.StudyAliquotedSpecimenDialog_available_nomore_msg;
+            return "Select the aliquoted specimen used by this study";
+        return "No more aliquoted specimen type can be derived from the study source specimen types.";
     }
 
     @Override
@@ -111,9 +111,9 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         specimenTypeComboViewer = getWidgetCreator().createComboViewer(
-            contents, Messages.StudyAliquotedSpecimenDialog_field_type_label,
+            contents, "Specimen type",
             availableSpecimenTypes, newAliquotedSpecimen.getSpecimenType(),
-            Messages.StudyAliquotedSpecimenDialog_field_type_validation_msg,
+            "A specimen type should be selected",
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -131,10 +131,10 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         activityStatus =
             getWidgetCreator().createComboViewer(
                 contents,
-                Messages.StudyAliquotedSpecimenDialog_label_activity,
+                "Activity status",
                 ActivityStatus.valuesList(),
                 newAliquotedSpecimen.getActivityStatus(),
-                Messages.StudyAliquotedSpecimenDialog_validation_activity,
+                "An activity status should be selected",
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -144,7 +144,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                         } catch (Exception e) {
                             BgcPlugin
                                 .openAsyncError(
-                                    Messages.StudyAliquotedSpecimenDialog_activityStatus_error_title,
+                                    "Error setting activity status",
                                     e);
                         }
                     }
@@ -152,19 +152,19 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
 
         volume = (BgcBaseText) createBoundWidgetWithLabel(contents,
             BgcBaseText.class, SWT.BORDER,
-            Messages.StudyAliquotedSpecimenDialog_volume_label, new String[0],
+            "Volume (ml)", new String[0],
             newAliquotedSpecimen, AliquotedSpecimenPeer.VOLUME.getName(),
             new DoubleNumberValidator(
-                Messages.StudyAliquotedSpecimenDialog_volume_validation_msg,
+                "Volume should be a real number",
                 false));
 
         quantity = (BgcBaseText) createBoundWidgetWithLabel(contents,
             BgcBaseText.class, SWT.BORDER,
-            Messages.StudyAliquotedSpecimenDialog_quantity_label,
+            "Quantity",
             new String[0], newAliquotedSpecimen,
             AliquotedSpecimenPeer.QUANTITY.getName(),
             new IntegerNumberValidator(
-                Messages.StudyAliquotedSpecimenDialog_quantity_validation_msg,
+                "Quantity should be a whole number",
                 false));
     }
 
@@ -204,11 +204,11 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
             newAliquotedSpecimen.reset();
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.StudyAliquotedSpecimenDialog_error_title, e);
+                "Error", e);
         }
         specimenTypeComboViewer.getCombo().deselectAll();
-        quantity.setText(""); //$NON-NLS-1$
-        volume.setText(""); //$NON-NLS-1$
+        quantity.setText("");
+        volume.setText("");
         activityStatus.getCombo().deselectAll();
     }
 

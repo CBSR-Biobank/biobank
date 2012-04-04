@@ -41,8 +41,8 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
         simpleCopyTo(origSpecimenType, tmpSpecimenType);
         this.message = message;
 
-        currentTitle = (specimenType.getName() == null ? Messages.SpecimenTypeDialog_title_add
-            : Messages.SpecimenTypeDialog_title_edit);
+        currentTitle = (specimenType.getName() == null ? "Add Specimen Type "
+            : "Edit Specimen Type");
 
         allOthersTypes = new ArrayList<SpecimenTypeWrapper>(allTypes);
         allOthersTypes.remove(specimenType);
@@ -75,19 +75,19 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            Messages.SpecimenTypeDialog_name_label, null, tmpSpecimenType,
+            "Name", null, tmpSpecimenType,
             SpecimenTypePeer.NAME.getName(), new NonEmptyStringValidator(
-                Messages.SpecimenTypeDialog_name_validation_msg));
+                "Specimen type must have a name."));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            Messages.SpecimenTypeDialog_nameShort_label, null, tmpSpecimenType,
+            "Short Name", null, tmpSpecimenType,
             SpecimenTypePeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
-                Messages.SpecimenTypeDialog_shortName_validation_msg));
+                "Specimen type must have a short name."));
 
         multiSelectChildren = new MultiSelectWidget<SpecimenTypeWrapper>(
             content, SWT.NONE,
-            Messages.SpecimenTypeDialog_availableTypes_label,
-            Messages.SpecimenTypeDialog_selectedTypes_label, 300) {
+            "Available types",
+            "Child types", 300) {
 
             @Override
             protected String getTextForObject(SpecimenTypeWrapper nodeObject) {

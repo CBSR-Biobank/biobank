@@ -41,7 +41,7 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.ReceiveScanDialog_description;
+        return "Scan one pallet received in the shipment.";
     }
 
     @Override
@@ -57,7 +57,7 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
 
     @Override
     protected String getProceedButtonlabel() {
-        return Messages.ReceiveScanDialog_proceed_button_label;
+        return "Accept specimens";
     }
 
     @Override
@@ -102,8 +102,8 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
         Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
         cancelButton.setEnabled(false);
 
-        if (BgcPlugin.openConfirm(Messages.ReceiveScanDialog_0,
-            Messages.ReceiveScanDialog_1))
+        if (BgcPlugin.openConfirm("Print",
+            "Do you wish to print a location sheet for the recipient?"))
             print();
     }
 
@@ -130,14 +130,14 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
                     output.add(cell);
                 }
                 Data data = new Data();
-                data.setColumnNames(Arrays.asList(Messages.ReceiveScanDialog_2,
-                    Messages.ReceiveScanDialog_3,
-                    Messages.ReceiveScanDialog_4, Messages.ReceiveScanDialog_5,
-                    Messages.ReceiveScanDialog_6));
-                data.setDescription(Arrays.asList(Messages.ReceiveScanDialog_7
+                data.setColumnNames(Arrays.asList("Location",
+                    "Inventory Id",
+                    "Patient", "Sample Type",
+                    "Date Drawn"));
+                data.setDescription(Arrays.asList("Barcode:"
                     + productBarcode));
                 data.setRows(output);
-                data.setTitle("Pallet Info Sheet"); //$NON-NLS-1$
+                data.setTitle("Pallet Info Sheet");
 
                 PrintPdfDataExporter pdf = new PrintPdfDataExporter();
 

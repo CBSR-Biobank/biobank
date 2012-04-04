@@ -25,17 +25,17 @@ public class UserManagementDialog extends BgcDialogWithPages {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.UserManagementDialog_description;
+        return "Select the security information to display";
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.UserManagementDialog_title;
+        return "User/Group Management";
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.UserManagementDialog_title;
+        return "User/Group Management";
     }
 
     @Override

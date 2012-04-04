@@ -56,11 +56,11 @@ public class GroupEditDialog extends AbstractSecurityEditDialog {
         this.context = context;
 
         if (group.isNew()) {
-            currentTitle = Messages.GroupEditDialog_title_add;
-            titleAreaMessage = Messages.GroupEditDialog_titlearea_add;
+            currentTitle = "Add Group";
+            titleAreaMessage = "Add a new group";
         } else {
-            currentTitle = Messages.GroupEditDialog_title_edit;
-            titleAreaMessage = Messages.GroupEditDialog_titlearea_modify;
+            currentTitle = "Edit Group";
+            titleAreaMessage = "Modify an existing group's information";
         }
     }
 
@@ -90,22 +90,22 @@ public class GroupEditDialog extends AbstractSecurityEditDialog {
         tb.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createGeneralFields(createTabItem(tb,
-            Messages.GroupEditDialog_general_tab_title, 2));
+            "General", 2));
 
         createMembershipsSection(createTabItem(tb,
-            Messages.UserEditDialog_roles_permissions_title, 1));
+            "Roles and Permissions", 1));
 
         createUsersSection(createTabItem(tb,
-            Messages.GroupEditDialog_users_tab_title, 1));
+            "Users", 1));
 
     }
 
     private void createGeneralFields(Composite createTabItem) {
         createBoundWidgetWithLabel(createTabItem, BgcBaseText.class,
-            SWT.BORDER, Messages.GroupEditDialog_property_title_name, null,
+            SWT.BORDER, "Name", null,
             group, GroupPeer.NAME.getName(),
             new NonEmptyStringValidator(
-                Messages.GroupEditDialog_msg_name_required));
+                "A valid name is required."));
     }
 
     private void createMembershipsSection(Composite contents) {
@@ -128,8 +128,8 @@ public class GroupEditDialog extends AbstractSecurityEditDialog {
 
     private void createUsersSection(Composite contents) {
         usersWidget = new MultiSelectWidget<User>(contents, SWT.NONE,
-            Messages.GroupEditDialog_available_users_label,
-            Messages.GroupEditDialog_selected_users_label, 200) {
+            "Available users",
+            "Selected users", 200) {
             @Override
             protected String getTextForObject(User node) {
                 return node.getFullName() + " (" + node.getLogin() + ")";
