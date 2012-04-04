@@ -22,8 +22,11 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.model.ActivityStatus.Loader;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.constraint.model.ValidContainer;
@@ -56,6 +59,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @ValidContainer(groups = PrePersist.class)
 public class Container extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final I18n i18n = I18nFactory.getI18n(Loader.class);
 
     private String productBarcode;
     private String label;
