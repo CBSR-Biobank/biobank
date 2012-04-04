@@ -48,8 +48,8 @@ public class CollectionEventAddHandler extends AbstractHandler {
             return SessionManager.getInstance().getSession() != null &&
                 allowed;
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("",
-                "");
+            BgcPlugin.openAsyncError("Error",
+                "Unable to retrieve permissions");
             return false;
         }
     }

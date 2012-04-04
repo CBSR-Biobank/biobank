@@ -12,7 +12,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicAddHandler extends LogoutSensitiveHandler {
     public static final String ID =
-        "edu.ualberta.med.biobank.commands.addClinic"; 
+        "edu.ualberta.med.biobank.commands.addClinic";
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
