@@ -45,6 +45,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -148,7 +149,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             specimen.setWrappedObject((Specimen) specimenAdapter
                 .getModelObject().getWrappedObject());
         }
-
+        comment.setWrappedObject(new Comment());
         SessionManager.logLookup(specimen.getWrappedObject());
         ((AdapterBase) adapter).setModelObject(specimen);
     }

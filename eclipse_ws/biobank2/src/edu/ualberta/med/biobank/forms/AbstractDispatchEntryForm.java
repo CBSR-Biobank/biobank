@@ -29,10 +29,12 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
+alberta.med.biobank.views.SpecimenTransitView;
 
 public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
@@ -63,9 +65,9 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     @Override
     protected void init() throws Exception {
-        Assert.isNotNull(adapter, "Adapter should be no null"); 
+        Assert.isNotNull(adapter, "Adapter should be no null");
         Assert.isTrue((adapter instanceof DispatchAdapter),
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         setDispatchInfo(adapter.getId());
@@ -86,6 +88,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             dispatch.setWrappedObject(read.dispatch);
             SessionManager.logLookup(read.dispatch);
         }
+        comment.setWrappedObject(new Comment());
     }
 
     protected abstract String getTextForPartName();
@@ -110,13 +113,13 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             public void handleEvent(Event e) {
                 doSpecimenTextAction(newSpecimenText.getText());
                 newSpecimenText.setFocus();
-                newSpecimenText.setText(""); 
+                newSpecimenText.setText("");
             }
         });
         if (setAsFirstControl) {
             setFirstControl(newSpecimenText);
         }
-        Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH); 
+        Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
         addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -124,13 +127,13 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             public void widgetSelected(SelectionEvent e) {
                 doSpecimenTextAction(newSpecimenText.getText());
                 newSpecimenText.setFocus();
-                newSpecimenText.setText(""); 
+                newSpecimenText.setText("");
             }
         });
         toolkit.createLabel(addComposite,
             "or open scan dialog:");
         Button openScanButton = toolkit
-            .createButton(addComposite, "", SWT.PUSH); 
+            .createButton(addComposite, "", SWT.PUSH);
         openScanButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
@@ -187,7 +190,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter()
                 .getId(), dispatch.getSenderCenter().getId(),
                 dispatch.getState(), (comment.getMessage() == null)
-                    ? "" : comment.getMessage()); 
+                    ? "" : comment.getMessage());
         ShipmentInfoSaveInfo ship = null;
         if (!dispatch.isNew() && dispatch.getShipmentInfo() != null)
             ship =

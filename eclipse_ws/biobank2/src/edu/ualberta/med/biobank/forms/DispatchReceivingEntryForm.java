@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm"; 
+        "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm";
     private DispatchSpecimensTreeTable specimensTree;
     private List<SpecimenWrapper> receivedOrExtraSpecimens =
         new ArrayList<SpecimenWrapper>();
@@ -82,7 +82,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         BgcBaseText shippingMethodLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Shipping Method");
         setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
-            .getShippingMethod() == null ? "" : dispatch.getShipmentInfo() 
+            .getShippingMethod() == null ? "" : dispatch.getShipmentInfo()
             .getShippingMethod().getName());
         BgcBaseText waybillLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Waybill");
@@ -101,15 +101,16 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentsInfoTable(client,
-            dispatch.getCommentCollection(false));
+        commentEntryTable =
+            new CommentsInfoTable(client,
+                dispatch.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            "Add a comment");
+        createBoundWidgetWithLabel(client, BgcBaseText.class,
+            SWT.MULTI, "Add a comment", null, comment, "message", null);
 
     }
 
@@ -264,8 +265,8 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             StringBuffer msg = new StringBuffer();
             for (Entry<String, String> entry : problems.entrySet()) {
                 if (msg.length() > 0)
-                    msg.append("\n"); 
-                msg.append(entry.getKey()).append(": ") 
+                    msg.append("\n");
+                msg.append(entry.getKey()).append(": ")
                     .append(entry.getValue());
             }
             throw new BiobankException(

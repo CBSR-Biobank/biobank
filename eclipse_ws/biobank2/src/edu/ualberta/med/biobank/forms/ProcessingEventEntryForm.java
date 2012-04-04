@@ -39,6 +39,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
@@ -57,7 +58,7 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ProcessingEventEntryForm"; 
+        "edu.ualberta.med.biobank.forms.ProcessingEventEntryForm";
 
     private static final String MSG_NEW_PEVENT_OK =
         "Creating a new processing event";
@@ -88,7 +89,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ProcessingEventAdapter,
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         pEventAdapter = (ProcessingEventAdapter) adapter;
@@ -129,6 +130,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             specimens = read.sourceSpecimenInfos;
             SessionManager.logLookup(read.pevent);
         }
+        comment.setWrappedObject(new Comment());
     }
 
     @Override
@@ -208,8 +210,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            "Add a comment");
+        createBoundWidgetWithLabel(client, BgcBaseText.class,
+            SWT.MULTI, "Add a comment", null, comment, "message", null);
 
     }
 

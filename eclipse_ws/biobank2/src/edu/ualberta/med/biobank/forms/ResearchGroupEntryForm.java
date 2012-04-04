@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -37,7 +38,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 @SuppressWarnings("unused")
 public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"; 
+        "edu.ualberta.med.biobank.forms.ResearchGroupEntryForm";
 
     private static final String MSG_NEW_RG_OK =
         "New Research Group information.";
@@ -77,7 +78,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ResearchGroupAdapter),
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         researchGroupAdapter = (ResearchGroupAdapter) adapter;
 
@@ -103,6 +104,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
                     new ResearchGroupGetInfoAction(id));
             researchGroup.setWrappedObject(read.researchGroup);
         }
+        comment.setWrappedObject(new Comment());
     }
 
     @Override
@@ -117,8 +119,11 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     protected void createFormContent() throws ApplicationException {
         form.setText("Research Group Information");
         page.setLayout(new GridLayout(1, false));
-        toolkit.createLabel(page,
-            "Research Groups can be associated with studies after submitting this initial information.", SWT.LEFT);
+        toolkit
+            .createLabel(
+                page,
+                "Research Groups can be associated with studies after submitting this initial information.",
+                SWT.LEFT);
         createResearchGroupInfoSection();
         createAddressArea(researchGroup);
         createButtonsSection();
