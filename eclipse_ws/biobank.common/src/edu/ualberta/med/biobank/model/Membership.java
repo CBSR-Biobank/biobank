@@ -158,7 +158,7 @@ public class Membership extends AbstractBiobankModel {
     /**
      * Get a {@link Set} of <em>all</em> {@link PermissionEnum}-s that this
      * {@link Membership} has directly, through its {@link Role}-s, and
-     * considering its {@link Rank} (if {@link Rank#ADMINISTRATOR}, then all
+     * considering its {{@link #isEveryPermission()} value (if true, then all
      * {@link PermissionEnum}-s are included).
      * 
      * @return
@@ -203,8 +203,9 @@ public class Membership extends AbstractBiobankModel {
      * 
      * @param user the manager, who is allowed to modify the returned
      *            {@link Role}-s
-     * @param defaultAdminRoles which {@link Role}-s to add to the set if the
-     *            {@link User} is an {@link Rank#ADMINISTRATOR}.
+     * @param defaultAdminRoles which {@link Role}-s to add to the set if {
+     *            {@link #isEveryPermission()} returns true
+     *
      * @return the {@link Role}-s that the manager can manipulate
      */
     @Transient
