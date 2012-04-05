@@ -1,8 +1,15 @@
 package edu.ualberta.med.biobank.model.type;
 
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
+@SuppressWarnings("nls")
 public enum DispatchState {
-    CREATION(0, "Creation"), IN_TRANSIT(1, "In Transit"), RECEIVED(2,  
-        "Received"), CLOSED(3, "Closed"), LOST(4, "Lost");   
+    CREATION(0, Loader.i18n.tr("Creation")),
+    IN_TRANSIT(1, Loader.i18n.tr("In Transit")),
+    RECEIVED(2, Loader.i18n.tr("Received")),
+    CLOSED(3, Loader.i18n.tr("Closed")),
+    LOST(4, Loader.i18n.tr("Lost"));
 
     private Integer id;
     private String label;
@@ -32,5 +39,9 @@ public enum DispatchState {
 
     public String getLabel() {
         return label;
+    }
+
+    public static class Loader {
+        private static final I18n i18n = I18nFactory.getI18n(Loader.class);
     }
 }

@@ -1,8 +1,14 @@
 package edu.ualberta.med.biobank.model.type;
 
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
+@SuppressWarnings("nls")
 public enum RequestState {
-    NEW(0, "New"), SUBMITTED(1, "Submitted"), APPROVED(2, "Approved"), CLOSED(   
-        3, "Closed"); 
+    NEW(0, Loader.i18n.tr("New")),
+    SUBMITTED(1, Loader.i18n.tr("Submitted")),
+    APPROVED(2, Loader.i18n.tr("Approved")),
+    CLOSED(3, Loader.i18n.tr("Closed"));
 
     private Integer id;
     private String label;
@@ -32,5 +38,9 @@ public enum RequestState {
 
     public String getLabel() {
         return label;
+    }
+
+    public static class Loader {
+        private static final I18n i18n = I18nFactory.getI18n(Loader.class);
     }
 }
