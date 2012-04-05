@@ -12,6 +12,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
@@ -43,8 +45,10 @@ import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable.ClinicC
 
 public class StudyViewForm extends BiobankViewForm {
 
+    public static I18n i18n = I18nFactory.getI18n(BiobankViewForm.class);
+
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.StudyViewForm"; 
+        "edu.ualberta.med.biobank.forms.StudyViewForm";
 
     private static final String DATE_PROCESSED_INFO_FIELD_NAME =
         ":Date Processed";
@@ -77,12 +81,11 @@ public class StudyViewForm extends BiobankViewForm {
         Assert
             .isTrue(
                 (adapter instanceof StudyAdapter || adapter instanceof StudyWithPatientAdapter),
-                "Invalid editor input: object of type " 
+                "Invalid editor input: object of type {0}"
                     + adapter.getClass().getName());
 
         updateStudyInfo();
-        setPartName(NLS
-            .bind("Study {0}", study.getNameShort()));
+        setPartName(i18n.tr("Study {0}", study.getNameShort()));
         pvCustomInfoList = new ArrayList<StudyEventAttrCustomInfo>();
     }
 
@@ -241,7 +244,8 @@ public class StudyViewForm extends BiobankViewForm {
         }
 
         if (pvCustomInfoList.size() == 0) {
-            toolkit.createLabel(client, "Study does not collect additional patient visit information");
+            toolkit.createLabel(client,
+                "Study does not collect additional patient visit information");
             return;
         }
 
@@ -271,7 +275,7 @@ public class StudyViewForm extends BiobankViewForm {
                 continue;
             }
             setTextValue(pvCustomInfo.widget, StringUtils.join(
-                study.getStudyEventAttrPermissible(label), ";")); 
+                study.getStudyEventAttrPermissible(label), ";"));
         }
     }
 

@@ -196,7 +196,8 @@ Export-Package: antlr;
  org.apache.log4j;uses:="org.apache.log4j.helpers,org.apache.log4j.or,org.apache.log4j.spi",
  org.apache.log4j.spi;uses:="org.apache.log4j,org.apache.log4j.or",
  org.hibernate.criterion,
- org.springframework.remoting;uses:="org.springframework.core"
+ org.springframework.remoting;uses:="org.springframework.core",
+ org.xnap.commons.i18n
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: edu.ualberta.med.biobank.common,edu.ualberta.med.bioba
  nk.model
