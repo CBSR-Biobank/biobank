@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.base.SiteBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.type.RequestState;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SiteWrapper extends SiteBaseWrapper {

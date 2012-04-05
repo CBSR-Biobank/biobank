@@ -1,4 +1,5 @@
-package edu.ualberta.med.biobank.common.util;
+package edu.ualberta.med.biobank.model.type;
+
 
 /**
  * Never remove one of these enum. Use deprecated if it should not be used

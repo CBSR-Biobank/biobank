@@ -5,9 +5,9 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
-import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.i18n.Msg;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.type.DispatchState;
 
 public class DispatchDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;

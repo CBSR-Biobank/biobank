@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.util;
+package edu.ualberta.med.biobank.model.type;
 
 public enum DispatchState {
     CREATION(0, "Creation"), IN_TRANSIT(1, "In Transit"), RECEIVED(2,  

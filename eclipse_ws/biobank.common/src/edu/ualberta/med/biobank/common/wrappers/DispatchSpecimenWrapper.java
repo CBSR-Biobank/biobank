@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class DispatchSpecimenWrapper extends DispatchSpecimenBaseWrapper

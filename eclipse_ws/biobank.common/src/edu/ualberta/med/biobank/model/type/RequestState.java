@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.util;
+package edu.ualberta.med.biobank.model.type;
 
 public enum RequestState {
     NEW(0, "New"), SUBMITTED(1, "Submitted"), APPROVED(2, "Approved"), CLOSED(   

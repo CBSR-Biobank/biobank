@@ -10,10 +10,10 @@ import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessIn
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenIsUsedInDispatchAction;
-import edu.ualberta.med.biobank.common.util.ItemState;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.type.ItemState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class DispatchCreateProcessAction extends ServerProcessAction {

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.util;
+package edu.ualberta.med.biobank.model.type;
 
 public interface ItemState {
 

@@ -11,9 +11,9 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.util.ItemState;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
+import edu.ualberta.med.biobank.model.type.ItemState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 /**

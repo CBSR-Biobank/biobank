@@ -3,12 +3,12 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 
 @SuppressWarnings({ "unused", "deprecation" })
 @Deprecated
