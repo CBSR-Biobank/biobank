@@ -36,11 +36,22 @@ insert into group_user(user_id, group_id)
        from principal u, principal g
        where u.login collate latin1_general_cs =@USER_NAME
        and g.name collate latin1_general_cs =@GROUP_NAME;
-
--- add a group membership for site CBSR (id = 34)
-insert into membership (id, version, center_id, not_null_center_id, not_null_study_id, principal_id,rank,level)
-       select coalesce(MAX(ms.id), 0)+1, 0, 34, 34, 0, max(p.id) ,0,999
-       from membership as ms, principal as p;
+	   
+-- create a new domain	   
+insert into domain (id, version, all_centers, all_studies)
+		select coalesce(max(d.id),0)+1, 0, 0, 1 
+		from domain d;
+		
+-- give this domain cbsr access
+insert into domain_center (domain_id, center_id)
+		select max(d.id), 34
+		from domain d;
+		
+	   
+-- add the groups membership to the domain
+insert into membership (id, version, every_permission, user_manager, domain_id, principal_id)
+       select coalesce(MAX(ms.id), 0)+1, 0, 0, 0, max(d.id), max(p.id)
+       from membership as ms, principal as p, domain as d;
 
 -- add a role
 insert into role (id, version, name)
