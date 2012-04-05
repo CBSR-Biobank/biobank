@@ -8,12 +8,12 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.security.MembershipContext;
 import edu.ualberta.med.biobank.common.action.security.MembershipContextGetAction;
 import edu.ualberta.med.biobank.common.action.security.MembershipContextGetInput;
 import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
 import edu.ualberta.med.biobank.common.action.security.UserSaveInput;
+import edu.ualberta.med.biobank.common.action.security.UserSaveOutput;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
@@ -57,11 +57,11 @@ public class TestUserSaveAction extends TestAction {
         MembershipContext context = exec(new MembershipContextGetAction(
             new MembershipContextGetInput())).getContext();
 
-        IdResult result =
+        UserSaveOutput result =
             exec(new UserSaveAction(new UserSaveInput(user, context)));
 
         Object o = session.createCriteria(User.class)
-            .add(Restrictions.idEq(result.getId()))
+            .add(Restrictions.idEq(result.getUserId()))
             .uniqueResult();
 
         Assert.assertTrue(o instanceof User);
