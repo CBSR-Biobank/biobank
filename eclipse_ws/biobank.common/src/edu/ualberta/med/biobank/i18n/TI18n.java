@@ -8,48 +8,54 @@ import java.util.Arrays;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-public class TransientI18n implements Serializable {
+/**
+ * A transient localized message.
+ * 
+ * @author Jonathan Ferland
+ */
+public class TI18n implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static final I18n i18n = I18nFactory.getI18n(TransientI18n.class);
+    private static final I18n i18n = I18nFactory.getI18n(TI18n.class);
 
     private final Translator translator;
-    private transient String message;
+    private transient String msg;
 
-    private TransientI18n(Translator translator) {
+    private TI18n(Translator translator) {
         this.translator = translator;
-        this.message = translator.translate();
+        this.msg = translator.translate();
     }
 
-    public static TransientI18n tr(String text, Object[] objects) {
-        return new TransientI18n(
-            new Tr(text, objects));
+    public static TI18n tr(String text, Object[] objects) {
+        return new TI18n(new Tr(text, objects));
     }
 
-    public static TransientI18n trc(String context, String text) {
-        return new TransientI18n(
-            new Trc(context, text));
+    public static TI18n trc(String context, String text) {
+        return new TI18n(new Trc(context, text));
     }
 
-    public static TransientI18n trn(String singular, String plural, long n,
+    public static TI18n trn(String singular, String plural, long n,
         Object[] objects) {
-        return new TransientI18n(
-            new Trn(singular, plural, n, objects));
+        return new TI18n(new Trn(singular, plural, n, objects));
     }
 
-    public static TransientI18n trnc(String context, String singular,
+    public static TI18n trnc(String context, String singular,
         String plural, long n, Object[] objects) {
-        return new TransientI18n(
-            new Trnc(context, singular, plural, n, objects));
+        return new TI18n(new Trnc(context, singular, plural, n, objects));
     }
 
+    public String getMsg() {
+        return msg;
+    }
+
+    @Override
     public String toString() {
-        return message;
+        return msg;
     }
 
     private void readObject(ObjectInputStream ois)
         throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
-        message = translator.translate();
+        msg = translator.translate();
     }
 
     private interface Translator extends Serializable {
@@ -133,9 +139,5 @@ public class TransientI18n implements Serializable {
         public String translate() {
             return i18n.trnc(context, singular, plural, n, objects);
         }
-    }
-
-    public static void test() {
-        TransientI18n.tr("test", null);
     }
 }
