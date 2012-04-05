@@ -1,9 +1,6 @@
 [submodule "eclipse_ws/scannerConfig"]
 	path = eclipse_ws/scannerConfig
 	url = ssh://biobank@aicml-med.cs.ualberta.ca/home/biobank/gitrepo/scannerConfig.git
-[submodule "eclipse_ws/sampleProcessingRobot"]
-	path = eclipse_ws/sampleProcessingRobot
-	url = ssh://biobank@aicml-med.cs.ualberta.ca/home/biobank/gitrepo/sampleProcessingRobot.git
 [submodule "eclipse_ws/labelPrinter"]
 	path = eclipse_ws/labelPrinter
 	url = ssh://biobank@aicml-med.cs.ualberta.ca/home/biobank/gitrepo/labelPrinter.git

@@ -34,7 +34,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.PatientViewForm"; 
+        "edu.ualberta.med.biobank.forms.PatientViewForm";
 
     private BgcBaseText studyLabel;
 
@@ -57,7 +57,7 @@ public class PatientViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof PatientAdapter,
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         updatePatientInfo();
@@ -174,7 +174,7 @@ public class PatientViewForm extends BiobankViewForm {
                 @Override
                 public void editItem(InfoTableEvent<PatientCEventInfo> event) {
                     CollectionEvent ce =
-                        (CollectionEvent) event.getInfoTable().getSelection().cevent;
+                        event.getInfoTable().getSelection().cevent;
                     if (ce != null) {
                         try {
                             Map<Integer, SimpleCEventInfo> map =

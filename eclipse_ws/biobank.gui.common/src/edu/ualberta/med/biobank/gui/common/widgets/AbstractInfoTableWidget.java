@@ -360,6 +360,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
      */
     public abstract T getSelection();
 
+    @SuppressWarnings("unchecked")
     public void doubleClick() {
         // get selection as derived class object
         Object selection = getSelection();

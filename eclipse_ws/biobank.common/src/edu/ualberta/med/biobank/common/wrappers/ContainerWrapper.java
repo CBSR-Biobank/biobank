@@ -848,6 +848,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      *            used
      * @throws BiobankException
      */
+    @SuppressWarnings({ "unused", "null" })
     public static List<ContainerWrapper> getPossibleContainersFromPosition(
         BiobankApplicationService appService, String positionText,
         boolean isContainerPosition, ContainerTypeWrapper contType)
