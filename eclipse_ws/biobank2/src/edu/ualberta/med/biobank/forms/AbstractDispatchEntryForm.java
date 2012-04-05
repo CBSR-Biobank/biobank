@@ -34,7 +34,6 @@ import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
-alberta.med.biobank.views.SpecimenTransitView;
 
 public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
