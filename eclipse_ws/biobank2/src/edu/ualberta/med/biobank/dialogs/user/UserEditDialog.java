@@ -28,12 +28,12 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.common.action.security.MembershipContext;
 import edu.ualberta.med.biobank.common.action.security.UserGetOutput;
 import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
 import edu.ualberta.med.biobank.common.action.security.UserSaveInput;
+import edu.ualberta.med.biobank.common.action.security.UserSaveOutput;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -270,16 +270,18 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
                 pw = pwText;
             }
 
-            IdResult res = SessionManager.getAppService()
+            UserSaveOutput res = SessionManager.getAppService()
                 .doAction(new UserSaveAction(
                     new UserSaveInput(user, membershipContext, pw)));
-            user.setId(res.getId());
+            user.setId(res.getUserId());
+            user.setCsmUserId(res.getCsmUserId());
 
             if (SessionManager.getUser().equals(user)) {
                 // if the User is making changes to himself, logout
-                BgcPlugin.openInformation(
-                    "User Information Saved",
-                    "Your information has been successfully updated. You will be logged out and have to reconnect.");
+                BgcPlugin
+                    .openInformation(
+                        "User Information Saved",
+                        "Your information has been successfully updated. You will be logged out and have to reconnect.");
 
                 LogoutHandler lh = new LogoutHandler();
                 try {
@@ -304,7 +306,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
         if (!user.isNew()) {
             // existing users can have their password field left blank
             passwordValidator = new OrValidator(Arrays.asList(
-                new EmptyStringValidator(""), passwordValidator), 
+                new EmptyStringValidator(""), passwordValidator),
                 MSG_PASSWORD_REQUIRED);
         }
 
@@ -312,7 +314,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
             BgcBaseText.class, SWT.BORDER | SWT.PASSWORD,
             (user.isNew() ? "New Password"
                 : "Password"), new String[0],
-            userWrapper, "password", passwordValidator); 
+            userWrapper, "password", passwordValidator);
 
         password.addModifyListener(new ModifyListener() {
             @Override
@@ -330,7 +332,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
                     : "Re-Type Password"),
                 new String[0],
                 userWrapper,
-                "password", new MatchingTextValidator( 
+                "password", new MatchingTextValidator(
                     "The passwords entered do not match.", password));
 
         MatchingTextValidator.addListener(password, passwordRetyped);

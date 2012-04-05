@@ -111,8 +111,11 @@ public abstract class UserInfoTable extends
     private static boolean isLockedOut(User user) {
         boolean lockedOut = false;
         try {
-            lockedOut = SessionManager.getAppService()
-                .isUserLockedOut(user.getCsmUserId());
+            Long csmUserId = user.getCsmUserId();
+            if (csmUserId != null) {
+                lockedOut = SessionManager.getAppService()
+                    .isUserLockedOut(user.getCsmUserId());
+            }
         } catch (ApplicationException e) {
         }
         return lockedOut;

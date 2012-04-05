@@ -9,7 +9,6 @@ import org.hibernate.Transaction;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
@@ -25,7 +24,7 @@ import edu.ualberta.med.biobank.util.SetDiff;
 import edu.ualberta.med.biobank.util.SetDiff.Pair;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class UserSaveAction implements Action<IdResult> {
+public class UserSaveAction implements Action<UserSaveOutput> {
     private static final long serialVersionUID = 1L;
     private static final Permission PERMISSION = new UserManagerPermission();
 
@@ -41,7 +40,7 @@ public class UserSaveAction implements Action<IdResult> {
     }
 
     @Override
-    public IdResult run(ActionContext context) throws ActionException {
+    public UserSaveOutput run(ActionContext context) throws ActionException {
         User user = context.load(User.class, input.getUserId(), new User());
 
         setProperties(context, user);
@@ -50,7 +49,7 @@ public class UserSaveAction implements Action<IdResult> {
 
         context.getSession().saveOrUpdate(user);
 
-        return new IdResult(user.getId());
+        return new UserSaveOutput(user.getId(), user.getCsmUserId());
     }
 
     private void setProperties(ActionContext context, User user) {
