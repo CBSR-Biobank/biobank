@@ -101,14 +101,17 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
      * @param cell
      * @throws Exception
      */
+    // TODO: the server local may be different than the client, baking strings
+    // here is a bad idea.
     private void processCellDipatchReceiveStatus(Session session, CellInfo cell) {
         Specimen foundSpecimen = searchSpecimen(session, cell.getValue());
         if (foundSpecimen == null) {
             // not in db
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(MessageFormat.format("Specimen {0} not found in database", cell 
-                .getValue()));
-            cell.setTitle("!"); 
+            cell.setInformation(MessageFormat.format(
+                "Specimen {0} not found in database", cell
+                    .getValue()));
+            cell.setTitle("!");
         } else {
             ItemState state = data
                 .getCurrentDispatchSpecimenIds().get(foundSpecimen.getId());
@@ -116,7 +119,7 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
                 // not in the shipment
                 updateCellWithSpecimen(cell, foundSpecimen);
                 cell.setStatus(CellInfoStatus.EXTRA);
-                cell.setInformation("Specimen should not be in shipment"); 
+                cell.setInformation("Specimen should not be in shipment");
             } else {
                 if (DispatchSpecimenState.RECEIVED == state) {
                     updateCellWithSpecimen(cell, foundSpecimen);

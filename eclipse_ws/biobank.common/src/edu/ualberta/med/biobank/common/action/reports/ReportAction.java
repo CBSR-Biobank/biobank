@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.action.ProxiedListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.i18n.Msg;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
 
 public class ReportAction implements Action<ProxiedListResult<Object>> {
@@ -27,6 +28,7 @@ public class ReportAction implements Action<ProxiedListResult<Object>> {
         return new ReportsPermission().isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public ProxiedListResult<Object> run(ActionContext context)
         throws ActionException {
@@ -42,7 +44,8 @@ public class ReportAction implements Action<ProxiedListResult<Object>> {
                 runReport.generate(context
                     .getAppService()));
         } catch (Exception e) {
-            throw new ActionException(e);
+            throw new ActionException(
+                Msg.tr("Unable to run report for unknown reason"), e);
         }
     }
 }

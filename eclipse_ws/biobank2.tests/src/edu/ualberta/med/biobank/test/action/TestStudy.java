@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
-import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
@@ -620,7 +620,7 @@ public class TestStudy extends TestAction {
         try {
             exec(studySaveAction);
             Assert.fail("should not be allowed to add more than 1 global type");
-        } catch (ActionCheckException e) {
+        } catch (ActionException e) {
             Assert.assertTrue(true);
         }
 

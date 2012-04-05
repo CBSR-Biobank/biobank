@@ -1,28 +1,30 @@
 package edu.ualberta.med.biobank.common.action.exception;
 
+import edu.ualberta.med.biobank.i18n.HasLocalizedMessage;
+import edu.ualberta.med.biobank.i18n.Msg;
+
 /**
  * 
- * @author jferland
- * 
+ * @author Jonathan Ferland
  */
-public class ActionException extends RuntimeException {
+public class ActionException extends RuntimeException
+    implements HasLocalizedMessage {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * So only derived classes can use the empty constructor.
-     */
-    protected ActionException() {
+    private final Msg msg;
+
+    public ActionException(Msg msg) {
+        this(msg, null);
     }
 
-    public ActionException(String message) {
-        super(message);
+    public ActionException(Msg msg, Throwable cause) {
+        super(msg.getMsg(), cause);
+
+        this.msg = msg;
     }
 
-    public ActionException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ActionException(Throwable cause) {
-        super(cause);
+    @Override
+    public String getLocalizedMessage() {
+        return msg.getMsg();
     }
 }

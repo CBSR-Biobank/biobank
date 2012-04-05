@@ -6,6 +6,7 @@ import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenUpdatePermission;
+import edu.ualberta.med.biobank.i18n.Msg;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
@@ -91,6 +92,7 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
         return comment;
     }
 
+    @SuppressWarnings("nls")
     private void updateCollectionEvent(ActionContext context,
         Specimen specimen, Comment comment) {
         // when i came across this old and new were reversed... definitely
@@ -107,7 +109,7 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
             if (specimen.getParentSpecimen()
                 .getProcessingEvent() == null)
                 throw new ActionException(
-                    "You must select a parent with a processing event");
+                    Msg.tr("You must select a parent with a processing event"));
         }
 
         if (!oldCEvent.equals(newCEvent)) {

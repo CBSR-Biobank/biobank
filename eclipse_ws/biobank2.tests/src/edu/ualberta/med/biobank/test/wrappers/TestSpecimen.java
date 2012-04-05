@@ -36,7 +36,6 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.InvalidOptionException;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -269,7 +268,7 @@ public class TestSpecimen extends TestDatabase {
         try {
             type1.delete();
             Assert.fail("cannot delete a type in use by a specimen");
-        } catch (ModelIsUsedException e) {
+        } catch (Exception e) {
             Assert.assertTrue(true);
         }
 
@@ -290,7 +289,7 @@ public class TestSpecimen extends TestDatabase {
         try {
             type2.delete();
             Assert.fail("cannot delete a type in use by a specimen");
-        } catch (ModelIsUsedException e) {
+        } catch (Exception e) {
             Assert.assertTrue(true);
         }
 

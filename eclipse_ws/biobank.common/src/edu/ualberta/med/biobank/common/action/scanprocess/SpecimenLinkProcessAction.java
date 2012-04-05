@@ -48,6 +48,8 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
         return res;
     }
 
+    // TODO: the server local may be different than the client, baking strings
+    // here is a bad idea.
     protected CellInfoStatus internalProcessScanResult(Session session,
         Map<RowColPos, CellInfo> cells, boolean isRescanMode)
         throws ActionException {
@@ -65,11 +67,16 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
                         String otherPosition = ContainerLabelingSchemeWrapper
                             .rowColToSbs(new RowColPos(otherValue.getRow(),
                                 otherValue.getCol()));
-                        cell.setInformation(MessageFormat.format(
-                            "Value ''{0}'' has already been scanned in position {1}", cell 
-                                .getValue(), otherPosition));
-                        appendNewLog(MessageFormat.format("ERROR in {0}: Value ''{1}'' has already been scanned in position {2}", thisPosition, cell.getValue(),
-                            otherPosition));
+                        cell.setInformation(MessageFormat
+                            .format(
+                                "Value ''{0}'' has already been scanned in position {1}",
+                                cell
+                                    .getValue(), otherPosition));
+                        appendNewLog(MessageFormat
+                            .format(
+                                "ERROR in {0}: Value ''{1}'' has already been scanned in position {2}",
+                                thisPosition, cell.getValue(),
+                                otherPosition));
                         cell.setStatus(CellInfoStatus.ERROR);
                     } else {
                         allValues.put(cell.getValue(), cell);
@@ -104,6 +111,8 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
      * 
      * @throws Exception
      */
+    // TODO: the server local may be different than the client, baking strings
+    // here is a bad idea.
     private CellInfoStatus processCellLinkStatus(Session session, CellInfo cell)
         throws ActionException {
         if (cell == null)
@@ -115,13 +124,14 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
             Specimen foundSpecimen = searchSpecimen(session, value);
             if (foundSpecimen != null) {
                 cell.setStatus(CellInfoStatus.ERROR);
-                cell.setInformation("Specimen already in database"); 
+                cell.setInformation("Specimen already in database");
                 String palletPosition = ContainerLabelingSchemeWrapper
                     .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
                 if (foundSpecimen.getParentSpecimen() == null)
                     appendNewLog(MessageFormat
                         .format(
-                            "ERROR in {0}: Specimen ''{1}'' already in database linked to visit {2} from patient {3} (currently in center {4})", palletPosition, value,
+                            "ERROR in {0}: Specimen ''{1}'' already in database linked to visit {2} from patient {3} (currently in center {4})",
+                            palletPosition, value,
                             foundSpecimen.getCollectionEvent()
                                 .getVisitNumber(), foundSpecimen
                                 .getCollectionEvent().getPatient()
@@ -130,7 +140,8 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
                 else
                     appendNewLog(MessageFormat
                         .format(
-                            "ERROR in {0}: Specimen ''{1}'' already in database linked to source specimen ''{2}'' ({3}) of visit {4} from patient {5} (currently in center {6})", palletPosition, value,
+                            "ERROR in {0}: Specimen ''{1}'' already in database linked to source specimen ''{2}'' ({3}) of visit {4} from patient {5} (currently in center {6})",
+                            palletPosition, value,
                             foundSpecimen.getParentSpecimen()
                                 .getInventoryId(), foundSpecimen
                                 .getParentSpecimen().getSpecimenType()

@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
@@ -209,7 +208,7 @@ public class TestShippingMethod extends TestDatabase {
         try {
             method.delete();
             Assert.fail("one cevent in the collection");
-        } catch (ModelIsUsedException e) {
+        } catch (Exception e) {
             Assert.assertTrue(true);
         }
 

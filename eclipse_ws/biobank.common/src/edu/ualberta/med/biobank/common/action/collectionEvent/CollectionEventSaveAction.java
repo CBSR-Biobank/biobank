@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
-import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
@@ -25,6 +24,7 @@ import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEven
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
+import edu.ualberta.med.biobank.i18n.Msg;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -37,6 +37,7 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 
+@SuppressWarnings("nls")
 public class CollectionEventSaveAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
@@ -182,8 +183,10 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     specimen = context.load(Specimen.class, specInfo.id);
 
                     if (!newAllSpecCollection.contains(specimen)) {
-                        throw new ActionCheckException(
-                            "specimen not found in collection");
+                        throw new ActionException(
+                            Msg
+                                .tr("Specimen \"{0}\" not found in collection",
+                                    specimen.getInventoryId()));
                     }
                 }
                 specimen.setActivityStatus(specInfo.activityStatus);
@@ -235,15 +238,18 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                         : studyEventAttrInfo.attr;
                     if (sAttr == null) {
                         throw new ActionException(
-                            "no StudyEventAttr found for id \"" //$NON-NLS-1$
-                                + attrInfo.studyEventAttrId + "\""); //$NON-NLS-1$
+                            Msg
+                                .tr("Cannot find Study Event Attribute with id \"{0}\".",
+                                    attrInfo.studyEventAttrId));
                     }
                 }
 
                 if (ActivityStatus.ACTIVE != sAttr.getActivityStatus()) {
+                    String label = sAttr.getGlobalEventAttr().getLabel();
                     throw new ActionException(
-                        "Attribute for \"" + sAttr.getGlobalEventAttr().getLabel() //$NON-NLS-1$
-                            + "\" is locked, changes not permitted"); //$NON-NLS-1$
+                        Msg
+                            .tr("Attribute for label \"{0}\" is locked, changes not permitted.",
+                                label));
                 }
 
                 if (attrInfo.value != null) {
@@ -264,18 +270,24 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
                         if (type == EventAttrTypeEnum.SELECT_SINGLE) {
                             if (!permissibleSplit.contains(attrInfo.value)) {
+                                String label =
+                                    sAttr.getGlobalEventAttr().getLabel();
                                 throw new ActionException(
-                                    "value " + attrInfo.value //$NON-NLS-1$
-                                        + "is invalid for label \"" + sAttr.getGlobalEventAttr().getLabel() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+                                    Msg
+                                        .tr("Value \"{0}\" is invalid for label \"{2}\".",
+                                            attrInfo.value, label));
                             }
                         } else if (type == EventAttrTypeEnum.SELECT_MULTIPLE) {
                             for (String singleVal : attrInfo.value.split(";")) { //$NON-NLS-1$
                                 if (!permissibleSplit.contains(singleVal)) {
+                                    String label =
+                                        sAttr.getGlobalEventAttr().getLabel();
                                     throw new ActionException(
-                                        "value " + singleVal + " (" //$NON-NLS-1$ //$NON-NLS-2$
-                                            + attrInfo.value
-                                            + ") is invalid for label \"" + sAttr.getGlobalEventAttr().getLabel() //$NON-NLS-1$
-                                            + "\""); //$NON-NLS-1$
+                                        Msg
+                                            .tr(
+                                                "Value \"{0}\" (\"{1}\") is invalid for label \"{2}\".",
+                                                singleVal, attrInfo.value,
+                                                label));
                                 }
                             }
                         } else if (type == EventAttrTypeEnum.NUMBER) {
@@ -285,13 +297,17 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                                 DateFormatter.dateFormatter
                                     .parse(attrInfo.value);
                             } catch (ParseException e) {
-                                throw new ActionException(e);
+                                throw new ActionException(
+                                    Msg.tr("Cannot parse date \"{0}\".",
+                                        attrInfo.value));
                             }
                         } else if (type == EventAttrTypeEnum.TEXT) {
                             // do nothing
                         } else {
                             throw new ActionException(
-                                "type \"" + type + "\" not tested"); //$NON-NLS-1$ //$NON-NLS-2$
+                                Msg.tr(
+                                    "Unknown Event Attribute Type \"{0}\".",
+                                    type.getName()));
                         }
                     }
                 }

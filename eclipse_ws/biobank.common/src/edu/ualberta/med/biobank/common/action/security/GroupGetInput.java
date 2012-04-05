@@ -8,6 +8,7 @@ public class GroupGetInput implements ActionInput {
 
     private final Integer groupId;
 
+    @SuppressWarnings("nls")
     public GroupGetInput(Group group) {
         if (group == null)
             throw new IllegalArgumentException("null group");

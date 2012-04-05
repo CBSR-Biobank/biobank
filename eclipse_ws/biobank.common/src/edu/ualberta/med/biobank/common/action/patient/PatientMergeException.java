@@ -1,9 +1,10 @@
 package edu.ualberta.med.biobank.common.action.patient;
 
-import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.i18n.Msg;
 
-public class PatientMergeException extends ActionCheckException {
-
+@SuppressWarnings("nls")
+public class PatientMergeException extends ActionException {
     private static final long serialVersionUID = 1L;
 
     public static enum ExceptionTypeEnum {
@@ -14,7 +15,7 @@ public class PatientMergeException extends ActionCheckException {
     private ExceptionTypeEnum type;
 
     public PatientMergeException(ExceptionTypeEnum type) {
-        super("");
+        super(Msg.tr("Problem merging patients"));
         this.type = type;
     }
 

@@ -40,6 +40,7 @@ public class GroupGetAllAction implements Action<GroupGetAllOutput> {
     @Override
     public GroupGetAllOutput run(ActionContext context)
         throws ActionException {
+        @SuppressWarnings("nls")
         Criteria c = context.getSession()
             .createCriteria(Group.class, "g")
             .createAlias("g.memberships", "m", Criteria.LEFT_JOIN)

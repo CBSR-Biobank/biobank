@@ -1,21 +1,21 @@
 package edu.ualberta.med.biobank.common.action.exception;
 
 import java.io.Serializable;
-import java.text.MessageFormat;
+
+import edu.ualberta.med.biobank.i18n.Msg;
+import edu.ualberta.med.biobank.model.Name;
 
 public class ModelNotFoundException extends ActionException {
     private static final long serialVersionUID = 1L;
-    private static final String MESSAGE =
-        "Cannot find model of type {0} with id {1} in persistence.";
 
     private final Class<?> modelClass;
     private final Serializable modelId;
 
-    public ModelNotFoundException(Class<?> modelClass, Serializable modelId) {
-        super(getMessage(modelClass, modelId));
+    public ModelNotFoundException(Class<?> klazz, Serializable id) {
+        super(getMessage(klazz, id));
 
-        this.modelClass = modelClass;
-        this.modelId = modelId;
+        this.modelClass = klazz;
+        this.modelId = id;
     }
 
     public Class<?> getModelClass() {
@@ -26,8 +26,10 @@ public class ModelNotFoundException extends ActionException {
         return modelId;
     }
 
-    private static String getMessage(Class<?> modelClass, Serializable modelId) {
-        String message = MessageFormat.format(MESSAGE, modelClass, modelId);
-        return message;
+    @SuppressWarnings("nls")
+    private static Msg getMessage(Class<?> klazz, Serializable id) {
+        Msg name = Name.of(klazz);
+        return Msg.tr("Cannot find a {0} with id {1} in persistence.",
+            new Object[] { name, id });
     }
 }

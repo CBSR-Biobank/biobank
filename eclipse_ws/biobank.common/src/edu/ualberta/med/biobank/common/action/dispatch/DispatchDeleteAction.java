@@ -6,6 +6,7 @@ import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.i18n.Msg;
 import edu.ualberta.med.biobank.model.Dispatch;
 
 public class DispatchDeleteAction implements Action<EmptyResult> {
@@ -25,15 +26,18 @@ public class DispatchDeleteAction implements Action<EmptyResult> {
         return new DispatchDeletePermission(shipId).isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public EmptyResult run(ActionContext context) throws ActionException {
         Dispatch ship = context.get(Dispatch.class, shipId);
 
-        if (ship.getState().equals(DispatchState.CREATION.getId()))
+        if (ship.getState().equals(DispatchState.CREATION.getId())) {
             context.getSession().delete(ship);
-        else
+        } else {
             throw new ActionException(
-                "Only freshly created dispatches may be deleted.");
+                Msg.tr("Only freshly created dispatches may be deleted."));
+        }
+
         return new EmptyResult();
     }
 }

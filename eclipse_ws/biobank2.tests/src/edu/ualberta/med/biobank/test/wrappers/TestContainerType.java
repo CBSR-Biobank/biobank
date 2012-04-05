@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropertyException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -386,7 +385,7 @@ public class TestContainerType extends TestDatabase {
         try {
             topType.delete();
             Assert.fail("cannot delete, one container is using this type");
-        } catch (ModelIsUsedException e) {
+        } catch (Exception e) {
             Assert.assertTrue(true);
         }
     }

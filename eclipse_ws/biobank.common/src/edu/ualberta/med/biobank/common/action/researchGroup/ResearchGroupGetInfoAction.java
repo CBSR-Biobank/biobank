@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupReadPermission;
+import edu.ualberta.med.biobank.i18n.Msg;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 
 /**
@@ -40,6 +41,7 @@ public class ResearchGroupGetInfoAction implements
         return new ResearchGroupReadPermission(rgId).isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public ResearchGroupReadInfo run(ActionContext context)
         throws ActionException {
@@ -56,10 +58,10 @@ public class ResearchGroupGetInfoAction implements
             sInfo.researchGroup = (ResearchGroup) row;
 
         } else {
-            throw new ActionException("No research group found with id:" + rgId); //$NON-NLS-1$
+            throw new ActionException(
+                Msg.tr("No research group found with id \"{0}\".", rgId));
         }
 
         return sInfo;
     }
-
 }

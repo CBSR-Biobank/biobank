@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
+import edu.ualberta.med.biobank.i18n.Msg;
 import edu.ualberta.med.biobank.model.Dispatch;
 
 public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
@@ -36,6 +37,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
         return new DispatchReadPermission(id).isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public DispatchReadInfo run(ActionContext context) throws ActionException {
         DispatchReadInfo sInfo = new DispatchReadInfo();
@@ -53,7 +55,8 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
                 new DispatchGetSpecimenInfosAction(id).run(context).getSet();
 
         } else {
-            throw new ActionException("No dispatch found for id:" + id); //$NON-NLS-1$
+            throw new ActionException(
+                Msg.tr("No dispatch found with id \"{0}\".", id));
         }
 
         return sInfo;

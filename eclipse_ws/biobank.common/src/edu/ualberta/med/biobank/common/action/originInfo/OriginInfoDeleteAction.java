@@ -5,6 +5,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.shipment.ShipmentDeletePermission;
+import edu.ualberta.med.biobank.i18n.Msg;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -33,6 +34,7 @@ public class OriginInfoDeleteAction implements Action<EmptyResult> {
             .isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public EmptyResult run(ActionContext context) throws ActionException {
         OriginInfo originInfo = context.load(OriginInfo.class, originInfoId);
@@ -47,7 +49,7 @@ public class OriginInfoDeleteAction implements Action<EmptyResult> {
                 currentCenter = spc.getCurrentCenter();
             else if (currentCenter != spc.getCurrentCenter())
                 throw new ActionException(
-                    "Specimens do not come from the same place.");
+                    Msg.tr("Specimens do not come from the same place."));
             spc.setOriginInfo(newOriginInfo);
             spc.setCurrentCenter(wCenter);
         }

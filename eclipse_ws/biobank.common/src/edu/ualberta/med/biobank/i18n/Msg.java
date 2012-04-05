@@ -13,34 +13,55 @@ import org.xnap.commons.i18n.I18nFactory;
  * 
  * @author Jonathan Ferland
  */
-public class TI18n implements Serializable {
+public class Msg implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static final I18n i18n = I18nFactory.getI18n(TI18n.class);
+    private static final I18n i18n = I18nFactory.getI18n(Msg.class);
 
     private final Translator translator;
     private transient String msg;
 
-    private TI18n(Translator translator) {
+    private Msg(Translator translator) {
         this.translator = translator;
         this.msg = translator.translate();
     }
 
-    public static TI18n tr(String text, Object[] objects) {
-        return new TI18n(new Tr(text, objects));
+    public static Msg tr(String text) {
+        return tr(text, new Object[] {});
     }
 
-    public static TI18n trc(String context, String text) {
-        return new TI18n(new Trc(context, text));
+    public static Msg tr(String text, Object[] objects) {
+        return new Msg(new Tr(text, objects));
     }
 
-    public static TI18n trn(String singular, String plural, long n,
+    public static Msg tr(String text, Object o1) {
+        return new Msg(new Tr(text, new Object[] { o1 }));
+    }
+
+    public static Msg tr(String text, Object o1, Object o2) {
+        return new Msg(new Tr(text, new Object[] { o1, o2 }));
+    }
+
+    public static Msg tr(String text, Object o1, Object o2, Object o3) {
+        return new Msg(new Tr(text, new Object[] { o1, o2, o3 }));
+    }
+
+    public static Msg tr(String text, Object o1, Object o2, Object o3,
+        Object o4) {
+        return new Msg(new Tr(text, new Object[] { o1, o2, o3, o4 }));
+    }
+
+    public static Msg trc(String context, String text) {
+        return new Msg(new Trc(context, text));
+    }
+
+    public static Msg trn(String singular, String plural, long n,
         Object[] objects) {
-        return new TI18n(new Trn(singular, plural, n, objects));
+        return new Msg(new Trn(singular, plural, n, objects));
     }
 
-    public static TI18n trnc(String context, String singular,
+    public static Msg trnc(String context, String singular,
         String plural, long n, Object[] objects) {
-        return new TI18n(new Trnc(context, singular, plural, n, objects));
+        return new Msg(new Trnc(context, singular, plural, n, objects));
     }
 
     public String getMsg() {

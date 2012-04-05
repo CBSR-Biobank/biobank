@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.i18n.Msg;
 
 public class CheckNoDuplicateAction implements Action<BooleanResult> {
 
@@ -36,6 +37,7 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
         return true;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
         String equalsTest = ""; //$NON-NLS-1$
@@ -54,9 +56,10 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
         @SuppressWarnings("unchecked")
         List<Long> res = query.list();
         if (res.size() != 1) {
-            throw new ActionException("Problem in query result size"); //$NON-NLS-1$
+            throw new ActionException(
+                Msg.tr("Expected a single query result, but got \"{0}\".",
+                    res.size()));
         }
         return new BooleanResult(res.get(0) == 0);
     }
-
 }

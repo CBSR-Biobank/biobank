@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
+import edu.ualberta.med.biobank.i18n.Msg;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
@@ -40,6 +41,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
             .isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public IdResult run(ActionContext context) throws ActionException {
         OriginInfo oi =
@@ -84,7 +86,8 @@ public class OriginInfoSaveAction implements Action<IdResult> {
         if (oiInfo.removedSpecIds != null)
             for (Integer specId : oiInfo.removedSpecIds) {
                 if (specId == null)
-                    throw new ActionException("Specimen id can not be null");
+                    throw new ActionException(
+                        Msg.tr("Specimen id can not be null"));
                 Specimen spec =
                     context.load(Specimen.class, specId);
                 Center center = context.load(Center.class, oiInfo.siteId);
@@ -98,7 +101,8 @@ public class OriginInfoSaveAction implements Action<IdResult> {
         if (oiInfo.addedSpecIds != null)
             for (Integer specId : oiInfo.addedSpecIds) {
                 if (specId == null)
-                    throw new ActionException("Specimen id can not be null");
+                    throw new ActionException(
+                        Msg.tr("Specimen id can not be null"));
                 Specimen spec =
                     context.load(Specimen.class, specId);
                 spec.setOriginInfo(oi);

@@ -123,6 +123,8 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
      * only be 'already added' (this status is used while scanning: the color
      * will be different)
      */
+    // TODO: the server local may be different than the client, baking strings
+    // here is a bad idea.
     private CellInfoStatus processCellDipatchCreateStatus(CellInfo scanCell,
         Center sender, boolean checkAlreadyAdded) {
         Specimen expectedSpecimen = null;
@@ -133,23 +135,24 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
         String value = scanCell.getValue();
         if (value == null) { // no specimen scanned
             scanCell.setStatus(CellInfoStatus.MISSING);
-            scanCell.setInformation(MessageFormat.format("Specimen {0} missing", 
+            scanCell.setInformation(MessageFormat.format(
+                "Specimen {0} missing",
                 expectedSpecimen.getInventoryId()));
-            scanCell.setTitle("?"); 
+            scanCell.setTitle("?");
         } else {
             Specimen foundSpecimen = searchSpecimen(session, value);
             if (foundSpecimen == null) {
                 // not in database
                 scanCell.setStatus(CellInfoStatus.ERROR);
-                scanCell.setInformation("Specimen does not exist."); 
+                scanCell.setInformation("Specimen does not exist.");
             } else {
                 if (expectedSpecimen != null
                     && !foundSpecimen.equals(expectedSpecimen)) {
                     // Position taken
                     scanCell.setStatus(CellInfoStatus.ERROR);
                     scanCell
-                        .setInformation("Specimen different from the one registered at this position"); 
-                    scanCell.setTitle("!"); 
+                        .setInformation("Specimen different from the one registered at this position");
+                    scanCell.setTitle("!");
                 } else {
                     scanCell.setSpecimenId(foundSpecimen.getId());
                     if (expectedSpecimen != null
@@ -162,7 +165,7 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
                         scanCell.setTitle(foundSpecimen.getCollectionEvent()
                             .getPatient().getPnumber());
                         scanCell
-                            .setInformation("This specimen should be on another pallet"); 
+                            .setInformation("This specimen should be on another pallet");
                     }
                 }
             }
@@ -179,20 +182,26 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
      * @param checkAlreadyAdded
      * @throws Exception
      */
+    // TODO: the server local may be different than the client, baking strings
+    // here is a bad idea.
     private void checkCanAddSpecimen(CellInfo cell, Specimen specimen,
         Center sender, boolean checkAlreadyAdded) {
         if (specimen.getId() == null) {
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(""); 
+            cell.setInformation("");
         } else if (specimen.getActivityStatus() != ActivityStatus.ACTIVE) {
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(MessageFormat.format("Activity status of {0} is not ''Active''. Check comments on this specimen for more information.", 
-                specimen.getInventoryId()));
+            cell.setInformation(MessageFormat
+                .format(
+                    "Activity status of {0} is not ''Active''. Check comments on this specimen for more information.",
+                    specimen.getInventoryId()));
         } else if (!specimen.getCurrentCenter().equals(sender)) {
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(MessageFormat.format("Specimen {0} is currently assigned to center {1}. It should first be sent to center {2}.", 
-                specimen.getInventoryId(), specimen.getCurrentCenter()
-                    .getNameShort(), sender.getNameShort()));
+            cell.setInformation(MessageFormat
+                .format(
+                    "Specimen {0} is currently assigned to center {1}. It should first be sent to center {2}.",
+                    specimen.getInventoryId(), specimen.getCurrentCenter()
+                        .getNameShort(), sender.getNameShort()));
         } else {
             Map<Integer, ItemState> currentSpecimenIds = data
                 .getCurrentDispatchSpecimenIds();
@@ -200,13 +209,14 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
                 && currentSpecimenIds.get(specimen.getId()) != null;
             if (checkAlreadyAdded && alreadyInShipment) {
                 cell.setStatus(CellInfoStatus.ERROR);
-                cell.setInformation(MessageFormat.format("{0} is already in this dispatch.", 
+                cell.setInformation(MessageFormat.format(
+                    "{0} is already in this dispatch.",
                     specimen.getInventoryId()));
             } else if (new SpecimenIsUsedInDispatchAction(specimen.getId())
                 .run(actionContext).isTrue()) {
                 cell.setStatus(CellInfoStatus.ERROR);
                 cell.setInformation(MessageFormat.format(
-                    "{0} is already in a not closed dispatch.", 
+                    "{0} is already in a not closed dispatch.",
                     specimen.getInventoryId()));
             } else {
                 if (alreadyInShipment)

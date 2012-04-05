@@ -7,11 +7,11 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
-import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCreatePermission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeUpdatePermission;
+import edu.ualberta.med.biobank.i18n.Msg;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Comment;
@@ -160,11 +160,12 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         containerType.setChildLabelingScheme(childLabelingScheme);
     }
 
+    @SuppressWarnings("nls")
     private void setContents(ActionContext context, ContainerType containerType) {
         if ((specimenTypeIds.size() > 0) &&
             (childContainerTypeIds.size() > 0)) {
-            throw new ActionCheckException(
-                "container type cannot have both specimen types and child container types");
+            throw new ActionException(
+                Msg.tr("A container type cannot have both specimen types and child container types"));
         }
         setSpecimenTypes(context, containerType);
         setChildContainerTypes(context, containerType);

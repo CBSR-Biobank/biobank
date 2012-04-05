@@ -78,7 +78,7 @@ public class DispatchSaveAction implements Action<IdResult> {
 
         // This stuff could be extracted to a util method. need to think about
         // how
-        if (!dInfo.comment.trim().equals("")) {
+        if (!dInfo.comment.trim().isEmpty()) {
             Set<Comment> comments = disp.getComments();
             if (comments == null) comments = new HashSet<Comment>();
             Comment newComment = new Comment();

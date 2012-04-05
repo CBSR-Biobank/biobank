@@ -22,6 +22,7 @@ public class UserSaveInput implements ActionInput {
     private final Set<Integer> groupIds;
     private final MembershipContext context;
 
+    @SuppressWarnings("nls")
     public UserSaveInput(User user, MembershipContext context, String password) {
         if (user == null)
             throw new IllegalArgumentException("null user");

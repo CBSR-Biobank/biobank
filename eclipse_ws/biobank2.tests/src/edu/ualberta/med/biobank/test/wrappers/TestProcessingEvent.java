@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
@@ -216,7 +215,7 @@ public class TestProcessingEvent extends TestDatabase {
             pevent.delete();
             Assert
                 .fail("should not be able to delete pevent with one or more specimens");
-        } catch (ModelIsUsedException e) {
+        } catch (Exception e) {
             Assert.assertTrue(true);
         }
 

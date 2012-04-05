@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.permission.request.RequestReadPermission;
+import edu.ualberta.med.biobank.i18n.Msg;
 import edu.ualberta.med.biobank.model.Request;
 
 public class RequestGetInfoAction implements Action<RequestReadInfo> {
@@ -40,6 +41,7 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
         return new RequestReadPermission().isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public RequestReadInfo run(ActionContext context)
         throws ActionException {
@@ -57,7 +59,7 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
 
         } else {
             throw new ActionException(
-                "No request found with id:" + id); //$NON-NLS-1$
+                Msg.tr("No request found with id \"{0}\".", id));
         }
 
         return sInfo;

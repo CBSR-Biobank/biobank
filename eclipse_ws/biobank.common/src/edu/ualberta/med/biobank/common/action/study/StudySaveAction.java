@@ -12,12 +12,12 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
-import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
+import edu.ualberta.med.biobank.i18n.Msg;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Comment;
@@ -246,6 +246,7 @@ public class StudySaveAction implements Action<IdResult> {
         return new IdResult(study.getId());
     }
 
+    @SuppressWarnings("nls")
     private void saveContacts(ActionContext context) {
         Set<Contact> contacts =
             context.load(Contact.class, contactIds);
@@ -267,7 +268,9 @@ public class StudySaveAction implements Action<IdResult> {
                 contact.setStudies(contactStudies);
             } else {
                 throw new ActionException(
-                    "study not found in removed contact's collection");
+                    Msg.tr(
+                        "Study \"{0}\" not found in removed contact's studies.",
+                        study.getNameShort()));
             }
         }
     }
@@ -335,14 +338,16 @@ public class StudySaveAction implements Action<IdResult> {
         }
     }
 
+    @SuppressWarnings("nls")
     private void saveEventAttributes(ActionContext context) {
         Set<Integer> geAttrIdsUsed = new HashSet<Integer>();
         Set<StudyEventAttr> newEAttrCollection = new HashSet<StudyEventAttr>();
         for (StudyEventAttrSaveInfo eAttrSaveInfo : studyEventAttrSaveInfos) {
             if (geAttrIdsUsed.contains(eAttrSaveInfo.globalEventAttrId)) {
-                throw new ActionCheckException(
-                    "canot add multiple study event attributes with same global id "
-                        + eAttrSaveInfo.globalEventAttrId);
+                throw new ActionException(
+                    Msg.tr(
+                        "Cannot add multiple study event attributes with the same id (\"{0}\").",
+                        eAttrSaveInfo.globalEventAttrId));
             }
             StudyEventAttr seAttr;
             if (eAttrSaveInfo.id == null) {

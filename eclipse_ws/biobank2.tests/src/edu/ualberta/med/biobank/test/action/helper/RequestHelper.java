@@ -9,7 +9,6 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
@@ -61,7 +60,7 @@ public class RequestHelper extends Helper {
 
         for (String id : specs) {
             if (id == null || id.equals(""))
-                throw new ActionException(
+                throw new Exception(
                     "Blank specimen id, please check your your file for correct input.");
 
             Query q = session.createQuery("from "

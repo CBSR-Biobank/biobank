@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
+import edu.ualberta.med.biobank.i18n.Msg;
 import edu.ualberta.med.biobank.model.OriginInfo;
 
 /**
@@ -42,6 +43,7 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
         return new OriginInfoReadPermission(oiId).isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public ShipmentReadInfo run(ActionContext context)
         throws ActionException {
@@ -61,7 +63,9 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
                     .getList());
 
         } else {
-            throw new ActionException("No patient found with id:" + oiId); //$NON-NLS-1$
+            throw new ActionException(
+                Msg.tr("No origin information with id \"{0}\" could be found.",
+                    oiId));
         }
 
         return sInfo;
