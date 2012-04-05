@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
-import edu.ualberta.med.biobank.i18n.Msg;
+import edu.ualberta.med.biobank.i18n.SS;
 import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
@@ -95,7 +95,7 @@ public class UserSaveAction implements Action<IdResult> {
 
                 if (pw == null || pw.length() < MIN_PW_LENGTH) {
                     throw new ActionException(
-                        Msg.tr(
+                        SS.tr(
                             "Passwords must be at least {0} characters long",
                             MIN_PW_LENGTH));
                 }
@@ -114,7 +114,7 @@ public class UserSaveAction implements Action<IdResult> {
             }
         } catch (ApplicationException e) {
             throw new ActionException(
-                Msg.tr("Problem modify associated CSM user properties"), e);
+                SS.tr("Problem modify associated CSM user properties"), e);
         }
     }
 
@@ -128,7 +128,7 @@ public class UserSaveAction implements Action<IdResult> {
 
         if (!managerMembs.containsAll(executorMembs)) {
             throw new ActionException(
-                Msg.tr("Your manageable memberships have changed since you began modifying this user. Please start over and try again."));
+                SS.tr("Your manageable memberships have changed since you began modifying this user. Please start over and try again."));
         }
 
         return managerMembs;
@@ -205,7 +205,7 @@ public class UserSaveAction implements Action<IdResult> {
             if (!newPermissionScope.containsAll(oldPermissionScope)
                 || !newRoleScope.containsAll(oldRoleScope)) {
                 throw new ActionException(
-                    Msg.tr("Your roles or permissions have changed since you began modifying this user. Please start over and try again."));
+                    SS.tr("Your roles or permissions have changed since you began modifying this user. Please start over and try again."));
             }
 
             // looks okay, clear out the old scope and assign intended values
@@ -246,7 +246,7 @@ public class UserSaveAction implements Action<IdResult> {
         User executingUser = context.getUser();
         if (!m.isFullyManageable(executingUser)) {
             throw new ActionException(
-                Msg.tr("You do not have adequate permissions to modify this user."));
+                SS.tr("You do not have adequate permissions to modify this user."));
         }
     }
 
@@ -260,7 +260,7 @@ public class UserSaveAction implements Action<IdResult> {
 
         if (!contextGroupIds.containsAll(input.getGroupIds())) {
             throw new ActionException(
-                Msg.tr("It appears you are trying to add groups you were not aware of. Please start over and try again."));
+                SS.tr("It appears you are trying to add groups you were not aware of. Please start over and try again."));
         }
 
         // add or remove every Group in the context
@@ -268,7 +268,7 @@ public class UserSaveAction implements Action<IdResult> {
         for (Group group : groups) {
             if (!group.isFullyManageable(executingUser)) {
                 throw new ActionException(
-                    Msg.tr("You cannot add this user to groups you cannot manage."));
+                    SS.tr("You cannot add this user to groups you cannot manage."));
             }
 
             if (input.getGroupIds().contains(group.getId())) {

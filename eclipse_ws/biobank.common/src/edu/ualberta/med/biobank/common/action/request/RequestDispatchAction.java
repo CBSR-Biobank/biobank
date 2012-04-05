@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.permission.request.UpdateRequestPermission;
-import edu.ualberta.med.biobank.i18n.Msg;
+import edu.ualberta.med.biobank.i18n.SS;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
@@ -53,7 +53,7 @@ public class RequestDispatchAction implements Action<EmptyResult> {
 
         if (!dsave.isAllowed(context))
             throw new ActionException(
-                Msg.tr("You do not have permission to dispatch this."));
+                SS.tr("You do not have permission to dispatch this."));
         RequestStateChangeAction stateaction =
             new RequestStateChangeAction(specs, rsstate);
         stateaction.run(context);

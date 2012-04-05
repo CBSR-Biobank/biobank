@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
-import edu.ualberta.med.biobank.i18n.Msg;
+import edu.ualberta.med.biobank.i18n.SS;
 import edu.ualberta.med.biobank.model.OriginInfo;
 
 /**
@@ -64,7 +64,7 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
 
         } else {
             throw new ActionException(
-                Msg.tr("No origin information with id \"{0}\" could be found.",
+                SS.tr("No origin information with id \"{0}\" could be found.",
                     oiId));
         }
 

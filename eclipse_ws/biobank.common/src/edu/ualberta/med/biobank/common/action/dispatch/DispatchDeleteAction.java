@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
-import edu.ualberta.med.biobank.i18n.Msg;
+import edu.ualberta.med.biobank.i18n.SS;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 
@@ -35,7 +35,7 @@ public class DispatchDeleteAction implements Action<EmptyResult> {
             context.getSession().delete(ship);
         } else {
             throw new ActionException(
-                Msg.tr("Only freshly created dispatches may be deleted."));
+                SS.tr("Only freshly created dispatches may be deleted."));
         }
 
         return new EmptyResult();

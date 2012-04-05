@@ -9,59 +9,59 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 /**
- * A transient localized message.
+ * A "Smart String" holder that is aware of i18n local changes.
  * 
  * @author Jonathan Ferland
  */
-public class Msg implements Serializable {
+public class SS implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static final I18n i18n = I18nFactory.getI18n(Msg.class);
+    private static final I18n i18n = I18nFactory.getI18n(SS.class);
 
     private final Translator translator;
     private transient String msg;
 
-    private Msg(Translator translator) {
+    private SS(Translator translator) {
         this.translator = translator;
         this.msg = translator.translate();
     }
 
-    public static Msg tr(String text) {
+    public static SS tr(String text) {
         return tr(text, new Object[] {});
     }
 
-    public static Msg tr(String text, Object[] objects) {
-        return new Msg(new Tr(text, objects));
+    public static SS tr(String text, Object[] objects) {
+        return new SS(new Tr(text, objects));
     }
 
-    public static Msg tr(String text, Object o1) {
-        return new Msg(new Tr(text, new Object[] { o1 }));
+    public static SS tr(String text, Object o1) {
+        return new SS(new Tr(text, new Object[] { o1 }));
     }
 
-    public static Msg tr(String text, Object o1, Object o2) {
-        return new Msg(new Tr(text, new Object[] { o1, o2 }));
+    public static SS tr(String text, Object o1, Object o2) {
+        return new SS(new Tr(text, new Object[] { o1, o2 }));
     }
 
-    public static Msg tr(String text, Object o1, Object o2, Object o3) {
-        return new Msg(new Tr(text, new Object[] { o1, o2, o3 }));
+    public static SS tr(String text, Object o1, Object o2, Object o3) {
+        return new SS(new Tr(text, new Object[] { o1, o2, o3 }));
     }
 
-    public static Msg tr(String text, Object o1, Object o2, Object o3,
+    public static SS tr(String text, Object o1, Object o2, Object o3,
         Object o4) {
-        return new Msg(new Tr(text, new Object[] { o1, o2, o3, o4 }));
+        return new SS(new Tr(text, new Object[] { o1, o2, o3, o4 }));
     }
 
-    public static Msg trc(String context, String text) {
-        return new Msg(new Trc(context, text));
+    public static SS trc(String context, String text) {
+        return new SS(new Trc(context, text));
     }
 
-    public static Msg trn(String singular, String plural, long n,
+    public static SS trn(String singular, String plural, long n,
         Object[] objects) {
-        return new Msg(new Trn(singular, plural, n, objects));
+        return new SS(new Trn(singular, plural, n, objects));
     }
 
-    public static Msg trnc(String context, String singular,
+    public static SS trnc(String context, String singular,
         String plural, long n, Object[] objects) {
-        return new Msg(new Trnc(context, singular, plural, n, objects));
+        return new SS(new Trnc(context, singular, plural, n, objects));
     }
 
     public String getMsg() {

@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCreatePermission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeUpdatePermission;
-import edu.ualberta.med.biobank.i18n.Msg;
+import edu.ualberta.med.biobank.i18n.SS;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Comment;
@@ -165,7 +165,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         if ((specimenTypeIds.size() > 0) &&
             (childContainerTypeIds.size() > 0)) {
             throw new ActionException(
-                Msg.tr("A container type cannot have both specimen types and child container types"));
+                SS.tr("A container type cannot have both specimen types and child container types"));
         }
         setSpecimenTypes(context, containerType);
         setChildContainerTypes(context, containerType);
