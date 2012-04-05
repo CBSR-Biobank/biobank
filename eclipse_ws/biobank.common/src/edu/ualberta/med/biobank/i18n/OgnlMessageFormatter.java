@@ -13,6 +13,7 @@ import ognl.OgnlException;
  * @author Jonathan Ferland
  */
 public class OgnlMessageFormatter {
+    @SuppressWarnings("nls")
     private static final Pattern VARIABLE_START_PATTERN = Pattern
         .compile("\\$\\{");
 
@@ -84,6 +85,7 @@ public class OgnlMessageFormatter {
      * @param variable a string matching <code>$&#123;contents&#125;</code>
      * @return contents
      */
+    @SuppressWarnings("nls")
     private static String extractContents(String variable) {
         int start = 2;
         int end = variable.length() - 1;
@@ -102,6 +104,7 @@ public class OgnlMessageFormatter {
      * 
      * @return true if the given character is escaped, otherwise false
      */
+    @SuppressWarnings("nls")
     private static boolean isEscaped(String string, int charIndex) {
         if (charIndex < 0 || charIndex > string.length()) {
             throw new IndexOutOfBoundsException(

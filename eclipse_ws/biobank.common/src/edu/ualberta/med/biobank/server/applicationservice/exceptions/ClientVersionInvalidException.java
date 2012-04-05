@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.server.applicationservice.exceptions;
 
+import edu.ualberta.med.biobank.i18n.SS;
+
 public class ClientVersionInvalidException extends BiobankServerException {
 
     private static final long serialVersionUID = 1L;
@@ -12,8 +14,11 @@ public class ClientVersionInvalidException extends BiobankServerException {
         super(cause);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getMessage() {
-        return "Client authentication failed. The Java Client version is not compatible with the server and must be upgraded."; 
+        return SS
+            .tr("Client authentication failed. The Java Client version is not compatible with the server and must be upgraded.")
+            .toString();
     }
 }

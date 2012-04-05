@@ -2,10 +2,13 @@ package edu.ualberta.med.biobank.server.applicationservice.exceptions;
 
 import java.text.MessageFormat;
 
+@SuppressWarnings("nls")
+@Deprecated
 public class ValueNotSetException extends BiobankServerException {
     private static final long serialVersionUID = 1L;
 
-    private static final String MSG_PATTERN = "Value ''{0}'' has not been set on ''{1}''."; 
+    private static final String MSG_PATTERN =
+        "Value ''{0}'' has not been set on ''{1}''.";
 
     private String propertyName;
 

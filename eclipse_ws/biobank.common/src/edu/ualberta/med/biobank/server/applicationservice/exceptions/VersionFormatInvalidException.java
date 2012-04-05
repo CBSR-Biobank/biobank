@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.server.applicationservice.exceptions;
 
+import edu.ualberta.med.biobank.i18n.SS;
+
 public class VersionFormatInvalidException extends BiobankServerException {
 
     private static final long serialVersionUID = 1L;
@@ -12,9 +14,10 @@ public class VersionFormatInvalidException extends BiobankServerException {
         super(cause);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getMessage() {
-        return "The version string is formatted incorrectly."; 
+        return SS.tr("The version string is formatted incorrectly.").toString();
     }
 
 }

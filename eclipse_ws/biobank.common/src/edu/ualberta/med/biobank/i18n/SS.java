@@ -9,7 +9,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 /**
- * A "Smart String" holder that is aware of i18n local changes.
+ * A "Smart String" holder that is aware of {@link I18n} local changes.
  * 
  * @author Jonathan Ferland
  */
