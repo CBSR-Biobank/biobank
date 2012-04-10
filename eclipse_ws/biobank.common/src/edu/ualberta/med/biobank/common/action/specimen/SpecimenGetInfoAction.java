@@ -20,7 +20,7 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
 
     @SuppressWarnings("nls")
     private static final String SPECIMEN_INFO_HQL =
-        "SELECT spc FROM " + Specimen.class.getName() + " spc"
+        "SELECT distinct spc FROM " + Specimen.class.getName() + " spc"
             + " INNER JOIN FETCH spc.topSpecimen"
             + " INNER JOIN FETCH spc.specimenType"
             + " INNER JOIN FETCH spc.currentCenter"

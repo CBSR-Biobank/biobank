@@ -209,6 +209,12 @@ public class Messages extends NLS {
 
     public static String ShippingMethodViewForm_title;
 
+    public static String SpecimenEntryForm_4;
+
+    public static String SpecimenEntryForm_5;
+
+    public static String SpecimenEntryForm_6;
+
     public static String SpecimenEntryForm_cEvent_label;
 
     public static String SpecimenEntryForm_cevent_modification;
