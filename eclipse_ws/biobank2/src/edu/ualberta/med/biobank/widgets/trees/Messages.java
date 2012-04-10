@@ -27,7 +27,7 @@ public class Messages extends NLS {
     public static String RequestSpecimensTreeTable_save_error_title;
     public static String RequestSpecimensTreeTable_state_label;
     public static String RequestSpecimensTreeTable_type_label;
-    public static String DispatchSpecimensTreeTable_set_nonprocessed_label;
+    public static String DispatchSpecimensTreeTable_delete_label;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -57,7 +57,8 @@ public class DispatchSaveAction implements Action<IdResult> {
 
         disp.setState(dInfo.state);
 
-        disp.setDispatchSpecimens(reassemble(context, disp,
+        disp.getDispatchSpecimens().clear();
+        disp.getDispatchSpecimens().addAll(reassemble(context, disp,
             dsInfos));
 
         if (siInfo != null) {

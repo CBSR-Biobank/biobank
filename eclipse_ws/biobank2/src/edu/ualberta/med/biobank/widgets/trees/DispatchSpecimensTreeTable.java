@@ -181,7 +181,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                             addSetMissingMenu(menu);
                         addModifyCommentMenu(menu);
                         if (DispatchSpecimenState.getState(dsa.getState()) != DispatchSpecimenState.NONE)
-                            addSetNonprocessedMenu(menu);
+                            addDeleteExtraMenu(menu);
                     }
                 }
             }
@@ -225,15 +225,20 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         });
     }
 
-    private void addSetNonprocessedMenu(final Menu menu) {
+    private void addDeleteExtraMenu(final Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.DispatchSpecimensTreeTable_set_nonprocessed_label);
+        item.setText(Messages.DispatchSpecimensTreeTable_delete_label);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                modifyCommentAndState((IStructuredSelection) tv.getSelection(),
-                    DispatchSpecimenState.NONE);
+                DispatchSpecimensTreeTable.this.shipment.removeDispatchSpecimens(Arrays
+                    .asList((DispatchSpecimenWrapper) ((TreeItemAdapter) ((IStructuredSelection) tv
+                        .getSelection())
+                        .getFirstElement())
+                        .getSpecimen()));
+                notifyListeners();
+                tv.refresh();
             }
         });
     }
