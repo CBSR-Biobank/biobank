@@ -35,7 +35,6 @@ public class JasperTemplateSaveAction implements Action<IdResult> {
         jTemplate.setXml(xml);
 
         context.getSession().saveOrUpdate(jTemplate);
-        context.getSession().flush();
 
         return new IdResult(jTemplate.getId());
     }

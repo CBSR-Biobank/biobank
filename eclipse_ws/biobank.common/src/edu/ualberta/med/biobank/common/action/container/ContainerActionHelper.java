@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.action.container;
 
+import org.apache.log4j.Logger;
+
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -7,6 +9,11 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 
 public class ContainerActionHelper {
+
+    private static Logger LOG = Logger.getLogger(ContainerActionHelper.class
+        .getName());
+
+    public static final String PATH_DELIMITER = "/"; //$NON-NLS-1$
 
     public static void setPosition(ActionContext context,
         Container container, RowColPos rcp, Integer parentId) {
@@ -34,5 +41,21 @@ public class ContainerActionHelper {
         }
         container.setTopContainer(parent == null ? container : parent
             .getTopContainer());
+    }
+
+    public static void updateContainerPathAndLabel(Container container,
+        Container parentContainer) {
+        StringBuilder path = new StringBuilder();
+        String parentPath = parentContainer.getPath();
+        if ((parentPath != null) && !parentPath.isEmpty()) {
+            path.append(parentPath).append(PATH_DELIMITER);
+        }
+        path.append(parentContainer.getId());
+        container.setPath(path.toString());
+        container.setTopContainer(parentContainer.getTopContainer());
+        container.setLabel(parentContainer.getLabel()
+            + parentContainer.getContainerType().getPositionString(
+                container.getPositionAsRowCol()));
+
     }
 }
