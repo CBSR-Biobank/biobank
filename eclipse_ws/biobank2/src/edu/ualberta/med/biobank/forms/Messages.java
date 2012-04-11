@@ -319,6 +319,54 @@ public class Messages extends NLS {
 
     public static String SpecimenViewForm_worksheet_string;
 
+    public static String RequestEntryForm_0;
+
+    public static String RequestEntryForm_1;
+
+    public static String RequestEntryForm_10;
+
+    public static String RequestEntryForm_11;
+
+    public static String RequestEntryForm_12;
+
+    public static String RequestEntryForm_13;
+
+    public static String RequestEntryForm_14;
+
+    public static String RequestEntryForm_16;
+
+    public static String RequestEntryForm_18;
+
+    public static String RequestEntryForm_2;
+
+    public static String RequestEntryForm_20;
+
+    public static String RequestEntryForm_21;
+
+    public static String RequestEntryForm_22;
+
+    public static String RequestEntryForm_23;
+
+    public static String RequestEntryForm_26;
+
+    public static String RequestEntryForm_27;
+
+    public static String RequestEntryForm_28;
+
+    public static String RequestEntryForm_3;
+
+    public static String RequestEntryForm_4;
+
+    public static String RequestEntryForm_5;
+
+    public static String RequestEntryForm_6;
+
+    public static String RequestEntryForm_7;
+
+    public static String RequestEntryForm_8;
+
+    public static String RequestEntryForm_9;
+
     public static String RequestEntryForm_comments_label;
 
     public static String RequestEntryForm_creation_error_msg;

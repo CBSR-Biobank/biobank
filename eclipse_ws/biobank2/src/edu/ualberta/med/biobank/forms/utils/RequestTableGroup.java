@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
@@ -79,7 +78,7 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
                     if (!adapters.containsKey(id)) {
                         // add adapter
                         DetachedCriteria c = DetachedCriteria
-                            .forClass(ContainerLabelingScheme.class)
+                            .forClass(Container.class)
                             .add(Restrictions.idEq(id));
                         ContainerWrapper cw = new ContainerWrapper(
                             SessionManager.getAppService(),
