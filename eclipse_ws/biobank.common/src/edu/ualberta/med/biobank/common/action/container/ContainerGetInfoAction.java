@@ -76,6 +76,9 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
         query.setParameter(0, containerId);
 
         containerInfo.container = (Container) query.uniqueResult();
+        if (containerInfo.container == null) {
+            throw new IllegalArgumentException("container is null");
+        }
         return containerInfo;
     }
 

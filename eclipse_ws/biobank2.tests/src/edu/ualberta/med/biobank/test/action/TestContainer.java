@@ -98,14 +98,49 @@ public class TestContainer extends TestAction {
         childL1Container = containerInfo.container;
 
         Assert.assertEquals(topContainer2.getId(),
-            childL1Container.getTopContainer());
+            childL1Container.getTopContainer().getId());
         Assert.assertEquals(topContainer2.getId(),
-            childL1Container.getParentContainer());
+            childL1Container.getParentContainer().getId());
+
+        String expectedL2Path =
+            topContainer2.getId() + "/" + childL1Container.getId();
+
+        // check that children have correct settings too
+        for (Container child : childL2Containers) {
+            containerInfo = exec(new ContainerGetInfoAction(child.getId()));
+            Assert.assertEquals(topContainer2.getId(),
+                containerInfo.container.getTopContainer().getId());
+
+            // ensure parent is still childL1Container
+            Assert.assertEquals(childL1Container.getId(),
+                containerInfo.container.getParentContainer().getId());
+
+            // check the path
+            Assert
+                .assertEquals(expectedL2Path, containerInfo.container.getPath());
+        }
     }
 
     @Test
     public void testMoveContainerOccupiedLocation() {
+        Transaction tx = session.beginTransaction();
 
+        factory.createTopContainer();
+        Container child1Container = factory.createContainer();
+
+        Container topContainer2 = factory.createTopContainer();
+        // create child at position A1
+        factory.createContainer();
+        tx.commit();
+
+        try {
+            exec(new ContainerMoveAction(child1Container, topContainer2,
+                topContainer2.getLabel() + "A1"));
+            Assert
+                .fail("should not be allowed to move a containers to occupied spot");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
