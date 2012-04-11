@@ -333,6 +333,8 @@ public class Messages extends NLS {
 
     public static String RequestEntryForm_14;
 
+    public static String RequestEntryForm_15;
+
     public static String RequestEntryForm_16;
 
     public static String RequestEntryForm_18;

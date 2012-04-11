@@ -96,4 +96,5 @@ public class Dispatch extends AbstractBiobankModel {
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
+
 }

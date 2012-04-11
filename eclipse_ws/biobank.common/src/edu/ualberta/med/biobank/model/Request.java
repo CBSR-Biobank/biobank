@@ -55,8 +55,8 @@ public class Request extends AbstractBiobankModel {
         this.created = created;
     }
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "REQUEST_ID", updatable = false)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "REQUEST_ID")
     public Set<Dispatch> getDispatches() {
         return this.dispatches;
     }

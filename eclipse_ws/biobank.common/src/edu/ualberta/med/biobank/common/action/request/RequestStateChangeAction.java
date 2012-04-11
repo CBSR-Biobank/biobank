@@ -37,7 +37,6 @@ public class RequestStateChangeAction implements Action<EmptyResult> {
             rs.setState(state.getId());
             context.getSession().saveOrUpdate(rs);
         }
-        context.getSession().flush();
         return new EmptyResult();
     }
 }

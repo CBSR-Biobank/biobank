@@ -26,7 +26,10 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
     + Request.class.getName() 
     + " request join fetch request." + RequestPeer.RESEARCH_GROUP.getName()
     + " rg left join fetch request.dispatches " 
-    + " dispatches left join fetch dispatches.dispatchSpecimens ds join fetch request." + RequestPeer.ADDRESS.getName()
+    + " dispatches left join fetch dispatches.dispatchSpecimens ds" 
+    + " left join fetch dispatches.senderCenter left join fetch dispatches.receiverCenter" 
+    + " left join fetch dispatches.shipmentInfo "
+    + " join fetch request." + RequestPeer.ADDRESS.getName()
     + " where request." + DispatchPeer.ID.getName()
     +"=?";
     // @formatter:on
