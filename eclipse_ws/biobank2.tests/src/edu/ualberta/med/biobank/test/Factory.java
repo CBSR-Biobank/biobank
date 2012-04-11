@@ -349,6 +349,7 @@ public class Factory {
         }
         container.setContainerType(getDefaultTopContainerType());
         container.setLabel(label);
+        container.setTopContainer(container);
 
         Container parentContainer = getDefaultParentContainer();
         if (parentContainer != null) {
@@ -379,6 +380,7 @@ public class Factory {
 
             cp.setParentContainer(parentContainer);
             parentContainer.getChildPositions().add(cp);
+            container.setTopContainer(parentContainer.getTopContainer());
         }
 
         setDefaultContainer(container);
