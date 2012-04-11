@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetChildrenAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerMoveAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerMoveSpecimensAction;
 import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
@@ -66,14 +68,15 @@ public class ContainerAdapter extends AdapterBase {
             Integer id = container.getId();
 
             this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new ContainerDeletePermission(id));
+                SessionManager.getAppService()
+                    .isAllowed(new ContainerDeletePermission(id));
             this.isReadable =
-                SessionManager.getAppService().isAllowed(
-                    new ContainerReadPermission(container.getSite().getId()));
+                SessionManager.getAppService()
+                    .isAllowed(new ContainerReadPermission(container.getSite()
+                        .getId()));
             this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new ContainerUpdatePermission(id));
+                SessionManager.getAppService()
+                    .isAllowed(new ContainerUpdatePermission(id));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(Messages.ContainerAdapter_error,
                 Messages.ContainerAdapter_message);
@@ -104,8 +107,8 @@ public class ContainerAdapter extends AdapterBase {
         if (container.getContainerType() == null) {
             return container.getLabel();
         }
-        return container.getLabel() + " (" //$NON-NLS-1$
-            + container.getContainerType().getNameShort() + ")"; //$NON-NLS-1$
+        return container.getLabel() + " ("
+            + container.getContainerType().getNameShort() + ")";
     }
 
     @Override
@@ -123,24 +126,23 @@ public class ContainerAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, Messages.ContainerAdapter_container_label);
-        addViewMenu(menu, Messages.ContainerAdapter_container_label);
+        addEditMenu(menu,
+            Messages.ContainerAdapter_container_label);
+        addViewMenu(menu,
+            Messages.ContainerAdapter_container_label);
 
-        // FIXME: issue 1557
-        //
-        // Commenting out for now
-        // Boolean topLevel = getContainer().getContainerType().getTopLevel();
-        //
-        // if (isEditable() && (topLevel == null || !topLevel)) {
-        // MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        // mi.setText(Messages.ContainerAdapter_move_label);
-        // mi.addSelectionListener(new SelectionAdapter() {
-        // @Override
-        // public void widgetSelected(SelectionEvent event) {
-        // moveContainer(null);
-        // }
-        // });
-        // }
+        Boolean topLevel = getContainer().getContainerType().getTopLevel();
+
+        if (isEditable() && (topLevel == null || !topLevel)) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText(Messages.ContainerAdapter_move_label);
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    moveContainer(null);
+                }
+            });
+        }
 
         if (isEditable() && getContainer().hasSpecimens()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
@@ -153,47 +155,53 @@ public class ContainerAdapter extends AdapterBase {
             });
         }
 
-        addDeleteMenu(menu, Messages.ContainerAdapter_container_label);
+        addDeleteMenu(menu,
+            Messages.ContainerAdapter_container_label);
     }
 
     public void moveSpecimens() {
         final MoveSpecimensToDialog msDlg =
-            new MoveSpecimensToDialog(PlatformUI
-                .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                getContainer());
+            new MoveSpecimensToDialog(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), getContainer());
         if (msDlg.open() == Dialog.OK) {
             try {
                 final Integer toContainerId = msDlg.getNewContainer().getId();
                 final ContainerWrapper newContainer = msDlg.getNewContainer();
-                IRunnableContext context = new ProgressMonitorDialog(Display
-                    .getDefault().getActiveShell());
-                context.run(true, false, new IRunnableWithProgress() {
-                    @Override
-                    public void run(final IProgressMonitor monitor) {
-                        monitor.beginTask(NLS.bind(
-                            Messages.ContainerAdapter_moving_specs,
-                            getContainer().getFullInfoLabel(),
-                            newContainer.getFullInfoLabel()),
-                            IProgressMonitor.UNKNOWN);
-                        try {
-                            SessionManager.getAppService().doAction(
-                                new ContainerMoveSpecimensAction(getContainer()
-                                    .getId(), toContainerId));
-                            monitor.done();
-                            BgcPlugin
-                                .openAsyncInformation(
-                                    Messages.ContainerAdapter_spec_moved_info_title,
-                                    NLS.bind(
-                                        Messages.ContainerAdapter_spec_moved_info_msg,
-                                        newContainer.getSpecimens().size(),
-                                        newContainer.getFullInfoLabel()));
-                        } catch (Exception e) {
-                            monitor.setCanceled(true);
-                            BgcPlugin.openAsyncError(
-                                Messages.ContainerAdapter_move_erro_title, e);
+                IRunnableContext context =
+                    new ProgressMonitorDialog(Display.getDefault()
+                        .getActiveShell());
+                context.run(true,
+                    false,
+                    new IRunnableWithProgress() {
+                        @Override
+                        public void run(final IProgressMonitor monitor) {
+                            monitor.beginTask(NLS
+                                .bind(Messages.ContainerAdapter_moving_specs,
+                                    getContainer().getFullInfoLabel(),
+                                    newContainer.getFullInfoLabel()),
+                                IProgressMonitor.UNKNOWN);
+                            try {
+                                SessionManager.getAppService()
+                                    .doAction(new ContainerMoveSpecimensAction(
+                                        getContainer().getWrappedObject(),
+                                        newContainer.getWrappedObject()));
+                                monitor.done();
+                                BgcPlugin
+                                    .openAsyncInformation(
+                                        Messages.ContainerAdapter_spec_moved_info_title,
+                                        NLS.bind(
+                                            Messages.ContainerAdapter_spec_moved_info_msg,
+                                            newContainer.getSpecimens().size(),
+                                            newContainer.getFullInfoLabel()));
+                            } catch (Exception e) {
+                                monitor.setCanceled(true);
+                                BgcPlugin
+                                    .openAsyncError(
+                                        Messages.ContainerAdapter_move_erro_title,
+                                        e);
+                            }
                         }
-                    }
-                });
+                    });
                 ContainerAdapter newContainerAdapter =
                     (ContainerAdapter) SessionManager
                         .searchFirstNode(ContainerWrapper.class,
@@ -205,8 +213,10 @@ public class ContainerAdapter extends AdapterBase {
                 getContainer().reload();
                 SessionManager.openViewForm(getContainer());
             } catch (Exception e) {
-                BgcPlugin.openError(
-                    Messages.ContainerAdapter_move_specs_error_title, e);
+                BgcPlugin
+                    .openError(
+                        Messages.ContainerAdapter_move_specs_error_title,
+                        e);
             }
         }
     }
@@ -218,15 +228,16 @@ public class ContainerAdapter extends AdapterBase {
 
     public void moveContainer(ContainerWrapper destParentContainer) {
         final ContainerAdapter oldParent = (ContainerAdapter) getParent();
-        final MoveContainerDialog mc = new MoveContainerDialog(PlatformUI
-            .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            getContainer(), destParentContainer);
+        final MoveContainerDialog mc =
+            new MoveContainerDialog(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), getContainer(),
+                destParentContainer);
         if (mc.open() == Dialog.OK) {
             try {
                 if (setNewPositionFromLabel(mc.getNewLabel())) {
                     // update new parent
-                    ContainerWrapper newParentContainer = getContainer()
-                        .getParentContainer();
+                    ContainerWrapper newParentContainer =
+                        getContainer().getParentContainer();
                     ContainerAdapter parentAdapter =
                         (ContainerAdapter) SessionManager
                             .searchFirstNode(ContainerWrapper.class,
@@ -242,8 +253,9 @@ public class ContainerAdapter extends AdapterBase {
                     oldParent.performExpand();
                 }
             } catch (Exception e) {
-                BgcPlugin.openError(
-                    Messages.ContainerAdapter_move_cont_error_title, e);
+                BgcPlugin
+                    .openError(Messages.ContainerAdapter_move_cont_error_title,
+                        e);
             }
         }
     }
@@ -256,22 +268,24 @@ public class ContainerAdapter extends AdapterBase {
         throws Exception {
         final ContainerWrapper container = getContainer();
         final String oldLabel = container.getLabel();
-        List<ContainerWrapper> newParentContainers = container
-            .getPossibleParents(newLabel);
+        List<ContainerWrapper> newParentContainers =
+            container.getPossibleParents(newLabel);
         if (newParentContainers.size() == 0) {
-            BgcPlugin.openError(Messages.ContainerAdapter_move_error_title,
-                NLS.bind(Messages.ContainerAdapter_move_parent_error_msg,
-                    newLabel));
+            BgcPlugin
+                .openError(
+                    "Container Move Error",
+                    MessageFormat
+                        .format(
+                            "A parent container with child \"{0}\" does not exist.",
+                            newLabel));
             return false;
         }
 
         ContainerWrapper newParent;
         if (newParentContainers.size() > 1) {
             SelectParentContainerDialog dlg =
-                new SelectParentContainerDialog(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell(),
-                    newParentContainers);
+                new SelectParentContainerDialog(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(), newParentContainers);
             if (dlg.open() != Dialog.OK) {
                 return false;
             }
@@ -280,39 +294,9 @@ public class ContainerAdapter extends AdapterBase {
             newParent = newParentContainers.get(0);
         }
 
-        ContainerWrapper currentChild = newParent.getChildByLabel(newLabel);
-        if (currentChild != null) {
-            BgcPlugin
-                .openError(Messages.ContainerAdapter_move_error_title, NLS
-                    .bind(Messages.ContainerAdapter_move_empty_error_msg,
-                        newLabel));
-            return false;
-        }
-
-        newParent.addChild(newLabel.substring(newParent.getLabel().length()),
-            container);
-
-        IRunnableContext context = new ProgressMonitorDialog(Display
-            .getDefault().getActiveShell());
-        context.run(true, false, new IRunnableWithProgress() {
-            @Override
-            public void run(final IProgressMonitor monitor) {
-                monitor.beginTask(NLS.bind(
-                    Messages.ContainerAdapter_moving_cont, oldLabel, newLabel),
-                    IProgressMonitor.UNKNOWN);
-                // try {
-                // container.persist();
-                // } catch (Exception e) {
-                // BgcPlugin.openAsyncError(
-                // Messages.ContainerAdapter_move_error_title, e);
-                // }
-                monitor.done();
-                BgcPlugin.openAsyncInformation(
-                    Messages.ContainerAdapter_cont_moved_info_title, NLS.bind(
-                        Messages.ContainerAdapter_moved_info_msg, oldLabel,
-                        container.getLabel()));
-            }
-        });
+        SessionManager.getAppService().doAction(new ContainerMoveAction(
+            getContainer().getWrappedObject(),
+            newParent.getWrappedObject(), newLabel));
         return true;
     }
 
@@ -351,10 +335,12 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        childContainers = SessionManager.getAppService().doAction(
-            new ContainerGetChildrenAction(getId())).getList();
+        childContainers =
+            SessionManager.getAppService()
+                .doAction(new ContainerGetChildrenAction(getId())).getList();
         return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
-            childContainers, ContainerWrapper.class);
+            childContainers,
+            ContainerWrapper.class);
     }
 
     @Override
@@ -369,16 +355,15 @@ public class ContainerAdapter extends AdapterBase {
 
     @Override
     public int compareTo(AbstractAdapterBase o) {
-        if (o instanceof ContainerAdapter)
-            return internalCompareTo(o);
+        if (o instanceof ContainerAdapter) return internalCompareTo(o);
         return 0;
     }
 
     @Override
     protected void runDelete() throws Exception {
-        SessionManager.getAppService().doAction(
-            new ContainerDeleteAction((Container) getModelObject()
-                .getWrappedObject()));
-        SessionManager.updateAllSimilarNodes(getParent(), true);
+        SessionManager.getAppService().doAction(new ContainerDeleteAction(
+            (Container) getModelObject().getWrappedObject()));
+        SessionManager.updateAllSimilarNodes(getParent(),
+            true);
     }
 }

@@ -19,8 +19,6 @@ import edu.ualberta.med.biobank.model.Site;
 public class ContainerSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
-    public static final String PATH_DELIMITER = "/"; //$NON-NLS-1$
-
     public Integer containerId;
     public ActivityStatus activityStatus;
     public String barcode;
@@ -92,25 +90,13 @@ public class ContainerSaveAction implements Action<IdResult> {
         container.setContainerType(context.load(ContainerType.class,
             typeId));
 
-        StringBuilder path = new StringBuilder();
-
         if (parentId != null) {
             if (label != null) {
                 throw new ActionCheckException(
                     "cannot set label on child containers");
             }
             Container parent = context.load(Container.class, parentId);
-            String parentPath = parent.getPath();
-            if ((parentPath != null) && !parentPath.isEmpty()) {
-                path.append(parentPath).append(PATH_DELIMITER);
-            }
-            path.append(parentId);
-            container.setPath(path.toString());
-
-            container.setTopContainer(parent.getTopContainer());
-            container.setLabel(parent.getLabel()
-                + parent.getContainerType().getPositionString(
-                    position));
+            ContainerActionHelper.updateContainerPathAndLabel(container, parent);
         } else {
             container.setLabel(label);
         }

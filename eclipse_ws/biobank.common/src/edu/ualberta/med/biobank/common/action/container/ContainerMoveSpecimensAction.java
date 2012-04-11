@@ -16,10 +16,17 @@ public class ContainerMoveSpecimensAction implements Action<IdResult> {
     public final Integer fromContainerId;
     public final Integer toContainerId;
 
-    public ContainerMoveSpecimensAction(Integer fromContainerId,
-        Integer toContainerId) {
-        this.fromContainerId = fromContainerId;
-        this.toContainerId = toContainerId;
+    public ContainerMoveSpecimensAction(Container fromContainer,
+        Container toContainer) {
+        if (fromContainer == null) {
+            throw new IllegalArgumentException("Container to move from is null");
+        }
+        if (toContainer == null) {
+            throw new IllegalArgumentException("Container to move to is null");
+        }
+
+        this.fromContainerId = fromContainer.getId();
+        this.toContainerId = toContainer.getId();
     }
 
     @Override
