@@ -87,8 +87,8 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
 
         createLabel(fileSelectionComposite, labelText);
 
-        final String biobankDir = System.getProperty("user.home")
-            + System.getProperty("file.separator") + "biobank";
+        final String biobankDir = System.getProperty("user.home") 
+            + System.getProperty("file.separator") + "biobank";  
         activityLogDirText = new Text(fileSelectionComposite, SWT.BORDER
             | SWT.FILL);
         activityLogDirText.setLayoutData(new GridData(GridData.FILL,
@@ -111,7 +111,7 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
                     File f = new File(selected);
                     f.canWrite();
                 } else {
-                    activityLogDirText.setText("");
+                    activityLogDirText.setText(""); 
                 }
             }
         });
@@ -139,7 +139,7 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
 
         } else { /* don't save to a log file */
             pstore.setValue(
-                PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, "");
+                PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, ""); 
             pstore.setValue(
                 PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE, false);
             super.okPressed();
@@ -149,7 +149,7 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
 
     private Label createLabel(Composite parent, String labelText) {
         Label label = new Label(parent, SWT.NONE);
-        label.setText(labelText + ": ");
+        label.setText(labelText + ": "); 
         label.setLayoutData(new GridData(GridData.END, GridData.CENTER, false,
             false));
         return label;

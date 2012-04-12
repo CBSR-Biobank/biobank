@@ -14,7 +14,7 @@ public class PatientReport1Editor extends ReportsEditor {
     protected DateTimeWidget end;
 
     public static String ID =
-        "edu.ualberta.med.biobank.editors.PatientVisitSummaryEditor";
+        "edu.ualberta.med.biobank.editors.PatientVisitSummaryEditor"; 
 
     @Override
     protected void createOptionSection(Composite parent) {

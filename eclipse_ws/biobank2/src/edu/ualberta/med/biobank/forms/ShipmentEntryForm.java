@@ -47,6 +47,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -166,7 +167,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             specimens = read.specimens;
             SessionManager.logLookup(read.originInfo);
         }
-
+        comment.setWrappedObject(new Comment());
     }
 
     @Override

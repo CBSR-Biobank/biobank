@@ -67,6 +67,7 @@ public class MembershipPermissionsPage extends BgcWizardPage {
         super.setVisible(visible);
 
         updateEveryPermissionButton();
+        updateUserManagerButton();
         updateRoleSelections();
         updatePermissionSelections();
     }
@@ -77,8 +78,8 @@ public class MembershipPermissionsPage extends BgcWizardPage {
         container.setLayout(new GridLayout(1, false));
         container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createUserManagerButton(container);
         createEveryPermissionButton(container);
+        createUserManagerButton(container);
 
         Group rolesGroup = createGroup(container, "Roles");
         createRolesWidget(rolesGroup);
@@ -192,7 +193,12 @@ public class MembershipPermissionsPage extends BgcWizardPage {
         userManagerButton = new Button(parent, SWT.CHECK);
         userManagerButton.setText("Can create users");
         userManagerButton
-            .setToolTipText("Can manage, create, edit, and delete users and groups. Can add and remove only the selected roles and permissions (for the previously selected centers and studies).");
+            .setToolTipText("Can manage, create, edit, and delete users and groups (for the previously selected centers and studies).");
+
+        GridData gd = new GridData();
+        gd.horizontalIndent = 20;
+        userManagerButton.setLayoutData(gd);
+
         userManagerButton.setSelection(membership.isUserManager());
         userManagerButton.addListener(SWT.Selection, new Listener() {
             @Override
@@ -214,6 +220,8 @@ public class MembershipPermissionsPage extends BgcWizardPage {
             public void handleEvent(Event event) {
                 boolean everyPermission = everyPermissionButton.getSelection();
                 membership.setEveryPermission(everyPermission);
+
+                updateUserManagerButton();
 
                 rolesWidget.setEnabled(!everyPermission);
                 permissionsTree.setEnabled(!everyPermission);
@@ -274,6 +282,14 @@ public class MembershipPermissionsPage extends BgcWizardPage {
             everyPermissionButton.setSelection(false);
         }
         everyPermissionButton.setEnabled(canGrantEveryPermission);
+
+        updateUserManagerButton();
+    }
+
+    private void updateUserManagerButton() {
+        boolean everyPermission = membership.isEveryPermission();
+        userManagerButton.setEnabled(everyPermission);
+        if (!everyPermission) userManagerButton.setSelection(false);
     }
 
     private void updatePageComplete() {

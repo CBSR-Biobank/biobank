@@ -26,7 +26,7 @@ import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManage
 
 public class DecodePlateForm extends PlateForm {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.DecodePlateForm";
+        "edu.ualberta.med.biobank.forms.DecodePlateForm"; 
 
     private ScanPalletWidget spw;
 

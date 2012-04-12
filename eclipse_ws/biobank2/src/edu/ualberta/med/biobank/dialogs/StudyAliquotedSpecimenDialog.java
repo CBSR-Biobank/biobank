@@ -207,8 +207,8 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                 "Error", e);
         }
         specimenTypeComboViewer.getCombo().deselectAll();
-        quantity.setText("");
-        volume.setText("");
+        quantity.setText(""); 
+        volume.setText(""); 
         activityStatus.getCombo().deselectAll();
     }
 

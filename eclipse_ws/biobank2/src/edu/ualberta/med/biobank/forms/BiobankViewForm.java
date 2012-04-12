@@ -35,12 +35,12 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 public abstract class BiobankViewForm extends BiobankFormBase {
 
     private static final String RELOAD_COMMAND_ID =
-        "edu.ualberta.med.biobank.commands.reload";
+        "edu.ualberta.med.biobank.commands.reload"; 
 
     private static final String EDIT_COMMAND_ID =
-        "edu.ualberta.med.biobank.commands.edit";
+        "edu.ualberta.med.biobank.commands.edit"; 
 
-    private static final String CONTEXT_VIEW_FORM = "biobank.context.viewForm";
+    private static final String CONTEXT_VIEW_FORM = "biobank.context.viewForm"; 
 
     private static BgcLogger logger = BgcLogger.getLogger(BiobankViewForm.class
         .getName());
@@ -61,7 +61,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                     try {
                         reload();
                     } catch (Exception e) {
-                        logger.error("Error sending event", e);
+                        logger.error("Error sending event", e); 
                     }
                 }
             };

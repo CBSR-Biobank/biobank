@@ -40,10 +40,10 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class PatientEntryForm extends BiobankEntryForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.PatientEntryForm";
+        "edu.ualberta.med.biobank.forms.PatientEntryForm"; 
 
     private static final String CREATED_AT_BINDING =
-        "patient-created-at-binding";
+        "patient-created-at-binding"; 
 
     public static final String MSG_NEW_PATIENT_OK =
         "Creating a new patient record.";
@@ -74,7 +74,7 @@ public class PatientEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof PatientAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
         updatePatientInfo();
 

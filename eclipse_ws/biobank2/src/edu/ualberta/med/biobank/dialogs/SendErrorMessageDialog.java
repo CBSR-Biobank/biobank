@@ -53,21 +53,21 @@ import edu.ualberta.med.biobank.utils.EMailDescriptor;
 
 public class SendErrorMessageDialog extends BgcBaseDialog {
 
-    private static final String CONTENT_TYPE = "text/plain";
+    private static final String CONTENT_TYPE = "text/plain"; 
 
-    private static final String MAIL_SMTP_SOCKET_FACTORY_FALLBACK_KEY = "mail.smtp.socketFactory.fallback";
+    private static final String MAIL_SMTP_SOCKET_FACTORY_FALLBACK_KEY = "mail.smtp.socketFactory.fallback"; 
 
-    private static final String MAIL_SMTP_SOCKET_FACTORY_CLASS_KEY = "mail.smtp.socketFactory.class";
+    private static final String MAIL_SMTP_SOCKET_FACTORY_CLASS_KEY = "mail.smtp.socketFactory.class"; 
 
-    private static final String MAIL_SMTP_SOCKET_FACTORY_PORT_KEY = "mail.smtp.socketFactory.port";
+    private static final String MAIL_SMTP_SOCKET_FACTORY_PORT_KEY = "mail.smtp.socketFactory.port"; 
 
-    private static final String MAIL_SMTP_PORT_KEY = "mail.smtp.port";
+    private static final String MAIL_SMTP_PORT_KEY = "mail.smtp.port"; 
 
-    private static final String MAIL_SMTP_AUTH_KEY = "mail.smtp.auth";
+    private static final String MAIL_SMTP_AUTH_KEY = "mail.smtp.auth"; 
 
-    private static final String MAIL_SMTP_HOST_KEY = "mail.smtp.host";
+    private static final String MAIL_SMTP_HOST_KEY = "mail.smtp.host"; 
 
-    private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+    private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory"; 
 
     private EMailDescriptor email;
 
@@ -108,14 +108,14 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.NONE,
             "Title", new String[0], email,
-            "title",
+            "title", 
             new NonEmptyStringValidator(
                 "Please enter a title"));
 
         BgcBaseText descText = (BgcBaseText) createBoundWidgetWithLabel(
             contents, BgcBaseText.class, SWT.MULTI,
             "Description", new String[0],
-            email, "description", new NonEmptyStringValidator(
+            email, "description", new NonEmptyStringValidator( 
                 "Please enter at least a very small comment"));
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 200;
@@ -298,14 +298,14 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
 
         // create and fill the first message part
         MimeBodyPart mbp1 = new MimeBodyPart();
-        String text = email.getDescription() + "\n\n------";
+        String text = email.getDescription() + "\n\n------"; 
         if (SessionManager.getInstance().isConnected()) {
-            text += "\nCreated by user "
+            text += "\nCreated by user " 
                 + SessionManager.getInstance().getSession().getUser()
                     .getLogin();
         }
 
-        text += "\nSent from BioBank Java Client, version "
+        text += "\nSent from BioBank Java Client, version " 
             + BiobankPlugin.getDefault().getBundle().getVersion();
 
         mbp1.setText(text);
@@ -388,7 +388,7 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
                 public void widgetSelected(SelectionEvent e) {
                     int height = AttachmentComposite.this.computeSize(
                         SWT.DEFAULT, SWT.DEFAULT).y;
-                    attachmentText.setText("");
+                    attachmentText.setText(""); 
                     AttachmentComposite.this.setVisible(false);
                     GridData gd = (GridData) AttachmentComposite.this
                         .getLayoutData();

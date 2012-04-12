@@ -42,7 +42,7 @@ public class NewServerDialog extends BgcBaseDialog {
         BgcBaseText textBox = (BgcBaseText) createBoundWidgetWithLabel(area,
             BgcBaseText.class, SWT.NONE,
             "Address", new String[0], this,
-            "serverAddress", validator);
+            "serverAddress", validator); 
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;

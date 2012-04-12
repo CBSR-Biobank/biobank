@@ -136,8 +136,8 @@ public class PalletScanManagement {
                         oldScannedCell
                             .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
                                 .getInformation()
-                                : "")
-                                + " " + "Rescanned value is different");
+                                : "") 
+                                + " " + "Rescanned value is different"); 
                         oldScannedCell.setStatus(CellInfoStatus.ERROR);
                         rescanDifferent = true;
 

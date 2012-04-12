@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.type.ItemState;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
@@ -39,7 +38,7 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
         ArrayList<RequestTableGroup> groups =
             new ArrayList<RequestTableGroup>();
         groups.add(new RequestTableGroup(null,
-            "All", ship));
+            Messages.RequestTableGroup_0, ship));
         groups.add(new RequestTableGroup(RequestSpecimenState.PULLED_STATE,
             ship));
         return groups;
@@ -56,8 +55,8 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
             results =
                 SessionManager.getAppService().doAction(specAction).getList();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error",
-                "Unable to retrieve data from server", e);
+            BgcPlugin.openAsyncError(Messages.RequestTableGroup_1,
+                Messages.RequestTableGroup_2, e);
         }
 
         HashSet<Integer> containers = new HashSet<Integer>();
@@ -79,7 +78,7 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
                     if (!adapters.containsKey(id)) {
                         // add adapter
                         DetachedCriteria c = DetachedCriteria
-                            .forClass(ContainerLabelingScheme.class)
+                            .forClass(Container.class)
                             .add(Restrictions.idEq(id));
                         ContainerWrapper cw = new ContainerWrapper(
                             SessionManager.getAppService(),

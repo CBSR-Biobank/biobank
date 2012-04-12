@@ -40,7 +40,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerEntryForm extends BiobankEntryForm {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ContainerEntryForm";
+        "edu.ualberta.med.biobank.forms.ContainerEntryForm"; 
 
     public static final String MSG_STORAGE_CONTAINER_NEW_OK =
         "Creating a new storage container.";
@@ -86,7 +86,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ContainerAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
         containerAdapter = (ContainerAdapter) adapter;
         updateContainerInfo(adapter.getId());
@@ -219,7 +219,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                                 && Boolean.TRUE.equals(ct.getTopLevel())) {
                                 Double temp = ct.getDefaultTemperature();
                                 if (temp == null) {
-                                    temperatureWidget.setText("");
+                                    temperatureWidget.setText(""); 
                                 } else {
                                     temperatureWidget.setText(temp.toString());
                                 }

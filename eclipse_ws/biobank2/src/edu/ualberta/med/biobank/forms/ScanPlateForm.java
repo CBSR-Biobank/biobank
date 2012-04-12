@@ -27,9 +27,9 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 public class ScanPlateForm extends PlateForm implements PaintListener {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ScanPlateForm";
+        "edu.ualberta.med.biobank.forms.ScanPlateForm"; 
 
-    public static final String PALLET_IMAGE_FILE = "plate.bmp";
+    public static final String PALLET_IMAGE_FILE = "plate.bmp"; 
 
     private Canvas imageCanvas;
 

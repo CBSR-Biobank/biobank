@@ -61,14 +61,14 @@ import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManage
 public abstract class AbstractPalletSpecimenAdminForm extends
     AbstractSpecimenAdminForm {
 
-    private static final String PLATE_VALIDATOR = "plate-validator";
+    private static final String PLATE_VALIDATOR = "plate-validator"; 
     private BgcBaseText plateToScanText;
     protected Button scanButton;
     private String scanButtonTitle;
 
     protected CancelConfirmWidget cancelConfirmWidget;
 
-    private static String plateToScanSessionString = "";
+    private static String plateToScanSessionString = ""; 
 
     private IObservableValue plateToScanValue = new WritableValue(
         plateToScanSessionString, String.class);
@@ -191,7 +191,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             public void propertyChange(PropertyChangeEvent event) {
                 // force a check on available plates
                 String plateText = plateToScanText.getText();
-                plateToScanText.setText("");
+                plateToScanText.setText(""); 
                 plateToScanText.setText(plateText);
             }
         };
@@ -221,7 +221,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         synchronized (plateToScanSessionString) {
             plateToScanSessionString = (String) plateToScanValue.getValue();
             if (finished || BiobankPlugin.getPlatesEnabledCount() != 1) {
-                plateToScanSessionString = "";
+                plateToScanSessionString = ""; 
             }
         }
         return super.onClose();
@@ -243,7 +243,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             "Launch scan";
         if (!BiobankPlugin.isRealScanEnabled()) {
             createFakeOptions(parent);
-            scanButtonTitle = "Fake scan";
+            scanButtonTitle = "Fake scan"; 
         }
         scanButton = toolkit.createButton(parent, scanButtonTitle, SWT.PUSH);
         GridData gd = new GridData();
@@ -296,7 +296,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                     lbl,
                     null,
                     null,
-                    "Invalid profile selected", false, null, null, new BiobankLabelProvider());
+                    "Invalid profile selected", false, null, null, new BiobankLabelProvider()); 
 
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
@@ -524,7 +524,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void createScanTubeAloneButton(Composite parent) {
-        scanTubeAloneSwitch = toolkit.createLabel(parent, "", SWT.NONE);
+        scanTubeAloneSwitch = toolkit.createLabel(parent, "", SWT.NONE); 
         GridData gd = new GridData();
         gd.verticalAlignment = SWT.TOP;
         scanTubeAloneSwitch.setLayoutData(gd);

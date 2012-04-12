@@ -16,7 +16,7 @@ public class PalletBarcodeDialog extends BgcBaseDialog {
         super(parentShell);
     }
 
-    IObservableValue barcode = new WritableValue("", String.class);
+    IObservableValue barcode = new WritableValue("", String.class); 
 
     @Override
     protected String getTitleAreaMessage() {

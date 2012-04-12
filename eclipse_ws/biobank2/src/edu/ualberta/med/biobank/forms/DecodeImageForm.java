@@ -27,7 +27,7 @@ public class DecodeImageForm extends PlateForm implements
     IBgcFileBrowserListener {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.DecodeImageForm";
+        "edu.ualberta.med.biobank.forms.DecodeImageForm"; 
 
     private ScanPalletWidget spw;
 
@@ -49,7 +49,7 @@ public class DecodeImageForm extends PlateForm implements
 
         imageFileSelector = new BgcFileBrowser(page,
             "Image File", SWT.NONE,
-            new String[] { "*.bmp" });
+            new String[] { "*.bmp" }); 
         imageFileSelector.addFileSelectedListener(this);
         imageFileSelector.adaptToToolkit(toolkit, true);
 

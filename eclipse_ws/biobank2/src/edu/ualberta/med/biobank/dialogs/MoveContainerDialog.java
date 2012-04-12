@@ -22,7 +22,7 @@ public class MoveContainerDialog extends BgcBaseDialog {
 
     private String title;
 
-    private String newLabel = "";
+    private String newLabel = ""; 
 
     public MoveContainerDialog(Shell parent, ContainerWrapper srcContainer,
         ContainerWrapper dstContainer) {
@@ -57,7 +57,7 @@ public class MoveContainerDialog extends BgcBaseDialog {
         BgcBaseText bbt = (BgcBaseText) createBoundWidgetWithLabel(contents,
             BgcBaseText.class, SWT.FILL,
             "Destination Address", null, this,
-            "newLabel", new StringLengthValidator(2,
+            "newLabel", new StringLengthValidator(2, 
                 "Destination label must be another container (4 characters minimum)."));
         if (this.dstContainer != null)
             bbt.setText(this.dstContainer.getLabel());

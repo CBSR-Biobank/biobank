@@ -174,7 +174,7 @@ public class PatientViewForm extends BiobankViewForm {
                 @Override
                 public void editItem(InfoTableEvent<PatientCEventInfo> event) {
                     CollectionEvent ce =
-                        (CollectionEvent) event.getInfoTable().getSelection().cevent;
+                        event.getInfoTable().getSelection().cevent;
                     if (ce != null) {
                         try {
                             Map<Integer, SimpleCEventInfo> map =

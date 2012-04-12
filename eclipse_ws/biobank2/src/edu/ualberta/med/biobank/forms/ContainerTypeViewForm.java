@@ -121,19 +121,19 @@ public class ContainerTypeViewForm extends BiobankViewForm {
                 "Name Short");
         isTopLevelButton =
             (Button) createLabelledWidget(client, Button.class, SWT.NONE,
-                "");
+                "Top level");
         rowCapacityLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "");
+                "Row");
         colCapacityLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "");
+                "Column");
         defaultTempLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "");
+                "Default temperature\n(Celcius)");
         numSchemeLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "");
+                "Child labeling scheme");
         activityStatusLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
                 "Activity status");

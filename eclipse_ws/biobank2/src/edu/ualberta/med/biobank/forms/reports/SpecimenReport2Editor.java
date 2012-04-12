@@ -25,7 +25,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class SpecimenReport2Editor extends ReportsEditor {
 
     public static String ID =
-        "edu.ualberta.med.biobank.editors.QAAliquotsEditor";
+        "edu.ualberta.med.biobank.editors.QAAliquotsEditor"; 
 
     private DateTimeWidget start;
     private DateTimeWidget end;
@@ -110,7 +110,7 @@ public class SpecimenReport2Editor extends ReportsEditor {
 
     protected BgcBaseText createValidatedIntegerText(String labelText,
         Composite parent) {
-        numSpecimens = new WritableValue("", String.class);
+        numSpecimens = new WritableValue("", String.class); 
         BgcBaseText widget = (BgcBaseText) widgetCreator
             .createBoundWidgetWithLabel(parent, BgcBaseText.class, SWT.BORDER,
                 labelText, new String[0], numSpecimens,
@@ -145,7 +145,7 @@ public class SpecimenReport2Editor extends ReportsEditor {
         end.setDate(null);
         topContainers.reset();
         typesViewer.getCombo().deselectAll();
-        numSpecimensText.setText("");
+        numSpecimensText.setText(""); 
         super.setValues();
     }
 

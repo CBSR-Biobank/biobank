@@ -111,23 +111,20 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
                 throw new ActionException(
                     SS.tr("You must select a parent with a processing event"));
         }
-
+        context.getSession().saveOrUpdate(specimen);
         if (!oldCEvent.equals(newCEvent)) {
-            updateChildSpecimensCEvent(specimen, newCEvent, comment);
+            updateChildSpecimensCEvent(context, specimen, newCEvent);
         }
 
     }
 
-    private void updateChildSpecimensCEvent(Specimen specimen,
-        CollectionEvent cEvent, Comment comment) {
+    private void updateChildSpecimensCEvent(ActionContext context,
+        Specimen specimen,
+        CollectionEvent cEvent) {
         for (Specimen childSpecimen : specimen.getChildSpecimens()) {
             specimen.setCollectionEvent(cEvent);
-
-            if (comment != null) {
-                specimen.getComments().add(comment);
-            }
-
-            updateChildSpecimensCEvent(childSpecimen, cEvent, comment);
+            context.getSession().saveOrUpdate(specimen);
+            updateChildSpecimensCEvent(context, childSpecimen, cEvent);
         }
     }
 

@@ -46,7 +46,7 @@ import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 public class DispatchViewForm extends BiobankViewForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.DispatchViewForm";
+        "edu.ualberta.med.biobank.forms.DispatchViewForm"; 
 
     private DispatchAdapter dispatchAdapter;
 
@@ -74,7 +74,7 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof DispatchAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         dispatchAdapter = (DispatchAdapter) adapter;
@@ -387,7 +387,7 @@ public class DispatchViewForm extends BiobankViewForm {
         if (shipInfo != null) {
             if (shippingMethodLabel != null)
                 setTextValue(shippingMethodLabel,
-                    shipInfo.getShippingMethod() == null ? "" : shipInfo
+                    shipInfo.getShippingMethod() == null ? "" : shipInfo 
                         .getShippingMethod().getName());
             if (waybillLabel != null)
                 setTextValue(waybillLabel, shipInfo.getWaybill());

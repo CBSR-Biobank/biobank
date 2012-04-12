@@ -425,8 +425,8 @@ public abstract class AbstractLinkAssignEntryForm extends
         gd.grabExcessHorizontalSpace = true;
         singleVisualisation.setLayoutData(gd);
 
-        thirdSingleParentLabel = toolkit.createLabel(singleVisualisation, "");
-        secondSingleParentLabel = toolkit.createLabel(singleVisualisation, "");
+        thirdSingleParentLabel = toolkit.createLabel(singleVisualisation, ""); 
+        secondSingleParentLabel = toolkit.createLabel(singleVisualisation, ""); 
 
         ContainerType thirdSingleParentType = null;
         ContainerType secondSingleParentType = null;
@@ -457,11 +457,11 @@ public abstract class AbstractLinkAssignEntryForm extends
         gd = new GridData();
         gd.horizontalSpan = 3;
         comp.setLayoutData(gd);
-        fakeScanRandom = toolkit.createButton(comp, "Get random scan values",
+        fakeScanRandom = toolkit.createButton(comp, "Get random scan values", 
             SWT.RADIO);
         fakeScanRandom.setSelection(true);
         toolkit.createButton(comp,
-            "Get random and already linked specimens", SWT.RADIO);
+            "Get random and already linked specimens", SWT.RADIO); 
     }
 
     /**
@@ -681,7 +681,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                 label = parent.getLabel();
             parentMsg.append(label);
             if (i != 0)
-                parentMsg.append("|");
+                parentMsg.append("|"); 
         }
         appendLog(NLS.bind(
             "Parent containers found: {0}",
@@ -697,7 +697,7 @@ public abstract class AbstractLinkAssignEntryForm extends
             @Override
             public void run() {
                 try {
-                    appendLog("----");
+                    appendLog("----"); 
                     String positionString = positionField.getText();
                     if (parentContainers == null
                         || parentContainers.size() == 0) {
@@ -712,7 +712,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                     ContainerWrapper container = parentContainers.get(0);
                     RowColPos position = container.getContainerType()
                         .getRowColFromPositionString(
-                            positionString.replace(container.getLabel(), ""));
+                            positionString.replace(container.getLabel(), "")); 
 
                     if (container.isPositionFree(position)) {
                         singleSpecimen.setParent(container, position);

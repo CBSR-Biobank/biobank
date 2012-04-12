@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class SpecimenTypeReport1Editor extends ReportsEditor {
 
     public static String ID =
-        "edu.ualberta.med.biobank.editors.AliquotCountEditor";
+        "edu.ualberta.med.biobank.editors.AliquotCountEditor"; 
 
     private ComboViewer studyCombo;
 

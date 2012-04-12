@@ -237,7 +237,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            "Add a comment", null, comment, "message", null); 
+            "Add a comment", null, comment, "message", null); //$NON-NLS-1$
     }
 
     private void createSourceSpecimensSection() {

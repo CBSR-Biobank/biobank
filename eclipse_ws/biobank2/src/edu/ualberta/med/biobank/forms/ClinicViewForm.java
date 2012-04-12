@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 
 public class ClinicViewForm extends AddressViewFormCommon {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ClinicViewForm";
+        "edu.ualberta.med.biobank.forms.ClinicViewForm"; 
 
     private ClinicWrapper clinic =
         new ClinicWrapper(SessionManager.getAppService());
@@ -65,7 +65,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ClinicAdapter,
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         Assert.isNotNull(adapter.getId());

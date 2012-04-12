@@ -9,7 +9,6 @@ import org.hibernate.Transaction;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
@@ -26,7 +25,7 @@ import edu.ualberta.med.biobank.util.SetDiff;
 import edu.ualberta.med.biobank.util.SetDiff.Pair;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class UserSaveAction implements Action<IdResult> {
+public class UserSaveAction implements Action<UserSaveOutput> {
     private static final long serialVersionUID = 1L;
     private static final Permission PERMISSION = new UserManagerPermission();
 
@@ -42,7 +41,7 @@ public class UserSaveAction implements Action<IdResult> {
     }
 
     @Override
-    public IdResult run(ActionContext context) throws ActionException {
+    public UserSaveOutput run(ActionContext context) throws ActionException {
         User user = context.load(User.class, input.getUserId(), new User());
 
         setProperties(context, user);
@@ -51,7 +50,7 @@ public class UserSaveAction implements Action<IdResult> {
 
         context.getSession().saveOrUpdate(user);
 
-        return new IdResult(user.getId());
+        return new UserSaveOutput(user.getId(), user.getCsmUserId());
     }
 
     private void setProperties(ActionContext context, User user) {
@@ -139,46 +138,38 @@ public class UserSaveAction implements Action<IdResult> {
         SetDiff<Membership> diff = new SetDiff<Membership>(
             manageable, input.getMemberships());
 
-        handleMembershipRemovals(context, diff.getRemovals());
+        handleMembershipDeletes(context, diff.getRemovals());
+        handleMembershipInserts(context, user, diff.getAdditions());
+        handleMembershipUpdates(context, diff.getIntersection());
 
-        for (Membership membership : diff.getAdditions()) {
-            checkFullyManageable(context, membership);
-
-            user.getMemberships().add(membership);
-            membership.setPrincipal(user);
-        }
-
-        mergeMembershipUpdates(context, diff.getIntersection());
+        mergeMembershipsOnDomain(context, user);
 
         for (Membership m : user.getMemberships()) {
             m.reducePermissions();
         }
     }
 
-    private void handleMembershipRemovals(ActionContext context,
+    private void handleMembershipDeletes(ActionContext context,
         Set<Membership> removals) {
-        User executingUser = context.getUser();
         for (Membership membership : removals) {
-            // can only remove these memberships if they're _still_ fully
-            // manageable, otherwise, the executing user can only clear out the
-            // portions they're allowed to edit
-            if (membership.isFullyManageable(executingUser)) {
-                membership.getPrincipal().getMemberships().remove(membership);
-                context.getSession().delete(membership);
-            } else {
-                Set<PermissionEnum> perms = membership
-                    .getManageablePermissions(executingUser);
-                membership.getPermissions().removeAll(perms);
+            checkFullyManageable(context, membership);
 
-                Set<Role> roles = membership.getManageableRoles(executingUser,
-                    input.getContext().getRoles());
-                membership.getRoles().removeAll(roles);
-            }
+            membership.getPrincipal().getMemberships().remove(membership);
+            context.getSession().delete(membership);
         }
     }
 
-    @SuppressWarnings("nls")
-    private void mergeMembershipUpdates(ActionContext context,
+    private void handleMembershipInserts(ActionContext context, User user,
+        Set<Membership> additions) {
+        for (Membership membership : additions) {
+            checkFullyManageable(context, membership);
+
+            user.getMemberships().add(membership);
+            membership.setPrincipal(user);
+        }
+    }
+
+    private void handleMembershipUpdates(ActionContext context,
         Set<Pair<Membership>> conflicts) {
         User executingUser = context.getUser();
         User manager = input.getContext().getManager();
@@ -208,7 +199,18 @@ public class UserSaveAction implements Action<IdResult> {
                     SS.tr("Your roles or permissions have changed since you began modifying this user. Please start over and try again."));
             }
 
-            // looks okay, clear out the old scope and assign intended values
+            Domain newD = newM.getDomain();
+            Domain oldD = oldM.getDomain();
+
+            oldD.getCenters().clear();
+            oldD.getCenters().addAll(newD.getCenters());
+            oldD.setAllCenters(newD.isAllCenters());
+
+            oldD.getStudies().clear();
+            oldD.getStudies().addAll(newD.getStudies());
+            oldD.setAllStudies(newD.isAllStudies());
+
+            // clear out the old scope and assign intended values
             oldM.getPermissions().removeAll(oldPermissionScope);
             oldM.getRoles().removeAll(oldRoleScope);
 
@@ -222,18 +224,6 @@ public class UserSaveAction implements Action<IdResult> {
             roles.retainAll(newM.getRoles());
             oldM.getRoles().addAll(roles);
 
-            // TODO: throw away old domain, copy into new? Shorter.
-            Domain newD = newM.getDomain();
-            Domain oldD = oldM.getDomain();
-
-            oldD.getCenters().clear();
-            oldD.getCenters().addAll(newD.getCenters());
-            oldD.setAllCenters(newD.isAllCenters());
-
-            oldD.getStudies().clear();
-            oldD.getStudies().addAll(newD.getStudies());
-            oldD.setAllStudies(newD.isAllStudies());
-
             oldM.setUserManager(newM.isUserManager());
             oldM.setEveryPermission(newM.isEveryPermission());
 
@@ -241,7 +231,10 @@ public class UserSaveAction implements Action<IdResult> {
         }
     }
 
-    @SuppressWarnings("nls")
+    private void mergeMembershipsOnDomain(ActionContext context, User user) {
+
+    }
+
     private void checkFullyManageable(ActionContext context, Membership m) {
         User executingUser = context.getUser();
         if (!m.isFullyManageable(executingUser)) {

@@ -18,7 +18,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class SpecimenReport1Editor extends ReportsEditor {
 
     public static String ID =
-        "edu.ualberta.med.biobank.editors.FTAReportEditor";
+        "edu.ualberta.med.biobank.editors.FTAReportEditor"; 
 
     private ComboViewer studyCombo;
     private DateTimeWidget afterDate;

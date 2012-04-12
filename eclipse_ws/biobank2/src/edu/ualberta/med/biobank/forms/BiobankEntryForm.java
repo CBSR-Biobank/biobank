@@ -71,7 +71,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     IBgcEntryForm {
 
     private static final String CONTEXT_ENTRY_FORM =
-        "biobank.context.entryForm";
+        "biobank.context.entryForm"; 
 
     protected String sessionName;
 
@@ -234,7 +234,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     @Override
     public void setFocus() {
         super.setFocus();
-        Assert.isNotNull(firstControl, "first control widget is not set");
+        Assert.isNotNull(firstControl, "first control widget is not set"); 
         if (!firstControl.isDisposed()) {
             firstControl.setFocus();
         }
@@ -424,7 +424,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                 closeEntryOpenView(true, openViewAfterSaving());
             }
         } catch (Exception e) {
-            LOGGER.error("Can't save the form", e);
+            LOGGER.error("Can't save the form", e); 
         }
     }
 
@@ -460,7 +460,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                 openView &= !((AdapterBase) adapter).getModelObject().isNew();
             closeEntryOpenView(true, openView);
         } catch (Exception e) {
-            LOGGER.error("Can't cancel the form", e);
+            LOGGER.error("Can't cancel the form", e); 
         }
     }
 

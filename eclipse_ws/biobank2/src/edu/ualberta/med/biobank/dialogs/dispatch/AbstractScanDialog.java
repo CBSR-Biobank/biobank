@@ -237,7 +237,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             (BgcBaseText) createBoundWidgetWithLabel(contents,
                 BgcBaseText.class, SWT.NONE,
                 "Plate to scan", new String[0],
-                this, "plateToScan", new ScannerBarcodeValidator(
+                this, "plateToScan", new ScannerBarcodeValidator( 
                     "Enter a valid plate barcode"));
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
@@ -443,7 +443,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.RIGHT;
         scanTubeAloneSwitch.setLayoutData(gd);
-        scanTubeAloneSwitch.setText("");
+        scanTubeAloneSwitch.setText(""); 
         scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_SCAN_EDIT));
         scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {

@@ -36,7 +36,7 @@ import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsS
 public class ProcessingEventViewForm extends BiobankViewForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ProcessingEventViewForm";
+        "edu.ualberta.med.biobank.forms.ProcessingEventViewForm"; 
 
     private BgcBaseText centerLabel;
 
@@ -58,7 +58,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ProcessingEventAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
         setPEventInfo(adapter.getId());
 

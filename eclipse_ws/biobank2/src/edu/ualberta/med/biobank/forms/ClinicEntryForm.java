@@ -43,7 +43,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicEntryForm extends AddressEntryFormCommon {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ClinicEntryForm";
+        "edu.ualberta.med.biobank.forms.ClinicEntryForm"; 
 
     private static final String MSG_NEW_CLINIC_OK =
         "New clinic information.";
@@ -80,7 +80,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ClinicAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
         updateClinicInfo(adapter.getId());
         String tabName;

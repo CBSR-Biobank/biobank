@@ -286,8 +286,9 @@ public abstract class BgcFormBase extends EditorPart implements
 
     protected BgcBaseText createReadOnlyWidget(Composite parent,
         int widgetOptions, String value) {
-        BgcBaseText result = (BgcBaseText) createWidget(parent,
-            BgcBaseText.class, SWT.READ_ONLY | widgetOptions, value);
+        BgcBaseText result =
+            widgetCreator.createReadOnlyField(parent, widgetOptions, value,
+                true);
         return result;
     }
 

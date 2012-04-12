@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
@@ -86,6 +87,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             dispatch.setWrappedObject(read.dispatch);
             SessionManager.logLookup(read.dispatch);
         }
+        comment.setWrappedObject(new Comment());
     }
 
     protected abstract String getTextForPartName();

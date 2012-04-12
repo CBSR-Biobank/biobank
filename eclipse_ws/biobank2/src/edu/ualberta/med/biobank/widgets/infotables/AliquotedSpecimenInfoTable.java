@@ -34,9 +34,9 @@ public class AliquotedSpecimenInfoTable extends
     }
 
     private static final String[] HEADINGS = new String[] {
-        "Specimen type",
-        "Volume (ml)",
-        "Quantity",
+        Messages.AliquotedSpecimen_field_type_label,
+        Messages.AliquotedSpecimen_field_volume_label,
+        Messages.AliquotedSpecimen_field_quantity_label,
         "Activity status" };
 
     public AliquotedSpecimenInfoTable(Composite parent,

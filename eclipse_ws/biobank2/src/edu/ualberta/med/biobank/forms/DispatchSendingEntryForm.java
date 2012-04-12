@@ -49,7 +49,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm";
+        "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm"; 
 
     public static final String MSG_NEW_DISPATCH_OK =
         "Creating a new dispatch record.";
@@ -356,13 +356,13 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         if (dispatch.isNew()) {
             return "New Dispatch";
         }
-        Assert.isNotNull(dispatch, "Dispatch is null");
-        String label = dispatch.getSenderCenter().getNameShort() + " -> "
+        Assert.isNotNull(dispatch, "Dispatch is null"); 
+        String label = dispatch.getSenderCenter().getNameShort() + " -> " 
             + dispatch.getReceiverCenter().getNameShort();
 
         String packedAt = dispatch.getFormattedPackedAt();
         if (packedAt != null)
-            label += " [" + packedAt + "]";
+            label += " [" + packedAt + "]";  
         return label;
     }
 

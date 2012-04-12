@@ -39,7 +39,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class PatientMergeForm extends BiobankEntryForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.PatientMergeForm";
+        "edu.ualberta.med.biobank.forms.PatientMergeForm"; 
 
     public static final String MSG_PATIENT_NOT_VALID =
         "Select a second patient";
@@ -71,7 +71,7 @@ public class PatientMergeForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof PatientAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         p = SessionManager
@@ -121,7 +121,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         patient1Data.verticalAlignment = SWT.FILL;
         patientArea1.setLayoutData(patient1Data);
 
-        Label arrow = toolkit.createLabel(client, "Arrow", SWT.IMAGE_BMP);
+        Label arrow = toolkit.createLabel(client, "Arrow", SWT.IMAGE_BMP); 
         arrow.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ARROW_LEFT2));
 
@@ -214,7 +214,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             BgcPlugin.openAsyncError(
                 "Error retrieving patient", e);
             patient2VisitsTable.setList(newContents);
-            study2Text.setText("");
+            study2Text.setText(""); 
             return;
         }
         if (patient2 == null) {
@@ -222,7 +222,7 @@ public class PatientMergeForm extends BiobankEntryForm {
                 "Invalid Patient Number",
                 "Cannot find a patient with that pnumber");
             patient2VisitsTable.setList(newContents);
-            study2Text.setText("");
+            study2Text.setText(""); 
             return;
         }
 
@@ -297,8 +297,8 @@ public class PatientMergeForm extends BiobankEntryForm {
                 }
             });
             SessionManager.log("merge",
-                patient2.getPnumber() + " " + "-->"
-                    + " " + patient1.getPnumber(),
+                patient2.getPnumber() + " " + "-->" 
+                    + " " + patient1.getPnumber(), 
                 "Patient");
         }
     }
@@ -308,8 +308,8 @@ public class PatientMergeForm extends BiobankEntryForm {
         pnumber1Text.setText(patient1.getPnumber());
         study1Text.setText(patient1.getStudy().getNameShort());
         patient1VisitsTable.setList(p.ceventInfos);
-        pnumber2Text.setText("");
-        study2Text.setText("");
+        pnumber2Text.setText(""); 
+        study2Text.setText(""); 
         patient2VisitsTable
             .setList(new ArrayList<PatientCEventInfo>());
         patient2 = null;

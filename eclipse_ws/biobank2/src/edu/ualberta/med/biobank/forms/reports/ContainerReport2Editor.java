@@ -27,7 +27,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ContainerReport2Editor extends ReportsEditor {
 
     public static String ID =
-        "edu.ualberta.med.biobank.editors.ContainerEmptyLocationsEditor";
+        "edu.ualberta.med.biobank.editors.ContainerEmptyLocationsEditor"; 
 
     private BgcBaseText containerLabel;
     private TopContainerListWidget topContainers;
@@ -63,7 +63,7 @@ public class ContainerReport2Editor extends ReportsEditor {
     protected BgcBaseText createCustomText(String labelText, Composite parent) {
         final BgcBaseText widget = (BgcBaseText) widgetCreator
             .createLabelledWidget(parent, BgcBaseText.class, SWT.NONE,
-                labelText, "");
+                labelText, ""); 
         widget.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -92,7 +92,7 @@ public class ContainerReport2Editor extends ReportsEditor {
 
     protected void validate(String label) {
         try {
-            if (label.equals("")
+            if (label.equals("") 
                 || ContainerWrapper.getContainersByLabel(
                     SessionManager.getAppService(), label).size() > 0)
                 filterList(label);
@@ -140,9 +140,9 @@ public class ContainerReport2Editor extends ReportsEditor {
 
     @Override
     public void setValues() throws Exception {
-        containerLabel.setText("");
+        containerLabel.setText(""); 
         topContainers.reset();
-        validate("");
+        validate(""); 
         super.setValues();
     }
 }

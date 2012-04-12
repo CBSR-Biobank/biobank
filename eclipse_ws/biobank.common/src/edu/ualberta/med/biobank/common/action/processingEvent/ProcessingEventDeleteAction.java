@@ -33,7 +33,11 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
 
         // if no aliquoted specimen, then ok to remove the specimens and to
         // delete the processing event
+
         for (Specimen sp : pevent.getSpecimens()) {
+            if (sp.getChildSpecimens().size() != 0)
+                throw new ActionException(
+                    "Delete failed. There are child specimens linked through this processing event");
             sp.setActivityStatus(ActivityStatus.ACTIVE);
             sp.setProcessingEvent(null);
             context.getSession().saveOrUpdate(sp);

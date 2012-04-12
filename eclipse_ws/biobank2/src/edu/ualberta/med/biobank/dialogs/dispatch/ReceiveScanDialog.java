@@ -137,7 +137,7 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
                 data.setDescription(Arrays.asList("Barcode:"
                     + productBarcode));
                 data.setRows(output);
-                data.setTitle("Pallet Info Sheet");
+                data.setTitle("Pallet Info Sheet"); 
 
                 PrintPdfDataExporter pdf = new PrintPdfDataExporter();
 

@@ -42,7 +42,7 @@ public class ReportFilter extends AbstractBiobankModel {
     }
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "REPORT_FILTER_ID", updatable = false)
+    @JoinColumn(name = "REPORT_FILTER_ID")
     public Set<ReportFilterValue> getReportFilterValues() {
         return this.reportFilterValues;
     }

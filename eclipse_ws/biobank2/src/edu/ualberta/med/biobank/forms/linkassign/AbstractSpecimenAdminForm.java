@@ -33,14 +33,14 @@ import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
 public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
 
-    private static final String FILE_NAME_SEPARATOR = "_";
-    private static final String LOG_EXTENSION = ".log";
-    private static final String FORM_USERNAME_PARAM = "username";
-    private static final String LOG_ACTION_PRINT = "print";
-    private static final String FORM_NAME_SUFFIX = "EntryForm";
-    private static final String JASPER_FORM_NAME = "ActivityReportForm";
+    private static final String FILE_NAME_SEPARATOR = "_"; 
+    private static final String LOG_EXTENSION = ".log"; 
+    private static final String FORM_USERNAME_PARAM = "username"; 
+    private static final String LOG_ACTION_PRINT = "print"; 
+    private static final String FORM_NAME_SUFFIX = "EntryForm"; 
+    private static final String JASPER_FORM_NAME = "ActivityReportForm"; 
     private static final SimpleDateFormat fileDateFormatter = new SimpleDateFormat(
-        "yyyy-MM-dd_HHmmss");
+        "yyyy-MM-dd_HHmmss"); 
 
     protected boolean finished = true;
     protected boolean printed = false;

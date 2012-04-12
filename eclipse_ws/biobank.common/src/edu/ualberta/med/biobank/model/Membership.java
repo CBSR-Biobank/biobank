@@ -121,15 +121,17 @@ public class Membership extends AbstractBiobankModel {
 
     public void setUserManager(boolean userManager) {
         this.userManager = userManager;
+        if (userManager) setEveryPermission(true);
     }
 
     @Column(name = "EVERY_PERMISSION")
     public boolean isEveryPermission() {
-        return everyPermission;
+        return everyPermission || isUserManager();
     }
 
     public void setEveryPermission(boolean everyPermission) {
         this.everyPermission = everyPermission;
+        if (!everyPermission) setUserManager(false);
     }
 
     /**
@@ -179,7 +181,7 @@ public class Membership extends AbstractBiobankModel {
 
     /**
      * Removes redundant {@link PermissionEnum}-s that are already reachable
-     * through a {@link Role}.
+     * through {@link #getRoles()} and {@link #isEveryPermission()}.
      */
     @Transient
     public void reducePermissions() {
@@ -187,6 +189,9 @@ public class Membership extends AbstractBiobankModel {
         nonRedundantPerms.addAll(getPermissions());
         for (Role role : getRoles()) {
             nonRedundantPerms.removeAll(role.getPermissions());
+        }
+        if (isEveryPermission()) {
+            nonRedundantPerms.clear();
         }
         getPermissions().retainAll(nonRedundantPerms);
     }

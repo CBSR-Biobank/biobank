@@ -97,7 +97,7 @@ public class DispatchCreateScanDialog extends
                 (BgcBaseText) createBoundWidget(parent,
                     BgcBaseText.class, SWT.NONE, palletproductBarcodeLabel,
                     new String[0], this,
-                    "currentProductBarcode", productBarcodeValidator);
+                    "currentProductBarcode", productBarcodeValidator); 
             palletproductBarcodeText
                 .addKeyListener(new EnterKeyToNextFieldListener());
             showProductBarcodeField(false);
@@ -109,7 +109,7 @@ public class DispatchCreateScanDialog extends
         resetScan();
         palletproductBarcodeText.setEnabled(show);
         if (show) {
-            palletproductBarcodeText.setText("");
+            palletproductBarcodeText.setText(""); 
         } else {
             palletproductBarcodeText
                 .setText("No previous position");

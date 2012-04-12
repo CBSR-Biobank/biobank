@@ -69,7 +69,7 @@ public class ChangePasswordDialog extends BgcBaseDialog {
             @Override
             public void modifyText(ModifyEvent e) {
                 Text text = (Text) e.widget;
-                if (text.getText().equals(""))
+                if (text.getText().equals("")) 
                     setErrorMessage("Please enter your old password");
                 else {
                     setErrorMessage(null);

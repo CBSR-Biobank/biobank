@@ -41,7 +41,7 @@ import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsS
 public class CollectionEventViewForm extends BiobankViewForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.CollectionEventViewForm";
+        "edu.ualberta.med.biobank.forms.CollectionEventViewForm"; 
 
     private BgcBaseText studyLabel;
 
@@ -68,7 +68,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof CollectionEventAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         updateCEventInfo();

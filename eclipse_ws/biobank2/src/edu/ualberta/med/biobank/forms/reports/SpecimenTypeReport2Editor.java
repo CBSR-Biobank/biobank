@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 
 public class SpecimenTypeReport2Editor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.SampleTypeSUsageEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.SampleTypeSUsageEditor"; 
 
     @Override
     protected void createOptionSection(Composite parent) {

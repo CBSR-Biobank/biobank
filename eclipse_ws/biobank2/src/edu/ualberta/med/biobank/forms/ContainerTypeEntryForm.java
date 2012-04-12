@@ -56,7 +56,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         .getLogger(ContainerTypeEntryForm.class.getName());
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm";
+        "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm"; 
 
     private static final String MSG_NEW_STORAGE_TYPE_OK =
         "Creating a new storage type.";
@@ -111,7 +111,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ContainerTypeAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         containerTypeAdapter = (ContainerTypeAdapter) adapter;

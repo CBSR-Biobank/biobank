@@ -80,5 +80,6 @@ public class AddressEntryView extends AbstractView implements
 
         country.setValidationControl(table.addLabel("Country"));
         country.setText(table.addText());
+
     }
 }

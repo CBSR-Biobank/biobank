@@ -13,7 +13,8 @@ import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
  */
 public class SessionsView extends AbstractViewWithAdapterTree {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.SessionsView"; 
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.SessionsView"; //$NON-NLS-1$
 
     public SessionsView() {
         SessionManager.getInstance().setSessionsView(this);
@@ -34,6 +35,8 @@ public class SessionsView extends AbstractViewWithAdapterTree {
         SessionAdapter session = (SessionAdapter) rootNode.getChild(0);
         if (session != null && SessionManager.getInstance().isConnected())
             session.rebuild();
+
+        getSite().setSelectionProvider(adaptersTree.getTreeViewer());
     }
 
     @Override

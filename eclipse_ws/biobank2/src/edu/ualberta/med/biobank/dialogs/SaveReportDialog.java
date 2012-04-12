@@ -41,7 +41,7 @@ public class SaveReportDialog extends BgcBaseDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.FILL,
-            "Name", null, this, "fileName", null);
+            "Name", null, this, "fileName", null); 
     }
 
     public String getFileName() {

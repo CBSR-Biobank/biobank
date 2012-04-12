@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -103,6 +104,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
                     new ResearchGroupGetInfoAction(id));
             researchGroup.setWrappedObject(read.researchGroup);
         }
+        comment.setWrappedObject(new Comment());
     }
 
     @Override
@@ -117,8 +119,11 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     protected void createFormContent() throws ApplicationException {
         form.setText("Research Group Information");
         page.setLayout(new GridLayout(1, false));
-        toolkit.createLabel(page,
-            "Research Groups can be associated with studies after submitting this initial information.", SWT.LEFT);
+        toolkit
+            .createLabel(
+                page,
+                "Research Groups can be associated with studies after submitting this initial information.",
+                SWT.LEFT);
         createResearchGroupInfoSection();
         createAddressArea(researchGroup);
         createButtonsSection();

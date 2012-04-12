@@ -101,15 +101,16 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentsInfoTable(client,
-            dispatch.getCommentCollection(false));
+        commentEntryTable =
+            new CommentsInfoTable(client,
+                dispatch.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            "Add a comment");
+        createBoundWidgetWithLabel(client, BgcBaseText.class,
+            SWT.MULTI, "Add a comment", null, comment, "message", null);
 
     }
 

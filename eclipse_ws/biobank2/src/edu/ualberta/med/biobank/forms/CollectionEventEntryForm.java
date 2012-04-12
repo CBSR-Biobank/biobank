@@ -70,7 +70,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class CollectionEventEntryForm extends BiobankEntryForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.CollectionEventEntryForm";
+        "edu.ualberta.med.biobank.forms.CollectionEventEntryForm"; 
 
     public static final String MSG_NEW_PATIENT_VISIT_OK =
         "Creating a new patient visit record.";
@@ -118,7 +118,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof CollectionEventAdapter,
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         ceventCopy = new CollectionEvent();
@@ -199,7 +199,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            "Add a comment", null, comment, "message", null);
+            "Add a comment", null, comment, "message", null); 
 
     }
 
@@ -278,7 +278,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             EventAttrInfo eventAttrInfo = (adapter.getId() == null)
                 ? null : ceventInfo.eventAttrs.get(entry.getKey());
             String origValue = (eventAttrInfo == null)
-                ? "" : eventAttrInfo.attr.getValue();
+                ? "" : eventAttrInfo.attr.getValue();  
             pvCustomInfo.setValue(origValue);
             pvCustomInfo.setOrigValue(origValue);
             pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
@@ -362,7 +362,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             control = s;
         } else {
             Assert.isTrue(false,
-                "Invalid pvInfo type: " + pvCustomInfo.getType());
+                "Invalid pvInfo type: " + pvCustomInfo.getType()); 
             return null;
         }
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -382,10 +382,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             ((Combo) pvCustomInfo.control).setText(pvCustomInfo.getOrigValue());
         else if (EventAttrTypeEnum.SELECT_MULTIPLE == pvCustomInfo.getType()) {
             ((SelectMultipleWidget) pvCustomInfo.control)
-                .setSelections(pvCustomInfo.getOrigValue().split(";"));
+                .setSelections(pvCustomInfo.getOrigValue().split(";")); 
         } else {
             Assert.isTrue(false,
-                "Invalid pvInfo type: " + pvCustomInfo.getType());
+                "Invalid pvInfo type: " + pvCustomInfo.getType()); 
         }
     }
 

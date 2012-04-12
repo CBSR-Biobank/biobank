@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
@@ -15,7 +14,7 @@ import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.views.CollectionView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class CollectionEventAddHandler extends AbstractHandler {
+public class CollectionEventAddHandler extends LogoutSensitiveHandler {
 
     private static BgcLogger logger = BgcLogger
         .getLogger(CollectionEventAddHandler.class.getName());
@@ -39,7 +38,6 @@ public class CollectionEventAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        Boolean allowed;
         try {
             allowed =
                 SessionManager.getAppService().isAllowed(

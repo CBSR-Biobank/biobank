@@ -69,18 +69,18 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
                 ContainerWrapper parent = container.getParentContainer();
                 boolean hasParents = parent != null;
                 if (hasParents)
-                    text.append(" (")
+                    text.append(" (")   
                         .append(
                             "Parents")
-                        .append(": ");
+                        .append(": ");   
                 while (parent != null) {
                     text.append(parent.getFullInfoLabel());
                     parent = parent.getParentContainer();
                     if (parent != null)
-                        text.append("; ");
+                        text.append("; "); 
                 }
                 if (hasParents)
-                    text.append(")");
+                    text.append(")"); 
                 return text.toString();
             }
         });

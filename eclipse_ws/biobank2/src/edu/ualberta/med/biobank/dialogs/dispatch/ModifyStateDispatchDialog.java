@@ -72,7 +72,7 @@ public class ModifyStateDispatchDialog extends BgcBaseDialog {
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.MULTI,
             "Comment", null,
-            commentValue, "value",
+            commentValue, "value", 
             new NonEmptyStringValidator(
                 "Comment should not be empty"));
     }

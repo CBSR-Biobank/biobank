@@ -35,19 +35,19 @@ public class ExportErrorsLogsDialog extends BgcBaseDialog {
 
     public static final String TITLE = "Errors logs export options";
 
-    public static final String DEFAULT_FILE_NAME = "log_export.zip";
+    public static final String DEFAULT_FILE_NAME = "log_export.zip"; 
 
-    public static final String ZIP_EXTENSION = ".zip";
+    public static final String ZIP_EXTENSION = ".zip"; 
 
-    public static final String LOG_EXTENSION = ".log";
+    public static final String LOG_EXTENSION = ".log"; 
 
-    public static final String EXPORT_ERRORS_LOGS_PROPERTIES_FILE = "ExportErrorsLogs.properties";
+    public static final String EXPORT_ERRORS_LOGS_PROPERTIES_FILE = "ExportErrorsLogs.properties"; 
 
-    public static final String SCANNER_FILES_KEY = "scanner_files";
+    public static final String SCANNER_FILES_KEY = "scanner_files"; 
 
-    public static final String OTHERS_KEY = "others_working_directory_files";
+    public static final String OTHERS_KEY = "others_working_directory_files"; 
 
-    public static final String SEPARATOR_KEY = "separator";
+    public static final String SEPARATOR_KEY = "separator"; 
 
     private Button scannerExportCheck;
 
@@ -242,7 +242,7 @@ public class ExportErrorsLogsDialog extends BgcBaseDialog {
         FileDialog fd = new FileDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), SWT.SAVE);
         fd.setText("Select destination zip file");
-        fd.setFilterExtensions(new String[] { "*" + ZIP_EXTENSION });
+        fd.setFilterExtensions(new String[] { "*" + ZIP_EXTENSION }); 
         fd.setFileName(DEFAULT_FILE_NAME);
         String selected = fd.open();
         return selected;

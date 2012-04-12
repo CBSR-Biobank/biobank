@@ -220,7 +220,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             (BgcBaseText) createBoundWidgetWithLabel(contents,
                 BgcBaseText.class, SWT.MULTI,
                 "Add a comment", null,
-                commentWrapper, "message",
+                commentWrapper, "message", 
                 null);
         GridData gd = new GridData();
         gd = (GridData) commentWidget.getLayoutData();
@@ -316,7 +316,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         quantityText.setVisible(enableVolume);
         quantityTextValidator.setAllowEmpty(!enableVolume || !isVolumeRequired);
         String originalText = quantityText.getText();
-        quantityText.setText(originalText + "*");
+        quantityText.setText(originalText + "*"); 
         quantityText.setText(originalText);
         if (!enableVolume) {
             internalSpecimen.specimen.setQuantity(null);
@@ -342,7 +342,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         quantityText.setVisible(enableVolume);
         quantityTextValidator.setAllowEmpty(!enableVolume || !isVolumeRequired);
         String originalText = quantityText.getText();
-        quantityText.setText(originalText + "*");
+        quantityText.setText(originalText + "*"); 
         quantityText.setText(originalText);
         if (!enableVolume) {
             internalSpecimen.specimen.setQuantity(null);
@@ -365,14 +365,14 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
     @Override
     protected void resetFields() {
-        inventoryIdWidget.setText("");
+        inventoryIdWidget.setText(""); 
         inventoryIdWidget.setFocus();
-        quantityText.setText("");
+        quantityText.setText(""); 
         timeDrawnWidget.setDate(null);
         specimenTypeComboViewer.getCombo().deselectAll();
         activityStatusComboViewer.setSelection(
             new StructuredSelection(ActivityStatus.ACTIVE));
-        commentWidget.setText("");
+        commentWidget.setText(""); 
         updateWidgetVisibilityAndValues();
     }
 
@@ -387,7 +387,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         spec.specimen.setQuantity(internalSpecimen.specimen.getQuantity());
         spec.specimen.setCreatedAt(internalSpecimen.specimen.getCreatedAt());
         if (commentWrapper.getMessage() != null
-            && !commentWrapper.getMessage().equals("")) {
+            && !commentWrapper.getMessage().equals("")) { 
             spec.comments.add(commentWrapper.getMessage());
         }
         if (spec.comments.size() > 0)

@@ -26,7 +26,7 @@ public class SpecimenReport3Editor extends ReportsEditor implements
     IBgcFileBrowserListener {
 
     public static String ID =
-        "edu.ualberta.med.biobank.editors.AliquotRequestEditor";
+        "edu.ualberta.med.biobank.editors.AliquotRequestEditor"; 
 
     private BgcFileBrowser csvSelector;
 
@@ -37,7 +37,7 @@ public class SpecimenReport3Editor extends ReportsEditor implements
             false));
         csvSelector = new BgcFileBrowser(parent,
             "CSV File", SWT.NONE,
-            new String[] { "*.csv" });
+            new String[] { "*.csv" }); 
         csvSelector.addFileSelectedListener(this);
         csvSelector.adaptToToolkit(toolkit, true);
         generateButton.setEnabled(false);
@@ -64,22 +64,22 @@ public class SpecimenReport3Editor extends ReportsEditor implements
             csvSelector.getFilePath()), CsvPreference.EXCEL_PREFERENCE);
 
         final CellProcessor[] processors = new CellProcessor[] {
-            new StrNotNullOrEmpty(), new ParseDate("yyyy-MM-dd"),
+            new StrNotNullOrEmpty(), new ParseDate("yyyy-MM-dd"), 
             new StrNotNullOrEmpty(), new LMinMax(1, Long.MAX_VALUE) };
 
         List<Object> requests = new ArrayList<Object>();
 
         try {
-            String[] header = new String[] { "pnumber", "dateDrawn",
-                "specimenTypeNameShort", "maxAliquots" };
+            String[] header = new String[] { "pnumber", "dateDrawn",  
+                "specimenTypeNameShort", "maxAliquots" };  
             RequestData request;
             while ((request = reader.read(RequestData.class, header,
                 processors)) != null) {
                 requests.add(request);
             }
         } catch (SuperCSVException e) {
-            throw new Exception("Parse error at line " + reader.getLineNumber()
-                + "\n" + e.getCsvContext());
+            throw new Exception("Parse error at line " + reader.getLineNumber() 
+                + "\n" + e.getCsvContext()); 
         } finally {
             reader.close();
         }

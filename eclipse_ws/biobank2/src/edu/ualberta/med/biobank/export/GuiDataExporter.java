@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 public abstract class GuiDataExporter implements DataExporter {
     private final String name;
 
-    public static final String LOG_TYPE = "data";
+    public static final String LOG_TYPE = "data"; 
 
     public GuiDataExporter(String name) {
         this.name = name;
@@ -80,16 +80,16 @@ public abstract class GuiDataExporter implements DataExporter {
         final Holder<String> path = new Holder<String>(null);
 
         if (exts != null) {
-            final Holder<String> defaultFilename = new Holder<String>("output");
+            final Holder<String> defaultFilename = new Holder<String>("output"); 
 
             if (data.getTitle() != null) {
-                defaultFilename.setValue(data.getTitle().replaceAll("[^\\w]",
-                    "_"));
+                defaultFilename.setValue(data.getTitle().replaceAll("[^\\w]", 
+                    "_")); 
             }
 
-            defaultFilename.setValue(defaultFilename.getValue() + "_"
-                + DateFormatter.formatAsDate(new Date()).replaceAll("_{2,}",
-                    "_"));
+            defaultFilename.setValue(defaultFilename.getValue() + "_" 
+                + DateFormatter.formatAsDate(new Date()).replaceAll("_{2,}", 
+                    "_")); 
 
             Display display = Display.getDefault();
             display.syncExec(new Runnable() {

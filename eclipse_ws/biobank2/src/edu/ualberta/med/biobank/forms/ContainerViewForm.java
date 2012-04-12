@@ -78,7 +78,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ContainerViewForm extends BiobankViewForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ContainerViewForm";
+        "edu.ualberta.med.biobank.forms.ContainerViewForm"; 
 
     private static BgcLogger logger = BgcLogger
         .getLogger(ContainerViewForm.class.getName());
@@ -124,7 +124,7 @@ public class ContainerViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof ContainerAdapter,
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         containerAdapter = (ContainerAdapter) adapter;
@@ -232,8 +232,8 @@ public class ContainerViewForm extends BiobankViewForm {
             Integer colCap =
                 containerInfo.container.getContainerType().getCapacity()
                     .getColCapacity();
-            Assert.isNotNull(rowCap, "row capacity is null");
-            Assert.isNotNull(colCap, "column capacity is null");
+            Assert.isNotNull(rowCap, "row capacity is null"); 
+            Assert.isNotNull(colCap, "column capacity is null"); 
             if (rowCap == 0) rowCap = 1;
             if (colCap == 0) colCap = 1;
 

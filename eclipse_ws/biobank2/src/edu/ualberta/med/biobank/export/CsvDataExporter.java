@@ -11,7 +11,7 @@ import org.supercsv.prefs.CsvPreference;
 import edu.ualberta.med.biobank.SessionManager;
 
 public class CsvDataExporter extends GuiDataExporter {
-    private static final String[] VALID_EXTS = { "*.csv" };
+    private static final String[] VALID_EXTS = { "*.csv" }; 
 
     public CsvDataExporter() {
         super("Export CSV");

@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 public class ContainerReport1Editor extends ReportsEditor {
 
     public static String ID =
-        "edu.ualberta.med.biobank.editors.ContainerCapacityEditor";
+        "edu.ualberta.med.biobank.editors.ContainerCapacityEditor"; 
 
     @Override
     protected void createOptionSection(Composite parent) {

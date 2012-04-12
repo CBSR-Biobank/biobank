@@ -17,5 +17,5 @@ insert into group_user(user_id, group_id)
        select u.id, g.id
        from principal u, principal g
        where u.login='testuser'
-       and g.name='Super Administrators';
+       and g.name='Global Administrators';
 

@@ -39,6 +39,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
@@ -129,6 +130,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             specimens = read.sourceSpecimenInfos;
             SessionManager.logLookup(read.pevent);
         }
+        comment.setWrappedObject(new Comment());
     }
 
     @Override
@@ -208,8 +210,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createLabelledWidget(client, BgcBaseText.class, SWT.MULTI,
-            "Add a comment");
+        createBoundWidgetWithLabel(client, BgcBaseText.class,
+            SWT.MULTI, "Add a comment", null, comment, "message", null);
 
     }
 

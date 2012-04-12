@@ -138,7 +138,7 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
             errorMessage));
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterGetValidator(validator);
-        selectedValue = new WritableValue("", String.class);
+        selectedValue = new WritableValue("", String.class); 
         listObserveSelection = SWTObservables.observeSelection(lv.getList());
         widgetCreator.bindValue(listObserveSelection, selectedValue, uvs, uvs);
     }

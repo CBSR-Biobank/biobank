@@ -581,11 +581,6 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.CollectionEventAddHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd">
-         <activeWhen>
-               <reference
-                     definitionId="biobank.processingPerspectiveSelected">
-               </reference>
-         </activeWhen>
          <enabledWhen>
             <and>
                <reference
@@ -616,6 +611,23 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.DeleteSelectionHandler"      
             commandId="edu.ualberta.med.biobank.commands.deleteSelection">
+         <enabledWhen>
+            <and>
+               <reference
+                     definitionId="biobank.oneElementSelected">
+               </reference>
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <test
+                           property="edu.ualberta.med.biobank.treeview.canDelete">
+                     </test>
+                  </iterate>
+               </with>
+            </and>
+         </enabledWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.SearchHandler"
@@ -2458,5 +2470,15 @@
                value="Biobank">
          </property>
       </product>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="edu.ualberta.med.biobank.expressions.AdapterBasePropertyTester"
+            id="edu.ualberta.med.biobank.expressions.AdapterBasePropertyTester"
+            namespace="edu.ualberta.med.biobank.treeview"
+            properties="canDelete"
+            type="edu.ualberta.med.biobank.treeview.AbstractAdapterBase">
+      </propertyTester>
    </extension>
 </plugin>

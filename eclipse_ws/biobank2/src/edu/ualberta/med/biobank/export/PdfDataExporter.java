@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
 public class PdfDataExporter extends GuiDataExporter {
-    private static final String[] VALID_EXTS = { "*.pdf" };
+    private static final String[] VALID_EXTS = { "*.pdf" }; 
 
     public PdfDataExporter() {
         super("Export PDF");

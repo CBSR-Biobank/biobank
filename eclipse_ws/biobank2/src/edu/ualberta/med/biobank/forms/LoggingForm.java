@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.widgets.infotables.LoggingInfoTable;
 
 public class LoggingForm extends BiobankViewForm {
 
-    public static String ID = "edu.ualberta.med.biobank.forms.LoggingForm";
+    public static String ID = "edu.ualberta.med.biobank.forms.LoggingForm"; 
 
     private BgcBaseText userLabel;
     private BgcBaseText typeLabel;
