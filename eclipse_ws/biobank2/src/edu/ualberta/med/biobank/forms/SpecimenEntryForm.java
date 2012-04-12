@@ -114,7 +114,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     protected void init() throws Exception {
         specimenAdapter = (SpecimenAdapter) adapter;
         updateSpecimenInfo(adapter.getId());
-        setPartName(Messages.SpecimenEntryForm_title);
+        setPartName("Specimen Entry");
     }
 
     private void updateSpecimenInfo(Integer id) throws ApplicationException {
@@ -258,7 +258,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         Button editSourceButton = new Button(c, SWT.NONE);
         editSourceButton
-            .setText(Messages.SpecimenEntryForm_change_button_label);
+            .setText("Change Source");
 
         toolkit.adapt(c);
 
@@ -316,12 +316,12 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                         parentPEventField.setText(new StringBuilder(
                             parentPEvent
                                 .getFormattedCreatedAt())
-                            .append(" (") //$NON-NLS-1$
+                            .append(" (") 
                             .append(
                                 NLS.bind(
-                                    Messages.SpecimenEntryForm_worksheet_string,
+                                    "worksheet: {0}",
                                     parentPEvent.getWorksheet()))
-                            .append(")") //$NON-NLS-1$
+                            .append(")") 
                             .toString());
                     commentText.setText(wizard.getComment());
                     setDirty(true); // so changes can be saved
@@ -404,18 +404,18 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 specimen.getParentSpecimen().getProcessingEvent();
         parentPEventLabel =
             widgetCreator.createLabel(client,
-                Messages.SpecimenEntryForm_source_pevent);
+                "Source Processing Event");
         String parentPEventString;
         if (parentPevent == null)
-            parentPEventString = ""; //$NON-NLS-1$
+            parentPEventString = ""; 
         else
             parentPEventString =
                 new StringBuilder(parentPevent.getFormattedCreatedAt())
-                    .append(" (") //$NON-NLS-1$
+                    .append(" (") 
                     .append(
-                        NLS.bind(Messages.SpecimenEntryForm_worksheet_string,
+                        NLS.bind("worksheet: {0}",
                             parentPevent.getWorksheet()))
-                    .append(")").toString(); //$NON-NLS-1$
+                    .append(")").toString(); 
         parentPEventField = createReadOnlyWidget(
             client,
             SWT.NONE,
@@ -425,16 +425,16 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         ProcessingEventWrapper pevent = specimen.getProcessingEvent();
         pEventLabel =
             widgetCreator.createLabel(client,
-                Messages.SpecimenEntryForm_pevent_label);
+                "Processing Event");
         String peventString;
         if (pevent == null)
-            peventString = ""; //$NON-NLS-1$
+            peventString = ""; 
         else
             peventString =
-                new StringBuilder(pevent.getFormattedCreatedAt()).append(" (") //$NON-NLS-1$
+                new StringBuilder(pevent.getFormattedCreatedAt()).append(" (") 
                     .append(
-                        NLS.bind(Messages.SpecimenEntryForm_worksheet_string,
-                            pevent.getWorksheet())).append(")").toString(); //$NON-NLS-1$
+                        NLS.bind("worksheet: {0}",
+                            pevent.getWorksheet())).append(")").toString(); 
         pEventField = createReadOnlyWidget(
             client,
             SWT.NONE,
@@ -444,7 +444,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private void createCommentSection() {
         Composite client =
-            createSectionWithClient(Messages.SpecimenEntryForm_4);
+            createSectionWithClient("Comments");
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -459,8 +459,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         commentText =
             (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
                 SWT.MULTI,
-                Messages.SpecimenEntryForm_5, null, comment,
-                Messages.SpecimenEntryForm_6, null);
+                "Add a comment", null, comment,
+                "message", null);
 
     }
 

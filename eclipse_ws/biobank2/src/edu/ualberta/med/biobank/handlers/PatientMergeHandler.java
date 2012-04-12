@@ -39,8 +39,7 @@ public class PatientMergeHandler extends LogoutSensitiveHandler {
             return SessionManager.getInstance().getSession() != null &&
                 allowed;
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
-                Messages.HandlerPermission_message);
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
             return false;
         }
     }

@@ -48,8 +48,8 @@ public class SiteAdapter extends AdapterBase {
                 SessionManager.getAppService().isAllowed(
                     new SiteUpdatePermission(getModelObject().getId()));
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.SiteAdapter_0,
-                Messages.SiteAdapter_1);
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
         }
     }
 

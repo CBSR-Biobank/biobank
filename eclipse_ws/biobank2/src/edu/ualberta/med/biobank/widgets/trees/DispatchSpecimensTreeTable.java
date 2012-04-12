@@ -228,7 +228,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     private void addDeleteExtraMenu(final Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.DispatchSpecimensTreeTable_delete_label);
+        item.setText("Delete");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
