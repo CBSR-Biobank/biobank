@@ -130,45 +130,38 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         SetDiff<Membership> diff = new SetDiff<Membership>(
             manageable, input.getMemberships());
 
-        handleMembershipRemovals(context, diff.getRemovals());
+        handleMembershipDeletes(context, diff.getRemovals());
+        handleMembershipInserts(context, user, diff.getAdditions());
+        handleMembershipUpdates(context, diff.getIntersection());
 
-        for (Membership membership : diff.getAdditions()) {
-            checkFullyManageable(context, membership);
-
-            user.getMemberships().add(membership);
-            membership.setPrincipal(user);
-        }
-
-        mergeMembershipUpdates(context, diff.getIntersection());
+        mergeMembershipsOnDomain(context, user);
 
         for (Membership m : user.getMemberships()) {
             m.reducePermissions();
         }
     }
 
-    private void handleMembershipRemovals(ActionContext context,
+    private void handleMembershipDeletes(ActionContext context,
         Set<Membership> removals) {
-        User executingUser = context.getUser();
         for (Membership membership : removals) {
-            // can only remove these memberships if they're _still_ fully
-            // manageable, otherwise, the executing user can only clear out the
-            // portions they're allowed to edit
-            if (membership.isFullyManageable(executingUser)) {
-                membership.getPrincipal().getMemberships().remove(membership);
-                context.getSession().delete(membership);
-            } else {
-                Set<PermissionEnum> perms = membership
-                    .getManageablePermissions(executingUser);
-                membership.getPermissions().removeAll(perms);
+            checkFullyManageable(context, membership);
 
-                Set<Role> roles = membership.getManageableRoles(executingUser,
-                    input.getContext().getRoles());
-                membership.getRoles().removeAll(roles);
-            }
+            membership.getPrincipal().getMemberships().remove(membership);
+            context.getSession().delete(membership);
         }
     }
 
-    private void mergeMembershipUpdates(ActionContext context,
+    private void handleMembershipInserts(ActionContext context, User user,
+        Set<Membership> additions) {
+        for (Membership membership : additions) {
+            checkFullyManageable(context, membership);
+
+            user.getMemberships().add(membership);
+            membership.setPrincipal(user);
+        }
+    }
+
+    private void handleMembershipUpdates(ActionContext context,
         Set<Pair<Membership>> conflicts) {
         User executingUser = context.getUser();
         User manager = input.getContext().getManager();
@@ -201,7 +194,18 @@ public class UserSaveAction implements Action<UserSaveOutput> {
                 throw new ActionException("reduced scope");
             }
 
-            // looks okay, clear out the old scope and assign intended values
+            Domain newD = newM.getDomain();
+            Domain oldD = oldM.getDomain();
+
+            oldD.getCenters().clear();
+            oldD.getCenters().addAll(newD.getCenters());
+            oldD.setAllCenters(newD.isAllCenters());
+
+            oldD.getStudies().clear();
+            oldD.getStudies().addAll(newD.getStudies());
+            oldD.setAllStudies(newD.isAllStudies());
+
+            // clear out the old scope and assign intended values
             oldM.getPermissions().removeAll(oldPermissionScope);
             oldM.getRoles().removeAll(oldRoleScope);
 
@@ -215,23 +219,15 @@ public class UserSaveAction implements Action<UserSaveOutput> {
             roles.retainAll(newM.getRoles());
             oldM.getRoles().addAll(roles);
 
-            // TODO: throw away old domain, copy into new? Shorter.
-            Domain newD = newM.getDomain();
-            Domain oldD = oldM.getDomain();
-
-            oldD.getCenters().clear();
-            oldD.getCenters().addAll(newD.getCenters());
-            oldD.setAllCenters(newD.isAllCenters());
-
-            oldD.getStudies().clear();
-            oldD.getStudies().addAll(newD.getStudies());
-            oldD.setAllStudies(newD.isAllStudies());
-
             oldM.setUserManager(newM.isUserManager());
             oldM.setEveryPermission(newM.isEveryPermission());
 
             checkFullyManageable(context, oldM);
         }
+    }
+
+    private void mergeMembershipsOnDomain(ActionContext context, User user) {
+
     }
 
     private void checkFullyManageable(ActionContext context, Membership m) {
