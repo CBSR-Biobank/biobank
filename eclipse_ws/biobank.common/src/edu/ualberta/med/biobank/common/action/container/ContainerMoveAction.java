@@ -6,7 +6,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -20,8 +21,8 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 public class ContainerMoveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOG = Logger.getLogger(ContainerMoveAction.class
-        .getName());
+    private static Logger log = LoggerFactory
+        .getLogger(ContainerMoveAction.class.getName());
 
     public final Integer containerToMoveId;
     public final Integer newParentContainerId;
@@ -40,6 +41,13 @@ public class ContainerMoveAction implements Action<IdResult> {
         }
         if (newLabel == null) {
             throw new IllegalArgumentException("Move to label is null");
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("containerToMoveId={} newParentId={} newLabel={}",
+                new Object[] { containerToMove.getLabel(),
+                    newParentContainer.getLabel(),
+                    newLabel });
         }
 
         this.containerToMoveId = containerToMove.getId();
@@ -78,7 +86,7 @@ public class ContainerMoveAction implements Action<IdResult> {
             context.getSession().saveOrUpdate(containerToMove);
             context.getSession().flush();
 
-            LOG.debug("container " + containerToMoveId + " moved under parent "
+            log.debug("container " + containerToMoveId + " moved under parent "
                 + newParentContainerId);
         } catch (ConstraintViolationException e) {
             ArrayList<String> msgs = new ArrayList<String>();
@@ -106,8 +114,8 @@ public class ContainerMoveAction implements Action<IdResult> {
             parentContainer);
         context.getSession().saveOrUpdate(container);
 
-        LOG.debug("container " + container.getId() + " new label "
-            + container.getLabel());
+        log.debug("updateContainerAndChildren: containerId={} label={}",
+            container.getId(), container.getLabel());
 
         for (ContainerPosition childPosition : container.getChildPositions()) {
             updateContainerAndChildren(childPosition.getContainer(), container);
