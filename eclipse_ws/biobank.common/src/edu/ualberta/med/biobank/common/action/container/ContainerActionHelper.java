@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.action.container;
 
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.i18n.SS;
+import edu.ualberta.med.biobank.i18n.S;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -32,7 +32,7 @@ public class ContainerActionHelper {
             }
         } else {
             throw new ActionException(
-                SS.tr("Parent container and position should either both be set or both be null"));
+                S.tr("Parent container and position should either both be set or both be null"));
         }
         container.setTopContainer(parent == null ? container : parent
             .getTopContainer());

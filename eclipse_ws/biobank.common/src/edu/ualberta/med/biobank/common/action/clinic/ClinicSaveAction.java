@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicCreatePermission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
-import edu.ualberta.med.biobank.i18n.SS;
+import edu.ualberta.med.biobank.i18n.S;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
@@ -125,7 +125,7 @@ public class ClinicSaveAction extends CenterSaveAction {
         for (Contact contact : contactsDiff.getRemoveSet()) {
             Collection<Study> studyCollection = contact.getStudies();
             if ((studyCollection != null) && !studyCollection.isEmpty()) {
-                throw new ActionException(SS.tr("Cannot delete contact {0}",
+                throw new ActionException(S.tr("Cannot delete contact {0}",
                     contact.getName()));
             }
             context.getSession().delete(contact);

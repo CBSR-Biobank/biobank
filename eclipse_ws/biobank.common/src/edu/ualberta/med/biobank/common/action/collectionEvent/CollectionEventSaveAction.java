@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEven
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.i18n.SS;
+import edu.ualberta.med.biobank.i18n.S;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -184,7 +184,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
                     if (!newAllSpecCollection.contains(specimen)) {
                         throw new ActionException(
-                            SS
+                            S
                                 .tr("Specimen \"{0}\" not found in collection",
                                     specimen.getInventoryId()));
                     }
@@ -238,7 +238,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                         : studyEventAttrInfo.attr;
                     if (sAttr == null) {
                         throw new ActionException(
-                            SS
+                            S
                                 .tr("Cannot find Study Event Attribute with id \"{0}\".",
                                     attrInfo.studyEventAttrId));
                     }
@@ -247,7 +247,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 if (ActivityStatus.ACTIVE != sAttr.getActivityStatus()) {
                     String label = sAttr.getGlobalEventAttr().getLabel();
                     throw new ActionException(
-                        SS
+                        S
                             .tr("Attribute for label \"{0}\" is locked, changes not permitted.",
                                 label));
                 }
@@ -273,7 +273,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                                 String label =
                                     sAttr.getGlobalEventAttr().getLabel();
                                 throw new ActionException(
-                                    SS
+                                    S
                                         .tr("Value \"{0}\" is invalid for label \"{2}\".",
                                             attrInfo.value, label));
                             }
@@ -283,7 +283,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                                     String label =
                                         sAttr.getGlobalEventAttr().getLabel();
                                     throw new ActionException(
-                                        SS
+                                        S
                                             .tr(
                                                 "Value \"{0}\" (\"{1}\") is invalid for label \"{2}\".",
                                                 singleVal, attrInfo.value,
@@ -298,14 +298,14 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                                     .parse(attrInfo.value);
                             } catch (ParseException e) {
                                 throw new ActionException(
-                                    SS.tr("Cannot parse date \"{0}\".",
+                                    S.tr("Cannot parse date \"{0}\".",
                                         attrInfo.value));
                             }
                         } else if (type == EventAttrTypeEnum.TEXT) {
                             // do nothing
                         } else {
                             throw new ActionException(
-                                SS.tr(
+                                S.tr(
                                     "Unknown Event Attribute Type \"{0}\".",
                                     type.getName()));
                         }

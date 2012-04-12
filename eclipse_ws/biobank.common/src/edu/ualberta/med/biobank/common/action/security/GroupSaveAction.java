@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
-import edu.ualberta.med.biobank.i18n.SS;
+import edu.ualberta.med.biobank.i18n.S;
 import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
@@ -58,7 +58,7 @@ public class GroupSaveAction implements Action<IdResult> {
     private void checkFullyManageable(Group group, User executingUser) {
         if (!group.isFullyManageable(executingUser)) {
             throw new ActionException(
-                SS.tr("You do not have adequate permissions to save this group."));
+                S.tr("You do not have adequate permissions to save this group."));
         }
     }
 

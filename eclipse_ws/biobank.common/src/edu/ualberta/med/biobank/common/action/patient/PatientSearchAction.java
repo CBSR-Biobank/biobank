@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.i18n.SS;
+import edu.ualberta.med.biobank.i18n.S;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 
@@ -82,7 +82,7 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
             return pinfo;
         }
         throw new ActionException(
-            SS.tr("More than one patient found with pnumber \"{0}\".", pnumber));
+            S.tr("More than one patient found with pnumber \"{0}\".", pnumber));
         // FIXME need this kind of test ?
         // if (patient != null) {
         // StudyWrapper study = patient.getStudy();

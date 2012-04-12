@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.common.action.exception;
 
 import edu.ualberta.med.biobank.i18n.HasLocalizedMessage;
-import edu.ualberta.med.biobank.i18n.SS;
+import edu.ualberta.med.biobank.i18n.S;
 
 /**
  * 
@@ -11,20 +11,20 @@ public class ActionException extends RuntimeException
     implements HasLocalizedMessage {
     private static final long serialVersionUID = 1L;
 
-    private final SS msg;
+    private final S string;
 
-    public ActionException(SS msg) {
-        this(msg, null);
+    public ActionException(S string) {
+        this(string, null);
     }
 
-    public ActionException(SS msg, Throwable cause) {
-        super(msg.getMsg(), cause);
+    public ActionException(S string, Throwable cause) {
+        super(string.toString(), cause);
 
-        this.msg = msg;
+        this.string = string;
     }
 
     @Override
     public String getLocalizedMessage() {
-        return msg.getMsg();
+        return string.toString();
     }
 }

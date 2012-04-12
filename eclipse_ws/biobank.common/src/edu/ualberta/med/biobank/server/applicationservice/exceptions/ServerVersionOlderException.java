@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.server.applicationservice.exceptions;
 
-import edu.ualberta.med.biobank.i18n.SS;
+import edu.ualberta.med.biobank.i18n.S;
 
 public class ServerVersionOlderException extends BiobankServerException {
 
@@ -21,7 +21,7 @@ public class ServerVersionOlderException extends BiobankServerException {
     @SuppressWarnings("nls")
     @Override
     public String getMessage() {
-        return SS
+        return S
             .tr("Client authentication failed. The \"{0}\" Java Client is too new to connect to a \"{1}\" server.",
                 client, server).toString();
     }

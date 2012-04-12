@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.i18n.SS;
+import edu.ualberta.med.biobank.i18n.S;
 
 public class CheckNoDuplicateAction implements Action<BooleanResult> {
 
@@ -57,7 +57,7 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
         List<Long> res = query.list();
         if (res.size() != 1) {
             throw new ActionException(
-                SS.tr("Expected a single query result, but got \"{0}\".",
+                S.tr("Expected a single query result, but got \"{0}\".",
                     res.size()));
         }
         return new BooleanResult(res.get(0) == 0);

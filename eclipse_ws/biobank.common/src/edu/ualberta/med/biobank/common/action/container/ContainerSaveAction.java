@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
-import edu.ualberta.med.biobank.i18n.SS;
+import edu.ualberta.med.biobank.i18n.S;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
@@ -98,7 +98,7 @@ public class ContainerSaveAction implements Action<IdResult> {
         if (parentId != null) {
             if (label != null) {
                 throw new ActionException(
-                    SS.tr("Cannot set label on child containers."));
+                    S.tr("Cannot set label on child containers."));
             }
             Container parent = context.load(Container.class, parentId);
             String parentPath = parent.getPath();
