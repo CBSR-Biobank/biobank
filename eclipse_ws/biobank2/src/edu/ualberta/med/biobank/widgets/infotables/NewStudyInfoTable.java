@@ -2,13 +2,11 @@ package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.List;
 
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 
 public class NewStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
     private static final String[] HEADINGS = new String[] {
@@ -48,52 +46,6 @@ public class NewStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
                     return ""; //$NON-NLS-1$
                 }
             }
-        };
-    }
-
-    @Override
-    protected BgcTableSorter getTableSorter() {
-        return new BgcTableSorter() {
-
-            @Override
-            public int compare(Viewer viewer, Object e1, Object e2) {
-                int rc = 0;
-                StudyCountInfo row1 = (StudyCountInfo) e1;
-                StudyCountInfo row2 = (StudyCountInfo) e2;
-
-                switch (propertyIndex) {
-                case 0:
-                    rc = row1.getStudy().getName()
-                        .compareTo(row2.getStudy().getName());
-                    break;
-                case 1:
-                    rc = row1.getStudy().getNameShort()
-                        .compareTo(row2.getStudy().getNameShort());
-                    break;
-                case 2:
-                    rc = row1
-                        .getStudy()
-                        .getActivityStatus()
-                        .getName()
-                        .compareTo(
-                            row2.getStudy().getActivityStatus().getName());
-                    break;
-                case 3:
-                    rc = row1.getPatientCount().compareTo(
-                        row2.getPatientCount());
-                    break;
-                case 4:
-                    rc = row1.getCollectionEventCount().compareTo(
-                        row2.getCollectionEventCount());
-                    break;
-                }
-                // If descending order, flip the direction
-                if (direction == DESCENDING) {
-                    rc = -rc;
-                }
-                return rc;
-            }
-
         };
     }
 
