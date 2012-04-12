@@ -95,14 +95,15 @@ public class ContainerSaveAction implements Action<IdResult> {
                 throw new ActionCheckException(
                     "cannot set label on child containers");
             }
+            ContainerActionHelper.setPosition(context, container, position,
+                parentId);
             Container parent = context.load(Container.class, parentId);
-            ContainerActionHelper.updateContainerPathAndLabel(container, parent);
+            ContainerActionHelper.updateContainerPathAndLabel(container,
+                parent);
         } else {
             container.setLabel(label);
+            container.setTopContainer(container);
         }
-
-        ContainerActionHelper.setPosition(context, container, position,
-            parentId);
 
         Comment comment = CommentUtil.create(context.getUser(), commentText);
         if (comment != null) {

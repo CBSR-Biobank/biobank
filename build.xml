@@ -181,7 +181,7 @@ End:
         <include name="sdk-security.jar" />
         <include name="sdk-writable-client-framework.jar" />
         <include name="slf4j-api-1.6.1.jar" />
-        <include name="slf4j-nop-1.6.4.jar" />
+        <include name="slf4j-log4j12-1.6.4.jar" />
         <include name="spring.jar" />
         <include name="validation-api-1.0.0.GA.jar" />
         <include name="wsdl4j-1.5.1.jar" />
@@ -384,8 +384,14 @@ End:
     </javac>
   </target>
 
-  <target name="package-webapp"
-          depends="build-common-project">
+  <target name="log4j-config">
+    <!-- create the file only if not present -->
+    <copy file="webapp/WEB-INF/classes/log4j.xml.default"
+          tofile="webapp/WEB-INF/classes/log4j.xml"
+          overwrite="false"/>
+  </target>
+
+  <target name="package-webapp" depends="build-common-project,log4j-config">
     <mkdir dir="${output.dir}" />
     <war destfile="${war.file}"
          webxml="webapp/WEB-INF/web.xml">
@@ -443,7 +449,7 @@ End:
         <include name="sdk-writable-core.jar" />
         <include name="sdk-ws-framework.jar" />
         <include name="slf4j-api-1.6.1.jar" />
-        <include name="slf4j-nop-1.6.4.jar" />
+        <include name="slf4j-log4j12-1.6.4.jar" />
         <include name="spring.jar" />
         <include name="struts2-api-2.0.1.jar" />
         <include name="struts2-core-2.0.1.jar" />
