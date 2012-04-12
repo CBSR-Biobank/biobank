@@ -43,7 +43,6 @@ public class ShipmentAdapter extends AdapterBase {
                 SessionManager.getAppService().isAllowed(
                     new ShipmentDeletePermission(
                         ((OriginInfoWrapper) getModelObject())
-                            .getReceiverSite()
                             .getId(),
                         SessionManager.getUser().getCurrentWorkingCenter()
                             .getId()));
