@@ -27,7 +27,8 @@ import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
 
 public class ProcessingView extends AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.ProcessingView"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.ProcessingView"; //$NON-NLS-1$
 
     private static ProcessingView currentInstance;
 
@@ -49,10 +50,7 @@ public class ProcessingView extends AbstractAdministrationView {
         SessionManager.addView(this);
     }
 
-    @Override
-    public void createPartControl(Composite parent) {
-        super.createPartControl(parent);
-
+    private void createNodes() {
         processingNode = new ProcessingEventGroup((RootNode) rootNode, 2,
             Messages.ProcessingView_pevent_group_label);
         processingNode.setParent(rootNode);
@@ -136,6 +134,15 @@ public class ProcessingView extends AbstractAdministrationView {
     public static void reloadCurrent() {
         if (currentInstance != null)
             currentInstance.reload();
+    }
+
+    @Override
+    public void reload() {
+        if (processingNode == null) createNodes();
+        for (AbstractAdapterBase adaper : processingNode.getChildren()) {
+            adaper.rebuild();
+        }
+        super.reload();
     }
 
     @Override
@@ -236,7 +243,8 @@ public class ProcessingView extends AbstractAdministrationView {
 
     @Override
     public void clear() {
-        processingNode.removeAll();
+        rootNode.removeAll();
+        processingNode = null;
         setSearchFieldsEnablement(false);
     }
 
