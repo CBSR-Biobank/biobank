@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.server.applicationservice.exceptions;
 
-import edu.ualberta.med.biobank.i18n.S;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 
 public class ServerVersionInvalidException extends BiobankServerException {
 
@@ -17,6 +17,6 @@ public class ServerVersionInvalidException extends BiobankServerException {
     @SuppressWarnings("nls")
     @Override
     public String getMessage() {
-        return S.tr("Server version could not be determined.").toString();
+        return LocalizedString.tr("Server version could not be determined.").toString();
     }
 }

@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.permission.request.RequestReadPermission;
-import edu.ualberta.med.biobank.i18n.S;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.Request;
 
 public class RequestGetInfoAction implements Action<RequestReadInfo> {
@@ -62,7 +62,7 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
 
         } else {
             throw new ActionException(
-                S.tr("No request found with id \"{0}\".", id));
+                LocalizedString.tr("No request found with id \"{0}\".", id));
         }
 
         return sInfo;

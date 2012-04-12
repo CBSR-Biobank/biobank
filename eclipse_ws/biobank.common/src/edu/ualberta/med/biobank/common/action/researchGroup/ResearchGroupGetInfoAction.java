@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupReadPermission;
-import edu.ualberta.med.biobank.i18n.S;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 
 /**
@@ -59,7 +59,7 @@ public class ResearchGroupGetInfoAction implements
 
         } else {
             throw new ActionException(
-                S.tr("No research group found with id \"{0}\".", rgId));
+                LocalizedString.tr("No research group found with id \"{0}\".", rgId));
         }
 
         return sInfo;

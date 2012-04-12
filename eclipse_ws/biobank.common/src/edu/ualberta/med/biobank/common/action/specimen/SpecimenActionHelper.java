@@ -5,7 +5,7 @@ import java.util.Collection;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.i18n.S;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -79,7 +79,7 @@ public class SpecimenActionHelper {
         } else if ((rcp == null && containerId != null)
             || (rcp != null && containerId == null)) {
             throw new ActionException(
-                S.tr("Parent container and position should either both be set or both be null"));
+                LocalizedString.tr("Parent container and position should either both be set or both be null"));
         }
     }
 

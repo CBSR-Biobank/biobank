@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
-import edu.ualberta.med.biobank.i18n.S;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.Group;
 
 public class GroupDeleteAction implements Action<EmptyResult> {
@@ -29,7 +29,7 @@ public class GroupDeleteAction implements Action<EmptyResult> {
 
         if (!group.isFullyManageable(context.getUser()))
             throw new ActionException(
-                S.tr("You do not have adequate permissions to delete this group"));
+                LocalizedString.tr("You do not have adequate permissions to delete this group"));
 
         context.getSession().delete(group);
         return new EmptyResult();

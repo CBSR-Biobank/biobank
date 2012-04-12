@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.server.applicationservice.exceptions;
 
-import edu.ualberta.med.biobank.i18n.S;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 
 public class ServerVersionNewerException extends BiobankServerException {
 
@@ -21,7 +21,7 @@ public class ServerVersionNewerException extends BiobankServerException {
     @SuppressWarnings("nls")
     @Override
     public String getMessage() {
-        return S
+        return LocalizedString
             .tr("Client authentication failed. The \"{0}\" Java Client is too old to connect to a \"{1}\" server.",
                 client, server).toString();
     }

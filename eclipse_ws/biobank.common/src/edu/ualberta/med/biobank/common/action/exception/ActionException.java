@@ -1,30 +1,30 @@
 package edu.ualberta.med.biobank.common.action.exception;
 
-import edu.ualberta.med.biobank.i18n.HasLocalizedMessage;
-import edu.ualberta.med.biobank.i18n.S;
+import edu.ualberta.med.biobank.i18n.HasLocalizedString;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 
 /**
  * 
  * @author Jonathan Ferland
  */
 public class ActionException extends RuntimeException
-    implements HasLocalizedMessage {
+    implements HasLocalizedString {
     private static final long serialVersionUID = 1L;
 
-    private final S string;
+    private final LocalizedString localizedString;
 
-    public ActionException(S string) {
-        this(string, null);
+    public ActionException(LocalizedString localizedString) {
+        this(localizedString, null);
     }
 
-    public ActionException(S string, Throwable cause) {
-        super(string.toString(), cause);
+    public ActionException(LocalizedString localizedString, Throwable cause) {
+        super(localizedString.toString(), cause);
 
-        this.string = string;
+        this.localizedString = localizedString;
     }
 
     @Override
-    public String getLocalizedMessage() {
-        return string.toString();
+    public LocalizedString getLocalizedString() {
+        return localizedString;
     }
 }

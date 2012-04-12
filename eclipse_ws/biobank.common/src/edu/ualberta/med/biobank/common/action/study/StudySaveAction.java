@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
-import edu.ualberta.med.biobank.i18n.S;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Comment;
@@ -268,7 +268,7 @@ public class StudySaveAction implements Action<IdResult> {
                 contact.setStudies(contactStudies);
             } else {
                 throw new ActionException(
-                    S.tr(
+                    LocalizedString.tr(
                         "Study \"{0}\" not found in removed contact's studies.",
                         study.getNameShort()));
             }
@@ -345,7 +345,7 @@ public class StudySaveAction implements Action<IdResult> {
         for (StudyEventAttrSaveInfo eAttrSaveInfo : studyEventAttrSaveInfos) {
             if (geAttrIdsUsed.contains(eAttrSaveInfo.globalEventAttrId)) {
                 throw new ActionException(
-                    S.tr(
+                    LocalizedString.tr(
                         "Cannot add multiple study event attributes with the same id (\"{0}\").",
                         eAttrSaveInfo.globalEventAttrId));
             }

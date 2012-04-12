@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
-import edu.ualberta.med.biobank.i18n.S;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.Dispatch;
 
 public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
@@ -56,7 +56,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
 
         } else {
             throw new ActionException(
-                S.tr("No dispatch found with id \"{0}\".", id));
+                LocalizedString.tr("No dispatch found with id \"{0}\".", id));
         }
 
         return sInfo;

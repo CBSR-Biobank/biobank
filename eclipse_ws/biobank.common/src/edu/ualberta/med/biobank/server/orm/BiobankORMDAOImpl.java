@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.reports.QueryProcess;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
-import edu.ualberta.med.biobank.i18n.S;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServiceImpl.AppServiceAction;
 import edu.ualberta.med.biobank.server.applicationservice.ReportData;
@@ -104,7 +104,7 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         @SuppressWarnings("unchecked")
         List<User> res = criteria.list();
         if (res.size() != 1)
-            throw new ActionException(S.tr("Unable to get the current user."));
+            throw new ActionException(LocalizedString.tr("Unable to get the current user."));
         return res.get(0);
     }
 

@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
-import edu.ualberta.med.biobank.i18n.S;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -33,14 +33,14 @@ public class UserDeleteAction implements Action<EmptyResult> {
 
         if (!user.isFullyManageable(context.getUser())) {
             throw new ActionException(
-                S.tr("You do not have adequate permissions to delete this user."));
+                LocalizedString.tr("You do not have adequate permissions to delete this user."));
         }
 
         try {
             BiobankCSMSecurityUtil.deleteUser(user);
         } catch (ApplicationException e) {
             throw new ActionException(
-                S.tr("Unable to delete associated CSM user."));
+                LocalizedString.tr("Unable to delete associated CSM user."));
         }
 
         context.getSession().delete(user);
