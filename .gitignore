@@ -61,3 +61,4 @@ docs/javaClientUserGuide/*.fls
 docs/javaClientUserGuide/*.lof
 docs/javaClientUserGuide/*.tdo
 output/
+webapp/WEB-INF/classes/log4j.xml

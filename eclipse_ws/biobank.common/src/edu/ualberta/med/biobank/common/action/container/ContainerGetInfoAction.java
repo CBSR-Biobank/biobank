@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.common.action.container;
 
 import org.hibernate.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -12,6 +14,9 @@ import edu.ualberta.med.biobank.model.Container;
 
 public class ContainerGetInfoAction implements Action<ContainerInfo> {
     private static final long serialVersionUID = 1L;
+
+    private static Logger log = LoggerFactory
+        .getLogger(ContainerGetInfoAction.class.getName());
 
     // this query is ridiculous!
     @SuppressWarnings("nls")
@@ -56,6 +61,7 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
     private final Integer containerId;
 
     public ContainerGetInfoAction(Integer containerId) {
+        log.debug("containerId={}", containerId);
         if (containerId == null) {
             throw new IllegalArgumentException();
         }
@@ -64,21 +70,27 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
+
         Container c = context.load(Container.class, containerId);
-        return new ContainerReadPermission(c.getSite().getId())
+        boolean result = new ContainerReadPermission(c.getSite().getId())
             .isAllowed(context);
+        log.debug("isAllowed: containerId={} allowed={}", containerId, result);
+        return result;
     }
 
     @Override
     public ContainerInfo run(ActionContext context) throws ActionException {
+        log.debug("run: containerId={}", containerId);
+
         ContainerInfo containerInfo = new ContainerInfo();
         Query query = context.getSession().createQuery(CONTAINER_INFO_HQL);
         query.setParameter(0, containerId);
 
         containerInfo.container = (Container) query.uniqueResult();
         if (containerInfo.container == null) {
-            throw new IllegalArgumentException("container is null");
+            throw new IllegalStateException("container is null");
         }
+
         return containerInfo;
     }
 
