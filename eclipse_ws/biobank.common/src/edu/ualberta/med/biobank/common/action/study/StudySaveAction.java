@@ -5,7 +5,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -31,7 +32,7 @@ import edu.ualberta.med.biobank.model.StudyEventAttr;
 public class StudySaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = Logger.getLogger(StudySaveAction.class
+    private static Logger log = LoggerFactory.getLogger(StudySaveAction.class
         .getName());
 
     public static class SourceSpecimenSaveInfo implements ActionResult {
@@ -285,8 +286,7 @@ public class StudySaveAction implements Action<IdResult> {
             newSsCollection.add(ssSaveInfo.populateSourceSpecimen(study, ss,
                 context.load(SpecimenType.class,
                     ssSaveInfo.specimenTypeId)));
-            LOGGER.debug("added source specimen: " //$NON-NLS-1$
-                + ssSaveInfo.specimenTypeId);
+            log.trace("added source specimen: {}", ssSaveInfo.specimenTypeId);
         }
 
         // delete source specimens no longer in use
@@ -299,8 +299,8 @@ public class StudySaveAction implements Action<IdResult> {
         // delete source specimens no longer in use
         for (SourceSpecimen srcSpc : srcSpcsDiff.getRemoveSet()) {
             context.getSession().delete(srcSpc);
-            LOGGER.debug("deleted source specimen: " //$NON-NLS-1$
-                + srcSpc.getSpecimenType().getName());
+            log.trace("deleted source specimen: {}", srcSpc.getSpecimenType()
+                .getName());
         }
     }
 
@@ -317,8 +317,7 @@ public class StudySaveAction implements Action<IdResult> {
             newAsCollection.add(asSaveInfo.populateAliquotedSpecimen(study, as,
                 asSaveInfo.activityStatus, context.load(SpecimenType.class,
                     asSaveInfo.specimenTypeId)));
-            LOGGER.debug("added aliquoted specimen: " //$NON-NLS-1$
-                + asSaveInfo.specimenTypeId);
+            log.trace("added aliquoted specimen: {}", asSaveInfo.specimenTypeId);
         }
 
         SetDifference<AliquotedSpecimen> aqSpcsDiff =
@@ -330,8 +329,8 @@ public class StudySaveAction implements Action<IdResult> {
         // delete aliquoted specimens no longer in use
         for (AliquotedSpecimen aqSpc : aqSpcsDiff.getRemoveSet()) {
             context.getSession().delete(aqSpc);
-            LOGGER.debug("deleted aliquoted specimen: " //$NON-NLS-1$
-                + aqSpc.getSpecimenType().getName());
+            log.trace("deleted aliquoted specimen: {}", aqSpc.getSpecimenType()
+                .getName());
         }
     }
 

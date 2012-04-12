@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.container;
 
-import org.apache.log4j.Logger;
-
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -9,9 +7,6 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 
 public class ContainerActionHelper {
-
-    private static Logger LOG = Logger.getLogger(ContainerActionHelper.class
-        .getName());
 
     public static final String PATH_DELIMITER = "/"; //$NON-NLS-1$
 
