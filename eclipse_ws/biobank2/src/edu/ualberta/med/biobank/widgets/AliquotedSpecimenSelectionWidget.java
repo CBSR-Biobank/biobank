@@ -54,13 +54,16 @@ public class AliquotedSpecimenSelectionWidget {
     private Label textNumber;
     private Integer number;
 
-    private IObservableValue bothSelected = new WritableValue(Boolean.FALSE,
+    private final IObservableValue bothSelected = new WritableValue(
+        Boolean.FALSE,
         Boolean.class);
 
-    private IObservableValue sourceSelected = new WritableValue(Boolean.FALSE,
+    private final IObservableValue sourceSelected = new WritableValue(
+        Boolean.FALSE,
         Boolean.class);
 
-    private IObservableValue resultSelected = new WritableValue(Boolean.FALSE,
+    private final IObservableValue resultSelected = new WritableValue(
+        Boolean.FALSE,
         Boolean.class);
 
     private Binding oneRowBinding;
@@ -85,11 +88,8 @@ public class AliquotedSpecimenSelectionWidget {
                 SWT.LEFT);
         }
         if (!oneRow) {
-            sourceLabel =
-                widgetCreator
-                    .createLabel(
-                        parent,
-                        Messages.AliquotedSpecimenSelectionWidget_sources_spec_title);
+            sourceLabel = widgetCreator.createLabel(parent,
+                Messages.AliquotedSpecimenSelectionWidget_sources_spec_title);
             sourceControlDecoration =
                 BgcBaseWidget
                     .createDecorator(

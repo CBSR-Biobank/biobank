@@ -54,6 +54,7 @@ import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCellPos;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 // FIXME the custom selection is not done in this version. 
 public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
@@ -71,7 +72,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     private static Mode mode = Mode.MULTIPLE;
 
     // TODO do not need a composite class anymore if only one link form is left
-    private LinkFormPatientManagement linkFormPatientManagement;
+    private final LinkFormPatientManagement linkFormPatientManagement;
 
     // single linking
     // source specimen / type relation when only one specimen
@@ -90,9 +91,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     private Composite typesSelectionPerRowComposite;
     // row:total (for one row number, associate the number of specimen found on
     // this row)
-    private Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
+    private final Map<Integer, Integer> typesRows =
+        new HashMap<Integer, Integer>();
     // List of specimen types that a pallet can have.
-    private List<SpecimenTypeWrapper> palletSpecimenTypes;
+    // private List<SpecimenTypeWrapper> palletSpecimenTypes;
+
     // source/type hierarchy selected (use rows order)
     private List<SpecimenHierarchyInfo> preSelections;
 
@@ -106,17 +109,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         super.init();
         setPartName("Linking specimens");
         setCanLaunchScan(true);
-
-        // If the current center is a site, and if this site defines containers
-        // of 8*12 size, then get the specimen types these containers can
-        // contain
-        if (SessionManager.getUser().getCurrentWorkingSite() != null) {
-            List<SpecimenTypeWrapper> res = SpecimenTypeWrapper
-                .getSpecimenTypeForPallet96(SessionManager.getAppService(),
-                    SessionManager.getUser().getCurrentWorkingSite());
-            if (res.size() != 0)
-                palletSpecimenTypes = res;
-        }
     }
 
     @Override
@@ -433,12 +425,39 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      * 
      * @param typesRowss used only in multiple to indicate the count of each row
      *            after scan has been done.
+     * @throws ApplicationException
      */
     private void setTypeCombos() {
         List<SpecimenTypeWrapper> studiesAliquotedTypes = null;
         List<SpecimenTypeWrapper> authorizedTypesInContainers = null;
-        if (!isSingleMode())
-            authorizedTypesInContainers = palletSpecimenTypes;
+        if (isSingleMode()) {
+            if (singleSpecimen.getParentContainer() != null) {
+                authorizedTypesInContainers =
+                    singleSpecimen.getParentContainer().getContainerType()
+                        .getSpecimenTypeCollection();
+            }
+        } else {
+            /*
+             * If the current center is a site, and if this site defines
+             * containers of 8*12 size, then get the specimen types these
+             * containers can contain
+             */
+            if (SessionManager.getUser().getCurrentWorkingSite() != null) {
+                List<SpecimenTypeWrapper> res = null;
+                try {
+                    res = SpecimenTypeWrapper.getSpecimenTypeForPallet96(
+                        SessionManager.getAppService(), SessionManager
+                            .getUser()
+                            .getCurrentWorkingSite());
+                } catch (ApplicationException e) {
+                    BgcPlugin.openAsyncError("Error",
+                        "Failed to retrieve specimen types.");
+                }
+                if (res.size() != 0)
+                    authorizedTypesInContainers = res;
+            }
+        }
+
         studiesAliquotedTypes = linkFormPatientManagement
             .getStudyAliquotedTypes(authorizedTypesInContainers);
         List<SpecimenWrapper> availableSourceSpecimens =

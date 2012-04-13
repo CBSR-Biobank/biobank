@@ -78,7 +78,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ContainerViewForm extends BiobankViewForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ContainerViewForm"; 
+        "edu.ualberta.med.biobank.forms.ContainerViewForm";
 
     private static BgcLogger logger = BgcLogger
         .getLogger(ContainerViewForm.class.getName());
@@ -124,7 +124,7 @@ public class ContainerViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof ContainerAdapter,
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         containerAdapter = (ContainerAdapter) adapter;
@@ -135,8 +135,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 .getContainerType().getNameShort()));
         initCells();
         canCreate =
-            SessionManager.getAppService().isAllowed(
-                new
+            SessionManager.getAppService().isAllowed(new
                 ContainerCreatePermission(((ContainerWrapper) containerAdapter
                     .getModelObject()).getSite().getId()));
         canDelete = SessionManager.getAppService().isAllowed(new
@@ -232,8 +231,8 @@ public class ContainerViewForm extends BiobankViewForm {
             Integer colCap =
                 containerInfo.container.getContainerType().getCapacity()
                     .getColCapacity();
-            Assert.isNotNull(rowCap, "row capacity is null"); 
-            Assert.isNotNull(colCap, "column capacity is null"); 
+            Assert.isNotNull(rowCap, "row capacity is null");
+            Assert.isNotNull(colCap, "column capacity is null");
             if (rowCap == 0) rowCap = 1;
             if (colCap == 0) colCap = 1;
 
@@ -297,8 +296,9 @@ public class ContainerViewForm extends BiobankViewForm {
         s.setClient(containerSection);
         if (!childrenOk) {
             Label label =
-                toolkit.createLabel(client,
-                    "Error in container children : can't display those initialized");
+                toolkit
+                    .createLabel(client,
+                        "Error in container children : can't display those initialized");
             label.setForeground(Display.getCurrent().getSystemColor(
                 SWT.COLOR_RED));
         }
